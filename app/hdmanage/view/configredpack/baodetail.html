@@ -1,0 +1,181 @@
+<div class="alert" role="alert">
+		红包总余额:<span class="text-danger mremain m-l-5 m-r-5">xxx</span>元，
+		红包总余量:<span class="text-danger nremain m-l-5 m-r-5">xxx</span>个
+</div>
+<div class="zam-inline-searchbar searchplan">
+	<div class="input-group zam-flex col-md-7">
+		<select class="form-control">
+			 <option value="0">全部</option>
+			 <option value="1">已内定</option>
+		</select>
+		<input type="text" class="form-control" id="keyword" placeholder="请输入精确的红包金额">
+		<span class="input-group-btn">
+			<button onclick="plansearch(this)" class="btn btn-primary btn-search"><i class="mdi mdi-magnify"></i> 搜索</button>
+		</span>
+	</div>
+</div>
+<table class="table" style="margin-bottom:0px;">
+<thead>
+  <tr>
+	<th style="width:50%;text-align:center;">金额</th>
+	<th style="width:50%;text-align:center;">内定操作(每人每轮均可内定一次)</th>
+  </tr>
+</thead>
+<tbody class="redpackbao-lists"></tbody>
+</table>
+<div class="redpackbao-pager" style="padding:10px;text-align: center;"></div>
+<script id="detailredpack-tpl" type="text/template">
+	<tr>
+		<td class="text-center">
+			<div class="input-group">
+				<input type="text" class="form-control"  value="<% d.sendmoney %>" disabled readonly/>
+				<div class="input-group-addon">元</div>
+			</div>
+		</td>
+		<td class="text-center">
+		  <%# if(d.user_id=='0'){ %>
+		  	   <a href="javascript:;" onclick="ndsomeone(this)" data-planid="<% d.id %>"  class="btn btn-primary btn-sm">内定</a>
+		  <%# }else{ %>
+			  <%# if(d.userinfo==''){ %>
+			  	<a href="javascript:;" onclick="ndsomeone(this)" data-planid="<% d.id %>"  class="btn btn-primary btn-sm">重新内定</a>
+			  	<div class="text-danger">内定的用户不存在或者被删除了</div>
+			  <%# }else{ %>
+			   <div class="nduserinfo" data-planid="<% d.id %>">
+					<img style="width:50px;height:50px;border-radius:50%;" src="<% d.userinfo.avatar %>" onclick="delnd(this)" />
+					<p><% d.userinfo.nickname %></p>
+			   </div>
+			  <%# } %>
+		  <%# } %>
+		</td>
+	</tr>
+</script>
+<script id="seluser-tpl" type="text/template">
+<div class="nduserinfo" data-planid="<% d.id %>">
+	<img style="width:50px;height:50px;border-radius:50%;" src="<% d.avatar %>" onclick="delnd(this)" />
+	<p><% d.nickname %></p>
+</div>
+</script>
+<script id="ndbtn-tpl" type="text/template">
+<a href="javascript:;" onclick="ndsomeone(this)" data-planid="<% d.id %>"  class="btn btn-primary btn-sm">内定</a>
+</script>
+<script>
+function ajaxbaolist(page,obj){ 
+	require(["zamnotice","layerBox","jconfirmBox","webcore"],function(zamnotice,layerBox,jconfirmBox,webcore){
+		webcore.ajaxSubmit("{:gohdmanage('configredpack/baodetail',['hdid'=>$hdid])}",{ajaxtype:'2',rotateid:"{$rotateid}",page:page,money:$(".searchplan input").val(),hadnd:$(".searchplan select").find("option:selected").val()},'正在加载..').then(function(json){
+			if(json.code==0){
+				var html = '';
+				var detaildata = json.msg.item;
+				$.each(detaildata,function(i,v){
+					html += webcore.tpl($("#detailredpack-tpl"),v);
+				});
+				$(".redpackbao-lists").html(html);
+				$(".redpackbao-pager").html(json.msg.pager);
+				$(".mremain").text(parseFloat(json.msg.totalmoney/100).toFixed(2));
+				$(".nremain").text(json.msg.totalnum);
+			}else{
+				zamnotice.showTips('error','网络差。操作失败');
+			}
+		}, function(json){
+			zamnotice.showTips('error','网络差。操作失败');
+		});
+	});
+}
+function initbaolist(){
+	require(["zamnotice","layerBox","jconfirmBox","webcore"],function(zamnotice,layerBox,jconfirmBox,webcore){
+		webcore.ajaxSubmit("{:gohdmanage('configredpack/baodetail',['hdid'=>$hdid])}",{ajaxtype:'2',rotateid:"{$rotateid}",money:$(".searchplan input").val(),hadnd:$(".searchplan select").find("option:selected").val()},'正在加载..').then(function(json){
+			var html = '';
+			if(json.code==0){
+				var detaildata = json.msg.item;
+				$.each(detaildata,function(i,v){
+					html += webcore.tpl($("#detailredpack-tpl"),v);
+				});
+				$(".redpackbao-lists").html(html);
+				$(".redpackbao-pager").html(json.msg.pager);
+				$(".mremain").text(parseFloat(json.msg.totalmoney/100).toFixed(2));
+				$(".nremain").text(json.msg.totalnum);
+			}else{
+				zamnotice.showTips('error','网络差。操作失败');
+			}
+		}, function(json){
+			zamnotice.showTips('error','网络差。操作失败');
+		});
+	});
+}
+function plansearch(obj){ 
+	require(["zamnotice","layerBox","jconfirmBox","webcore"],function(zamnotice,layerBox,jconfirmBox,webcore){
+		webcore.ajaxSubmit("{:gohdmanage('configredpack/baodetail',['hdid'=>$hdid])}",{ajaxtype:'2',rotateid:"{$rotateid}",money:$(obj).parent().prev().val(),hadnd:$(".searchplan select").find("option:selected").val()},'正在加载..').then(function(json){
+			var html = '';
+			if(json.code==0){
+				var detaildata = json.msg.item;
+				$.each(detaildata,function(i,v){
+					html += webcore.tpl($("#detailredpack-tpl"),v);
+				});
+				$(".redpackbao-lists").html(html);
+				$(".redpackbao-pager").html(json.msg.pager);
+				$(".mremain").text(parseFloat(json.msg.totalmoney/100).toFixed(2));
+				$(".nremain").text(json.msg.totalnum);
+			}else{
+				zamnotice.showTips('error','网络差。操作失败');
+			}
+		}, function(json){
+			zamnotice.showTips('error','网络差。操作失败');
+		});
+	});
+}
+function ndsomeone(obj){
+var planid = $(obj).attr("data-planid");
+require(["zamnotice","layerBox","jconfirmBox","webcore"],function(zamnotice,layerBox,jconfirmBox,webcore){
+	var confirmObj = jconfirmBox.ajaxconfirm("内定用户","{:gohdmanage('common/searchuser',['hdid'=>$hdid])}",{ishtml:'1'},'html','col-lg-8 col-lg-offset-2',function(e){
+			var selectuser = e.find("input:checked");
+			if(selectuser){
+				if(selectuser.length>1){
+					return zamnotice.showTips('error','只能选择一个用户.');
+				}else{
+					var html = '',user_id = '';
+					selectuser.each(function(){
+						var $this = $(this),$thisp = $this.parent().parent();
+						html += webcore.tpl($("#seluser-tpl"),{id:planid,avatar:$thisp.next().attr('src'),nickname:$thisp.next().next().text()});
+						user_id = $this.attr('data-id');
+					});
+					if(html==''){
+						zamnotice.showTips('error','请选择用户');
+					}else{
+						webcore.ajaxSubmit("{:gohdmanage('configredpack/gond',['hdid'=>$hdid])}",{rotateid:"{$rotateid}",user_id:user_id,planid:planid},'正在内定用户..').then(function(json){
+							 if(json.code==0){
+								$(obj).parent().html(html);
+								confirmObj.close();
+							 }else{
+								zamnotice.showTips('error',json.msg);
+							 }
+						}, function(json){
+							zamnotice.showTips('error','网络差。操作失败');
+						});
+						
+					}
+				}
+			}else{
+				zamnotice.showTips('error','请选择一个用户');
+			}
+	});
+});
+}
+function delnd(obj){
+	var planid = $(obj.parentNode).attr("data-planid");
+	require(["zamnotice","layerBox","jconfirmBox","webcore"],function(zamnotice,layerBox,jconfirmBox,webcore){
+		jconfirmBox.confirm('温馨提示','您确定要删除么？',function(){
+			webcore.ajaxSubmit("{:gohdmanage('configredpack/delnd',['hdid'=>$hdid])}",{rotateid:"{$rotateid}",planid:planid}).then(function(json){
+				if(json.code==0){
+					var html = '<a href="javascript:;" onclick="ndsomeone(this)" data-planid="'+planid+'"  class="btn btn-primary btn-sm">内定</a>';
+					$(obj).parent().parent().html(html);
+					zamnotice.showTips('success','删除成功');
+				}else{
+					zamnotice.showTips('error',json.msg);
+				}
+			}, function(json){
+				zamnotice.showTips('error','网络差。操作失败');
+			});
+		});
+	});
+}
+initbaolist();
+</script>

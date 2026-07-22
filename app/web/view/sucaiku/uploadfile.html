@@ -1,0 +1,143 @@
+<style>
+.uploadattachments-card{
+    margin:0;
+    box-shadow:unset;
+}
+.uploadattachments-card .card-header{
+    display: flex;
+    justify-content: center;
+}
+</style>
+<div class="row" style="margin:0;">
+<div class="card uploadattachments-card">
+    <div class="alert alert text-center m-b-0">
+        上传文件时请务必先在左侧激活指定的分类，否则上传的所有文件将无分类
+    </div>
+    <div class="card-header">
+    	  <a class="uploadattachment-upload btn btn-primary" href="javascript:"><i class="mdi mdi-plus"></i> 上传(可一次性上传多个)</a>
+    </div>
+</div>
+<script>
+var amtype = "{$type}";
+require(['webcore','webtable','zamnotice','webupload'],function(webcore,webtable,zamnotice,WebUploader){
+    var uptotype = XCV3Config.amconfig.type||'0',isstsup = true;
+    if(uptotype == '0'){
+        isstsup = false;
+    }
+    var filecount = 0,upsuccess = 0,upfail = 0,layerclose = false,activecate = $(".zam-cates-grouplist li.active"),upparams = {
+        auto: true,
+        server:"{:gocommon('attachment/upload')}",
+        duplicate: true,
+        swf: '__STATIC__/js/webupload/Uploader.swf',
+        formData: {
+            amtype: "{$type}",
+            issucai:"1",
+            fcateid:activecate.parent().hasClass('nav-subnav')?activecate.parent().prev().data('cateid'):'0',
+            cateid:activecate.data('cateid')||'0',
+        },
+        compress:false,
+        threads:1,
+        prepareNextFile:true,
+        pick: {
+            id: '.uploadattachment-upload',
+            multiple: true
+        },
+        accept: {
+            title: "{$typename}s",
+            extensions: "{$fileconfig['ext']}",
+            mimeTypes: "{$typename}/*",
+        },
+    };
+    if(!isstsup){
+        upparams.fileSingleSizeLimit = {$fileconfig['size']};
+    }
+    var uploader = WebUploader.create(upparams),layerindex = false;
+    if(isstsup){
+        uploader.on('beforeFileQueued',function (file) {
+            filecount++;
+            if(!layerindex){
+                layerindex = webcore.showLoading('<span>正在拼命上传，请稍后...</span>');
+            }
+            webcore.uploadStsFile({issucaiku:'1',file:file,filetype:amtype,amtype:uptotype,fcateid:upparams.formData.fcateid,cateid:upparams.formData.cateid},function(json){
+                if(json.code==0){
+                    upsuccess++;
+                }else{
+                    upfail++;
+                    zamnotice.showNotice('提示',json.msg,2e3,false,'error','error');
+                }
+                if(upsuccess > 0 && filecount > 0 && upsuccess + upfail >= filecount){
+                    $(".layui-layer-msg .layui-layer-content span").text('已成功'+upsuccess+'个文件，已失败'+upfail+'个文件');
+                    setTimeout(function(){
+                        webcore.closeLayer();
+                        zamnotice.showTips('success','上传文件结果，成功了'+upsuccess+'个文件，失败了'+upfail+'个文件');
+                        webtable.refresh();
+                        upfail = 0;
+                        upsuccess = 0;
+                        filecount = 0;
+                        layerindex = false;
+                    },1e3);
+                }else{
+                    $(".layui-layer-msg .layui-layer-content span").text('已成功'+upsuccess+'个文件，已失败'+upfail+'个文件');
+                }
+            },function(per){
+                $('.upprogress'+file.id).find('.progress-bar').css({"width":per +'%'});
+            });
+            return false;
+        });
+        uploader.on('uploadFinished', function() {
+            if(upfail > 0 && filecount > 0 && upfail == filecount){
+                setTimeout(function(){
+                    webcore.closeLayer();
+                    zamnotice.showTips('success','上传文件结果，成功了'+upsuccess+'个文件，失败了'+upfail+'个文件');
+                    //webtable.refresh();
+                    upfail = 0;
+                    upsuccess = 0;
+                    filecount = 0;
+                    layerindex = false;
+                },1e3);
+            }
+        });
+    }else{
+        uploader.on('uploadStart', function(file) {
+            webcore.showLoading(file.name+'上传中...');
+        });
+        uploader.on('uploadSuccess', function(file, json) {
+            if(json.code==0){
+                upsuccess++;
+                zamnotice.showTips('success','上传成功');
+            }else{
+                upfail++;
+                zamnotice.showTips('error',json.msg);
+            }
+        });
+        uploader.on('uploadError', function(file) {
+            upfail++;
+            zamnotice.showTips('error','上传出错，上传失败');
+        });
+        uploader.on('uploadComplete',function(file){
+            webcore.showLoading(file.name+'上传完毕...');
+        });
+        uploader.on('uploadFinished', function(file, percentage) {
+            webcore.closeLayer();
+            zamnotice.showTips('success','上传文件结果，成功了'+upsuccess+'个文件，失败了'+upfail+'个文件');
+            webtable.refresh();
+            upfail = 0;
+            upsuccess = 0;
+            filecount = 0;
+        });
+        uploader.on('error', function(type) {
+            upfail++;
+            switch (type) {
+                case 'Q_TYPE_DENIED':
+                    zamnotice.showTips('error','部分文件类型不正确，已从上传队列移除');
+                    break;
+                case 'F_EXCEED_SIZE':
+                    zamnotice.showTips('error','部分文件大小不符，已从上传队列移除');
+                    break;
+                default:
+                    zamnotice.showTips('error','error','部分文件上传失败');
+            }
+        });
+    }
+});
+</script>

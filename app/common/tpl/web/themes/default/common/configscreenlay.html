@@ -1,0 +1,186 @@
+<div class="form-group{if !dzshouyelay()} hidden{/if}">
+    <label class="col-lg-2 control-label"> 自定义显示图片或文字</label>
+    <div class="col-lg-10 yautooverflow">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th style="width:7%">类型</th>
+                    <th style="width:24%">属性</th>
+                    <th style="width:30%">内容</th>
+                    <th style="width:12%">文字颜色</th>
+                    <th style="width:17%">距离前一个元素距离</th>
+                    <th style="width:10%">操作</th>
+                </tr>
+            </thead>
+            <tbody class="layitems-list">
+            {if isset($config['layitems']) && !empty($config['layitems'])}
+            {foreach $config['layitems'] as $item}    
+            <tr>
+                <td class="text-center">
+                    <input type="hidden" name="layitems[type][]" value="{$item['type']}">
+                    {if $item['type'] == '1'}<label class="label label-success">文字</label>{else /}<label class="label label-primary">图片</label>{/if}
+                </td>
+                <td class="text-center">
+                    <div class="touchspin">
+                        <input type="text" class="form-control numberincdec" name="layitems[size][]" 
+                        data-bts-min="0" data-bts-replacement-val="0"
+                        data-bts-max="null"
+                        data-bts-step="1"
+                        data-bts-prefix="{if $item['type'] == '1'}大小{else /}高度{/if}:"
+                        data-bts-postfix="px"
+                        data-bts-postfix-extra-class="touchspin-postfix"
+                        value="{$item['size']}">
+                    </div>
+                    {if $item['type'] == '1'}
+                    <div class="touchspin m-t-5">
+                        <input type="text" class="form-control numberincdec" name="layitems[letterspace][]" 
+                        data-bts-min="1" data-bts-replacement-val="1"
+                        data-bts-max="null"
+                        data-bts-step="1"
+                        data-bts-prefix="间距:"
+                        data-bts-postfix="px"
+                        data-bts-postfix-extra-class="touchspin-postfix"
+                        value="{$item['letterspace']??1}">
+                    </div>
+                    {else /}
+                    <input type="hidden" name="layitems[letterspace][]" value="0">
+                    {/if}
+                </td>
+                <td class="text-center">
+                    {if $item['type'] == '1'}
+                    <input type="text" class="form-control" name="layitems[txt][]" value="{$item['txt']??''}" placeholder="请输入文字内容">
+                    <input type="hidden" name="layitems[img][]" value="0">
+                    {else /}
+                    <input type="hidden" name="layitems[txt][]" value="0">
+                    {:tpl_image_one('layitems[img][]', $item['img'])}
+                    {/if}
+                </td>
+                <td class="text-center">
+                    <div class="zam-flex zam-justifyContent">
+                    {if $item['type'] == '1'}
+                    {:tpl_color('layitems[color][]',$item['color'])}
+                    {else /}
+                    <input type="hidden" name="layitems[color][]" value="0">
+                    -
+                    {/if}
+                    </div>
+                </td>
+                <td class="text-center">
+                    <div class="touchspin">
+                        <input type="text" class="form-control numberincdec" name="layitems[margin][]" 
+                        data-bts-min="0" data-bts-replacement-val="0"
+                        data-bts-max="null"
+                        data-bts-step="1"
+                        data-bts-postfix="px"
+                        data-bts-postfix-extra-class="touchspin-postfix"
+                        value="{$item['margin']}">
+                    </div>
+                </td>
+                <td class="text-center">
+                    <a class="btn btn-xs btn-primary btn-xs zam-sortable btn-moveitem" href="javascript:void(0)"> <i class="mdi mdi-arrow-all"></i> </a>
+                    <a class="btn btn-xs btn-danger btn-delitem" href="javascript:void(0)"> <i class="mdi mdi-close"></i> </a>
+                </td>
+            </tr>
+            {/foreach}
+            {/if}
+            </tbody>
+            <tfoot>
+            <tr class="laytypebox">
+                <td colspan="5">
+                    <a data-type="1" class="btn btn-primary btn-xs" href="javascript:;"> <i class="mdi mdi-plus"></i>新增文字</a>
+                    <a data-type="2" class="btn btn-primary btn-xs" href="javascript:;"> <i class="mdi mdi-plus"></i>新增图片</a>
+                </td>
+            </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+<script>
+    require(['webcore','jconfirmBox','zamnotice',"jquery.ui","bootstrap-touchspin"],function(webcore,jconfirmBox,zamnotice){
+        $('.layitems-list').sortable({handle: ".btn-moveitem"}).disableSelection();
+        $('.layitems-list').on("click",".btn-delitem",function(){
+            var trnode = $(this).parent().parent();
+            jconfirmBox.confirm('温馨提示','删除将无法回复，您确定要删除么？',function(){
+                trnode.remove();
+            });
+        });
+        $(".laytypebox .btn").click(function(){
+            var $this = $(this),type = $this.attr('data-type'),size = (type == '1' ? 20 : 400);
+            var margin = 30;
+            if(!$(".layitems-list tr").length){
+                margin = 200;
+            }
+            $(".layitems-list").append(webcore.tpl($("#layitems-tpl"),{type:type,size:size,margin:margin}));
+            $(".layitems-list .numberincdec").TouchSpin();
+            tpl_colorpicker();
+        });
+    });
+</script>
+<script id='layitems-tpl' type="text/template">
+    <tr>
+        <td class="text-center">
+            <input type="hidden" name="layitems[type][]" value="<% d.type %>">
+            <%# if(d.type == '1'){ %><label class="label label-success">文字</label><%# }else{ %><label class="label label-primary">图片</label><%# } %>
+        </td>
+        <td class="text-center">
+            <div class="touchspin">
+                <input type="text" class="form-control numberincdec" name="layitems[size][]" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="null"
+                data-bts-step="1"
+                data-bts-prefix="<%# if(d.type == '1'){ %>大小<%# }else{ %>高度<%# } %>:"
+                data-bts-postfix="px"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="<% d.size %>">
+            </div>
+            <%# if(d.type == '1'){ %>
+            <div class="touchspin m-t-5">
+                <input type="text" class="form-control numberincdec" name="layitems[letterspace][]" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="null"
+                data-bts-step="1"
+                data-bts-prefix="间距:"
+                data-bts-postfix="px"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="1">
+            </div>
+            <%# }else{ %>
+                <input type="hidden" name="layitems[letterspace][]" value="0">
+            <%# } %>
+        </td>
+        <td class="text-center">
+            <%# if(d.type == '1'){ %>
+                <input type="text" class="form-control" name="layitems[txt][]" value="" placeholder="请输入文字内容">
+                <input type="hidden" name="layitems[img][]" value="0">
+            <%# }else{ %>
+            <input type="hidden" name="layitems[txt][]" value="0">
+            {:tpl_image_one('layitems[img][]', '')}
+            <%# } %>
+        </td>
+        <td class="text-center">
+            <div class="zam-flex zam-justifyContent">
+            <%# if(d.type == '1'){ %>
+            {:tpl_color('layitems[color][]','#fff')}
+            <%# }else{ %>
+            <input type="hidden" name="layitems[color][]" value="0">
+            -
+            <%# } %>
+            </div>
+        </td>
+        <td class="text-center">
+            <div class="touchspin">
+                <input type="text" class="form-control numberincdec" name="layitems[margin][]" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="null"
+                data-bts-step="1"
+                data-bts-postfix="px"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="<% d.margin %>">
+            </div>
+        </td>
+        <td class="text-center">
+            <a class="btn btn-xs btn-primary btn-xs zam-sortable btn-moveitem" href="javascript:void(0)"> <i class="mdi mdi-arrow-all"></i> </a>
+            <a class="btn btn-xs btn-danger btn-delitem" href="javascript:void(0)"> <i class="mdi mdi-close"></i> </a>
+        </td>
+    </tr>
+</script>

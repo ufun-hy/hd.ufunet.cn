@@ -1,0 +1,98 @@
+<div class="zam-inline-searchbar searchplan">
+	<div class="input-group zam-flex col-md-7">
+		<input type="text" class="form-control" id="keyword" placeholder="请输入活动主题或者活动备注">
+		<span class="input-group-btn">
+			<button onclick="plansearch(this)" class="btn btn-primary btn-search"><i class="mdi mdi-magnify"></i> 搜索</button>
+		</span>
+	</div>
+</div>
+<table class="table" style="margin-bottom:0px;">
+<thead>
+  <tr>
+  	<th style="width:20%;text-align:center;">活动主题</th>
+	<th style="width:30%;text-align:center;">活动类型</th>
+	<th style="width:30%;text-align:center;">创建时间</th>
+	<th style="width:20%;text-align:center;">操作</th>
+  </tr>
+</thead>
+<tbody class="recyclehd-lists"></tbody>
+</table>
+<div class="pf-pager" style="padding:10px;text-align: center;"></div>
+<script id="reone-tpl" type="text/template">
+	<tr>
+		<td class="text-center">
+			<% d.hdtitle %>
+		</td>
+		<td class="text-center">
+			<span class="label label-<%# if(d.ispub=='1'){ %>primary<%# }else{ %>danger<%# } %>"><%# if(d.ispub=='1'){ %>正式活动<%# }else{ %>测试活动<%# } %></span>
+		</td>
+		<td class="text-center">
+			<% d.create_time %>
+		</td>
+		<td class="text-center">
+			<a class="btn btn-primary btn-xs" data-hdid="<% d.id %>" title="恢复" onclick="huifuone(this)"><i class="mdi mdi-gavel"></i></a>
+		</td>
+	</tr>
+</script>
+<script>
+function initrecyclelist(){
+	require(["zamnotice","webcore"],function(zamnotice,webcore){
+		webcore.ajaxSubmit("{:gomyhd('index/myrecyclehd')}",{ajaxtype:'2',keyword:$(".searchplan input").val()},'正在加载..').then(function(json){
+			var html = '';
+			if(json.code==0){
+				rushhtml(json);
+			}else{
+				zamnotice.showTips('error',json.msg);
+			}
+		}, function(json){
+			zamnotice.showTips('error','网络差。操作失败');
+		});
+	});
+}
+function plansearch(obj){ 
+	require(["zamnotice","webcore"],function(zamnotice,webcore){
+		var keyword = $(obj).parent().prev().val()||'';
+		webcore.ajaxSubmit("{:gomyhd('index/myrecyclehd')}",{ajaxtype:'2',keyword:keyword},'正在加载..').then(function(json){
+			var html = '';
+			if(json.code==0){
+				rushhtml(json);
+			}else{
+				zamnotice.showTips('error',json.msg);
+			}
+		}, function(json){
+			zamnotice.showTips('error','网络差。操作失败');
+		});
+	});
+}
+function rushhtml(json){
+	require(["webcore"],function(webcore){
+		var html = '';
+		var detaildata = json.msg;
+		$.each(detaildata,function(i,v){
+			html += webcore.tpl($("#reone-tpl"),v);
+		});
+		$(".recyclehd-lists").html(html);
+	});
+}
+function huifuone(obj){
+	var hdid = $(obj).attr('data-hdid');
+	require(["webcore","webtable","zamnotice","jconfirmBox"],function(webcore,webtable,zamnotice,jconfirmBox){
+		jconfirmBox.confirm('温馨提示','您确定要从回收站里恢复当前活动么？',function(){
+			webcore.ajaxSubmit("{:gomyhd('index/huifuonehd')}",{hdid:hdid},'正在操作..').then(function(json){
+				if(json.code==0){
+					zamnotice.showTips('success','操作成功');
+					initrecyclelist();
+					var totalnum = parseInt($(".zam-activitylist-navbox-recycle .totalnum").text()) - 1;
+					if(totalnum < 0) totalnum = 0;
+					$(".zam-activitylist-navbox-recycle .totalnum").text(totalnum);
+				}else{
+					zamnotice.showTips('error',json.msg);
+				}
+			}, function(json){
+				zamnotice.showTips('error','网络差。操作失败');
+			});
+		});
+	});
+}
+initrecyclelist();
+</script>

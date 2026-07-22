@@ -1,0 +1,214 @@
+{include file='$Wpath/common/header'}
+<div class="confirmbox-pop">
+<div class="text-center">
+      <div class="btn-group pop-btns" style="margin-bottom:10px;">
+        <a href="javascript:void(0)" class="btn btn-default btn-primary"><span>基础设置</span></a>
+        <a href="javascript:void(0)" class="btn btn-default"><span>大屏欢迎页</span></a>
+        <a href="javascript:void(0)" class="btn btn-default"><span>大屏设置</span></a>
+        <a href="javascript:void(0)" class="btn btn-default"><span>排行榜</span></a>
+        <a href="javascript:void(0)" class="btn btn-default"><span>微信设置</span></a>
+        <a href="javascript:void(0)" class="btn btn-default"><span>自定义css</span></a>
+      </div>
+</div>
+<form id="formBox" class="zam-formvalidation form-horizontal" method="post">
+  <div class="carditem">
+    {include file='$Wpath/common/gamestyle/basic'}
+    {include file='$Wpath/common/gamestyle/bgmusic'}
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 吃箱子音效</label>
+      <div class="col-lg-8">
+        {:tpl_audio('scorevoice', $config['scorevoice'])}
+        <span class="help-block">注意:必须控制在100KB内</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 碰到障碍物音效</label>
+      <div class="col-lg-8">
+        {:tpl_audio('boomvoice', $config['boomvoice'])}
+        <span class="help-block">注意:必须控制在100KB内</span>
+      </div>
+    </div>
+  </div>
+  <div class="carditem hidden">
+    {include file='$Wpath/common/gamestyle/welcome'}
+  </div>
+  <div class="carditem hidden">
+    <div class="form-group">
+      <label class="col-md-2 control-label text-right">* 游戏背景图滚动一次时间</label>
+      <div class="col-md-8">
+        <div class="input-group">
+          <input type="text" class="form-control" name="topbgspeed" value="{$config['topbgspeed']}">
+          <div class="input-group-addon">秒</div>
+        </div>
+        <span class="zam-help-block">注:尽量设置在10-60s内</span>
+      </div>
+      </div>
+    <div class="form-group">
+      <label class="col-md-2 control-label text-right">* 游戏顶部背景图</label>
+      <div class="col-md-8">
+        {:tpl_image_one('topbg', $config['topbg'])}
+        <span class="help-block">规格:1920*400px</span>
+      </div>
+      </div>
+    <div class="form-group">
+      <label class="col-md-2 control-label text-right">* 游戏顶部背景图2</label>
+      <div class="col-md-8">
+        {:tpl_image_one('topbg2', $config['topbg2'])}
+        <span class="help-block">规格:1920*400px 注:此图可不设置，此图将展示在顶部背景图上面，故需要配合顶部背景图设计</span>
+      </div>
+      </div>
+    <div class="form-group">
+      <label class="col-md-2 control-label text-right">* 轨道图滚动一次时间</label>
+      <div class="col-md-8">
+        <div class="input-group">
+          <input type="text" class="form-control" name="trackimgspeed" value="{$config['trackimgspeed']}">
+          <div class="input-group-addon">秒</div>
+        </div>
+        <span class="zam-help-block">注:尽量设置在10-60s内</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-md-2 control-label text-right">* 轨道图</label>
+      <div class="col-md-8">
+        {:tpl_image_one('trackimg', $config['trackimg'])}
+        <span class="help-block">规格:1920*400px</span>
+      </div>
+     </div>
+     <div class="form-group">
+      <label class="col-md-2 control-label text-right">* 轨道图2</label>
+      <div class="col-md-8">
+        {:tpl_image_one('trackimgbg', $config['trackimgbg'])}
+        <span class="help-block">规格:1920*400px 注:此图可不设置，此图将展示在轨道图上面，故需要配合轨道图设计</span>
+      </div>
+     </div>
+      {include file='$Wpath/common/gamestyle/role'}
+  </div>
+  <div class="carditem hidden">
+    {include file='$Wpath/common/gamestyle/phb'}
+  </div>
+  <div class="carditem hidden">
+    <div class="form-group">
+      <label class="col-md-2 control-label text-right">* 微信背景图</label>
+      <div class="col-md-8">
+        {:tpl_image_one('appbgimg', $config['appbgimg'])}
+        <span class="help-block">规格:640*1260px</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 游戏中背景</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('appgamebg', $config['appgamebg'])}
+        <span class="help-block">{$desconfig['appgamebg']}</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 顶部图</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('apptopimg', $config['apptopimg'])}
+        <span class="help-block">{$desconfig['apptopimg']}</span>
+      </div>
+     </div>
+     <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 角色</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('appplayer', $config['appplayer'])}
+        <span class="help-block">{$desconfig['appplayer']}</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 宝箱</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('appbox', $config['appbox'])}
+        <span class="help-block">{$desconfig['appbox']}</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 障碍物</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('appboom', $config['appboom'])}
+        <span class="help-block">{$desconfig['appboom']}</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 游戏中按钮</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('appbutton', $config['appbutton'])}
+        <span class="help-block">{$desconfig['appbutton']}</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 顶部得分背景</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('appscorebg', $config['appscorebg'])}
+        <span class="help-block">规格:269*125px</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 顶部时间背景</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('apptimebg', $config['apptimebg'])}
+        <span class="help-block">规格:267*115px</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 游戏结束背景</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('appoverbg', $config['appoverbg'])}
+        <span class="help-block">规格:596*556px</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 游戏结束排名按钮</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('apppmbtn', $config['apppmbtn'])}
+        <span class="help-block">{$desconfig['apppmbtn']}</span>
+      </div>
+    </div>
+  </div>
+  <div class="carditem hidden">
+    {include file='$Wpath/common/gamestyle/diycss'}
+  </div>
+  {include file='$Wpath/common/cancelsavepanel'}
+</form>
+</div>
+<script type="text/javascript">
+require(['webcore','jconfirmBox','zamnotice','zvalidator'],function(webcore,jconfirmBox,zamnotice){
+  $(".confirmbox-pop .pop-btns a.btn").click(function(){
+      $(this).addClass('btn-primary').siblings().removeClass("btn-primary");
+      $(".confirmbox-pop .carditem").addClass('hidden').eq($(this).index()).removeClass('hidden');
+  });
+  $(".confirmbox-pop .type-btns a.btn").click(function(){
+      $(this).addClass('btn-primary').siblings().removeClass("btn-primary");
+      $(".confirmbox-pop .typeitem").addClass('hidden').eq($(this).index()).removeClass('hidden');
+  });
+  $('#formBox').formValidation({
+      framework: 'bootstrap',
+      excluded: [':disabled'],
+      message: '您填写的内容无效',
+      fields: {}
+  }).on('success.form.fv', function(e) {
+    e.preventDefault();
+    var $form = $(e.target);
+    var postData = webcore.serializeObject($form);
+    var bload = $form.find(".zam-fixedbottom button").lyearloading({opacity: 0.2,spinnerSize: 'nm'});
+    $form.formValidation('disableSubmitButtons', true);
+    webcore.ajaxSubmit("{:goweb('hdconfig/edit'.$gametype.'style')}",postData).then(function(json){
+      bload.hide();
+      if(json.code==0){
+          $form.formValidation('disableSubmitButtons', false);
+          zamnotice.showTips('success','操作成功',1e3,function(){
+            window.location.href = "{:goweb('hdconfig/'.$gametype.'style')}";
+          });
+        }else{
+            zamnotice.showTips('error',json.msg);
+            $form.formValidation('disableSubmitButtons', false);
+        }
+    }, function(json){
+      bload.hide();
+      zamnotice.showTips('error','网络差。操作失败');
+      $form.formValidation('disableSubmitButtons', false);
+    });
+  });
+});
+</script>
+{include file='$Wpath/common/footer'}

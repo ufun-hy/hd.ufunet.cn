@@ -1,0 +1,142 @@
+{include file='$Wpath/common/header'}
+<div class="form-inline zam-inline-searchbar">
+    <div class="form-group">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">微信昵称</span>
+        <input type="text" class="form-control" value="" id="keyword" name="username" placeholder="请输入昵称/姓名/手机">
+      </div>
+    </div>
+    <a class="btn btn-primary btn-sm btn-search" href="javascript:void(0)"><i class="mdi mdi-magnify"></i> 搜索</a>
+    <a class="btn btn-warning btn-sm btn-export hidden" href="javascript:void(0)"><i class="mdi mdi-export"></i> 导出</a>
+</div>
+{include file='$Wpath/common/tabletoolbar'}
+<table id="listtable" class="zam-btable"></table>
+<script>
+require(['webcore','webtable','jconfirmBox','zamnotice'],function(webcore,webtable,jconfirmBox,zamnotice){
+var initConfig = {
+    tableId:'#listtable',
+    url:"{:gohdmanage('configjika/record',['hdid'=>$hdid])}",
+    columnoperate:{
+        btns:{
+            del:true,
+        },
+        func:{
+            del:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','删除无法恢复，您确定要删除么？',function(){
+                        webcore.ajaxSubmit("{:gohdmanage('configjika/delrecord',['hdid'=>$hdid])}",{recordid:row.id}).then(function(json){
+                            if(json.code==0){
+                                webtable.refresh();
+                                zamnotice.showTips('success','删除成功');
+                            }else{
+                                zamnotice.showTips('error',json.msg);
+                            }
+                        }, function(json){
+                            zamnotice.showTips('error','网络差。操作失败');
+                        });
+                });
+            },
+        }
+    },
+    columns:[{
+            checkbox: true,
+        }, 
+        {
+            field: 'id',
+            title: 'id',
+            align: 'center',
+            visible: false
+        },{
+            field: 'nickname',
+            title: '用户',
+            align: 'center',
+            formatter:function(value,row,index){
+                var html = `
+                <div class='zam-flex-column-center'>
+                    <img src="${row.avatar}" class="avatarImg" />
+                    <span>${value||'已删除'}</span>
+                </div>
+                `;
+                return html;
+            }
+        },{
+            field: 'catename',
+            title: '卡包',
+            align: 'center',
+            
+        },{
+            field: 'cardname',
+            title: '碎片名',
+            align: 'center',
+            
+        },  {
+            field: 'cardimg',
+            title: '碎片图',
+            align: 'center',
+            formatter:function(value,row,index){
+                var html = "<img src="+value+" height='100px' />";
+                return html;
+            }
+        },  {
+            field: 'create_time',
+            title: '集卡时间',
+            align: 'center',
+        }
+    ],
+    searchParamas:[{'type':'1','id':'keyword'}],
+    toolbar:{
+        del:function(){
+            var getSelects = webtable.getSelections();
+            if(getSelects.length>0){
+                jconfirmBox.confirm('温馨提示','删除无法恢复，您确定要删除选中的集卡数据么？',function(){
+                    webcore.ajaxSubmit("{:gohdmanage('configjika/delrecord',['hdid'=>$hdid])}",{recordid:getSelects}).then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','删除成功');
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差,操作失败');
+                    });
+                });
+            }else{
+                zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+        },
+        reset:function(){
+            jconfirmBox.confirm('温馨提示','清空将删除所有用户的集碎片数据，并且无法恢复，您确定要清空么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('configjika/resetallrecord',['hdid'=>$hdid])}",{}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','删除成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+        },
+    },
+};
+$(function(){
+    webtable.init(initConfig);
+})
+$('.zam-inline-searchbar select').change(function(e) {
+     webtable.refresh();
+});
+$('.btn-export').on('click',function(){
+   var status = $("#signstatus").find('option:selected').val();
+   webcore.ajaxSubmit("{:gohdmanage('configjika/export',['hdid'=>$hdid])}",{}).then(function(json){
+        if(json.code!=0){
+            zamnotice.showTips('error',json.msg);
+        }else{
+            window.location.href = "{:gohdmanage('configjika/export',['hdid'=>$hdid])}";
+        }
+    }, function(json){
+        zamnotice.showTips('error','网络差,操作失败');
+    });
+});
+});
+</script>
+{include file='$Wpath/common/footer'}

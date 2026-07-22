@@ -1,0 +1,155 @@
+{include file='$Wpath/common/header'}
+<style>
+.font-lists a{cursor:pointer;}
+{volist name="fonts" id="bpfont"}	
+	@font-face {
+		font-family:"{$bpfont['fontval']}";
+		src:url("{$bpfont['fontsrc']}");
+	}
+	.{$bpfont['fontval']}{
+		font-family:"{$bpfont['fontval']}";
+	}
+{/volist}
+</style>
+<div class="zam-inner-title mb20">霸屏弹窗文字字体组</div>
+<div class="bgfontsBox">
+<table class="table" style="margin-bottom:0px;">
+	<thead>
+	  <tr>
+		<th style="width:15%">组名</th>
+		<th style="width:10%">状态</th>
+		<th style="width:40%">字体链接</th>
+		<th style="width:25%">字体样式</th>
+		<th style="width:10%">操作</th>
+	  </tr>
+	</thead>
+	<tbody class="font-lists">
+			{volist name="fonts" id="font"}
+			<tr>
+				<td>
+				   <span>{$font['fontname']}</span>
+				</td>
+				<td>
+				   <span>{if $font['status']=='1'}<span class="label label-primary">可见</span>{else}<span class="label label-info">不可见</span>{/if}</span>
+				</td>
+				<td>
+				   <a href="{$font['fontsrc']}" target="__blank">{$font['fontsrc']}</span>
+				</td>
+				<td>
+				   <span class="{$font['fontval']}" style="font-size:30px;">字体样式</span>
+				</td>
+				<td>
+				   <a href="javascript:;"  class="btn btn-primary btn-sm btn-edit" data-id="{$font['id']}"><i class="mdi mdi-pencil"></i></a>
+				   <a href="javascript:;"  class="btn btn-danger btn-sm btn-del" data-id="{$font['id']}"><i class="mdi mdi-delete"></i></a>
+				</td>
+			</tr>
+			{/volist}
+	</tbody>
+	<tfoot>
+		  <tr>
+			<td colspan="4">
+			  <a class="btn btn-primary btn-xs addfontgroup" href="javascript:;"><i class="mdi mdi-plus"></i> 新增字体组</a>
+			</td>
+		  </tr>
+	</tfoot>
+</table>
+</div>
+<script id='editfont-tpl' type="text/template">
+<form class="form-horizontal">
+  <input type="hidden"  name="fid" value="<% d.fid %>">
+  <input type="hidden"  name="fontval" value="<% d.fontval %>">
+  <div class="form-group">
+    <label class="col-lg-2 control-label">* 状态</label>
+    <div class="col-lg-8">
+	      <label class="lyear-radio radio-inline radio-primary">
+	       <input type="radio" name="status" value="1" <%# if(d.status=='1'){ %>checked<%# } %>>
+	       <span>可见</span>
+	      </label>
+	      <label class="lyear-radio radio-inline radio-primary">
+	       <input type="radio" name="status" value="2" <%# if(d.status=='2'){ %>checked<%# } %>>
+	       <span>不可见</span>
+	      </label>
+	      <div class="help-block">不推荐删除组，建议设置为不可见</div>
+  	</div>
+  </div>
+  <div class="form-group">
+    <label class="col-lg-2 control-label">* 字体名</label>
+    <div class="col-lg-8">
+      <input class="form-control" type="text"  name="fontname" value="<% d.fontname %>">
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-lg-2 control-label">* 字体url</label>
+    <div class="col-lg-8">
+      <input class="form-control" type="text"  name="fontsrc" value="<% d.fontsrc %>">
+      <div class="help-block">请把字体文件上传到oss/cos/七牛等第三方附件以达到快速加载的效果，然后把字体文件的url链接粘贴到此处，否则霸屏大屏幕界面加载时间很长，还会导致带宽暂时性消耗很大</div>
+    </div>
+  </div>
+</form>
+</script>
+<script>
+	require(["webcore","zamnotice","layerBox","jconfirmBox"],function(webcore,zamnotice,layerBox,jconfirmBox){
+		$(".addfontgroup").on('click',function(){
+				var $this = $(this);
+				var confirmobj = jconfirmBox.confirm('新增图片组',webcore.tpl($("#editfont-tpl"),{fid:'',status:'1',fontname:'',fontval:webcore.random(8,1,1),fontsrc:''}),function(e){
+		        var pdata = webcore.serializeObject(e.$content.find("form"));
+		        if(pdata.fontname == '' || pdata.fontsrc=='') return zamnotice.showTips('error','字体名称与url必须设置');
+		        webcore.ajaxSubmit("{:goweb('hdconfig/bapingfonts')}",pdata).then(function(json){
+					if(json.code==0){
+						zamnotice.showTips('success','新增成功',1e3,function(){
+							window.location.reload();
+						});
+						confirmobj.close();
+					}else{
+						zamnotice.showTips('error',json.msg);
+					}
+				}, function(json){
+					zamnotice.showTips('error','网络差。操作失败.');
+				});
+  			  },false,'col-lg-10 col-lg-offset-1',true,[{'hidden':false,'txt':'确定'},{'hidden':false,'txt':'取消'}]);
+				
+		});
+		$(".font-lists").on('click','.btn-edit',function(){
+				var $this = $(this),fid = $this.attr('data-id');
+				webcore.ajaxSubmit("{:goweb('hdconfig/bapingfonts')}",{isdata:'1',fid:fid}).then(function(json){
+					if(json.code==0){
+						var confirmobj = jconfirmBox.confirm('编辑图片组',webcore.tpl($("#editfont-tpl"),json.msg),function(e){
+					        var pdata = webcore.serializeObject(e.$content.find("form"));
+					        if(pdata.fontname == '' || pdata.fontsrc=='') return zamnotice.showTips('error','字体名称与url必须设置');
+					        webcore.ajaxSubmit("{:goweb('hdconfig/bapingfonts')}",pdata).then(function(json){
+								if(json.code==0){
+									zamnotice.showTips('success','保存成功',1e3,function(){
+										window.location.reload();
+									});
+									confirmobj.close();
+								}else{
+									zamnotice.showTips('error',json.msg);
+								}
+							}, function(json){
+								zamnotice.showTips('error','网络差。操作失败.');
+							});
+		  			  	},false,'col-lg-10 col-lg-offset-1',true,[{'hidden':false,'txt':'确定'},{'hidden':false,'txt':'取消'}]);
+					}else{
+						zamnotice.showTips('error',json.msg);
+					}
+				});
+		});
+		$("table").on('click','.btn-del',function(){
+			var $this = $(this);
+			jconfirmBox.confirm('温馨提示','删除将无法恢复，您确定要删除么？',function(){
+					var fid = $this.attr('data-id');
+					webcore.ajaxSubmit("{:goweb('hdconfig/bapingfonts')}",{fid:fid,isdel:'1'},'').then(function(json){
+						if(json.code==0){
+							zamnotice.showTips('success','删除成功');
+							$this.parent().parent().remove();
+						}else{
+							zamnotice.showTips('error',json.msg);
+						}
+					}, function(json){
+						zamnotice.showTips('error','网络差。操作失败.');
+					});
+			});
+		});
+	});
+</script>
+{include file='$Wpath/common/footer'}

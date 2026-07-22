@@ -1,0 +1,309 @@
+{php}
+$cjconfig = \app\common\service\web\moduleconfigService::getmoduleconfig($gametype);
+$isroundcj = $cjconfig['isroundcj']??'2';
+{/php}
+{include file='$Wpath/common/header'}
+{include file='$Wpath/common/lotterytoptip'}
+{include file='$Wpath/common/tabletoolbar'}
+<style type="text/css">.awardgroup .d-inline-block:first-child{padding-left: 0}</style>
+<table id="listtable" class="zam-btable"></table>
+<script>    
+require(['webcore','webtable','jconfirmBox','zamnotice',"bootstrap-touchspin"],function(webcore,webtable,jconfirmBox,zamnotice){
+var initConfig = {
+    tableId:'#listtable',
+    url:"{:gohdmanage('common/ajaxaward',['hdid'=>$hdid,'gametype'=>$gametype])}",
+    columnoperate:{
+        btns:{
+            edit:true,
+            del:true,
+            data:true,
+        },
+        func:{
+            edit:function(value, row, index){
+                var confirmObj = jconfirmBox.ajaxconfirm("编辑奖品","{:gohdmanage('common/editaward',['hdid'=>$hdid,'gametype'=>$gametype])}",{awardid:row.id},'html','col-lg-10 col-lg-offset-1',function(e){
+                    var postData = webcore.serializeObject(e.find('form'));
+                    {if $gametype != 'liuyancj'}
+                        var treeObj = $.fn.zTree.getZTreeObj("groupsTree"),nodes = treeObj.getCheckedNodes();
+                        if(nodes.length <= 0){
+                            zamnotice.showTips('error','请选择用户分组');
+                            return false;
+                        }
+                        var usergroup = {},groupids = {};
+                        $.each(nodes,function(i,v){
+                            if(i==0){
+                                usergroup.type = v.id;
+                            }else{
+                                var vid = v.id;
+                                if(usergroup.type == '4' && v.level==1){
+                                    //groupids[vid] = vid;
+                                    groupids[vid] = {
+                                        groupval:vid,
+                                        outnum:($("#"+v.tId+"_a").attr('data-outnum')||0),
+                                    };
+                                }
+                                if(usergroup.type == '3' && v.level==1){
+                                    groupids[vid] = [];
+                                }
+                                if(usergroup.type == '3' && v.level==2){
+                                    var fnode = v.getParentNode();
+                                    //groupids[fnode.id].push(v.id);
+                                    groupids[fnode.id].push({
+                                        groupval:v.id,
+                                        outnum:($("#"+v.tId+"_a").attr('data-outnum')||0),
+                                    });
+                                }
+                            }
+                        });
+                        if(usergroup.type > 2){
+                            if($.isEmptyObject(groupids)){
+                                zamnotice.showTips('error',(usergroup.type=='3'?'签到':'自定义') + '分组必须选择具体的分组');
+                                return false;
+                            }
+                            usergroup.groupid = groupids;
+                        }
+                        postData.grouptype = usergroup;
+                    {/if}
+                    {// 公用部分}
+                    postData.awardid = row.id;
+                    webcore.ajaxSubmit("{:gohdmanage('common/saveaward',['hdid'=>$hdid,'gametype'=>$gametype])}",postData).then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','保存成功');
+                            confirmObj.close();
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                             return false;
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                         return false;
+                    });
+                });
+            },
+            del:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','删除将删除当前奖品数据以及中奖数据并且无法恢复，您确定要删除么？',function(){
+                        webcore.ajaxSubmit("{:gohdmanage('common/delaward',['hdid'=>$hdid,'gametype'=>$gametype])}",{awardid:row.id}).then(function(json){
+                            if(json.code==0){
+                                webtable.refresh();
+                                zamnotice.showTips('success','删除成功');
+                            }else{
+                                zamnotice.showTips('error',json.msg);
+                            }
+                        }, function(json){
+                            zamnotice.showTips('error','网络差。操作失败');
+                        });
+                });
+            },
+            data:function(value, row, index){
+                window.location.href = "{:gohdmanage('data'.$gametype.'/index',['hdid'=>$hdid])}&prizeid="+row.id;
+            },
+        }
+    },
+    columns:[
+        {
+            checkbox: true,
+        },{
+            field: 'id',
+            title: 'Id',
+            align: 'center',
+            visible: false
+        },{
+            field: 'displayorder',
+            title: '序号',
+            align: 'center',
+            formatter:function(value,row,index){
+                return `
+                <span>${value}</span>
+                <span class="label label-primary m-l-10"><i class="mdi mdi-pencil cursor editorder" data-order="${value}" data-awardid="${row.id}"></i></span>
+                `;
+            }
+        },{
+            field: 'prizetypetxt',
+            title: '类型',
+            align: 'center',
+            formatter:function(value,row,index){
+                return `
+                <div>${value}</div>
+                ${row.prizetype == '2' ? `<div class="text-danger m-t-10">金额:${row.prizemoney}元</div>` : ''}
+                `;
+            }
+        },{
+            field: 'awardname',
+            title: '奖项',
+            align: 'center',
+        },{
+            field: 'prizename',
+            title: '奖品',
+            align: 'center',
+            formatter:function(value,row,index){
+                return `
+                    <div>${value}</div>
+                    <div class="m-t-10"><img src="${row.prizeimg}" width="100px" height="100px" /></div>
+                `;
+            }
+        },{
+            field: 'prizenum',
+            title: '数量(个)',
+            align: 'center',
+        },
+        {if $isroundcj == '2'}
+        {
+            field: 'onceout',
+            title: '一次抽(个)',
+            align: 'center',
+        },
+        {/if}
+        {
+            field: 'grouptypename',
+            title: '分组',
+            align: 'center',
+            width:'10%',
+        },{
+            field: 'create_time',
+            title: '创建时间',
+            align: 'center',
+            visible: false
+        }
+    ],
+    searchParamas:[],
+    toolbar:{
+        add:function(){
+            var confirmObj = jconfirmBox.ajaxconfirm("新增奖品","{:gohdmanage('common/editaward',['hdid'=>$hdid,'gametype'=>$gametype])}",{},'html','col-lg-10 col-lg-offset-1',function(e){
+	            var postData = webcore.serializeObject(e.find('form'));
+                {if $gametype != 'liuyancj'}
+                var treeObj = $.fn.zTree.getZTreeObj("groupsTree"),nodes = treeObj.getCheckedNodes();
+                if(nodes.length <= 0){
+                    zamnotice.showTips('error','请选择用户分组');
+                    return false;
+                }
+                var usergroup = {},groupids = {};
+                $.each(nodes,function(i,v){
+                    if(i==0){
+                        usergroup.type = v.id;
+                    }else{
+                        var vid = v.id;
+                        if(usergroup.type == '4' && v.level==1){
+                            //groupids[vid] = vid;
+                            groupids[vid] = {
+                                groupval:vid,
+                                outnum:$("#"+v.tId+"_a").attr('data-outnum')||0
+                            };
+                        }
+                        if(usergroup.type == '3' && v.level==1){
+                            groupids[vid] = [];
+                        }
+                        if(usergroup.type == '3' && v.level==2){
+                            var fnode = v.getParentNode();
+                            //groupids[fnode.id].push(v.id);
+                            groupids[fnode.id].push({
+                                groupval:v.id,
+                                outnum:$("#"+v.tId+"_a").attr('data-outnum')||0
+                            });
+                        }
+                    }
+                });
+                if(usergroup.type > 2){
+                    if($.isEmptyObject(groupids)){
+                        zamnotice.showTips('error',(usergroup.type=='3'?'签到':'自定义') + '分组必须选择具体的分组');
+                        return false;
+                    }
+                    usergroup.groupid = groupids;
+                }
+                postData.grouptype = usergroup;
+                {/if}
+	            webcore.ajaxSubmit("{:gohdmanage('common/saveaward',['hdid'=>$hdid,'gametype'=>$gametype])}",postData,'奖品新增中...').then(function(json){
+	                if(json.code==0){
+	                    webtable.refresh();
+	                    zamnotice.showTips('success','新增成功');
+	                    confirmObj.close();
+	                }else{
+	                    zamnotice.showTips('error',json.msg);
+	                     return false;
+	                }
+	            }, function(json){
+	                zamnotice.showTips('error','网络差。操作失败');
+	                 return false;
+	            });
+	        });
+        },
+        del:function(){
+            var getSelects = webtable.getSelections();
+            if(!getSelects.length){
+                return zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+            jconfirmBox.confirm('温馨提示','删除将删除所选奖品数据以及中奖数据并且无法恢复，您确定要删除么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('common/delaward',['hdid'=>$hdid,'gametype'=>$gametype])}",{awardid:getSelects}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','删除成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+        },
+        reset:function(){
+            jconfirmBox.confirm('温馨提示','清空轮次将清空所有奖品数据以及中奖数据，您确定要清空么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('common/resetaward',['hdid'=>$hdid,'gametype'=>$gametype])}",{}).then(function(json){
+                    webtable.refresh();
+                    zamnotice.showTips('success','操作成功');
+                }, function(json){
+                    zamnotice.showTips('error','网络差。操作失败');
+                });
+            });
+        },
+        import:function(){
+            webcore.importxls({title:'导入奖品信息',url:"{:gohdmanage('common/importaward',['hdid'=>$hdid,'gametype'=>$gametype])}",moban:"/{:SYSIMGURL}excel/award.xls?t=1",uptxt:"点击上传奖品信息文件",xlstxt:''},function(){
+                zamnotice.showTips('success','导入成功');
+                webtable.refresh();
+            });
+        },
+    },
+};
+webtable.init(initConfig);
+$("#listtable").on('click','.editorder',function(){
+    var $this = $(this),disorder=  $this.attr('data-order');
+    var confirmobj = jconfirmBox.confirm('编辑奖品排序序号',webcore.tpl($("#awardorder-tpl"),{displayorder:disorder}),function(e){
+        var displayorder = e.$content.find(".displayorder").val()||'';
+        if(!displayorder) {
+            return zamnotice.showTips('error','请设置排序序号');
+        }
+        webcore.ajaxSubmit("{:gohdmanage('common/editawardorder',['hdid'=>$hdid,'gametype'=>$gametype])}",{awardid:$this.attr('data-awardid'),displayorder:displayorder},'正在处理..').then(function(json){
+             if(json.code==0){
+                confirmobj.close();
+                zamnotice.showTips('success','修改成功');
+                webtable.refresh();
+             }else{
+                zamnotice.showTips('error',json.msg);
+             }
+        })
+    },false,false,true,false,function(){
+        $(".confirmbox-pop .numberincdec").TouchSpin().on("change", function(){
+            var $this = $(this),funcstr = $this.data('func');
+            var func = window[funcstr];
+            func && func();
+        });
+    });
+});
+});
+</script>
+<script id='awardorder-tpl' type="text/template">
+<div class="form-horizontal confirmbox-pop">
+  <form class="confirm-formbox" method="post">
+    <div class="form-group">
+      <label class="col-lg-3 control-label">* 序号</label>
+      <div class="col-lg-7">
+        <input type="text" class="form-control numberincdec displayorder" name="displayorder" value="<% d.displayorder %>"
+        placeholder="排序序号"
+        data-bts-min="0" data-bts-replacement-val="0"
+        data-bts-max="null"
+        data-bts-step="1">
+        <span class="help-block">奖品排序序号越小排在越前</span>
+      </div>
+    </div>
+  </form>
+</div>
+</script>
+{include file='$Wpath/common/footer'}

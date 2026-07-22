@@ -1,0 +1,213 @@
+<div class="form-horizontal confirmbox-pop">
+<form>
+ <div class="form-group">
+    <label class="col-lg-3 control-label">* 类型</label>
+    <div class="col-lg-8">
+      <label class="lyear-radio radio-inline radio-primary" onclick="showMoneyBox(this)" {if !$edittype}style="pointer-events:none"{/if}>
+        <input type="radio" name="prizetype" value="1" {if $config['prizetype']=='1'}checked{/if}><span>实物</span>
+      </label>
+      <label class="lyear-radio radio-inline radio-primary" onclick="showMoneyBox(this)" {if !$edittype}style="pointer-events:none"{/if}>
+        <input type="radio" name="prizetype" value="2" {if $config['prizetype']=='2'}checked{/if}><span>红包</span>
+      </label>
+      <label class="lyear-radio radio-inline radio-primary" onclick="showMoneyBox(this)" {if !$edittype}style="pointer-events:none"{/if}>
+        <input type="radio" name="prizetype" value="3" {if $config['prizetype']=='3'}checked{/if}><span>谢谢参与</span>
+      </label>
+      <div class="zam-help-block">注意：谢谢参与不仅可作为不中奖也可作为一种不限量的小奖品来使用，作为不限量的小奖品来使用的时候建议开启下面的抽中写入记录否则抽到后不记录中奖数据{if !$edittype}<span class="text-danger">，已产生中奖数据此项不可更改</span>{/if}</div>
+    </div>
+ </div>
+ <div class="form-group">
+    <label class="col-lg-3 control-label">* 奖品名称</label>
+    <div class="col-lg-8">
+      <input type="text" class="form-control"  name="prizename" value="{$config['prizename']}" placeholder="30字内，推荐控制在15字内" maxlength="30">
+    </div>
+ </div>
+ <div class="form-group">
+	<label class="col-lg-3 control-label">* 奖品图</label>
+	<div class="col-lg-8">
+	   {:tpl_image_one('prizeimg',$config['prizeimg'])}
+       <span class="zam-help-block">规格:100px * 100px</span>
+	</div>
+ </div>
+ <div class="prizetypebox{if $config['prizetype']=='3'} hidden{/if}">
+     <div class="form-group">
+    		<label class="col-lg-3 control-label">* 奖品个数</label>
+    		<div class="col-lg-8">
+    			<input type="text" class="form-control numberincdec" name="prizenum" 
+                    data-bts-min="1" data-bts-replacement-val="1"
+                    data-bts-max="null"
+                    data-bts-step="1"
+                    data-bts-postfix="个"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                    value="{$config['prizenum']}">
+    			<span class="zam-help-block">注:至少是1个</span>
+    		</div>
+     </div>
+     <div class="form-group prizetype2{if $config['prizetype']!='2'} hidden{/if}">
+    		<label class="col-lg-3 control-label">* 单个红包金额</label>
+    		<div class="col-lg-8">
+    			<input type="text" class="form-control numberincdec" name="prizemoney" 
+                    data-bts-min="{$sendhbmin}" data-bts-replacement-val="{$sendhbmin}"
+                    data-bts-max="null"
+                    data-bts-decimals="2"
+                    data-bts-step="1"
+                    data-bts-force-step-divisibility="xstwo"
+                    data-bts-postfix="元"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                    value="{$config['prizemoney']}">
+                {if $cjmode=='2'} 
+                    <span class="zam-help-block">注:最小可以是{$sendhbmin}元，<span class="text-danger">请保证您的红包账户余额充足，账户余额不足会导致中奖用户无法收到红包</span>，<a href="{:gomyhome('account/index')}" target="__blank">点击充值</a></span>
+                {/if}
+    		</div>
+    </div>
+    <div class="form-group{if $cjmode=='1'} hidden{/if}" style="display: none;">
+        <label class="col-lg-3 control-label">* 可重复抽中</label>
+        <div class="col-lg-8">
+            {:tpl_switch('canrepeat',$config['canrepeat'])}
+            <span class="zam-help-block">注:开启则本奖品可以被同一个微信用户多次抽到</span>
+        </div>
+    </div>
+ </div>
+ <div class="form-group">
+        <label class="col-lg-3 control-label">* 抽中概率</label>
+        <div class="col-lg-8">
+            <input type="text" class="form-control numberincdec" name="prizegl" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="1000"
+                data-bts-step="1"
+                data-bts-postfix="千分制"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['prizegl']}">
+            <span class="zam-help-block">注:概率越大越容易被抽中，<span class="text-danger">中奖概率为0即为永远抽不出来这个奖品</span>，本轮所有奖品概率和不能超1000</span>
+        </div>
+ </div>
+ <div class="form-group prizetype3{if $config['prizetype']=='1'} hidden{/if}">
+    <label class="col-lg-3 control-label">* 抽中写入中奖记录</label>
+    <div class="col-lg-8">
+        {:tpl_switch('saverecord',$config['saverecord'])}
+        <span class="zam-help-block">注:本奖品计划视作不中奖则建议关闭此项，如果作为人人可中的小奖品使用则建议开启</span>
+    </div>
+ </div>
+ <div class="form-group">
+    <label class="col-lg-3 control-label">* 格子背景色</label>
+    <div class="col-lg-4">
+        {:tpl_color('bgcolor',$config['bgcolor'])}
+        <span class="help-block">默认白色</span>
+    </div>
+ </div>
+ <div class="form-group">
+    <label class="col-lg-3 control-label">* 奖品名颜色</label>
+    <div class="col-lg-4">
+        {:tpl_color('fontcolor',$config['fontcolor'])}
+        <span class="help-block">默认蓝色</span>
+    </div>
+ </div>
+ <div class="form-group dzpndboxs{if request()->opencjnd=='2' || $cjmode != '2' || $config['prizetype']=='3'} hidden{/if}">
+    <label class="col-lg-3 control-label">* 特别用户</label>
+    <div class="col-lg-9">
+        <table class="table table-bordered" style="margin-bottom:0px;">
+            <thead>
+              <tr>
+                <th style="width:50%;text-align:center;">用户</th>
+                <th style="width:50%;text-align:center;">操作</th>
+              </tr>
+            </thead>
+            <tbody class="nduser-lists">
+                {volist name="config.nduser" id="prow"}
+                    <tr>
+                        <td class="text-center">
+                            <img class="userimg" src="{:tomedia($prow['avatar']);}">
+                            <p>{$prow['nickname']}</p>
+                            <input type="hidden" name="ndids[]" value="{$prow['userid']}">
+                        </td>
+                        <td class="text-center">
+                          <a href="javascript:;"  class="btn btn-danger btn-sm btn-del"><i class="mdi mdi-close"></i></a>
+                        </td>
+                    </tr>
+                {/volist}
+            </tbody>
+            <tfoot style="border: 1px solid #efefef;">
+              <tr>
+                <td colspan="2">
+                  <a  class="btn btn-primary btn-xs adduser" href="javascript:;"> <i class="mdi mdi-plus"></i>&nbsp;<span>添加用户</span></a>
+                </td>
+              </tr>
+            </tfoot>
+        </table>
+        <span class="zam-help-block">注:每个用户仅可指定一个奖项</span>
+    </div>
+</div>
+</form>
+</div>
+<script type="text/template" id="nduser-tpl">
+    <tr>
+        <td class="text-center">
+            <img class="userimg" src="<% d.avatar %>">
+            <p><% d.nickname %></p>
+            <input type="hidden" name="ndids[]" value="<% d.id %>">
+        </td>
+        <td class="text-center">
+          <a href="javascript:;"  class="btn btn-danger btn-sm btn-del"><i class="mdi mdi-close"></i></a>
+        </td>
+    </tr>
+    </script>  
+<script>
+require(['webcore','jconfirmBox','zamnotice',"bootstrap-touchspin"],function(webcore,jconfirmBox,zamnotice){
+    $(function(){
+      $(".sp-container").remove();
+      $(".js-colorpicker").each(function(){
+            tpl_colorpicker(this);
+      });
+    })
+    $(".confirmbox-pop .numberincdec").TouchSpin();
+    {// 公用部分}
+	$(".adduser").click(function(){
+		var confirmObj = jconfirmBox.ajaxconfirm("内定用户","{:gohdmanage('common/searchuser',['hdid'=>$hdid])}",{ishtml:'1'},'html','col-lg-8 col-lg-offset-2',function(e){
+			var selectuser = e.find("input:checked");
+			if(selectuser.length>0){
+				var html = '',userids = [],nduserobj = $(".nduser-lists input");
+				nduserobj.each(function(){
+					userids.push($(this).val());
+				});
+				selectuser.each(function(){
+					var $this = $(this),$thisp = $this.parent().parent(),userid = $this.attr('data-id');
+					if($.inArray(userid,userids) > -1) return true; 
+					html += webcore.tpl($("#nduser-tpl"),{id:userid,avatar:$thisp.next().attr('src'),nickname:$thisp.next().next().text()});
+				});
+				$(".nduser-lists").append(html);
+				confirmObj.close();
+			}else{
+				zamnotice.showTips('error','请选择需内定的用户');
+			}
+		});
+	});
+	$(".nduser-lists").on('click','.btn-del',function(){
+		var $this = $(this);
+		jconfirmBox.confirm('温馨提示','您确定要删除么？',function(){
+			$this.parent().parent().remove();
+			zamnotice.showTips('success','删除成功');
+		});
+	});
+});
+function showMoneyBox(obj){
+	var type = $(obj).find('input').val();
+	if(type=='1'){
+		$('.prizetype2,.prizetype3').addClass('hidden');
+        $('.prizetypebox').removeClass('hidden');
+        {if request()->opencjnd=='1' && $cjmode == '2'}
+            $(".dzpndboxs").removeClass('hidden');
+        {/if}
+	}else if(type=='2'){
+        $('.prizetype3').addClass('hidden');
+        $('.prizetype2').removeClass('hidden');
+        $('.prizetypebox').removeClass('hidden');
+        {if request()->opencjnd=='1' && $cjmode == '2'}
+            $(".dzpndboxs").removeClass('hidden');
+        {/if}
+    }else{
+        $('.prizetype3').removeClass('hidden');
+		    $('.prizetypebox').addClass('hidden');
+        $(".dzpndboxs").addClass('hidden');
+        $(".nduser-lists").empty();
+	}
+}
+</script>

@@ -1,0 +1,277 @@
+{include file='common/header' /}
+<style>
+    .bigmenu-mainbox{
+        width: 100%;
+        height: 100%;
+        margin-top: {$pcconfig['pcstyle']['boxmt']??0}px;
+        margin-left: {$pcconfig['pcstyle']['boxml']??0}px;
+    }
+    .bigmenu-container {
+        max-height: 600px;
+        overflow: hidden auto;
+        width: {$pcconfig['pcstyle']['boxwidth']??1000}px;
+        border-radius: {$pcconfig['pcstyle']['boxradius']??10}px;
+        padding: {$pcconfig['pcstyle']['boxpadding']??30}px;
+        gap: {$pcconfig['pcstyle']['onegap']??10}px;
+        background-color: {$pcconfig['pcstyle']['boxbgcolor']??'#fff'};
+    }
+    .bigmenu-container .bigmenu-item {
+        cursor: pointer;
+        box-sizing: border-box;
+        text-align: center;
+        transition: all 0.3s;
+        width:{$pcconfig['pcstyle']['onewidth']??80}px;
+        padding: {$pcconfig['pcstyle']['onepadding']??10}px;
+        border-radius: {$pcconfig['pcstyle']['oneradius']??80}px;
+        opacity: {$pcconfig['pcstyle']['oneopacity']??'0.8'};
+        box-shadow: 0 4px 8px {$pcconfig['pcstyle']['oneshadow']??'rgba(0, 0, 0, 0.5)'};
+        color: {$pcconfig['pcstyle']['txtcolor']??'#333'};
+        font-size: {$pcconfig['pcstyle']['txtsize']??12}px;
+        background-color: {$pcconfig['pcstyle']['onebgcolor']??'transparent'};
+        font-weight: bold;
+    }
+    .bigmenu-container .bigmenu-item:hover {
+        transform: scale(1.2);
+        opacity: 1;
+        background-image: url({:tomedia($pcconfig['pcstyle']['menubg']??'/static/images/screen/bigmenu/menubg.png')});
+        background-position: top center;
+    }
+    .bigmenu-container .bigmenu-item .module img {
+        width: calc(100% - 10px);
+    }
+    .bigmenu-container .bigmenu-item .module div {
+        margin-top: {$pcconfig['pcstyle']['txtmargin']??5}px;
+    }
+    .drawerbox-wrapper{
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left:0;
+        width: 100%;
+        height: 100%;
+        z-index: 10;
+        pointer-events: none;
+    }
+    .drawerbox-wrapper.active{
+        pointer-events: all;
+    }
+    .drawerbox-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.2);
+        display: none;
+    }
+    .drawerbox-wrapper.active .drawerbox-backdrop{
+        display: block;
+    }
+    .drawerbox {
+        position: fixed;
+        top: 0;
+        right: 0;
+        height: 100%;
+        background-color: #fff;
+        transition: all .3s;
+    }
+    .drawerbox.slideDown{
+        width: 100%;
+        transform: translateY(-100%);
+    }
+    .drawerbox.slideLeft{
+        width: 420px;
+        max-width: calc(100% - 50px);
+        transform: translateX(100%);
+    }
+    .drawerbox-wrapper.active .drawerbox{
+        transform: translate3d(0,0,0);
+        box-shadow: 1px 1px 50px rgba(0, 0, 0, .3);
+    }
+    .drawerbox-header {
+        position: relative;
+        padding: 0 20px;
+        min-height: 46px !important;
+        border-bottom: 1px solid #ebebeb
+    }
+    .drawerbox-header .drawerbox-close {
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        margin-left: 16px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+    .drawerbox-header .drawerbox-title {
+        letter-spacing: .5px;
+        line-height: 46px;
+    }
+    .drawerbox-body {
+        flex: 1;
+        position: relative;
+        padding: 18px;
+        overflow: hidden auto;
+    }
+    .drawerbox-body::-webkit-scrollbar {
+        width: 5px;
+        border-radius: 10px;
+    }
+    .drawerbox-body::-webkit-scrollbar-track {
+        background-color: rgba(0, 0, 0, 0.22);
+        border-radius: 10px;
+    }
+    .drawerbox-body::-webkit-scrollbar-thumb {
+        border-radius: 10px;
+        outline-offset: -2px;
+        background-color: #333;
+    }
+    .drawerbox-body::-webkit-scrollbar-thumb:hover {
+        background-color: #333;
+    }
+    .drawerbox-body ul{
+        gap: 20px 18px;
+    }
+    .drawerbox-body ul li{
+        position: relative;
+        width: 180px;
+        height: 101px;
+        border-radius: 8px;
+        overflow: hidden;
+        cursor: pointer;
+    }
+    .drawerbox-body ul li:hover{
+        box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
+    }
+    .drawerbox-body ul li img{
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .drawerbox-body ul li div{
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        width: 100%;
+        height: 24px;
+        line-height: 24px;
+        padding: 0 8px;
+        box-sizing: border-box;
+        font-size: 12px;
+        text-align: center;
+        color: #fff;
+        border-radius: 0 0 8px 8px;
+        background: rgba(0, 0, 0, .5);
+        cursor: pointer;
+    }
+</style>
+<section class="bigmenu-mainbox zam-app-flex-ajCenter2">
+    <div class="bigmenu-container zam-app-flex zam-app-flex-wrap zam-app-justifyCenter">
+        {foreach $menus as $menu}
+		{if $menu['openstatus']=='1' && !in_array($menu['modulefield'],['fulldm','bigmenu'])}
+        <div class="bigmenu-item">
+            <div class="module" 
+            data-module="{$menu['modulefield']}" 
+            data-ishandadd="{$menu['ishandadd']??2}"
+            data-url="{$menu['moduleurl']??''}"
+            >
+                <img src="{:tomedia($menu['moduleimg'])}">
+                <div class="limitbox">{$menu['oldmodulename']??$menu['modulename']}</div>
+            </div>
+        </div>
+        {/if}
+		{/foreach}
+    </div>
+</section>
+{include file='common/footer' /}
+<script id="drawer-tpl" type="html/javascript">
+    <div class="drawerbox-wrapper">
+        <div class="drawerbox-backdrop"></div>
+        <div class="drawerbox zam-app-flex zam-app-directionColumn slideLeft">
+            <header class="drawerbox-header">
+                <div class="drawerbox-title">风格</div>
+                <span class="drawerbox-close"><i class="mxc-close"></i></span>
+            </header>
+            <div class="drawerbox-body">
+                <ul class="zam-app-flex zam-app-flex-wrap">
+                    {{ each list as item key}}
+                    <li data-styleid="{{ item.styleid }}" data-module="{{ item.stylemodule }}">
+                        <img src="{{ item.styleimg }}" onerror="javascript:this.src='/static/images/sys/nopic.jpg';" />
+                        <div>{{ item.stylename }}</div>
+                    </li>
+                    {{ /each }}
+                </ul>
+            </div>
+        </div>
+    </div>
+</script>
+<script>
+var stylepop = "{$pcconfig['pcstyle']['stylepop']??1}";
+require(['screencore','template','layerBox','screensocket'],function(screencore,template,layerBox,screensocket){
+    var clicked = false;
+    $(".bigmenu-container .bigmenu-item .module").click( function(e) { 
+        if(clicked){
+            return;
+        }
+        clicked = true;
+        var $this = $(this),gamemodule = $this.attr('data-module')||'',ishandadd = $this.attr('data-ishandadd')||'2';
+        if (typeof gamestyles === 'undefined') {
+            gamestyles = {:json_encode($gamestyles)};
+        }
+        var href = "{:goscreen('frame/index',['hdid'=>$hdinfo['hdid']])}";
+        if(XCV3Config.loadtype == '2'){
+            href += `&module=${gamemodule}`;
+        }else{
+            href = href.replace(`frame/index`,`${gamemodule}/index`);
+        }
+        var modulestyles = gamestyles[gamemodule]??[];
+        if(stylepop == '2' || !$.isArray(modulestyles) || !modulestyles.length){
+            if(ishandadd == '1'){
+                href = $this.attr('data-url')||'';
+            }
+            if(href){
+                window.open(href,"_blank");
+            }
+            clicked = false;
+            return false;
+        }
+        var drawer = $(template('drawer-tpl',{list:modulestyles}));
+        $('.bigmenu-mainbox').append(drawer);
+        setTimeout(()=>{
+            drawer.addClass('active');
+            screencore.getdom('.footer-controlBox').addClass('hidden');
+            clicked = false;
+        },50);
+    });
+    $(document).on('click','.drawerbox-backdrop,.drawerbox-close',()=>{
+        $('.drawerbox-wrapper').removeClass('active');
+        setTimeout(()=>{
+            $('.drawerbox-wrapper').remove();
+        },200);
+        screencore.getdom('.footer-controlBox').removeClass('hidden');
+    });
+    $(document).on('click','.drawerbox-body li',function(){
+        var $this = $(this),stylemodule = $this.attr("data-module")||'',styleid = $this.attr("data-styleid")||'';
+        screencore.ajaxSubmit('/screen/common/changestyle',{
+            module: stylemodule,
+            styleid: styleid,
+            isactive: '2',
+            rotateid:"{$rotateid??'0'}"
+        }).then(function(data){
+            if(data.code == 0){
+                screensocket.isclose = false;
+                var href = data.msg;
+                if(XCV3Config.loadtype == '2'){
+                    href = href.replace(`${stylemodule}/index`,`frame/index`) + `&module=${stylemodule}`;
+                }
+                window.open(href,"_blank");
+            }
+        }, function(){
+            console.log('网络太差，请稍后重试.');
+        });
+    });
+});
+</script>

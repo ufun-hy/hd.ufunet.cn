@@ -1,0 +1,122 @@
+{include file='$Wpath/common/header'}
+<div class="form-inline zam-inline-searchbar">
+	<div class="form-group">
+		<div class="input-group input-group-sm">
+			<span class="input-group-addon">公众号名称</span>
+			<input type="text" class="form-control" value="" id="keyword" placeholder="请输入公众号名称">
+		</div>
+	</div>
+	<div class="form-group">
+		<div class="input-group input-group-sm">
+			<span class="input-group-addon">用户名或手机号</span>
+			<input type="text" class="form-control" value="" id="keyword2" placeholder="请输入用户名或手机号">
+		</div>
+	</div>
+	<a class="btn btn-primary btn-sm btn-search" href="javascript:void(0)"><i class="mdi mdi-magnify"></i> 搜索</a>
+</div>
+<table id="listtable" class="zam-btable"></table>
+<script>
+	require(['webcore', 'webtable', 'jconfirmBox', 'zamnotice'], function (webcore, webtable, jconfirmBox, zamnotice) {
+		var initConfig = {
+			tableId: '#listtable',
+			url: "{:goweb('wxaccount/index')}",
+			columnoperate: {
+				btns: {
+					edit: true,
+					del: true,
+				},
+				func: {
+					edit: function (value, row, index) {
+						var confirmObj = jconfirmBox.ajaxconfirm("编辑公众号", "{:goweb('wxaccount/edit')}", { ishtml: '1', wechatid: row.id }, 'html', 'col-lg-8 col-lg-offset-2', function (e) {
+							var postData = webcore.serializeObject(e.find('form'));
+							postData.wechatid = row.id;
+							webcore.ajaxSubmit("{:goweb('wxaccount/edit')}", postData).then(function (json) {
+								if (json.code == 0) {
+									webtable.refresh();
+									zamnotice.showTips('success', '保存成功');
+									confirmObj.close();
+								} else {
+									zamnotice.showTips('error', json.msg);
+									return false;
+								}
+							}, function (json) {
+								zamnotice.showTips('error', '网络差。操作失败');
+								return false;
+							});
+						}, false, '1', ['确定', '取消'], true, function () {
+							tpl_switch();
+						});
+					},
+					del: function (value, row, index) {
+						jconfirmBox.confirm('温馨提示', '删除公众号将导致绑定了当前公众号的所有活动无法通过关键词触发，并且无法恢复，您确定要删除么？', function () {
+							webcore.ajaxSubmit("{:goweb('wxaccount/del')}", { wechatid: row.id }).then(function (json) {
+								if (json.code == 0) {
+									webtable.refresh();
+									zamnotice.showTips('success', '删除成功');
+								} else {
+									zamnotice.showTips('error', json.msg);
+								}
+							}, function (json) {
+								zamnotice.showTips('error', '网络差。操作失败');
+							});
+						});
+					},
+				}
+			},
+			columns: [{
+				checkbox: true,
+			},
+			{
+				field: 'id',
+				title: 'id',
+				align: 'center',
+				visible: false
+			}, {
+				field: 'user_name',
+				title: '接入用户',
+				align: 'center',
+				width: '10%',
+				formatter: function (value, row, index) {
+					var html = "<div><span class=\"m-t-5\">" + (value == null ? "已删除" : value) + "</span></div><div class='m-t-5'><span>id:" + row.user_id + "</span></div>";
+					return html;
+				},
+			}, {
+				field: 'statushtml',
+				title: '状态',
+				align: 'center',
+			}, {
+				field: 'accountname',
+				title: '公众号名称',
+				align: 'center',
+			}, {
+				field: 'appid',
+				title: 'APPID',
+				align: 'center'
+			}, {
+				field: 'levelhtml',
+				title: '类型',
+				align: 'center',
+			}, {
+				field: 'qrcode',
+				title: '二维码',
+				align: 'center',
+				formatter: function (value, row, index) {
+					return '<img src="' + value + '" style="width:80px;height:80px;object-fit: cover;" onerror="javascript:this.src=\'/static/images/sys/nopic.jpg\'" />';
+				},
+			}
+				, {
+				field: 'create_time',
+				title: '接入时间',
+				align: 'center',
+			}
+			],
+			searchParamas: [{ 'type': '1', 'id': 'keyword' }, { 'type': '1', 'id': 'keyword2' }],
+
+		};
+		webtable.init(initConfig);
+		$(".useraccount-box").on('click', '.btn-tx', function () {
+
+		});
+	});
+</script>
+{include file='$Wpath/common/footer'}

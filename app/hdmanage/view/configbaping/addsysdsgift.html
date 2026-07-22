@@ -1,0 +1,31 @@
+<style>
+.user-item{position:relative;width:100px;height:100px;}
+.user-item .zam-select{position:absolute;top:20px;left:0px;}
+.user-item img{width:50px;height:50px;border-radius:50%;}
+.resultuser{
+	flex-wrap: wrap;
+    justify-content: center;
+}
+</style>
+<div class="zam-confirmBox">
+	<ul class="alert resultuser zam-flex"> 
+		{volist name="sysdsgifts" id="gift"}
+			{if !in_array($gift['id'],$hdsysgiftids) && $gift['isshow']=='1'}
+				<li class="zam-flex-column-center user-item">
+					<span class="zam-select">
+						<label class=" lyear-checkbox checkbox-primary ">
+			              <input data-id="{$gift['id']}" name="selectuser[]" type="checkbox">
+			              <span></span>
+			            </label>
+					</span>
+					<img src="{:tomedia($gift['giftconfig']['giftimg'])}" class="loaded"> <p>{$gift['giftconfig']['giftname']}</p> 
+				</li>
+			{/if}
+		{/volist}
+	</ul>
+</div>
+<script>
+require(["webcore"],function(webcore){
+	$(".zam-confirmBox .resultuser li").length<=0&&$(".zam-confirmBox .resultuser").html("<span class='text-error'>暂无礼物可选</span>");
+});
+</script>

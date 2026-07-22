@@ -1,0 +1,229 @@
+{include file='$Wpath/common/header'}
+<div class="form-inline zam-inline-searchbar">
+    <div class="form-group">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">名单数据</span>
+        <input type="text" class="form-control" value="" id="keyword" name="username" placeholder="请输入名单数据">
+      </div>
+    </div>
+    <a class="btn btn-primary btn-sm btn-search" href="javascript:void(0)"><i class="mdi mdi-magnify"></i> 搜索</a>
+</div>
+{include file='$Wpath/common/tabletoolbar'}
+<table id="listtable" class="zam-btable"></table>
+<script>    
+require(['webcore','webtable','jconfirmBox','zamnotice','clipboard','layerBox','jcode'],function(webcore,webtable,jconfirmBox,zamnotice,Clipboard,layerBox){
+var initConfig = {
+    tableId:'#listtable',
+    url:"{:gohdmanage('configyaohao/user',['hdid'=>$hdid])}",
+    columnoperate:{
+        btns:{
+            edit:true,
+            del:true,
+        },
+        func:{
+            edit:function(value, row, index){
+                var confirmObj = jconfirmBox.ajaxconfirm("编辑用户","{:gohdmanage('configyaohao/edituser',['hdid'=>$hdid])}",{userid:row.id},'html','col-lg-10 col-lg-offset-1',function(e){
+                    var postData = webcore.serializeObject(e.find('form'));
+                    postData.userid = row.id;
+                    webcore.ajaxSubmit("{:gohdmanage('configyaohao/saveuser',['hdid'=>$hdid])}",postData).then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','保存成功');
+                            confirmObj.close();
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                             return false;
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                         return false;
+                    });
+                });
+            },
+            del:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','删除将删除名单以及名单摇号中奖数据并且无法恢复，您确定要删除么？',function(){
+                        webcore.ajaxSubmit("{:gohdmanage('configyaohao/deluser',['hdid'=>$hdid])}",{userid:row.id}).then(function(json){
+                            if(json.code==0){
+                                webtable.refresh();
+                                zamnotice.showTips('success','删除成功');
+                            }else{
+                                zamnotice.showTips('error',json.msg);
+                            }
+                        }, function(json){
+                            zamnotice.showTips('error','网络差。操作失败');
+                        });
+                });
+            },
+        }
+    },
+    columns:[{
+            checkbox: true,
+        }, 
+        {
+            field: 'id',
+            title: 'Id',
+            align: 'center',
+            visible: false
+        },
+        {foreach $fieldconfig as $fkey=>$fval}
+        {
+            field: "{$fkey}",
+            title: "{$fval['fieldname']}",
+            align: 'center',
+        },
+        {/foreach}
+        {
+            field: "catename",
+            title: "分类",
+            align: 'center',
+            formatter: function(value, row, index){
+                var html = row.cateid!='0'?'<div><span class="label label-primary">'+value+'</span></div>':'-';
+                html += "<i class='mdi mdi-pencil m-l-5 cursor changecateid' data-userid="+row.id+" data-cateid="+row.cateid+"></i>";
+                return html;
+            },
+        }
+        ,{
+            field: 'create_time',
+            title: '创建时间',
+            align: 'center',
+        }
+    ],
+    searchParamas:[{'type':'1','id':'keyword'}],
+    toolbar:{
+        add:function(){
+            var confirmObj = jconfirmBox.ajaxconfirm("新增名单","{:gohdmanage('configyaohao/edituser',['hdid'=>$hdid])}",{},'html','col-lg-10 col-lg-offset-1',function(e){
+	            var postData = webcore.serializeObject(e.find('form')),hasempty=false;
+                e.find(".mustinput").each(function(){
+                    if($(this).val()==''){
+                        hasempty = true;
+                        return false;
+                    }
+                });
+                if(hasempty){
+                    zamnotice.showTips('error','必填项必须填写内容');
+                    return false;
+                }
+	            webcore.ajaxSubmit("{:gohdmanage('configyaohao/saveuser',['hdid'=>$hdid])}",postData).then(function(json){
+	                if(json.code==0){
+	                    webtable.refresh();
+	                    zamnotice.showTips('success','新增成功');
+	                    confirmObj.close();
+	                }else{
+	                    zamnotice.showTips('error',json.msg);
+	                    return false;
+	                }
+	            }, function(json){
+	                zamnotice.showTips('error','网络差。操作失败');
+	                 return false;
+	            });
+	        });
+        },
+        del:function(){
+            var getSelects = webtable.getSelections();
+            if(getSelects.length>0){
+                jconfirmBox.confirm('温馨提示','删除将删除所选名单以及名单摇号中奖数据并且无法恢复，您确定要删除么？',function(){
+                    webcore.ajaxSubmit("{:gohdmanage('configyaohao/deluser',['hdid'=>$hdid])}",{userid:getSelects}).then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','删除成功');
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差,操作失败');
+                    });
+                });
+            }else{
+                zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+        },
+        reset:function(){
+            jconfirmBox.confirm('温馨提示','清空将删除所有名单和摇号中奖数据并且无法恢复，您确定要清空么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('configyaohao/resetalluser',['hdid'=>$hdid])}",{}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','清空成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+        },
+        other:function(){
+            var getSelects = webtable.getSelections();
+            if(getSelects.length>0){
+                var confirmObj = jconfirmBox.ajaxconfirm("加入分类","{:gohdmanage('configyaohao/showcate',['hdid'=>$hdid])}",{},'html','col-lg-8 col-lg-offset-2',function(e){
+                        var cateid = e.find("option:selected").val();
+                        if(cateid!='' && cateid){
+                            webcore.ajaxSubmit("{:gohdmanage('configyaohao/changeusercateid',['hdid'=>$hdid])}",{cateid:cateid,userid:getSelects},'正在新增用户到分类...').then(function(json){
+                                if(json.code==0){
+                                    confirmObj.close();
+                                    zamnotice.showTips('success','操作成功');
+                                    webtable.refresh();
+                                }else{
+                                    zamnotice.showTips('error',json.msg);
+                                }
+                            }, function(json){
+                                zamnotice.showTips('error','网络差。操作失败');
+                            });
+                        }else{
+                            zamnotice.showTips('error','请选择分类');
+                        }
+                });
+            }else{
+                zamnotice.showTips('error','请先选择名单');
+            }
+        },
+        import:function(){
+            webcore.importxls({title:'导入名单信息',url:"{:gohdmanage('configyaohao/importuser',['hdid'=>$hdid])}",moban:"/{:SYSIMGURL}excel/yaohao.xls?t=2",uptxt:"点击上传名单信息",xlstxt:"注:请务必严格按照模板内容制作xls文件"},function(){
+                        webtable.refresh();
+            });
+        },
+        shenhe:function(){
+            var confirmobj = jconfirmBox.ajaxconfirm("重复数据检查结果","{:gohdmanage('configyaohao/checkuser',['hdid'=>$hdid])}",{},'html','col-lg-8 col-lg-offset-2',function(e){},false,'2');
+        },
+    },
+};
+webtable.init(initConfig);
+$("#listtable").on('click','.changecateid',function(){
+    var userid = $(this).attr('data-userid'),usercateid = $(this).attr('data-cateid');
+    var confirmObj = jconfirmBox.ajaxconfirm((usercateid=='0'?"加入分类":"修改分类"),"{:gohdmanage('configyaohao/showcate',['hdid'=>$hdid])}",{userid:userid},'html','col-lg-8 col-lg-offset-2',function(e){
+            var cateid = e.find("option:selected").val();
+            if(cateid!='' && cateid){
+                webcore.ajaxSubmit("{:gohdmanage('configyaohao/changeusercateid',['hdid'=>$hdid])}",{cateid:cateid,userid:userid},'正在新增用户到分类...').then(function(json){
+                    if(json.code==0){
+                        confirmObj.close();
+                        zamnotice.showTips('success','操作成功');
+                        webtable.refresh();
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差。操作失败');
+                });
+            }else{
+                zamnotice.showTips('error','请选择分类');
+            }
+    });
+});
+$("body").on('click','.btn-samedetail',function() {
+        var field = $(this).attr('data-field');
+        var confirmobj = jconfirmBox.ajaxconfirm("重复数据明细","{:gohdmanage('configyaohao/repeatuser',['hdid'=>$hdid])}",{yhfield:field},'html','col-md-10 col-md-offset-1',function(e){},false,'2');
+});
+$("body").on('click','.btn-delsame',function(){
+    var $this = $(this),dataid = $this.attr('data-id');
+    jconfirmBox.confirm('温馨提示','删除所选数据将同步删除相关的摇号结果数据，并且无法恢复，您确定要删除么？',function(){
+        webcore.ajaxSubmit("{:gohdmanage('configyaohao/deluser',['hdid'=>$hdid])}",{userid:dataid}).then(function(json){
+            $this.parent().parent().remove();
+            webtable.refresh();
+            zamnotice.showTips('success','删除成功');
+        }, function(json){
+            zamnotice.showTips('error','网络差。操作失败');
+        });
+    });
+});
+});
+</script>
+{include file='$Wpath/common/footer'}

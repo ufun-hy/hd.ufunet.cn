@@ -1,0 +1,205 @@
+{include file='$Wpath/common/header'}
+
+<div class="col-lg-12">
+	<div class="btn-groups pull-right daysbox">
+		<a class="btn btn-default btn-xs" data-day='7'>最近7天</a>
+		<a class="btn btn-default btn-xs" data-day='30'>最近30天</a>
+		<a class="btn btn-default btn-xs" data-day='diy'>自定义日期</a>
+	</div>
+</div>
+<div class="col-lg-12 seltimebox hidden">
+	<div class="pull-right m-t-15" style="width: 300px;">
+	  {:tpl_daterangetime([
+	  	'name'=>'startendtime',
+	  	'autoval'=>'2',
+	  	'needsfm'=>'2',
+	  	'needsdd'=>'2',
+	  	'val'=>'',
+	  	'placeholder'=>'点击选择时间范围',
+	  	'neededit'=>'1',
+	  ])}
+	</div>
+</div>
+<div id="orderdirection" style="width:100%; height:500px;margin-top:90px;"></div>
+<script type="text/javascript">
+	require(['webcore','zamnotice','echarts'],function(webcore,zamnotice,echarts){
+		$(".daysbox .btn").click(function(){
+			var day = $(this).attr('data-day');
+			$(this).addClass('btn-primary').siblings().removeClass('btn-primary');
+			if(day!='diy'){
+				initdata(day,'1');
+				$(".seltimebox").addClass('hidden');
+			}else{
+				$(".seltimebox").removeClass('hidden');
+				var startendtime = $(".seltimebox input").val();
+				if(startendtime!=''){
+					let splittime = startendtime.split(' - ');
+					initdata({start:splittime[0],end:splittime[1]},'2');
+				}
+			}
+		});
+		
+		$('input[name="startendtime"]').on('apply.daterangepicker', function(ev, picker) {
+			var start = picker.startDate.format('YYYY-MM-DD HH:mm:ss'),end = picker.endDate.format('YYYY-MM-DD HH:mm:ss');
+			var starttime = (new Date(start).getTime()) / 1000,endtime = (new Date(end).getTime()) / 1000;
+			if(endtime - starttime > 30 * 24 * 60 * 60){
+				return zamnotice.showTips('error','日期时间范围不可超出30天，请重新选择日期');
+			}
+			$(".seltimebox input").val(start + ' - ' + end);
+			initdata({start:start,end:end},'2');
+		});
+		var myChart = echarts.init(document.getElementById('orderdirection'));
+		$(".daysbox .btn").eq(0).trigger('click');
+		function initdata(daynum,daytype){
+			myChart.showLoading();
+			webcore.ajaxSubmit("{:goweb('weborder/direction')}",{ daynum:daynum,daytype:daytype }).then(function(json){
+				myChart.hideLoading();
+				var titletext = daynum=='7'?'近7天':'近30天';
+				if(daytype=='2'){
+					titletext = daynum.start + '-' + daynum.end;
+				}
+				var chartOption = {
+					title: {
+					    text:titletext + '后台订单走势',
+					    top: '0',
+					    textStyle: {
+					        fontWeight: 'normal',
+					        fontSize: 12,
+					        color: '#404040',
+					        fontFamily: 'Microsoft YaHei UI',
+					    }
+					},
+					tooltip: {
+					    trigger: 'axis'
+					},
+					legend: {
+					    data: [ '订单总量','成交总量','订单总额','成交总额' ]
+					},
+					grid: {
+					    x: 50,
+					    x2: 50,
+					    y2: 30
+					},
+					calculable: true,
+					xAxis: [
+					    {
+					        type: 'category',
+					        boundaryGap: false,
+					        data: json.xdate,
+					        axisLine: {
+					            lineStyle: {
+					                width: '0'
+					            }
+					        },
+					    },
+					],
+					yAxis: [
+					    {
+					        type: 'value',
+					        axisLine: {
+					            lineStyle: {
+					                width: '0'
+					            }
+					        },
+					        axisLabel: {
+					            formatter: '{value}'
+					        }
+					    }
+					],
+					series: [
+					    {
+					        name: '订单总量',
+					        type: 'line',
+					        data: json.totalnum,
+					        markPoint: {
+					            data: [
+					                {
+					                    type: 'max',
+					                    name: '最大值'
+					                },
+					                {
+					                    type: 'min', name: '最小值'
+					                }
+					            ]
+					        },
+					        markLine: {
+					            data: [
+					                {type: 'average', name: '平均值'}
+					            ]
+					        },
+					        itemStyle: {
+					            normal: {
+					                color: '#ffc000'
+					            }
+					        }
+					    },
+                        {
+                            name: '成交总量',
+                            type: 'line',
+                            data: json.num,
+                            markPoint: {
+                                data: [
+                                    {
+                                        type: 'max',
+                                        name: '最大值'
+                                    },
+                                    {
+                                        type: 'min', name: '最小值'
+                                    }
+                                ]
+                            },
+                            markLine: {
+                                data: [
+                                    {type: 'average', name: '平均值'}
+                                ]
+                            },
+                            itemStyle: {
+                                normal: {
+                                    color: '#ff5555'
+                                }
+                            }
+                        },
+					    {
+					        name: '订单总额',
+					        type: 'line',
+					        data: json.totalmoney,
+					        markLine: {
+					            data: [
+					                {type: 'average', name: '平均值'}
+					            ]
+					        },
+					        itemStyle: {
+					            normal: {
+					                color: '#44abf7'
+					            }
+					        }
+					    },
+					      {
+                            name: '成交总额',
+                            type: 'line',
+                            data: json.money,
+                            markLine: {
+                                data: [
+                                    {type: 'average', name: '平均值'}
+                                ]
+                            },
+                            itemStyle: {
+                                normal: {
+                                    color: '#30af84'
+                                }
+                            }
+                        }
+					]
+				};
+				myChart.setOption(chartOption);
+				window.addEventListener("resize", function () {
+		            myChart.resize();
+		        });
+			},function(){
+				myChart.hideLoading();
+				zamnotice.showTips('error','数据加载失败.');
+			});
+	 }
+	});
+</script>
+{include file='$Wpath/common/footer'}

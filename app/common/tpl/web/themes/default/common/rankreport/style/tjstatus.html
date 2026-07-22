@@ -1,0 +1,194 @@
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 显示</label>
+    <div class="col-lg-6">
+        {:tpl_switch('tjstatusconfig[open]',$config['tjstatusconfig']['open']??'2','opentjstatusbox')}
+        <span class="zam-help-block">关闭则大屏幕不显示提交状态对应的文字</span>
+    </div>
+</div>
+<div class="tjstatusconfigbox{if !isset($config['tjstatusconfig']['open']) || $config['tjstatusconfig']['open'] =='2'} hidden{/if}">
+    <div class="form-group">
+        <label class="col-lg-2 control-label text-right">* 宽高与位置</label>
+        <div class="col-lg-9">
+            <div class="input-group">
+                <div class="input-group-btn not-allow"><a class="btn btn-default">宽度</a></div>
+                <div class="touchspin">
+                <input type="text" class="form-control numberincdec" name="tjstatusconfig[width]" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="null"
+                data-bts-step="1"
+                data-bts-postfix="px"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['tjstatusconfig']['width']??90}">
+                </div>
+                <div class="input-group-btn not-allow"><a class="btn btn-default">高度</a></div>
+                <div class="touchspin">
+                <input type="text" class="form-control numberincdec" name="tjstatusconfig[height]" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="null"
+                data-bts-step="1"
+                data-bts-postfix="px"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['tjstatusconfig']['height']??32}">
+                </div>
+                <div class="input-group-btn not-allow"><a class="btn btn-default">距屏幕顶部距离</a></div>
+                <div class="touchspin">
+                <input type="text" class="form-control numberincdec" name="tjstatusconfig[top]" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="null"
+                data-bts-step="1"
+                data-bts-postfix="px"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['tjstatusconfig']['top']??10}">
+                </div>
+                <div class="input-group-btn not-allow"><a class="btn btn-default">距屏幕左侧距离</a></div>
+                <div class="touchspin">
+                <input type="text" class="form-control numberincdec" name="tjstatusconfig[left]" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="null"
+                data-bts-step="1"
+                data-bts-postfix="px"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['tjstatusconfig']['left']??10}">
+                </div>
+            </div>
+            <span class="help-block">注:宽高与位置可在大屏幕自行拖动</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label text-right">* 温馨提示</label>
+        <div class="col-lg-10">
+            <div class="alert alert-danger">
+                可在大屏幕上通过点击键盘的空格键来切换提交状态
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label text-right">* 未开始</label>
+        <div class="col-lg-10">
+            <div class="input-group">
+                <div class="input-group-btn not-allow"><a class="btn btn-default">文字</a></div>
+                <input class="form-control" type="text"  name="tjstatusconfig[status1][text]" value="{$config['tjstatusconfig']['status1']['text']??'未开始'}">
+                <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
+                <div class="touchspin">
+                <input type="text" class="form-control numberincdec" name="tjstatusconfig[status1][size]" 
+                data-bts-min="12" data-bts-replacement-val="12"
+                data-bts-max="60"
+                data-bts-step="1"
+                data-bts-postfix="px"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['tjstatusconfig']['status1']['size']??18}">
+                </div>
+                <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+                {:tpl_color('tjstatusconfig[status1][color]',$config['tjstatusconfig']['status1']['color']??'#fff')}
+                <div class="input-group-btn not-allow"><a class="btn btn-default">背景色</a></div>
+                {:tpl_color('tjstatusconfig[status1][bgcolor]',$config['tjstatusconfig']['status1']['bgcolor']??'#274e13')}
+                <div class="input-group-btn not-allow"><a class="btn btn-default">边界</a></div>
+                <div class="touchspin">
+                <input type="text" class="form-control numberincdec" name="tjstatusconfig[status1][bordersize]" 
+                data-bts-min="0" data-bts-replacement-val="1"
+                data-bts-max="6"
+                data-bts-step="1"
+                data-bts-postfix="px"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['tjstatusconfig']['status1']['bordersize']??1}">
+                </div>
+                <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+                {:tpl_color('tjstatusconfig[status1][bordercolor]',$config['tjstatusconfig']['status1']['bordercolor']??'#ffdfa1')}
+            </div>
+            <span class="help-block">未开始状态</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label text-right">* 进行中</label>
+        <div class="col-lg-10">
+            <div class="input-group">
+                <div class="input-group-btn not-allow"><a class="btn btn-default">文字</a></div>
+                <input class="form-control" type="text"  name="tjstatusconfig[status2][text]" value="{$config['tjstatusconfig']['status2']['text']??'进行中'}">
+                <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
+                <div class="touchspin">
+                <input type="text" class="form-control numberincdec" name="tjstatusconfig[status2][size]" 
+                data-bts-min="12" data-bts-replacement-val="12"
+                data-bts-max="60"
+                data-bts-step="1"
+                data-bts-postfix="px"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['tjstatusconfig']['status2']['size']??18}">
+                </div>
+                <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+                {:tpl_color('tjstatusconfig[status2][color]',$config['tjstatusconfig']['status2']['color']??'#fff')}
+                <div class="input-group-btn not-allow"><a class="btn btn-default">背景色</a></div>
+                {:tpl_color('tjstatusconfig[status2][bgcolor]',$config['tjstatusconfig']['status2']['bgcolor']??'#03A9F4')}
+                <div class="input-group-btn not-allow"><a class="btn btn-default">边界</a></div>
+                <div class="touchspin">
+                <input type="text" class="form-control numberincdec" name="tjstatusconfig[status2][bordersize]" 
+                data-bts-min="0" data-bts-replacement-val="1"
+                data-bts-max="6"
+                data-bts-step="1"
+                data-bts-postfix="px"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['tjstatusconfig']['status2']['bordersize']??1}">
+                </div>
+                <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+                {:tpl_color('tjstatusconfig[status2][bordercolor]',$config['tjstatusconfig']['status2']['bordercolor']??'#ffdfa1')}
+            </div>
+            <span class="help-block">进行中状态</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label text-right">* 已结束</label>
+        <div class="col-lg-10">
+            <div class="input-group">
+                <div class="input-group-btn not-allow"><a class="btn btn-default">文字</a></div>
+                <input class="form-control" type="text"  name="tjstatusconfig[status3][text]" value="{$config['tjstatusconfig']['status3']['text']??'已结束'}">
+                <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
+                <div class="touchspin">
+                <input type="text" class="form-control numberincdec" name="tjstatusconfig[status3][size]" 
+                data-bts-min="12" data-bts-replacement-val="12"
+                data-bts-max="60"
+                data-bts-step="1"
+                data-bts-postfix="px"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['tjstatusconfig']['status3']['size']??18}">
+                </div>
+                <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+                {:tpl_color('tjstatusconfig[status3][color]',$config['tjstatusconfig']['status3']['color']??'#fff')}
+                <div class="input-group-btn not-allow"><a class="btn btn-default">背景色</a></div>
+                {:tpl_color('tjstatusconfig[status3][bgcolor]',$config['tjstatusconfig']['status3']['bgcolor']??'#000')}
+                <div class="input-group-btn not-allow"><a class="btn btn-default">边界</a></div>
+                <div class="touchspin">
+                <input type="text" class="form-control numberincdec" name="tjstatusconfig[status3][bordersize]" 
+                data-bts-min="0" data-bts-replacement-val="1"
+                data-bts-max="6"
+                data-bts-step="1"
+                data-bts-postfix="px"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['tjstatusconfig']['status3']['bordersize']??1}">
+                </div>
+                <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+                {:tpl_color('tjstatusconfig[status3][bordercolor]',$config['tjstatusconfig']['status3']['bordercolor']??'#ffdfa1')}
+            </div>
+            <span class="help-block">已结束状态</span>
+        </div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 状态切换成功文字提示层</label>
+    <div class="col-lg-6">
+        {:tpl_switch('tjstatusconfig[openlay]',$config['tjstatusconfig']['openlay']??'1')}
+        <span class="zam-help-block">关闭则不显示切换成功提示文字黑色层，按需选择开关</span>
+    </div>
+</div>
+<script>
+    function opentjstatusbox(obj,status){
+        if(status=='1'){
+            obj.prev().val('2');
+            obj.attr('data-status','2');
+            $(".tjstatusconfigbox").addClass('hidden');
+        }else{
+            obj.prev().val('1');
+            obj.attr('data-status','1');
+            $(".tjstatusconfigbox").removeClass('hidden');
+        }
+        obj.prev().prev().prop("checked",status=='1'?false:true);
+    }
+</script>

@@ -1,0 +1,102 @@
+<script id='table-operate-tpl' type="text/template">
+    <%#  $.each(d.btns, function(index, item){ %>
+        <%# if(index=='edit'){ %>
+            <%# 
+                var defaultclass="primary",defaulttitle="编辑",defaulticon="mdi-pencil";
+            %>
+        <%# }else if(index=='data'){ %>
+            <%# 
+                var defaultclass="warning",defaulttitle="数据",defaulticon="mdi-account-outline"; 
+            %>
+        <%# }else if(index=='del'){ %>
+            <%# 
+                var defaultclass="danger",defaulttitle="删除",defaulticon="mdi-close"; 
+            %>
+        <%# }else if(index=='shenhe'){ %>
+            <%# 
+                var defaultclass="info",defaulttitle="审核",defaulticon="mdi-gavel"; 
+            %>
+        <%# }else if(index=='reset'){ %>
+            <%# 
+                var defaultclass="info",defaulttitle="重置",defaulticon="mdi-gavel"; 
+            %>
+        <%# }else if(index=='refund'){ %>
+            <%# 
+                var defaultclass="danger",defaulttitle="退款",defaulticon="mdi-export"; 
+            %>
+        <%# } %>
+        <%# if(item.except){ %>
+            <%# if(item.except.only && d.data[item.except.field||'status']!=item.except.only){ %>
+                <%# return true; %>
+            <%# } %>
+            <%# if(item.except.not && $.inArray(d.data[item.except.field||'status']+'',item.except.not) != -1){ %>
+                <%# return true; %>
+            <%# } %>
+            <%# if(item.except.more){ %>
+                <%# 
+                    var btnshow = true; 
+                %>
+                <%# $.each(item.except.more, function(i, v){ %>
+                    <%# if(v.only && d.data[v.field||'status']!=v.only){ %>
+                        <%# 
+                            btnshow = false;
+                            return false;
+                        %>
+                    <%# } %>
+                    <%# if(v.eq && d.data[v.field||'status']==v.eq){ %>
+                        <%# 
+                            btnshow = false;
+                            return false;
+                        %>
+                    <%# } %>
+                    <%# if(v.not && $.inArray(d.data[v.field||'status']+'',v.not) != -1){ %>
+                        <%# 
+                            btnshow = false;
+                            return false;
+                        %>
+                    <%# } %>
+                <%#  }); %>
+                <%# if(!btnshow){ %>
+                    <%# return true; %>
+                <%# } %>
+            <%# } %>
+        <%# } %>
+        <a class="btn btn-xs btn-<% item.class || defaultclass %> btn-<% index %>-one m-l-5 m-b-5" href="javascript:void(0)" data-title="<% item.title || defaulttitle %>" data-toggle="tooltip">
+            <i class="mdi <% item.icon || defaulticon %>"></i>
+        </a>
+    <%#  }); %>
+</script>
+<script id='multiimg-item-tpl' type="text/template">
+    <div class="multi-item">
+        <img src="<% d.filesrc %>" onerror="this.src='/static/images/sys/nopic.jpg'; this.title='图片未找到'" class="img-responsive img-thumbnail">
+        <input type="hidden" name="<% d.inputname %>[]" value="<% d.filepath %>" >
+        <i class="mdi mdi-close" title="删除图片" onclick="javascript:$(this).parent().remove()"></i>
+    </div>
+</script>
+<script id='importxls-tpl' type="text/template">
+<div class="form-horizontal confirmbox-pop">
+    <%# if(d.moban!=''){ %>
+    <div class="form-group">
+        <span class="col-lg-3 text-right">模板</span>
+        <div class="col-lg-6">
+            <a href="<% d.moban %>" class="btn btn-success btn-sm">点击下载模板</a>
+        </div>
+    </div>
+    <%# } %>
+    <div class="form-group">
+        <span class="col-lg-3 text-right">上传</span>
+        <div class="col-lg-9">
+            <a href="javascript:;" class="btn btn-primary btn-sm" style="pointer-events:none"><% d.uptxt %></a>
+            <input  style="position: absolute;opacity:0;top: 0;left: 0;z-index: 1;" class="xlsfile" type="file" name="file" onchange="readexcl(this)" data-filetype="<% d.filetype %>" accept="<%# if(d.filetype=='xls'){ %>.xls<%# }else{ %>text/plain<%# } %>" />
+            <div class="help-block"><% d.xlstxt %></div>
+        </div>
+    </div>
+    <div class="form-group placefilename hidden">
+        <span class="col-lg-3 text-right">本地<% d.filetype %>文件</span>
+        <div class="col-lg-9">
+            <div class="filename"><span class="text-danger"></span></div>
+        </div>
+    </div>
+</div>
+</div>
+</script>

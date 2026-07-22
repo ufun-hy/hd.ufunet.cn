@@ -1,0 +1,50 @@
+<div class="form-horizontal confirmbox-pop">
+    <form class="confirm-formbox" method="post">
+        <div class="form-group faSelect">
+            <label class="col-lg-2  control-label">* 选择分组</label>
+            <div class="col-lg-10">	
+                <select name="cateid" class="form-control">
+                    {foreach $cates as $cate}
+                     <option value="{$cate['id']}">{$cate['catename']}</option>
+                    {/foreach}
+                </select>
+                <div class="help-block">同一个文件有且只能移动到一个组，同一个文件无法拥有多个组</div>
+            </div>
+        </div>
+        <div class="form-group sonSelect hidden">
+            <label class="col-lg-2  control-label">* 选择二级分组</label>
+            <div class="col-lg-10">	
+                <select name="scateid" class="form-control"></select>
+                <div class="help-block">同一个文件有且只能移动到一个组，同一个文件无法拥有多个组</div>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+    var allcates = {:json_encode($cates)};
+    require(['webcore'],function(webcore){
+        var sonbox = $(".sonSelect"),sonSelect = sonbox.find('select');
+        $('.faSelect select').change(function(){
+            var fcateid = $(this).val()||'';
+            var options = [];
+            $.each(allcates,function(i,v){
+                if(v.id == fcateid){
+                    options = v.children||[];
+                    return false;
+                }
+            });
+            var html = ``;
+            if(options.length){
+                $.each(options,function(j,k){
+                    html += `<option value="${k.id}">${k.catename}</option>`;
+                });
+            }
+            sonSelect.html(html);
+            if(!html){
+                sonbox.addClass('hidden');
+            }else{
+                sonbox.removeClass('hidden');
+            }
+        });
+    });
+</script>

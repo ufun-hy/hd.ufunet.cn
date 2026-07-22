@@ -1,0 +1,112 @@
+<div class="form-horizontal confirmbox-pop addgameprize-pop">
+ <div class="form-group">
+    <label class="col-lg-3 control-label">* 类型</label>
+    <div class="col-lg-8">
+      <label class="lyear-radio radio-inline radio-primary" onclick="showMoneyBox(this)">
+       <input type="radio" name="prizetype" value="1" {if $prizetype=='1'}checked{/if}><span>实物</span>
+      </label>
+      <label class="lyear-radio radio-inline radio-primary" onclick="showMoneyBox(this)">
+       <input type="radio" name="prizetype" value="2" {if $prizetype=='2'}checked{/if}><span>红包</span>
+      </label>
+    </div>
+ </div>
+ <div class="form-group">
+	<label class="col-lg-3 control-label">* 奖品图</label>
+	<div class="col-lg-8">
+	   {:tpl_image_one('prizeimg',$prizeimg)}
+	   <span class="zam-help-block">规格:200*200px</span>
+	</div>
+ </div>
+ <div class="form-group">
+	<label class="col-lg-3 control-label">* 奖品名称</label>
+	<div class="col-lg-8">
+	  <input type="text" class="form-control"  name="prizename" value="一等奖" maxlength="20" placeholder="20字内">
+	</div>
+ </div>
+ <div class="form-group">
+	<label class="col-lg-3 control-label">奖品描述(可不填写此项)</label>
+	<div class="col-lg-8">
+	  <input type="text" class="form-control"  name="prizedes" value="" maxlength="100" placeholder="100字内，可通过#实现换行显示">
+	  <div class="help-block">此描述文字将展示在微信端中奖记录内</div>
+	</div>
+ </div>
+ <div class="form-group prizemoneyBox{if $prizetype=='1'} hidden{/if}">
+		<label class="col-lg-3 control-label">* 单个红包金额</label>
+		<div class="col-lg-8">
+			<input type="text" class="form-control numberincdec" name="prizemoney" 
+                data-bts-min="{$sendhbmin}" data-bts-replacement-val="{$sendhbmin}"
+                data-bts-max="null"
+                data-bts-decimals="2"
+                data-bts-step="1"
+                data-bts-force-step-divisibility="xstwo"
+                value="{$prizemoney}">
+			<span class="zam-help-block">注:最小可以是{$sendhbmin}元，<span class="text-danger">请必须保证您的红包账户余额充足，账户余额不足会导致中奖用户无法收到红包</span>，<a href="{:gomyhome('account/index')}" target="__blank">点击充值</a></span>
+		</div>
+ </div>
+ <div class="form-group gameteammcbox">
+ {if $gametype=='tug'}
+    <label class="col-lg-3 control-label">* 队伍</label>
+    <div class="col-lg-8">
+      <label class="lyear-radio radio-inline radio-primary" onclick="changetugteam(this)">
+    	<input type="radio" name="mcnum" value="1" checked><span>获胜队伍</span>
+      </label>
+      <label class="lyear-radio radio-inline radio-primary" onclick="changetugteam(this)">
+    	<input type="radio" name="mcnum" value="2" ><span>失败队伍</span>
+      </label>
+    </div>
+ {else /}
+ 	{if $isteam=='1'}
+ 		<label class="col-lg-3 control-label">* 团队名次</label>
+		<div class="col-lg-8">
+			<input type="text" class="form-control numberincdec mcnum" name="mcnum" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="null"
+                data-bts-step="1"
+                value="1"
+                readonly 
+                >
+		</div>
+ 	{else /}
+ 		<input class="mcnum" type="hidden" name="mcnum" value="1" /> 
+ 	{/if}
+ {/if}
+ </div>
+ <div class="form-group fjrange">
+	<label class="col-lg-3 control-label">* 发奖范围</label>
+	<div class="col-lg-8">
+		<div class="input-group">
+			<div class="input-group-addon">第</div>
+			<input type="text" class="form-control" name="rangemin" value="{$max}">
+			<div class="input-group-addon">名至第</div>
+			<input type="text" class="form-control" name="rangemax" value="{$max}">
+			<div class="input-group-addon">名</div>
+		</div>
+		<span class="help-block">注:设置两个值相等即为此值的名次 如:第1名至第1名即为第1名，其他名次依次类推</span>
+	</div>
+ </div>
+</div>
+<script>
+require(['webcore',"bootstrap-touchspin"],function(webcore){
+    var teamchangespin = $(".addgameprize-pop .numberincdec").TouchSpin();
+    teamchangespin.on("change", function () {
+        $(".fjrange input").val(getranmax($(".mcnum").val()) + 1);
+    });
+});
+function changetugteam(obj){
+	var $this = $(obj),tugteam = $this.find('input').val(),fjobj = $(".fjrange input");
+	if(tugteam=='1'){
+		fjobj.val("{$max}");
+	}else{
+		var calcval = getranmax(tugteam) + 1;
+		fjobj.val(calcval);
+	}
+}
+function showMoneyBox(obj){
+	var type = $(obj).find('input').val();
+	if(type=='1'){
+		$('.prizemoneyBox').addClass('hidden');
+	}else{
+		$('.prizemoneyBox').removeClass('hidden');
+	}
+}
+</script>

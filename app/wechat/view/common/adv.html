@@ -1,0 +1,292 @@
+<style type="text/css">
+.loadadvbox{
+	position: fixed;
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: 100%;
+	background-color: #fff;
+	z-index: 99999999;
+}
+.loadadvbox .loadadv-iconbox{
+	width: 30px;
+	height: 30px;
+}
+.loadadvbox .loadadv-icon{
+	width: 100%;
+    height: 100%;
+    margin: 0 auto;
+    border: 2px solid #999;
+    border-radius: 50%;
+    border-left-color: transparent;
+    border-right-color: transparent;
+    animation: cssload-spin .4s infinite linear;
+    -webkit-animation: cssload-spin .4s infinite linear;
+}
+.loadadvbox .loadadv-iconimg{
+    width: 100%;
+}
+.loadadvbox .loadadv-iconimg img{
+    max-width: 80%;
+    animation: loadimgani 1s infinite cubic-bezier(0.1, 0.15, 0.9, 1);
+    display: inline-block;
+}
+@keyframes loadimgani {
+    0% {
+      transform: translateY(0px);
+    }
+    25% {
+      transform: translateY(6px);
+    }
+    50% {
+      transform: translateY(0px);
+    }
+    75% {
+      transform: translateY(-6px);
+    }
+    100% {
+      transform: translateY(0px);
+    }
+}
+.loadadvbox .loadadvtxt{
+    width: 100%;
+    padding: 0 0.24rem;
+    margin-top: {$hdinfo['advconfig']['h5']['loadmt']??20}px;
+    color: {$hdinfo['advconfig']['h5']['loadcolor']??'#333'};
+    font-size: {$hdinfo['advconfig']['h5']['loadsize']??'20'}px;
+    text-align: center;
+}
+@keyframes cssload-spin{100%{transform:rotate(360deg);transform:rotate(360deg)}}
+.advbox{
+	position: fixed;
+	top: 0;
+	left: 0;
+    width: 100%;
+    height: 100%;
+	z-index: 99999999;
+	transform: scale(1);
+    -webkit-transform: scale(1); 
+}
+.advboxani {
+    animation: scales 1.5s ease;
+    -webkit-animation: scales 1.5s ease;
+}
+@keyframes scales {
+    from {
+        transform: scale(1.2);
+    }
+
+    to {
+        transform: scale(1);
+    }
+}
+.advboxanihide {
+    animation: scalehide 1s ease;
+    -webkit-animation: scalehide 1s ease;
+}
+@keyframes scalehide {
+    from {
+      opacity: 1
+    }
+    to {
+      opacity: 0
+    }
+}
+.advbox .scrollbox{
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+.advbox .scrollbox .advimg{
+    width: 100%;
+    height: auto;
+}
+.advbox .advinfobox{
+    position: absolute;
+    top:0;
+    left:0;
+    display: none;
+}
+.advbox .advinfobox .advdjsbox{
+    position: fixed;
+    top: 0.24rem;
+    left: 0.24rem;
+    height: 0.72rem;
+    line-height: 0.72rem;
+    background-color: rgba(0,0,0,0.42);
+    color: #fff;
+    border-radius: 0.36rem;
+    padding: 0 0.42rem;
+    font-size: 0.32rem;
+    z-index: 1;
+    max-width: calc(100% - 0.48rem);
+}
+.advbox .advinfobox .advdjsbox .advseconds{width:0.62rem;margin-right: 0.1rem;text-align: center;}
+.advbox .advinfobox .advdjsbox .advtitle{
+    max-width: calc(100% - 0.84rem);
+    margin-right: 0.1rem;
+}
+.advbox .advinfobox .advdetailbox{
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 1.2rem;
+    padding: 0 0.34rem;
+    font-size:0.36rem;
+    color: #fff;
+    background-color: rgba(0,0,0,0.42);
+    font-weight: 600;
+}
+.advbox .advinfobox .advdetailbox div{
+    line-height: 1.2rem;
+}
+.advbox .advinfobox .advdetailbox .lefttxt{
+    float:left;
+}
+.advbox .advinfobox .advdetailbox .righticon{
+    float:right;
+}
+.advbox .advinfobox .advclose{
+    position: fixed;
+    bottom: 1.4rem;
+    right: 0.24rem;
+    height: 0.72rem;
+    line-height: 0.72rem;
+    background-color: rgba(0,0,0,0.42);
+    color: #fff;
+    border-radius: 0.36rem;
+    padding: 0 0.42rem;
+    font-size: 0.32rem;
+    letter-spacing: 2px;
+    z-index: 1;
+}
+.advbox .advinfobox .advclose.alignbottom{
+    bottom: 0.4rem;
+}
+</style>
+<script type="text/javascript">
+var advdjstimer = null;
+{//!XCV3Config.isiframe 直播内??? } 
+if(XCV3Config.adv.open && XCV3Config.adv.open == '1'){
+    if(XCV3Config.adv.open=='1' && (XCV3Config.adv.loadopen == '1' || XCV3Config.adv.advopen == '1')){
+        if(XCV3Config.adv.loadopen == '1'){
+            $("body").append(`
+                <section class="loadadvbox zam-app-flex-ajCenter">
+                    <div class="loadadv-iconimg zam-app-flex-ajCenter${XCV3Config.adv.loadimg === '' ? ' hidden' : ''}">
+                        <img src="${XCV3Config.adv.loadimg}" />
+                    </div>
+                    <div class="loadadv-iconbox${XCV3Config.adv.loadimg != '' ? ' hidden' : ''}">
+                        <div class="loadadv-icon"></div>
+                    </div>
+                    <div class="loadadvtxt${XCV3Config.adv.loadtxt==='' ? ' hidden' : ''}">${XCV3Config.adv.loadtxt==='' ? '' : XCV3Config.adv.loadtxt}</div>
+            </section>`);
+            if(XCV3Config.adv.advopen == '1' && XCV3Config.adv.advimg != ''){
+                var img = new Image();
+                img.onload = img.onerror = function(){
+                    setTimeout(function(){
+                        $(".loadadvbox").remove();
+                        $("body").append(`
+                            <section class="advbox zam-app-flex-ajCenter">
+                                <div class="scrollbox">
+                                    <img class="advimg" src="${XCV3Config.adv.advimg}">
+                                </div>
+                                <div class="advinfobox">
+                                    <div class="advdjsbox zam-app-flex">
+                                        <div class="advtitle limitbox${XCV3Config.adv.advtitle==='' ? ' hidden' : ''}">${XCV3Config.adv.advtitle==='' ? '' : XCV3Config.adv.advtitle}</div>
+                                        <div class="advseconds">${XCV3Config.adv.advtime}</div>秒
+                                    </div>
+                                    <div class="advdetailbox${XCV3Config.adv.advurl==='' ? ' hidden' : ''}">
+                                        <div class="lefttxt">查看详情</div>
+                                        <div class="righticon"><i class="mxc-right"></i></div>
+                                    </div>
+                                    <div class="advclose${XCV3Config.adv.advclose==='2' ? ' hidden' : ''}${XCV3Config.adv.advurl==='' ? ' alignbottom' : ''}">${XCV3Config.adv.advclose==='2' ? '' : '跳过'}</div>
+                                    </div>
+                            </section>
+                        `);
+                        $("body").on('click','.advbox .advinfobox .advdetailbox',function(){
+                            if(XCV3Config.adv.advurl=='') return false;
+                            clearInterval(advdjstimer);
+                            window.location.href = XCV3Config.adv.advurl;
+                        });
+                        $("body").on('click','.advbox .advinfobox .advclose',function(){
+                            clearInterval(advdjstimer);
+                            $(".advbox").remove();
+                        });
+                        $('.advbox').addClass('advboxani').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function () {
+                            $(this).find('.advinfobox').fadeIn();
+                            var advseconds = XCV3Config.adv.advtime;
+                            advdjstimer = setInterval(function(){
+                                advseconds--;
+                                $(".advbox .advdjsbox .advseconds").text(advseconds);
+                                if(advseconds <= 0){
+                                    clearInterval(advdjstimer);
+                                    $('.advbox').addClass('advboxanihide').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function () {
+                                        $(".advbox").remove();
+                                    })
+                                }
+                            },1e3);      
+                        });
+                    },XCV3Config.adv.loadtime * 1e3);
+                }
+                img.src = XCV3Config.adv.advimg;
+            }else{
+                setTimeout(function(){
+                    $(".loadadvbox").remove();
+                },XCV3Config.adv.loadtime * 1e3)
+            }
+        }else{
+            if(XCV3Config.adv.advopen == '1' && XCV3Config.adv.advimg != ''){
+                var img = new Image();
+                img.onload = img.onerror = function(){
+                    $("body").append(`
+                        <section class="advbox zam-app-flex-ajCenter">
+                            <div class="scrollbox">
+                                <img class="advimg" src="${XCV3Config.adv.advimg}">
+                            </div>
+                            <div class="advinfobox">
+                                <div class="advdjsbox zam-app-flex">
+                                    <div class="advtitle limitbox${XCV3Config.adv.advtitle==='' ? ' hidden' : ''}">${XCV3Config.adv.advtitle==='' ? '' : XCV3Config.adv.advtitle}</div>
+                                    <div class="advseconds">${XCV3Config.adv.advtime}</div>秒
+                                </div>
+                                <div class="advdetailbox${XCV3Config.adv.advurl==='' ? ' hidden' : ''}">
+                                    <div class="lefttxt">查看详情</div>
+                                    <div class="righticon"><i class="mxc-right"></i></div>
+                                </div>
+                                <div class="advclose${XCV3Config.adv.advclose==='2' ? ' hidden' : ''}${XCV3Config.adv.advurl==='' ? ' alignbottom' : ''}">${XCV3Config.adv.advclose==='2' ? '' : '跳过'}</div>
+                            </div>
+                        </section>
+                    `);
+                    $("body").on('click','.advbox .advinfobox .advdetailbox',function(){
+                        if(XCV3Config.adv.advurl=='') return false;
+                        clearInterval(advdjstimer);
+                        window.location.href = XCV3Config.adv.advurl;
+                    });
+                    $("body").on('click','.advbox .advinfobox .advclose',function(){
+                        clearInterval(advdjstimer);
+                        $(".advbox").remove();
+                    });
+                    $('.advbox').addClass('advboxani').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function () {
+                        $(this).find('.advinfobox').fadeIn();
+                        var advseconds = XCV3Config.adv.advtime;
+                        advdjstimer = setInterval(function(){
+                            advseconds--;
+                            $(".advbox .advdjsbox .advseconds").text(advseconds);
+                            if(advseconds <= 0){
+                                clearInterval(advdjstimer);
+                                $('.advbox').addClass('advboxanihide').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function () {
+                                    $(".advbox").remove();
+                                })
+                            }
+                        },1e3);      
+                    });
+                };
+                img.src = XCV3Config.adv.advimg;
+            }
+        }
+    }
+}
+</script>

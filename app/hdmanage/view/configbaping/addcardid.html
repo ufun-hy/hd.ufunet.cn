@@ -1,0 +1,65 @@
+<div class="form-horizontal confirmbox-pop">
+  <form class="confirm-formbox" method="post">
+    <div class="form-group">
+      <label class="col-lg-3 control-label">* 卡券功能</label>
+      <div class="col-lg-7">
+        <select class="form-control cardmodule" name="cardmodule">
+              <option value="">-----请选择功能-----</option>
+              {foreach $cardtypes as $key=>$type } 
+              <option value="{$key}" {if $key=="0"}selected{/if}>{$type}</option>
+              {/foreach}
+        </select>
+        <span class="help-block">必须选一个功能</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-3 control-label">* 券号类型</label>
+      <div class="col-lg-7">
+        <label class="lyear-radio radio-inline radio-primary">
+         <input type="radio" name="cardtype" value="1" checked><span>数字英文混合体 <b class="label label-success">推荐</b></span>
+        </label>
+        <label class="lyear-radio radio-inline radio-primary">
+         <input type="radio" name="cardtype" value="2"><span>纯英文</span>
+        </label>
+        <label class="lyear-radio radio-inline radio-primary">
+         <input type="radio" name="cardtype" value="3"><span>纯数字</span>
+        </label>
+        <div class="help-block">由于简单的短卡券号容易被恶意盗刷，强烈推荐使用数字英文混合体</div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-3 control-label">券号前缀</label>
+      <div class="col-lg-8">
+        <input class="form-control" type="text"  name="cardprev" placeholder="可以不填写" value="" maxlength="6">
+        <span class="help-block">最多6个字符，例如：Card，NO等</span>
+      </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-3 control-label">* 券号字符长度</label>
+        <div class="col-lg-8">
+            <input type="text" class="form-control numberincdec cardlen" name="cardlen" 
+            data-bts-min="8" data-bts-replacement-val="8"
+            data-bts-max="null"
+            data-bts-step="1"
+            value="8">
+            <div class="help-block m-0">至少为8位，如果券号生成的数量较多推荐16位以上</div>
+        </div>
+     </div>
+     <div class="form-group">
+        <label class="col-lg-3 control-label">* 生成券号数量</label>
+        <div class="col-lg-8">
+            <input type="text" class="form-control numberincdec cardnum" name="cardnum" 
+            data-bts-min="1" data-bts-replacement-val="1"
+            data-bts-max="null"
+            data-bts-step="1"
+            value="8">
+            <div class="help-block m-0">至少为1个，如果生成的券号数量较多耗时较长请耐心等待，一次生成数量不要超1万个</div>
+        </div>
+     </div>
+</form>
+</div>
+<script type="text/javascript">
+require(['webcore','jconfirmBox','zamnotice','layerBox',"bootstrap-touchspin"],function(webcore,jconfirmBox,zamnotice,layerBox){
+  $(".confirmbox-pop .numberincdec").TouchSpin();
+});
+</script>

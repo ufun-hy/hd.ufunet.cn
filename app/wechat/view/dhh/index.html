@@ -1,0 +1,367 @@
+{include file="common/header" /}
+<style type="text/css">
+.wechatbody{overflow: hidden;}
+.zam-app-bodyBg{min-height: 100%;height: auto;overflow:hidden;overflow-y: auto;background-position: center;}
+.recordbtn{
+	position: fixed;
+    right: .3rem;
+    top: .3rem;
+    z-index:1;
+    padding: 0 .24rem;
+    min-width: 1.58rem;
+    height: .6rem;
+    background: rgba(0,0,0,.3);
+    color: #fff;
+    border-radius: .5rem;
+}
+.recordbtn i{margin-right:0.08rem}
+.dhh-box{
+	position: relative;
+	height: 100%;
+}
+.dhh-list{
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	overflow-y: auto;
+	margin-top: {if $isdz == '1' && !empty($rotatelist)}2.2{else /}1.1{/if}rem;
+	margin-bottom: 0.5rem;
+}
+.dhh-list .dhh-item {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    cursor: pointer;
+    padding: 0.2rem;
+    padding-top: 0;
+}
+.dhh-list .dhh-item .dhh-content{
+	position: relative;
+	background-color: #fff;
+	border-radius: 0.1rem;
+	padding: 0.2rem;
+	width: 100%;
+	box-shadow: -3px 5px 15px rgb(64 102 178 / 30%);
+}
+.dhh-list .dhh-item .dhh-content .goodsimg{
+	width: 2rem;
+	height: 2rem;
+	margin-right: 0.2rem;
+}
+.dhh-list .dhh-item .dhh-content .goodsimg img{
+	width: 1.9rem;
+	height: 1.9rem;
+	border-radius: 0.2rem;
+}
+.dhh-list .dhh-item .dhh-content .goodsinfo{
+	width: calc(100% - 2.2rem);
+	padding-bottom: 0.62rem;
+}
+.dhh-list .dhh-item .dhh-content .goodsinfo .goodsname{
+	font-size: 0.26rem;
+	font-weight: 600;
+	margin-bottom: 0.12rem;
+}
+.dhh-list .dhh-item .dhh-content .goodsinfo .goodsdes{
+	font-size: 0.22rem;
+}
+.dhh-list .dhh-item .dhh-content .goods-btn{
+	position: absolute;
+	right: 0.2rem;
+	bottom: 0.2rem;
+}
+.dhh-list .dhh-item .dhh-content .goods-btn .btn{
+	height: .6rem;
+	line-height: .6rem;
+}
+.zam-app-bpopupFoot{
+	display: none;
+}
+.zam-app-bpopupCloseBox i.zam-app-bpopupClose{color: #000;font-weight: 600}
+.zam-app-bpopupBox .zam-app-bpopupMain{
+	display:flex;
+	flex-direction:column;
+	max-height: 86%;
+	overflow: hidden;
+	border-radius: 8px 8px 0 0;
+	padding-bottom: 1rem;
+}
+.zam-app-bpopupBox .zam-app-bpopupMain .zam-app-bpopupBody{
+	flex: 1;
+	padding: 0;
+	overflow: hidden auto;
+}
+.goodspopbox{
+	width: 100%;
+}
+
+.goodspopbox .goodsimgbox{
+	padding: 0.2rem;
+}
+.goodspopbox .goodsimgbox img{
+	width: 2rem;
+	height: 2rem;
+}
+.goodspopbox .goodsname{
+	font-size: 0.28rem;
+	font-weight: 600;
+	margin-bottom: 0.14rem;
+}
+.goodspopbox .goodsdes{
+	font-size: 0.24rem;
+	margin-bottom: 0.14rem;
+}
+.goodspopbox .inputminbox{
+	font-size: 0.24rem;
+	color: red;
+	margin-bottom: 0.12rem;
+}
+.goodspopbox .inputbox{
+	position: relative;
+	margin-bottom: 0.12rem;
+	height: 0.6rem;
+}
+.goodspopbox .inputbox .inputname{
+	line-height: 0.6rem;
+	font-size: 0.3rem;
+	font-weight: 600;
+}
+.inputcontrol{
+	position: absolute;
+	right: 0;
+	top: 0;
+}
+.inputcontrol input{
+	line-height: 0.6rem;
+	width: 1.2rem;
+}
+.goodsfooter{
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	padding: 0.12rem 0.4rem;
+	background: #fff;
+	border-top: 1px solid #dad2d2;
+	z-index: 11;
+}
+.goodsfooter .goodsmoney{
+	color: red;
+	line-height: 0.7rem;
+	font-size: 0.3rem;
+}
+.goodsfooter .goodsmoney .weightnumbox{
+	font-size: 0.22rem;
+	color: #000;
+}
+.goodsfooter .goodsconfirm{
+	position: absolute;
+	right: 0.4rem;
+	top: 0.1rem;
+}
+.dhh-nav{
+	position: absolute;
+	top: 1rem;
+	left: 0;
+	width: 100%;
+	text-align: center;
+	z-index: 1;
+}
+.dhh-nav ul,.dhh-nav ul:before{border:0!important;background: none!important}
+.dhh-nav ul .grids-item{padding: 0.22rem 0;}
+.dhh-nav ul .grids-item:before,.dhh-nav ul .grids-item:after{border: 0!important}
+.dhh-nav ul .grids-item .btn{
+	height: 0.8rem;
+	line-height: 0.8rem;
+	padding: 0 0.42rem;
+	font-size: 0.32rem;
+}
+</style>
+<a href="javascript:;" data-href="{:gowechat('dhh/record',['hdid'=>$hdinfo['hdid'],'rotateid'=>$rotate['id']])}" class="recordbtn zam-app-flex-ajCenter2"><i class="mxc-calendar"></i><span>我的订货单</span></a>
+{if $isdz == '1' && !empty($rotatelist)}
+<div class="dhh-nav">
+<ul class="m-grids-{:count($rotatelist)}">
+{foreach $rotatelist as $r}
+<li class="grids-item">
+    <a class="btn btn-{if $r['id']==$rotateid}primary{else /}hollow{/if}" href="{:gowechat('dhh/index',['hdid'=>$hdinfo['hdid'],'rotateid'=>$r['id']])}">{$r['title']}</a>
+</li>
+{/foreach}
+</ul>
+</div>
+{/if}
+<div class="dhh-box zam-app-flex-ajCenter">
+	<div class="dhh-list">
+		{foreach $rotate['goods'] as $good}
+		<div class="dhh-item zam-app-flex-ajCenter">
+			<div class="dhh-content zam-app-flex">
+				<div class="goodsimg zam-app-flex-ajCenter2">
+					<img src="{:tomedia($good['goodsimg'])}">
+				</div>
+				<div class="goodsinfo">
+					<div class="goodsname">{$good['goodsname']}</div>
+					<div class="goodsdes">{$good['goodsdes']}</div>
+				</div>
+				<div class="goods-btn"><a class="btn btn-primary" href="javascript:;" data-goodsid="{$good['id']}">立即订货</a></div>
+			</div>
+		</div>
+		{/foreach}
+	</div>
+</div>
+<script type="text/javascript">
+require(['wechatcore'],function (wechatcore) {
+	$(".dhh-box .btn").click(function(){
+		var $this = $(this),goodsid = $this.attr('data-goodsid')||'';
+		wechatcore.ajaxSubmit('/wechat/dhh/loadgoods',{rotateid:"{$rotate['id']}",goodsid:goodsid},'正在加载商品信息...').then(function(data){
+			if(data.code==0){
+				var goodsinfo = data.msg;
+				wechatcore.oneSlideBox({
+					title:'订货',
+					classname:'bppopBox',
+					btnText:'确认订货',
+					btnType:'btn-primary',
+					html:wechatcore.tpl($("#goods-tpl"),goodsinfo),
+					ready:function(){
+						var t = this,spinconfig = {
+				            input: '.J_Input',
+				            add: '.J_Add',
+				            minus: '.J_Del',
+				            min:goodsinfo.inputmin,
+				            unit:goodsinfo.inputadd,
+							listenchange: false,
+				            callback: function (ordernum, $ele) {
+				            	ordernum = parseInt(ordernum);
+				                var oneprice = goodsinfo.goodsprice;
+				                if(goodsinfo.isladder=='1' && goodsinfo.ladderrules.length > 0 ){
+				                	var mjcheck = false,mjallprice = [];
+									$.each(goodsinfo.ladderrules,function(k,v){
+										if(ordernum >= v.num){
+											mjallprice.push({key:k,price:v.price});
+											mjcheck = true;
+										}
+									});
+									if(mjcheck) {
+										mjallprice = mjallprice.sort(compare('price',true));
+										oneprice = goodsinfo.ladderrules[mjallprice[0].key].price;
+									}
+				                }
+				                var totalmoney = ordernum * oneprice,totalweight = ordernum * goodsinfo.goodsweight;
+				                t.popBoxfind('.goodsmoney .moneynum').text(parseFloat(totalmoney).toFixed(2));
+				                t.popBoxfind('.goodsmoney .weightnum').text(parseFloat(totalweight).toFixed(4));
+				            }
+				        },inputmax = goodsinfo.inputmax || 0;
+						if(inputmax > 0){
+							spinconfig.max = inputmax;
+						}
+						$('.m-spinner').spinner(spinconfig);
+						t.popBoxfind(".J_Input").bind('blur',function(){
+						    var ordernum = $(this).val()||'0';
+						    if(!/^[1-9]\d*$/.test(ordernum)){
+								return wechatcore.msg('订货数量必须是个大于0的整数');
+							}
+							if(goodsinfo.inputmin > 0 && ordernum < goodsinfo.inputmin){
+								return wechatcore.msg(`订货数量必须大于等于${goodsinfo.inputmin}`);
+							}
+							if(goodsinfo.inputmax > 0 && ordernum > goodsinfo.inputmax){
+								return wechatcore.msg(`订货数量必须小于等于${goodsinfo.inputmax}`);
+							}
+							ordernum = parseInt(ordernum);
+			                var oneprice = goodsinfo.goodsprice;
+			                if(goodsinfo.isladder=='1' && goodsinfo.ladderrules.length > 0 ){
+			                	var mjcheck = false,mjallprice = [];
+								$.each(goodsinfo.ladderrules,function(k,v){
+									if(ordernum >= v.num){
+										mjallprice.push({key:k,price:v.price});
+										mjcheck = true;
+									}
+								});
+								if(mjcheck) {
+									mjallprice = mjallprice.sort(compare('price',true));
+									oneprice = goodsinfo.ladderrules[mjallprice[0].key].price;
+								}
+			                }
+			                var totalmoney = ordernum * oneprice,totalweight = ordernum * goodsinfo.goodsweight;
+			                t.popBoxfind('.goodsmoney .moneynum').text(parseFloat(totalmoney).toFixed(2));
+			                t.popBoxfind('.goodsmoney .weightnum').text(parseFloat(totalweight).toFixed(4));
+						})
+				        t.popBoxfind(".goodsconfirm .btn").bind('click',function(){
+							var ordernum = t.popBoxfind('.J_Input').val()||'0',ordermoney = t.popBoxfind('.goodsmoney .moneynum').text();
+							if(!/^[1-9]\d*$/.test(ordernum)){
+								return wechatcore.msg('订货数量必须是个大于0的整数');
+							}
+							if(goodsinfo.inputmin > 0 && ordernum < goodsinfo.inputmin){
+								return wechatcore.msg(`订货数量必须大于等于${goodsinfo.inputmin}`);
+							}
+							if(goodsinfo.inputmax > 0 && ordernum > goodsinfo.inputmax){
+								return wechatcore.msg(`订货数量必须小于等于${goodsinfo.inputmax}`);
+							}
+							wechatcore.ajaxSubmit('/wechat/dhh/confirmgoods',{rotateid:"{$rotate['id']}",goodsid:goodsid,ordernum:ordernum,ordermoney:ordermoney},'正在提交订单...').then(function(data){
+								if(data.code==0){
+									wechatcore.msg('订购成功');
+									t.popBoxclose();
+								}else{
+									wechatcore.msg(data.msg);
+								}
+							}, function(){
+								wechatcore.msg('订货失败，请稍后重试');
+							});
+						});
+					},
+				});
+			}else{
+				wechatcore.msg(data.msg);
+			}
+		}, function(){
+			wechatcore.msg('加载商品数据失败，请稍后重试');
+		});
+	});
+})
+function compare(key, asc) {
+  asc = asc||false;
+  return function(a, b) {
+    var value1 = a[key];
+    var value2 = b[key];
+    if (asc) {
+      return value1 - value2;
+    } else {
+      return value2 - value1;
+    }
+  };
+}
+</script>
+<script id="goods-tpl" type="text/html">
+<div class="goodspopbox">
+<div class="goodsbox">
+	<div class="goodsimgbox zam-app-flex-ajCenter2">
+		<img src="<% d.goodsimg %>">
+	</div>
+	<div class="goodsname"><% d.goodsname %></div>
+	<div class="goodsdes"><% d.goodsdes %></div>
+	<div class="inputminbox"><% d.inputmin %><% d.goodsunit %>起订</div>
+	<div class="inputbox zam-app-flex">
+		<div class="inputname">订货数量</div>
+		<div class="inputcontrol">
+			<span class="m-spinner">
+                <a href="javascript:;" class="J_Del"></a>
+                <input type="number" class="J_Input" value="1" placeholder="请输入订货数量">
+                <a href="javascript:;" class="J_Add"></a>
+            </span>
+		</div>
+	</div>
+	<%#  if(d.isladder == '1' && d.ladderrules.length > 0 ){ %>
+	<div class="ladder-ruls">
+		<%#  $.each(d.ladderrules, function(i, v){ %>
+		<div class="rule-item">订单数量满<span><% v.num %></span><% d.goodsunit %>，单价为<span><% v.price %></span>{$rotate['priceunit']??'元'}</div>
+		<%# }) %>
+	</div>
+	<%#  } %>
+</div>
+</div>
+<div class="goodsfooter zam-app-flex">
+	<div class="goodsmoney">￥<span class="moneynum">1.00</span>{$rotate['priceunit']??'元'}<span class="weightnumbox hidden">(共<span class="weightnum"><% d.goodsweight %></span>{$rotate['weightunit']??'吨'})</span></div>
+	<div class="goodsconfirm">
+		<a href="javascript:;" class="btn btn-primary">确定订货</a>
+	</div>
+</div>
+</script>
+{include file="common/footermenu" /}
+{include file="common/footer" /}

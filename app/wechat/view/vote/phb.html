@@ -1,0 +1,93 @@
+{include file='vote/header' /}
+<div class="num_box">
+	<div class="timeremain">
+    <div class="timeremain-title"><i class="mxc-unie6b2"></i> <span>距离{$appconfig['votetxt']??'投票'}"结束时间</span></div>
+	<div class="timerremain-box">
+		<strong id="timeremain-day">0天</strong>
+		<strong id="timeremain-hour">0时</strong>
+		<strong id="timeremain-min">00分</strong>
+		<strong id="timeremain-sec">00秒</strong>
+	</div>
+</div>
+<script>
+var remainSec,votetxt = "{$appconfig['votetxt']??'投票'}";
+$(function(){
+	{if $rotate['endtime'] < time()}
+		$(".timeremain .timeremain-title span").text(votetxt+'已结束');
+		$(".remainnums").remove();
+	{elseif $rotate['starttime'] > time() /}
+		$(".timeremain .timeremain-title span").text('距离'+votetxt+'开始时间');
+		remainSec = parseInt("{$rotate['starttime'] - time()}");
+		timerun(remainSec);
+		$(".remainnums").remove();
+	{else /}
+		{// 进行中}
+		$(".timeremain .timeremain-title span").text('距离'+votetxt+'结束时间');
+		remainSec = parseInt("{$rotate['endtime'] - time()}");
+		timerun(remainSec);
+	{/if}
+})
+{// 到技术函数}
+function timerun(remainSec){
+	var t = setInterval(function(){
+		var day = 0,hour = 0,minute = 0,second = 0;		
+		if(remainSec > 0){
+			day = Math.floor(remainSec / (60 * 60 * 24));
+			hour = Math.floor(remainSec / (60 * 60)) - (day * 24);
+			minute = Math.floor(remainSec / 60) - (day * 24 * 60) - (hour * 60);
+			second = Math.floor(remainSec) - (day * 24 * 60 * 60) - (hour * 60 * 60) - (minute * 60);
+		}
+		if (minute <= 9) minute = '0' + minute;
+		if (second <= 9) second = '0' + second;
+		$('#timeremain-day').html(day+"天");
+		$('#timeremain-hour').html(hour+'时');
+		$('#timeremain-min').html(minute+'分');
+		$('#timeremain-sec').html(second+'秒');
+		remainSec--;
+		if(remainSec<0){
+			clearInterval(t);
+			window.location.reload();
+		}
+	}, 1e3);
+} 
+</script>
+</div>
+<ul class="vote-phblists">
+	{foreach $rotate['items'] as $ikey=>$ival}
+	<li>
+	 <section class="number zam-app-flex-ajCenter">
+		{if $ikey<3}
+			<img src="/{:WIMGURL}vote/{$ikey+1}.png" />
+		{else}
+			{$ikey+1}
+		{/if}
+	 </section>
+	 <section class="avatar zam-app-flex-ajCenter"><img src="{$ival['voteimg']}" {if empty($ival['voteimg'])}class="hidden"{/if} /></section>
+	 <section class="nickname">{:str_replace('<br>',' - ',$ival['votename'])}</section>
+	 <section class="score zam-app-flex-ajCenter">{$ival['votenums']}{$appconfig['voteunit']??'票'}</section>
+	</li>
+	{/foreach}
+</ul>
+<footer class="m-tabbar m-tabbar tabbar-fixed vote-ftab">
+    <a href="javascript:;" data-href="{:gowechat('vote/index',array('hdid'=>$hdinfo['hdid']))}" data-module="vote" class="tabbar-item">
+        <span class="tabbar-icon">
+            <i class="mxc-unie6cc"></i>
+        </span>
+        <span class="tabbar-txt">{$appconfig['votetxt']??'投票'}</span>
+    </a>
+    <a href="javascript:;" data-href="{:gowechat('vote/phb',array('hdid'=>$hdinfo['hdid']))}" data-module="vote" class="tabbar-item tabbar-active">
+        <span class="tabbar-icon">
+            <i class="mxc-unie722"></i>
+        </span>
+        <span class="tabbar-txt">排行榜</span>
+    </a>
+    {if !isset($appconfig['apppageconfig']['openrule']) || (isset($appconfig['apppageconfig']['openrule']) && $appconfig['apppageconfig']['openrule']=='1')}
+    <a href="javascript:;" data-href="{:gowechat('vote/guize',array('hdid'=>$hdinfo['hdid']))}" data-module="vote" class="tabbar-item">
+        <span class="tabbar-icon">
+            <i class="mxc-unie699"></i>
+        </span>
+        <span class="tabbar-txt">规则</span>
+    </a>
+    {/if}
+</footer>
+{include file='vote/footer' /}

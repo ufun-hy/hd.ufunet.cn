@@ -1,0 +1,185 @@
+{include file='$Wpath/common/header'}
+<div class="form-inline zam-inline-searchbar">
+    <div class="form-group m-l-5">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">选择轮次</span>
+          <select id="rotateid" class="form-control js_select2">
+            {if empty($rotates)}
+                <option value="0">暂无轮次</option>
+            {/if}
+            {foreach $rotates as $key=>$rotate} 
+                <option value="{$rotate['id']}" {if $rotateid == $rotate['id']}selected{/if}>{$rotate['title']}</option>
+            {/foreach}
+          </select>
+        </div>
+    </div>
+    <div class="form-group">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">昵称或表单内容</span>
+        <input type="text" class="form-control" value="" id="keyword" placeholder="请输入昵称或表单内容">
+      </div>
+    </div>
+    <div class="form-group m-l-5">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">发放状态</span>
+          <select id="hadsend" class="form-control js_select2">
+            {foreach $sendtypes as $k => $v } 
+            <option value="{$k}" {if $k == "0"}selected{/if}>{$v}</option>
+            {/foreach}
+          </select>
+        </div>
+    </div>
+    <a class="btn btn-primary btn-sm btn-search" href="javascript:void(0)"><i class="mdi mdi-magnify"></i> 搜索</a>
+    <a class="btn btn-warning btn-sm btn-export" href="javascript:void(0)"><i class="mdi mdi-export"></i> 导出</a>
+    <div class="form-group">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">本轮发放成功金额</span>
+        <span class="input-group-addon rotaterotatesend">0.00元</span>
+      </div>
+    </div>
+</div>
+{include file='$Wpath/common/tabletoolbar'}
+<table id="listtable" class="zam-btable"></table>
+<script id='binddata-tpl' type="text/template">
+    <ul class="bddataUl">
+    <%#  $.each(d.bd, function(index, item){ %>
+        <li>
+          <span class="text-primary"><% item %>:</span>
+          <span>
+            <%#  if(d.list){ %>
+            <%#  if(index === 'uploadimg'){ %>
+                <%#  if(d.list[index]){ %>
+                <img style="max-width:120px;" onclick="prevshowattachs(this,1);"  src="<% d.list[index] %>"  />
+                <%#  }else{ %>
+                    -
+                <%# } %>
+            <%#  }else{ %>
+                <%#  if(d.list[index]){ %>
+                <% d.list[index] %>
+                <%#  }else{ %>
+                    -
+                <%# } %>
+            <%#  } %> 
+            <%#  } %> 
+          </span>
+       </li>
+    <%#  }); %>
+    </ul>
+</script>
+<script>
+require(['webcore','webtable','jconfirmBox','zamnotice'],function(webcore,webtable,jconfirmBox,zamnotice){
+var initConfig = {
+    tableId:'#listtable',
+    url:"{:gohdmanage('dataredpack/index',['hdid'=>$hdid])}",
+    columnoperate:{
+        btns:{
+            del:true,
+        },
+        func:{
+            del:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','您确定要删除么？',function(){
+                    webcore.ajaxSubmit("{:gohdmanage('dataredpack/del',['hdid'=>$hdid])}",{recordid:row.id}).then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','删除成功');
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差，操作失败');
+                    });
+                });
+            }
+        }
+    },
+    columns:[
+        {
+            checkbox: true,
+        },{
+            field: 'id',
+            title: 'id',
+            align: 'center',
+            visible: false
+        },{
+            field: 'nicknamehtml',
+            title: '用户',
+            align: 'center',
+        },{
+            field: 'prizemoney',
+            title: '红包金额(元)',
+            align: 'center',
+        },{
+            field: 'hxsendmorehtml',
+            title: '发放状态',
+            align: 'center',
+        },{
+            field: 'create_time',
+            title: '抢到时间',
+            align: 'center',
+        }
+    ],
+    searchParamas:[{'type':'2','id':'rotateid'},{'type':'1','id':'keyword'},{'type':'2','id':'hadsend'}],
+    onloadsuccess:function(data){
+        $(".rotaterotatesend").text(data.totalmoney+'元');
+    },
+    toolbar:{
+        del:function(){
+            var getSelects = webtable.getSelections();
+            if(!getSelects.length){
+                return zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+            jconfirmBox.confirm('温馨提示','您确定要删除选中的数据用户么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('dataredpack/del',['hdid'=>$hdid])}",{recordid:getSelects}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','删除成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差，操作失败');
+                });
+            });
+        },
+        reset:function(){
+            var rotateid = $("#rotateid option:selected").val()||'';
+            if(+rotateid < 1) {
+                return zamnotice.showTips('info','请先选择轮次');
+            }
+            jconfirmBox.confirm('温馨提示','清空将删除所选轮次内的所有中奖记录并且无法恢复，您确定要清空么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('dataredpack/reset',['hdid'=>$hdid])}",{rotateid:rotateid}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','清空成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差，操作失败');
+                });
+            });
+        },
+    },
+};
+webtable.init(initConfig);
+$('#rotateid,#hadsend').change(function(e) {
+     webtable.refresh();
+});
+$('.btn-export').on('click',function(){
+    var rotateid = $("#rotateid option:selected").val() || '';
+    if(+rotateid < 1) {
+        return zamnotice.showTips('info','请先选择轮次');
+    }
+    webcore.ajaxSubmit("{:gohdmanage('dataredpack/export',['hdid'=>$hdid])}",{rotateid:rotateid}).then(function(json){
+        if(json.code!=0){
+            zamnotice.showTips('error',json.msg);
+        }else{
+            window.location.href = `{:gohdmanage('dataredpack/export',['hdid'=>$hdid])}&rotateid=${rotateid}`;
+        }
+    }, function(json){
+        zamnotice.showTips('error','网络差,操作失败');
+    });
+});
+});
+</script>
+{include file='$Wpath/common/footer'}

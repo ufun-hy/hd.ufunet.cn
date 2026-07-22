@@ -1,0 +1,1533 @@
+{include file='$Wpath/common/header'}
+<style type="text/css">
+    .select2-container--default .select2-results__option[aria-selected=true]:after{
+        float: right;
+        margin-right: 10px;
+        content: "√";
+    }
+</style>
+<form id="formBox" class="zam-formvalidation form-horizontal" method="post">
+	<div class="config-titlebox">
+        <span class="config-titlename">基础设置</span>
+    </div>
+	<div class="form-group">
+        <label class="col-lg-2 control-label">* 微信端网页标题</label>
+        <div class="col-lg-8">
+            <input class="form-control" type="text"  name="apptitle" value="{$config['apptitle']}">
+            <span class="help-block"></span>
+        </div>
+    </div>
+    <div class="config-titlebox">
+        <span class="config-titlename">直播设置</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#screenconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+    </div>
+    <div id="screenconfigbox" class="collapse in">
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 直播封面图</label>
+            <div class="col-lg-8">
+                {:tpl_image_one('liveconfig[poster]',$config['liveconfig']['poster'])}
+                <span class="help-block">规格:640*360px</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 直播logo</label>
+            <div class="col-lg-8">
+                {:tpl_image_one('liveconfig[logo]',$config['liveconfig']['logo'])}
+                <span class="help-block">规格:120*36px，不需要logo可以不设置此项</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 展示历史观看人数</label>
+            <div class="col-lg-8">
+                {:tpl_switch('liveconfig[showjoin]',$config['liveconfig']['showjoin'],'showjoin')}
+                <span class="help-block">注:关闭后直播将不显示历史观看记录人数,当历史人数超过10000将以万为单位</span>
+            </div>
+        </div>
+        <div class="livebasicbox{if $config['liveconfig']['showjoin']=='2'} hidden{/if}">
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 基础人数</label>
+                <div class="col-lg-4">
+                  <input type="text" class="form-control numberincdec" name="liveconfig[basicperson]" value="{$config['liveconfig']['basicperson']}"
+                        data-bts-min="0" data-bts-replacement-val="0"
+                        data-bts-max="null"
+                        data-bts-step="1"
+                        data-bts-postfix="人"
+                        data-bts-postfix-extra-class="touchspin-postfix">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 进入一次增加多少人</label>
+                <div class="col-lg-4">
+                  <input type="text" class="form-control numberincdec" name="liveconfig[addperson]" value="{$config['liveconfig']['addperson']}"
+                        data-bts-min="0" data-bts-replacement-val="0"
+                        data-bts-max="null"
+                        data-bts-step="1"
+                        data-bts-postfix="人"
+                        data-bts-postfix-extra-class="touchspin-postfix">
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 直播状态</label>
+            <div class="col-lg-8">
+                <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.waitlivebox').removeClass('hidden'),$('.livingbox,.endlivebox,.backlivebox').addClass('hidden');">
+                    <input type="radio" name="liveconfig[status]" {if $config['liveconfig']["status"]=="1"}checked{/if} value="1"><span>未开始</span>
+                </label>
+                <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.waitlivebox,.endlivebox,.backlivebox').addClass('hidden'),$('.livingbox').removeClass('hidden');">
+                    <input type="radio" name="liveconfig[status]" {if $config['liveconfig']["status"]=="2"}checked{/if} value="2" ><span>直播中</span>
+                </label>
+                <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.waitlivebox,.livingbox,.backlivebox').addClass('hidden'),$('.endlivebox').removeClass('hidden');">
+                    <input type="radio" name="liveconfig[status]" {if $config['liveconfig']["status"]=="3"}checked{/if} value="3" ><span>已结束</span>
+                </label>
+                <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.waitlivebox,.livingbox,.endlivebox').addClass('hidden'),$('.backlivebox').removeClass('hidden');">
+                    <input type="radio" name="liveconfig[status]" {if $config['liveconfig']["status"]=="4"}checked{/if} value="4" ><span>回放中</span>
+                </label>
+            </div>
+        </div>
+        <div class="waitlivebox{if $config['liveconfig']['status']!='1'} hidden{/if}">
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 未开始提示文字</label>
+                <div class="col-lg-8">
+                  <input type="text" class="form-control"  name="liveconfig[nostart]"  value="{$config['liveconfig']['nostart']}">
+                  <div class="help-block">未开始提示文字</div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 未开始视频地址</label>
+                <div class="col-lg-8">
+                  {:tpl_video('liveconfig[nostartvideo]',$config['liveconfig']['nostartvideo']??'')}
+                  <div class="help-block">不设置此地址则未开始状态下不播放视频，此视频仅微信浏览器有效</div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 直播开始时间</label>
+                <div class="col-lg-8">
+                    {:tpl_daterangetime([
+                        'name'=>'liveconfig[livestarttime]',
+                        'issingle'=>'1',
+                        'autoval'=>'1',
+                        'needsfm'=>'1',
+                        'needsdd'=>'1',
+                        'val'=>$config['liveconfig']['livestarttime']
+                    ])}
+                  <span class="help-block">注:直播状态是未开始时候，用户进入直播的时间大于等于直播开始时间，才会自动将直播改为直播中，其他状态无效</span>
+                </div>
+            </div>
+            <div class="form-group{if !dzpclive()} hidden{/if}">
+                <label class="col-lg-2 control-label">* 订阅开播通知</label>
+                <div class="col-lg-8">
+                    {:tpl_switch('liveconfig[opensublivetpl]',$config['liveconfig']['opensublivetpl']??'1')}
+                    <span class="help-block">注:关闭后会隐藏订阅开播通知按钮，用户无法订阅开播通知</span>
+                </div>
+            </div>
+        </div>
+        <div class="livingbox{if $config['liveconfig']['status']!='2'} hidden{/if}">
+            {if $userliveconfig['openlive'] == '1' && ((isset($userliveconfig['txlive']) && isset($userliveconfig['txlive']['tlhost']) && !empty($userliveconfig['txlive']['tlhost'])) || (isset($userliveconfig['qiniulive']) && isset($userliveconfig['qiniulive']['tlhost']) && !empty($userliveconfig['qiniulive']['tlhost'])))}
+                <div class="form-group">
+                    <label class="col-lg-2 control-label">* 直播平台</label>
+                    <div class="col-lg-8 platformbox">
+                        <label class="lyear-radio radio-inline radio-primary">
+                            <input type="radio" name="liveconfig[liveurl][platform]" {if isset($config['liveconfig']['liveurl']['platform']) && $config['liveconfig']['liveurl']['platform']=='1'}checked{/if} value="1"><span>腾讯云直播</span>
+                        </label>
+                        <label class="lyear-radio radio-inline radio-primary">
+                            <input type="radio" name="liveconfig[liveurl][platform]" {if isset($config['liveconfig']['liveurl']['platform']) && $config['liveconfig']['liveurl']['platform']=='2'}checked{/if} value="2" ><span>七牛云直播</span>
+                        </label>
+                        <label class="lyear-radio radio-inline radio-primary">
+                            <input type="radio" name="liveconfig[liveurl][platform]" {if !isset($config['liveconfig']['liveurl']['platform']) || $config['liveconfig']['liveurl']['platform']=='0'}checked{/if} value="0" ><span>其他平台直播</span>
+                        </label>
+                    </div>
+                </div>
+            {else /}
+                <input type="hidden" name="liveconfig[liveurl][platform]" value="0" />
+            {/if}
+            <div class="defaultlive{if !isset($config['liveconfig']['liveurl']['platform']) || $config['liveconfig']['liveurl']['platform']=='0'}{else /} hidden{/if}">
+                <div class="form-group">
+                    <label class="col-lg-2 control-label">* 快直播</label>
+                    <div class="col-lg-8">
+                        <label class="lyear-radio radio-inline radio-primary">
+                            <input type="radio" name="liveconfig[liveurl][thirdtype]" {if !isset($config['liveconfig']["liveurl"]['thirdtype']) || $config['liveconfig']["liveurl"]['thirdtype']=="1"}checked{/if} value="1"><span>腾讯云</span>
+                        </label>
+                        <label class="lyear-radio radio-inline radio-primary">
+                            <input type="radio" name="liveconfig[liveurl][thirdtype]" {if isset($config['liveconfig']["liveurl"]['thirdtype']) && $config['liveconfig']['liveurl']['thirdtype']=="2"}checked{/if} value="2" ><span>七牛云</span>
+                        </label>
+                        <span class="help-block">注意:快直播目前仅支持腾讯云与七牛云</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-2 control-label">* 快直播地址</label>
+                    <div class="col-lg-8">
+                      <input type="text" class="form-control"  name="liveconfig[liveurl][webrtc]"  value="{$config['liveconfig']['liveurl']['webrtc']}">
+                     <span class="help-block">注意:快直播目前仅支持腾讯云与七牛云</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-2 control-label">* 直播地址</label>
+                    <div class="col-lg-8">
+                      <input type="text" class="form-control"  name="liveconfig[liveurl][m3u8]"  value="{$config['liveconfig']['liveurl']['m3u8']}">
+                      <span class="help-block">一般是个m3u8地址</span>
+                    </div>
+                </div>
+            </div>
+            <div class="txlive{if isset($config['liveconfig']['liveurl']['platform']) && $config['liveconfig']['liveurl']['platform']=='1'}{else /} hidden{/if}">
+                <div class="form-group">
+                    <label class="col-lg-2 control-label">* 快直播</label>
+                    <div class="col-lg-8">
+                        {:tpl_switch('liveconfig[liveurl][txopenwebrtc]',$config['liveconfig']['liveurl']['txopenwebrtc']??'2','opentxwebrtc')}
+                        <span class="help-block">注:快直播延迟低但费用较高</span>
+                    </div>
+                </div>
+                <div class="form-group txwebrtcbox{if !isset($config['liveconfig']['liveurl']['txopenwebrtc']) || $config['liveconfig']['liveurl']['txopenwebrtc']=='2'} hidden{/if}">
+                    <label class="col-lg-2 control-label">* 快直播地址</label>
+                    <div class="col-lg-8">
+                        <div class="input-group">
+                            <input type="text" class="form-control" name="liveconfig[liveurl][txwebrtc]" value="{$config['liveconfig']['liveurl']['txwebrtc']??'webrtc://' . ($userliveconfig['txlive']['llhost']??'') . '/' .($userliveconfig['txlive']['bucket']??'') . '/' . $streamname}" readonly="true">
+                            <div class="input-group-btn">
+                              <button type="button" class="btn btn-default btn-primary zam-clip" >点击复制</button>
+                            </div>
+                        </div>
+                        <span class="help-block">由系统生成</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-2 control-label">* HlS拉流地址</label>
+                    <div class="col-lg-8">
+                        <div class="input-group">
+                            <input type="text" class="form-control" name="liveconfig[liveurl][txm3u8]" value="{$config['liveconfig']['liveurl']['txm3u8']??'https://' . ($userliveconfig['txlive']['llhost']??'') . '/' .($userliveconfig['txlive']['bucket']??'') . '/' . $streamname . '.m3u8'}" readonly="true">
+                            <div class="input-group-btn">
+                              <button type="button" class="btn btn-default btn-primary zam-clip" >点击复制</button>
+                            </div>
+                        </div>
+                        <span class="help-block">由系统自动生成</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-2 control-label">* RTMP拉流地址</label>
+                    <div class="col-lg-8">
+                        <div class="input-group">
+                            <input type="text" class="form-control" name="liveconfig[liveurl][txrtmp]" value="{$config['liveconfig']['liveurl']['txrtmp']??'rtmp://' . ($userliveconfig['txlive']['rllhost']??'') . '/' .($userliveconfig['txlive']['bucket']??'') . '/' . $streamname}" readonly="true">
+                            <div class="input-group-btn">
+                              <button type="button" class="btn btn-default btn-primary zam-clip" >点击复制</button>
+                            </div>
+                        </div>
+                        <span class="help-block">由系统自动生成</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-2 control-label">* 推流地址</label>
+                    <div class="col-lg-8">
+                        <div class="input-group">
+                            <input type="text" class="form-control" name="liveconfig[liveurl][txtlurl]" value="{$config['liveconfig']['liveurl']['txtlurl']??'rtmp://' . ($userliveconfig['txlive']['tlhost']??'') . '/' .($userliveconfig['txlive']['bucket']??'') . '/' . $streamname}" readonly="true">
+                            <div class="input-group-btn">
+                              <button type="button" class="btn btn-default btn-primary zam-clip" >点击复制</button>
+                            </div>
+                        </div>
+                        <span class="help-block">由系统自动生成</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-lg-12 text-center m-t-10 m-b-10">
+                        <a href="javascript:;" class="btn btn-danger btn-resetlive" data-type='1'>一键重置腾讯云推拉流地址</a>
+                    </div>
+                </div>
+            </div>
+            <div class="qiniulive{if isset($config['liveconfig']['liveurl']['platform']) && $config['liveconfig']['liveurl']['platform']=='2'}{else /} hidden{/if}">
+                <div class="form-group">
+                    <label class="col-lg-2 control-label">* 快直播</label>
+                    <div class="col-lg-8">
+                        {:tpl_switch('liveconfig[liveurl][qiniuopenwebrtc]',$config['liveconfig']['liveurl']['qiniuopenwebrtc']??'2','openqiniuwebrtc')}
+                        <span class="help-block">注:快直播延迟低但费用较高</span>
+                    </div>
+                </div>
+                <div class="form-group qiniuwebrtcbox{if !isset($config['liveconfig']['liveurl']['qiniuopenwebrtc']) || $config['liveconfig']['liveurl']['qiniuopenwebrtc']=='2'} hidden{/if}">
+                    <label class="col-lg-2 control-label">* 快直播地址</label>
+                    <div class="col-lg-8">
+                        <div class="input-group">
+                            <input type="text" class="form-control"  name="liveconfig[liveurl][qiniuwebrtc]"  value="{$config['liveconfig']['liveurl']['qiniuwebrtc']??'https://' . ($userliveconfig['qiniulive']['llhost']??'') . '/' .($userliveconfig['qiniulive']['bucket']??'') . '/' . $streamname . '.whep'}" readonly="true">
+                            <div class="input-group-btn">
+                              <button type="button" class="btn btn-default btn-primary zam-clip" >点击复制</button>
+                            </div>
+                        </div>
+                        <span class="help-block">由系统自动生成，快直播低延迟但费用高</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-2 control-label">* HlS拉流地址</label>
+                    <div class="col-lg-8">
+                        <div class="input-group">
+                            <input type="text" class="form-control"  name="liveconfig[liveurl][qinium3u8]"  value="{$config['liveconfig']['liveurl']['qinium3u8']??'https://' . ($userliveconfig['qiniulive']['llhost']??'') . '/' .($userliveconfig['qiniulive']['bucket']??'') . '/' . $streamname . '.m3u8'}" readonly="true">
+                            <div class="input-group-btn">
+                              <button type="button" class="btn btn-default btn-primary zam-clip" >点击复制</button>
+                            </div>
+                        </div>
+                      <span class="help-block">由系统自动生成</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-2 control-label">* RTMP拉流地址</label>
+                    <div class="col-lg-8">
+                        <div class="input-group">
+                            <input type="text" class="form-control"  name="liveconfig[liveurl][qiniurtmp]"  value="{$config['liveconfig']['liveurl']['qiniurtmp']??'rtmp://' . ($userliveconfig['qiniulive']['rllhost']??'') . '/' .($userliveconfig['qiniulive']['bucket']??'') . '/' . $streamname}" readonly="true">
+                            <div class="input-group-btn">
+                              <button type="button" class="btn btn-default btn-primary zam-clip" >点击复制</button>
+                            </div>
+                        </div>
+                      <span class="help-block">由系统自动生成</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-2 control-label">* 推流地址</label>
+                    <div class="col-lg-8">
+                        <div class="input-group">
+                            <input type="text" class="form-control"  name="liveconfig[liveurl][qiniutlurl]"  value="{$config['liveconfig']['liveurl']['qiniutlurl']??'rtmp://' . ($userliveconfig['qiniulive']['tlhost']??'') . '/' .($userliveconfig['qiniulive']['bucket']??'') . '/' . $streamname}" readonly="true">
+                            <div class="input-group-btn">
+                              <button type="button" class="btn btn-default btn-primary zam-clip" >点击复制</button>
+                            </div>
+                        </div>
+                        <span class="help-block">由系统自动生成</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-lg-12 text-center m-t-10 m-b-10">
+                        <a href="javascript:;" class="btn btn-danger btn-resetlive" data-type='2'>一键重置七牛云推拉流地址</a>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 直播出现异常提示文字</label>
+                <div class="col-lg-8">
+                  <input type="text" class="form-control"  name="liveconfig[liveurl][errortxt]"  value="{$config['liveconfig']['liveurl']['errortxt']}">
+                </div>
+            </div>
+        </div>
+        <div class="form-group endlivebox{if $config['liveconfig']['status']!='3'} hidden{/if}">
+            <label class="col-lg-2 control-label">* 已结束提示文字</label>
+            <div class="col-lg-8">
+              <input type="text" class="form-control"  name="liveconfig[stoptxt]"  value="{$config['liveconfig']['stoptxt']}">
+            </div>
+        </div>
+        <div class="backlivebox{if $config['liveconfig']['status']!='4'} hidden{/if}">
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 回放类型</label>
+                <div class="col-lg-8">
+                    <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.normlbackbox').removeClass('hidden'),$('.iframebackbox').addClass('hidden');">
+                        <input type="radio" name="liveconfig[backurl][urltype]" {if !isset($config['liveconfig']["backurl"]["urltype"]) || $config['liveconfig']["backurl"]["urltype"]=="1"}checked{/if} value="1"><span>普通直播回放url</span>
+                    </label>
+                    <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.normlbackbox').addClass('hidden'),$('.iframebackbox').removeClass('hidden');">
+                        <input type="radio" name="liveconfig[backurl][urltype]" {if isset($config['liveconfig']["backurl"]["urltype"]) && $config['liveconfig']["backurl"]["urltype"]=="2"}checked{/if} value="2" ><span>第三方视频iframe代码块</span>
+                    </label>
+                </div>
+            </div>
+            <div class="form-group normlbackbox{if isset($config['liveconfig']["backurl"]["urltype"]) && $config['liveconfig']["backurl"]["urltype"]=="2"} hidden{/if}">
+                <div class="form-group">
+                    <label class="col-lg-2 control-label">* 地址url</label>
+                    <div class="col-lg-8">
+                      <input type="text" class="form-control"  name="liveconfig[backurl][m3u8]"  value="{$config['liveconfig']['backurl']['m3u8']}">
+                      <span class="help-block">一般是个m3u8或mp4等url地址</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-2 control-label">* 回放出现异常提示文字</label>
+                    <div class="col-lg-8">
+                      <input type="text" class="form-control"  name="liveconfig[backurl][errortxt]"  value="{$config['liveconfig']['backurl']['errortxt']}">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group iframebackbox{if !isset($config['liveconfig']["backurl"]["urltype"]) || $config['liveconfig']["backurl"]["urltype"]=="1"} hidden{/if}">
+                <label class="col-lg-2 control-label">* 第三方视频分享代码</label>
+                <div class="col-lg-8">
+                  <input type="text" class="form-control"  name="liveconfig[backurl][iframe]"  value="{$config['liveconfig']['backurl']['iframe']??''}">
+                  <span class="help-block">一般是哔哩哔哩，优酷视频，腾讯视频等点击分享按钮即可看到代码</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    {if dzpclive()}
+    <div class="config-titlebox">
+        <span class="config-titlename">开屏广告设置</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#advconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+    </div>
+    <div id="advconfigbox" class="collapse in">
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 状态</label>
+            <div class="col-lg-8">
+                {:tpl_switch('liveconfig[advconfig][open]',$config['liveconfig']['advconfig']['open'],'openadv')}
+                <span class="help-block">注:关闭后将不显示广告图，开启则仅微信浏览器有效</span>
+            </div>
+        </div>
+        <div class="advbox{if $config['liveconfig']['advconfig']['open']=='2'} hidden{/if}">
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 广告时间</label>
+                <div class="col-lg-4">
+                     <input type="text" class="form-control numberincdec" name="liveconfig[advconfig][seconds]" value="{$config['liveconfig']['advconfig']['seconds']}"
+                    data-bts-min="1" data-bts-replacement-val="1"
+                    data-bts-max="200"
+                    data-bts-step="1"
+                    data-bts-postfix="秒"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                    >
+                    <span class="help-block">注:至少1秒，最大200秒</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 广告图</label>
+                <div class="col-lg-8">
+                    {:tpl_image_one('liveconfig[advconfig][img]',$config['liveconfig']['advconfig']['img'])}
+                    <span class="help-block">注:开启广告必须上传此图，推荐尺寸640*1260px</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 广告链接</label>
+                <div class="col-lg-8">
+                     <input type="text" class="form-control" name="liveconfig[advconfig][url]" value="{$config['liveconfig']['advconfig']['url']}">
+                    <span class="help-block">注:设置后用户点击广告图将转跳到此链接，不设置则不转跳</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 跳过广告</label>
+                <div class="col-lg-8">
+                    {:tpl_switch('liveconfig[advconfig][skep]',$config['liveconfig']['advconfig']['skep']??'2')}
+                    <span class="help-block">注:开启后用户可通过点击跳过按钮或者倒计时秒数来跳过广告</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    {/if}
+    {if dzlivebanner() && isset($userliveconfig['bannerset']) && $userliveconfig['bannerset']=='1'}
+    <!--广告位-->
+    <div class="config-titlebox">
+        <span class="config-titlename">banner广告设置</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#bannerconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+    </div>
+    <div id="bannerconfigbox" class="collapse in">
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 状态</label>
+            <div class="col-lg-8">
+                {:tpl_switch('bannerconfig[open]',$config['bannerconfig']['open'],'openbanner')}
+                <span class="help-block">注:关闭后微信端直播页面不显示banner广告位</span>
+            </div>
+        </div>
+        <div class="bannerlist{if $config['bannerconfig']['open']=='2'} hidden{/if}">
+            <div class="form-group">
+                <label class="col-lg-2 control-label"> banner广告位列表</label>
+                <div class="col-lg-8">
+                    <table class="table table-bordered">
+                        <thead>
+                          <tr>
+                            <th style="width:20%;text-align:center;">状态</th>
+                            <th style="width:30%;text-align:center;">广告图</th>
+                            <th style="width:30%;text-align:center;">广告链接</th>
+                            <th style="width:20%;text-align:center;">操作</th>
+                          </tr>
+                        </thead>
+                        <tbody class="banner-lists">
+                        {volist name="config.bannerconfig.list" id="banner"}    
+                        <tr>
+                            <td class="text-center">
+                                {:tpl_switch('bannerconfig[list][status]',$banner['status']??'1')}
+                             </td>
+                            <td class="text-center">
+                               {:tpl_image_one('bannerconfig[list][img]',$banner['img']??'')}
+                               <div class="help-block text-left">推荐尺寸：640* 120px</div>
+                            </td>
+                            <td class="text-center">
+                               <input class="form-control" name="bannerconfig[list][url]" value="{$banner['url']??''}" onblur="checkbannerurl(this)">
+                               <div class="help-block text-left">不设置此链接则点击广告不进行跳转</div>
+                            </td>
+                            <td class="text-center">
+                               <a class="btn btn-danger btn-xs btn-del"><i class="mdi mdi-close"></i></a>
+                               <a class="btn btn-primary btn-xs mousemove zam-sortable"><i class="mdi mdi-arrow-all"></i></a>
+                            </td>
+                        </tr>
+                        {/volist}
+                        </tbody>
+                        <tfoot>
+                          <tr>
+                            <td colspan="4">
+                              <a class="btn btn-primary btn-xs addbanner" href="javascript:;" > <i class="mdi mdi-plus"></i>新增banner广告</a>
+                            </td>
+                          </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 自动切换间隔时间</label>
+                <div class="col-lg-4">
+                  <input type="text" class="form-control numberincdec" name="bannerconfig[pageseconds]" value="{$config['bannerconfig']['pageseconds']}"
+                        data-bts-min="3" data-bts-replacement-val="3"
+                        data-bts-max="null"
+                        data-bts-step="1"
+                        data-bts-postfix="秒"
+                        data-bts-postfix-extra-class="touchspin-postfix">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* banner分页器类型</label>
+                <div class="col-lg-8">
+                    <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.pagecolor').addClass('hidden');">
+                        <input type="radio" name="bannerconfig[pagetype]" {if $config['bannerconfig']['pagetype']=="1"}checked{/if} value="1"><span>隐藏</span>
+                    </label>
+                    <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.pagecolor').removeClass('hidden');">
+                        <input type="radio" name="bannerconfig[pagetype]" {if $config['bannerconfig']['pagetype']=="2"}checked{/if} value="2"><span>圆点</span>
+                    </label>
+                    <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.pagecolor').removeClass('hidden');">
+                        <input type="radio" name="bannerconfig[pagetype]" {if $config['bannerconfig']['pagetype']=="3"}checked{/if} value="3" ><span>数字</span>
+                    </label>
+                </div>
+            </div>
+            <div class="form-group pagecolor{if $config['bannerconfig']['pagetype']=='1'} hidden{/if}">
+                <label class="col-lg-2 control-label">* 分页器颜色</label>
+                <div class="col-lg-3">
+                    {:tpl_color('bannerconfig[pagecolor]',$config['bannerconfig']['pagecolor'])}
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--广告位-->
+    {/if}
+    <div class="config-titlebox">
+        <span class="config-titlename">菜单设置</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#menuconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+    </div>
+    <div id="menuconfigbox" class="collapse in">
+        <div class="form-group hidden">
+            <label class="col-lg-2 control-label">* 状态</label>
+            <div class="col-lg-8">
+                {:tpl_switch('menuconfig[open]',$config['menuconfig']['open'],'openmenu')}
+                <span class="help-block">注:关闭后直播将不显示菜单</span>
+            </div>
+        </div>
+        <div class="menulist{if $config['menuconfig']['open']=='2'} hidden{/if}">
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 菜单高度</label>
+                <div class="col-lg-4">
+                     <input type="text" class="form-control numberincdec" name="menuconfig[height]" value="{$config['menuconfig']['height']}"
+                    data-bts-min="1" data-bts-replacement-val="1"
+                    data-bts-max="null"
+                    data-bts-step="1"
+                    data-bts-postfix="px"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                    >
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 菜单文字大小</label>
+                <div class="col-lg-4">
+                    <input type="text" class="form-control numberincdec" name="menuconfig[fontsize]" value="{$config['menuconfig']['fontsize']}"
+                    data-bts-min="1" data-bts-replacement-val="1"
+                    data-bts-max="null"
+                    data-bts-step="1"
+                    data-bts-postfix="px"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                    >
+                    <span class="zam-help-block">注:必须是个大于0的整数</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 菜单背景颜色</label>
+                <div class="col-lg-2">
+                    {:tpl_color('menuconfig[bgcolor]',$config['menuconfig']['bgcolor'])}
+                    <span class="help-block">默认灰白色</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 菜单文字颜色</label>
+                <div class="col-lg-2">
+                    {:tpl_color('menuconfig[fontcolor]',$config['menuconfig']['fontcolor'])}
+                    <span class="help-block">默认黑色</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 激活菜单文字颜色</label>
+                <div class="col-lg-2">
+                    {:tpl_color('menuconfig[activecolor]',$config['menuconfig']['activecolor'])}
+                    <span class="help-block">默认蓝色</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 菜单列表</label>
+                <div class="col-lg-10">
+                    <table class="table table-bordered">
+                        <thead>
+                          <tr>
+                            <th style="width:20%;text-align:center;">名称</th>
+                            <th style="width:20%;text-align:center;">类型</th>
+                            <th style="width:20%;text-align:center;">内容</th>
+                            <th style="width:20%;text-align:center;">状态</th>
+                            <th style="width:20%;text-align:center;">操作</th>
+                          </tr>
+                        </thead>
+                        <tbody class="menu-lists">
+                        {volist name="config.menuconfig.menus" id="amenu"}    
+                            <tr>
+                                <td class="text-center">
+                                    <input class="form-control" name="mname[]" value="{$amenu['mname']}" readonly>
+                                </td>
+                                <td class="text-center">
+                                    {$amenu['typename']}
+                                    <input class="form-control" type="hidden" name="mtype[]" value="{$amenu['mtype']}">
+                                </td>
+                                <td class="text-center">
+                                    {$amenu['content']}
+                                    <input type="hidden" name="minurl[]" value="{$amenu['minurl']}">
+                                    <input type="hidden" name="mouturl[]" value="{$amenu['mouturl']}">
+                                    <input type="hidden" name="martid[]" value="{$amenu['martid']}">
+                                    <input type="hidden" name="phbnum[]" value="{$amenu['phbnum']??'20'}">
+                                </td>
+                                <td class="text-center">
+                                    {:tpl_switch('mstatus[]',$amenu['mstatus']??'1','mstatusopen')}
+                                </td>
+                                <td class="text-center">
+                                    <a class="btn btn-primary btn-xs btn-editmenu"><i class="mdi mdi-pencil"></i></a>
+                                    <a class="btn btn-danger btn-xs btn-delmenu"><i class="mdi mdi-close"></i></a>
+                                    <a href="javascript:;"  class="btn btn-default btn-xs mousemove zam-sortable" title="拖动排序"><i class="mdi mdi-arrow-all"></i></a>
+                                </td>
+                            </tr>
+                        {/volist}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                            <td colspan="5">
+                                <a href="javascript:void(0)" class="btn btn-primary btn-addmenu btn-xs"><i class="mdi mdi-plus"></i> 新增菜单</a>
+                                <a href="javascript:void(0)" class="btn btn-danger btn-pushmenu btn-xs"><i class="mdi mdi-import"></i> 推送菜单</a>
+                                <div class="m-t-10">建议菜单数量不要超过6个</div>
+                            </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="nomenulist hidden{if $config['menuconfig']['open']=='1'} hidden{/if}">
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 默认打开链接</label>
+                <div class="col-lg-8">
+                     <input type="text" class="form-control" name="menuconfig[defaulturl]" value="{$config['menuconfig']['defaulturl']}">
+                     <span class="help-block">注:当关闭了菜单，默认打开活动哪个页面，必须填写活动内部页面的链接</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="config-titlebox">
+        <span class="config-titlename">小屏设置</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#smallconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+    </div>
+    <div id="smallconfigbox" class="collapse in">
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 小屏宽</label>
+            <div class="col-lg-4">
+                <input type="text" class="form-control numberincdec" name="smallconfig[width]" value="{$config['smallconfig']['width']}"
+                    data-bts-min="200" data-bts-replacement-val="200"
+                    data-bts-max="null"
+                    data-bts-step="1"
+                    data-bts-postfix="px"
+                    data-bts-postfix-extra-class="touchspin-postfix">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 小屏顶部位置</label>
+            <div class="col-lg-4">
+              <input type="text" class="form-control numberincdec" name="smallconfig[top]" value="{$config['smallconfig']['top']}"
+                    data-bts-min="0" data-bts-replacement-val="0"
+                    data-bts-max="null"
+                    data-bts-step="1"
+                    data-bts-postfix="px"
+                    data-bts-postfix-extra-class="touchspin-postfix">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 小屏左侧位置</label>
+            <div class="col-lg-4">
+              <input type="text" class="form-control numberincdec" name="smallconfig[left]" value="{$config['smallconfig']['left']}"
+                    data-bts-min="0" data-bts-replacement-val="0"
+                    data-bts-max="null"
+                    data-bts-step="1"
+                    data-bts-postfix="px"
+                    data-bts-postfix-extra-class="touchspin-postfix">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 拖动状态</label>
+            <div class="col-lg-8">
+                {:tpl_switch('smallconfig[candrag]',$config['smallconfig']['candrag'])}
+                <span class="help-block">注:开启后可以拖到小屏位置</span>
+            </div>
+        </div>
+        <div class="form-group hidden">
+            <label class="col-lg-2 control-label">* 半屏播放模块</label>
+            <div class="col-lg-8">
+                <select class="form-control js_select2" name="smallconfig[modules]" multiple="multiple">
+                  <option value>请选择</option>
+                  <option value="msg"{if in_array('msg',$config['smallconfig']['modules'])} selected{/if}>潜水</option>
+                  <option value="shake"{if in_array('shake',$config['smallconfig']['modules'])} selected{/if}>摸鱼</option>
+                </select>
+                <span class="help-block">注:默认仅直播首页是半屏播放，其他模块内均为小屏播放，如果需要设置其他模块半屏播放，请请到此处设置</span>
+            </div>
+        </div>
+    </div>
+    {if dzpclive()}
+    <div class="config-titlebox">
+        <span class="config-titlename">pc直播设置</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#pcliveconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+    </div>
+    <div id="pcliveconfigbox" class="collapse in">
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 开关</label>
+            <div class="col-lg-4">
+                {:tpl_switch('pclive[open]',$config['pclive']['open'],'openpclive')}
+                <span class='help-block'>关闭则pc端直播无法进入</span>
+            </div>
+        </div>
+        <div class="pclivebox{if $config['pclive']['open']=='2'} hidden{/if}">
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 进入直播必须先扫码授权</label>
+                <div class="col-lg-4">
+                 {:tpl_switch('pclive[forcelogin]',$config['pclive']['forcelogin'])}
+                 <span class='help-block'>开启则用户必须先微信扫码授权才可以打开电脑端直播页面</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 菜单开关</label>
+                <div class="col-lg-4">
+                 {:tpl_switch('pclive[menuconfig][open]',$config['pclive']['menuconfig']['open'],'pcmenuopen')}
+                 <span class='help-block'>关闭则pc端直播不显示菜单</span>
+                </div>
+            </div>
+            <div class="form-group pcmenubox{if $config['pclive']['menuconfig']['open']=='2'} hidden{/if}">
+                <label class="col-lg-2 control-label">* 菜单列表</label>
+                <div class="col-lg-10">
+                    <table class="table table-bordered">
+                        <thead>
+                          <tr>
+                            <th style="width:25%;text-align:center;">状态</th>
+                            <th style="width:25%;text-align:center;">名称</th>
+                            <th style="width:30%;text-align:center;">类型</th>
+                            <th style="width:20%;text-align:center;">操作</th>
+                          </tr>
+                        </thead>
+                        <tbody class="pcmenu-lists">
+                            {volist name="config.pclive.menuconfig.menus" id="pmenu"}
+                            <tr>
+                                <td class="text-center">
+                                {:tpl_switch('pcmenustatus[]',$pmenu['pcmenustatus'])}
+                                </td>
+                                <td class="text-center">
+                                    <input class="form-control" name="pcmenuname[]" value="{$pmenu['pcmenuname']}" />
+                                </td>
+                                <td class="text-center">
+                                    {if $pmenu['pcmenutype']=='1'}
+                                    聊天室
+                                    <input class="form-control" type="hidden" name="pcphbnum[]" value="{$pmenu['pcphbnum']??'20'}">
+                                    {else /}
+                                    <div class="input-group">
+                                        <div class="input-group-btn not-allow"><a class="btn btn-default">邀请榜</a></div>
+                                        <div class="touchspin">
+                                        <input type="text" class="form-control numberincdec" name="pcphbnum[]" 
+                                        data-bts-min="1" data-bts-replacement-val="1"
+                                        data-bts-max="100"
+                                        data-bts-step="1"
+                                        value="{$pmenu['pcphbnum']??'20'}">
+                                        </div>
+                                        <div class="input-group-btn not-allow"><a class="btn btn-default">人</a></div>
+                                    </div>
+                                    {/if}
+                                    <input class="form-control" type="hidden" name="pcmenutype[]" value="{$pmenu['pcmenutype']}">
+                                    
+                                </td>
+                                <td class="text-center">
+                                    <a href="javascript:;" class="btn btn-default btn-xs mousemove zam-sortable" title="拖动排序"><i class="mdi mdi-arrow-all"></i></a>
+                                </td>
+                            </tr>
+                            {/volist}
+                        </tbody>
+                        <tfoot>
+                            <tr><td colspan="4">注:聊天室跟随微信端直播菜单内的上墙或者霸屏，也就是说你微信菜单选的是上墙那么pc直播聊天室就是上墙，当然如果您微信端直播菜单里没有选上墙或者霸屏功能，但是你pc菜单还是开了聊天室菜单则会使用上墙功能作为聊天功能</td></tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 底部技术支持</label>
+                <div class="col-lg-8">
+                  <input type="text" class="form-control"  name="pclive[jxzc]"  value="{$config['pclive']['jxzc']??'xxx公司提供技术支持'}">
+                  <span class="help-block">涉及直播内容必须设置一下</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 底部版权</label>
+                <div class="col-lg-8">
+                  <input type="text" class="form-control"  name="pclive[copyright]"  value="{$config['pclive']['copyright']??'Copyright © 2022 xxxx.com All Rights Reserved Powered by xxx公司 ICP备案： 湘ICP备xxxxxx号 湘公网安备 xxxxxxxxxx号'}">
+                  <span class="help-block">涉及直播内容必须设置一下</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="config-titlebox">
+        <span class="config-titlename">普通手机浏览器直播设置<span class="text-danger" style="font-size: 12px">(注意:普通浏览器游客留言内容不入库，刷新页面后将不再展示)</span></span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#mobileliveconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+    </div>
+    <div id="mobileliveconfigbox" class="collapse in">
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 开关</label>
+            <div class="col-lg-4">
+                {:tpl_switch('mobilelive[open]',$config['mobilelive']['open'],'openmobilelive')}
+                <span class='help-block'>关闭则普通手机浏览器端直播无法进入</span>
+            </div>
+        </div>
+        <div class="mobilelivebox{if $config['mobilelive']['open']=='2'} hidden{/if}">
+            
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 菜单开关</label>
+                <div class="col-lg-4">
+                 {:tpl_switch('mobilelive[menuconfig][open]',$config['mobilelive']['menuconfig']['open'],'mobilemenuopen')}
+                 <span class='help-block'>关闭则普通手机浏览器端直播不显示菜单</span>
+                </div>
+            </div>
+            <div class="form-group mobilemenubox{if $config['mobilelive']['menuconfig']['open']=='2'} hidden{/if}">
+                <label class="col-lg-2 control-label">* 菜单列表</label>
+                <div class="col-lg-10">
+                    <table class="table table-bordered">
+                        <thead>
+                          <tr>
+                            <th style="width:25%;text-align:center;">状态</th>
+                            <th style="width:25%;text-align:center;">名称</th>
+                            <th style="width:30%;text-align:center;">类型</th>
+                            <th style="width:20%;text-align:center;">操作</th>
+                          </tr>
+                        </thead>
+                        <tbody class="pcmenu-lists">
+                            {volist name="config.mobilelive.menuconfig.menus" id="mmenu"}
+                            <tr>
+                                <td class="text-center">
+                                {:tpl_switch('mobilemenustatus[]',$mmenu['mobilemenustatus'])}
+                                </td>
+                                <td class="text-center">
+                                    <input class="form-control" name="mobilemenuname[]" value="{$mmenu['mobilemenuname']}" />
+                                </td>
+                                <td class="text-center">
+                                    {if $mmenu['mobilemenutype']=='1'}
+                                    聊天室
+                                    <input class="form-control" type="hidden" name="mobilephbnum[]" value="{$mmenu['mobilephbnum']??'20'}">
+                                    {else /}
+                                    <div class="input-group">
+                                        <div class="input-group-btn not-allow"><a class="btn btn-default">邀请榜</a></div>
+                                        <div class="touchspin">
+                                        <input type="text" class="form-control numberincdec" name="mobilephbnum[]" 
+                                        data-bts-min="1" data-bts-replacement-val="1"
+                                        data-bts-max="100"
+                                        data-bts-step="1"
+                                        value="{$mmenu['pcphbnum']??'20'}">
+                                        </div>
+                                        <div class="input-group-btn not-allow"><a class="btn btn-default">人</a></div>
+                                    </div>
+                                    {/if}
+                                    <input class="form-control" type="hidden" name="mobilemenutype[]" value="{$mmenu['mobilemenutype']}">
+                                    
+                                </td>
+                                <td class="text-center">
+                                    <a href="javascript:;" class="btn btn-default btn-xs mousemove zam-sortable" title="拖动排序"><i class="mdi mdi-arrow-all"></i></a>
+                                </td>
+                            </tr>
+                            {/volist}
+                        </tbody>
+                        <tfoot>
+                            <tr><td colspan="4">注:聊天室跟随微信端直播菜单内的上墙或者霸屏，也就是说你微信菜单选的是上墙那么pc直播聊天室就是上墙，当然如果您微信端直播菜单里没有选上墙或者霸屏功能，但是你普通浏览器菜单还是开了聊天室菜单则会使用上墙功能作为聊天功能</td></tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 禁言</label>
+                <div class="col-lg-4">
+                 {:tpl_switch('mobilelive[guestestoppel]',$config['mobilelive']['guestestoppel'])}
+                 <span class='help-block'>开启则普通手机浏览器进入直播页面无法在留言窗发送消息</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 游客名称</label>
+                <div class="col-lg-8">
+                  <input type="text" class="form-control"  name="mobilelive[guestnickname]"  value="{$config['mobilelive']['guestnickname']??'游客'}">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 游客头像</label>
+                <div class="col-lg-8">
+                  {:tpl_image_one('mobilelive[guestavatar]',$config['mobilelive']['guestavatar'])}
+                </div>
+            </div>
+        </div>
+    </div>
+    {/if}
+    <div class="config-titlebox">
+        <span class="config-titlename">弹幕设置(消息来源与大屏全局弹幕消息来源一致)</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#dmconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+    </div>
+    <div id="dmconfigbox" class="collapse in">
+          <div class="form-group">
+            <label class="col-lg-2 control-label text-right">* 开启弹幕</label>
+            <div class="col-lg-4">
+                {:tpl_switch('dmconfig[opendm]',$config['dmconfig']['opendm'])}
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-lg-2 control-label text-right">* 速度快慢</label>
+            <div class="col-lg-8">
+              <label class="lyear-radio radio-inline radio-primary">
+               <input type="radio" name="dmconfig[dmspeed]" value="1" {if $config['dmconfig']['dmspeed']=='1'}checked{/if}><span>慢</span>
+              </label>
+              <label class="lyear-radio radio-inline radio-primary">
+               <input type="radio" name="dmconfig[dmspeed]" value="2" {if $config['dmconfig']['dmspeed']=='2'}checked{/if}><span>一般</span>
+              </label>
+              <label class="lyear-radio radio-inline radio-primary">
+               <input type="radio" name="dmconfig[dmspeed]" value="3" {if $config['dmconfig']['dmspeed']=='3'}checked{/if}><span>快</span>
+              </label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-lg-2 control-label text-right">* 是否循环播放</label>
+            <div class="col-lg-5">
+                {:tpl_switch('dmconfig[isloop]',$config['dmconfig']['isloop'])}
+                <span class="help-block">关闭后同一条弹幕将播放一次不再继续播放</span>
+            </div>
+          </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label text-right">* 是否加载历史消息</label>
+                <div class="col-lg-5">
+                    {:tpl_switch('dmconfig[loadhistory]',$config['dmconfig']['loadhistory'],'nohistory')}
+                </div>
+            </div>
+            <div class="form-group loadhistory{if $config['dmconfig']['loadhistory']=='2'} hidden{/if}">
+                <label class="col-lg-2 control-label text-right">* 加载历史弹幕条数</label>
+                <div class="col-lg-2">
+                    <input type="text" class="form-control numberincdec" name="dmconfig[historynum]" value="{$config['dmconfig']['historynum']}"
+                    data-bts-min="0" data-bts-replacement-val="0"
+                    data-bts-max="null"
+                    data-bts-step="1"
+                    data-bts-postfix="条"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                    >
+                    <span class="zam-help-block">注:必须是个大于等于0的整数，0为加载所有消息</span>
+                </div>
+            </div>
+          <div class="form-group">
+            <label class="col-lg-2 control-label text-right">* 弹幕背景</label>
+            <div class="col-lg-5">
+                {:tpl_switch('dmconfig[needbg]',$config['dmconfig']['needbg'],'nodmbg')}
+            </div>
+          </div>
+          <div class="dmbgbox{if $config['dmconfig']['needbg']=='2'} hidden{/if}">
+          <div class="form-group">
+            <label class="col-lg-2 control-label text-right">* 背景色类型</label>
+            <div class="col-lg-5">
+              <label class="lyear-radio radio-inline radio-primary">
+               <input type="radio" name="dmconfig[bgcolortype]" value="1" {if $config['dmconfig']['bgcolortype']=='1'}checked{/if} onclick="changebgcolor(this);"><span>固定色</span>
+              </label>
+              <label class="lyear-radio radio-inline radio-primary">
+               <input type="radio" name="dmconfig[bgcolortype]" value="2" {if $config['dmconfig']['bgcolortype']=='2'}checked{/if} onclick="changebgcolor(this);"><span>随机色</span>
+              </label>
+            </div>
+          </div>
+          <div class="form-group bgcolortype {if $config['dmconfig']['bgcolortype']=='2'}hidden{/if}">
+            <label class="col-lg-2 control-label text-right">* 背景色</label>
+            <div class="col-lg-5">
+                {:tpl_color('dmconfig[bgcolor]',$config['dmconfig']['bgcolor'])}
+                <span class="help-block">默认黑色 rgba(0,0,0,0.5)</span>
+            </div>
+          </div>
+          </div>
+          <div class="form-group">
+            <label class="col-lg-2 control-label text-right">* 用户头像</label>
+            <div class="col-lg-5">
+                {:tpl_switch('dmconfig[needavatar]',$config['dmconfig']['needavatar'])}
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-lg-2 control-label text-right">* 用户昵称</label>
+            <div class="col-lg-5">
+                {:tpl_switch('dmconfig[neednickname]',$config['dmconfig']['neednickname'])}
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-lg-2 control-label text-right">* 文字颜色</label>
+            <div class="col-lg-5">
+                <label class="lyear-radio radio-inline radio-primary">
+                   <input type="radio" name="dmconfig[fontcolortype]" value="1" {if $config['dmconfig']['fontcolortype']=='1'}checked{/if} onclick="changefontcolor(this);"><span>固定色</span>
+                  </label>
+                <label class="lyear-radio radio-inline radio-primary">
+                   <input type="radio" name="dmconfig[fontcolortype]" value="2" {if $config['dmconfig']['fontcolortype']=='2'}checked{/if} onclick="changefontcolor(this);"><span>随机色</span>
+                </label>
+                <span class="help-block">如果背景色选择了随机色最好颜色文字选择固定为白色</span>
+            </div>
+          </div>
+          <div class="form-group fontcolortype{if $config['dmconfig']['fontcolortype']=='2'} hidden{/if}">
+            <label class="col-lg-2 control-label text-right">* 颜色</label>
+            <div class="col-lg-5">
+                {:tpl_color('dmconfig[fontcolor]',$config['dmconfig']['fontcolor'])}
+                <span class="help-block">默认白色</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-lg-2 control-label text-right">* 文字大小</label>
+            <div class="col-lg-2">
+                <input type="text" class="form-control numberincdec" name="dmconfig[fontsize]" value="{$config['dmconfig']['fontsize']}"
+                data-bts-min="10" data-bts-replacement-val="10"
+                data-bts-max="30"
+                data-bts-step="1"
+                data-bts-postfix="px"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                >
+                <span class="zam-help-block">注:必须是个大于10,小于60的数字</span>
+            </div>
+          </div>
+    </div>
+    {if dzpclive()}
+    <div class="config-titlebox">
+        <span class="config-titlename">开播推送</span>
+    </div>
+    <div class="submessagebox">
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 直播名称</label>
+            <div class="col-lg-8">
+              <input class="form-control first" type="text"  name="submessage[first]" placeholder="请输入推送内容的直播名称，20个字内" maxlength='20' value="{$config['submessage']['first']??''}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 直播品牌</label>
+            <div class="col-lg-8">
+              <input class="form-control keyword1" type="text"  name="submessage[keyword1]" placeholder="请输入推送内容的直播品牌，20个字内" maxlength='20' value="{$config['submessage']['keyword1']??''}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 开播时间</label>
+            <div class="col-lg-8">
+              {:tpl_daterangetime([
+                    'name'=>'submessage[keyword2]',
+                    'issingle'=>'1',
+                    'autoval'=>'1',
+                    'needsfm'=>'1',
+                    'needsdd'=>'1',
+                    'inputclass'=>'keyword2',
+                    'val'=>$config['submessage']['keyword2']??time()
+                ])}
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 备注说明</label>
+            <div class="col-lg-8">
+              <input class="form-control remark" type="text"  name="submessage[remark]" placeholder="请输入推送内容中的备注说明，20个字内" maxlength='20' value="{$config['submessage']['remark']??''}">
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 推送</label>
+        <div class="col-lg-8">
+            <div class="form-control-static">
+                <a class="btn btn-primary btn-xs btn-sendsubnotice">批量推送开播提醒通知</a>
+            </div>
+            <span class="help-block">仅订阅了开播通知的用户才可以收到直播开播提醒</span>
+        </div>
+    </div>
+    {/if}
+    {include file='$Wpath/common/liveshare'}
+    {include file='$Wpath/common/savepanel'}
+</form>
+<script>
+var menutypes = {:json_encode($menutypes)};
+require(['webcore','jconfirmBox','zamnotice','layerBox','clipboard','zvalidator','jquery.ui'],function(webcore,jconfirmBox,zamnotice,layerBox,Clipboard){
+    var clipboard = new Clipboard('.zam-clip', {
+        text: function(e) {
+            return $(e).parent().prev().val();
+        }
+    });
+    clipboard.on('success',function(e) {
+       zamnotice.showTips('success','复制成功',2e3);
+    });
+    $(".btn-resetlive").click(function(){
+        var $this = $(this),type = $this.attr('data-type');
+        jconfirmBox.confirm('温馨提示','重置推拉流地址将生成新的直播推流和直播地址并且会导致之前的推流地址以及直播地址均失效，您确定要重置操作么？',function(){
+          webcore.ajaxSubmit("{:gohdmanage('configwechatlive/resetliveurl',['hdid'=>$hdid])}",{type:type},'正在执行重置命令...').then(function(json){
+             if(json.code==0){
+                if(type=='1'){
+                    var livebox = $('.txlive');
+                }else{
+                    var livebox = $('.qiniulive');
+                }
+                livebox.find('input').eq(2).val(json.msg.webrtc);
+                livebox.find('input').eq(3).val(json.msg.live);
+                livebox.find('input').eq(4).val(json.msg.rtmp);
+                livebox.find('input').eq(5).val(json.msg.pull);
+                zamnotice.showTips('success','重置成功，点击底部保存按钮才可生效',3e3);
+             }else{
+                zamnotice.showTips('error',json.msg);
+            }
+          }, function(json){
+            zamnotice.showTips('error','网络差。操作失败.');
+          });
+        });
+    });
+    $(".btn-confirmuse").click(function(){
+        var $this = $(this),webrtcurl = $this.parent().prev().val();
+        if(webrtcurl && webrtcurl!=''){
+            $this.parent().prev().prev().val(webrtcurl);
+        }
+    });
+    $('.menu-lists').sortable({handle: ".mousemove"}).disableSelection();
+    $(".menu-lists").disableSelection();
+    $('.pcmenu-lists').sortable({handle: ".mousemove"}).disableSelection();
+    $(".pcmenu-lists").disableSelection();
+    $(".platformbox label").click(function(){
+        var type = $(this).find('input').val();
+        if(type=='0'){
+            $('.defaultlive').removeClass('hidden');
+            $('.txlive,.qiniulive').addClass('hidden');
+        }else if(type=='1'){
+            $('.txlive').removeClass('hidden');
+            $('.defaultlive,.qiniulive').addClass('hidden');
+        }else{
+            $('.qiniulive').removeClass('hidden');
+            $('.txlive,.defaultlive').addClass('hidden');
+        }
+    });
+    $('.banner-lists').sortable({handle: ".mousemove"}).disableSelection();
+    $(".banner-lists").disableSelection();
+    $(".addbanner").click(function(){
+        $(".banner-lists").append($(webcore.tpl($("#addbanneritem"),{img:'',url:' ',status:'1'})).clone());
+        tpl_switch();
+    });
+    $(".banner-lists").on('click','.btn-del',function(){
+        var $this = $(this);
+        jconfirmBox.confirm('温馨提示','您确定要删除么？',function(){
+            $this.parent().parent().remove();
+        });
+    });
+    $('#formBox').formValidation({
+        framework: 'bootstrap',
+        excluded: [':disabled'],
+        message: '您填写的内容无效',
+        fields: {}
+    }).on('success.form.fv', function(e) {
+        e.preventDefault();
+        var $form = $(e.target);
+        var postData = webcore.serializeObject($form);
+        var bload = $form.find(".zam-fixedbottom button").lyearloading({opacity: 0.2,spinnerSize: 'nm'});
+        $form.formValidation('disableSubmitButtons', true);
+        webcore.ajaxSubmit("{:gohdmanage('configwechatlive/index',['hdid'=>$hdid])}",postData).then(function(json){
+            bload.hide();
+            if(json.code==0){
+                $form.formValidation('disableSubmitButtons', false);
+                zamnotice.showTips('success','操作成功',2e3,function(){
+                    window.location.reload();
+                });
+            }else{
+                zamnotice.showTips('error',json.msg);
+                $form.formValidation('disableSubmitButtons', false);
+            }
+        }, function(json){
+            bload.hide();
+            zamnotice.showTips('error','网络差。操作失败');
+            $form.formValidation('disableSubmitButtons', false);
+        });
+    });
+    $(".btn-addmenu").click(function(){
+        var chatmodules = [];
+        $("input[name='minurl[]']").each(function(){
+            var url = $(this).val();
+            if(url.indexOf("/wechat/msg/index")!=-1 || url.indexOf("/wechat/baping/index")!=-1){
+                if(url.indexOf("/wechat/msg/index")!=-1){
+                    chatmodules.push('msg');
+                }else{
+                    chatmodules.push('baping');
+                }
+            }
+        });
+        var confirmObj = jconfirmBox.ajaxconfirm("新增菜单","{:gohdmanage('configwechatlive/editmenu',['hdid'=>$hdid])}",{},'html','col-lg-8 col-lg-offset-2',function(e){
+            var postData = webcore.serializeObject(e.find('form'));
+            if($.trim(postData.menuname)==""){
+                return zamnotice.showTips('error','请填写菜单名称');
+            }
+            if(postData.menutype=='1'){
+                if($.trim(postData.menuinurl)==""){
+                    return zamnotice.showTips('error','请选择链接或者填写内链链接');
+                }
+                if(chatmodules.length > 0 && (postData.menuinurl.indexOf("/wechat/msg/index")!=-1 || postData.menuinurl.indexOf("/wechat/baping/index")!=-1)){
+                    return zamnotice.showTips('error','您已经添加过了上墙或者霸屏功能，严禁添加多个');
+                }
+            }
+            if(postData.menutype=='2' && $.trim(postData.menuouturl)==""){
+                return zamnotice.showTips('error','请填写外链链接');
+            }
+            if(postData.menutype=='3' && (typeof(postData.menuartid)=='undefined' || postData.menuartid=="")){
+                return zamnotice.showTips('error','请选择文章');
+            }
+            if(postData.menuouturl==""){
+                postData.menuouturl = " ";
+            }
+            if(postData.menuinurl==""){
+                postData.menuinurl = " ";
+            }
+            if(postData.menuartid==""){
+                postData.menuartid = " ";
+            }
+            if(postData.menutype=='1'){
+                postData.content = postData.menuinurl;
+            }
+            if(postData.menutype=='2'){
+                postData.content = postData.menuouturl;
+            }
+            if(postData.menutype=='3'){
+                var selarttitle = e.find('form select').find("option:selected").text();
+                postData.content = "(id:"+postData.menuartid+")"+selarttitle;
+            }
+            if(postData.menutype=='4'){
+                postData.content = postData.phbnum+'人';
+            }
+            postData.typename = menutypes[postData.menutype];
+            $(".menu-lists").append(webcore.tpl($("#onemenu-tpl"),postData));
+            confirmObj.close(postData);
+        });
+    });
+    $(".btn-pushmenu").click(function(){
+        jconfirmBox.confirm('温馨提示','推送微信端直播菜单在线用户会立即生效，确定要推送么?',function(){
+            webcore.ajaxSubmit("{:gohdmanage('configwechatlive/pushmenu',['hdid'=>$hdid])}",{},'推送中...').then(function(json){
+                if(json.code==0){
+                    zamnotice.showTips('success','推送成功');
+                }else{
+                    zamnotice.showTips('error',json.msg);
+                }
+            }, function(json){
+                zamnotice.showTips('error','网络差。操作失败');
+            })
+        });
+    });
+    $(".menu-lists").on('click','.btn-editmenu',function(){
+        var $this = $(this),$thisp = $this.parent().parent();
+        var menudata = {
+            menuname:$thisp.find('input').eq(0).val(),
+            type:$thisp.find('input').eq(1).val(),
+            inurl:$thisp.find('input').eq(2).val(),
+            outurl:$thisp.find('input').eq(3).val(),
+            artid:$thisp.find('input').eq(4).val(),
+            phbnum:$thisp.find('input').eq(5).val(),
+            mstatus:$thisp.find('input').eq(7).val(),
+        };
+        var chatcount = 0;
+        $("input[name='minurl[]']").each(function(){
+            var url = $(this).val();
+            if(url.indexOf("/wechat/msg/index")!=-1 || url.indexOf("/wechat/baping/index")!=-1){
+                chatcount++;
+            }
+        });
+        var $thistype = $thisp.find("input[name='mtype[]']").val(),$thisurl = $thisp.find("input[name='minurl[]']").val();
+        if($thistype=='1' && ($thisurl.indexOf("/wechat/msg/index")!=-1 || $thisurl.indexOf("/wechat/baping/index")!=-1)){
+            chatcount--;
+        }
+        var confirmObj = jconfirmBox.ajaxconfirm("编辑菜单","{:gohdmanage('configwechatlive/editmenu',['hdid'=>$hdid])}",{menudata:menudata},'html','col-lg-8 col-lg-offset-2',function(e){
+            var postData = webcore.serializeObject(e.find('form'));
+            if($.trim(postData.menuname)==""){
+                return zamnotice.showTips('error','请填写菜单名称');
+            }
+            if(postData.menutype=='1'){
+                if($.trim(postData.menuinurl)==""){
+                    return zamnotice.showTips('error','请选择链接或者填写内链链接');
+                }
+                if(chatcount > 0 && (postData.menuinurl.indexOf("/wechat/msg/index")!=-1 || postData.menuinurl.indexOf("/wechat/baping/index")!=-1)){
+                    return zamnotice.showTips('error','您已经添加过了上墙或者霸屏功能，严禁添加多个');
+                }
+            }
+            if(postData.menutype=='2' && $.trim(postData.menuouturl)==""){
+                return zamnotice.showTips('error','请填写外链链接');
+            }
+            if(postData.menutype=='3' && postData.menuartid==""){
+                return zamnotice.showTips('error','请选择文章');
+            }
+            if(postData.menuouturl==""){
+                postData.menuouturl = " ";
+            }
+            if(postData.menuinurl==""){
+                postData.menuinurl = " ";
+            }
+            if(postData.menuartid==""){
+                postData.menuartid = " ";
+            }
+            if(postData.menutype=='1'){
+                postData.content = postData.menuinurl;
+            }
+            if(postData.menutype=='2'){
+                postData.content = postData.menuouturl;
+            }
+            if(postData.menutype=='3'){
+                var selarttitle = e.find('form select').find("option:selected").text();
+                postData.content = "(id:"+postData.menuartid+")"+selarttitle;
+            }
+            postData.typename = menutypes[postData.menutype];
+            $thisp.html($(webcore.tpl($("#onemenu-tpl"),postData)).html());
+            confirmObj.close();
+        });
+    });
+    $(".menu-lists").on('click','.btn-delmenu',function(){
+        var $this = $(this);
+        jconfirmBox.confirm('温馨提示','您确定要删除么？',function(){
+            $this.parent().parent().remove();
+        });
+    });
+    $(".btn-sendsubnotice").click(function(){
+        var subbox = $(".submessagebox");
+        var first = subbox.find(".first").val();
+        if(first=='') return zamnotice.showTips('error','请填写直播名称');
+        var keyword1 = subbox.find(".keyword1").val();
+        if(keyword1=='') return zamnotice.showTips('error','请填写直播品牌');
+        var keyword2 = subbox.find(".keyword2").val();
+        if(keyword2=='') return zamnotice.showTips('error','请填写开播时间');
+        var remark = subbox.find(".remark").val();
+        if(remark=='') return zamnotice.showTips('error','请填写备注说明');
+        var postData = {
+            first:first,
+            keyword1:keyword1,
+            keyword2:keyword2,
+            remark:remark,
+        };
+        jconfirmBox.confirm('温馨提示','推送开播提醒无法撤回，确定要推送么?',function(){
+            webcore.ajaxSubmit("{:gohdmanage('configwechatlive/pushsubnotice',['hdid'=>$hdid])}",{data:postData},'推送中...').then(function(json){
+                if(json.code==0){
+                    zamnotice.showTips('success','推送成功');
+                }else{
+                    zamnotice.showTips('error',json.msg);
+                }
+            }, function(json){
+                zamnotice.showTips('error','网络差。操作失败');
+            });
+        });
+    });
+});
+
+function showjoin(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".livebasicbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".livebasicbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openmenu(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".menulist").addClass('hidden');
+        $(".nomenulist").removeClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".menulist").removeClass('hidden');
+        $(".nomenulist").addClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function nohistory(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".loadhistory").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".loadhistory").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function nodmbg(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".dmbgbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".dmbgbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function mstatusopen(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+
+function changebgcolor(obj){
+    var type = $(obj).val();
+    if(type=='1'){
+        $(".bgcolortype").removeClass('hidden');
+    }else{
+        $(".bgcolortype").addClass('hidden');
+    }
+}
+function changefontcolor(obj){
+    var type = $(obj).val();
+    if(type=='1'){
+        $(".fontcolortype").removeClass('hidden');
+    }else{
+        $(".fontcolortype").addClass('hidden');
+    }
+}
+function openbanner(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".bannerlist").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".bannerlist").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openpclive(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".pclivebox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".pclivebox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function pcmenuopen(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".pcmenubox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".pcmenubox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openmobilelive(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".mobilelivebox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".mobilelivebox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function mobilemenuopen(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".mobilemenubox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".mobilemenubox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openadv(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".advbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".advbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function opentxwebrtc(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".txwebrtcbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".txwebrtcbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openqiniuwebrtc(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".qiniuwebrtcbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".qiniuwebrtcbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function checkbannerurl(obj){
+    var urlvalue = $(obj).val();
+    if(urlvalue.trim() === ''){
+        $(obj).val(" ");
+    }
+}
+</script>
+<script id='onemenu-tpl' type="text/template">
+<tr>
+    <td class="text-center">
+        <input class="form-control" name="mname[]" value="<% d.menuname %>" readonly>
+    </td>
+    <td class="text-center">
+        <% d.typename %>
+        <input class="form-control" type="hidden" name="mtype[]" value="<% d.menutype %>">
+    </td>
+    <td class="text-center">
+        <% d.content %>
+        <input type="hidden" name="minurl[]" value="<% d.menuinurl %>">
+        <input type="hidden" name="mouturl[]" value="<% d.menuouturl %>">
+        <input type="hidden" name="martid[]" value="<% d.menuartid %>">
+        <input type="hidden" name="phbnum[]" value="<% d.phbnum %>">
+    </td>
+    <td class="text-center">
+            <label class="lyear-switch switch-primary normal-swith switch-solid" style="height:38px">
+                <input type="checkbox" <%# if(d.mstatus=='1'){ %>checked="checked"<%# } %> />
+                <input type="hidden" name="mstatus[]" value="<% d.mstatus %>">
+                <span data-status="<% d.mstatus %>" data-func="mstatusopen" class="normal-span has-func" data-ajax=""></span>
+            </label>                                
+    </td>
+    <td class="text-center">
+        <a class="btn btn-primary btn-xs btn-editmenu"><i class="mdi mdi-pencil"></i></a>
+        <a class="btn btn-danger btn-xs btn-delmenu"><i class="mdi mdi-close"></i></a>
+        <a href="javascript:;"  class="btn btn-default btn-xs mousemove zam-sortable" title="拖动排序"><i class="mdi mdi-arrow-all"></i></a>
+    </td>
+</tr>
+</script>
+<script id='addbanneritem' type="text/template">
+<tr>
+    <td class="text-center">
+    {:tpl_switch('bannerconfig[list][status]','1')}
+    </td>
+    <td class="text-center">
+    {:tpl_image_one('bannerconfig[list][img]','')}
+    <div class="help-block text-left">推荐尺寸：640* 120px</div>
+    </td>
+    <td class="text-center">
+        <input class="form-control" name="bannerconfig[list][url]" value=" " onblur="checkbannerurl(this)">
+        <div class="help-block text-left">不设置此链接则点击广告不进行跳转</div>
+    </td>
+    <td class="text-center">
+        <a class="btn btn-danger btn-xs btn-del"><i class="mdi mdi-close"></i></a>
+        <a class="btn btn-primary btn-xs mousemove zam-sortable"><i class="mdi mdi-arrow-all"></i></a>
+    </td>
+</tr>
+</script>
+{include file='$Wpath/common/footer'}

@@ -1,0 +1,189 @@
+{include file='$Wpath/common/header'}
+<div class="form-inline zam-inline-searchbar">
+    <div class="form-group m-l-5">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">选择轮次</span>
+          <select id="rotateid" class="form-control">
+            {if !empty($rotates)}
+            {foreach $rotates as $key=>$ro} 
+                <option value="{$ro['id']}" {if $rotate['id']==$ro['id']}selected{/if}>{$ro['title']}</option>
+            {/foreach}
+            {/if}
+          </select>
+        </div>
+    </div>
+    <div class="form-group m-l-5">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">选择投票项目</span>
+          <select id="voteid" class="form-control">
+            <option value='' {if empty($rotate)}selected{/if}>全部</option>
+            {if !empty($rotate)}
+                {foreach $rotate['items'] as $item}
+                    <option value="{$item['id']}" >{$item['votename']}</option>
+                {/foreach}
+            {/if}
+          </select>
+        </div>
+    </div>
+    <div class="form-group" style="max-width: 200px">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">用户名</span>
+        <input type="text" class="form-control" value="" id="keyword" placeholder="请输入用户名">
+      </div>
+    </div>
+    <div class="form-group" style="max-width: 200px">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">点评内容</span>
+        <input type="text" class="form-control" value="" id="comment" placeholder="请输入点评内容">
+      </div>
+    </div>
+    <a class="btn btn-primary btn-sm btn-search" href="javascript:void(0)"><i class="mdi mdi-magnify"></i> 搜索</a>
+    <a class="btn btn-warning btn-sm btn-export" href="javascript:void(0)"><i class="mdi mdi-export"></i> 导出</a>
+</div>
+{include file='$Wpath/common/tabletoolbar'}
+<table id="listtable" class="zam-btable"></table>
+<script>    
+var $rotates = {:json_encode($rotates)};
+require(['webcore','webtable','jconfirmBox','zamnotice'],function(webcore,webtable,jconfirmBox,zamnotice){
+var searchParamas = [{'type':'2','id':'rotateid'},{'type':'2','id':'voteid'},{'type':'1','id':'keyword'},{'type':'1','id':'comment'}];
+var initConfig = {
+    tableId:'#listtable',
+    url:"{:gohdmanage('configvote/comment',['hdid'=>$hdid])}",
+    columnoperate:{
+        btns:{
+            del:true,
+        },
+        func:{
+            del:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','删除评论数据将无法恢复，您确定要删除么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('configvote/delcomment',['hdid'=>$hdid])}",{rotateid:$("#rotateid option:selected").val(),recordid:row.id}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','删除成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差。操作失败');
+                });
+                });
+            }
+        }
+    },
+    columns:[{
+            checkbox: true,
+        }, 
+        {
+            field: 'id',
+            title: 'id',
+            align: 'center',
+            visible: false
+        },{
+            field: 'nickname',
+            title: '用户',
+            align: 'center',
+            formatter:function(value,row,index){
+                var html = `
+                <div class='zam-flex-column-center'>
+                    <img src="${row.avatar}" class="avatarImg" />
+                    <span>${value||'已删除'}</span>
+                </div>
+                `;
+                return html;
+            },
+            width:'20%',
+        },{
+            field: 'votename',
+            title: '投票项',
+            align: 'center',
+            formatter:function(value,row,index){
+                var html = `
+                <div class='zam-flex-column-center'>
+                    <img src="${row.voteimg}" class="avatarImg" />
+                    <span>${value||'已删除'}</span>
+                </div>
+                `;
+                return html;
+            },
+            width:'20%',
+        },  {
+            field: 'votecomment',
+            title: '点评内容',
+            align: 'center',
+            width:'30%',
+        }
+        ,{
+            field: 'create_time',
+            title: '点评时间',
+            align: 'center',
+            width:'20%',
+        }
+    ],
+    searchParamas:searchParamas,
+    toolbar:{
+        del:function(){
+            var getSelects = webtable.getSelections();
+            if(getSelects.length>0){
+                jconfirmBox.confirm('温馨提示','删除用户点评数据将无法恢复，您确定要删除选中的数据么？',function(){
+                    webcore.ajaxSubmit("{:gohdmanage('configvote/delcomment',['hdid'=>$hdid])}",{rotateid:$("#rotateid option:selected").val(),recordid:getSelects}).then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','删除成功');
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差,操作失败');
+                    });
+                });
+            }else{
+                zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+        },
+        reset:function(){
+            var rotateid = $("#rotateid option:selected").val();
+            if(typeof rotateid == "undefined") return zamnotice.showTips('info','请选择轮次');
+            jconfirmBox.confirm('温馨提示','清空将删除本轮所有投票项目的点评数据并且无法恢复，您确定要清空么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('configvote/resetcomment',['hdid'=>$hdid])}",{rotateid:rotateid}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','清空成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+        },
+    },
+};
+webtable.init(initConfig);
+$('#rotateid').change(function(e) {
+    var selroundid = $(e.target).find("option:selected").val(),selround = $rotates[selroundid].items;
+    if(!selround) return;
+    var html = '<option value="0" selected>全部</option>';
+    $.each(selround,function(i,v){
+        html += '<option value="'+v.id+'">'+v.votename+'</option>';
+    });
+    $("#voteid").html(html);
+    webtable.refresh();
+});
+$('#voteid').change(function(e) {
+     webtable.refresh();
+})
+$('.btn-export').on('click',function(){
+   var rotateid = $("#rotateid").find('option:selected').val();
+   webcore.ajaxSubmit("{:gohdmanage('configvote/exportcomment',['hdid'=>$hdid])}",{rotateid:rotateid}).then(function(json){
+        if(json.code!=0){
+            zamnotice.showTips('error',json.msg);
+        }else{
+            window.location.href = "{:gohdmanage('configvote/exportcomment',['hdid'=>$hdid])}&rotateid="+rotateid;
+        }
+    }, function(json){
+        zamnotice.showTips('error','网络差,操作失败');
+    });
+});
+});
+</script>
+{include file='$Wpath/common/footer'}

@@ -1,0 +1,305 @@
+{include file="common/header" /}
+<style>
+.game-tips{position:fixed; top:0; left:0;width:100%;height:100%;text-align:center;}
+.game-tips img{width:2rem;height:2.43rem;margin-left:0.3rem}
+.game-tips p{font-size:12px; line-height:26px; color:#fff; margin-top:20px;}
+.game-tips .game-status{font-size:18px; line-height:30px; color:#fff; margin-top:20px;}
+/*红包掉落效果*/
+.redenvelop_box{width:100%; height:100%; position:fixed; top:0; left:0;}
+.redenvelop_box.hidden{visibility:hidden;pointer-events:none}
+.redenvelop_box .countNum{width:75px; height:100px; text-align:center; background:url("{if isset($appconfig['style']['apptimebg']) && !empty($appconfig['style']['apptimebg'])}{:tomedia($appconfig['style']['apptimebg'])}{else /}/static/images/wechat/redpack/stopwatch.png{/if}") top center no-repeat; background-size:contain; position:absolute; left:10px; top:20px;}
+.redenvelop_box .countNum p{font-size:14px; color:#ff0000; margin-top:24px; }
+.redenvelop_box .countNum p b{font-size:24px;}
+.redenvelop_box .countNum span{display:block; font-size:12px; line-height:12px; color:#333;}
+.redenvelop_box .redenvelop_list{height: 100%;}
+.redenvelop_box .redenvelop_list li{
+	position:absolute; 
+	top:-200px;
+	left:0; 
+	background-size:100% 100%;
+	background-repeat:no-repeat;
+	background-image:url("{:tomedia($appconfig['style']['dropredpack'])}");
+}
+.redenvelop_box .redenvelop_list .redenvelop1{width:200px; height:200px; z-index:7;}
+.redenvelop_box .redenvelop_list .redenvelop2{width:168px; height:168px; z-index:6;}
+.redenvelop_box .redenvelop_list .redenvelop3{width:128px; height:128px; z-index:5;}
+.redenvelop_box .redenvelop_list .redenvelop4{width:71px; height:71px;  z-index:4;}
+.redenvelop_box .redenvelop_list .redenvelop5{width:67px; height:67px; z-index:3;}
+.redenvelop_box .redenvelop_list .redenvelop6{width:37px; height:37px; z-index:2;}
+.redenvelop_box .redenvelop_list .redenvelop7{width:28px; height:28px; z-index:1;}
+.redenvelop_box .redenvelop_list li a{
+	display:block; 
+	width:100%; 
+	height:100%; 
+	background-size:contain; -ms-touch-action:none; 
+	touch-action:none;
+}
+/*抢的一个红包*/
+.grab_one_redenvelop{position:fixed;left:0;top:0;width:100%;height:100%;z-index:8;background-color:rgba(0,0,0,0.5)}
+.grab_one_redenvelop.hidden{display:none;}
+.grab_one_redenvelop .txt{
+	position: relative;
+	font-size:18px; 
+	line-height:30px; 
+	color:#ffef85; 
+	text-align:center;
+	margin-bottom: 5px;
+	display: none;
+}
+.grab_one_redenvelop .one_redenvelop{
+	position:relative;
+	width:250px;
+	height: 288px;
+	background-image: url("{if isset($appconfig['style']['appwaitopenimg']) && !empty($appconfig['style']['appwaitopenimg'])}{:tomedia($appconfig['style']['appwaitopenimg'])}{else /}/static/images/wechat/redpack/waitopen.png{/if}");
+	background-size: cover;
+	background-repeat: no-repeat;
+	color:#fff;
+	overflow:hidden;
+}
+.grab_one_redenvelop .one_redenvelop .user_info{
+	width: 100%;
+	padding: 0 30px;
+	margin-top: 60px;
+	text-align:center;
+	
+}
+.grab_one_redenvelop .one_redenvelop .user_info img{ 
+	width:50px; 
+	height:50px; 
+	border-radius:50%; 
+	border:2px solid #fff; 
+	margin:0 auto;
+}
+.grab_one_redenvelop .one_redenvelop .user_info .user_info_name{
+	font-size:18px; 
+	line-height:24px; 
+	margin-top:12px;
+}
+.grab_one_redenvelop .one_redenvelop .user_info .user_info_tip{
+	font-size:14px; 
+	line-height:40px; 
+}
+.grab_one_redenvelop .one_redenvelop .btn_open{
+	position:absolute; 
+	bottom:16px; 
+	left:calc(50% - 48px);
+	width:96px; 
+	height:96px;
+	font-size: 24px;
+	background-image: url("{if isset($appconfig['style']['appwaitopenbtn']) && !empty($appconfig['style']['appwaitopenbtn'])}{:tomedia($appconfig['style']['appwaitopenbtn'])}{else /}/static/images/wechat/redpack/openbtn.png{/if}");
+	background-size: cover;
+	background-repeat: no-repeat;
+	color: #b7301c;
+	font-weight: 600;
+}
+.grab_one_redenvelop .one_redenvelop .btn_open.rotate3d{
+	-webkit-transform-style: preserve-3d;
+	-webkit-animation: btnrotateY 2s infinite ease;
+	transform-style: preserve-3d;
+	animation: btnrotateY 2s infinite ease;
+	pointer-events:none;
+}
+@keyframes btnrotateY {
+	0 { transform: rotateY(0); }
+	100% { transform: rotateY(360deg); }
+}
+@-webkit-keyframes btnrotateY {
+	0 { -webkit-transform: rotateY(0); }
+	100% { -webkit-transform: rotateY(360deg); }
+}
+.grab_one_redenvelop .close{
+	position:relative;
+	margin-top: 20px;
+	width: 30px;
+	height: 30px;
+	background-size: cover;
+	background-repeat: no-repeat;
+	background-image: url(/static/images/wechat/redpack/close.png);
+}
+/**点击红包弹窗**/
+.prize_redenvelop{
+	position:fixed; 
+	left:0; 
+	top:0;
+	width:100%;
+	height:100%;
+	z-index:8;
+	background-color:rgba(0,0,0,0.5);
+}
+.prize_redenvelop.hidden{ display:none;}
+.prize_redenvelop .txt{ 
+	margin-top: 54px;
+	font-size:18px; 
+	color:#ffef85; 
+	text-align:center;
+}
+.prize_redenvelop .prize_box{
+	position:relative;
+	width:250px;
+	height: 288px;
+	background-image: url("{if isset($appconfig['style']['appopenedimg']) && !empty($appconfig['style']['appopenedimg'])}{:tomedia($appconfig['style']['appopenedimg'])}{else /}/static/images/wechat/redpack/opened.png{/if}");
+	background-size: cover;
+	background-repeat: no-repeat;
+	overflow:hidden;
+}
+.prize_redenvelop .prize_box .prize_info{
+	width:100%;
+	margin-top: 18px;
+	text-align:center;
+	padding: 0 30px;
+}
+
+.prize_redenvelop .prize_box .prize_info .user_info img{
+	width:50px; 
+	height:50px; 
+	border-radius:50%; 
+	border:2px solid #fff; 
+	margin:0 auto;
+}
+.prize_redenvelop .prize_box .prize_info .user_info div{
+	margin-top: 5px;
+	color:#333;
+	font-size:14px; 
+	font-weight: 600;
+}
+.prize_redenvelop .prize_box .prize_info .emptytxt{ 
+	margin-top: 20px;
+	color:#333;
+	font-size:20px; 
+	text-overflow:ellipsis;
+	overflow:hidden;
+}
+.prize_redenvelop .close{
+	position:relative;
+	margin-top: 20px;
+	width: 30px;
+	height: 30px;
+	background-size: cover;
+	background-repeat: no-repeat;
+	background-image: url(/static/images/wechat/redpack/close.png);
+}
+/*中了红包弹窗*/
+.money_redenvelop{position:fixed; left:0; top:0;width:100%;height:100%;z-index:8;background-color:rgba(0,0,0,0.5)}
+.money_redenvelop.hidden{ display:none;}
+.money_redenvelop .txt{ 
+	margin-top: 54px;
+	font-size:18px; 
+	color:#ffef85; 
+	text-align:center;
+}
+.money_redenvelop .money_box{
+	position:relative;
+	width:250px;
+	height: 288px;
+	background-image: url("{if isset($appconfig['style']['appopenedimg']) && !empty($appconfig['style']['appopenedimg'])}{:tomedia($appconfig['style']['appopenedimg'])}{else /}/static/images/wechat/redpack/opened.png{/if}");
+	background-size: cover;
+	background-repeat: no-repeat;
+	overflow:hidden;
+}
+.money_redenvelop .money_box .box_main{
+	position:relative; 
+	text-align:center; 
+	color: #333;
+	padding: 0 30px;
+}
+.money_redenvelop .money_box .box_main img{
+	margin-top: 46px;
+	width:50px; 
+	height:50px; 
+	border-radius:50%; 
+	border:2px solid #fff; 
+	margin-top: 14px;	
+}
+.money_redenvelop .money_box .box_main .money_info{ 
+	margin-top: 6px;
+}
+.money_redenvelop .money_box .box_main .money_info span{ 
+	font-size:14px; 
+	line-height:20px;
+}
+.money_redenvelop .money_box .box_main .money {
+	font-size:14px;
+	margin: 6px 0;
+}
+.money_redenvelop .money_box .box_main .money b{
+	font-size:36px; 
+	padding-right:5px; 
+}
+.money_redenvelop .close{
+	position:relative;
+	margin-top: 20px;
+	width: 30px;
+	height: 30px;
+	background-size: cover;
+	background-repeat: no-repeat;
+	background-image: url(/static/images/wechat/redpack/close.png);
+}
+</style>
+{if !empty($appconfig['style']['diycss'])}<style>{$appconfig['style']['diycss']}</style>{/if}
+<section class="g-flexview appredpack">
+	<div class="game-tips zam-app-flex-ajCenter">
+		<div class="game-wait zam-app-flex-ajCenter hidden">
+			<img src="{:tomedia($appconfig['style']['apptipimg'])}">
+			<div class="game-rule">
+				{:html_entity_decode($appconfig['apptipwords']);}
+			</div>
+		</div>
+		<div class="game-status"></div>
+	</div>
+	<div class="redenvelop_box hidden">
+		<div class="countNum"><p><b>0</b>s</p><span>倒计时</span></div>
+		<ul class="redenvelop_list"></ul>
+	</div>
+</section>
+<script id="onehb-tpl" type="text/html">
+<div class="grab_one_redenvelop zam-app-flex-ajCenter">
+    <p class="txt">你抢到了一个神秘红包<br>快拆开看看</p>
+    <div class="one_redenvelop">
+	  <div class="user_info">
+		<img src="{:tomedia($wxuser['avatar'])}">
+		<div class="user_info_name limitbox">{$wxuser['nickname']}</div>
+		<span class="user_info_tip">恭喜您获得一个红包</span>
+	  </div>
+	  <div class="btn_open zam-app-flex-ajCenter2">拆</div>
+    </div>
+	<span class="close"></span>
+</div>
+</script>
+<script id="emptyhb-tpl" type="text/html">
+<div class="prize_redenvelop zam-app-flex-ajCenter">
+	<div class="prize_box">
+		<div class="txt">很遗憾</div>
+		<div class="prize_info">
+			<div class="user_info">
+				<img src="{:tomedia($wxuser['avatar'])}">
+				<div class="user_info_name limitbox">{$wxuser['nickname']}</div>
+			</div>
+			<div class="emptytxt">{if !empty($appconfig['emptytxt'])}{$appconfig['emptytxt']}{else}空空如也{/if}</div>
+		</div>
+	</div>
+	<span onclick="javascript:$('.prize_redenvelop').remove();" class="close"></span>
+</div>
+</script>
+<script id="moneyhb-tpl" type="text/html">
+<div class="money_redenvelop zam-app-flex-ajCenter">
+	<div class="money_box">
+		<p class="txt">恭喜您获得</p>
+		<div class="box_main zam-app-flex-alignCenter zam-app-directionColumn">
+			<img src="{:tomedia($wxuser['avatar'])}">
+			<div class="money_info">
+				<span><% d.sender %></span>
+			</div>
+			<div class="money"><b><% d.sendmoney %></b>元</div>
+			<p class="tip">已发放到您的微信钱包</p>
+		</div>
+	</div>
+	<span onclick="javascript:$('.money_redenvelop').remove();" class="close"></span>
+</div>
+</script>
+<script>
+require(['appredpack'],function (appredpack){
+	appredpack.init();
+});
+</script>
+{include file="common/footermenu" /}
+{include file="common/footer" /}

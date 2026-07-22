@@ -1,0 +1,341 @@
+{include file='$Wpath/common/header'}
+<form id="formBox" class="zam-formvalidation form-horizontal" method="post">
+<div class="zam-titleBox">地图<a class="btn btn-primary btn-xs m-l-5" href="https://lbs.amap.com/" target="__blank">点我去高德地图注册</a><a class="btn btn-warning btn-xs m-l-5" href="https://lbsyun.baidu.com/" target="__blank">点我去百度地图注册</a><a class="btn btn-success btn-xs m-l-5" href="https://lbs.qq.com/" target="__blank">点我去腾讯地图注册</a>
+</div>
+<div class="form-group">
+  <label class="col-lg-2 control-label">* 类型</label>
+  <div class="col-lg-8">
+    <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.gdmap').removeClass('hidden'),$('.bdmap,.txmap').addClass('hidden');">
+     <input type="radio" name="map[type]" value="1" {if $config['map']['type']=='1'}checked{/if}><span>高德地图</span>
+    </label>
+    <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.bdmap').removeClass('hidden'),$('.gdmap,.txmap').addClass('hidden');">
+     <input type="radio" name="map[type]" value="2" {if $config['map']['type']=='2'}checked{/if}><span>百度地图</span>
+    </label>
+    <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.txmap').removeClass('hidden'),$('.bdmap,.gdmap').addClass('hidden');">
+     <input type="radio" name="map[type]" value="3" {if $config['map']['type']=='3'}checked{/if}><span>腾讯地图 <b class="label label-success">推荐</b></span>
+    </label>
+    <div class="help-block">推荐使用腾讯地图</div>
+  </div>
+</div>
+<div class="gdmap{if $config['map']['type']!='1'} hidden{/if}">
+  <div class="form-group">
+      <label class="col-lg-2 control-label">* Web端KEY</label>
+      <div class="col-lg-8">
+        <input class="form-control" type="text"  name="map[gdmap][jskey]" value="{$config['map']['gdmap']['jskey']??''}" onkeyup="return trimSpace(this)">
+        <span class="help-block">Web端KEY意思是在高德地区创建好应用后添加一个服务平台为Web端(JS API)的KEY</span>
+      </div>
+  </div>
+  <div class="form-group">
+      <label class="col-lg-2 control-label">* Web端(JS API)对应的安全密钥</label>
+      <div class="col-lg-8">
+        <input class="form-control" type="text"  name="map[gdmap][jskeycode]" value="{$config['map']['gdmap']['jskeycode']??''}" onkeyup="return trimSpace(this)">
+        <span class="help-block">如果您是2021年12月02日之前升级的应用，应该是没有此安全密钥的，可以不填写</span>
+      </div>
+  </div>
+  <div class="form-group">
+      <label class="col-lg-2 control-label">* Web服务KEY</label>
+      <div class="col-lg-8">
+        <input class="form-control" type="text"  name="map[gdmap][webkey]" value="{$config['map']['gdmap']['webkey']??''}" onkeyup="return trimSpace(this)">
+        <span class="help-block">Web端KEY意思是在高德地区创建好应用后添加一个服务平台为Web服务的KEY</span>
+      </div>
+  </div>
+</div>
+<div class="bdmap{if $config['map']['type']!='2'} hidden{/if}">
+  <div class="form-group">
+      <label class="col-lg-2 control-label">* 浏览器端ak</label>
+      <div class="col-lg-8">
+        <input class="form-control" type="text"  name="map[bdmap][jsak]" value="{$config['map']['bdmap']['jsak']??''}" onkeyup="return trimSpace(this)">
+        <span class="help-block">创建一个类型为浏览器端的应用把ak复制过来，Referer白名单里按照提示填写即可</span>
+      </div>
+  </div>
+  <div class="form-group">
+      <label class="col-lg-2 control-label">* 服务端ak</label>
+      <div class="col-lg-8">
+        <input class="form-control" type="text"  name="map[bdmap][serverak]" value="{$config['map']['bdmap']['serverak']??''}" onkeyup="return trimSpace(this)">
+        <span class="help-block">创建一个类型为服务端的应用把ak复制过来</span>
+      </div>
+  </div>
+  <div class="form-group">
+      <label class="col-lg-2 control-label">* 服务端ak对应的sk</label>
+      <div class="col-lg-8">
+        <input class="form-control" type="text"  name="map[bdmap][serversk]" value="{$config['map']['bdmap']['serversk']??''}" onkeyup="return trimSpace(this)">
+        <span class="help-block">创建服务端ak时请求校验方式选择sn校验方式，创建好了以后点击这个应用的设置按钮，拉到最底部就可以看到这个sk</span>
+      </div>
+  </div>
+</div>
+<div class="txmap{if $config['map']['type']!='3'} hidden{/if}">
+  <div class="form-group">
+      <label class="col-lg-2 control-label">* 应用key</label>
+      <div class="col-lg-8">
+        <input class="form-control" type="text"  name="map[txmap][key]" value="{$config['map']['txmap']['key']??''}" onkeyup="return trimSpace(this)">
+        <span class="help-block">创建应用后点击添加key，勾选webserviceAPI选择域名白名单并且填写您的域名即可</span>
+      </div>
+  </div>
+  <div class="form-group hidden">
+      <label class="col-lg-2 control-label">* webserviceAPI校验签名sk</label>
+      <div class="col-lg-8">
+        <input class="form-control" type="text"  name="map[txmap][sk]" value="{$config['map']['txmap']['sk']??''}" onkeyup="return trimSpace(this)">
+        <span class="help-block">创建应用后点击添加key，勾选webserviceAPI选择签名校验才需要填写此项</span>
+      </div>
+  </div>
+</div>
+<div class="zam-titleBox">人脸识别</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 类型</label>
+    <div class="col-lg-8">
+      <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.baiduface').removeClass('hidden'),$('.txface,.aliface').addClass('hidden');">
+      <input type="radio" name="face[type]" value="1" {if $config['face']['type']=='1'}checked{/if}><span>百度人脸识别</span>
+      </label>
+      <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.txface').removeClass('hidden'),$('.baiduface,.aliface').addClass('hidden');">
+      <input type="radio" name="face[type]" value="2" {if $config['face']['type']=='2'}checked{/if}><span>腾讯云人脸检测 <b class="label label-success">推荐</b></span>
+      </label>
+      <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.aliface').removeClass('hidden'),$('.baiduface,.txface').addClass('hidden');">
+      <input type="radio" name="face[type]" value="3" {if $config['face']['type']=='3'}checked{/if}><span>阿里云人脸检测</span>
+      </label>
+      <div class="help-block">
+        <div>百度人脸识别需要到百度ai里创建新应用，并且将应用的appid、appkey、secretkey复制并填写到此处，个人版和企业版均有1万次免费额度，但是qps太低如果不购买包无法正常使用</div>
+        <div>腾讯云人脸检测需要到腾讯云里开通人脸识别，默认每月1万次免费额度，qps是50，能满足大部分活动的需求，如果每月免费额度耗光可考虑购买人脸检测包</div>
+        <div>阿里云人脸检测默认qps为2，对于正常活动如果不购买包无法正常使用</div>
+      </div>
+    </div>
+</div>
+<div class="baiduface{if $config['face']['type'] != '1'} hidden{/if}">
+  <div class="form-group">
+      <label class="col-lg-2 control-label">* APPID</label>
+      <div class="col-lg-8">
+        <input class="form-control" type="text"  name="face[baidu][appid]" value="{$config['face']['baidu']['appid']??''}" onkeyup="return trimSpace(this)">
+      </div>
+  </div>
+  <div class="form-group">
+      <label class="col-lg-2 control-label">* APPKEY</label>
+      <div class="col-lg-8">
+        <input class="form-control" type="text"  name="face[baidu][appkey]" value="{$config['face']['baidu']['appkey']??''}" onkeyup="return trimSpace(this)">
+      </div>
+  </div>
+  <div class="form-group">
+      <label class="col-lg-2 control-label">* SECRETKEY</label>
+      <div class="col-lg-8">
+        <input class="form-control" type="text"  name="face[baidu][secretkey]" value="{$config['face']['baidu']['secretkey']}" onkeyup="return trimSpace(this)">
+      </div>
+  </div>
+</div>
+<div class="txface{if $config['face']['type'] != '2'} hidden{/if}">
+    <div class="form-group">
+      <label class="col-lg-2 control-label">* 提示</label>
+      <div class="col-lg-8">
+        <div class="alert alert-danger">
+            如果测试时提示计费状态未知，请确认是否已在控制台开通<a class="text-primary" href="https://console.cloud.tencent.com/aiface" target="__blank">人脸识别</a>
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* SecretId</label>
+        <div class="col-lg-8">
+          <input class="form-control" type="text"  name="face[tx][key]" value="{$config['face']['tx']['key']??''}" onkeyup="return trimSpace(this)">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* SecretKey</label>
+        <div class="col-lg-8">
+          <input class="form-control" type="text"  name="face[tx][secret]" value="{$config['face']['tx']['secret']??''}" onkeyup="return trimSpace(this)">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 地区</label>
+        <div class="col-lg-8">
+          <select class="form-control js_select2"  name="face[tx][location]">
+            <option value="" {if !isset($config['face']['tx']['location']) || empty($config['face']['tx']['location'])}selected{/if}>请选择</option>
+            {foreach $txlocations  as $k=>$l}
+              <option value="{$k}"{if isset($config['face']['tx']['location']) && $config['face']['tx']['location'] == $k}selected{/if}>{$l}</option>
+            {/foreach}
+          </select>
+        </div>
+    </div>
+</div>
+<div class="aliface{if $config['face']['type'] != '3'} hidden{/if}">
+    <div class="form-group">
+      <label class="col-lg-2 control-label">* 提示</label>
+      <div class="col-lg-8">
+        <div class="alert alert-danger">
+          开通<a class="text-primary" href="https://vision.console.aliyun.com/cn-shanghai/detail/facebody" target="__blank">阿里云人体人脸</a>
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* Access Key ID</label>
+        <div class="col-lg-8">
+          <input class="form-control" type="text"  name="face[ali][key]" value="{$config['face']['ali']['key']??''}" onkeyup="return trimSpace(this)">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* Access Key Secret</label>
+        <div class="col-lg-8">
+          <input class="form-control" type="text"  name="face[ali][secret]" value="{$config['face']['ali']['secret']??''}" onkeyup="return trimSpace(this)">
+        </div>
+    </div>
+</div>
+{if dzfacecomic()}
+<div class="zam-titleBox">人脸动漫化处理</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 类型</label>
+    <div class="col-lg-8">
+      <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.txcomic').removeClass('hidden'),$('.alicomic').addClass('hidden');">
+      <input type="radio" name="facecomic[type]" value="1" {if $config['facecomic']['type']=='1'}checked{/if}><span>腾讯云人脸动漫化 <b class="label label-success">推荐</b></span>
+      </label>
+      <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.alicomic').removeClass('hidden'),$('.txcomic').addClass('hidden');">
+      <input type="radio" name="facecomic[type]" value="2" {if $config['facecomic']['type']=='2'}checked{/if}><span>阿里云人脸动漫化</span>
+      </label>
+      <div class="help-block">
+        <div>腾讯云人脸动漫化需要到腾讯云里开通人脸识别，默认每月1千次免费额度，qps是50，能满足大部分活动的需求，如果每月免费额度耗光可考虑购买人脸动漫化包</div>
+        <div>阿里云人脸动漫化默认qps为2，对于正常活动如果未购买包就无法正式商用，但是阿里云动画化支持多种风格，如果有需要可以考虑购买</div>
+      </div>
+    </div>
+</div>
+<div class="txcomic{if $config['facecomic']['type'] != '1'} hidden{/if}">
+    <div class="form-group">
+      <label class="col-lg-2 control-label">* 提示</label>
+      <div class="col-lg-8">
+        <div class="alert alert-danger">
+            如果测试时提示计费状态未知，请确认是否已在控制台开通<a class="text-primary" href="https://console.cloud.tencent.com/ft/face-cartoon-pic" target="__blank">人脸动漫化</a>
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* SecretId</label>
+        <div class="col-lg-8">
+          <input class="form-control" type="text"  name="facecomic[tx][key]" value="{$config['facecomic']['tx']['key']??''}" onkeyup="return trimSpace(this)">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* SecretKey</label>
+        <div class="col-lg-8">
+          <input class="form-control" type="text"  name="facecomic[tx][secret]" value="{$config['facecomic']['tx']['secret']??''}" onkeyup="return trimSpace(this)">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 地区</label>
+        <div class="col-lg-8">
+          <select class="form-control js_select2"  name="facecomic[tx][location]">
+            <option value="" {if !isset($config['facecomic']['tx']['location']) || empty($config['facecomic']['tx']['location'])}selected{/if}>请选择</option>
+            {foreach $txlocations  as $k=>$l}
+              <option value="{$k}" {if isset($config['facecomic']['tx']['location']) && $config['facecomic']['tx']['location'] == $k}selected{/if}>{$l}</option>
+            {/foreach}
+          </select>
+        </div>
+    </div>
+</div>
+<div class="alicomic{if $config['facecomic']['type'] != '2'} hidden{/if}">
+    <div class="form-group">
+      <label class="col-lg-2 control-label">* 提示</label>
+      <div class="col-lg-8">
+        <div class="alert alert-danger">
+          开通<a class="text-primary" href="https://vision.console.aliyun.com/cn-shanghai/detail/facebody" target="__blank">阿里云人体人脸</a>
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* Access Key ID</label>
+        <div class="col-lg-8">
+          <input class="form-control" type="text"  name="facecomic[ali][key]" value="{$config['facecomic']['ali']['key']??''}" onkeyup="return trimSpace(this)">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* Access Key Secret</label>
+        <div class="col-lg-8">
+          <input class="form-control" type="text"  name="facecomic[ali][secret]" value="{$config['facecomic']['ali']['secret']??''}" onkeyup="return trimSpace(this)">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 动漫风格</label>
+        <div class="col-lg-8">
+          <input class="form-control" type="text"  name="facecomic[ali][style]" value="{$config['facecomic']['ali']['style']??'anime'}">
+          <div class="help-block">anime即为日漫风，3d即为3D特效，handdrawn即为手绘风，sketch即为铅笔画，artstyle即为艺术特效</div>
+        </div>
+    </div>
+</div>
+{/if}
+<div class="zam-titleBox">签到桌面软件(该软件不属于本系统，仅支持对接该软件)</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 软件对接地址</label>
+    <div class="col-lg-8">
+      <div class="form-control-static">{$signsofturl}</div>
+      <div class="help-block">非软件官方获取到的桌面软件请关闭站点强制https</div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 负载均衡</label>
+    <div class="col-lg-8">
+      {:tpl_switch('fyinfo[openslb]',$config['fyinfo']['openslb'],'openslb')}
+
+    </div>
+</div>
+<div class="form-group ecshost{if $config['fyinfo']['openslb']=='2'} hidden{/if}">
+    <label class="col-lg-2 control-label">主服务域名</label>
+
+    <div class="col-lg-8">
+      <input class="form-control" type="text"  name="fyinfo[ecshost]" value="{$config['fyinfo']['ecshost']}" onkeyup="return trimSpace(this)">
+      <span class="help-block">格式:https://您的域名,样例:https://baidu.com，后面没有斜杠</span>
+    </div>
+</div>
+<div class="zam-titleBox">系统CSS(此css在后台、前台均生效)</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">css内容</label>
+    <div class="col-lg-8">
+      <textarea class="form-control" name="globalcss" rows="4" placeholder="注:必须是压缩后的css代码">{$config['globalcss']}</textarea>
+    </div>
+</div>
+<div class="zam-titleBox">百度统计(后台、大屏幕端，微信端均会使用)</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">统计代码</label>
+    <div class="col-lg-8">
+      <textarea class="form-control" name="globalbaiducalc" rows="4" placeholder="注:请到百度统计后台复制过来">{$config['globalbaiducalc']}</textarea>
+      <div class="help-block"><a href="https://tongji.baidu.com/web5/welcome/login" target="__blank">点我登录百度统计</a></div>
+    </div>
+</div>
+{include file='$Wpath/common/savepanel'}
+</form>
+<script>
+require(['webcore','jconfirmBox','zamnotice','zvalidator'],function(webcore,jconfirmBox,zamnotice){
+    $('#formBox').formValidation({
+		framework: 'bootstrap',
+		excluded: [':disabled'],
+		message: '您填写的内容无效',
+		fields: {}
+	}).on('success.form.fv', function(e) {
+		e.preventDefault();
+		var $form = $(e.target);
+		var postData = webcore.serializeObject($form);
+		var bload = $form.find(".zam-fixedbottom button").lyearloading({opacity: 0.2,spinnerSize: 'nm'});
+		$form.formValidation('disableSubmitButtons', true);
+		webcore.ajaxSubmit("{:goweb('othermanage/index')}",postData).then(function(json){
+			bload.hide();
+			if(json.code==0){
+			    $form.formValidation('disableSubmitButtons', false);
+			    zamnotice.showTips('success','操作成功',2e3,function(){
+			    	window.location.reload();
+			    });
+		    }else{
+		        zamnotice.showTips('error',json.msg);
+		        $form.formValidation('disableSubmitButtons', false);
+		    }
+		}, function(json){
+			bload.hide();
+			zamnotice.showTips('error','网络差。操作失败');
+			$form.formValidation('disableSubmitButtons', false);
+		});
+	});
+});
+function openslb(obj,status){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".ecshost").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".ecshost").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+</script>
+{include file='$Wpath/common/footer'}

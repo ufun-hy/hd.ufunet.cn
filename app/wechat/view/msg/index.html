@@ -1,0 +1,532 @@
+{include file="common/header" /}
+{if $hdinfo['id']=='bosheng'}
+<style type="text/css">
+.say-box{width: 100%;height: 100%}
+.say-box fieldset{
+	width: 2rem;
+    background: #ffffff;
+    padding: 10px;
+    border-radius: 6px;
+    box-shadow: 1px 1px 15px #d2d2d2;
+    margin-bottom: 28px;
+    border: 2px;
+    border-color: #00bcd4;
+    border-style: dashed;
+}
+.say-box legend{
+  background: #00BCD4;
+  color: #fff;
+  padding: 0.2rem 0.62rem;
+  border-radius: 4px;
+  font-size: 0.42rem;
+  font-weight: 600;
+  text-align: center;
+}
+.textarea-box{width: 5.6rem;margin: 0.24rem 0;height: 1.6rem;}
+.textarea-box textarea{width: 100%;height: 100%;border:1px solid #dfdfdf;border-radius: 5px;padding:0.2rem 0.24rem;line-height: 0.42rem}
+.defaultwords{
+	margin: 0.12rem 0;
+}
+.defaultwords li{
+	margin-bottom: 0.12rem;
+	font-size: 0.3rem;
+	text-align: center;
+	cursor: pointer;
+}
+.textarea-tip{font-size: 0.2rem;color:#333;display: none}
+.button-box{text-align: center;margin-bottom: 0.24rem;margin-top: 0.24rem;}
+.button-box button{padding: 0 0.36rem}
+</style>
+<div class="say-box zam-app-flex-ajCenter2">
+<fieldset>
+    <legend>打卡祝福语</legend>
+    <label>请输入您想说的话</label>
+    <div class="textarea-box">
+    	<textarea placeholder="请输入您想说的话，{$appconfig['appmaxlength']}字以内" {if isset($mymsg['content'])}readonly{/if} maxlength="{$appconfig['appmaxlength']}">{$mymsg['content']??''}</textarea>
+    </div>
+    <ul class="defaultwords">
+    	<li>网络安全我们共同守护</li>
+    	<li>争做网络文明小卫士</li>
+    	<li>来啦来啦</li>
+    	<li>赞赞赞</li>
+    </ul>
+    <div class="button-box">
+    	<button class="btn btn-primary btn-send">提 交</button>
+    </div>
+    <p class="textarea-tip">注：每个人只能提交一次并且提交后不可以更改</p>
+    </div>
+ </fieldset>
+ </div>
+ <script type="text/javascript">
+ 	require(['wechatcore'],function(wechatcore){
+ 		$(".defaultwords li").click(function(){
+ 			var $this = $(this);
+ 			$('.textarea-box textarea').val($this.text());
+ 		});
+ 		$(".btn-send").click(function(){
+ 			var $this = $(this),msg = $('.textarea-box textarea').val();
+ 			if(!msg || msg==''){
+ 				return wechatcore.msg('请输入您想说的话');
+ 			}
+ 			if(msg.replace(/\s/g,"")==''){
+ 				return wechatcore.msg('请输入您想说的话');
+ 			}
+			wechatcore.ajaxSubmit("/wechat/msg/send",{type:1,content:msg},'提交中...').then(function(data){
+				if(data.code==0){
+					//$('.textarea-box textarea').attr('readonly',true);
+					$this.text(XCV3Config.sendJgtime+" s").removeClass("btn-send").addClass('btn-disabled');
+					wechatcore.coundown(XCV3Config.sendJgtime,function(t){
+						$this.text(t+" s");
+					},function(){
+						$this.text("提 交").removeClass("btn-disabled").addClass("btn-send");
+					})
+					$('.textarea-box textarea').val('');
+					wechatcore.msg('提交成功');
+				}else{
+					wechatcore.msg(data.msg);
+				}
+			}, function(){
+				wechatcore.msg('发送失败，请稍后重试');
+			});
+ 		});
+ 	});
+ </script>
+{else /}
+<style>
+.zam-app-msg-box{
+	color:#fff;
+}
+.zam-app-topNoticeBox{
+	position:fixed;
+	top:0;
+	left:0;
+	width:100%;
+	height:45px;
+	background-color:rgba(0,0,0,0.5);
+}
+.zam-app-topNotice-laba{
+	height:45px;
+	width:40px;
+}
+.zam-app-topNotice-laba i{
+	font-size:0.4rem;
+}
+.zam-app-topNotice-txt{
+	-webkit-box-flex: 1;
+    -webkit-flex: 1;
+    flex: 1;
+    position: relative;
+	height:45px;
+	word-break:keep-all;
+	white-space:nowrap;
+	overflow:hidden;  
+}
+.zam-app-topNotice-txt li{
+	position:relative;
+	right:0;
+	top:0;
+	height:45px;
+	line-height:45px;
+	font-size:16px;
+}
+.zam-app-topNotice-close{
+	height:45px;
+	width:40px;
+}
+.zam-app-topNotice-close i{
+	font-size:0.36rem;
+}
+.zam-app-msg-box .zam-app-msg-scroll{
+	width: 100%;
+	overflow: hidden;
+	position:fixed;
+	top:46px;
+	bottom:1rem;
+}
+.zam-app-msg-box .zam-app-msg-scroll.scrollnotop{
+	top:1px!important;
+}
+.zam-pulldown-box{
+	width:100%;
+	height:40px;
+	position:absolute;
+	left:0;
+	top:-40px;
+	text-align:center;
+}
+.zam-pulldown-box .pulldownRefresh{
+	display:none;
+	width:30px;
+	height:30px;
+	
+}
+.zam-pulldown-box .pulldownRefresh .pulldownRefresh-loading {
+	width: 20px;
+	height: 20px;
+	margin: 0 auto;
+	border: 2px solid #fff;
+	border-radius: 50%;
+	border-left-color: transparent;
+	border-right-color: transparent;
+	animation: cssload-spin 400ms infinite linear;
+	-webkit-animation: cssload-spin 400ms infinite linear;
+}
+@keyframes cssload-spin {
+	100% {
+		transform: rotate(360deg);
+		transform: rotate(360deg);
+	}
+}
+.zam-pulldown-box .pulldownOver{
+	font-size:14px;
+	position:relative;
+	display:none;
+}
+.zam-pulldown-box .pulldownOver i{
+	font-size:15px;
+	position: absolute;
+    top:-1px;
+    left: -25px;
+}
+.zam-pulldown-box .pulldownTxt{
+	font-size:14px;
+	position:relative;
+}
+.zam-pulldown-box .pulldownTxt i{
+	font-size:16px;
+	position: absolute;
+    top:-1px;
+    left: -25px;
+}
+.zam-app-msg-box .zam-app-msg-footerbar{
+	position: fixed;
+    bottom: 0;
+    left: 0;
+	padding:0;
+	z-index:2;
+	border:0;
+	background-color:rgba(0,0,0);
+	width: 100%;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+}
+.zam-app-msg-box .zam-app-msg-footerbar:after{
+	border:0;
+}
+.zam-app-msg-box .zam-app-msg-footerbar .zam-app-msg-inputbox{
+	margin:0px;
+}
+
+.zam-app-msg-box .zam-app-msg-footerbar .zam-app-msg-inputbox .zam-input-box{
+	background:none;
+	border-radius:0;
+	border:0;
+	padding-right:0;
+}
+.zam-app-msg-box .zam-app-msg-footerbar .zam-app-msg-inputbox input{
+	height:0.8rem;
+	color:#333;
+	margin:0;
+	background-color:#fff;
+	border-radius:6px;
+	text-indent:5px;
+}
+.zam-app-msg-box .zam-app-msg-footerbar .zam-app-msg-inputbox .zam-btn-send{
+	display:inline-block;
+    font-size: 0.32rem;
+	width: 1.3rem;
+    margin: 0 10px 0 0;
+    height: 0.68rem;
+	line-height: 0.68rem;
+    text-align: center;
+	background-color: #00aeff;
+    color: #fff;
+	border-radius:3px;
+	-webkit-user-select:none;
+    user-select:none;
+}
+.zam-btn-disabled{
+	background-color: #ccc!important;
+    color: #F0F0F0!important;
+    pointer-events: none;
+	-webkit-user-select:none;
+    user-select:none;
+}
+.zam-app-msg-faceicon{
+	width:0.6rem;
+	margin:0 5px;
+	height:0.75rem;
+}
+.zam-app-msg-faceicon i{
+	font-size:0.6rem;
+}
+.zam-app-msg-picicon{
+	width:1.3rem;
+	margin:0 10px 0 0;
+	height:0.75rem;
+}
+.zam-app-msg-picicon i{
+	font-size:0.6rem;
+}
+.zam-app-facebox{
+	position:relative;
+	width:100%;
+	z-index:1;
+}
+.zam-app-facebox .emo-list {
+    padding-top:2px;
+    padding-bottom: 15px;
+}
+.zam-app-facebox .emo-list li {
+    cursor: pointer;
+    float: left;
+    text-align: Center;
+    list-style: none;
+    width: 14.2%;
+    margin: .1rem 0;
+	-webkit-user-select:none;
+    user-select:none;
+}
+.zam-app-facebox .emo-list li.delemojili{
+	margin:0;
+}
+.zam-app-facebox .emo-list li img {
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+}
+.zam-app-facebox .emo-list li  img.delemoji{
+	width:38px;
+	height:38px;
+}
+.zam-app-facebox .emo-page{bottom:1px!important}
+.zam-app-msglist{
+	padding:0.2rem 0.3rem 0.1rem 0.3rem;
+	width:100%;
+	position:relative;
+	min-height:100.5%;
+	color:{if empty($appconfig['appfontcolor'])}#fff{else}{$appconfig['appfontcolor']}{/if};
+}
+.zam-app-msglist .zam-app-msg-item{ 
+	max-width:100%;
+	margin-bottom: 0.26rem;
+	padding-left: 1.05rem;
+	padding-right:1.6rem;
+	position: relative;
+    font-size: 0;
+    min-height:50px;
+}
+.zam-app-msglist .msgnamebox{
+	height:0.6rem;
+    line-height:0.6rem;
+    font-size:0.24rem;
+    text-align: left;
+	text-overflow: ellipsis;
+	white-space:nowrap;
+	word-break: break-all;
+	overflow:hidden;
+}
+.zam-app-msglist .msgtime{
+	height:0.4rem;
+    line-height:0.4rem;
+	text-align: center;
+	font-size:0.24rem;
+	margin-left: 0.55rem;
+}
+
+.zam-app-msglist .zam-app-msg-text {
+    position: relative;
+    background-color:{if empty($appconfig['appbgcolor'])}rgba(0,0,0,.5){else}{$appconfig['appbgcolor']}{/if};
+    border-radius: 4px 12px 12px 12px;
+    word-break: break-all;
+	display: inline-block;
+    vertical-align: top;
+    font-size: 16px;
+}
+.zanbox{
+	position: absolute;
+	right: -1.1rem;
+	top: calc(50% - 0.2rem);
+	width: 1rem;
+	height: 0.4rem;
+	background-image: url("/static/images/wechat/msg/zan.png");
+	background-size: cover;
+	background-repeat: no-repeat;
+	cursor: pointer;
+}
+.zanbox.clicked{
+	background-image: url("/static/images/wechat/msg/nozan.png");
+}
+.zam-app-msglist .zam-app-msg-text .zam-app-msg-user{
+	display: inline-block;
+    vertical-align: top;
+    font-size: 13px;
+	position: absolute;
+    left:-1.05rem;
+    top: -0.32rem;
+}
+.zam-app-msglist .zam-app-msg-text .zam-app-msg-user .userAvatar{
+	width: 0.95rem;
+    height: 0.95rem;
+    border-radius: 50%;
+    border:2px solid #fff;
+}
+.zam-app-msglist .zam-app-msg-text .msgtxt{
+	padding:0.18rem;
+}
+.zam-app-msglist .zam-app-msg-text .wechatImg {
+    max-width: 100%;
+    vertical-align: middle;
+    border-radius: 6px;
+}
+.zam-app-msglist .zam-app-msg-text .faceImg{
+	width:24px;height:24px;display:inline-block;margin:0 1px;vertical-align: middle;
+}
+.zam-app-msglist .zam-app-msg-control{
+	position: relative;
+	height: 30px;
+}
+.zam-app-msglist .zam-app-msg-control .delmsg{
+	display: inline-block;
+	height: 30px;
+	line-height: 30px;
+	margin-left:2px;
+	color: #fff;
+	font-size: 12px;
+	cursor:pointer;
+}
+.zam-app-msglist .zam-app-msg-control .addblack {
+    display: inline-block;
+    height: 30px;
+    line-height: 30px;
+    margin: 0 10px;
+    color: #fff;
+    font-size: 12px;
+    cursor: pointer;
+}
+.zam-app-msglist .zam-app-msg-control .addestoppel{
+	display: inline-block;
+    height: 30px;
+    line-height: 30px;
+    color: #fff;
+    font-size: 12px;
+    cursor: pointer;
+}
+/*新的底部样式*/
+.msgfooterbar{background-color: #f8f8f8!important;color: #333;}
+.msgfooterbar input{border: 1px solid #d8d8d8;}
+/*新增禁言层*/
+.msgfooterbar .stoplayer{
+	position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.32);
+    z-index: 1;
+    display: none;
+}
+.msgfooterbar.isforbidden .stoplayer{
+	display: block;
+}
+.msgfooterbar.isforbidden .zam-btn-send{
+	background-color: #faa64b!important;
+	font-size: 0.26rem!important;
+}
+</style>
+<section class="g-flexview zam-app-msg-box">
+    {if $appconfig['appshownotice']=='1' && !empty($appconfig['appnotices'])}
+	<header class="zam-app-topNoticeBox zam-app-flex-ajCenter2">
+        <div class="zam-app-topNotice-laba zam-app-flex-ajCenter"><i class="mxc-notification"></i></div>
+		<ul class="zam-app-topNotice-txt">
+			{volist name="appconfig.appnotices" id="notice"}
+				<li>{$notice}</li>
+			{/volist}
+		</ul>
+		{if $appconfig['appclosenotice']=='1'}
+		<div class="zam-app-topNotice-close zam-app-flex-ajCenter"><i class="mxc-roundclose"></i></div>
+		{/if}
+    </header>
+	{/if}
+	<div class="newjoin-enter zam-app-flex">
+		<div class="name">...</div>
+		<div class="text">已加入</div>
+	</div>
+	<div class="g-view zam-app-msg-scroll {if $appconfig['appshownotice']=='2' || empty($appconfig['appnotices'])}scrollnotop{/if}">
+        <ul class="zam-app-msglist"></ul>
+		<!-- 顶部提示信息 -->
+		<div class="zam-pulldown-box zam-app-flex-ajCenter">
+				<div class="pulldownOver"><i class="mxc-roundcheck"></i>加载完成</div>
+				<div class="pulldownRefresh"><div class="pulldownRefresh-loading"></div></div>
+				<span class="pulldownTxt"><i class="mxc-refresharrow"></i>下拉加载，释放刷新</span>
+		</div>
+    </div>
+	<footer class="zam-app-msg-footerbar msgfooterbar">
+        <div class="zam-input-item zam-app-msg-inputbox">
+			<div class="zam-input-box zam-app-flex-ajCenter2">
+				{if $appconfig['appstabletxt'] == '1'}
+					<input type="text" name="content" class="cell-input zam-app-cell-input app-msg-txtInput btn-showpoplits"  style="margin-right: 5px;" placeholder="{$appconfig['appstabletip']??'点击选择您想要说的话'}" autocomplete="off" readonly />
+					<span class="zam-btn-send btn-send-data">发送</span>
+				{else /}
+					<input type="text" name="content" class="cell-input zam-app-cell-input app-msg-txtInput" placeholder="{$appconfig['apptxttip']??'请输入你想说的话'}" autocomplete="off" maxlength="{$appconfig['appmaxlength']}" />
+					<a href="javascript:;" class="zam-app-msg-faceicon zam-app-flex-ajCenter2"><i class="mxc-emoji"></i></a>
+					{if $appconfig['appcanimg']=='1'}
+						<a href="javascript:;" class="zam-app-msg-picicon zam-app-flex-ajCenter2"><i class="mxc-pic"></i></a>
+					{/if}
+					<span class="zam-btn-send btn-send-data {if $appconfig['appcanimg']=='1'}zam-app-displaynone{/if}">发送</span>
+				{/if}
+				{if $appconfig['appstabletxt'] == '1'}
+					{include file="msg/lists" /}
+				{/if}
+			</div>
+			<div class="zam-app-facebox zam-app-displaynone"></div>
+		</div>
+		
+		<div class="stoplayer"></div>
+    </footer>
+</section>
+<script id="msg-tpl" type="text/html">
+	<%#  if(d.content != ''){ %>
+	<li class="zam-app-msg-item appmsg-<% d.id %>">
+		{if !isset($appconfig['showmsgtime']) || $appconfig['showmsgtime']=='1'}<p class="msgtime"><% d.create_time %></p>{/if}
+		<div class="msgnamebox"><% d.nickname %></div>
+		<div class="zam-app-msg-text">
+				<div class="zam-app-msg-user"><img class="userAvatar" src="<% d.avatar %>"></div>
+				<%#  if(d.type == '1'){ %>
+				<div class="msgtxt"><% d.content %></div>
+				<%#  }else if(d.type == '2'){ %>
+				<img class="wechatImg needwait" src="<% d.content %>" />
+				<%#  }else if(d.type == '3'){ %>
+					<div class="msgtxt">霸屏</div>
+					<%#  if(d.content.bpimg&&d.content.bpimg!=''){ %>
+						<img class="wechatImg needwait" src="<% d.content.bpimg %>" />
+					<%#  } %>
+					<%#  if(d.content.bptxt&&d.content.bptxt!=''){ %>
+						<div class="msgtxt"><% d.content.bptxt %></div>
+					<%#  } %>
+				<%#  } %>
+				{if $hdinfo['id']=='1653'}
+				<div class="zanbox<%#  if(d.hadliked == '1'){ %> clicked<%#  } %>"  data-msgid="<% d.id %>" ></div>
+				{/if}
+		</div>
+		<%#  if(d.ismanager === '1'){ %>
+			<div class="zam-app-msg-control" data-msgid="<% d.id %>" data-userid="<% d.user_id %>"><span class="delmsg">删除</span> <span class="addblack">拉黑</span> <span class="addestoppel">禁言</span></div>
+		<%#  } %>
+	</li>
+	<%#  } %>
+</script>
+<script>
+var cansendImg = parseInt("{$appconfig['appcanimg']}"),appjointip = parseInt("{$appconfig['appjointip']}"),appestoppel = "{$appconfig['appestoppel']??'2'}";
+require(['appmsg'],function (appmsg) {
+	appmsg.init();
+});
+</script>
+{/if}
+{include file="common/footermenu" /}
+{include file="common/footer" /}

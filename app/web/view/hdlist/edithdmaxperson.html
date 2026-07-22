@@ -1,0 +1,19 @@
+<div class="form-horizontal confirmbox-pop">
+  <form class="confirm-formbox" method="post" style="height:60px">
+	<div class="form-group">
+      <label class="col-lg-3 control-label">* 活动人数</label>
+      <div class="col-lg-7">
+         <input type="text" name="maxperson" class="form-control numberincdec" value="{$config['maxperson']??'0'}"
+          data-bts-min="1" data-bts-replacement-val="1"
+          data-bts-max="null"
+          data-bts-step="1"
+          />
+      </div>
+  </div>
+  </form>
+</div>
+<script type="text/javascript">
+require(["webcore","bootstrap-touchspin"],function(webcore){
+  $(".confirmbox-pop .numberincdec").TouchSpin();
+});
+</script>

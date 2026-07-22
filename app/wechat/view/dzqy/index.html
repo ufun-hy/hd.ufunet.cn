@@ -1,0 +1,52 @@
+{include file="common/header" /}
+<style>
+.zam-app-dzqy-main{position:fixed;top:0;left:0;width:100%;height:100%;overflow: hidden;color:#333;}
+.dzqybox{cursor:pointer;}
+.clearcanvas{position:absolute;right:0.2rem;bottom:0.4rem;color:#fff;font-size:0.8rem;cursor:pointer;}
+</style>
+<div class="zam-app-dzqy-main zam-app-flex-ajCenter">
+	<canvas class="dzqybox"></canvas>
+	<div class="clearcanvas"><i class="mxc-unie6a42"></i></div>
+</div>
+<img class="maoimg hidden" src="/{:SIMGURL}dzqy/mao.png">
+<script>
+var selClientBase = "{:gowechat('dzqy/selclient',['hdid'=>$hdinfo['hdid']])}";
+var rotateInfo = {if !empty($rotate)}{:json_encode($rotate)}{else /}""{/if};
+var forcelandscape = {if isset($appconfig['forcelandscape']) && $appconfig['forcelandscape']=='1'}"1"{else /}"2"{/if};
+require(['wechatcore','appdzqy'],function (wechatcore,appdzqy) {
+	function isAndorid() {
+	    var u = navigator.userAgent;
+	    if (u.indexOf('Android') > -1 || u.indexOf('Linux') > -1) {
+			return true;
+	    }
+	    return false;
+	}
+	if(forcelandscape=='1'){
+		var tips = '请旋转屏幕，使用横屏签名';
+		if(isAndorid() && wechatcore.device(3)){
+			tips = "请用手机自带浏览器打开，并且"+tips;
+		}
+		if(window.orientation == 0 || window.orientation == 180) {
+			appdzqy.init(rotateInfo);
+	        wechatcore.ask('温馨提示',tips,['好的'],function(){},function(){});
+	    }else{
+	    	appdzqy.init(rotateInfo);
+	    }
+		window.addEventListener("orientationchange", function() {
+			if (window.orientation === 180 || window.orientation === 0) {
+				appdzqy.init(rotateInfo);
+				wechatcore.ask('温馨提示',tips,['好的'],function(){},function(){});
+			}else if (window.orientation === 90 || window.orientation === -90 ){ 
+				window.location.reload();
+			}
+		},false);
+	}else{
+		appdzqy.init(rotateInfo);
+	}
+	document.addEventListener('touchmove', function(e) {
+    	if(e.target.tagName.toLowerCase()!='canvas') e.preventDefault();
+	},{passive: false});
+})
+</script>
+{include file="common/footermenu" /}
+{include file="common/footer" /}

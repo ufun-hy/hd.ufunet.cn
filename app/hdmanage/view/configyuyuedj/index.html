@@ -1,0 +1,1095 @@
+{include file='$Wpath/common/header'}
+<style type="text/css">
+.bdItemlist li{margin-bottom:10px;border: 1px solid rgba(0,0,0,0.2);
+    border-radius: 5px;}
+.bdItemlist li .form-group{
+    margin: 0 4px 0 0;
+    padding:5px 6px;
+}
+.bdItemlist li .checkbox{margin-top:9px!important;}
+.selectItemlist li:first-child{margin-top:1px;}
+.selectItemlist .bdselectLi input{width:230px!important}
+.form-bd-special{
+    height:30px;
+}
+.ui-tooltip{position: absolute!important}
+/*微信端组件*/
+table tr td,table tr th{text-align: center}
+.ditshowitems .card .card-header{padding: 10px 20px;}
+.ditshowitems .card .card-body{padding: 14px;}
+.card-totalitems span{margin-bottom:10px;margin-right: 10px;}
+.normalitems span{
+    color: #333;
+    background: #e6f7ff;
+    border: 1px solid #91d5ff;
+}
+.bditems span{
+    color: #333;
+    background: #f9ebd6;
+    border: 1px solid #fdb538;
+}
+</style>
+<form id="formBox" class="zam-formvalidation form-horizontal" method="post">
+    <div class="config-titlebox">
+        <span class="config-titlename">微信设置</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#wechatconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+    </div>
+    <div id="wechatconfigbox" class="collapse in">
+        {include file="$Wpath/common/configwechatcommon" /}
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 是否开启审核</label>
+            <div class="col-lg-8">
+                {:tpl_switch('appverify',$config['appverify'])}
+                <span class="zam-help-block">开启后微信用户预约信息将处于未审核状态，需要人工手动审核</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 开启头像上传与表单</label>
+            <div class="col-lg-8">
+                {:tpl_switch('appopenbd',$config['appopenbd'],'openupbd')}
+            </div>
+        </div>
+        <div class="upbdbox{if $config['appopenbd']=='2'} hidden{/if}">
+            <div class="form-group">
+                <label class="col-lg-2 control-label">*距离手机顶部距离(px)</label>
+                <div class="col-lg-4">
+                    <input type="text" class="form-control numberincdec" name="appbdbgmargintop" 
+                    data-bts-min="0" data-bts-replacement-val="0"
+                    data-bts-max="null"
+                    data-bts-step="1"
+                    value="{$config['appbdbgmargintop']}">
+                    <span class="zam-help-block">注:默认是0，表单框在页面居中显示，如果背景图有一部分被表单框遮挡可以设置此处来调节表单框的位置</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 开启上传头像</label>
+                <div class="col-lg-8">
+                    {:tpl_switch('appuploadimg',$config['appuploadimg'],'openuploadimg')}
+                    <span class="zam-help-block">开启后微信用户需要在微信端上传头像或图片</span>
+                </div>
+            </div>
+            <div class="form-group uploadavatarimg{if $config['appuploadimg']=='2'} hidden{/if}">
+                <label class="col-lg-2 control-label">* 上传头像提示文字</label>
+                <div class="col-lg-8">
+                    <input class="form-control" name="appuploadtxt" value="{if isset($config['appuploadtxt'])}{$config['appuploadtxt']}{else /}点击上传头像{/if}" />
+                    <span class="zam-help-block">控制在10个汉字内，尽量简单明了，默认显示点击上传头像</span>
+                </div>
+            </div>
+            <div class="form-group uploadavatarimg{if $config['appuploadimg']=='2'} hidden{/if}">
+                <label class="col-lg-2 control-label">* 头像开启截取方形图</label>
+                <div class="col-lg-8">
+                    {:tpl_switch('appcropperupload',(isset($config['appcropperupload'])?$config['appcropperupload']:'1'))}
+                    <span class="zam-help-block">关闭则不截取头像</span>
+                </div>
+            </div>
+            <div class="form-group uploadavatarimg{if $config['appuploadimg']=='2'} hidden{/if}">
+                <label class="col-lg-2 control-label">* 上传头像人脸识别</label>
+                <div class="col-lg-8">
+                    {:tpl_switch('appfaceverify',(isset($config['appfaceverify'])?$config['appfaceverify']:'2'))}
+                    <span class="zam-help-block">开启后微信端上传头像将进行人脸检测，如果不含人脸会上传失败</span>
+                </div>
+            </div>
+            <div class="form-group uploadavatarimg{if $config['appuploadimg']=='2'} hidden{/if}">
+                <label class="col-lg-2 control-label">* 大屏显示上传头像</label>
+                <div class="col-lg-8">
+                    {:tpl_switch('upimgavatar',$config['upimgavatar'])}
+                    <span class="zam-help-block">开启后大屏幕将显示微信端上传的头像</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">表单框顶部标题</label>
+                <div class="col-lg-8">
+                    <input class="form-control" type="text"  name="appbdtitle" placeholder="请输入表单框顶部标题.." value="{$config['appbdtitle']}">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">表单框顶部logo</label>
+                <div class="col-lg-8">
+                    {:tpl_image_one('appbdlogo',$config['appbdlogo'])}
+                    <span class="help-block">规格:500*190px</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">表单框背景色</label>
+                <div class="col-lg-8">
+                    {:tpl_color('appbdbgcolor',$config['appbdbgcolor'])}
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label text-right">* 提交按钮</label>
+                <div class="col-lg-7 col-xs-12">
+                    <div class="input-group">
+                        <div class="input-group-btn not-allow"><a class="btn btn-default">文字</a></div>
+                        <input type="text" class="form-control" name="appbdbtntxt" value="{$config['appbdbtntxt']}">
+                        <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+                        {:tpl_color('appbdbtnfontcolor',$config['appbdbtnfontcolor'])}
+                        <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
+                        <div class="touchspin">
+                        <input type="text" class="form-control numberincdec" name="appbdbtnfontsize" 
+                        data-bts-min="0" data-bts-replacement-val="0"
+                        data-bts-max="100"
+                        data-bts-step="1"
+                        value="{$config['appbdbtnfontsize']}">
+                        </div>
+                        <div class="input-group-btn not-allow"><a class="btn btn-default">背景色</a></div>
+                        {:tpl_color('appbdbtnbgcolor',$config['appbdbtnbgcolor'])}
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 强制验证</label>
+                <div class="col-lg-8">
+                    {:tpl_switch('forceyz',$config['forceyz'])}
+                    <span class="zam-help-block">注意:此项生效必须表单有开启了验证的表单项，关闭强制验证代表微信用户输入的信息与验证数据无关联则直接预约成功，适用于部分来宾信息无法提前预知，但已知来宾必须验证的场景</span>
+                </div>
+            </div>
+            <div class="alert alert-danger" role="alert">
+                预约产生数据后，表单信息不可更改。{if $signnums>0}(本活动已产生预约数据)，如需更改表单信息 <a href="javascript:;" class="btn btn-danger btn-sm m-l-5 resetsigndata">点我清空预约数据</a>{/if}<br><br>
+                表单验证(最多可开启2项): 您添加表单项并开启了验证后，您需要手动添加或导入用户验证信息<a href="javascript:;" class="btn btn-danger btn-sm m-l-5 resetyzdata">点我清空验证用户数据</a><br><br>
+                附加项(最多可开启5项): 您添加的表单项中某一项或多项开启了验证后才可以开启其他表单项为附加项 (附加项必须与验证相结合，用户预约时不需要填写开启了附加项的表单项目，此类项目需要后台导入数据)<br><br>
+                大屏显示项(最多可开启2项): 开启了大屏显示的项目将在大屏显示，并且开启后大屏将不再显示用户的微信昵称
+            </div>
+            <div class="form-group bdListsBox" style="margin-bottom: 0">
+                <label class="col-lg-2 control-label">* 预约表单设置</label>
+                <div class="col-lg-10">
+                    <ul class="bdItemlist">
+                    {foreach $config['appbddata'] as $bditem}
+                    <li class="form-inline">
+                      <div class="mustDom">
+                        <input type="hidden" name="bdzd[]" value="{$bditem['zd']}" />
+                        <input type="hidden" name="bdtype[]" value="{$bditem['type']}"  />
+                        <div class="form-group bdnameInput">
+                            <input type="text"  class="form-control" name="bdtitle[]" value="{$bditem['title']}"  />
+                        </div>
+                        <div class="form-group form-control form-bd-special form-bdmust">
+                            <label class="lyear-checkbox checkbox-primary">
+                                <input type="hidden" name="bdmust[]"  value="{$bditem['bdmust']??'1'}"  />
+                                <input type="checkbox" {if !isset($bditem['bdmust']) || $bditem['bdmust']=='1'}checked{/if} onchange="changemust(this)" {if $signnums > 0}disabled{/if} />
+                                <span>必填</span>
+                            </label>
+                        </div>
+                        <div class="form-group form-control form-bd-special form-bdyz">
+                            <label class="lyear-checkbox checkbox-primary">
+                                <input type="hidden" name="bdyz[]"  value="{$bditem['bdyz']}"  />
+                                <input type="checkbox" {if $bditem['bdyz']=='1'}checked{/if} onchange="changeyz(this)" {if $signnums > 0}disabled{/if} />
+                                <span>验证</span>
+                            </label>
+                        </div>
+                        <div class="form-group form-control form-bd-special form-bdyzbind">
+                            <label class="lyear-checkbox checkbox-primary">
+                                <input type="hidden" name="yzbind[]"  value="{$bditem['yzbind']}"  />
+                                <input type="checkbox" {if $bditem['yzbind']=='1'}checked{/if} onchange="yzbind(this)" {if $signnums > 0}disabled{/if} />
+                                <span>附加项</span>
+                            </label>
+                        </div>
+                        <div class="form-group form-control form-bd-special form-bdscreenshow">
+                            <label class="lyear-checkbox checkbox-primary">
+                                <input type="hidden" name="screenshow[]"  value="{$bditem['screenshow']}"  />
+                                <input type="checkbox" {if $bditem['screenshow']=='1'}checked{/if} onchange="changescreenshow(this)" />
+                                <span>大屏显示</span>
+                            </label>
+                        </div>
+                        {if $bditem['type']=='number'}
+                            <div class="form-bd-special" style="display: inline-block;">
+                                <div class="input-group input-group-sm">                             
+                                    <div class="input-group-btn not-allow hidden"><a class="btn btn-default">最小</a></div>
+                                    <div class="input-group-addon">最小</div>
+                                    <div class="touchspin" style="width: 80px">
+                                        <input type="text" class="form-control numberincdec" name="bdmin[]" 
+                                        data-bts-min="0" data-bts-replacement-val="0"
+                                        data-bts-max="null"
+                                        data-bts-step="1"
+                                        value="{$bditem['bdmin']??'0'}">
+                                    </div>
+                                    <div class="input-group-btn not-allow hidden"><a class="btn btn-default">最大</a></div>
+                                    <div class="input-group-addon">最大</div>
+                                    <div class="touchspin" style="width: 80px">
+                                        <input type="text" class="form-control numberincdec" name="bdmax[]" 
+                                        data-bts-min="0" data-bts-replacement-val="0"
+                                        data-bts-max="null"
+                                        data-bts-step="1"
+                                        value="{$bditem['bdmax']??'0'}">
+                                    </div>
+                                </div>
+                            </div>
+                        {else /}
+                            <input type="hidden" name="bdmin[]"  value="{$bditem['bdmin']??0}"  />
+                            <input type="hidden" name="bdmax[]"  value="{$bditem['bdmax']??0}"  />
+                        {/if}
+                        {if $bditem['zd']=='mobile'}
+                        <div class="form-group form-control form-bd-special form-bdmobilecode">
+                            <label class="lyear-checkbox checkbox-primary">
+                                <input type="hidden" name="opencode"  value="{$bditem['opencode']}"  />
+                                <input type="checkbox" {if $bditem['opencode']=='1'}checked{/if} onchange="changemobilecode(this)" />
+                                <span>短信验证</span>
+                            </label>
+                        </div>
+                        <div class="form-group form-control  form-bd-special form-bdhide4">
+                            <label class="lyear-checkbox checkbox-primary">
+                            <input type="hidden" name="hidefournum" value="{$bditem['hidefournum']}" />
+                            <input type="checkbox" {if $bditem['hidefournum']=='1'}checked{/if} onchange="hidemobile(this)" /><span>隐藏中间4位</span>
+                            </label>
+                        </div>
+                        {/if}
+                        <div class="form-group bdnameInput">
+                            <input type="text"  class="form-control" name="defaulttip[]" value="{$bditem['defaulttip']??'请'.(in_array($bditem['type'],['select','date'])?'选择':'输入').$bditem['title']}" placeholder="默认提示语" onblur="blurinput(this,'1')" />
+                        </div>
+                        <div class="form-group bdnameInput">
+                            <input type="text"  class="form-control" name="errortip[]" value="{$bditem['errortip']??$bditem['title'].(in_array($bditem['type'],['select','date'])?'选择':'输入').'错误'}" placeholder="错误提示语" onblur="blurinput(this,'2')" />
+                        </div>
+                        <div class="form-group">
+                            <a href="javascript:;" class="btn btn-danger btn-sm delbditem" {if $signnums > 0}data-disabled="1" disabled{/if} title="删除"><i class="mdi mdi-close"></i></a>
+                            {if $bditem['type']=='select'}
+                            <a href="javascript:;" class="btn btn-primary btn-sm addselectitem" data-zd="{$bditem['zd']}" title="新增选项"><i class="mdi mdi-plus"></i></a>
+                            {/if}
+                            <a href="javascript:;"  class="btn btn-info btn-sm mousemove zam-sortable" title="拖动排序"><i class="mdi mdi-arrow-all"></i></a>
+                        </div>
+                      </div>
+                      {if $bditem['type']=='select'}
+                      <div class="bindDom">
+                         <div class="form-group selectLists">
+                            <ul class="selectItemlist">
+                                {foreach $bditem['items'] as $sitem}
+                                    <li class="bdselectLi">
+                                        <div class="form-group">
+                                            选项
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="text"  class="form-control" name="{$bditem['zd']}[]" value="{$sitem}" />
+                                        </div>
+                                        <div class="form-group">
+                                            <a href="javascript:;" class="btn btn-danger btn-sm delselectitem" {if $signnums > 0}data-disabled="1" disabled{/if}><i class="mdi mdi-close"></i></a>
+                                            <a href="javascript:;"  class="btn btn-info btn-sm mousemoveselect zam-sortable" title="拖动排序"><i class="mdi mdi-arrow-all"></i></a>
+                                        </div>
+                                    </li>
+                                {/foreach}
+                            </ul>
+                         </div>
+                      </div>
+                      {/if}
+                    </li>
+                    {/foreach}
+                    </ul>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label"></label>
+                <div class="col-lg-8">
+                    <a class="btn btn-primary btn-sm btn-additem" {if $signnums > 0}data-disabled="1" disabled{/if}><i class="mdi mdi-plus"></i>新增表单项</a>
+                    <span class="help-block">注:产生预约数据后不可新增或者删除表单项，但是可以修改已添加的表单项目名称以及顺序</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 用户预约协议</label>
+                <div class="col-lg-8">
+                    {:tpl_switch('appbdxieyi[open]',$config['appbdxieyi']['open']??'2','appbdxieyi')}
+                    <span class="zam-help-block">注意:开启则微信用户填写表单后必须勾选协议才可以提交预约信息</span>
+                </div>
+            </div>
+            <div class="xieyibox{if !isset($config['appbdxieyi']['open']) || $config['appbdxieyi']['open']=='2'} hidden{/if}">
+                <div class="form-group">
+                    <label class="col-lg-2 control-label">* 协议名称</label>
+                    <div class="col-lg-8">
+                        <input class="form-control" type="text"  name="appbdxieyi[name]" placeholder="务必简单明了" value="{$config['appbdxieyi']['name']??'预约用户协议'}">
+                    <span class="help-block">务必简单明了</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-2 control-label">* 协议内容链接</label>
+                    <div class="col-lg-8">
+                        <input class="form-control" type="text"  name="appbdxieyi[url]" placeholder="请填写一个完整的url链接" value="{$config['appbdxieyi']['url']}">
+                    <span class="help-block">ps:可以到<a class="m-l-5 m-r-5" href="{:gohdmanage('configh5/index',['hdid'=>$hdid])}" target="__blank">H5文章</a>里编辑一篇文章(编辑好协议内容)然后将该文章链接复制到此处</span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">预约成功提示</label>
+                <div class="col-lg-8">
+                    <input class="form-control" type="text"  name="successtxt" value="{$config['successtxt']}">
+                    <span class="help-block">默认为预约成功</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">验证失败提示</label>
+                <div class="col-lg-8">
+                    <input class="form-control" type="text"  name="yzfailtxt" value="{$config['yzfailtxt']??'验证失败'}">
+                    <span class="help-block">默认为验证失败，仅开启了表单验证项才有效</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="config-titlebox">
+        <span class="config-titlename">大屏设置</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#screenconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+    </div>
+    <div id="screenconfigbox" class="collapse in">
+        {include file="$Wpath/common/configscreencommon"}
+        {include file="$Wpath/common/configscreenmusic"}
+    </div>
+    <div class="config-titlebox">
+        <span class="config-titlename">通用设置</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#commonconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+    </div>
+    <div id="commonconfigbox" class="collapse in">
+        <div class="form-group">
+            <label class="col-lg-2 control-label">*预约目标总额</label>
+            <div class="col-lg-7">
+                  <input type="text" class="form-control numberincdec" name="tongjiconfig[totalmoney]" 
+                  data-bts-min="0" data-bts-replacement-val="0"
+                  data-bts-max="9999"
+                  data-bts-step="1"
+                  data-bts-postfix="万元"
+                  data-bts-postfix-extra-class="touchspin-postfix"
+                  value="{$config['tongjiconfig']['totalmoney']??'0'}">
+                  <div class="help-block">最大可以是9999，0即为不设置预约目标总额</div>
+            </div>
+        </div>
+        <div class="form-group">
+          <label class="col-lg-2 control-label">*同一个微信号每天预约次数</label>
+          <div class="col-lg-7">
+                <input type="text" class="form-control numberincdec" name="tongjiconfig[daymax]" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="null"
+                data-bts-step="1"
+                data-bts-postfix="次"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['tongjiconfig']['daymax']??'1'}">
+                <div class="help-block">注意：此项可限制同一个微信用户每天最多可预约次数，0即为不限制同一个微信用户每天预约次数</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-lg-2 control-label">*同一个微信号总预约次数</label>
+          <div class="col-lg-7">
+                <input type="text" class="form-control numberincdec" name="tongjiconfig[totalmax]" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="null"
+                data-bts-step="1"
+                data-bts-postfix="次"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['tongjiconfig']['totalmax']??'0'}">
+                <div class="help-block">注意：此项可限制同一个微信用户总预约次数，0即为不限制同一个微信用户总预约次数</div>
+          </div>
+        </div>
+        <div class="form-group tongjiitembox">
+          <label class="col-lg-2 control-label">* 统计金额项目</label>
+          <div class="col-lg-8">
+            <div class="form-control-static">
+                {foreach $config['appbddata'] as $bd}
+                    {if $bd['type']=='number'}
+                    <a href="javascript:;" class="btn btn-default btn-sm m-r-5{if isset($config['tongjiconfig']['zd']) && $config['tongjiconfig']['zd']==$bd['zd']} btn-primary{/if}" data-zd="{$bd['zd']}">{$bd['title']}</a>
+                    {/if}
+                {/foreach}
+                <input type="hidden" class="form-control" name="tongjiconfig[zd]" value="{$config['tongjiconfig']['zd']??''}">
+            </div>
+            <div class="help-block">注:只展示整数型表单项目，<span class="text-danger">特意注意如果删除表单需要重新选择统计金额项目</span></div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-lg-2 control-label">* 金额单位</label>
+          <div class="col-lg-4">
+                <input type="text" class="form-control" name="tongjiconfig[unit]" value="{$config['tongjiconfig']['unit']??'万元'}">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-lg-2 control-label">* 修正额</label>
+          <div class="col-lg-7">
+                <input type="text" class="form-control numberincdec" name="tongjiconfig[addmoney]" 
+                data-bts-min="null" data-bts-replacement-val="0"
+                data-bts-max="null"
+                data-bts-step="1"
+                data-bts-postfix="万元"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['tongjiconfig']['addmoney']??'0'}">
+                <div class="help-block">注：此项可以是正数或者负数，系统会自动在真实统计总金额基础上加减此修正额</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-lg-2 control-label">* 修正人数</label>
+          <div class="col-lg-7">
+                <input type="text" class="form-control numberincdec" name="tongjiconfig[addperson]" 
+                data-bts-min="null" data-bts-replacement-val="0"
+                data-bts-max="null"
+                data-bts-step="1"
+                data-bts-postfix="人"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['tongjiconfig']['addperson']??'0'}">
+                <div class="help-block">注：此项可以是正数或者负数，系统会自动在真实预约总人数基础上加减此修正人数</div>
+          </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 榜单滚动</label>
+            <div class="col-lg-8">
+                {:tpl_switch('tongjiconfig[canroll]',$config['tongjiconfig']['canroll']??'1','canroll')}
+                <div class="help-block">注意：关闭后大屏榜单不会自动滚动并仅展示最新的10条预约记录</div>
+            </div>
+        </div>
+        <div class="form-group histnumbox{if isset($config['tongjiconfig']['canroll']) && $config['tongjiconfig']['canroll']=='2'} hidden{/if}">
+          <label class="col-lg-2 control-label">* 榜单最新预约记录数</label>
+          <div class="col-lg-7">
+                <input type="text" class="form-control numberincdec" name="tongjiconfig[hisnum]" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="100"
+                data-bts-step="1"
+                data-bts-postfix="条记录"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['tongjiconfig']['hisnum']??'10'}">
+                <div class="help-block">注意：默认10条预约记录</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-lg-2 control-label">* 榜单宽度</label>
+          <div class="col-lg-7">
+                <input type="text" class="form-control numberincdec" name="tongjiconfig[width]" 
+                data-bts-min="400"
+                data-bts-max="null"
+                data-bts-step="1"
+                data-bts-postfix="px"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['tongjiconfig']['width']??'600'}">
+                <div class="help-block">注意：默认600px的宽度</div>
+          </div>
+        </div>
+        <div class="form-group">
+                <label class="col-lg-2 control-label"> 榜单显示项</label>
+                <div class="col-lg-7">
+                    <table class="table table-bordered">
+                        <thead>
+                          <tr>
+                            <th style="width:20%">表单项</th>
+                            <th style="width:20%">单位</th>
+                            <th style="width:20%">隐私</th>
+                            <th style="width:30%">操作</th>
+                          </tr>
+                        </thead>
+                        <tbody class="phbitem-lists ui-sortable">
+                            {foreach $config['phbconfig'] as $pitem}
+                            <tr>
+                                <td class="text-center">
+                                    <input type="hidden" name="phbconfig[zd][]" value="{$pitem['zd']}">
+                                    <input type="hidden" name="phbconfig[type][]" value="{$pitem['type']}">
+                                    <input class="form-control" name="phbconfig[title][]" value="{$pitem['title']}" />
+                                </td>
+                                <td class="text-center">
+                                   {if $pitem['type']=='number'}
+                                        <input class="form-control"  type="text" name="phbconfig[unit][]" value="{$pitem['unit']}" onblur="unitblurinput(this)">
+                                   {else /}
+                                        -
+                                        <input type="hidden" name="phbconfig[unit][]" value="0">
+                                    {/if}
+                                </td>
+                                <td class="text-center">
+                                    {if $pitem['type']=='realname' || $pitem['type']=='mobile'}
+                                        <label class="lyear-switch switch-primary normal-swith switch-solid" style="height:38px">
+                                            <input type="checkbox" {if $pitem['isprotect']=='1' }checked="checked"{/if} >
+                                            <input type="hidden" name="phbconfig[isprotect][]" value="{$pitem['isprotect']}">
+                                            <span data-status="{$pitem['isprotect']}" data-func="protectchange" class="normal-span has-func" data-ajax=""></span>
+                                        </label>
+                                    {else /}
+                                        -
+                                        <input type="hidden" name="phbconfig[isprotect][]" value="2">
+                                    {/if}
+                                </td>
+                                <td class="text-center">
+                                    <a class="btn btn-xs btn-primary btn-xs zam-sortable btn-moveitem" href="javascript:void(0)"> <i class="mdi mdi-arrow-all"></i> </a>
+                                    <a class="btn btn-xs btn-danger btn-xs btn-delshowitem" href="javascript:void(0)"> <i class="mdi mdi-delete"></i> </a>
+                                </td>
+                            </tr>
+                            {/foreach}
+                        </tbody>
+                    </table>
+                    <div class="help-block">
+                        <div class="text-danger m-t-5">特意注意如果删除表单需要重新选择排行榜显示项目</div>
+                        <div class="text-danger m-t-5">可通过键盘空格键来隐藏或显示大屏排行榜</div>
+                        <div class="m-t-5">最多可添加5种表单项目</div>
+                        <div class="m-t-5">姓名开启隐私后默认会只展示姓氏，如果预约表单添加了性别则会展示为姓氏+先生或者女士</div>
+                        <div class="m-t-5">手机号开启隐私后会隐藏手机号中间4位号码</div>
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    {php}
+                    $selzds = [];
+                    if(!empty($config['phbconfig'])){
+                        $selzds = array_column($config['phbconfig'],'zd');
+                    }
+                    {/php}
+                    <div class="card card-totalitems">
+                        <div class="card-header">表单项</div>
+                        <div class="card-body normalitems">
+                            {foreach $config['appbddata'] as $bd}
+                            <span class="btn btn-default btn-sm{if in_array($bd['zd'],$selzds)} disabled{/if}" data-type="{$bd['type']}" data-zd="{$bd['zd']}" data-title="{$bd['title']}">{$bd['title']}</span>
+                            {/foreach}
+                            <span class="btn btn-default btn-sm{if in_array('createtime',$selzds)} disabled{/if}" data-zd="createtime"  data-type="createtime" data-title="预约时间">预约时间</span>
+                        </div>
+                    </div>
+                </div>
+        </div>
+    </div>
+    {include file='$Wpath/common/configsavepanel'}
+</form>
+<script id='bditem-tpl' type="text/template">
+    <li class="form-inline">
+      <div class="mustDom">
+        <input type="hidden" name="bdzd[]"  />
+        <input type="hidden" name="bdtype[]"  />
+        <div class="form-group bdnameInput">
+            <input type="text"  class="form-control" name="bdtitle[]" value="<% d.itemname %>" />
+        </div>
+        <div class="form-group form-control form-bd-special form-bdmust">
+            <label class="lyear-checkbox checkbox-primary">
+                <input type="hidden" name="bdmust[]"  value="1"  />
+                <input type="checkbox" checked onchange="changemust(this)"  />
+                <span>必填</span>
+            </label>
+        </div>
+        <div class="form-group form-control form-bd-special form-bdyz">
+            <label class="lyear-checkbox checkbox-primary">
+                <input type="hidden" name="bdyz[]"  value="2"  />
+                <input type="checkbox" onchange="changeyz(this)" />
+                <span>验证</span>
+            </label>
+        </div>
+        <div class="form-group form-control form-bd-special form-bdyzbind">
+            <label class="lyear-checkbox checkbox-primary">
+                <input type="hidden" name="yzbind[]" value="2"  />
+                <input type="checkbox" onchange="yzbind(this)" />
+                <span>附加项</span>
+            </label>
+        </div>
+        <div class="form-group form-control form-bd-special form-bdscreenshow">
+            <label class="lyear-checkbox checkbox-primary">
+                <input type="hidden" name="screenshow[]" value="2" />
+                <input type="checkbox" onchange="changescreenshow(this)" />
+                <span>大屏显示</span>
+            </label>
+        </div>
+        <%# if(d.type=='number'){ %>
+            <div class="form-bd-special" style="display: inline-block;">
+                <div class="input-group input-group-sm">                             
+                    <div class="input-group-btn not-allow hidden"><a class="btn btn-default">最小</a></div>
+                    <div class="input-group-addon">最小</div>
+                    <div class="touchspin" style="width: 80px">
+                        <input type="text" class="form-control numberincdec" name="bdmin[]" 
+                        data-bts-min="0" data-bts-replacement-val="0"
+                        data-bts-max="null"
+                        data-bts-step="1"
+                        value="0">
+                    </div>
+                    <div class="input-group-btn not-allow hidden"><a class="btn btn-default">最大</a></div>
+                    <div class="input-group-addon">最大</div>
+                    <div class="touchspin" style="width: 80px">
+                        <input type="text" class="form-control numberincdec" name="bdmax[]" 
+                        data-bts-min="0" data-bts-replacement-val="0"
+                        data-bts-max="null"
+                        data-bts-step="1"
+                        value="0">
+                    </div>
+                </div>
+            </div>
+        <%# }else{ %>
+            <input type="hidden" name="bdmin[]"  value="0"  />
+            <input type="hidden" name="bdmax[]"  value="0"  />
+        <%# } %>
+        <div class="form-group bdnameInput">
+            <input type="text"  class="form-control" name="defaulttip[]" value="请<%# if(d.type=='select' || d.type=='date' || d.type=='sex'){ %>选择<%# }else{ %>输入<%# } %><% d.itemname %>" placeholder="默认提示语" onblur="blurinput(this,'1')" />
+        </div>
+        <div class="form-group bdnameInput">
+            <input type="text"  class="form-control" name="errortip[]" value="<% d.itemname %><%# if(d.type=='select' || d.type=='date' || d.type=='sex'){ %>选择<%# }else{ %>输入<%# } %>错误" placeholder="错误提示语" onblur="blurinput(this,'2')" />
+        </div>
+        <div class="form-group">
+            <a href="javascript:;" class="btn btn-danger btn-sm delbditem"  title="删除"><i class="mdi mdi-close"></i></a>
+            <%# if(d.type=='select'){ %>
+            <a href="javascript:;" class="btn btn-primary btn-sm addselectitem" title="新增选项"><i class="mdi mdi-plus"></i></a>
+            <%# } %>
+            <a href="javascript:;"  class="btn btn-info btn-sm mousemove zam-sortable" title="拖动排序"><i class="mdi mdi-arrow-all"></i></a>
+        </div>
+      </div>
+      <%# if(d.type=='select'){ %>
+      <div class="bindDom">
+         <div class="form-group selectLists">
+            <ul class="selectItemlist"></ul>
+         </div>
+      </div>
+      <%# } %>
+    </li>
+</script>
+<script id='selectitem-tpl' type="text/template">
+    <li class="bdselectLi">
+        <div class="form-group">
+            选项
+        </div>
+        <div class="form-group">
+            <input type="text"  class="form-control" />
+        </div>
+        <div class="form-group">
+            <a href="javascript:;" class="btn btn-danger btn-sm delselectitem"><i class="mdi mdi-close"></i></a>
+            <a href="javascript:;"  class="btn btn-info btn-sm mousemoveselect zam-sortable" title="拖动排序"><i class="mdi mdi-arrow-all"></i></a>
+        </div>
+    </li>
+</script>
+<script id='oneitem-tpl' type="text/template">
+    <div class="form-horizontal confirmbox-pop">
+        <div class="form-group bdaddTypes">
+          <label class="col-lg-3 control-label">* 项目类型</label>
+          <div class="col-lg-8">
+            <div class="form-control-static">
+            <a href="javascript:;" class="btn btn-default m-r-5" data-type="realname">姓名</a>
+            <a href="javascript:;" class="btn btn-default m-r-5" data-type="mobile">手机号</a>
+            <a href="javascript:;" class="btn btn-default m-r-5" data-type="sex">性别</a>
+            <a href="javascript:;" class="btn btn-default m-r-5" data-type="normal">文本</a>
+            <a href="javascript:;" class="btn btn-default m-r-5" data-type="select">下拉框</a>
+            <a href="javascript:;" class="btn btn-default m-r-5" data-type="number">整数</a>
+            <a href="javascript:;" class="btn btn-default m-r-5" data-type="date">日期</a>
+            </div>
+            <div class="help-block">注:姓名和手机号类型的只能添加一次</div>
+          </div>
+        </div>
+        <div class="form-group m-b-5">
+          <label class="col-lg-3 control-label">* 项目名称</label>
+          <div class="col-lg-7">
+            <input type="text" class="form-control itemname" value="">
+            <div class="help-block">注:尽量控制在5个字以内</div>
+          </div>
+        </div>
+    </div>
+</script>
+<script id='phbitem-tpl' type="text/template">
+<tr>
+    <td class="text-center">
+        <input type="hidden" name="phbconfig[zd][]" value="<% d.zd %>">
+        <input type="hidden" name="phbconfig[type][]" value="<% d.type %>">
+        <input class="form-control" name="phbconfig[title][]" value="<% d.title %>" />
+    </td>
+    <td class="text-center">
+       <%# if(d.type=='number'){ %>
+            <input class="form-control"  type="text" name="phbconfig[unit][]" value="<% d.unit %>" onblur="unitblurinput(this)">
+       <%# }else{ %>
+            -
+            <input type="hidden" name="phbconfig[unit][]" value="0">
+        <%# } %>
+    </td>
+    <td class="text-center">
+        <%# if(d.type=='realname' || d.type=='mobile'){ %>
+            <label class="lyear-switch switch-primary normal-swith switch-solid" style="height:38px">
+                <input type="checkbox" <%# if(d.isprotect=='1'){ %>checked="checked"<%# } %> >
+                <input type="hidden" name="phbconfig[isprotect][]" value="<% d.isprotect %>">
+                <span data-status="<% d.isprotect %>" data-func="protectchange" class="normal-span has-func" data-ajax=""></span>
+            </label>
+        <%# }else{ %>
+            -
+            <input type="hidden" name="phbconfig[isprotect][]" value="2">
+        <%# } %>
+    </td>
+    <td class="text-center">
+        <a class="btn btn-xs btn-primary btn-xs zam-sortable btn-moveitem" href="javascript:void(0)"> <i class="mdi mdi-arrow-all"></i> </a>
+        <a class="btn btn-xs btn-danger btn-xs btn-delshowitem" href="javascript:void(0)"> <i class="mdi mdi-delete"></i> </a>
+    </td>
+</tr>
+</script>
+<script>
+require(['webcore','jconfirmBox','zamnotice','layerBox',"jquery.ui",'zvalidator',"bootstrap-touchspin"],function(webcore,jconfirmBox,zamnotice,layerBox){
+    $('.bdItemlist').sortable({handle: ".mousemove"}).disableSelection();
+    $('.bdItemlist .selectItemlist').sortable({handle: ".mousemoveselect"}).disableSelection();
+    $(".bdItemlist").disableSelection();
+    $('.phbitem-lists').sortable({handle: ".btn-moveitem"}).disableSelection();
+    $('#formBox').formValidation({
+            framework: 'bootstrap',
+            excluded: [':disabled'],
+            message: '您填写的内容无效',
+            fields: {
+                apptitle:{
+                    message: '请输入网页标题',
+                    validators: {
+                        notEmpty: {
+                            message: '请输入网页标题'
+                        },
+                    }
+                },
+            }
+    }).on('success.form.fv', function(e) {
+        e.preventDefault();
+        var $form = $(e.target);
+        var postData = webcore.serializeObject($form);
+        var bload = $form.find(".zam-fixedbottom button").lyearloading({opacity: 0.2,spinnerSize: 'nm'});
+        $form.formValidation('disableSubmitButtons', true);
+        webcore.ajaxSubmit("{:gohdmanage('configyuyuedj/index',['hdid'=>$hdid])}",postData).then(function(json){
+            bload.hide();
+            if(json.code==0){
+                $form.formValidation('disableSubmitButtons', false);
+                zamnotice.showTips('success','操作成功',2e3,function(){
+                    window.location.reload();
+                });
+            }else{
+                zamnotice.showTips('error',json.msg);
+                $form.formValidation('disableSubmitButtons', false);
+            }
+        }, function(json){
+            bload.hide();
+            zamnotice.showTips('error','网络差。操作失败');
+            $form.formValidation('disableSubmitButtons', false);
+        });
+    });
+    $(".btn-additem").click(function(){
+        var isdisabled = $(this).attr('data-disabled');
+        if(isdisabled=='1'){
+            return false;
+        }
+        var confirmobj = jconfirmBox.confirm('添加表单项目',webcore.tpl($("#oneitem-tpl"),{}),function(e){
+                var $this = e.$content,itemtype = $this.find('a.btn-primary').attr('data-type'),itemname = $this.find('.itemname').val();
+                if(typeof itemtype==='undefined' || itemtype==''){
+                    return zamnotice.showTips('error','项目类型必须选择');
+                }
+                if(typeof itemname==='undefined' || itemname==''){
+                    return zamnotice.showTips('error','项目名称必须填写');
+                }
+
+                var newDom = $(webcore.tpl($("#bditem-tpl"),{itemname:itemname,type:itemtype,random:webcore.random(5,1,1)})).clone();
+                 if(itemtype!='select'){
+                     if($.inArray(itemtype,['realname','mobile','sex'])!=-1){
+                        if(checkRM(itemtype)){
+                            return zamnotice.showTips('error',(itemtype=='realname'?'姓名':(itemtype=='mobile'?'手机号':'性别'))+'已经存在');
+                        }
+                        newDom.find('input').eq(0).val(itemtype);
+                        if(itemtype=='mobile'){
+                            newDom.find('.mustDom').children("div:last-child").before('<div class="form-group form-control  form-bd-special form-bdmobilecode"><label class="lyear-checkbox checkbox-primary"><input type="hidden" name="opencode" value="2" /><input type="checkbox" class="opencode" onchange="changemobilecode(this)" /><span>短信验证</span></label></div><div class="form-group form-control  form-bd-special form-bdhide4"><label class="lyear-checkbox checkbox-primary"><input type="hidden" name="hidefournum" value="2" /><input type="checkbox" onchange="hidemobile(this)" /><span>隐藏中间4位</span></label></div>');
+                        }
+                     }else{
+                        newDom.find('input').eq(0).val(webcore.random(10,1,1));
+                     }
+                 }else{
+                    var zdName = 'select'+webcore.random(10,1,1);
+                    newDom.find('input').eq(0).val(zdName);
+                    newDom.find(".addselectitem").attr('data-zd',zdName);
+                 }
+                 newDom.find("a").tooltip();
+                 newDom.find('input').eq(1).val(itemtype);
+                 newDom.appendTo($(".bdItemlist"));
+                 if(itemtype=='select'){
+                    $('.bdItemlist .selectItemlist').sortable({handle: ".mousemoveselect"}).disableSelection();
+                 }
+                $(".bdItemlist .numberincdec").TouchSpin().on("change", function(){
+                    var $this = $(this),funcstr = $this.data('func');
+                    var func = window[funcstr];
+                    func && func();
+                });
+                confirmobj.close();
+        },false,'col-md-10 col-md-offset-1',true,[{'hidden':false,'txt':'确定新增'},{'hidden':false,'txt':'取消'}],function(){
+            var $this = confirmobj.$content;
+            $this.find(".bdaddTypes a").on('click',function(){
+                 $(this).addClass('btn-primary').siblings().removeClass('btn-primary');
+                 var itemtype = $(this).attr('data-type');
+                 $this.find('input').val(itemtype=='realname'?'姓名':(itemtype=='mobile'?'手机号':(itemtype=='sex'?'性别':'')));
+            });
+        });
+    });
+    $(".bdItemlist").on('click','.delbditem',function(){
+        if(!$(this).data("disabled")) $(this).parent().parent().parent().remove();
+    });
+    $(".bdItemlist").on('click','.delselectitem',function(){
+        if(!$(this).data("disabled")) $(this).parent().parent().remove();
+    });
+    $(".bdItemlist").on('click','.addselectitem',function(){
+            var selecDom = $(webcore.tpl($("#selectitem-tpl"),{})).clone();
+            selecDom.find('input').eq(0).attr("name",$(this).attr('data-zd')+'[]');
+            selecDom.appendTo($(this).parent().parent().next().find(".selectItemlist"));
+    });
+    $(".resetsigndata").on('click',function(){
+        jconfirmBox.confirm('温馨提示','清空将删除本次活动用户所有的预约数据，并且无法恢复，您确定要清空么？',function(){
+            webcore.ajaxSubmit("{:gohdmanage('datayuyuedj/reset',['hdid'=>$hdid])}",{}).then(function(json){
+                if(json.code==0){
+                    zamnotice.showTips('success','清空成功');
+                    setTimeout(function(){
+                        window.location.reload();
+                    },5e2);
+                }else{
+                    zamnotice.showTips('error',json.msg);
+                }
+            }, function(json){
+                zamnotice.showTips('error','网络差。操作失败.');
+            });
+        });
+    });
+    $(".resetyzdata").on('click',function(){
+        jconfirmBox.confirm('温馨提示','清空将删除活动所有的验证预约数据，并且无法恢复，您确定要清空么？',function(){
+            webcore.ajaxSubmit("{:gohdmanage('configyuyuedj/resetdata',['hdid'=>$hdid])}",{}).then(function(json){
+                if(json.code==0){
+                    zamnotice.showTips('success','已清空所有验证数据');
+                }else{
+                    zamnotice.showTips('error',json.msg);
+                }
+            }, function(json){
+                zamnotice.showTips('error','网络差。操作失败.');
+            });
+        });
+    });
+    $(".tongjiitembox a").on('click',function(){
+        $(this).addClass('btn-primary').siblings().removeClass('btn-primary');
+        $(this).parent().find('input').val($(this).attr('data-zd'));
+    });
+    $(".card-totalitems span").click(function(){
+        if($(".phbitem-lists tr").length >=5) return zamnotice.showTips('error','最多仅可添加5种表单项');
+        var $this = $(this),zd = $this.attr('data-zd'),title = $this.attr('data-title'),type = $this.attr('data-type');
+        if($this.hasClass('disabled')) return false;
+        var phbitem = {
+            zd:zd,
+            type:type,
+            title:title,
+            unit:' ',
+            isprotect:2,
+        };
+        $(".phbitem-lists").append(webcore.tpl($("#phbitem-tpl"),phbitem));
+        tpl_switch();
+        $this.addClass('disabled');
+    });
+    //删除微信菜單組件
+    $(".phbitem-lists").on('click','.btn-delshowitem',function(){
+        var pnode = $(this).parents('tr'),zd = pnode.find('input').eq(0).val();
+        $(".card-totalitems span").filter(function(o, i) {
+            return $(i).attr("data-zd")==zd;
+        }).removeClass('disabled');
+        pnode.remove();
+    });
+});
+/*开关控件 关闭上传头像与表单*/
+function openupbd(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".upbdbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".upbdbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+/*开关控件 关闭上传头像*/
+function changeupimg(obj){
+    var prevval = $(obj).prev().val();
+    if(prevval=='1'){
+        $('.upimgBox').removeClass('hidden');
+    }else{
+        $('.upimgBox').addClass('hidden');
+    }
+}
+function openuploadimg(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".uploadavatarimg").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".uploadavatarimg").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+
+function changemobilecode(obj){
+var check = $(obj).prop('checked'),fnode = $(obj).parent().parent().parent();
+require(["webcore","zamnotice"],function(webcore,zamnotice){
+    if(check){
+        webcore.ajaxSubmit("{:gohdmanage('configyuyuedj/checksms',['hdid'=>$hdid])}",{}).then(function(json){
+            if(json.code==0){
+                $(obj).prop('checked',true);
+                $(obj).prev().val('1');
+                if(check){
+                    var mustnode = fnode.find(".form-bdmust input[type='checkbox']");
+                    mustnode.prop('checked',true);
+                    mustnode.prev().val("1");
+                }
+            }else{
+                $(obj).prop('checked',false);
+                $(obj).prev().val('2');
+                zamnotice.showTips('error',json.msg,2e3);
+            }
+        }, function(json){
+            $(obj).prop('checked',false);
+            $(obj).prev().val('2');
+            zamnotice.showTips('error','网络差，操作失败');
+        });
+    }else{
+        $(obj).prev().val('2');
+    }
+});
+}
+function hidemobile(obj){
+    var check = $(obj).prop('checked'),fnode = $(obj).parent().parent().parent();
+    $(obj).prev().val(check?"1":"2");
+    if(check){
+        var mustnode = fnode.find(".form-bdmust input[type='checkbox']");
+        mustnode.prop('checked',true);
+        mustnode.prev().val("1");
+    }
+}
+function changeyz(obj){
+    require(["webcore","zamnotice"],function(webcore,zamnotice){
+        if($(".form-bdyz input[type='checkbox']:checked").length > 2){
+            $(obj).prop('checked',false);
+            return zamnotice.showTips('error','最多仅可验证2项');
+        }
+        if($(obj).parent().parent().next().find('input').eq(0).val()=='1'){
+            $(obj).prop('checked',false);
+            return zamnotice.showTips('error','已经开启了附加项的表单项目无法开启验证');
+        }
+        var check = $(obj).prop('checked'),fnode = $(obj).parent().parent().parent();
+        $(obj).prev().val(check?"1":"2");
+        if(check){
+            var mustnode = fnode.find(".form-bdmust input[type='checkbox']");
+            mustnode.prop('checked',true);
+            mustnode.prev().val("1");
+        }
+    });
+}
+
+function yzbind(obj){
+    require(["webcore","zamnotice"],function(webcore,zamnotice){
+        if($(obj).parent().parent().prev().find('input').eq(0).val()=='1'){
+            $(obj).prop('checked',false);
+            return zamnotice.showTips('error','已经开启了验证的表单项目无法开启附加项');
+        }
+        if($(".form-bdyzbind input[type='checkbox']:checked").length > 5){
+            $(obj).prop('checked',false);
+            return zamnotice.showTips('error','最多仅可5项开启附加项');
+        }
+        var check = $(obj).prop('checked'),fnode = $(obj).parent().parent().parent();
+        $(obj).prev().val(check?"1":"2");
+        //取消附加项则取消必填
+        if(check){
+            var mustnode = fnode.find(".form-bdmust input[type='checkbox']");
+            mustnode.prop('checked',false);
+            mustnode.prev().val("2");
+        }else{
+            //取消附加项
+            var dpshow = fnode.find(".form-bdscreenshow input[type='checkbox']").prop('checked');
+            var mobilecode = fnode.find(".form-bdmobilecode input[type='checkbox']").prop('checked');
+            var hidefour = fnode.find(".form-bdhide4 input[type='checkbox']").prop('checked');
+            if(dpshow || mobilecode || hidefour){
+                var mustnode = fnode.find(".form-bdmust input[type='checkbox']");
+                mustnode.prop('checked',true);
+                mustnode.prev().val("1");
+            }
+        }
+    });
+}
+function changemust(obj){
+    var check = $(obj).prop('checked'),fnode = $(obj).parent().parent().parent();
+    require(["webcore","zamnotice"],function(webcore,zamnotice){
+        var isyzbind = fnode.find(".form-bdyzbind input[type='checkbox']").prop('checked');
+        if(!isyzbind){
+            var yz = fnode.find(".form-bdyz input[type='checkbox']").prop('checked');
+            if(yz && !check){
+                $(obj).prop('checked',true);
+                $(obj).prev().val("1");
+                return zamnotice.showTips('error','开启验证的表单必须必填');
+            }
+            var dpshow = fnode.find(".form-bdscreenshow input[type='checkbox']").prop('checked');
+            if(dpshow && !check){
+                $(obj).prop('checked',true);
+                $(obj).prev().val("1");
+                return zamnotice.showTips('error','开启大屏显示的表单必须必填');
+            }
+            var mobilecode = fnode.find(".form-bdmobilecode input[type='checkbox']").prop('checked');
+            if(mobilecode && !check){
+                $(obj).prop('checked',true);
+                $(obj).prev().val("1");
+                return zamnotice.showTips('error','开启短信验证的表单必须必填');
+            }
+            var hidefour = fnode.find(".form-bdhide4 input[type='checkbox']").prop('checked');
+            if(hidefour && !check){
+                $(obj).prop('checked',true);
+                $(obj).prev().val("1");
+                return zamnotice.showTips('error','开启隐藏中间4位的表单必须必填');
+            }
+            $(obj).prev().val(check?"1":"2");
+            if($(".form-bdmust input[type='checkbox']:checked").length <= 0){
+                $(obj).prop('checked',true);
+                $(obj).prev().val("1");
+                return zamnotice.showTips('error','至少保留一项必填');
+            }
+        }else{
+            if(check){
+                $(obj).prop('checked',false);
+                $(obj).prev().val("2");
+                return zamnotice.showTips('error','已开启附加项表单无法开启必填');
+            }
+        }
+    })
+}
+function changescreenshow(obj){
+    require(["webcore","zamnotice"],function(webcore,zamnotice){
+        if($(".form-bdscreenshow input[type='checkbox']:checked").length>2){
+            $(obj).prop('checked',false);
+            return zamnotice.showTips('error','最多仅可设置2项为大屏显示');
+        }
+        var check = $(obj).prop('checked'),fnode = $(obj).parent().parent().parent();
+        $(obj).prev().val(check?"1":"2");
+        if(check){
+            var isyzbind = fnode.find(".form-bdyzbind input[type='checkbox']").prop('checked');
+            if(isyzbind) return false;
+            var mustnode = fnode.find(".form-bdmust input[type='checkbox']");
+            mustnode.prop('checked',true);
+            mustnode.prev().val("1");
+        }
+    });
+}
+function checkRM(type){
+    var checked  = false;
+    var bdItemTypes = $(".bdItemlist").find("input[name='bdtype[]']");
+    if(bdItemTypes.length>0){
+        $.each(bdItemTypes,function(k,v){
+            if($(v).val()==type){
+                checked =true;
+                return;
+            }
+        });
+    }
+    return checked;
+}
+function appbdxieyi(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".xieyibox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".xieyibox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function canroll(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".histnumbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".histnumbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function blurinput(obj,type){
+    var inputval = $(obj).val(),nametitle = $(obj).parent().parent().find('.bdnameInput input').eq(0).val(),inputtype = $(obj).parent().parent().find('input').eq(1).val(),puttxt = (inputtype=='select'||inputtype=='date' || inputtype=='sex')?'选择':'输入';
+    if(type=='1'){
+        if(typeof inputval === 'undefined' || inputval=='') $(obj).val('请'+puttxt+nametitle);
+    }else{
+        if(typeof inputval === 'undefined' || inputval=='') $(obj).val(nametitle+puttxt+'错误');
+    }
+}
+function unitblurinput(obj){
+    var inputval = $(obj).val();
+    if(typeof inputval === 'undefined' || inputval=='') $(obj).val(' ');
+}
+function protectchange(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+</script>
+{include file='$Wpath/common/footer'}

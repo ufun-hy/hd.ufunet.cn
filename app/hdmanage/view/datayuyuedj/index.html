@@ -1,0 +1,304 @@
+{include file='$Wpath/common/header'}
+<div class="form-inline zam-inline-searchbar">
+    <div class="form-group">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">昵称</span>
+        <input type="text" class="form-control" value="" id="keyword" placeholder="请输入用户昵称">
+      </div>
+    </div>
+    {if $signconfig['appopenbd']=='1'}
+    <div class="form-group">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">表单内容</span>
+        <input type="text" class="form-control" value="" id="bdkeyword" placeholder="请输入表单内容">
+      </div>
+    </div>
+    {/if}
+    <div class="form-group">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">是否审核</span>
+          <select id="signstatus" class="form-control js_select2">
+            {foreach $shenhetypes as $k => $v} 
+            <option value="{$k}" {if $k == "0"}selected{/if}>{$v}</option>
+            {/foreach}
+          </select>
+        </div>
+    </div>
+    <div class="form-group">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">是否异常</span>
+          <select id="isnormal" class="form-control js_select2">
+            {foreach $orderstatus as $k => $v} 
+            <option value="{$k}" {if $k == "0"}selected{/if}>{$v}</option>
+            {/foreach}
+          </select>
+        </div>
+    </div>
+    <a class="btn btn-primary btn-sm btn-search" href="javascript:void(0)"><i class="mdi mdi-magnify"></i> 搜索</a>
+    <a class="btn btn-warning btn-sm btn-export" href="javascript:void(0)"><i class="mdi mdi-export"></i> 导出</a>
+</div>
+{include file='$Wpath/common/tabletoolbar'}
+<table id="listtable" class="zam-btable"></table>
+<script id='binddata-tpl' type="text/template">
+    <ul class="bddataUl">
+    <%#  $.each(d.bd, function(index, item){ %>
+        <li>
+          <span class="text-primary"><% item %>:</span>
+          <span>
+            <%#  if(d.list){ %>
+            <%#  if(index === 'uploadimg'){ %>
+                <%#  if(d.list[index]){ %>
+                <img class="cursor" style="max-width:120px;" onclick="prevshowattachs(this,1);"  src="<% d.list[index] %>"  />
+                <%#  }else{ %>
+                    -
+                <%# } %>
+            <%#  }else{ %>
+                <%#  if(d.list[index]){ %>
+                <% d.list[index] %>
+                <%#  }else{ %>
+                    -
+                <%# } %>
+            <%#  } %> 
+            <%#  } %> 
+          </span>
+       </li>
+    <%#  }); %>
+    </ul>
+</script>
+<script>
+var zdconfig = {:json_encode($zd2title)};    
+require(['webcore','webtable','jconfirmBox','zamnotice'],function(webcore,webtable,jconfirmBox,zamnotice){
+var initConfig = {
+    tableId:'#listtable',
+    url:"{:gohdmanage('datayuyuedj/index',['hdid'=>$hdid])}",
+    columnoperate:{
+        btns:{
+            edit:{title:"编辑",'except':{'field':'neededit','only':'1'}},
+            shenhe:{title:"审核",icon:"mdi-gavel",'except':{'only':'2'}},
+            del:true,
+        },
+        func:{
+            edit:function(value, row, index){
+                var confirmObj = jconfirmBox.ajaxconfirm("编辑预约用户","{:gohdmanage('datayuyuedj/save',['hdid'=>$hdid])}",{ishtml:'1',userid:row.id},'html','col-lg-6 col-lg-offset-3',function(e){
+                    var postData = webcore.serializeObject(e.find('form'));
+                    postData.userid = row.id;
+                    webcore.ajaxSubmit("{:gohdmanage('datayuyuedj/save',['hdid'=>$hdid])}",postData).then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','保存成功');
+                            confirmObj.close();
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                             return false;
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                         return false;
+                    });
+                });
+            },
+            del:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','您确定要删除么？',function(){
+                        webcore.ajaxSubmit("{:gohdmanage('datayuyuedj/del',['hdid'=>$hdid])}",{userid:row.id}).then(function(json){
+                            if(json.code==0){
+                                webtable.refresh();
+                                zamnotice.showTips('success','删除成功');
+                            }else{
+                                zamnotice.showTips('error',json.msg);
+                            }
+                        }, function(json){
+                            zamnotice.showTips('error','网络差。操作失败');
+                        });
+                });
+            },
+            shenhe:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','您确定要审核当前用户么？',function(){
+                        webcore.ajaxSubmit("{:gohdmanage('datayuyuedj/shenhe',['hdid'=>$hdid])}",{userid:row.id}).then(function(json){
+                            webtable.refresh();
+                            zamnotice.showTips('success','审核成功');
+                        }, function(json){
+                            zamnotice.showTips('error','网络差。操作失败');
+                        });
+                });
+            },
+        }
+    },
+    columns:[{
+            checkbox: true,
+        }, 
+        {
+            field: 'id',
+            title: 'id',
+            align: 'center',
+            visible: false
+        },{
+            field: 'nickname',
+            title: '用户',
+            align: 'center',
+            width:'15',
+            formatter:function(value,row,index){
+                var html = `
+                <div class='zam-flex-column-center'>
+                    <img src="${row.avatar}" class="avatarImg" />
+                    <span>${value||'已删除'}</span>
+                </div>
+                `;
+                return html;
+            }
+        },  {
+            field: 'statushtml',
+            title: '审核状态',
+            align: 'center',
+            
+        },  {
+            field: 'isnormalhtml',
+            title: '订单状态',
+            align: 'center',
+            formatter:function(value,row,index){
+                var html = '<div>' + value + '</div>';
+                html += '<div class="btn btn-primary btn-xs m-t-5 btn-changestatus" href="javascript:void(0)" data-title="更改状态" data-toggle="tooltip"><i class="mdi mdi-pencil"></i></div>';
+                return html;
+            },
+            events: {
+                'click .btn-changestatus': function (event, value, row, index) {
+                    var isnormal = row.isnormal;
+                    jconfirmBox.confirm('温馨提示','您确定要将当前订单转成'+(isnormal=='1'?'异常':'正常')+'么？',function(){
+                        webcore.ajaxSubmit("{:gohdmanage('datayuyuedj/changenormal',['hdid'=>$hdid])}",{userid:row.id}).then(function(json){
+                            if(json.code==0){
+                                webtable.refresh();
+                                zamnotice.showTips('success','操作成功');
+                            }else{
+                                zamnotice.showTips('error',json.msg);
+                            }
+                        }, function(json){
+                            zamnotice.showTips('error','网络差,操作失败');
+                        });
+                    });
+                },
+            }
+        },{
+            
+            field: 'ordersn',
+            title: '订单号',
+            align: 'center',
+            width:'15',
+        }
+        {if $signconfig['appopenbd']=='1'}
+        ,{
+            field: 'bddata',
+            title: '表单内容',
+            align: 'center',
+            formatter: function(value, row, index){
+                 if(value=='') return ''; 
+                 return $.isEmptyObject(zdconfig)?'-':webcore.tpl($("#binddata-tpl"),{list:value,bd:zdconfig});
+            }
+        }
+        {/if}
+        ,{
+            field: 'create_time',
+            title: '预约时间',
+            align: 'center',
+            width:'15',
+        }
+    ],
+    searchParamas:[{'type':'1','id':'keyword'},{'type':'1','id':'bdkeyword'},{'type':'2','id':'signstatus'},{'type':'2','id':'isnormal'}],
+    toolbar:{
+        del:function(){
+            var getSelects = webtable.getSelections();
+            if(getSelects.length>0){
+                jconfirmBox.confirm('温馨提示','您确定要删除选中的数据用户么？',function(){
+                    webcore.ajaxSubmit("{:gohdmanage('datayuyuedj/del',['hdid'=>$hdid])}",{userid:getSelects}).then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','删除成功');
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差,操作失败');
+                    });
+                });
+            }else{
+                zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+        },
+        reset:function(){
+            jconfirmBox.confirm('温馨提示','清空将删除活动所有用户的预约并且无法恢复，您确定要清空所有的用户么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('datayuyuedj/reset',['hdid'=>$hdid])}",{}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','清空成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+        },
+        shenhe:function(){
+            var getSelects = webtable.getSelections();
+            if(getSelects.length>0){
+                jconfirmBox.confirm('温馨提示','您确定要审核选中的用户么？',function(){
+                    webcore.ajaxSubmit("{:gohdmanage('datayuyuedj/shenhe',['hdid'=>$hdid])}",{userid:getSelects}).then(function(json){
+                        webtable.refresh();
+                        zamnotice.showTips('success','审核成功');
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                    });
+                });
+            }else{
+                zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+            
+        },
+        other:function(){
+            var getSelects = webtable.getSelections();
+            if(getSelects.length>0){
+                var confirmObj = jconfirmBox.ajaxconfirm("加入自定义分组","{:gohdmanage('common/pullusergroup',['hdid'=>$hdid])}",{ishtml:'1'},'html','col-lg-8 col-lg-offset-2',function(e){
+                        var selectgroups = e.find("input:checked");
+                        if(selectgroups.length>0){
+                            var selgroups = [];
+                            selectgroups.each(function(){
+                                selgroups.push($(this).val());
+                            });
+                            webcore.ajaxSubmit("{:gohdmanage('common/pullusergroup',['hdid'=>$hdid])}",{issign:'1',groupid:selgroups,userid:getSelects},'正在新增用户到用户组...').then(function(json){
+                                if(json.code==0){
+                                    confirmObj.close();
+                                    zamnotice.showTips('success','操作成功');
+                                    webtable.refresh();
+                                }else{
+                                    zamnotice.showTips('error',json.msg);
+                                }
+                            }, function(json){
+                                zamnotice.showTips('error','网络差。操作失败');
+                            });
+                        }else{
+                            zamnotice.showTips('error','请选择用户组');
+                        }
+                });
+            }else{
+                zamnotice.showTips('error','请先选择用户');
+            }
+        },
+    },
+};
+webtable.init(initConfig);
+$('.zam-inline-searchbar select').change(function(e) {
+     webtable.refresh();
+});
+$('.btn-export').on('click',function(){
+   var status = $("#signstatus").find('option:selected').val();
+   webcore.ajaxSubmit("{:gohdmanage('datayuyuedj/export',['hdid'=>$hdid])}",{status:status}).then(function(json){
+        if(json.code!=0){
+            zamnotice.showTips('error',json.msg);
+        }else{
+            window.location.href = "{:gohdmanage('datayuyuedj/export',['hdid'=>$hdid])}&status="+status;
+        }
+    }, function(json){
+        zamnotice.showTips('error','网络差,操作失败');
+    });
+});
+});
+</script>
+{include file='$Wpath/common/footer'}

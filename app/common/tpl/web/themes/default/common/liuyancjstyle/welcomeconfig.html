@@ -1,0 +1,59 @@
+{if dznormalrequest('liuyancjstyle')}
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 风格类型</label>
+    <div class="col-lg-10">	
+        <div class="zam-stylewrapper zam-flex zam-alignItems">
+        {foreach $styles as $skey=>$style}
+            <div data-val="{$style['val']}" class="zam-styleitem{if (!isset($config['styletype']) && $skey == 0) || (isset($config['styletype']) && $config['styletype'] == $style['val'])} hadchecked{/if}">
+                <div class="zam-styleimg">
+                    <img src="{:tomedia($style['img'])}" onerror="javascript:this.src='/static/images/sys/nopic.jpg';this.title='暂无图片'">
+                </div>
+                <div class="zam-stylename">{$style['name']}</div>
+                <div class="zam-selected"><i class="mdi mdi-check"></i></div>
+                {if !request()->realhdid}
+                <input type="hidden" name="styleimg{$style['val']}" value="{$style['img']}">
+                {/if}
+            </div>
+        {/foreach}
+        </div>
+        <input type="hidden" name="styletype" value="{$config['styletype']??1}">
+        {if !request()->realhdid}
+        <div class="help-block">点击图片即可上传预览图，图片尺寸：180*101px</div>
+        {/if}
+    </div>
+</div>
+<script>
+$(".zam-stylewrapper .zam-styleitem").click(function(){
+    var flytype = $(this).attr('data-val');
+    $(this).addClass('hadchecked').siblings().removeClass('hadchecked');
+    $(this).parent().next().val(flytype);
+    if(flytype == '1'){
+        $(".showjoinbox").removeClass('hidden');
+        $(".welcomebox").addClass('hidden');
+    }else{
+        $(".showjoinbox").addClass('hidden');
+        $(".welcomebox").removeClass('hidden');
+    }
+    $(".liuyancj-styles .typeitem").eq(flytype - 1).removeClass('hidden').siblings().addClass('hidden');
+});
+{if !request()->realhdid}
+$(".zam-stylewrapper .zam-styleitem img").click(function(e){
+    //e.stopPropagation();
+    tpl_image_one(this,function($imgsrc,srcpath,obj){
+        $(obj).attr('src',$imgsrc);
+        $(obj).parent().parent().find('input').val(srcpath);
+    });
+});
+{/if}
+</script>
+{/if}
+<div class="form-group showjoinbox{if isset($config['styletype']) && $config['styletype'] != '1'} hidden{/if}">
+    <label class="col-lg-2 control-label">* 显示参与抽奖人数</label>
+    <div class="col-lg-3">
+        {:tpl_switch('showjoin',$config['showjoin'])}
+    </div>
+</div>
+<div class="welcomebox{if !isset($config['styletype']) || $config['styletype'] == '1'} hidden{/if}">
+{include file="$Wpath/common/liuyancjstyle/welcome" /}
+</div>
+{include file="$Wpath/common/liuyancjstyle/index" /}

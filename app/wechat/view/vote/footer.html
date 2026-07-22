@@ -1,0 +1,38 @@
+	<div class="clearfix"></div>
+	<img class="footerbg" src="{:tomedia($appconfig['apppageconfig']['bottombg'])}">
+</div>
+<script>
+require(['wechatcore','swiper','appsocket'],function (wechatcore,Swiper,appsocket) {	
+		var wsConfig = {};
+		wsConfig.onmessage = function(data){
+			if(data.type=='connected'){
+				appsocket.isclose = false;
+				wechatcore.connectsocket({clientid:data.clientid});
+			}else if(data.type=='delshowvote' || data.type=='rollvoterotate' || data.type=='resetallvote'){
+				wechatcore.reloadpage();
+			}else if(data.type=='goto'){
+				wechatcore.goto(data);
+			}else if(data.type=='addblack'){
+				data.userid==XCV3Config.userid&&wechatcore.closewxwindow();
+			}else if(data.type=='luckeruserids'){
+				wechatcore.layerAsklucker(data);
+			}
+		};
+		appsocket.init(wsConfig);
+		if($(".vote-slides li").length > 0){
+			var mySwiper = new Swiper('.vote-slide-wrapper',{
+				watchOverflow: true,
+				autoplay: {
+					delay: 6000,
+					stopOnLastSlide: false,
+					disableOnInteraction: false,
+				},
+				pagination: {
+					el: '.swiper-pagination',
+				}
+			});
+		}
+})
+</script>
+{include file="common/footermenu" /}
+{include file="common/footer" /}

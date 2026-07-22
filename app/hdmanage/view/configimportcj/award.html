@@ -1,0 +1,230 @@
+{include file='$Wpath/common/header'}
+{include file='$Wpath/common/lotterytoptip'}
+{include file='$Wpath/common/tabletoolbar'}
+<style type="text/css">.awardgroup .d-inline-block:first-child{padding-left: 0}</style>
+<table id="listtable" class="zam-btable"></table>
+<script>    
+require(['webcore','webtable','jconfirmBox','zamnotice'],function(webcore,webtable,jconfirmBox,zamnotice){
+var initConfig = {
+    tableId:'#listtable',
+    url:"{:gohdmanage('configimportcj/award',['hdid'=>$hdid])}",
+    columnoperate:{
+        btns:{
+            edit:true,
+            del:true,
+            data:true,
+        },
+        func:{
+            edit:function(value, row, index){
+                var confirmObj = jconfirmBox.ajaxconfirm("编辑奖品","{:gohdmanage('configimportcj/editaward',['hdid'=>$hdid])}",{awardid:row.id},'html','col-lg-10 col-lg-offset-1',function(e){
+                    var postData = webcore.serializeObject(e.find('form'));
+                    postData.awardid = row.id;
+                    webcore.ajaxSubmit("{:gohdmanage('configimportcj/saveaward',['hdid'=>$hdid])}",postData).then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','保存成功');
+                            confirmObj.close();
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                             return false;
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                         return false;
+                    });
+                });
+            },
+            del:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','删除将删除当前奖品数据以及中奖数据并且无法恢复，您确定要删除么？',function(){
+                        webcore.ajaxSubmit("{:gohdmanage('configimportcj/delaward',['hdid'=>$hdid])}",{awardid:row.id}).then(function(json){
+                            if(json.code==0){
+                                webtable.refresh();
+                                zamnotice.showTips('success','删除成功');
+                            }else{
+                                zamnotice.showTips('error',json.msg);
+                            }
+                        }, function(json){
+                            zamnotice.showTips('error','网络差。操作失败');
+                        });
+                });
+            },
+            data:function(value, row, index){
+                window.location.href = "{:gohdmanage('dataimportcj/index',['hdid'=>$hdid])}&prizeid="+row.id;
+            },
+        }
+    },
+    columns:[{
+            checkbox: true,
+        }, 
+        {
+            field: 'id',
+            title: 'Id',
+            align: 'center',
+            visible: false
+        }, {
+            field: 'displayorder',
+            title: '序号',
+            align: 'center',
+            formatter:function(value,row,index){
+                return value + '<i class="mdi mdi-pencil m-l-10 cursor editorder" data-order="'+value+'" data-awardid="'+row.id+'"></i>';
+            }
+        }, {
+            field: 'prizetypetxt',
+            title: '类型',
+            align: 'center',
+            formatter:function(value,row,index){
+                return value + (row.prizetype == '2' ? '<div class="text-danger m-t-10">金额:' + row.prizemoney + '元</div>' : '');
+            }
+        },{
+            field: 'awardname',
+            title: '奖项',
+            align: 'center',
+            formatter:function(value,row,index){
+                return value;
+            }
+        },  {
+            field: 'prizename',
+            title: '奖品',
+            align: 'center',
+        },{
+            field: 'prizeimg',
+            title: '奖品图',
+            align: 'center',
+            formatter:function(value,row,index){
+                return '<img src="'+value+'" width="100px" />';
+            }
+        },{
+            field: 'prizenum',
+            title: '数量(个)',
+            align: 'center',
+        }
+        {if $isroundcj == '2'}
+        ,{
+            field: 'onceout',
+            title: '一次抽(个)',
+            align: 'center',
+        }
+        {/if}
+        ,{
+            field: 'grouptypename',
+            title: '分组',
+            align: 'center',
+            width:'15%',
+            formatter:function(value,row,index){
+                var html = "<div>"+value+"</div>";
+                $.each(row.groupnames,function(i,v){
+                    html += "<div class='m-t-10'><span class='label label-primary'>"+v+"</span></div>";
+                });
+                return html;
+            }
+        }
+        ,{
+            field: 'create_time',
+            title: '创建时间',
+            align: 'center',
+            visible: false
+        }
+    ],
+    searchParamas:[],
+    toolbar:{
+        add:function(){
+            var confirmObj = jconfirmBox.ajaxconfirm("新增奖品","{:gohdmanage('configimportcj/editaward',['hdid'=>$hdid])}",{},'html','col-lg-10 col-lg-offset-1',function(e){
+	            var postData = webcore.serializeObject(e.find('form'));
+	            webcore.ajaxSubmit("{:gohdmanage('configimportcj/saveaward',['hdid'=>$hdid])}",postData,'奖品新增中...').then(function(json){
+	                if(json.code==0){
+	                    webtable.refresh();
+	                    zamnotice.showTips('success','新增成功');
+	                    confirmObj.close();
+	                }else{
+	                    zamnotice.showTips('error',json.msg);
+	                     return false;
+	                }
+	            }, function(json){
+	                zamnotice.showTips('error','网络差。操作失败');
+	                 return false;
+	            });
+	        });
+        },
+        del:function(){
+            var getSelects = webtable.getSelections();
+            if(!getSelects.length){
+                return zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+            jconfirmBox.confirm('温馨提示','删除将删除所选奖品数据以及中奖数据并且无法恢复，您确定要删除么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('configimportcj/delaward',['hdid'=>$hdid])}",{awardid:getSelects}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','删除成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+        },
+        reset:function(){
+            jconfirmBox.confirm('温馨提示','清空轮次将清空所有奖品数据以及中奖数据，您确定要清空么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('configimportcj/resetaward',['hdid'=>$hdid])}",{}).then(function(json){
+                    webtable.refresh();
+                    zamnotice.showTips('success','操作成功');
+                }, function(json){
+                    zamnotice.showTips('error','网络差。操作失败');
+                });
+            });
+        },
+        shenhe:function(){
+            var getSelects = webtable.getSelections();
+            if(!getSelects.length){
+                return zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+            jconfirmBox.confirm('温馨提示','重置将删除所选奖品的中奖数据并且无法恢复，您确定要重置么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('configimportcj/resetoneaward',['hdid'=>$hdid])}",{awardid:getSelects}).then(function(json){
+                    webtable.refresh();
+                    zamnotice.showTips('success','重置成功');
+                }, function(json){
+                    zamnotice.showTips('error','网络差。操作失败');
+                });
+            });
+        },
+        import:function(){
+            webcore.importxls({title:'导入奖品信息',url:"{:gohdmanage('configimportcj/importaward',['hdid'=>$hdid])}",moban:"/{:SYSIMGURL}excel/importcjaward.xls?t=1",uptxt:"点击上传奖品信息文件",xlstxt:''},function(){
+                zamnotice.showTips('success','导入成功');
+                webtable.refresh();
+            });
+        },
+    },
+};
+webtable.init(initConfig);
+$("#listtable").on('click','.editorder',function(){
+    var $this = $(this),disorder=  $this.attr('data-order');
+    var confirmobj = jconfirmBox.confirm('编辑奖品排序序号',webcore.tpl($("#awardorder-tpl"),{displayorder:disorder}),function(e){
+        var displayorder = e.$content.find(".displayorder").val();
+        if(displayorder=='') return zamnotice.showTips('error','请设置排序序号');
+        webcore.ajaxSubmit("{:gohdmanage('configimportcj/editawardorder',['hdid'=>$hdid])}",{awardid:$this.attr('data-awardid'),displayorder:displayorder},'正在处理..').then(function(json){
+             if(json.code==0){
+                confirmobj.close();
+                zamnotice.showTips('success','修改成功');
+                webtable.refresh();
+             }else{
+                zamnotice.showTips('error',json.msg);
+             }
+        })
+    },false,false,true);
+});
+});
+</script>
+<script id='awardorder-tpl' type="text/template">
+<div class="form-horizontal confirmbox-pop">
+  <form class="confirm-formbox" method="post">
+    <div class="form-group">
+      <label class="col-lg-3 control-label">* 序号</label>
+      <div class="col-lg-7">
+        <input class="form-control displayorder" type="text"  placeholder="排序序号" value="<% d.displayorder %>">
+        <span class="help-block">奖品排序序号越小排在越前</span>
+      </div>
+    </div>
+  </form>
+</div>
+</script>
+{include file='$Wpath/common/footer'}

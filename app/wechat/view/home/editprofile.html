@@ -1,0 +1,179 @@
+{include file="common/header" /}
+<style>
+.editprofile-menus{
+	margin-top:0.9rem!important;
+}
+.editprofile-menus .m-celltitle{padding: 0.24rem}
+.editprofile-menus .normal-cell .cell-right{
+	margin-left:0.3rem;
+}
+.editprofile-menus .normal-cell select{
+	color:#555;
+}
+.editprofile-menus .avatar-cell{
+	height:1.5rem;
+}
+.editprofile-menus .avatar-cell img{
+	width:1rem;height:1rem;border-radius:50%;
+}
+.editprofile-menus .edit-save{
+	width:100%;text-align:center;
+}
+.edit-save a{
+	width:60%;
+	height:0.85rem;
+	line-height:0.85rem;
+	margin:0 20%;
+}
+</style>
+<header class="m-navbar navbar-fixed">
+	<a href="javascript:;" data-href="{:gowechat('home/index',['hdid'=>$hdinfo['hdid']])}" class="navbar-item">
+		<i class="back-ico"></i>返回
+	</a>
+	<div class="navbar-center"></div>
+</header>
+<section class="g-flexview editprofile">
+	 <div class="editprofile-menus g-scrollview">
+	 	<div class="m-celltitle">基础信息</div>
+		<div class="m-cell">
+			<a class="cell-item normal-cell">
+				<div class="cell-left">昵称:</div>
+				<div class="cell-right"><input type="text" class="cell-input nickname" name="nickname" placeholder="请输入昵称" autocomplete="off" value="{$myuser['nickname']}" /></div>
+			</a>
+			<a class="cell-item avatar-cell">
+				<div class="cell-left">微信头像:</div>
+				<div class="cell-right">
+					<img class="upavatar"  data-filepath="{if isset($myuser['avatar'])}{$myuser['avatar']}{/if}" src="{:tomedia($myuser['avatar'])}" />
+				</div>
+			</a>
+		</div>
+		{if !empty($bditems)}
+		<div class="m-celltitle">签到信息</div>
+		<div class="m-cell signbox">
+			{volist name="bditems" id="bditem"}
+			{if $bditem['type']!='select'}
+				<a class="cell-item normal-cell" {if in_array($bditem['type'],['sex','date','area','file']) || (isset($bditem['isqdbook']) && $bditem['isqdbook']=='1')}style="display: none"{/if}>
+					<div class="cell-left">{$bditem['title']}:</div>
+					<div class="cell-right"><input type="text" class="cell-input {$bditem['zd']}" name="{$bditem['zd']}" placeholder="{$bditem['title']}" autocomplete="off" value="{if isset($mysign['bddata'][$bditem['zd']])}{$mysign['bddata'][$bditem['zd']]}{/if}" {if $bditem['zd']=='mobile'}maxlength="11"{/if} /></div>
+				</a>
+			{else /}
+				<a class="cell-item normal-cell" style="display: none">
+					<div class="cell-left">{$bditem['title']}:</div>
+					<label class="cell-right cell-arrow">
+						<select class="cell-select" name="{$bditem['zd']}">
+							<option value="">请选择{$bditem['title']}</option>
+							{volist name="bditem.items" id="item"}
+							<option value="{$item}" {if isset($mysign['bddata'][$bditem['zd']]) && $mysign['bddata'][$bditem['zd']]==$item}selected{/if}>{$item}</option>
+							{/volist}
+						</select>
+					</label>
+				</a>
+			{/if}
+			{/volist}
+			{if $signupimg=='1'}
+			<a class="cell-item avatar-cell">
+				<div class="cell-left">上传头像:</div>
+				<div class="cell-right">
+					<img class="uploadimg" data-filepath="{if isset($mysign['bddata']['uploadimg'])}{$mysign['bddata']['uploadimg']}{/if}" src="{if isset($mysign['bddata']['uploadimg'])}{:tomedia($mysign['bddata']['uploadimg'])}{/if}" />
+				</div>
+			</a>
+			{/if}
+		</div>
+		{/if}
+		<div class="edit-save">
+			<a href="javascript:;" class="btn-block btn-primary">保存</a>
+		</div>
+	 </div>
+</section>
+<script>
+require(['wechatcore'],function (wechatcore) {
+	if(wechatcore.ios12over()){
+		$("input,select").on('blur', function () {
+			window.scrollTo(0 ,document.documentElement.scrollTop || document.body.scrollTop);
+		});
+	}
+	$(".edit-save a").on('click',function(){
+		var $thisbtn = $(this),nickname = $(".editprofile-menus .nickname").val(),avatar = $(".editprofile-menus .upavatar").attr("data-filepath");
+		if(nickname==''){
+			return wechatcore.msg('请输入昵称');
+		}
+		if(avatar==''){
+			return wechatcore.msg('请设置头像');
+		}
+		var userdata = {
+			nickname:nickname,
+			avatar:avatar,
+		};
+		var signdata = {};
+		if($(".signbox").length > 0){
+			var fieldBox = $(".signbox input,.signbox select");
+			if(fieldBox.length>0){
+				var hascheck = true;
+				fieldBox.each(function(k,v){
+					var $this = $(this),bdval = $this.val();
+					if("undefined" == typeof bdval || bdval==''){
+						wechatcore.showtopmsg('请完善签到信息');
+						hascheck = false;
+						return false;
+					}else{
+						if($this.attr('name')=='mobile'&&!bdval.match(/^[1][3,4,5,6,7,8,9][0-9]{9}$/)){
+							wechatcore.showtopmsg('手机号有误');
+							hascheck = false;
+						}
+						signdata[$this.attr('name')] = bdval;
+					}
+				});
+				if(!hascheck){
+					return false;
+				}
+				{if $signupimg=='1'}
+				var uploadimg = $(".editprofile-menus .uploadimg").attr("data-filepath");
+				if("undefined" == typeof uploadimg || uploadimg==''){
+					return wechatcore.showtopmsg('请设置签到头像');
+				}
+				signdata.uploadimg = uploadimg;
+				{/if}
+			}
+		}
+		{//存储信息 }
+		$thisbtn.addClass("btn-disabled");
+		var postdata = {userdata:userdata,signdata:signdata};
+		wechatcore.ajaxSubmit("{:gowechat('home/editprofile')}",postdata,'正在保存..').then(function(e){
+			if(e.code==0){
+				wechatcore.showtopmsg(e.msg,1e3,function(){
+					window.location.href = "{:gowechat('home/index',['hdid'=>$hdinfo['hdid']])}";
+				});
+			}else{
+				$thisbtn.removeClass("btn-disabled");
+				wechatcore.msg(e.msg);
+			}
+		},function(){
+			$thisbtn.removeClass("btn-disabled");
+			return wechatcore.showtopmsg('网络异常，出现错误');
+		});
+	});
+	{//上传头像 }
+	$(".avatar-cell .upavatar").on('click',function(){
+		var $this = $(this);
+		wechatcore.uploadImg({posturl:'/wechat/home/upload',type:'avatar'},function(data){
+			if(data.code==0){
+			  $this.attr({'src':data.msg.filesrc,'data-filepath':data.msg.filepath});
+			}else{
+			  wechatcore.msg(data.msg);
+			}
+		});
+	})
+	{//上传签到头像 }
+	$(".avatar-cell .uploadimg").on('click',function(){
+		var $this = $(this);
+		wechatcore.uploadImg({posturl:'/wechat/home/upload',type:'signcopper'},function(data){
+			if(data.code==0){
+				$this.attr({'src':data.msg.filesrc,'data-filepath':data.msg.filepath});
+			}else{
+				wechatcore.msg(data.msg);
+			}
+		});
+	})
+});
+</script>
+{include file="common/footer" /}

@@ -1,0 +1,40 @@
+<div class="form-horizontal confirmbox-pop">
+<form class="confirm-formbox" method="post">
+    <div class="carditem">
+        <div class="form-group{if !isset($fielddata[0])} hidden{/if}">
+            <label class="col-lg-3 control-label">* {$fielddata[0]['fieldname']??'第一列数据'}</label>
+            <div class="col-lg-8">
+                <input class="form-control" type="text"  name="datafield1" value="{$config['datafield1']}">
+            </div>
+        </div>
+        <div class="form-group{if !isset($fielddata[1])} hidden{/if}">
+            <label class="col-lg-3 control-label">* {$fielddata[1]['fieldname']??'第二列数据'}</label>
+            <div class="col-lg-8">
+                <input class="form-control" type="text"  name="datafield2" value="{$config['datafield2']}">
+            </div>
+        </div>
+        <div class="form-group{if !isset($fielddata[2])} hidden{/if}">
+            <label class="col-lg-3 control-label">* {$fielddata[2]['fieldname']??'第三列数据'}</label>
+            <div class="col-lg-8">
+                <input class="form-control" type="text"  name="datafield3" value="{$config['datafield3']}">
+            </div>
+        </div>
+        <div class="form-group{if !isset($fielddata[3])} hidden{/if}">
+            <label class="col-lg-3 control-label">* {$fielddata[3]['fieldname']??'第四列数据'}</label>
+            <div class="col-lg-8">
+                <input class="form-control" type="text"  name="datafield4" value="{$config['datafield4']}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">分组</label>
+            <div class="col-lg-8">
+            	<select name="groupid" class="form-control">
+            	<option value='' {if empty($config['cateid'])}selected{/if}>请选择分组</option>
+                {volist name="groups" id="group"}
+				<option value="{$group['id']}" {if $config['groupid']==$group['id']}selected{/if}>{$group['groupname']}</option>
+				{/volist}
+				</select>
+            </div>
+        </div>
+    </div>
+</form>

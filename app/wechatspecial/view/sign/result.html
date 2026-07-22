@@ -1,0 +1,109 @@
+<!--
+ * @Author: 赞木
+ * @Company: 株洲米波网络科技有限公司
+ * @Project: 米波现场v3
+ * @Date: 2024-03-04 10:17:50
+ * @LastEditors: 赞木
+ * @LastEditTime: 2024-03-04 18:44:29
+ * @Link: 公司官网地址:https://miboxianchang.cn
+ * @Copyright: 本软件归株洲米波网络科技有限公司所有，非法渠道获得本系统或者未经授权使用本系统将依法追究当事人或公司法律责任
+-->
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>汉高AAO中国销售大会</title>
+<meta content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0" name="viewport"/>
+<meta content="yes" name="apple-mobile-web-app-capable"/>
+<meta content="black" name="apple-mobile-web-app-status-bar-style"/>
+<meta content="telephone=no" name="format-detection"/>
+<link rel="shortcut icon" href="" />
+<link rel="stylesheet" href="__STATIC__/js/ydui/css/ydui.css"/>
+<link rel="stylesheet" href="__STATIC__/css/zam-icon.css" media="all" />
+<link rel="stylesheet" href="__STATIC__/css/mxc-icon.css" media="all" />
+<link rel="stylesheet" href="__STATIC__/css/wechat/style.css" />
+<link rel="stylesheet" href="__STATIC__/css/animate.css"/>
+<script src="https://res.wx.qq.com/open/js/jweixin-1.6.0.js" type="text/javascript" charset="utf-8"></script>
+<script src="__STATIC__/js/ydui/js/ydui.flexible.js"></script>
+<script src="__STATIC__/js/jquery.2.1.4.js"></script>
+<script src="__STATIC__/js/jquery.extend.js"></script>
+<style type="text/css">
+.zam-app-signsearch{
+    background-color: #fff;
+}
+.zam-app-signsearch .errmsg{
+    margin-top: 2.1rem;
+    font-size: 0.32rem;
+    color: red;
+    text-align: center;
+}
+.zam-app-signsearch .banner{
+    width: 100%;
+}
+.zam-app-signsearch .banner img{
+    width: 100%;
+}
+.search-wrap {
+    margin: 0.5rem 0.2rem;
+    border: 1px solid #e3dfdf;
+    padding: 0.5rem;
+    border-radius: 0.2rem;
+    box-shadow: 0 0 0.5rem rgba(0, 0, 0, .1);
+}
+.search-wrap .title{
+    font-size: 0.4rem;
+    color: #26aaf2;
+}
+.search-content{
+    margin: 0.32rem 0;
+    text-align: center;
+}
+.search-ul li{
+    border-bottom: 1px solid #e3dfdf;
+}
+.search-ul li div{
+    width: 50%;
+    height: 1rem;
+    line-height: 1rem;
+    text-align: left;
+}
+.again-btn{
+    position: fixed;
+    top: 0.2rem;
+    right: 0.2rem;
+    display: inline-block;
+    border-radius: 0.12rem;
+    background-color: #ff9a00;
+    color: #fff;
+    font-size: 0.24rem;
+    text-align: center;
+    padding: 0.12rem;
+}
+</style>
+</head>
+<body>
+<section class="zam-app-signsearch g-scrollview">
+    <a class="again-btn" href="{:gowechatspecial('sign/index',['hdid'=>$hdid])}">重新查询</a>
+    <div class="banner">
+        <img src="/top.png" />
+    </div>
+	{if !empty($errmsg)}
+        <div class="errmsg">{$errmsg}</div>
+    {else /}
+    <div class="search-wrap">
+        <div class="title">个人信息</div>
+        <div class="search-content">
+            <ul class="search-ul">
+                {foreach $data as $d}
+                <li class="zam-app-flex">
+                    <div>{$d['title']}</div>
+                    <div>{$d['value']}</div>
+                </li>
+                {/foreach}
+            </ul>
+        </div>
+    </div>
+    {/if}
+</section>
+</body>
+</html>

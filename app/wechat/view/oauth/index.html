@@ -1,0 +1,459 @@
+{php}
+$myclient = clienttype($clienttype);
+{/php}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{if in_array(request()->host(true),['zam.miboxianchang.cn','v3.martian.net.cn']) && in_array($hdinfo['id'],['357','13929'])}Login to Play{else/}登录参与活动{/if}</title>
+    <meta content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0" name="viewport"/>
+    <meta content="yes" name="apple-mobile-web-app-capable"/>
+    <meta content="black" name="apple-mobile-web-app-status-bar-style"/>
+    <meta content="telephone=no" name="format-detection"/>
+	<link rel="shortcut icon" href="{:globalico()}" />
+    <link rel="stylesheet" href="__STATIC__/js/ydui/css/ydui.css"/>
+	<link rel="stylesheet" href="__STATIC__/css/wechat/style.css" />
+	{if $clienttype == '10'}
+		<script type="text/javascript" src="https://lf1-cdn-tos.bytegoofy.com/goofy/lark/op/h5-js-sdk-1.5.16.js"></script>
+	{/if}
+	<script src="__STATIC__/js/jquery.2.1.4.js"></script>
+	<script src="__STATIC__/js/jquery.extend.js"></script>
+	<script type="text/javascript"  src="__STATIC__/js/require.js"></script>
+	<script type="text/javascript">
+		var XCV3Config = {
+		  staticurl:"__STATIC__/",
+		  amconfig:{:json_encode(amconfig())},
+		  hdid:"{$hdinfo['hdid']??''}",
+		  rhdid:"{$hdinfo['id']??''}",
+		  clienttype:"{$clienttype??'1'}",
+		  douyinjssdk:{
+			client_key:"{$dyjssdk['client_key']??''}",
+			signature:"{$dyjssdk['signature']??''}",
+			timestamp:"{$dyjssdk['timestamp']??''}",
+			nonce_str:"{$dyjssdk['nonce_str']??''}",
+			url:"{$dyjssdk['url']??''}"
+		  },
+		},dysdkobj = null;
+		require.config({
+			baseUrl: XCV3Config.staticurl + "js",
+			urlArgs:'v=2.9.0',//+(new Date()).getTime(),
+			waitSeconds:0,
+			paths: {
+				 css: "css.min",
+				 jquery:"jquery.2.1.4",
+				 jquerytrans:'screenjs/jquery.transit.min',
+				 fastclick:'wechatjs/fastclick',
+				 mobileselect:"mobileselect/mobileselect",
+				 mobileselectAreas:"mobileselect/mobileselectareas",
+				 'q-select':"q-select/q-select",
+				 ionrangeslider:'ionrangeslider/ionrangeslider',
+				 ydui: "ydui/js/ydui",
+				 template:"template/template",
+				 layer:"layer/mobile/layer",
+				 laytpl:"laytpl/laytpl",
+				 howler:"howler/howler.min",
+				 cropper:"cropper/cropper",
+				 "jquery.shake":'wechatjs/jquery.shake',
+				 jform:'jquery.form',
+				 touch:'wechatjs/touch',
+				 slideBox:'wechatjs/slideBox',
+				 wechatcore:"wechatjs/wechatcore",
+				 marqueen:"wechatjs/marqueen",
+				 bscroll:'wechatjs/bscroll/bscroll',
+				 swiper:'swiper/swiper.min',
+				 emojicore:"wechatjs/emojicore",
+				 appsocket:"wechatjs/appsocket",
+				 appmsg:"wechatjs/appmsg",
+				 appgame:"wechatjs/appgame",
+				 appredpack:"wechatjs/appredpack",
+				 appydj:"wechatjs/appydj",
+				 appdgshake:"wechatjs/appdgshake",
+				 appshuqian:"wechatjs/appshuqian",
+				 appmonkey:"wechatjs/appmonkey",
+				 appcar:"wechatjs/appcar",
+				 apphorse:"wechatjs/apphorse",
+				 appmls:"wechatjs/appmls",
+				 appbike:"wechatjs/appbike",
+				 appswim:"wechatjs/appswim",
+				 apptug:"wechatjs/apptug",
+				 appanswerbs:"wechatjs/appanswerbs",
+				 appjjb:"wechatjs/appjjb",
+				 appcutfruit:"wechatjs/appcutfruit",
+				 appdzqy:"wechatjs/appdzqy",
+				 appmouse:"wechatjs/appmouse",
+				 appshakestart:"wechatjs/appshakestart",
+				 appdzp:"wechatjs/appdzp",
+				 appdzpdz:"wechatjs/appdzpdz",
+				 videojs:'videojs/video',
+				 TcPlayer:'videojs/TcPlayer-2.4.1/TcPlayer-2.4.1',
+				 TcPlayer2:'videojs/TcPlayer-2.4.5/TcPlayer-2.4.5',
+				 TXLivePlayer:'videojs/TcPlayer-2.4.1/TXLivePlayer.min',
+				 hls:'videojs/TcPlayer-2.4.1/hls.min',
+				 qnrtplayer:'videojs/qiniu/qn-web',
+				 plupload:'plupload/plupload',
+				 uploader:'plupload/uploader',
+				 phaser:'wechatjs/phaser.min',
+				 domtoimage:'domtoimg/domtoimage',
+				 html2canvas:"wechatjs/html2canvas",
+				 danmuku:'screenjs/danmuku',
+				 fulldm:'wechatjs/fulldm',
+				 dialog:'dialog/js/dialog',
+				 sweetalert:"sweetalert/sweetalert",
+				 directoss:'directupload/aliyun',
+				 directqiniu:'directupload/qiniu',
+				 directcos:'directupload/cos',
+				 DouyinOpenJSBridge:'wechatjs/douyin.open',
+				 feishujssdk:'wechatjs/h5-js-sdk-1.5.16',
+				 luckycanvas:'wechatjs/luckycanvas',
+				 bubbleHearts:'wechatjs/bubbleHearts',
+				 numkeyboard:'numkeyboard/numkeyboard',
+				 glightbox:'glightbox/glightbox.min',
+			},
+			shim:{
+				"ydui": {
+					exports:"YDUI"
+				},
+				'template':{
+					exports: 'template',
+				},
+				'layer':{
+					exports: 'layer',
+					deps: ['css!../js/layer/mobile/need/layer.css']
+				},
+				'mobileselect':{
+					exports:'MobileSelect',
+					deps: ['mobileselectAreas','css!../js/mobileselect/mobileselect.css']
+				},
+				'sweetalert':{
+					exports:'Swal',
+					deps: ['css!../js/sweetalert/sweetalert.css']
+				},
+				'q-select':{
+					exports:'QSelect',
+					deps: ['css!../js/q-select/q-select.css']
+				},
+				'ionrangeslider':{
+					deps:['css!../js/ionrangeslider/ionrangeslider.css'],
+				},
+				'wechatcore':{
+					exports:'wechatcore',
+				},
+				'marqueen':{
+					exports:'marqueen',
+				},
+				'laytpl':{
+					exports: 'laytpl',
+				},
+				'jquery.shake':{
+					exports: 'Shake',
+					deps: ['jquery']
+				},
+				'jform':{
+					deps: ['jquery']
+				},
+				'touch':{
+					exports:'touch',
+				},
+				'bscroll':{
+					exports:'BScroll',
+				},
+				'swiper':{
+					exports:'Swiper',
+					deps: ['css!../js/swiper/swiper.min.css']
+				},
+				'cropper':{
+					exports:'Cropper',
+					deps: ['css!../js/cropper/cropper.css']
+				},
+				'glightbox':{
+					exports:'GLightbox',
+					deps: ['css!../js/glightbox/glightbox.min.css'],
+				},
+				'appsocket':{
+					exports:'appsocket',
+				},
+				'appgame':{
+					exports:'appgame',
+				},
+				'appdgshake':{
+					exports:'appdgshake',
+				},
+				'appshuqian':{
+					exports:'appshuqian',
+				},
+				'appmonkey':{
+					exports:'appmonkey',
+				},
+				'appcar':{
+					exports:'appcar',
+				},
+				'apphorse':{
+					exports:'apphorse',
+				},
+				'appmls':{
+					exports:'appmls',
+				},
+				'appbike':{
+					exports:'appbike',
+				},
+				'appswim':{
+					exports:'appswim',
+				},
+				'apptug':{
+					exports:'apptug',
+				},
+				'appanswerbs':{
+					exports:'appanswerbs',
+				},
+				'appdzqy':{
+					exports:'appdzqy',
+				},
+				'appjjb':{
+					exports:'appjjb',
+				},
+				'appcutfruit':{
+					exports:'appcutfruit',
+				},
+				'videojs':{
+					exports:'videojs',
+					deps:['css!../js/videojs/video.css'],
+				},
+				'TcPlayer2':{
+					deps:['css!../js/videojs/TcPlayer-4.7.2/tcplayer.min.css'],
+				},
+				'plupload':{
+					exports:'plupload',
+				},
+				'uploader':{
+					exports:'uploader',
+					deps: ['jquery','plupload'],
+				},
+				'domtoimage':{
+					exports:'domtoimage'
+				},
+				'dialog':{
+					exports:'dialog',
+					deps:['css!../js/dialog/css/dialog.css'],
+				},
+				'numkeyboard':{
+					exports: 'numkeyboard',
+					deps: ['css!../js/numkeyboard/numkeyboard.css']
+				},
+			},
+		});
+		define("jquery", [], function () {
+			return jQuery;
+		});
+	</script>
+	<style type="text/css">
+	.zam-app-login{position: absolute;top:0;left:0;width: 100%;height: 100%;background: rgba(0,0,0,0.12);}
+	.zam-app-login-content{padding: 40px 20px;border-radius: 14px;background-color: #fff;box-shadow: -3px 5px 15px #8c8c8c;}
+	.login-title{font-size: 16px;font-weight: bold;margin-bottom: 8px;}
+	.login-des{font-size: 12px;color:#333;margin-bottom: 20px;}
+	.wx-login {
+	    width: 62vw;
+	    height: 40px;
+	    background-color:#0CC161;
+	    color: #fff;
+	    border-radius: 20px;
+	    cursor: pointer;
+	}
+	.wx-login img {
+	    width: 28px;
+	    height:28px;
+	}
+	.wx-login span {
+	    font-size: 16px;
+	    color: #fff;
+	    display: inline-block;
+	    margin-left: 8px;
+	}
+	.wx-login.clicked{
+		pointer-events: none;
+	}
+	{if $clienttype == '10'}
+		.zam-app-login{display: none;}
+		.layui-m-layercont{font-size: 16px!important;}
+	{/if}
+	</style>
+</head>
+<body>
+<section class="zam-app-login zam-app-flex-ajCenter">
+<div class="zam-app-login-content zam-app-flex-ajCenter">
+	<p class="login-title">{if in_array(request()->host(true),['zam.miboxianchang.cn','v3.martian.net.cn']) && in_array($hdinfo['id'],['357','13929'])}You're not logged in{else/}您还没有登录{/if}</p>
+	<div class="login-des">{if in_array(request()->host(true),['zam.miboxianchang.cn','v3.martian.net.cn']) && in_array($hdinfo['id'],['357','13929'])}Tap below to log in with WeChat{else/}点击{$myclient['name']??''}一键登录参与活动{/if}</div>
+	<a class="wx-login zam-app-flex-ajCenter2" href="javascript:;" {if isset($myclient['bgcolor']) && !empty($myclient['bgcolor'])}style="background-color:{$myclient['bgcolor']};"{/if}><img src="__STATIC__/images/wechat/login/{$myclient['field']??'weixin'}.png"><span>{if in_array(request()->host(true),['zam.miboxianchang.cn','v3.martian.net.cn']) && in_array($hdinfo['id'],['357','13929'])}LOGIN VIA WECHAT{else/}{$myclient['name']??''}一键登录{/if}</span></a>
+</div>
+</section>
+</body>
+<script>
+{if $clienttype == '1'}
+function onBridgeReady() {
+    WeixinJSBridge.call('hideOptionMenu');
+}
+if (typeof WeixinJSBridge == "undefined") {
+    if (document.addEventListener) {
+        document.addEventListener('WeixinJSBridgeReady', onBridgeReady, false);
+    } else if (document.attachEvent) {
+        document.attachEvent('WeixinJSBridgeReady', onBridgeReady);
+        document.attachEvent('onWeixinJSBridgeReady', onBridgeReady);
+    }
+} else {
+    onBridgeReady();
+}
+$(function(){
+	var oauthUrl = "{:$url}";
+	$('.wx-login').click(function(){
+		var $this = $(this);
+		if(oauthUrl == '' || $this.hasClass('clicked')) return false;
+		$this.addClass('clicked');
+		window.location.href = oauthUrl;
+	});
+})
+{elseif $clienttype=='2' /}
+{// 抖音授权}
+require(['DouyinOpenJSBridge','wechatcore'],function(DouyinOpenJSBridge,wechatcore){
+	const sdk = DouyinOpenJSBridge;
+	var isready = false;
+	var forcesub = "{$forcesub}";
+	var scopes = {
+		user_info: 0,
+	};
+	if(forcesub == '1'){
+		scopes = {
+			user_info: 0,
+			'fans.check': 0,
+		};
+	}
+	wechatcore.ajaxSubmit('{:gowechat("oauth/jsticket")}',{pageurl:location.href},false).then(function(json){
+		 if(json.code==0){
+			XCV3Config.douyinjssdk = json.msg;
+			sdk.config({
+				params: {
+				  client_key:XCV3Config.douyinjssdk.client_key,
+				  signature:XCV3Config.douyinjssdk.signature,
+				  timestamp:XCV3Config.douyinjssdk.timestamp,
+				  nonce_str:XCV3Config.douyinjssdk.nonce_str,
+				  url:XCV3Config.douyinjssdk.url,
+				}
+			});
+			sdk.ready(function () {
+				isready = true;
+			});
+			sdk.error(function (res) {
+				wechatcore.msg("code"+res.code+', '+res.error);
+			});
+		 }else{
+			wechatcore.msg(json.msg);
+		 }
+	}, function(){ 
+		wechatcore.msg('请求失败，请稍后重试');
+	});
+	//点击授权登录
+	$(".wx-login").click(function(){
+		var $this = $(this);
+		if(!isready) return false;
+		if($this.hasClass('clicked')) return false;
+		$this.addClass('clicked');
+		sdk.showOpenAuth({
+		  params: {
+		    client_key: XCV3Config.douyinjssdk.client_key,
+		    state: "",
+		    scopes: scopes,
+		    response_type: "code",
+		  },
+		  success: ({ticket,response}) => {
+		  	if(ticket){
+				var grant_permissions = response.grant_permissions||'';
+				var redirectTo = true;
+				if(forcesub == '1'){
+					redirectTo = (grant_permissions.indexOf('fans.check') !== -1);
+				}
+				if(redirectTo){
+					window.location.href = "{:$url}&code=" + ticket;
+				}else{
+					wechatcore.dialogAsk('提示','请点击同意授权判断其他用户是否关注本抖音号',
+					[
+						{
+							name: '好的',
+							callback: function() {
+								window.location.reload();
+							}
+						},
+					]);
+				}
+		  	}
+		  },
+		  error: (res) => {
+			$this.removeClass('clicked');
+		  	wechatcore.msg(res.msg);
+		  },
+		});
+	});
+});
+{elseif $clienttype == '10'}
+require(['wechatcore'],function(wechatcore){
+	var loadLayer = wechatcore.loading('登录中...');
+	if (!window.h5sdk) {
+		wechatcore.close(loadLayer);
+		wechatcore.msg('登录失败，请在飞书客户端打开链接');
+        return false;
+    }
+	wechatcore.ajaxSubmit("{:gowechat('oauth/feishujssdk')}",{pageurl:encodeURIComponent(location.href)}).then(function(data){
+		if(data.code==0){
+			window.h5sdk.config({
+				appId: data.msg.appid,
+				timestamp: data.msg.timestamp,
+				nonceStr: data.msg.noncestr,
+				signature: data.msg.signature,
+				jsApiList: [],
+				onSuccess: function(res) {},
+				onFail: function(err) {},
+			});
+			window.h5sdk.ready(function() {
+				tt.requestAuthCode({
+					appId: data.msg.appid,
+					success(res) {
+						wechatcore.ajaxSubmit("{:gowechat('oauth/feishulogin')}",{code:res.code,isrefresh:"{$isrefresh}"},'').then(function(data){
+							wechatcore.close(loadLayer);
+							if(data.code==0){
+								wechatcore.msg('登录成功');
+								setTimeout(function(){
+									window.location.href = "{:$url}";
+								},1e3);
+							}else{
+								wechatcore.msg(data.msg);
+								setTimeout(function(){
+									tt.closeWindow();
+								},3e3);
+							}
+						}, function(){
+							wechatcore.close(loadLayer);
+							wechatcore.msg('网络太差，请稍后重试');
+						});
+					},
+					fail(err) {
+						wechatcore.close(loadLayer);
+						wechatcore.msg('getAuthCode failed:'+JSON.stringify(err)+'，请稍后重试');
+						setTimeout(function(){
+							tt.closeWindow();
+						},3e3);
+					}
+				})
+			});
+			window.h5sdk.error(function(err) {
+				wechatcore.close(loadLayer);
+				wechatcore.msg('h5sdk error:'+JSON.stringify(err)+'，请稍后重试');
+			});
+		}else{
+			wechatcore.close(loadLayer);
+			wechatcore.msg(data.msg);
+		}
+	}, function(){
+		wechatcore.close(loadLayer);
+		wechatcore.msg('网络太差，请稍后重试');
+	});
+});
+{/if}
+</script>
+</html>

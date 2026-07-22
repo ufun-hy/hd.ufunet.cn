@@ -1,0 +1,1161 @@
+{include file='$Wpath/common/header'}
+<style type="text/css">
+.bdItemlist li{margin-bottom:10px;border: 1px solid rgba(0,0,0,0.2);border-radius: 5px;padding: 5px;}
+.bdItemlist li .form-group{
+    margin: 0 4px 0 0;
+    padding:5px;
+}
+.bdItemlist li .form-group.bdnameInput{
+    padding: 5px 0;
+}
+.bdItemlist li .checkbox{margin-top:9px!important;}
+.selectItemlist li:first-child{margin-top:1px;}
+.selectItemlist .bdselectLi input{width:230px!important}
+.form-bd-special{
+    display: inline-flex!important;
+    align-items: center;
+}
+.form-bd-special .lyear-checkbox{
+    padding-left: 24px;
+    padding-right: 1px!important;
+}
+
+.ui-tooltip{position: absolute!important}
+.input-group-addon{font-size: 12px!important}
+
+table tr td,table tr th{text-align: center}
+table tr td .touchspin{display: inline-block;}
+.normalitems span{
+    color: #333;
+    background: #e6f7ff;
+    border: 1px solid #91d5ff;
+    margin-bottom: 10px;
+    margin-right: 10px
+}
+</style>
+{if $hasbuy=='2'}
+<div class="alert alert-danger">您还未购买当前功能，购买后可正常使用</div>
+{/if}
+<form id="formBox" class="zam-formvalidation form-horizontal rankreportconfigbox" method="post">
+    <div class="text-center">
+        <div class="btn-group zam-inner-highconfig-btns" style="margin:-5px 0 20px 0;">
+            <a href="javascript:void(0)" class="btn btn-default"><span>基础设置</span></a>
+            <a href="javascript:void(0)" class="btn btn-default"><span>微信表单设置</span></a>
+            <a href="javascript:void(0)" class="btn btn-default"><span>大屏风格设置</span></a>
+        </div>
+    </div>
+    <div class="highconfig-item hidden">
+        <div class="config-titlebox">
+            <span class="config-titlename">微信设置</span>
+            <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#wechatconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+        </div>
+        <div id="wechatconfigbox" class="collapse in">
+            {include file="$Wpath/common/configwechatcommon"}
+        </div>
+        <div class="config-titlebox">
+            <span class="config-titlename">大屏设置</span>
+            <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#screenconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+        </div>
+        <div id="screenconfigbox" class="collapse in">
+            {include file="$Wpath/common/configscreencommon"}
+            {include file="$Wpath/common/configscreenmusic"}
+        </div>
+    </div>
+    <div class="highconfig-item hidden">
+        <div class="form-group">
+            <label class="col-lg-2 control-label text-right">* 表单顶部标题</label>
+            <div class="col-lg-8">
+                <div class="input-group">
+                    <div class="input-group-btn not-allow"><a class="btn btn-default">文字</a></div>
+                    <input type="text" class="form-control" name="appstyle[title][txt]" value="{$config['appstyle']['title']['txt']??'开门红目标'}" placeholder="请输入表单顶部标题">
+                    <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
+                    <div class="touchspin">
+                    <input type="text" class="form-control numberincdec" name="appstyle[title][size]" 
+                    data-bts-min="12" data-bts-replacement-val="12"
+                    data-bts-max="52"
+                    data-bts-step="1"
+                    data-bts-postfix="px"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                    value="{$config['appstyle']['title']['size']??20}">
+                    </div>
+                    <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+                    {:tpl_color('appstyle[title][color]',$config['appstyle']['title']['color']??'#fff')}
+                    <div class="input-group-btn not-allow"><a class="btn btn-default">下间距</a></div>
+                    <div class="touchspin">
+                    <input type="text" class="form-control numberincdec" name="appstyle[title][margin]" 
+                    data-bts-min="12" data-bts-replacement-val="12"
+                    data-bts-max="52"
+                    data-bts-step="1"
+                    data-bts-postfix="px"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                    value="{$config['appstyle']['title']['margin']??20}">
+                    </div>
+                </div>
+                <span class="help-block">不填写标题文字就不会显示标题内容</span>
+            </div>
+        </div>
+        <div class="form-group bdListsBox" style="margin-bottom: 0">
+            <label class="col-lg-2 control-label">* 表单设置</label>
+            <div class="col-lg-8">
+                <ul class="bdItemlist">
+                {foreach $config['appbddata'] as $bditem}
+                <li class="form-inline">
+                    <div class="mustDom">
+                    <input type="hidden" name="bdzd[]" value="{$bditem['bdzd']}" />
+                    <input type="hidden" name="bdtype[]" value="{$bditem['bdtype']}"  />
+                    <div class="form-group bdnameInput">
+                        <input type="text"  class="form-control" name="bdtitle[]" value="{$bditem['bdtitle']}"  />
+                    </div>
+                    <div class="form-group form-control form-bd-special form-bdmust">
+                        <label class="lyear-checkbox checkbox-primary">
+                            <input type="hidden" name="bdmust[]" value="{$bditem['bdmust']??'1'}"  />
+                            <input type="checkbox" {if !isset($bditem['bdmust']) || $bditem['bdmust']=='1'}checked{/if} onchange="changemust(this)" />
+                            <span>必填</span>
+                        </label>
+                    </div>
+                    <div class="form-group form-control form-bd-special form-bdonly">
+                        <label class="lyear-checkbox checkbox-primary">
+                            <input type="hidden" name="bdonly[]" value="{$bditem['bdonly']??'2'}"  />
+                            <input type="checkbox" {if isset($bditem['bdonly']) && $bditem['bdonly']=='1'}checked{/if} onchange="changeonly(this)"  />
+                            <span>唯一</span>
+                        </label>
+                    </div>
+                    <div class="form-group form-control form-bd-special form-bdscreenshow">
+                        <label class="lyear-checkbox checkbox-primary">
+                            <input type="hidden" name="bdagaininput[]" value="{$bditem['bdagaininput']??'1'}"  />
+                            <input type="checkbox" {if !isset($bditem['bdagaininput']) || $bditem['bdagaininput']=='1'}checked{/if} onchange="changeagaininput(this)" />
+                            <span>支持修改</span>
+                        </label>
+                    </div>
+                    {if $bditem['bdtype']=='select'}
+                    <div class="form-group form-control form-bd-special form-bdisteam">
+                        <label class="lyear-checkbox checkbox-primary">
+                            <input type="hidden" name="bdisteam[]" value="{$bditem['bdisteam']??'2'}"  />
+                            <input type="checkbox" {if isset($bditem['bdisteam']) && $bditem['bdisteam']=='1'}checked{/if} onchange="changebdteam(this)" />
+                            <span>团队项</span>
+                        </label>
+                    </div>
+                    <div class="form-group form-control form-bd-special form-bdscreenshow">
+                        <label class="lyear-checkbox checkbox-primary">
+                            <input type="hidden" name="supportsearch[]" value="{$bditem['supportsearch']??'2'}"  />
+                            <input type="checkbox" {if isset($bditem['supportsearch']) && $bditem['supportsearch']=='1'}checked{/if} onchange="changesupportsearch(this)" />
+                            <span>支持搜索</span>
+                        </label>
+                    </div>
+                    
+                    {else /}
+                    <input type="hidden" name="bdisteam[]" value="2"  />
+                    <input type="hidden" name="supportsearch[]" value="2"  />
+                    {/if}
+                    {if $bditem['bdtype']=='number'}
+                        <div class="form-group form-control form-bd-special form-bdisrank">
+                            <label class="lyear-checkbox checkbox-primary">
+                                <input type="hidden" name="bdisrank[]" value="{$bditem['bdisrank']??'2'}"  />
+                                <input type="checkbox" {if isset($bditem['bdisrank']) && $bditem['bdisrank']=='1'}checked{/if} onchange="changebdrank(this)" />
+                                <span>统计项</span>
+                            </label>
+                        </div>
+                        <div class="form-group form-bdunit{if !isset($bditem['bdisrank']) || $bditem['bdisrank']=='2'} hidden{/if}">
+                            单位: <input type="text" style="width:60px" class="form-control" name="bdunit[]" value="{$bditem['bdunit']??'万'}" placeholder="请输入统计项单位" onblur="calcbdunit(this)" />
+                        </div>
+                    {else /}
+                        <input type="hidden" name="bdisrank[]" value="2"  />
+                        <input type="hidden" name="bdunit[]" value="0"  />
+                    {/if}
+                    {if $bditem['bdtype']=='number'}
+                        <div class="form-group form-control form-bd-special">
+                            <label class="lyear-checkbox checkbox-primary">
+                                <input type="hidden" name="isfloat[]"  value="{$bditem['isfloat']??'2'}"  />
+                                <input type="checkbox" {if isset($bditem['isfloat']) && $bditem['isfloat']=='1'}checked{/if} onchange="changefloat(this)" />
+                                <span>小数</span>
+                            </label>
+                        </div>
+                        <div class="form-bd-special" style="display: inline-block;">
+                            <div class="input-group input-group-sm">                             
+                                <div class="input-group-btn not-allow hidden"><a class="btn btn-default">最小</a></div>
+                                <div class="input-group-addon">最小</div>
+                                <div class="touchspin" style="width: 80px">
+                                    <input type="text" class="form-control numberincdec" name="bdmin[]" 
+                                    data-bts-min="0" data-bts-replacement-val="0"
+                                    data-bts-max="null"
+                                    data-bts-step="1"
+                                    value="{$bditem['bdmin']??'0'}">
+                                </div>
+                                <div class="input-group-btn not-allow hidden"><a class="btn btn-default">最大</a></div>
+                                <div class="input-group-addon">最大</div>
+                                <div class="touchspin" style="width: 80px">
+                                    <input type="text" class="form-control numberincdec" name="bdmax[]" 
+                                    data-bts-min="0" data-bts-replacement-val="0"
+                                    data-bts-max="null"
+                                    data-bts-step="1"
+                                    value="{$bditem['bdmax']??'0'}">
+                                </div>
+                            </div>
+                        </div>
+                    {elseif in_array($bditem['bdtype'],['normal','textarea'])}
+                        <div class="form-group form-control form-bd-special" style="height: auto;border: 0">
+                            <select class="form-control" name="isfloat[]">
+                                <option value="2" {if !isset($bditem['isfloat']) || $bditem['isfloat']=='2'}selected{/if}>不限制</option>
+                                <option value="3" {if isset($bditem['isfloat']) && $bditem['isfloat']=='3'}selected{/if}>汉字</option>
+                                <option value="4" {if isset($bditem['isfloat']) && $bditem['isfloat']=='4'}selected{/if}>字母</option>
+                                <option value="5" {if isset($bditem['isfloat']) && $bditem['isfloat']=='5'}selected{/if}>数字</option>
+                                <option value="6" {if isset($bditem['isfloat']) && $bditem['isfloat']=='6'}selected{/if}>汉字字母组合</option>
+                                <option value="7" {if isset($bditem['isfloat']) && $bditem['isfloat']=='7'}selected{/if}>汉字数字组合</option>
+                                <option value="8" {if isset($bditem['isfloat']) && $bditem['isfloat']=='8'}selected{/if}>字母数字组合</option>
+                                <option value="9" {if isset($bditem['isfloat']) && $bditem['isfloat']=='9'}selected{/if}>汉字或字母</option>
+                                <option value="10" {if isset($bditem['isfloat']) && $bditem['isfloat']=='10'}selected{/if}>汉字或数字</option>
+                                <option value="11" {if isset($bditem['isfloat']) && $bditem['isfloat']=='11'}selected{/if}>字母或数字</option>
+                            </select>
+                        </div>
+                        <div class="form-bd-special" style="display: inline-block;">
+                            <div class="input-group input-group-sm">                             
+                                <div class="input-group-addon">最短</div>
+                                <div class="touchspin" style="width: 140px">
+                                    <input type="text" class="form-control numberincdec" name="bdmin[]" 
+                                    data-bts-min="0" data-bts-replacement-val="0"
+                                    data-bts-max="null"
+                                    data-bts-step="1"
+                                    data-bts-postfix="个字符"
+                                    data-bts-postfix-extra-class="touchspin-postfix"
+                                    value="{$bditem['bdmin']??'0'}">
+                                </div>
+                                <div class="input-group-addon">最长</div>
+                                <div class="touchspin" style="width: 140px">
+                                    <input type="text" class="form-control numberincdec" name="bdmax[]" 
+                                    data-bts-min="0" data-bts-replacement-val="0"
+                                    data-bts-max="null"
+                                    data-bts-step="1"
+                                    data-bts-postfix="个字符"
+                                    data-bts-postfix-extra-class="touchspin-postfix"
+                                    value="{$bditem['bdmax']??'0'}">
+                                </div>
+                            </div>
+                        </div>
+                    {elseif $bditem['bdtype']=='file' }
+                        <div class="form-group form-control form-bd-special" style="height: auto;border: 0">
+                            <select class="form-control" name="isfloat[]">
+                                <option value="1" {if !isset($bditem['isfloat']) || $bditem['isfloat']=='1'}selected{/if}>图片文件</option>
+                                <option value="2" {if isset($bditem['isfloat']) && $bditem['isfloat']=='2'}selected{/if}>视频文件</option>
+                            </select>
+                        </div>
+                        <input type="hidden" name="bdmin[]" value="{$bditem['bdmin']??0}"  />
+                        <input type="hidden" name="bdmax[]" value="{$bditem['bdmax']??0}"  />
+                    {else /}
+                        <input type="hidden" name="isfloat[]" value="2"  />
+                        <input type="hidden" name="bdmin[]" value="{$bditem['bdmin']??0}"  />
+                        <input type="hidden" name="bdmax[]" value="{$bditem['bdmax']??0}"  />
+                    {/if}
+                    {if $bditem['bdzd']=='mobile'}
+                    <div class="form-group form-control form-bd-special form-bdmobilecode">
+                        <label class="lyear-checkbox checkbox-primary">
+                            <input type="hidden" name="opencode" value="{$bditem['opencode']??'2'}"  />
+                            <input type="checkbox" {if isset($bditem['opencode']) && $bditem['opencode']=='1'}checked{/if} onchange="changemobilecode(this)" />
+                            <span>短信验证</span>
+                        </label>
+                    </div>
+                    {/if}
+                    <div class="form-group bdnameInput">
+                        <input type="text" class="form-control" name="defaulttip[]" value="{$bditem['defaulttip']??'请'.(in_array($bditem['type'],['select','date'])?'选择':($bditem['type']=="file" ? "上传" : "输入")).$bditem['title']}" placeholder="输入提示语" onblur="blurinput(this,'1')" />
+                    </div>
+                    <div class="form-group bdnameInput">
+                        <input type="text" class="form-control" name="errortip[]" value="{$bditem['errortip']??$bditem['title'].(in_array($bditem['type'],['select','date'])?'选择':( $bditem['type']=="file" ? "上传" : "输入" )).'错误'}" placeholder="错误提示语" onblur="blurinput(this,'2')" />
+                    </div>
+                    <div class="form-group">
+                        <a href="javascript:;" class="btn btn-danger btn-sm delbditem" title="删除"><i class="mdi mdi-close"></i></a>
+                        {if $bditem['bdtype']=='select'}
+                        <a href="javascript:;" class="btn btn-primary btn-sm addselectitem" data-zd="{$bditem['bdzd']}" title="新增选项"><i class="mdi mdi-plus"></i></a>
+                        {/if}
+                        <a href="javascript:;"  class="btn btn-info btn-sm mousemove zam-sortable" title="拖动排序"><i class="mdi mdi-arrow-all"></i></a>
+                    </div>
+                    </div>
+                    {if $bditem['bdtype']=='select'}
+                    <div class="bindDom">
+                        <div class="form-group selectLists">
+                        <ul class="selectItemlist">
+                            {foreach $bditem['items'] as $sitem}
+                                <li class="bdselectLi">
+                                    <div class="form-group">
+                                        选项
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="text"  class="form-control" name="{$bditem['bdzd']}[]" value="{$sitem}" />
+                                    </div>
+                                    <div class="form-group">
+                                        <a href="javascript:;" class="btn btn-danger btn-sm delselectitem"><i class="mdi mdi-close"></i></a>
+                                        <a href="javascript:;"  class="btn btn-info btn-sm mousemoveselect zam-sortable" title="拖动排序"><i class="mdi mdi-arrow-all"></i></a>
+                                    </div>
+                                </li>
+                            {/foreach}
+                        </ul>
+                        </div>
+                    </div>
+                    {/if}
+                </li>
+                {/foreach}
+                </ul>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label"></label>
+            <div class="col-lg-8">
+                <a class="btn btn-primary btn-sm btn-additem"><i class="mdi mdi-plus"></i>新增表单项</a>
+                <span class="help-block">注意事项:
+                    <br>
+                    1 产生数据后不可新增或者删除表单项，仅可以修改已添加的表单项目名称以及顺序等
+                    <br>
+                    2 如果开启了准许多次提交则以用户最后一次提交的非统计项表单信息未准
+                </span>
+            </div>
+        </div>
+        <div class="config-titlebox">
+            <span class="config-titlename">提交规则设置</span>
+            <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#postconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+        </div>
+        <div id="postconfigbox" class="collapse in">
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 提交限制</label>
+                <div class="col-lg-8">
+                    <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.morebox').removeClass('hidden'),$('.oncebox').addClass('hidden');">
+                        <input type="radio" name="apppost[type]" {if $config['apppost']['type']=="1"}checked{/if} value="1"><span>可多次提交</span>
+                    </label>
+                    <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.morebox').addClass('hidden'),$('.oncebox').removeClass('hidden');">
+                        <input type="radio" name="apppost[type]" {if $config['apppost']['type']=="2"}checked{/if} value="2" ><span>只能提交一次</span>
+                    </label>
+                </div>
+            </div>
+            <div class="form-group morebox{if $config['apppost']['type']=='2'} hidden{/if}">
+                <label class="col-lg-2 control-label">*最大次数</label>
+                <div class="col-lg-8">
+                    <input type="text" class="form-control numberincdec" name="apppost[max]" 
+                    data-bts-min="0" data-bts-replacement-val="0"
+                    data-bts-max="null"
+                    data-bts-step="1"
+                    value="{$config['apppost']['max']}">
+                    <span class="zam-help-block">注:0为不限制次数</span>
+                </div>
+            </div>
+            <div class="oncebox{if $config['apppost']['type']=='1'} hidden{/if}">
+                <div class="form-group">
+                    <label class="col-lg-2 control-label">* 是否可修改</label>
+                    <div class="col-lg-8">
+                        {:tpl_switch('apppost[modify]',$config['apppost']['modify'],'modifypop')}
+                        <span class="zam-help-block">开启则提交后可修改上次提交的支持修改的表单项</span>
+                    </div>
+                </div>
+                <div class="form-group modifybox{if $config['apppost']['modify'] != '1'} hidden{/if}">
+                    <label class="col-lg-2 control-label">* 微信端修改数据金额达标后弹窗</label>
+                    <div class="col-lg-8">
+                        {:tpl_switch('apppost[modifypop]',$config['apppost']['modifypop']??'2')}
+                        <span class="zam-help-block">开启则微信端修改提交数据金额达标后，如果大屏风格里开启了达标弹窗，大屏也会播放达标弹窗</span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 后台修改提交记录金额达标后弹窗</label>
+                <div class="col-lg-8">
+                    {:tpl_switch('apppost[webmodifypop]',$config['apppost']['webmodifypop']??'2')}
+                    <span class="zam-help-block">开启则后台修改提交记录金额达标后，如果大屏风格里开启了达标弹窗，大屏也会播放达标弹窗</span>
+                </div>
+            </div>
+        </div>
+        <div class="config-titlebox">
+            <span class="config-titlename">表单样式设置</span>
+            <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#inputconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+        </div>
+        <div id="inputconfigbox" class="collapse in">
+            <div class="form-group">
+                <label class="col-lg-2 control-label text-right">* 表单项基础</label>
+                <div class="col-lg-8">
+                    <div class="input-group">
+                        <div class="input-group-btn not-allow"><a class="btn btn-default">高度</a></div>
+                        <div class="touchspin">
+                        <input type="text" class="form-control numberincdec" name="appstyle[input][height]" 
+                        data-bts-min="10" data-bts-replacement-val="10"
+                        data-bts-max="100"
+                        data-bts-step="1"
+                        data-bts-postfix="px"
+                        data-bts-postfix-extra-class="touchspin-postfix"
+                        value="{$config['appstyle']['input']['height']}">
+                        </div>
+                        <div class="input-group-btn not-allow"><a class="btn btn-default">宽度</a></div>
+                        <div class="touchspin">
+                        <input type="text" class="form-control numberincdec" name="appstyle[input][width]" 
+                        data-bts-min="40" data-bts-replacement-val="40"
+                        data-bts-max="100"
+                        data-bts-step="1"
+                        data-bts-postfix="%"
+                        data-bts-postfix-extra-class="touchspin-postfix"
+                        value="{$config['appstyle']['input']['width']}">
+                        </div>
+                        <div class="input-group-btn not-allow"><a class="btn btn-default">背景色</a></div>
+                        {:tpl_color('appstyle[input][bgcolor]',$config['appstyle']['input']['bgcolor'])}
+                        <div class="input-group-btn not-allow"><a class="btn btn-default">文字色</a></div>
+                        {:tpl_color('appstyle[input][color]',$config['appstyle']['input']['color'])}
+                        <div class="input-group-btn not-allow"><a class="btn btn-default">文字大小</a></div>
+                        <div class="touchspin">
+                        <input type="text" class="form-control numberincdec" name="appstyle[input][size]" 
+                        data-bts-min="12" data-bts-replacement-val="12"
+                        data-bts-max="60"
+                        data-bts-step="1"
+                        data-bts-postfix="px"
+                        data-bts-postfix-extra-class="touchspin-postfix"
+                        value="{$config['appstyle']['input']['size']}">
+                        </div>
+                    </div>
+                    <span class="help-block">高度默认32px，宽度最大是100%，请根据实际情况设置此值</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label text-right">* 表单项内边距</label>
+                <div class="col-lg-6">
+                    <div class="input-group">
+                        <div class="input-group-btn not-allow"><a class="btn btn-default">左右内边距</a></div>
+                        <div class="touchspin">
+                        <input type="text" class="form-control numberincdec" name="appstyle[input][padleft]" 
+                        data-bts-min="1" data-bts-replacement-val="1"
+                        data-bts-max="20"
+                        data-bts-step="1"
+                        data-bts-postfix="px"
+                        data-bts-postfix-extra-class="touchspin-postfix"
+                        value="{$config['appstyle']['input']['padleft']}">
+                        </div>
+                        <div class="input-group-btn not-allow"><a class="btn btn-default">上下内边距</a></div>
+                        <div class="touchspin">
+                        <input type="text" class="form-control numberincdec" name="appstyle[input][padtop]" 
+                        data-bts-min="1" data-bts-replacement-val="1"
+                        data-bts-max="20"
+                        data-bts-step="1"
+                        data-bts-postfix="px"
+                        data-bts-postfix-extra-class="touchspin-postfix"
+                        value="{$config['appstyle']['input']['padtop']}">
+                        </div>
+                    </div>
+                    <span class="help-block">请根据实际情况设置</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label text-right">* 表单项边界圆角</label>
+                <div class="col-lg-8">
+                    <div class="input-group">
+                        <div class="input-group-btn not-allow"><a class="btn btn-default">边界宽度</a></div>
+                        <div class="touchspin">
+                        <input type="text" class="form-control numberincdec" name="appstyle[input][bordersize]" 
+                        data-bts-min="0" data-bts-replacement-val="0"
+                        data-bts-max="10"
+                        data-bts-step="1"
+                        data-bts-postfix="px"
+                        data-bts-postfix-extra-class="touchspin-postfix"
+                        value="{$config['appstyle']['input']['bordersize']}">
+                        </div>
+                        <div class="input-group-btn not-allow"><a class="btn btn-default">边界色</a></div>
+                        {:tpl_color('appstyle[input][bordercolor]',$config['appstyle']['input']['bordercolor'])}
+                        <div class="input-group-btn not-allow"><a class="btn btn-default">表单项圆角大小</a></div>
+                        <div class="touchspin">
+                        <input type="text" class="form-control numberincdec" name="appstyle[input][borderraduis]" 
+                        data-bts-min="1" data-bts-replacement-val="1"
+                        data-bts-max="20"
+                        data-bts-step="1"
+                        data-bts-postfix="px"
+                        data-bts-postfix-extra-class="touchspin-postfix"
+                        value="{$config['appstyle']['input']['borderraduis']}">
+                        </div>
+                    </div>
+                    <span class="help-block">请根据实际情况设置</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 显示表单名称</label>
+                <div class="col-lg-8">
+                    {:tpl_switch('appstyle[input][showbdname]',$config['appstyle']['input']['showbdname'],'openshowbdname')}
+                    <span class="zam-help-block">开启则每个表单项的名称将会显示在表单项目的左侧</span>
+                </div>
+            </div>
+            <div class="form-group bdnamebox{if $config['appstyle']['input']['showbdname']=='2'} hidden{/if}">
+                <label class="col-lg-2 control-label text-right">* 表单名称</label>
+                <div class="col-lg-8">
+                    <div class="input-group">
+                        <div class="input-group-btn not-allow"><a class="btn btn-default">宽度</a></div>
+                        <div class="touchspin">
+                        <input type="text" class="form-control numberincdec" name="appstyle[input][bdnamewidth]" 
+                        data-bts-min="40" data-bts-replacement-val="40"
+                        data-bts-max="100"
+                        data-bts-step="1"
+                        data-bts-postfix="px"
+                        data-bts-postfix-extra-class="touchspin-postfix"
+                        value="{$config['appstyle']['input']['bdnamewidth']}">
+                        </div>
+                        <div class="input-group-btn not-allow"><a class="btn btn-default">文字色</a></div>
+                        {:tpl_color('appstyle[input][bdnamecolor]',$config['appstyle']['input']['bdnamecolor'])}
+                        <div class="input-group-btn not-allow"><a class="btn btn-default">文字大小</a></div>
+                        <div class="touchspin">
+                        <input type="text" class="form-control numberincdec" name="appstyle[input][bdnamesize]" 
+                        data-bts-min="12" data-bts-replacement-val="12"
+                        data-bts-max="60"
+                        data-bts-step="1"
+                        data-bts-postfix="px"
+                        data-bts-postfix-extra-class="touchspin-postfix"
+                        value="{$config['appstyle']['input']['bdnamesize']}">
+                        </div>
+                        <div class="input-group-btn not-allow"><a class="btn btn-default">位置</a></div>
+                        <select class="form-control" name="appstyle[input][bdnamepos]">
+                            <option value="left" selected="">居左</option>
+                            <option value="center">居中</option>
+                            <option value="right">居右</option>
+                        </select>
+                    </div>
+                    <span class="help-block">高度默认32px，宽度最大是100%，请根据实际情况设置此值</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">提交按钮</label>
+                <div class="col-lg-8">
+                    {:tpl_image_one('appstyle[input][postbtn]',$config['appstyle']['input']['postbtn'])}
+                    <span class="help-block">推荐尺寸:290*65px</span>
+                </div>
+            </div>
+        </div>
+        <div class="config-titlebox">
+            <span class="config-titlename">提交成功页面设置</span>
+            <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#successconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+        </div>
+        <div id="successconfigbox" class="collapse in">
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 自定义转跳地址</label>
+                <div class="col-lg-8">
+                    {:tpl_switch('appstyle[success][diypage]',$config['appstyle']['success']['diypage'],'diysuccesspage')}
+                    <span class="zam-help-block">开启则可以自定义提交成功后转跳页面</span>
+                </div>
+            </div>
+            <div class="form-group diypagebox{if $config['appstyle']['success']['diypage']=='2'} hidden{/if}">
+                <label class="col-lg-2 control-label">提交成功转跳地址</label>
+                <div class="col-lg-8">
+                    <input class="form-control" type="text"  name="appstyle[success][successurl]" placeholder="请填写一个完整的url地址" value="{$config['appstyle']['success']['successurl']}">
+                    <span class="help-block">填写一个完整的url地址</span>
+                </div>
+            </div>
+            <div class="successpagebox{if $config['appstyle']['success']['diypage']=='1'} hidden{/if}">
+                <div class="form-group">
+                    <label class="col-lg-2 control-label">* 网页标题</label>
+                    <div class="col-lg-8">
+                        <input class="form-control" type="text"  name="appstyle[success][apptitle]" value="{$config['appstyle']['success']['apptitle']}" maxlength="50" placeholder="50个字符以内">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-2 control-label">* 背景图片</label>
+                    <div class="col-lg-8">
+                        {:tpl_image_one('appstyle[success][appbgimg]',$config['appstyle']['success']['appbgimg'])}
+                        <span class="help-block">推荐尺寸:640*1240px</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-2 control-label text-right">* 提示</label>
+                    <div class="col-lg-8">
+                        <div class="input-group">
+                            <div class="input-group-btn not-allow"><a class="btn btn-default">文字</a></div>
+                            <input type="text" class="form-control" name="appstyle[success][tip][txt]" value="{$config['appstyle']['success']['tip']['txt']}" placeholder="请输入提示语">
+                            <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
+                            <div class="touchspin">
+                            <input type="text" class="form-control numberincdec" name="appstyle[success][tip][size]" 
+                            data-bts-min="12" data-bts-replacement-val="12"
+                            data-bts-max="52"
+                            data-bts-step="1"
+                            data-bts-postfix="px"
+                            data-bts-postfix-extra-class="touchspin-postfix"
+                            value="{$config['appstyle']['success']['tip']['size']??20}">
+                            </div>
+                            <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+                            {:tpl_color('appstyle[success][tip][color]',$config['appstyle']['success']['tip']['color']??'#fff')}
+                            <div class="input-group-btn not-allow"><a class="btn btn-default">下间距</a></div>
+                            <div class="touchspin">
+                            <input type="text" class="form-control numberincdec" name="appstyle[success][tip][margin]" 
+                            data-bts-min="12" data-bts-replacement-val="12"
+                            data-bts-max="52"
+                            data-bts-step="1"
+                            data-bts-postfix="px"
+                            data-bts-postfix-extra-class="touchspin-postfix"
+                            value="{$config['appstyle']['success']['tip']['margin']??20}">
+                            </div>
+                        </div>
+                        <span class="help-block">不填写提示文字就不显示</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-2 control-label">* 返回按钮</label>
+                    <div class="col-lg-8">
+                        {:tpl_image_one('appstyle[success][backbtn]',$config['appstyle']['success']['backbtn'])}
+                        <span class="help-block">推荐尺寸:290*65px</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="highconfig-item hidden">
+        <div class="text-center">
+            <div class="btn-group zam-inner-son-highconfig-btns" style="margin:-5px 0 20px 0;">
+                <a href="javascript:void(0)" class="btn btn-default"><span>顶部图</span></a>
+                <a href="javascript:void(0)" class="btn btn-default"><span>统计数值设置</span></a>
+                <a href="javascript:void(0)" class="btn btn-default"><span>个人榜单设置</span></a>
+                <a href="javascript:void(0)" class="btn btn-default"><span>实时订购设置</span></a>
+                <a href="javascript:void(0)" class="btn btn-default"><span>团队榜单设置</span></a>
+                <a href="javascript:void(0)" class="btn btn-default"><span>达标弹窗设置</span></a>
+                <a href="javascript:void(0)" class="btn btn-default"><span>提交状态设置</span></a>
+            </div>
+        </div>
+        <div class="highconfig-son-item hidden">
+            {include file='$Wpath/common/rankreport/style/toptitle'}
+        </div>
+        <div class="highconfig-son-item hidden">
+            {include file='$Wpath/common/rankreport/style/tongji'}
+        </div>
+        <div class="highconfig-son-item hidden">
+            {include file='$Wpath/common/rankreport/style/personrank'}
+        </div>
+        <div class="highconfig-son-item hidden">
+            {include file='$Wpath/common/rankreport/style/personlist'}
+        </div>
+        <div class="highconfig-son-item hidden">
+            {include file='$Wpath/common/rankreport/style/teamrank'}
+        </div>
+        <div class="highconfig-son-item hidden">
+            {include file='$Wpath/common/rankreport/style/pop'}
+        </div>
+        <div class="highconfig-son-item hidden">
+            {include file='$Wpath/common/rankreport/style/tjstatus'}
+        </div>
+    </div>
+    {include file='$Wpath/common/savepanel'}
+</form>
+<script id='bditem-tpl' type="text/template">
+    <li class="form-inline">
+      <div class="mustDom">
+        <input type="hidden" name="bdzd[]"  />
+        <input type="hidden" name="bdtype[]"  />
+        <div class="form-group bdnameInput">
+            <input type="text" class="form-control" name="bdtitle[]" value="<% d.itemname %>" />
+        </div>
+        <div class="form-group form-control form-bd-special form-bdmust">
+            <label class="lyear-checkbox checkbox-primary">
+                <input type="hidden" name="bdmust[]" value="1"  />
+                <input type="checkbox" checked onchange="changemust(this)"  />
+                <span>必填</span>
+            </label>
+        </div>
+        <div class="form-group form-control form-bd-special form-bdonly">
+            <label class="lyear-checkbox checkbox-primary">
+                <input type="hidden" name="bdonly[]" value="2"  />
+                <input type="checkbox" onchange="changeonly(this)" />
+                <span>唯一</span>
+            </label>
+        </div>
+        <div class="form-group form-control form-bd-special form-bdscreenshow">
+            <label class="lyear-checkbox checkbox-primary">
+                <input type="hidden" name="bdagaininput[]" value="1"  />
+                <input type="checkbox" checked onchange="changeagaininput(this)" />
+                <span>支持修改</span>
+            </label>
+        </div>
+        <%# if(d.type=='select'){ %>
+        <div class="form-group form-control form-bd-special form-bdisteam">
+            <label class="lyear-checkbox checkbox-primary">
+                <input type="hidden" name="bdisteam[]" value="2"  />
+                <input type="checkbox"  onchange="changebdteam(this)" />
+                <span>团队项</span>
+            </label>
+        </div>
+        <div class="form-group form-control form-bd-special">
+            <label class="lyear-checkbox checkbox-primary">
+                <input type="hidden" name="supportsearch[]" value="2"  />
+                <input type="checkbox" onchange="changesupportsearch(this)" />
+                <span>支持搜索</span>
+            </label>
+        </div>
+        <%# }else{ %>
+        <input type="hidden" name="bdisteam[]" value="2"  />
+        <input type="hidden" name="supportsearch[]" value="2"  />
+        <%# } %>
+        <%# if(d.type=='number'){ %>
+        <div class="form-group form-control form-bd-special form-bdisrank">
+            <label class="lyear-checkbox checkbox-primary">
+                <input type="hidden" name="bdisrank[]" value="2"  />
+                <input type="checkbox"  onchange="changebdrank(this)" />
+                <span>统计项</span>
+            </label>
+        </div>
+        <div class="form-group form-bdunit hidden">
+            单位: <input type="text" style="width:60px" class="form-control" name="bdunit[]" value="万" placeholder="请输入统计项单位" onblur="calcbdunit(this)" />
+        </div>
+        <%# }else{ %>
+        <input type="hidden" name="bdisrank[]" value="2"  />
+        <input type="hidden" name="bdunit[]" value="0"  />
+        <%# } %>
+        <%# if(d.type=='number'){ %>
+            <div class="form-group form-control form-bd-special">
+                <label class="lyear-checkbox checkbox-primary">
+                    <input type="hidden" name="isfloat[]" value="2"  />
+                    <input type="checkbox"  onchange="changefloat(this)" />
+                    <span>小数</span>
+                </label>
+            </div>
+            <div class="form-bd-special" style="display: inline-block;">
+                <div class="input-group input-group-sm">                             
+                    <div class="input-group-btn not-allow hidden"><a class="btn btn-default">最小</a></div>
+                    <div class="input-group-addon">最小</div>
+                    <div class="touchspin" style="width: 80px">
+                        <input type="text" class="form-control numberincdec" name="bdmin[]" 
+                        data-bts-min="0" data-bts-replacement-val="0"
+                        data-bts-max="null"
+                        data-bts-step="1"
+                        value="0">
+                    </div>
+                    <div class="input-group-btn not-allow hidden"><a class="btn btn-default">最大</a></div>
+                    <div class="input-group-addon">最大</div>
+                    <div class="touchspin" style="width: 80px">
+                        <input type="text" class="form-control numberincdec" name="bdmax[]" 
+                        data-bts-min="0" data-bts-replacement-val="0"
+                        data-bts-max="null"
+                        data-bts-step="1"
+                        value="0">
+                    </div>
+                </div>
+            </div>
+        <%# }else if(d.type=='normal' || d.type == 'textarea'){ %>
+            <div class="form-group form-control form-bd-special" style="height: auto;border: 0">
+                <select class="form-control" name="isfloat[]">
+                    <option value="2" selected>不限制</option>
+                    <option value="3">汉字</option>
+                    <option value="4">字母</option>
+                    <option value="5">数字</option>
+                    <option value="6">汉字字母组合</option>
+                    <option value="7">汉字数字组合</option>
+                    <option value="8">字母数字组合</option>
+                    <option value="9">汉字或字母</option>
+                    <option value="10">汉字或数字</option>
+                    <option value="11">字母或数字</option>
+                </select>
+            </div>
+            <div class="form-bd-special" style="display: inline-block;">
+                <div class="input-group input-group-sm">                             
+                    <div class="input-group-addon">最短</div>
+                    <div class="touchspin" style="width: 140px">
+                        <input type="text" class="form-control numberincdec" name="bdmin[]" 
+                        data-bts-min="0" data-bts-replacement-val="0"
+                        data-bts-max="null"
+                        data-bts-step="1"
+                        data-bts-postfix="个字符"
+                        data-bts-postfix-extra-class="touchspin-postfix"
+                        value="0">
+                    </div>
+                    <div class="input-group-addon">最长</div>
+                    <div class="touchspin" style="width: 140px">
+                        <input type="text" class="form-control numberincdec" name="bdmax[]" 
+                        data-bts-min="0" data-bts-replacement-val="0"
+                        data-bts-max="null"
+                        data-bts-step="1"
+                        data-bts-postfix="个字符"
+                        data-bts-postfix-extra-class="touchspin-postfix"
+                        value="0">
+                    </div>
+                </div>
+            </div>
+        <%# }else if(d.type=='file'){ %>
+            <div class="form-group form-control form-bd-special" style="height: auto;border: 0">
+                <select class="form-control" name="isfloat[]">
+                    <option value="1" selected>图片文件</option>
+                    <option value="2">视频文件</option>
+                </select>
+            </div>
+            <input type="hidden" name="bdmin[]" value="0"  />
+            <input type="hidden" name="bdmax[]" value="0"  />
+        <%# }else{ %>
+            <input type="hidden" name="isfloat[]" value="2"  />
+            <input type="hidden" name="bdmin[]" value="0"  />
+            <input type="hidden" name="bdmax[]" value="0"  />
+        <%# } %>
+        <div class="form-group bdnameInput">
+            <input type="text"  class="form-control" name="defaulttip[]" value="请<%# if(d.type=='select' || d.type=='date' || d.type=='sex' || d.type=='area'){ %>选择<%# }else if(d.type=='file'){ %>上传<%# }else{ %>输入<%# } %><% d.itemname %>" placeholder="输入提示语" onblur="blurinput(this,'1')" />
+        </div>
+        <div class="form-group bdnameInput">
+            <input type="text"  class="form-control" name="errortip[]" value="<% d.itemname %><%# if(d.type=='select' || d.type=='date' || d.type=='sex' || d.type=='area'){ %>选择<%# }else if(d.type=='file'){ %>上传<%# }else{ %>输入<%# } %>错误" placeholder="错误提示语" onblur="blurinput(this,'2')" />
+        </div>
+        <div class="form-group">
+            <a href="javascript:;" class="btn btn-danger btn-sm delbditem" title="删除"><i class="mdi mdi-close"></i></a>
+            <%# if(d.type=='select'){ %>
+                <a href="javascript:;" class="btn btn-primary btn-sm addselectitem" title="新增选项"><i class="mdi mdi-plus"></i></a>
+            <%# } %>
+            <a href="javascript:;"  class="btn btn-info btn-sm mousemove zam-sortable" title="拖动排序"><i class="mdi mdi-arrow-all"></i></a>
+        </div>
+      </div>
+      <%# if(d.type=='select'){ %>
+        <div class="bindDom">
+            <div class="form-group selectLists">
+                <ul class="selectItemlist"></ul>
+            </div>
+        </div>
+      <%# } %>
+    </li>
+</script>
+<script id='selectitem-tpl' type="text/template">
+    <li class="bdselectLi">
+        <div class="form-group">选项</div>
+        <div class="form-group">
+            <input type="text"  class="form-control" />
+        </div>
+        <div class="form-group">
+            <a href="javascript:;" class="btn btn-danger btn-sm delselectitem"><i class="mdi mdi-close"></i></a>
+            <a href="javascript:;"  class="btn btn-info btn-sm mousemoveselect zam-sortable" title="拖动排序"><i class="mdi mdi-arrow-all"></i></a>
+        </div>
+    </li>
+</script>
+<script id='oneitem-tpl' type="text/template">
+    <div class="form-horizontal confirmbox-pop">
+        <div class="form-group bdaddTypes">
+          <label class="col-lg-2 control-label">* 类型</label>
+          <div class="col-lg-10">
+            <div class="form-control-static">
+                <a href="javascript:;" class="btn btn-default m-r-5" data-type="realname">姓名</a>
+                <a href="javascript:;" class="btn btn-default m-r-5" data-type="mobile">手机号</a>
+                <a href="javascript:;" class="btn btn-default m-r-5" data-type="sex">性别</a>
+                <a href="javascript:;" class="btn btn-default m-r-5" data-type="normal">单行文本</a>
+                <a href="javascript:;" class="btn btn-default m-r-5" data-type="textarea">多行文本</a>
+                <a href="javascript:;" class="btn btn-default m-r-5" data-type="select">下拉框</a>
+                <a href="javascript:;" class="btn btn-default m-r-5" data-type="email">邮箱</a>
+                <a href="javascript:;" class="btn btn-default m-r-5" data-type="number">整数</a>
+                <a href="javascript:;" class="btn btn-default m-r-5" data-type="date">日期</a>
+                <a href="javascript:;" class="btn btn-default m-r-5" data-type="area">地区</a>
+                <a href="javascript:;" class="btn btn-default m-r-5" data-type="file">图片或视频</a>
+            </div>
+            <div class="help-block">注:姓名，手机号，性别只能添加一次</div>
+          </div>
+        </div>
+        <div class="form-group m-b-5">
+          <label class="col-lg-2 control-label">* 名称</label>
+          <div class="col-lg-7">
+            <input type="text" class="form-control itemname" value="">
+            <div class="help-block">注:请控制在5个字符以内</div>
+          </div>
+        </div>
+    </div>
+</script>
+<script>
+require(['webcore','jconfirmBox','zamnotice','layerBox',"jquery.ui",'zvalidator',"bootstrap-touchspin"],function(webcore,jconfirmBox,zamnotice,layerBox){
+    $(".rankreportconfigbox .zam-inner-highconfig-btns a.btn").click(function(){
+        localStorage.setItem("sysrankreportconfigindex",$(this).index());
+        $(this).addClass('btn-primary').siblings().removeClass("btn-primary");
+        $(".rankreportconfigbox .highconfig-item").addClass('hidden').eq($(this).index()).removeClass('hidden');
+    });
+    var faindex = localStorage.getItem("sysrankreportconfigindex");
+    if (faindex != null && faindex != 'null') {
+        $(".rankreportconfigbox .zam-inner-highconfig-btns a.btn").eq(faindex).trigger('click');
+    }else{
+        $(".rankreportconfigbox .zam-inner-highconfig-btns a.btn").eq(0).trigger('click');
+    }
+    //大屏配置子项
+    $(".rankreportconfigbox .zam-inner-son-highconfig-btns a.btn").click(function(){
+        localStorage.setItem("sysrankreportconfigson",$(this).index());
+        $(this).addClass('btn-primary').siblings().removeClass("btn-primary");
+        $(".rankreportconfigbox .highconfig-son-item").addClass('hidden').eq($(this).index()).removeClass('hidden');
+    });
+    var sonindex = localStorage.getItem("sysrankreportconfigson");
+    if (sonindex != null && sonindex != 'null') {
+        $(".rankreportconfigbox .zam-inner-son-highconfig-btns a.btn").eq(sonindex).trigger('click');
+    }else{
+        $(".rankreportconfigbox .zam-inner-son-highconfig-btns a.btn").eq(0).trigger('click');
+    }
+    $('.bdItemlist').sortable({handle: ".mousemove"}).disableSelection();
+    $('.bdItemlist .selectItemlist').sortable({handle: ".mousemoveselect"}).disableSelection();
+    $(".bdItemlist").disableSelection();
+    $('#formBox').formValidation({
+            framework: 'bootstrap',
+            excluded: [':disabled'],
+            message: '您填写的内容无效',
+            fields: {
+                apptitle:{
+                    message: '请输入网页标题',
+                    validators: {
+                        notEmpty: {
+                            message: '请输入网页标题'
+                        },
+                    }
+                },
+            }
+    }).on('success.form.fv', function(e) {
+        e.preventDefault();
+        var $form = $(e.target);
+        var postData = webcore.serializeObject($form);
+        var bload = $form.find(".zam-fixedbottom button").lyearloading({opacity: 0.2,spinnerSize: 'nm'});
+        $form.formValidation('disableSubmitButtons', true);
+        webcore.ajaxSubmit("{:goweb('hdconfig/rankreport')}",postData).then(function(json){
+            bload.hide();
+            if(json.code==0){
+                $form.formValidation('disableSubmitButtons', false);
+                zamnotice.showTips('success','保存成功',2e3,function(){
+                    window.location.reload();
+                });
+            }else{
+                zamnotice.showTips('error',json.msg);
+                $form.formValidation('disableSubmitButtons', false);
+            }
+        }, function(json){
+            bload.hide();
+            zamnotice.showTips('error','网络差。操作失败');
+            $form.formValidation('disableSubmitButtons', false);
+        });
+    });
+    $(".btn-additem").click(function(){
+        var isdisabled = $(this).attr('data-disabled');
+        if(isdisabled == '1'){
+            return false;
+        }
+        var confirmobj = jconfirmBox.confirm('添加表单项目',webcore.tpl($("#oneitem-tpl"),{}),function(e){
+            var $this = e.$content,itemtype = $this.find('a.btn-primary').attr('data-type'),itemname = $this.find('.itemname').val();
+            if(typeof itemtype==='undefined' || itemtype==''){
+                return zamnotice.showTips('error','项目类型必须选择');
+            }
+            if(typeof itemname==='undefined' || itemname==''){
+                return zamnotice.showTips('error','项目名称必须填写');
+            }
+            var newDom = $(webcore.tpl($("#bditem-tpl"),{itemname:itemname,type:itemtype,random:webcore.random(5,1,1)})).clone();
+            if(itemtype!='select'){
+                if($.inArray(itemtype,['realname','mobile','sex'])!=-1){
+                    if(checkRM(itemtype)){
+                        return zamnotice.showTips('error',(itemtype=='realname'?'姓名':(itemtype=='mobile'?'手机号':'性别'))+'仅可添加一次');
+                    }
+                    newDom.find('input').eq(0).val(itemtype);
+                    if(itemtype=='mobile'){
+                        newDom.find('.mustDom').children("div:last-child").before(`
+                        <div class="form-group form-control form-bd-special form-bdmobilecode">
+                            <label class="lyear-checkbox checkbox-primary">
+                                <input type="hidden" name="opencode" value="2" />
+                                <input type="checkbox" class="opencode" onchange="changemobilecode(this)" /><span>短信验证</span>
+                            </label>
+                        </div>`
+                        );
+                    }
+                }else{
+                    newDom.find('input').eq(0).val(webcore.random(10,1,1));
+                }
+            }else{
+                var zdName = 'select'+webcore.random(10,1,1);
+                newDom.find('input').eq(0).val(zdName);
+                newDom.find(".addselectitem").attr('data-zd',zdName);
+            }
+            newDom.find("a").tooltip();
+            newDom.find('input').eq(1).val(itemtype);
+            newDom.appendTo($(".bdItemlist"));
+            if(itemtype=='select'){
+                $('.bdItemlist .selectItemlist').sortable({handle: ".mousemoveselect"}).disableSelection();
+            }
+            $(".bdItemlist .numberincdec").TouchSpin().on("change", function(){
+                var $this = $(this),funcstr = $this.data('func');
+                var func = window[funcstr];
+                func && func();
+            });
+            confirmobj.close();
+        },false,'col-lg-12 col-lg-offset-0',true,[{'hidden':false,'txt':'确定新增'},{'hidden':false,'txt':'取消'}],function(){
+            var $this = confirmobj.$content;
+            $this.find(".bdaddTypes a").on('click',function(){
+                 $(this).addClass('btn-primary').siblings().removeClass('btn-primary');
+                 $this.find('input').val($(this).text());
+            });
+        });
+    });
+    $(".bdItemlist").on('click','.delbditem',function(){
+        if(!$(this).data("disabled")) $(this).parent().parent().parent().remove();
+    });
+    $(".bdItemlist").on('click','.delselectitem',function(){
+        if(!$(this).data("disabled")) $(this).parent().parent().remove();
+    });
+    $(".bdItemlist").on('click','.addselectitem',function(){
+        var selecDom = $(webcore.tpl($("#selectitem-tpl"),{})).clone();
+        selecDom.find('input').eq(0).attr("name",$(this).attr('data-zd')+'[]');
+        selecDom.appendTo($(this).parent().parent().next().find(".selectItemlist"));
+    });
+});
+function changemobilecode(obj){
+var check = $(obj).prop('checked'),fnode = $(obj).parent().parent().parent();
+if(check){
+    $(obj).prop('checked',true);
+    $(obj).prev().val('1');
+    if(check){
+        var mustnode = fnode.find(".form-bdmust input[type='checkbox']");
+        mustnode.prop('checked',true);
+        mustnode.prev().val("1");
+    }
+    
+}else{
+    $(obj).prev().val('2');
+}
+}
+function changemust(obj){
+    var check = $(obj).prop('checked'),fnode = $(obj).parent().parent().parent();
+    require(["webcore","zamnotice"],function(webcore,zamnotice){
+        var mobilecode = fnode.find(".form-bdmobilecode input[type='checkbox']").prop('checked');
+        if(mobilecode && !check){
+            $(obj).prop('checked',true);
+            $(obj).prev().val("1");
+            return zamnotice.showTips('error','开启短信验证的表单必须必填');
+        }
+        $(obj).prev().val(check?"1":"2");
+        if($(".form-bdmust input[type='checkbox']:checked").length <= 0){
+            $(obj).prop('checked',true);
+            $(obj).prev().val("1");
+            return zamnotice.showTips('error','至少需保留一项必填');
+        }
+        if(!check){
+            var bdonly = fnode.find(".form-bdonly input[type='checkbox']");
+            bdonly.prop('checked',false);
+            bdonly.prev().val("2");
+        }
+    });
+}
+function changeonly(obj){
+    var check = $(obj).prop('checked'),fnode = $(obj).parent().parent().parent();
+    require(["webcore","zamnotice"],function(webcore,zamnotice){
+        if(fnode.find('input').eq(1).val() == 'file'){
+            $(obj).prop('checked',false);
+            return zamnotice.showTips('error','图片或视频文件表单项无法开启唯一'); 
+        }
+        var ismust = fnode.find(".form-bdmust input[type='checkbox']").prop('checked');
+        if(!ismust){
+            $(obj).prop('checked',false);
+            $(obj).prev().val("2");
+            return zamnotice.showTips('error','开启必填的表单才可开启值唯一');
+        }
+        $(obj).prop('checked',check ? true : false);
+        $(obj).prev().val(check ? "1" : "2");
+    });
+}
+function checkRM(type){
+    var checked  = false;
+    var bdItemTypes = $(".bdItemlist").find("input[name='bdtype[]']");
+    if(bdItemTypes.length>0){
+        $.each(bdItemTypes,function(k,v){
+            if($(v).val()==type){
+                checked =true;
+                return;
+            }
+        });
+    }
+    return checked;
+}
+function changefloat(obj){
+    var check = $(obj).prop('checked');
+    $(obj).prev().val(check?"1":"2");
+}
+function changeagaininput(obj){
+    var check = $(obj).prop('checked');
+    $(obj).prev().val(check?"1":"2");
+}
+function changesupportsearch(obj){
+    var check = $(obj).prop('checked');
+    $(obj).prev().val(check ? "1" : "2");
+}
+function changebdrank(obj){
+    var check = $(obj).prop('checked'),fnode = $(obj).parent().parent().parent().parent().parent();
+    require(["webcore","zamnotice"],function(webcore,zamnotice){
+        //取消选中
+        if(!check){
+            //核实是否还剩余存在选中项
+            if(fnode.find(".form-bdisrank input[type='checkbox']:checked").length <= 0){
+                $(obj).prop('checked',true);
+                $(obj).prev().val("1");
+                return zamnotice.showTips('error','至少需选中一项作为统计项');
+            }
+            //取消选中
+            $(obj).prop('checked',false);
+            $(obj).prev().val("2");
+            $(obj).parent().parent().next().addClass('hidden');
+        }else{
+            var bdisranks = fnode.find(".form-bdisrank input[type='checkbox']");
+            if(bdisranks.length){
+                bdisranks.each(function(){
+                    $(this).prop('checked',false);
+                    $(this).prev().val("2");
+                    $(this).parent().parent().next().addClass('hidden');
+                });
+            }
+            $(obj).prop('checked',true);
+            $(obj).prev().val("1");
+            $(obj).parent().parent().next().removeClass('hidden');
+        }
+    });
+}
+function changebdteam(obj){
+    var check = $(obj).prop('checked'),fnode = $(obj).parent().parent().parent().parent().parent();
+    require(["webcore","zamnotice"],function(webcore,zamnotice){
+        //取消选中
+        if(!check){
+            //核实是否还剩余存在选中项
+            if(fnode.find(".form-bdisteam input[type='checkbox']:checked").length <= 0){
+                $(obj).prop('checked',true);
+                $(obj).prev().val("1");
+                return zamnotice.showTips('error','至少需选中一项作为团队项');
+            }
+            //取消选中
+            $(obj).prop('checked',false);
+            $(obj).prev().val("2");
+        }else{
+            var bdisteams = fnode.find(".form-bdisteam input[type='checkbox']");
+            if(bdisteams.length){
+                bdisteams.each(function(){
+                    $(this).prop('checked',false);
+                    $(this).prev().val("2");
+                });
+            }
+            $(obj).prop('checked',true);
+            $(obj).prev().val("1");
+        }
+    });
+}
+function blurinput(obj,type){
+    var inputval = $(obj).val(),nametitle = $(obj).parent().parent().find('.bdnameInput input').eq(0).val(),inputtype = $(obj).parent().parent().find('input').eq(1).val(),puttxt = (inputtype=='select'||inputtype=='date' || inputtype=='sex' || inputtype=='area')?'选择':(inputtype=='file'?'上传':'输入');
+    if(type=='1'){
+        if(typeof inputval === 'undefined' || inputval=='') $(obj).val('请'+puttxt+nametitle);
+    }else{
+        if(typeof inputval === 'undefined' || inputval=='') $(obj).val(nametitle+puttxt+'错误');
+    }
+}
+function calcbdunit(obj){
+    var inputval = $(obj).val();
+    if(typeof inputval === 'undefined' || inputval=='') $(obj).val('万');
+}
+function openshowbdname(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".bdnamebox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".bdnamebox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function modifypop(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".modifybox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".modifybox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function diysuccesspage(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".successpagebox").removeClass('hidden');
+        $(".diypagebox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".successpagebox").addClass('hidden');
+        $(".diypagebox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+</script>
+{include file='$Wpath/common/footer'}

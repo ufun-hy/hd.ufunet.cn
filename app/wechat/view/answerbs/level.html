@@ -1,0 +1,116 @@
+{include file="common/header" /}
+<style>
+    .levelbox{
+        width: 100%;
+        height: 100%;
+    }
+    .answerbsleveltime{
+        margin-bottom: 0.3rem;
+        color: #fff;
+        font-size: 0.42rem;
+    }
+    .answerbsleveltime span{
+        margin-left: 0.24rem;
+    }
+    .levelbox .leveltip{
+        line-height: 1rem;
+        font-size:0.32rem;
+        font-weight: bold;
+        color: #fff;
+    }
+    .levelbox .btn{width: 60%;}
+    .issellevel{
+        margin-top: 0.3rem;
+        color: #fff;
+        font-size: 0.42rem;
+        font-weight: bold;
+    }
+    .isgiveup{
+        margin-top: 0.3rem;
+        color: #fff;
+        font-size: 0.42rem;
+        font-weight: bold;
+    }
+    .isdjsover{
+        margin-top: 0.3rem;
+        color: #fff;
+        font-size: 0.42rem;
+        font-weight: bold;
+    }
+</style>
+<section class="levelbox zam-app-flex-ajCenter">
+    <div class="answerbsleveltime zam-app-flex-ajCenter2 hidden"><i class="mxc-unie6b2"></i><span>20秒</span></div>
+    <div class="leveltip">请选取题目档次</div>
+    {if !empty($levelid) && !is_array($levelid)}<div class="issellevel">您已选择档次</div>{/if}
+    <a class="btn btn-primary btn-level btn-block{if (!empty($levelid) && $levelid!=$levels[0]) || (!empty($djsend) && empty($levelid))} btn-disabled{/if}" data-hdid="{$levels[0]}">低难度题</a>
+    <a class="btn btn-primary btn-level btn-block{if (!empty($levelid) && $levelid!=$levels[1]) || (!empty($djsend) && empty($levelid))} btn-disabled{/if}" data-hdid="{$levels[1]}">中难度题</a>
+    <a class="btn btn-primary btn-level btn-block{if (!empty($levelid) && $levelid!=$levels[2]) || (!empty($djsend) && empty($levelid))} btn-disabled{/if}" data-hdid="{$levels[2]}">高难度题</a>
+    <a class="btn btn-danger btn-block btn-giveup{if (!empty($levelid) && is_array($levelid)) || (!empty($djsend) && empty($levelid))} btn-disabled{/if}{if $showgiveup != '1'} hidden{/if}">弃权</a>
+    {if $isgiveup=='1'}<div class="isgiveup">您已弃权</div>{/if}
+    <div class="isdjsover{if !empty($djsend) && empty($levelid)}{else /} hidden{/if}">您已超时，20秒内未选择档次</div>
+</section>
+<script>
+    require(['wechatcore'],function(wechatcore){
+        var clicklevel = false;
+        $(".levelbox .btn-level").click(function(){
+            var $this = $(this);
+            if($this.hasClass('btn-disabled')){
+                return false;
+            }
+            {if empty($levelid)}
+                if(clicklevel) return false;
+                clicklevel = true;
+                wechatcore.ask('警告','一旦选择成功将无法更换，您确定要选择此档次么?',['确定','取消'],function(index){
+                    wechatcore.close(index);
+                    wechatcore.ajaxSubmit("{:gowechat('common/levelselected')}",{levelid:$this.attr('data-hdid')},'正在提交请求..').then(function(data){
+                        if(data.code==0){
+                            window.location.href = data.msg;
+                        }else{
+                            wechatcore.msg(data.msg);
+                            if(data.code == -2){
+                                setTimeout(function(){
+                                    window.location.reload(true);
+                                },2e3);
+                            }
+                        }
+                        clicklevel = false;
+                    }, function(){
+                        wechatcore.msg('网络太差，请稍后重试');
+                        clicklevel = false;
+                    });
+                },function(){
+                    clicklevel = false;
+                });
+            {else /}
+                window.location.href = "{$levelurl}";
+            {/if}
+        });
+        var clickgiveup = false;
+        $(".levelbox .btn-giveup").click(function(){
+            if(clickgiveup) return false;
+            clickgiveup = true;
+            wechatcore.ask('警告','一旦弃权，您将无法选择档次，您确定要弃权么?',['确定','取消'],function(index){
+				wechatcore.close(index);
+                wechatcore.ajaxSubmit("{:gowechat('common/levelgiveup')}",{},'正在提交请求..').then(function(data){
+                    if(data.code==0){
+                        window.location.reload(true);
+                    }else{
+                        wechatcore.msg(data.msg);
+                        if(data.code == -2){
+                            setTimeout(function(){
+                                window.location.reload(true);
+                            },2e3);
+                        }
+                    }
+                    clickgiveup = false;
+                }, function(){
+                    wechatcore.msg('网络太差，请稍后重试');
+                    clickgiveup = false;
+                });
+			},function(){
+                clickgiveup = false;
+            });
+        });
+    });
+</script>
+{include file="common/footer" /}

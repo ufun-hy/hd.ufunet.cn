@@ -1,0 +1,116 @@
+{include file='$Wpath/common/header'}
+{include file='$Wpath/common/tabletoolbar'}
+<table id="listtable" class="zam-btable"></table>
+<script>
+require(['webcore','webtable','jconfirmBox','zamnotice'],function(webcore,webtable,jconfirmBox,zamnotice){
+var initConfig = {
+    tableId:'#listtable',
+    url:"{:gohdmanage('datappqd/index',['hdid'=>$hdid])}",
+    columnoperate:{
+        btns:{
+            del:true,
+        },
+        func:{
+            del:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','您确定要删除么？',function(){
+                    webcore.ajaxSubmit("{:gohdmanage('datappqd/del',['hdid'=>$hdid])}",{signid:row.id}).then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','删除成功');
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                    });
+                });
+            },
+        }
+    },
+    columns:[{
+            checkbox: true,
+        }, 
+        {
+            field: 'id',
+            title: 'id',
+            align: 'center',
+            visible: false
+        },{
+            field: 'sqimg',
+            title: '签名',
+            align: 'center',
+            formatter:function(value,row,index){
+                return `<img src="${value}" style="max-width:200px;" onclick="prevshowattachs(this,1);">`;
+            }
+        }
+        ,{
+            field: 'create_time',
+            title: '签到时间',
+            align: 'center',
+        }
+    ],
+    searchParamas:[],
+    toolbar:{
+        del:function(){
+            var getSelects = webtable.getSelections();
+            if(!getSelects.length){
+                return zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+            jconfirmBox.confirm('温馨提示','您确定要删除选中的数据用户么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('datappqd/del',['hdid'=>$hdid])}",{signid:getSelects}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','删除成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+        },
+        reset:function(){
+            jconfirmBox.confirm('温馨提示','清空将删除活动所有用户的签名并且无法恢复，您确定要清空所有的用户么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('datappqd/reset',['hdid'=>$hdid])}",{}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','清空成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+        },
+        export:function(){
+            webcore.ajaxSubmit("{:gohdmanage('datappqd/export',['hdid'=>$hdid])}",{}).then(function(json){
+                if(json.code!=0){
+                    zamnotice.showTips('error',json.msg);
+                }else{
+                    window.location.href = "{:gohdmanage('datappqd/export',['hdid'=>$hdid])}";
+                }
+            }, function(json){
+                zamnotice.showTips('error','网络差,操作失败');
+            });
+        },
+    },
+};
+webtable.init(initConfig);
+$('.zam-inline-searchbar select').change(function(e) {
+     webtable.refresh();
+});
+$('.btn-export').on('click',function(){
+    webcore.ajaxSubmit("{:gohdmanage('datappqd/export',['hdid'=>$hdid])}",{}).then(function(json){
+        if(json.code!=0){
+            zamnotice.showTips('error',json.msg);
+        }else{
+            window.location.href = "{:gohdmanage('datappqd/export',['hdid'=>$hdid])}";
+        }
+    }, function(json){
+        zamnotice.showTips('error','网络差,操作失败');
+    });
+});
+});
+</script>
+{include file='$Wpath/common/footer'}

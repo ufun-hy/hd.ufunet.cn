@@ -1,0 +1,122 @@
+{include file="common/header" /}
+<style>
+.zam-app-index{height:100%;}
+.app-index{height:100%;padding:0 0.2rem;}
+.userInfoBox{
+	width:100%;
+	color:#fff;
+}
+.userInfoBox .userInfoBox-user{
+	width:100%;
+}
+.userInfoBox .userInfoBox-user .useravatar{
+	border-radius:50%;
+}
+.userInfoBox .userInfoBox-user .useravatar img{
+	width: 100%;
+	height: 100%;
+	border-radius: 50%;
+	border:4px solid transparent;
+}
+.userInfoBox .userInfoBox-user .username{
+	width:100%;height:0.6rem;line-height:0.6rem;text-align:center;overflow:hidden;font-size:0.3rem;
+}
+{if $appconfig['apppageconfig']['showscore']!='1'}
+.myscore{display: none!important}
+{/if}
+.clickbox{
+	position: relative;
+	margin-top: 1rem;
+    width: 100%;
+	user-select: none;
+}
+.clickbox .clickbtnimg{
+	width: 2rem;
+	height: 2rem;
+}
+.clickbox canvas {
+	position: absolute;
+	bottom: 1.68rem;
+	left: 50%;
+	transform: translateX(-50%);
+	-webkit-transform: translateX(-50%);
+}
+.clickstart{
+	height: 2.42rem;
+	margin-top: 0.42rem;
+}
+.clickstart img{
+	height: 100%;
+}
+.sweet-alert .sa-input-error{top: 22px;}
+.sa-error-container{
+	display: flex;
+    justify-content: center;
+    align-items: center;
+}
+/* 新增定制 */
+.clicknewbox{
+	margin-top: 0.32rem;
+}
+.clicknewbox img{
+	width: 3rem!important;
+	height: 2.5rem!important;
+	cursor: pointer;
+	user-select: none;
+	-webkit-tap-highlight-color: rgba(0,0,0,0);
+    -webkit-tap-highlight-color: transparent;
+}
+</style>
+<audio id="shakeaudio" src="/{:WIMGURL}shake/shake.mp3"></audio>
+<section class="zam-app-index g-flexview">
+<section class="app-index zam-app-flex-ajCenter">
+<div class="userInfoBox">
+	<div class="userInfoBox-user zam-app-flex-ajCenter">
+		{if $appconfig['apppageconfig']['showavatar']=='1'}
+		<div class="useravatar" style="width:{$appconfig['apppageconfig']['avatarsize']}px;height:{$appconfig['apppageconfig']['avatarsize']}px;">
+			<img src="{$wxuser['avatar']}" style="border-color:#fff" />
+		</div>
+		{/if}
+		{if $appconfig['apppageconfig']['showname']=='1'}
+		<p class="username" style="color:{$appconfig['apppageconfig']['namecolor']};font-size:{$appconfig['apppageconfig']['namesize']}px;margin-top:20px;text-align: center;">{$wxuser['nickname']}</p>
+		{/if}
+		<p class="tip" style="color:{$appconfig['apppageconfig']['tipcolor']};font-size:{$appconfig['apppageconfig']['tipsize']}px;margin-top:30px;text-align: center;"></p>
+		<p class="myscore" style="color:{$appconfig['apppageconfig']['scorecolor']};font-size:{$appconfig['apppageconfig']['scoresize']}px;margin-top:30px;text-align: center;"></p>
+	</div>
+</div>
+{if $hdinfo['id'] == '-1'}
+<div class="clickbox zam-app-flex-ajCenter{if $hdinfo['id'] == '-1'} clicknewbox{/if}">
+	{if $hdinfo['id'] == '-1'}
+		<img class='clickbtnimg' src="/{:WIMGURL}shakestart/click/click.png" />
+		<img class='clickedbtnimg hidden' src="/{:WIMGURL}shakestart/click/clicked.png" />
+	{else}
+		<img class='clickbtnimg' src="/{:WIMGURL}shakestart/clickbtn.png" />
+		<img src="/{:WIMGURL}shakestart/love.png" class="heartimg hidden">
+	{/if}
+</div>
+{/if}
+{if $appconfig['startconfig']['type']=='3'}
+<div class="clickstart zam-app-flex-ajCenter">
+	<img class='clickstartimg' src="/{:WIMGURL}shakestart/start.png" />
+	<div class="successtip hidden">已完成助力启动</div>
+</div>
+{/if}
+</section>
+</section>
+<script>
+var waittip = "{$appconfig['apppageconfig']['waittip']}",starttip = "{$appconfig['apppageconfig']['starttip']}",endtip = "{$appconfig['apppageconfig']['endtip']}",djstip = "{$appconfig['apppageconfig']['djstip']??'正在倒计时，马上开始'}",scoretxt = "{$appconfig['apppageconfig']['scoretxt']}";
+var shakeandclick = "{if $hdinfo['id'] == '-1'}1{else}2{/if}";
+require(['wechatcore','appshakestart'],function (wechatcore,appshakestart) {
+	if($('.clickbox').length || $('.clickstart').length){
+		if(shakeandclick == '1'){
+			wechatcore.gameInit(appshakestart);
+		}else{
+			appshakestart.init();
+		}
+	}else{
+		wechatcore.gameInit(appshakestart);
+	}
+});
+</script>
+{include file="common/footermenu" /}
+{include file="common/footer" /}

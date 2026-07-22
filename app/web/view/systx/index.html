@@ -1,0 +1,249 @@
+{include file='$Wpath/common/header'}
+<div class="alert alert-danger">
+    注意:如果红包模板内发放类型选了商家转账到零钱需要自己点击核实按钮确定是否到账
+</div>
+<div class="form-inline zam-inline-searchbar">
+    <div class="form-group">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">提现类型</span>
+          <select id="txtype" class="form-control">
+            {foreach $txtypes as $txkey=>$txval } 
+            <option value="{$txkey}">{$txval}</option>
+            {/foreach}
+          </select>
+        </div>
+    </div>
+    <div class="form-group">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">提现状态</span>
+          <select id="txstatus" class="form-control">
+            {foreach $txstatus as $tkey=>$txstatu } 
+            <option value="{$tkey}">{$txstatu}</option>
+            {/foreach}
+          </select>
+        </div>
+    </div>
+    <div class="form-group">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">真实姓名</span>
+        <input type="text" class="form-control" value="" id="realname" placeholder="请输入提现账户真实姓名">
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">微信昵称</span>
+        <input type="text" class="form-control" value="" id="nickname" placeholder="请输入微信提现昵称">
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">微信openid</span>
+        <input type="text" class="form-control" value="" id="openid" placeholder="请输入微信提现openid">
+      </div>
+    </div>
+    <a class="btn btn-primary btn-sm btn-search" href="javascript:void(0)"><i class="mdi mdi-magnify"></i> 搜索</a>
+    <a class="btn btn-warning btn-sm btn-export hidden" href="javascript:void(0)"><i class="mdi mdi-export"></i> 导出</a>
+    <a class="btn btn-warning btn-sm btn-exportall hidden" href="javascript:void(0)"><i class="mdi mdi-export"></i> 全部导出</a>
+</div>
+<table id="listtable" class="zam-btable"></table>
+<script>
+require(['webcore','webtable','jconfirmBox','zamnotice'],function(webcore,webtable,jconfirmBox,zamnotice){
+var initConfig = {
+	tableId:'#listtable',
+	url:"{:goweb('systx/index')}",
+	columnoperate:{
+        btns:{
+            shenhe:{title:"打款",icon:"mdi-gavel",except:{'only':'2'}},
+            data:{title:"已手动打款",icon:"mdi-gavel",except:{'only':'2'}},
+            refund:{title:"拒绝",except:{'only':'2'}},
+            edit:{
+                title:"核实到账",
+                icon:"mdi-check",
+                except:{
+                    'more':[
+                        {'field':'status','only':'1'},
+                        {'field':'type','only':'1'},
+                        {'field':'ischecked','only':'2'}
+                    ],
+                }
+            },
+        },
+        func:{
+            shenhe:function(value, row, index){
+                var tips = row.type=='1'?'此操作不可撤回，您确定要以发放微信红包的形式打款么？':'此操作不可撤回，您确定以企业支付宝转账形式打款么？';
+                jconfirmBox.confirm('温馨提示',tips,function(){
+                    webcore.ajaxSubmit("{:goweb('systx/shenhe')}",{txid:row.id},'正在打款，请等待返回打款结果后再去进行其他操作').then(function(json){
+                        if(json.code!=0){
+                            zamnotice.showTips('error',json.msg);
+                        }else{
+                            webtable.refresh();
+                            zamnotice.showTips('success','操作成功');
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                    });
+                });
+            },
+            data:function(value, row, index){
+                var confirmobj = jconfirmBox.confirm('您确定已给当前提现用户私下转账'+row.realmoney+'元了吗？',webcore.tpl($("#forceshenhe-tpl"),{}),function(e){
+                    var objdata = {
+                        txid:row.id,
+                        txtype:'3',
+                        beizhu:e.$content.find('.beizhu').val(),
+                    };
+                    if(objdata.beizhu==''){
+                        return zamnotice.showTips('error','备注信息必填');
+                    }
+                    webcore.ajaxSubmit("{:goweb('systx/shenhe')}",objdata,'正在处理..').then(function(json){
+                         if(json.code==0){
+                            confirmobj.close();
+                            zamnotice.showTips('success',json.msg);
+                            webtable.refresh();
+                         }else{
+                            zamnotice.showTips('error',json.msg);
+                         }
+                    })
+                },false,'col-lg-8 col-lg-offset-2',true,[{'hidden':false,'txt':'确定'},{'hidden':false,'txt':'取消'}]);
+            },
+            refund:function(value, row, index){
+                var confirmobj = jconfirmBox.confirm('您确定要拒绝此提现申请么？',webcore.tpl($("#reason-tpl"),{}),function(e){
+                  var reason = e.$content.find(".reason").val();
+                  if(reason=='') return zamnotice.showTips('error','请填写理由');
+                  webcore.ajaxSubmit("{:goweb('systx/refuse')}",{txid:row.id,reason:reason},'正在处理..').then(function(json){
+                       if(json.code==0){
+                            confirmobj.close();                        
+                            webtable.refresh();
+                            zamnotice.showTips('success','操作成功');
+                       }else{
+                            zamnotice.showTips('error',json.msg);
+                       }
+                  })
+                },false,false,true,[{'hidden':false,'txt':'确定拒绝'},{'hidden':false,'txt':'取消'}]);
+            },
+            edit:function(value, row, index){
+                  webcore.ajaxSubmit("{:goweb('systx/checkdz')}",{type:'1',txid:row.id},'正在核实并处理..').then(function(json){
+                       if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success',json.msg);
+                       }else{
+                            zamnotice.showTips('error',json.msg);
+                       }
+                  })
+            },
+        }
+    },
+	columns:[{
+			checkbox: true,
+		}, 
+		{
+			field: 'id',
+			title: 'ID',
+			align: 'center',
+            width:'6%',
+			visible: false
+		}, {
+            field: 'user_name',
+            title: '提现用户',
+            align:'center',
+            width:'10%',
+            formatter: function (value, row, index) {
+                if(row.huodong_id=='0') return '-';
+                var html = "<div><span>"+(value==null?"已删除":value)+"</span></div><div class='m-t-5'><span>id:"+row.user_id+"</span></div>";
+                return html;
+            },
+        }, {
+            field: 'typehtml',
+            title: '提现类型',
+            align:'center',
+            width:'10%',
+            formatter: function (value, row, index) {
+                var html = value;
+                if(row.type=='3'){
+                    html += '<div class="m-t-10"><div>备注信息：</div><div>'+row.beizhu+'</div></div>';
+                }
+                return html;
+            },
+        }, {
+            field: 'statushtml',
+            title: '提现状态',
+            align:'center',
+            width:'10%',
+            formatter: function (value, row, index) {
+                var html = value;
+                if(row.ischecked=='1'){
+                    html += '<div class="m-t-10">已到账</div>';
+                }
+                return html;
+            },
+        }, {
+            field: 'typeaccount',
+            title: '提现账户',
+            align:'center',
+            width:'10%',
+            formatter: function (value, row, index) {
+                var html = '<div class="zam-flex-column-center">';
+                if(row.type=='1'){
+                    html += '<img class="avatarImg m-b-10" src="'+value.avatar+'" /><span class="label label-primary">'+value.nickname+'</span><span class="m-b-10">'+value.openid+'</span>';
+                }
+                html +='<span class="m-b-10">'+value.realname+'</span>';
+                if(value.account){
+                    html += '<span class="m-b-10">支付宝号:'+value.account+'</span>';
+                }
+                html += "</div>";
+                return html;
+            },
+        }, {
+            field: 'txmoney',
+            title: '提现金额(元)',
+            align:'center',
+            width:'10%',
+        }, {
+            field: 'txsxf',
+            title: '手续费(元)',
+            align:'center',
+        },  {
+			field: 'realmoney',
+			title: '到账金额',
+			align: 'center',
+		},  {
+            field: 'create_time',
+            title: '提现时间',
+            align: 'center',
+        }
+	],
+	searchParamas:[{'type':'2','id':'txtype'},{'type':'2','id':'txstatus'},{'type':'1','id':'realname'},{'type':'1','id':'nickname'},{'type':'1','id':'openid'}],
+	toolbar:{
+	},
+};
+webtable.init(initConfig);
+$('#txtype,#txstatus').change(function(e) {
+     webtable.refresh();
+})
+});
+</script>
+<script id='reason-tpl' type="text/template">
+<div class="form-horizontal">
+  <div class="form-group">
+    <label class="col-lg-3 control-label">* 拒绝理由</label>
+    <div class="col-lg-8">
+      <input class="form-control reason" type="text"  name="reason" placeholder="理由尽量精简">
+    </div>
+  </div>
+</div>
+</script>
+<script id='forceshenhe-tpl' type="text/template">
+<div class="form-horizontal confirmbox-pop">
+    <div class="alert alert-danger">
+        1 此操作适用于您已经私下给用户微信或者支付宝或银行卡转过钱了，一旦点击确定无法撤回，并且此条提现记录类型会归为私下转账类型，请务必要写清楚备注转账信息，防止后期分不清怎么回事<br>
+        2 用户在自己后台提现记录内可查看到您填写的备注信息
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label">* 备注</label>
+      <div class="col-lg-9">
+            <input type="text" class="form-control beizhu" value="" placeholder="请填写私下转账备注的相关信息，如转账时间，日期，单号等信息">
+            <span class="zam-help-block">注:必须填写个备注信息，防止后期不知道什么时候给人家私下转账了</span>
+      </div>
+    </div>
+</div>
+</script>
+{include file='$Wpath/common/footer'}

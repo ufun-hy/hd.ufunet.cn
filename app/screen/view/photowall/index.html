@@ -1,0 +1,272 @@
+{include file='common/header' /}
+<style>
+.hidden{display: none;}
+.img-boxs{
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+}
+.img-boxs .imgcover{
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    background-repeat: no-repeat;
+    background-position: center center;
+    {if isset($pcconfig['pcstyle']['layer']) && $pcconfig['pcstyle']['layer'] == '1' && isset($pcconfig['pcstyle']['layerimg']) && !empty($pcconfig['pcstyle']['layerimg'])}
+        background-image:url({:tomedia($pcconfig['pcstyle']['layerimg'])});
+    {/if}
+    {if isset($pcconfig['pcstyle']['layeropacity']) && !empty($pcconfig['pcstyle']['layeropacity'])}
+        opacity:{$pcconfig['pcstyle']['layeropacity']};
+    {/if}
+    background-size: {if isset($pcconfig['pcstyle']['layersize']) && $pcconfig['pcstyle']['layersize'] == '2'}contain{elseif isset($pcconfig['pcstyle']['layersize']) && $pcconfig['pcstyle']['layersize'] == '3'}100% 100%{else}cover{/if};
+
+}
+.img-boxs .imgboxs{
+    position: relative;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+.img-boxs .imgboxs .img-contents{
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 100px;
+}
+.img-boxs .img-contents .img-one{
+    position: absolute;
+    display: inline-block;
+    height: 100%;
+    will-change: transform;
+}
+.img-boxs .img-contents .img-one img{
+    width: 100%;
+    height: 100%;
+    
+}
+.photopopbox{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+.photopopbox .photobox{
+    opacity: 0;
+}
+.photopopbox img{
+    width: 100%;
+    height: 100%;
+    box-shadow: 0 0 20px 5px rgba(0, 0, 0 ,0.62);
+    border-radius: 8px;
+}
+.photopopbox .pictxt{
+    margin-top: 10px;
+    font-weight: bold;
+    text-align: center;
+    color: {$pcconfig['pcstyle']['screenpop']['color']??'#fff'};
+    font-size: {$pcconfig['pcstyle']['screenpop']['size']??24}px;
+    display:{if $pcconfig['pcstyle']['screenpop']['opentxt'] == '1'}block{else /}none{/if};
+}
+</style>
+<div class="img-boxs">
+    <div class="imgcover"></div>
+    <div class="imgboxs"></div>
+</div>
+<div class="photopopbox zam-app-flex-ajCenter hidden">
+    <div class="photobox zam-app-flex-ajCenter">
+        <img src="" />
+        <div class="pictxt"></div>
+    </div>
+</div>
+<script>
+var pcstyle = {:json_encode($pcconfig['pcstyle'])};
+require(['screencore','screenphotowall','anime','layerBox'],function(screencore,screenphotowall,anime,layerBox){
+    var photocontrol = {
+        oldphotos:[],
+        newphotos:[],
+        photowall:null,
+        rowindex:0,
+        maxid:0,
+        photopopbox:null,
+        init:function(){
+            var self = this;
+            self.photopopbox = $(".photopopbox");
+            self.rownum = pcstyle.rownum;
+            self.popseconds = parseInt(pcstyle.screenpop.seconds);
+            self.oldphotopop = pcstyle.screenpop.oldpop || '1';
+            self.initdata(function(){
+                self.makeonerow();
+            });
+            self.pushdata();
+            setTimeout(function(){
+                self.ajaxphotos();
+                if(pcstyle.screenpop.open == '1') {
+                    self.showPopone(pcstyle.screenpop.type || '1');
+                }
+            },2e3);
+        },
+        initdata:function(fuc){
+            var self = this;
+            screencore.ajaxSubmit("/screen/photowall/initdata",{}).then(function(json){
+                if(json.code != 0){
+                    return layerBox.showMsg(json.msg);
+                }
+                if(json.msg.list.length){
+                    self.maxid = json.msg.list[0].id;
+                    self.oldphotos = json.msg.list.reverse();
+                }
+                fuc && fuc();
+			},function(){
+				layerBox.showMsg('加载出错');
+			});
+        },
+        makeonerow:function(){
+            var self = this;
+            Object.create(screenphotowall).init(self.oldphotos, self.rowindex, function(wallobj){
+                if(!self.photowall){
+                    self.photowall = wallobj;
+                }
+                self.rowindex++;
+                if(self.rowindex < self.rownum){
+                    self.makeonerow();
+                }
+            },function(wallobj){
+                if(!self.photowall){
+                    self.photowall = wallobj;
+                }
+                self.rowindex++;
+                if(self.rowindex < self.rownum){
+                    self.makeonerow();
+                }
+            });
+        },
+        ajaxphotos:function(){
+            var self = this;
+            screencore.ajaxSubmit("/screen/photowall/ajaxdata",{maxid:self.maxid}).then(function(json){
+                if(json.code != 0){
+                    return layerBox.showMsg(json.msg);
+                }
+                if(json.msg.list.length > 0){
+                    self.maxid = json.msg.list[0].id;
+                    self.newphotos.push(...json.msg.list);
+                }
+                setTimeout(function(){
+                    self.ajaxphotos();
+                },2e3);
+			},function(){
+				layerBox.showMsg('加载出错');
+			});
+        },
+        loadtimer:null,
+        ispushing:false,
+        pushdata:function(){
+            var self = this;
+            self.loadtimer = setInterval(function(){
+                if(!self.photowall || self.ispushing){
+                    return false;
+                }
+                var one = self.newphotos.shift();
+                if(one){
+                    self.ispushing = true;
+                    self.photowall.pushOnedata(one,function(){
+                        self.ispushing = false;
+                    },function(){
+                        self.ispushing = false;
+                    });
+                }
+            },2e2);
+        },
+        popseconds:4,
+        oldphotopop:'1',
+        ispoping:false,
+        popindex:0,
+        showPopone:function(israndom){
+            var self = this;
+            if(!self.photowall || self.ispoping){
+                setTimeout(function(){
+                    self.showPopone(israndom);
+                },2e3);
+                return false;
+            }
+            var photo = false;
+            if(israndom == '1'){
+                if(self.photowall.newphotos.length){
+                    photo = self.photowall.newphotos.shift();
+                }
+                var photos = self.photowall.photos.filter(item => item.hasOwnProperty('rw'));
+                if(!photo && self.oldphotopop == '1' && photos.length){
+                    photo = photos[Math.floor(Math.random() * photos.length)];
+                }
+            }else{
+                photo = self.photowall.photos[self.popindex];
+                if(photo){
+                    self.popindex = (self.popindex + 1) % self.photowall.photos.length;
+                }
+                if(!self.photowall.photos.length){
+                    self.popindex = 0;
+                }
+            }
+            if(!photo){
+                setTimeout(function(){
+                    self.showPopone(israndom);
+                },2e3);
+                return false;
+            }
+            self.ispoping = true;
+            if(photo.rw > photo.rh){
+                var sw = Math.min(820, photo.rw), sh = sw * (photo.rh / photo.rw);
+            }else{
+                var sh = Math.min(620, photo.rh), sw = sh * (photo.rw / photo.rh);
+            }
+            var box = self.photopopbox.find('.photobox');
+            box.find('img').css({
+                width:sw,
+                height:sh,
+            }).attr("src", photo.img);
+            box.find('.pictxt').html(photo.pictxt);
+            self.photopopbox.removeClass('hidden');
+            anime({
+                targets: box[0],
+                opacity: [0, 1],
+                scale: [0, 1],
+                duration: 5e2,
+                easing: 'linear',
+                complete:function(anim){
+                    anime({
+                        targets: box[0],
+                        opacity:[1, 0],
+                        scale: [1, 0],
+                        duration: 5e2,
+                        delay: self.popseconds * 1e3,
+                        easing: 'linear',
+                        complete: function(anim){
+                            self.ispoping = false;
+                            self.photopopbox.addClass('hidden');
+                            setTimeout(function(){
+                                self.showPopone(israndom);
+                            },2e3);
+                        }
+                    });
+                },
+            });
+        },
+    };
+    photocontrol.init();
+});
+</script>
+<script id="box-tpl" type="html/javascript">
+    <div class="img-contents" style="height:{{ height }}px;top:{{ top }}px"></div>
+</script>
+<script id="img-tpl" type="html/javascript">
+    <div class="img-one" style="transform: translateX({{ x }}px); width: {{ w }}px; height: {{ h }}px; opacity: 0">
+        <img src="{{ img }}" alt="{{ id }}">
+    </div>
+</script>
+{include file='common/footer' /}

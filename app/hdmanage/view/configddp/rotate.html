@@ -1,0 +1,251 @@
+{include file='$Wpath/common/header'}
+<div class="alert alert-danger">
+    温馨提醒:键盘空格键用于开始或者停止匹配，键盘方向键左键用于切换上一轮，键盘方向键右键用于切换下一轮，键盘shift键用于显示当前轮次所有匹配结果；修改轮次信息后请务必刷新大屏幕
+</div>
+{include file='$Wpath/common/tabletoolbar'}
+<table id="listtable" class="zam-btable"></table>
+<script>
+require(['webcore','webtable','jconfirmBox','zamnotice'],function(webcore,webtable,jconfirmBox,zamnotice){
+var initConfig = {
+    tableId:'#listtable',
+    url:"{:gohdmanage('configddp/rotate',['hdid'=>$hdid])}",
+    columnoperate:{
+        btns:{
+            edit:true,
+            del:true,
+            reset:true,
+            data:{title:"匹配记录"},
+        },
+        func:{
+            edit:function(value, row, index){
+                var confirmObj = jconfirmBox.ajaxconfirm("编辑轮次","{:gohdmanage('configddp/editrotate',['hdid'=>$hdid])}",{rotateid:row.id},'html','col-lg-10 col-lg-offset-1',function(e){
+                    var postData = webcore.serializeObject(e.find('form'));
+                    postData.rotateid = row.id;
+                    webcore.ajaxSubmit("{:gohdmanage('configddp/saverotate',['hdid'=>$hdid])}",postData).then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','保存成功');
+                            confirmObj.close();
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                             return false;
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                         return false;
+                    });
+                });
+            },
+            del:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','删除将删除当前轮次内的匹配记录并且无法恢复，您确定要删除么？',function(){
+                    webcore.ajaxSubmit("{:gohdmanage('configddp/delrotate',['hdid'=>$hdid])}",{rotateid:row.id}).then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','删除成功');
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                    });
+                });
+            },
+            data:function(value, row, index){
+                window.location.href = "{:gohdmanage('dataddp/index',['hdid'=>$hdid])}&rotateid="+row.id;
+            },
+            reset:function(value, row, index){
+                jconfirmBox.confirm('温馨提示',"<div class='m-b-5'><span class='text-danger'>如果活动正在进行中，请不要进行此操作</span></div><div>重置本轮将清空本轮匹配记录，您确定要强制重置本轮么？</div>",function(){
+                    webcore.ajaxSubmit("{:gohdmanage('configddp/resetrotate',['hdid'=>$hdid])}",{rotateid:row.id},'正在重置轮次数据....').then(function(json){
+                        webtable.refresh();
+                        zamnotice.showTips('success','操作成功');
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                    });
+                });
+            },
+        }
+    },
+    columns:[{
+            checkbox: true,
+            width:'5',
+        }, 
+        {
+            field: 'id',
+            title: 'id',
+            align: 'center',
+            visible: false,
+            width:'5',
+        },{
+            field: 'title',
+            title: '轮次',
+            align: 'center',
+            formatter:function(value,row,index){
+                var html = "<div class='m-b-5'>"+value+(row.status=='2'?"<span class='label label-primary m-l-5'>展示中</span>":"")+"</div>";
+                html += '<div class="m-t-10">'+(row.sextype=='1'?'男女':(row.sextype=='2'?'男男':(row.sextype=='3'?'女女':'随机')))+'对对碰</div>';
+                return html;
+            },
+            width:'15',
+        },{
+            field: 'plannum',
+            title: '计划匹配对数',
+            align: 'center',
+            width:'10',
+            formatter:function(value,row,index){
+                var html = "<div class='m-b-5'>"+(value=='0'?'不限制':value)+"</div>";
+                html += '<div>已匹配<span class="label label-primary m-l-5">'+row.lucknum+'</span></div>';
+                return html;
+            },
+        },{
+            field: 'outnum',
+            title: '单次抽出对数',
+            align: 'center',
+            width:'8',
+        },{
+            field: 'isexcept',
+            title: '重复匹配',
+            align: 'center',
+            width:'10',
+            formatter:function(value,row,index){
+                return value=='1' ? '<div class="label label-danger">匹配后自动剔除</div>' : '<div class="label label-primary">独立轮次</div>';
+            },
+        },{
+            field: 'leftgroupconfig',
+            title: '左侧队伍配置',
+            align: 'left',
+            formatter:function(value,row,index){
+                let html = '';
+                html += "<div class='teamname'>队伍名称:"+value.name+"</div>";
+                html += "<div class='groupname'>分组类型:"+grouptypename(value.type)+"</div>";
+                if(value.type=='3'){
+                    let gname = groupsignname(value.sign_groupid,value.sign_groupid_val);
+                    html += "<div class='groupname'>分组名称:" + (gname=='' ? '<span class="text-danger">所选分组异常</span>' : '<span class="text-primary">'+gname+'</span>') + "</div>";
+                }else if(value.type=='4'){
+                    let gname = groupselfname(value.self_groupid);
+                    html += "<div class='groupname'>分组名称:" + (gname=='' ? '<span class="text-danger">所选分组异常</span>' : '<span class="text-primary">'+gname+'</span>') + "</div>";
+                }
+                return  html;
+            }
+        },{
+            field: 'rightgroupconfig',
+            title: '右侧队伍配置',
+            align: 'left',
+            formatter:function(value,row,index){
+                let html = '';
+                html += "<div class='teamname'>队伍名称:"+value.name+"</div>";
+                html += "<div class='groupname'>分组类型:"+grouptypename(value.type)+"</div>";
+                if(value.type=='3'){
+                    let gname = groupsignname(value.sign_groupid,value.sign_groupid_val);
+                    html += "<div class='groupname'>分组名称:" + (gname=='' ? '<span class="text-danger">所选分组异常</span>' : '<span class="text-primary">'+gname+'</span>') + "</div>";
+                }else if(value.type=='4'){
+                    let gname = groupselfname(value.self_groupid);
+                    html += "<div class='groupname'>分组名称:" + (gname=='' ? '<span class="text-danger">所选分组异常</span>' : '<span class="text-primary">'+gname+'</span>') + "</div>";
+                }
+                return  html;
+            }
+        },
+        {
+            field: 'create_time',
+            title: '创建时间',
+            align: 'center',
+            width:'10',
+        }
+        
+    ],
+    searchParamas:[],
+    toolbar:{
+        add:function(){
+            var confirmObj = jconfirmBox.ajaxconfirm("新增轮次","{:gohdmanage('configddp/editrotate',['hdid'=>$hdid])}",{},'html','col-lg-10 col-lg-offset-1',function(e){
+                var postData = webcore.serializeObject(e.find('form'));
+                webcore.ajaxSubmit("{:gohdmanage('configddp/saverotate',['hdid'=>$hdid])}",postData,'正在创建轮次...').then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','创建成功');
+                        confirmObj.close();
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                         return false;
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差。操作失败');
+                     return false;
+                });
+            });
+        },
+        del:function(){
+            var getSelects = webtable.getSelections();
+            if(!getSelects.length){
+                return zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+            jconfirmBox.confirm('温馨提示','删除将删除所选轮次下的匹配记录并且无法恢复，您确定要删除么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('configddp/delrotate',['hdid'=>$hdid])}",{rotateid:getSelects}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','删除成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+        },
+        reset:function(){
+            jconfirmBox.confirm('温馨提示','清空轮次将清空所有轮次的匹配记录数据并且无法恢复，您确定要清空么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('configddp/resetallrotate',['hdid'=>$hdid])}",{}).then(function(json){
+                    webtable.refresh();
+                    zamnotice.showTips('success','操作成功');
+                }, function(json){
+                    zamnotice.showTips('error','网络差。操作失败');
+                });
+            });
+        }
+    },
+};
+webtable.init(initConfig);
+});
+function grouptypename(type){
+    let groupnames = {
+        'type1':'全部用户',
+        'type2':'签到用户',
+        'type3':'签到分组',
+        'type4':'自定义分组'
+    };
+    return groupnames['type'+(type||'1')];
+}
+var hdgroups = {:json_encode($hdgroups)};
+function groupsignname(sgroupid,sgroupval){
+    let gname = '',vname = '';
+    let signgroups = hdgroups[2].children || [];
+    if( $.isArray(signgroups) && signgroups.length > 0 ){
+        $.each(signgroups,function(i,v){
+            if(v.id==sgroupid){
+                gname += v.name;
+                let signvals = v.children || [];
+                if( $.isArray(signvals) && signvals.length > 0 ){
+                    $.each(signvals,function(j,z){
+                        if(z.id==sgroupval){
+                            vname += z.id;
+                        }
+                    });
+                }
+                return false;
+            }
+        })
+    }
+    return gname=='' ? '' : (gname + (vname!='' ? ' - ' + vname :' - <span class="text-danger">分组异常</span>'));
+}
+function groupselfname(groupid){
+    let gname = '';
+    let selfgroups = hdgroups[3].children || [];
+    if( $.isArray(selfgroups) && selfgroups.length > 0 ){
+        $.each(selfgroups,function(i,v){
+            if(v.id==groupid){
+                gname += v.name;
+                return false;
+            }
+        })
+    }
+    return gname;
+}
+</script>
+{include file='$Wpath/common/footer'}

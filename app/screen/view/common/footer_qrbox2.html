@@ -1,0 +1,135 @@
+<script src="__STATIC__/js/jquery.qrcode.resize.js"></script>
+<style>
+.hdQrbox {
+	position:absolute;
+	top:20%;
+	left:50%;
+	width:150px;
+	color:#646464;
+	display: none;
+	z-index:11
+}
+.hdQrbox.active:before {
+    content: '';
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: -2px;
+    top: -2px;
+    border:2px solid #4886ff;
+	z-index:-1
+}
+.hdQrbox-txt {
+	margin:0;
+	height:40px;
+	color:#fff;
+	text-align:center;
+	line-height:40px;
+	cursor:default;
+	overflow:hidden;
+	text-overflow:ellipsis;
+	white-space:nowrap;
+	box-sizing:border-box
+}
+.hdQrbox img {
+	display:block;
+	width:100%;
+	height:calc(100% - 40px);
+	vertical-align: middle;
+	cursor:move;
+	border-radius:5px;
+	user-select: none;
+	-webkit-user-drag: none;
+	-moz-user-drag: none;
+	-ms-user-drag: none;
+	user-drag: none;
+}
+.hdQrbox span{
+	width: 10px;
+    height: 10px;
+    overflow: hidden;
+    border-radius: 10px;
+    background-color: #4886ff;
+	position:absolute;
+	z-index: 1;
+	cursor:nwse-resize;
+	display:none;
+}
+.hdQrbox.active span{
+	display:block;
+}
+.hdQrbox .sw,.hdQrbox .nw,.hdQrbox .w{
+	left:-6px
+}
+.hdQrbox .se,.hdQrbox .ne,.hdQrbox .e{
+	right:-6px
+}
+.hdQrbox .sw,.hdQrbox .se,.hdQrbox .s{
+	bottom:-6px
+}
+.hdQrbox .nw,.hdQrbox .ne,.hdQrbox .n{
+	top:-6px
+}
+.hdQrbox .sw,.hdQrbox .ne {
+	cursor:nesw-resize
+}
+.hdQrbox .w,.hdQrbox .e {
+	top:calc(50% - 5px);
+	cursor:w-resize;
+	display:none;
+}
+.hdQrbox .n,.hdQrbox .s {
+	left:calc(50% - 5px);
+	cursor:n-resize;
+	display:none;
+}
+.hdQrbox .help-qr{
+	position: absolute;
+	width: 340px;
+	height: 120px;
+	top: 50%;
+    right: -350px;
+    transform: translate(0,-50%);
+	background-size: 100% 100%;
+	
+}
+</style>
+<div class="hdQrbox hdQrbox1">
+	<span class="n"></span>
+	<span class="s"></span>
+	<span class="w"></span>
+	<span class="e"></span>
+	<span class="ne"></span>
+	<span class="nw"></span>
+	<span class="se"></span>
+	<span class="sw"></span>
+	<div style="position:relative;width:100%;height:100%;">
+		<img src="{$qrcode}">
+		<p class="hdQrbox-txt">{$hdinfo['screenconfig']['qrtxt']}</p>
+		<div class="help-popimg help-qr"></div>
+	</div>
+</div>
+{if isset($hdinfo['screenconfig']['qrdouble']) && $hdinfo['screenconfig']['qrdouble'] == '1'}
+<div class="hdQrbox hdQrbox2">
+	<span class="n"></span>
+	<span class="s"></span>
+	<span class="w"></span>
+	<span class="e"></span>
+	<span class="ne"></span>
+	<span class="nw"></span>
+	<span class="se"></span>
+	<span class="sw"></span>
+	<div style="position:relative;width:100%;height:100%;">
+		<img src="{$qrcode}">
+		<p class="hdQrbox-txt">{$hdinfo['screenconfig']['qrtxt']}</p>
+		<div class="help-popimg help-qr"></div>
+	</div>
+</div>
+{/if}
+<script>
+	$(function(){
+		new QRcodeResize({
+			itemClass: 'hdQrbox'
+		});
+	});
+</script>

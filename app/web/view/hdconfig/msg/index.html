@@ -1,0 +1,272 @@
+{include file='$Wpath/common/header'}
+<form id="formBox" class="zam-formvalidation form-horizontal" method="post">
+    <div class="config-titlebox">
+        <span class="config-titlename">微信设置</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#wechatconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+    </div>
+    <div id="wechatconfigbox" class="collapse in">
+        {include file="$Wpath/common/configwechatcommon" /}
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 是否开启审核</label>
+            <div class="col-lg-8">
+                {:tpl_switch('appverify',$config['appverify'])}
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 是否开启顶部公告</label>
+            <div class="col-lg-8">
+                {:tpl_switch('appshownotice',$config['appshownotice'],'opennotice')}
+            </div>
+        </div>
+        <div class="appnoticebox{if $config['appshownotice']=='2'} hidden{/if}">
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 公告是否准许关闭</label>
+                <div class="col-lg-8">
+                    {:tpl_switch('appclosenotice',$config['appclosenotice'])}
+                    <span class="help-block">注:准许则微信用户可以点击关闭按钮关闭通告</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 公告内容</label>
+                <div class="col-lg-8">
+                     <textarea class="form-control" name="appnotices" rows="4" placeholder="注:多条公告必须以#隔开">{$config['appnotices']}</textarea>
+                    <span class="zam-help-block">注:多条公告请以#隔开，否则视为仅一条公告</span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 发送消息时间间隔</label>
+            <div class="col-lg-4">
+                <div class="input-group">
+                    <input type="text" class="form-control" name="appsendtime" value="{$config['appsendtime']}">
+                    <div class="input-group-addon">秒</div>
+                </div>
+                <span class="zam-help-block">用于防刷屏 注:必须是整数，0为不限制发送时间间隔</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 消息最大长度</label>
+            <div class="col-lg-4">
+                <div class="input-group">
+                    <input type="text" class="form-control" name="appmaxlength" value="{$config['appmaxlength']}">
+                    <div class="input-group-addon">个汉字</div>
+                </div>
+                <span class="zam-help-block">注:必须是个大于0的整数</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 消息颜色(用户名与文字)</label>
+            <div class="col-lg-3">
+                {:tpl_color('appfontcolor',$config['appfontcolor'])}
+                <span class="help-block">默认白色</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 消息背景色</label>
+            <div class="col-lg-3">
+                {:tpl_color('appbgcolor',$config['appbgcolor'],'rgba')}
+                <span class="help-block">默认黑色 rgba(0,0,0,.5)</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 是否准许发送图片</label>
+            <div class="col-lg-8">
+                {:tpl_switch('appcanimg',$config['appcanimg'])}
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 是否开启加入提示</label>
+            <div class="col-lg-8">
+                {:tpl_switch('appjointip',$config['appjointip'])}
+            </div>
+        </div>
+    </div>
+    <div class="config-titlebox">
+        <span class="config-titlename">大屏设置</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#screenconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+    </div>
+    <div id="screenconfigbox" class="collapse in">
+        {include file="$Wpath/common/configscreencommon" /}
+        {include file="$Wpath/common/configscreenmusic" /}
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 每页消息数量</label>
+            <div class="col-lg-8">
+              <label class="lyear-radio radio-inline radio-primary">
+               <input type="radio" name="msgnums" value="3" {if $config['msgnums']=='3'}checked{/if}><span>3条</span>
+              </label>
+              <label class="lyear-radio radio-inline radio-primary">
+               <input type="radio" name="msgnums" value="4" {if $config['msgnums']=='4'}checked{/if}><span>4条</span>
+              </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 是否显示消息发送时间</label>
+            <div class="col-lg-8">
+                {:tpl_switch('showmsgtime',$config['showmsgtime'])}
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 消息背景颜色</label>
+            <div class="col-lg-3">
+                {:tpl_color('pcbgcolor',$config['pcbgcolor'])}
+                <span class="help-block">默认黑色</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 消息颜色(用户名与文字)</label>
+            <div class="col-lg-3">
+                {:tpl_color('pcfontcolor',$config['pcfontcolor'])}
+                <span class="help-block">默认白色</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 消息边界大小</label>
+            <div class="col-lg-2">
+                <div class="input-group">
+                    <input type="text" class="form-control" name="pcbordersize" value="{$config['pcbordersize']}">
+                    <div class="input-group-addon">px</div>
+                </div>
+                <span class="zam-help-block">0则为无边界</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 消息边界颜色</label>
+            <div class="col-lg-3">
+                {:tpl_color('pcbordercolor',$config['pcbordercolor'])}
+                <span class="help-block">默认淡黄色</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 头像背景图片</label>
+            <div class="col-lg-8">
+                {:tpl_image_one('pcavatarbg',$config['pcavatarbg'])}
+                <span class="help-block">可以不设置此项，规格:241*168px</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 滚动时间间隔</label>
+            <div class="col-lg-4">
+                <div class="input-group">
+                    <input type="text" class="form-control" name="rolltime" value="{$config['rolltime']}">
+                    <div class="input-group-addon">秒</div>
+                </div>
+                <span class="zam-help-block">即为每几秒切换至下一页</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 加载历史消息</label>
+            <div class="col-lg-4">
+                <div class="input-group">
+                    <input type="text" class="form-control" name="historynums" value="{$config['historynums']}">
+                    <div class="input-group-addon">条</div>
+                </div>
+                <span class="zam-help-block">注:必须是个大于0的整数</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 图片自动放大</label>
+            <div class="col-lg-2">
+                {:tpl_switch('showbigimg',$config['showbigimg'],'openbigshow')}
+                <span class="help-block">开启则图片会自动放大</span>
+            </div>
+        </div>
+        <div class="bigshowbox{if $config['showbigimg']=='2'} hidden{/if}">
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 开启循环放大</label>
+                <div class="col-lg-3">
+                    {:tpl_switch('bigimgtype',$config['bigimgtype'])}
+                    <span class="help-block">关闭则图片仅放大一次</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 放大时间</label>
+                <div class="col-lg-4">
+                    <div class="input-group">
+                        <input type="text" class="form-control" name="bigimgtime" value="{$config['bigimgtime']}">
+                        <div class="input-group-addon">秒</div>
+                    </div>
+                    <span class="zam-help-block">注:必须是个大于0的整数，注:合理设置此值，一般3-4秒即可</span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 仅显示弹幕</label>
+            <div class="col-lg-3">
+                {:tpl_switch('onlydm',$config['onlydm'])}
+                <span class="help-block">开启则大屏不显示上墙滚动消息，只显示弹幕横屏滚动消息</span>
+            </div>
+        </div>
+    </div>
+    {include file='$Wpath/common/savepanel'}
+</form>
+<script>
+require(['webcore','jconfirmBox','zamnotice','layerBox','zvalidator'],function(webcore,jconfirmBox,zamnotice,layerBox){
+    $('#formBox').formValidation({
+        framework: 'bootstrap',
+        excluded: [':disabled'],
+        message: '您填写的内容无效',
+        fields: {
+            apptitle:{
+                message: '请输入网页标题',
+                validators: {
+                    notEmpty: {
+                        message: '请输入网页标题'
+                    },
+                }
+            },
+        }
+    }).on('success.form.fv', function(e) {
+        e.preventDefault();
+        var $form = $(e.target);
+        var postData = webcore.serializeObject($form);
+        var bload = $form.find(".zam-fixedbottom button").lyearloading({opacity: 0.2,spinnerSize: 'nm'});
+        $form.formValidation('disableSubmitButtons', true);
+        webcore.ajaxSubmit("{:goweb('hdconfig/msg')}",postData).then(function(json){
+            bload.hide();
+            if(json.code==0){
+                $form.formValidation('disableSubmitButtons', false);
+                zamnotice.showTips('success','保存成功',2e3,function(){
+                    window.location.reload();
+                });
+            }else{
+                zamnotice.showTips('error',json.msg);
+                $form.formValidation('disableSubmitButtons', false);
+            }
+        }, function(json){
+            bload.hide();
+            zamnotice.showTips('error','网络差。操作失败');
+            $form.formValidation('disableSubmitButtons', false);
+        });
+    });
+});
+/*开关控件 关闭上传头像与表单*/
+function opennotice(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".appnoticebox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".appnoticebox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openbigshow(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".bigshowbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".bigshowbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function changeasnickname(obj){
+    var check = $(obj).prop('checked');
+    $(obj).prev().val(check?"1":"2");
+}
+</script>
+{include file='$Wpath/common/footer'}

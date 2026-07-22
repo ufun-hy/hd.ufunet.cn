@@ -1,0 +1,152 @@
+{include file='common/header' /}
+<style type="text/css">
+.vote-container{
+	position: absolute;
+	width: calc(100% - 120px);
+	left:60px;
+	height: 710px;
+	top: 0px;
+    bottom: 90px;
+    color: #fff;
+}
+.vote-title{height: 90px;line-height:90px;font-size: 30px;font-weight: bold;letter-spacing: 3px}
+.vote-lists{width: 100%;margin-top: 60px;}
+.vote-lists .vote-item{margin: 0 16px;min-width: 240px;}
+.vote-names{text-align: center;}
+.vote-names .vote-hz{font-size: 24px;font-weight: 500}
+.vote-names .vote-en{margin-top:10px;font-size: 16px;font-weight: 300}
+.vote-score{
+	margin: 60px 0;
+	text-align: center;
+}
+.vote-score .score{font-size: 32px;font-weight:bold;color:#34d3fd }
+.zzboxs{width: 200px;margin: 0 auto}
+.zzboxs .zzone{text-align: left;font-size: 20px;margin-bottom: 15px}
+.zztxt{display:inline-block;width:20px;height:20px;background-repeat: no-repeat;background-size: cover;margin-right: 20px}
+.zzone div:first-child
+{
+    margin-left:10px;
+}
+.zzone div:last-child
+{
+    margin-right:0;
+}
+.zztxt.zz1{
+	background-image: url('/{:SIMGURL}/vote/zz/1.png');
+}
+.zztxt.zz2{
+	background-image: url('/{:SIMGURL}/vote/zz/2.png');
+}
+.zztxt.zz3{
+	background-image: url('/{:SIMGURL}/vote/zz/3.png');
+}
+.zztxt.zz4{
+	background-image: url('/{:SIMGURL}/vote/zz/4.png');
+}
+.zztxt.zz5{
+	background-image: url('/{:SIMGURL}/vote/zz/5.png');
+}
+.zam-app-flex-alignflexstart{
+	-webkit-box-align: start;
+    -webkit-align-items: flex-start;
+    -ms-flex-align: start;
+    align-items: flex-start;
+}
+</style>
+<div class="vote-container zam-app-flex zam-app-alignCenter zam-app-directionColumn">
+	<div class="vote-title">{$rotate['title']??'第二十一届国际潮团联谊年会团长暨秘书长会议'}</div>
+	<div class="vote-lists zam-app-flex-ajCenter2 zam-app-flex-alignflexstart">
+		{foreach $rotate['items'] as $ikey=>$ival}
+		<div class="vote-item vote{$ival['id']}">
+			<div class="vote-names">
+				{php}$votenames = explode('/',$ival['votename']){/php}
+				<div class="vote-hz limitbox">{$votenames[0]??''}</div>
+				<div class="vote-en limitbox">{$votenames[1]??''}</div>
+			</div>
+			<div class="vote-score zam-app-flex-ajCenter2"><span>得票数：</span><span class="score">{$ival['votenums']??'0'}</span></div>
+			<div class="vote-zzbox zam-app-flex zam-app-justifyCenter">
+				<div class="zzboxs">
+					{if $ival['votenums'] > 0}
+						{for start="0" end="$ival['votenums']" }
+							{if $i%25==0}
+								<div class="zzone zam-app-flex">
+								{if ($i+1)==$ival['votenums']}
+									<div class="zztxt zz1"></div>
+									</div>
+								{/if}
+							{else /}
+								{if ($i+1)%5==0}
+									<div class="zztxt zz5"></div>
+								{else /}
+									{if ($i+1)==$ival['votenums']}
+										<div class="zztxt zz{$i%5+1}"></div>
+									{/if}
+								{/if}
+								{if ($i+1)%25==0 || ($i+1)==$ival['votenums']}
+									</div>
+								{/if}
+							{/if}
+						{/for}
+					{/if}
+				</div>
+			</div>
+		</div>
+		{/foreach}
+	</div>
+</div>
+<script>
+require(['screencore'],function(screencore){
+	function ajaxvoteuser(){
+		screencore.ajaxSubmit("/screen/vote/dzajaxvotedata",{}).then(function(json){
+			if(json.code==0){
+				$(".vote-title").text(json.msg.title);
+				$.each(json.msg.items,function(i,v){
+					if($(".vote"+v.id).length > 0){
+						$(".vote"+v.id).find('.score').text(v.votenums);
+						if(v.votename.indexOf('/')!=-1){
+							var names = v.votename.split('/');
+							$(".vote"+v.id).find('.vote-hz').text(names[0]);
+							$(".vote"+v.id).find('.vote-en').text(names[1]);
+						}else{
+							$(".vote"+v.id).find('.vote-hz').text(v.votename);
+							$(".vote"+v.id).find('.vote-en').text('');
+						}
+						makezz($(".vote"+v.id).find(".zzboxs"),v.votenums);
+					}
+				});
+			}
+		});
+	}
+	function makezz(obj,num=0){
+		var html = '';
+		if(num > 0){
+			for (var i=0;i<num;i++){
+				if(i%25==0){
+					html += '<div class="zzone zam-app-flex zam-app-flex-alignflexstart">';
+					if((i+1)==num){
+						html += '<div class="zztxt zz1"></div></div>';
+					}
+				}else{
+					if((i+1)%5==0){
+						html += '<div class="zztxt zz5"></div>';
+					}else{
+						if((i+1)==num){
+							var type = i%5+1;
+							html += '<div class="zztxt zz'+type+'"></div>';
+						}
+							
+					}
+					if((i+1)%25==0 || (i+1)==num){
+						html += '</div>';
+					}
+				}
+			}
+		}
+		obj.html(html);
+	}
+	setInterval(function(){
+		ajaxvoteuser();
+	},3e3);
+});
+</script>
+{include file='common/footer' /}

@@ -1,0 +1,135 @@
+{include file="$Wpath/common/header_base" /}
+<style>
+html,body{overflow:hidden;}
+</style>
+<div class="container-fluid">
+<div class="row install-box">
+<div class="col-lg-12">
+    <div class="card">
+      <div class="card-header fa-1-5x">安装米波互动v3</div>
+      <div class="card-body">
+      	<div class="row">
+        <form id="formBox" class="zam-formvalidation"  method="post">
+          <div class="form-group">
+            <label>* 原系统authkey</label>
+            <input class="form-control" type="text" name="authkey" placeholder="原有系统authkey">
+            <div class="help-block">注:如需原有系统用户可以直接登录米波互动v3，需要将原系统authkey复制过来，当然如果你觉得没必要，可以填写8位英文或者数字组合字符</div>
+          </div>
+          <div class="form-group">
+            <label>* 超级管理员账号</label>
+            <input class="form-control" type="text" name="user_name" placeholder="数字与英文字符组合">
+          </div>
+          <div class="form-group">
+            <label>* 超级管理员密码</label>
+            <input class="form-control" type="text" name="user_password" placeholder="数字与英文字符组合">
+          </div>
+          <div class="form-group">
+            <label>* 超级管理员密码</label>
+            <input class="form-control" type="text" name="repassword" placeholder="请再次输入密码">
+          </div>
+          <div class="form-group">
+            <label>* 超级管理员手机号</label>
+            <input class="form-control" type="text" name="user_mobile" placeholder="请填写您的11位手机号" maxlength='11'>
+          </div>
+          <div class="form-group">
+            <div class="col-lg-12 text-center">
+              <button class="btn btn-primary btn-w-md" type="submit">确定安装</button>
+            </div>
+          </div>
+        </form>
+    	</div>
+      </div>
+    </div>
+</div>
+</div>
+</div>
+<script>
+require(['webcore','layerBox','zvalidator'],function(webcore,layerBox){
+	$('#formBox').formValidation({
+      framework: 'bootstrap',
+      excluded: [':disabled'],
+      message: '您填写的内容无效',
+      fields: {
+      	authkey: {
+          message: 'authkey必须填写',
+          validators: {
+            notEmpty: {
+              message: 'authkey必须填写'
+            },
+            stringLength: {
+                min: 8,
+                max:8,
+                message: '账号必须是8个字符长度'
+            },
+          }
+        },
+        user_name: {
+          message: '用户名必须填写',
+          validators: {
+            notEmpty: {
+              message: '用户名必须填写'
+            },
+            stringLength: {
+                min: 5,
+                message: '账号至少是5个字符长度'
+            },
+          }
+        },
+        user_password:{
+          message: '密码必须填写',
+          validators: {
+            notEmpty: {
+              message: '密码必须填写'
+            },
+            regexp : {
+              regexp : /^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{8,20}$/,
+              message : '密码由8-20字母和数字组成，不能是纯数字或纯英文'
+            }
+          }
+        },
+        repassword:{
+          message: '重复密码必须填写',
+          validators: {
+            identical: {
+              field: 'user_password',
+              message: '两次输入的密码不一致'
+            }
+          }
+        },
+        user_mobile:{
+          message: '手机号必须填写',
+          validators: {
+            notEmpty: {
+              message: '手机号必须填写'
+            },
+            regexp: {
+                regexp: /^[1][3,4,5,6,7,8,9][0-9]{9}$/,
+                message: '手机号格式错误'
+            }
+          }
+        },
+      }
+    }).on('success.form.fv', function(e) {
+      e.preventDefault();
+      var $form = $(e.target);
+      var postData = webcore.serializeObject($form);
+      var bload = $form.find("button").lyearloading({opacity: 0.2,spinnerSize: 'nm'});
+      $form.formValidation('disableSubmitButtons', true);
+      webcore.ajaxSubmit("/install/index",postData,'安装中...').then(function(json){
+          if(json.code==0){
+            layerBox.showMsg('安装成功');
+            setTimeout(function(){
+              window.location.href = "{:APP_WEB_LOGIN}";
+            },1e3);
+          }else{
+              layerBox.showMsg(json.msg);
+              $form.formValidation('disableSubmitButtons', false);
+          }
+      },function(){
+          $form.formValidation('disableSubmitButtons', false);
+          layerBox.showMsg('安装出现异常');
+      });
+    });
+});
+</script>
+{include file="$Wpath/common/footer_base" /}

@@ -1,0 +1,908 @@
+{include file='$Wpath/common/header'}
+<style type="text/css">
+  .catenameitem {
+    margin-bottom: 20px
+  }
+
+  .card-hdmodule {
+    border: 1px solid #dfe6ec
+  }
+
+  .card-hdmodule:hover {
+    box-shadow: 1px 3px 10px rgba(37, 46, 64, .2);
+  }
+
+  .card-hdmodule .card-body {
+    padding: 15px 10px;
+  }
+
+  .hdmodule-name {
+    width: 50%
+  }
+
+  .card-hdmodule .hdmodule-price {
+    width: 50%;
+  }
+
+  .hdmodule-price input {
+    border-radius: 0px !important;
+    height: 28px;
+    padding: 0;
+    text-align: center;
+  }
+
+  .hdmodule-price .input-group-addon {
+    height: 28px;
+    padding: 0 5px;
+  }
+</style>
+<div class="confirmbox-pop">
+  <div class="text-center">
+    <div class="btn-group pop-btns" style="margin-bottom:10px;">
+      <a href="javascript:void(0)" class="btn btn-default btn-primary"><span>基础设置</span></a>
+      <a href="javascript:void(0)" class="btn btn-default"><span>活动限制</span></a>
+      <a href="javascript:void(0)" class="btn btn-default"><span>充值红包</span></a>
+      <a href="javascript:void(0)" class="btn btn-default"><span>收入提现</span></a>
+      <a href="javascript:void(0)" class="btn btn-default"><span>可用模块</span></a>
+      <a href="javascript:void(0)" class="btn btn-default"><span>增值服务</span></a>
+      <a href="javascript:void(0)" class="btn btn-default"><span>套餐设置</span></a>
+      <a href="javascript:void(0)" class="btn btn-default"><span>满减设置</span></a>
+      <a href="javascript:void(0)" class="btn btn-default"><span>短信通道</span></a>
+      {if dzhuodongfree()}
+      <a href="javascript:void(0)" class="btn btn-default"><span>免费活动</span></a>
+      {/if}
+      {if dzgroupoem()}
+      <a href="javascript:void(0)" class="btn btn-default"><span>OEM设置</span></a>
+      {/if}
+    </div>
+  </div>
+  <form id="formBox" class="zam-formvalidation form-horizontal" method="post">
+    <input type="hidden" name="groupid" value="{if isset($config['id'])}{$config['id']}{/if}">
+    <div class="carditem">
+      <div class="form-group">
+        <label class="col-lg-3 control-label">* 用户组名称</label>
+        <div class="col-lg-7">
+          <input class="form-control" type="text" name="groupname" placeholder="请务必填写一个您觉得唯一的名称"
+            value="{$config['groupname']}">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-3 control-label">用户组介绍</label>
+        <div class="col-lg-7">
+          <textarea class="form-control" name="groupdes" rows="3">{$config['groupdes']}</textarea>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-3 control-label">* 默认组</label>
+        <div class="col-lg-8">
+          {:tpl_switch('isdefault',$config['isdefault'])}
+          <span class="zam-help-block">默认用户组即为新注册用户的默认用户组，一定是有且仅有一个默认用户组</span>
+        </div>
+      </div>
+      <div class="form-group hidden">
+        <label class="col-lg-3 control-label">享受折扣率</label>
+        <div class="col-lg-7">
+          <div class="input-group">
+            <input type="text" class="form-control" name="paydiscount" value="{$config['paydiscount']}">
+            <div class="input-group-addon">%</div>
+          </div>
+          <span class="zam-help-block">0即为不享受折扣，1折填写10，依次类推，不可设置为100</span>
+        </div>
+      </div>
+    </div>
+    <div class="carditem hidden">
+      <div class="form-group pubqrtypebox">
+        <label class="col-lg-3 control-label">* 创建活动默认参与二维码类型</label>
+        <div class="col-lg-8">
+          <label class="lyear-radio radio-inline radio-primary">
+            <input type="radio" name="pubconfig[qrtype]" value="1" {if !isset($config['pubconfig']['qrtype']) ||
+              $config['pubconfig']['qrtype']=='1' }checked{/if}
+              onclick="javascript:$('.pubminibox').addClass('hidden');"><span>H5二维码</span>
+          </label>
+          {if $openwxmini}
+          <label class="lyear-radio radio-inline radio-primary">
+            <input type="radio" name="pubconfig[qrtype]" value="4" {if isset($config['pubconfig']['qrtype']) &&
+              $config['pubconfig']['qrtype']=='4' }checked{/if}
+              onclick="javascript:$('.pubminibox').removeClass('hidden');"><span>小程序二维码</span>
+          </label>
+          {/if}
+          {if dzqrtype()}
+          <label class="lyear-radio radio-inline radio-primary">
+            <input type="radio" name="pubconfig[qrtype]" value="2" {if isset($config['pubconfig']['qrtype']) &&
+              $config['pubconfig']['qrtype']=='2' }checked{/if}
+              onclick="javascript:$('.pubminibox').addClass('hidden');"><span>系统公众号带参二维码</span>
+          </label>
+          {/if}
+          <div class="help-block">
+            <div>H5二维码即为微信用户扫码即可进入活动</div>
+            <div>小程序二维码即为微信用户扫小程序二维码即可进入活动，需要在后台管理->活动管理->基础设置->微信小程序配置内开启并配置好相关参数</div>
+            {if !dzqrtype()}
+            <div>系统公众号带参二维码即为微信用户扫大屏二维码后会先自动关注系统公众号再点击公众号回复的消息进入活动</div>
+            {/if}
+          </div>
+        </div>
+      </div>
+      {if dzqrtype() && dzqrreplymsgtype()}
+      <div
+        class="form-group pubqrtypemsgtypebox{if isset($config['pubconfig']['qrtype']) && $config['pubconfig']['qrtype']=='2'}{else /} hidden{/if}">
+        <label class="col-lg-3 control-label">* 带参二维码扫码回复消息链接类型</label>
+        <div class="col-lg-8">
+          <label class="lyear-radio radio-inline radio-primary">
+            <input type="radio" name="pubconfig[replymsgtype]" value="1" {if
+              !isset($config['pubconfig']['replymsgtype']) || $config['pubconfig']['replymsgtype']=='1'
+              }checked{/if}><span>H5链接</span>
+          </label>
+          <label class="lyear-radio radio-inline radio-primary">
+            <input type="radio" name="pubconfig[replymsgtype]" value="2" {if isset($config['pubconfig']['replymsgtype'])
+              && $config['pubconfig']['replymsgtype']=='2' }checked{/if}><span>小程序链接</span>
+          </label>
+          <div class="help-block">
+            <div>H5链接即为微信用户点击回复的内容自动跳转到H5微信端</div>
+            <div>小程序链接即为微信用户点击回复的内容自动跳转到小程序微信端</div>
+            <div class="text-danger">小程序仅文字回复可跳转到小程序，图文消息暂不支持直接跳转小程序</div>
+          </div>
+        </div>
+      </div>
+      {/if}
+      {if $openwxmini}
+      <div
+        class="form-group pubminibox{if isset($config['pubconfig']['qrtype']) && $config['pubconfig']['qrtype']=='4'}{else /} hidden{/if}">
+        <label class="col-lg-3 control-label">* 强制小程序访问</label>
+        <div class="col-lg-8">
+          {:tpl_switch('pubconfig[inminiprogram]',$config['pubconfig']['inminiprogram']??'1')}
+          <span class="help-block">
+            <div>开启后当前用户组下用户创建新活动若活动选择小程序二维码默认即为强制小程序访问</div>
+          </span>
+        </div>
+      </div>
+      {/if}
+      <div class="form-group">
+        <label class="col-lg-3 control-label">* 禁止修改活动二维码类型</label>
+        <div class="col-lg-8">
+          {:tpl_switch('pubconfig[forceqrtype]',$config['pubconfig']['forceqrtype']??'2')}
+          <span class="help-block">
+            <div>开启后当前用户组下用户无法自己在活动二维码与链接内修改自己的活动的大屏二维码类型，需管理员帮其修改</div>
+          </span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-3 control-label">* 准许创建活动</label>
+        <div class="col-lg-8">
+          {:tpl_switch('pubconfig[opencreatehd]',$config['pubconfig']['opencreatehd']??'1')}
+          <span class="help-block">
+            <div>关闭后当前用户组下的用户将无法创建活动，具体表现为：我的活动页面右上角没有创建活动的按钮</div>
+          </span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-3 control-label">最大创建活动数量</label>
+        <div class="col-lg-6">
+          <div class="input-group">
+            <input type="text" class="form-control" name="pubconfig[maxhd]" value="{$config['pubconfig']['maxhd']}">
+            <div class="input-group-addon">个活动</div>
+          </div>
+          <span class="zam-help-block">0即为不限制</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-3 control-label">* 免费发布活动</label>
+        <div class="col-lg-9">
+          {:tpl_switch('pubconfig[isfree]',$config['pubconfig']['isfree'],'openfreecreatenumbox')}
+          <span
+            class="zam-help-block">免费发布活动即为用户组下的用户可以免费发布活动或新增活动功能，必须先到用户管理的用户列表给用户设置一个免费截止日期，这样才可实现用户免费发布活动</span>
+        </div>
+      </div>
+      <div class="form-group freecreatenumbox{if $config['pubconfig']['isfree']=='2'} hidden{/if}">
+        <label class="col-lg-3 control-label">存量最大已发布活动数量</label>
+        <div class="col-lg-6">
+          <div class="input-group">
+            <input type="text" class="form-control" name="pubconfig[freehadpubnum]"
+              value="{$config['pubconfig']['freehadpubnum']??0}">
+            <div class="input-group-addon">个活动</div>
+          </div>
+          <span class="zam-help-block">存量最大已发布活动数量即为当前用户组下的用户免费发布的总活动数量限制（仅统计已发布未开始和已发布进行中的活动），0即为不限制</span>
+        </div>
+      </div>
+      <div class="form-group hidden">
+        <label class="col-lg-3 control-label">* 活动默认开始时间</label>
+        <div class="col-lg-9">
+          <label class="lyear-radio radio-inline radio-primary" onclick="keywordtype(this)">
+            <input type="radio" name="pubconfig[startmode]" value="1" {if $config['pubconfig']['startmode']=='1'
+              }checked{/if}><span>以发布时间为默认开始时间</span>
+          </label>
+          <label class="lyear-radio radio-inline radio-primary" onclick="keywordtype(this)">
+            <input type="radio" name="pubconfig[startmode]" value="2" {if $config['pubconfig']['startmode']=='2'
+              }checked{/if}><span>以发布活动当天0点为默认开始时间</span>
+          </label>
+          <span class="help-block">酌情设置</span>
+        </div>
+      </div>
+      <div class="form-group hidden">
+        <label class="col-lg-3 control-label">* 活动起止时间间隔</label>
+        <div class="col-lg-6">
+          <div class="input-group">
+            <input type="text" class="form-control" name="pubconfig[maxhour]" value="{$config['pubconfig']['maxhour']}">
+            <span class="input-group-btn"><a class="btn btn-default">小时</a></span>
+          </div>
+          <span class="help-block">活动起止时间间隔:正式购买活动选择活动开始时间后，活动结束时间即为所选时间 + 时间间隔</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-3 control-label">* 活动人数限制</label>
+        <div class="col-lg-4">
+          <div class="input-group">
+            <span class="input-group-btn"><a class="btn btn-default">最少</a></span>
+            <input type="text" class="form-control" name="pubconfig[minperson]"
+              value="{$config['pubconfig']['minperson']}">
+            <span class="input-group-btn"><a class="btn btn-default">人，最多</a></span>
+            <input type="text" class="form-control" name="pubconfig[maxperson]"
+              value="{$config['pubconfig']['maxperson']}">
+            <span class="input-group-btn"><a class="btn btn-default">人</a></span>
+          </div>
+          <span class="help-block">0即为不限制<br>最少即为:正式购买活动时所填写人数最少多少人<br>最多即为:发布或者新增活动人数总和不得超过最多人数，建议此处设置的足够大</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-3 control-label">* 人数不计费</label>
+        <div class="col-lg-8">
+          {:tpl_switch("pubconfig[openfree]",$config['pubconfig']['openfree'])}
+          <span class="help-block">开启则用户发布活动或新增功能时购买人数不计费</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-3 control-label">* 免费人数</label>
+        <div class="col-lg-3">
+          <div class="input-group">
+            <input type="text" class="form-control" name="pubconfig[freeperson]"
+              value="{$config['pubconfig']['freeperson']}">
+            <span class="input-group-btn"><a class="btn btn-default">人</a></span>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-3 control-label">* 人数单价</label>
+        <div class="col-lg-3">
+          <div class="input-group">
+            <input type="text" class="form-control" name="pubconfig[oneprice]"
+              value="{$config['pubconfig']['oneprice']}">
+            <span class="input-group-btn"><a class="btn btn-default">元</a></span>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-3 control-label">* 测试活动人数</label>
+        <div class="col-lg-3">
+          <div class="input-group">
+            <input type="text" class="form-control" name="pubconfig[nopubperson]"
+              value="{$config['pubconfig']['nopubperson']}">
+            <span class="input-group-btn"><a class="btn btn-default">人</a></span>
+          </div>
+          <span class="help-block">测试活动人数上限</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-3 control-label">* 测试活动可改版权信息</label>
+        <div class="col-lg-8">
+          {:tpl_switch("pubconfig[bqchange]",$config['pubconfig']['bqchange'])}
+          <span class="help-block">开启后测试活动用户可到活动信息内修改默认logo以及版权信息</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-3 control-label">* 关注系统公众号</label>
+        <div class="col-lg-8">
+          {:tpl_switch("pubconfig[forcesub]",$config['pubconfig']['forcesub'],'openforcesub')}
+          <span class="help-block">开启后此用户组的用户创建的活动默认需微信用户关注系统公众号才可进入活动，可到活动基础信息->特殊设置内关闭</span>
+        </div>
+      </div>
+      <div class="form-group forcesubbox{if $config['pubconfig']['forcesub']=='2'} hidden{/if}">
+        <label class="col-lg-3 control-label">* 强制关注二维码背景图</label>
+        <div class="col-lg-8">
+          {:tpl_image_one('pubconfig[forcebgimg]',$config['pubconfig']['forcebgimg'])}
+          <span class="help-block">尺寸控制在562*816px</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-3 control-label">* 可删除自己的活动</label>
+        <div class="col-lg-8">
+          {:tpl_switch('pubconfig[candelhd]',$config['pubconfig']['candelhd']??'1')}
+          <span class="zam-help-block">一般关闭是为了防止用户误删自己的活动</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-3 control-label">* 抽奖功能内定</label>
+        <div class="col-lg-8">
+          {:tpl_switch("pubconfig[opencjnd]",$config['pubconfig']['opencjnd']??'1')}
+          <span class="help-block">开启则创建的活动抽奖功能可内定用户，关闭则需后台管理员到活动信息->特殊设置里开启</span>
+        </div>
+      </div>
+      <div class="form-group{if !dzgamend()} hidden{/if}">
+        <label class="col-lg-3 control-label">* 游戏功能内定</label>
+        <div class="col-lg-8">
+          {:tpl_switch("pubconfig[opengamend]",$config['pubconfig']['opengamend']??'2')}
+          <span class="help-block">开启则创建的活动游戏功能可内定用户，关闭则需管理员到活动信息->特殊设置里开启</span>
+        </div>
+      </div>
+      <div class="form-group{if !dzguestopen()} hidden{/if}">
+        <label class="col-lg-3 control-label">* 准许设置游客浏览器访问</label>
+        <div class="col-lg-8">
+          {:tpl_switch("pubconfig[openguestopen]",$config['pubconfig']['openguestopen']??'2')}
+          <span class="help-block">开启则创建的新活动用户可自由开启或者关闭游客浏览器访问，关闭则需管理员到活动信息->特殊设置里开启</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-3 control-label">* 活动准许新增和导入用户</label>
+        <div class="col-lg-8">
+          {:tpl_switch("pubconfig[openadduploadperson]",$config['pubconfig']['openadduploadperson']??'1')}
+          <span class="help-block">
+            注意事项：<br>
+            <div>
+              1 关闭后当前用户组下的用户所有的活动，在活动数据->全部用户里不显示新增用户和导入用户2个按钮
+            </div>
+            <div>
+              2 一般是为了防止用户喜欢乱点这些按钮才需要关闭此开关
+            </div>
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="carditem hidden">
+      <div class="form-group">
+        <label class="col-lg-3 control-label">单次充值最小金额</label>
+        <div class="col-lg-7">
+          <div class="input-group">
+            <input type="text" class="form-control" name="czhbmin" value="{$config['czhbmin']}">
+            <div class="input-group-addon">元</div>
+          </div>
+          <span class="zam-help-block">0即为不限制，必须是整数</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-3 control-label">单次充值最大金额</label>
+        <div class="col-lg-7">
+          <div class="input-group">
+            <input type="text" class="form-control" name="czhbmax" value="{$config['czhbmax']}">
+            <div class="input-group-addon">元</div>
+          </div>
+          <span class="zam-help-block">0即为不限制，必须是整数</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-3 control-label">单次最大充值金额<br /><span class="text-danger"
+            style="font-size: 12px">(面向没有活动或存在测试活动的用户)</span></label>
+        <div class="col-lg-7">
+          <div class="input-group">
+            <input type="text" class="form-control" name="hasnotpubczmax" value="{$config['hasnotpubczmax']??'0'}">
+            <div class="input-group-addon">元</div>
+          </div>
+          <span class="zam-help-block">设置为0则另外一个单次充值最大金额有效，此项必须是整数，注意:<span
+              class="text-danger">此项仅为防控诈骗分子注册个账号就拿着红包充值码去诈骗傻白甜</span></span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-3 control-label">单次费率</label>
+        <div class="col-lg-7">
+          <div class="input-group">
+            <input type="text" class="form-control" name="czhbfl" value="{$config['czhbfl']}">
+            <div class="input-group-addon">%</div>
+          </div>
+          <span class="zam-help-block">0即为无手续费，必须是整数</span>
+        </div>
+      </div>
+    </div>
+    <div class="carditem hidden">
+      <div class="form-group">
+        <label class="col-lg-3 control-label">单次提现最小金额</label>
+        <div class="col-lg-7">
+          <div class="input-group">
+            <input type="text" class="form-control" name="txmin" value="{$config['txmin']}">
+            <div class="input-group-addon">元</div>
+          </div>
+          <span class="zam-help-block">0即为不限制，必须是整数</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-3 control-label">单次提现最大金额</label>
+        <div class="col-lg-7">
+          <div class="input-group">
+            <input type="text" class="form-control" name="txmax" value="{$config['txmax']}">
+            <div class="input-group-addon">元</div>
+          </div>
+          <span class="zam-help-block">0即为不限制，必须是整数</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-3 control-label">单次费率</label>
+        <div class="col-lg-7">
+          <div class="input-group">
+            <input type="text" class="form-control" name="txfl" value="{$config['txfl']}">
+            <div class="input-group-addon">%</div>
+          </div>
+          <span class="zam-help-block">0即为无手续费，必须是整数</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-3 control-label">提现冷却时间</label>
+        <div class="col-lg-7">
+          <div class="input-group">
+            <input type="text" class="form-control" name="txjg" value="{$config['txjg']}">
+            <div class="input-group-addon">小时</div>
+          </div>
+          <span class="zam-help-block">提现冷却时间即为用户发起提现，管理员审核打款后，冷却设置的小时后才可以发起下一次提现，0为无限制，必须是整数</span>
+        </div>
+      </div>
+    </div>
+    <div class="carditem hidden">
+      <div class="form-group">
+        <div class="col-lg-12 clearfix">
+          {volist name="allcatemodules" id="cate"}
+          <div class="modulelist clearfix">
+            <div class="catenameitem col-lg-12 fa-1-5x">
+              <label class="lyear-checkbox checkbox-primary">
+                <input type="checkbox">
+                <span>{$cate['catename']}</span>
+              </label>
+            </div>
+            {volist name="cate.catemodules" id="module"}
+            <div class="catemoduleitem col-sm-4 col-lg-3">
+              <div class="card card-hdmodule">
+                <div class="card-body clearfix">
+                  <div class="pull-left hdmodule-name m-t-5">
+                    <label class="lyear-checkbox checkbox-primary ">
+                      <input name="moduleid[]" type="checkbox" {if !empty($config['modules']) &&
+                        isset($config['modules'][$module['id']])}checked{/if} value="{$module['id']}"
+                        onchange="selonemodule(this)">
+                      <span>{$module['modulename']}</span>
+                    </label>
+                  </div>
+                  <div class="pull-right hdmodule-price">
+                    <div class="input-group">
+                      <input type="text" class="form-control moduleprice" {if !empty($config['modules']) &&
+                        isset($config['modules'][$module['id']])}name="moduleprice[]" {/if}
+                        value="{if !empty($config['modules']) && isset($config['modules'][$module['id']])}{$config['modules'][$module['id']]['moduleprice']}{else}{$module['moduleprice']}{/if}">
+                      <div class="input-group-addon">元</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {/volist}
+          </div>
+          {/volist}
+        </div>
+        <p class="col-lg-12 text-danger">注意:模块价格均可保留2位小数</p>
+      </div>
+    </div>
+    <div class="carditem hidden">
+      <div class="form-group">
+        <div class="col-lg-12 clearfix">
+          {if !empty($allfws)}
+          {volist name="allfws" id="fw"}
+          <div class="catemoduleitem col-sm-4 col-lg-3">
+            <div class="card card-hdmodule">
+              <div class="card-body clearfix">
+                <div class="pull-left hdmodule-name p-l-5 m-t-5">
+                  <input type="hidden" name="fwid[]" value="{$fw['id']}">
+                  <span>{$fw['fwname']}</span>
+                </div>
+                <div class="pull-right hdmodule-price">
+                  <div class="input-group">
+                    <input type="text" class="form-control" name="fwprice[]"
+                      value="{if !empty($config['fws']) && isset($config['fws'][$fw['id']])}{$config['fws'][$fw['id']]['fwprice']}{else}{$fw['fwprice']}{/if}">
+                    <div class="input-group-addon">元</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {/volist}
+          {else /}
+          <p class="text-danger text-center">系统暂未添加增值服务</p>
+          {/if}
+        </div>
+        {if !empty($allsetmeals)}
+        <p class="col-lg-12 text-danger">注意:增值服务价格均可保留2位小数</p>
+        {/if}
+      </div>
+    </div>
+    <div class="carditem hidden">
+      <div class="form-group">
+        <div class="col-lg-12 clearfix">
+          {if !empty($allsetmeals)}
+          {volist name="allsetmeals" id="setmeal"}
+          <div class="catemoduleitem col-sm-4 col-lg-3">
+            <div class="card card-hdmodule">
+              <div class="card-body clearfix">
+                <div class="pull-left hdmodule-name p-l-5 m-t-5">
+                  <input type="hidden" name="setmealid[]" value="{$setmeal['id']}">
+                  <span>{$setmeal['setmealname']}</span>
+                </div>
+                <div class="pull-right hdmodule-price">
+                  <div class="input-group">
+                    <input type="text" class="form-control" name="setmealprice[]"
+                      value="{if !empty($config['setmeals']) && isset($config['setmeals'][$setmeal['id']])}{$config['setmeals'][$setmeal['id']]['setmealprice']}{else}{$setmeal['setmealprice']}{/if}">
+                    <div class="input-group-addon">元</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {/volist}
+          {else /}
+          <p class="text-danger text-center">系统暂未添加套餐服务</p>
+          {/if}
+        </div>
+        {if !empty($allsetmeals)}
+        <p class="col-lg-12 text-danger">注意:如果某套餐内含当前用户组未勾选模块，那么该用户组下的用户将无法购买某套餐</p>
+        {/if}
+      </div>
+    </div>
+    <div class="carditem hidden">
+      <div class="form-group">
+        <div class="col-lg-12 clearfix">
+          {if !empty($allmjs)}
+          {volist name="allmjs" id="mj"}
+          <div class="catemoduleitem col-sm-4 col-lg-3">
+            <div class="card card-hdmodule">
+              <div class="card-body clearfix">
+                <div class="pull-left hdmodule-name p-l-5 m-t-5  m-r-10" style="width: auto">
+                  <input type="hidden" name="mjid[]" value="{$mj['id']}">
+                  <span>满{$mj['mjprice']}元则减</span>
+                </div>
+                <div class="pull-left hdmodule-price">
+                  <div class="input-group">
+                    <input type="text" class="form-control" name="reduceprice[]"
+                      value="{if !empty($config['mjs']) && isset($config['mjs'][$mj['id']])}{$config['mjs'][$mj['id']]['reduceprice']}{else}{$mj['reduceprice']}{/if}">
+                    <div class="input-group-addon">元</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {/volist}
+          {else /}
+          <p class="text-danger text-center">系统暂未添加满减服务</p>
+          {/if}
+        </div>
+        {if !empty($allmjs)}
+        <p class="col-lg-12 text-danger">注意:满减服务仅对发布活动以及新增活动功能或人数订单有效，价格均可保留2位小数</p>
+        {/if}
+      </div>
+    </div>
+    <div class="carditem hidden">
+      <div class="form-group">
+        <div class="col-lg-12 clearfix">
+          {if !empty($allsmss)}
+          {volist name="allsmss" id="sms"}
+          <div class="catemoduleitem col-sm-4 col-lg-3">
+            <div class="card card-hdmodule">
+              <div class="card-body clearfix">
+                <div class="pull-left hdmodule-name p-l-5 m-t-5">
+                  <input type="hidden" name="smsid[]" value="{$sms['id']}">
+                  <span>{$sms['smsnum']}条短信</span>
+                </div>
+                <div class="pull-right hdmodule-price">
+                  <div class="input-group">
+                    <input type="text" class="form-control" name="smsprice[]"
+                      value="{if !empty($config['smsitems']) && isset($config['smsitems'][$sms['id']])}{$config['smsitems'][$sms['id']]['smsprice']}{else}{$sms['smsprice']}{/if}">
+                    <div class="input-group-addon">元</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {/volist}
+          {else /}
+          <p class="text-danger text-center">系统暂未添加通信通道</p>
+          {/if}
+        </div>
+        {if !empty($allsmss)}
+        <p class="col-lg-12 text-danger">注意:短信通道价格均可保留2位小数</p>
+        {/if}
+      </div>
+    </div>
+    {if dzhuodongfree()}
+    <div class="carditem hidden">
+      <div class="form-group">
+        <label class="col-lg-2 control-label">* 状态</label>
+        <div class="col-lg-10">
+          {:tpl_switch('freeconfig[open]',$config['freeconfig']['open']??'2','openfreeconfig')}
+          <span class="zam-help-block">开启后用户可以创建免费活动</span>
+        </div>
+      </div>
+      <div
+        class="freeconfigbox{if !isset($config['freeconfig']['open']) || $config['freeconfig']['open']=='2'} hidden{/if}">
+        <div class="form-group">
+          <label class="col-lg-2 control-label">最大创建免费活动数量</label>
+          <div class="col-lg-4">
+            <div class="input-group">
+              <input type="text" class="form-control" name="freeconfig[maxhd]"
+                value="{$config['freeconfig']['maxhd']??'0'}">
+              <div class="input-group-addon">个</div>
+            </div>
+            <span class="zam-help-block">0即为不限制</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-lg-2 control-label">创建免费活动最大人数</label>
+          <div class="col-lg-4">
+            <div class="input-group">
+              <input type="text" class="form-control" name="freeconfig[maxperson]"
+                value="{$config['freeconfig']['maxperson']??'0'}">
+              <div class="input-group-addon">人</div>
+            </div>
+            <span class="zam-help-block">0即为不限制，此项可控制用户创建免费活动填写人数的时候最大人数</span>
+          </div>
+        </div>
+        <div class="form-group freeqrtypebox">
+          <label class="col-lg-2 control-label">* 创建活动默认参与二维码类型</label>
+          <div class="col-lg-8">
+            <label class="lyear-radio radio-inline radio-primary">
+              <input type="radio" name="freeconfig[qrtype]" value="1" {if !isset($config['freeconfig']['qrtype']) ||
+                $config['freeconfig']['qrtype']=='1' }checked{/if}
+                onclick="javascript:$('.freeminibox').addClass('hidden');"><span>H5二维码</span>
+            </label>
+            {if $openwxmini}
+            <label class="lyear-radio radio-inline radio-primary">
+              <input type="radio" name="freeconfig[qrtype]" value="4" {if isset($config['freeconfig']['qrtype']) &&
+                $config['freeconfig']['qrtype']=='4' }checked{/if}
+                onclick="javascript:$('.freeminibox').removeClass('hidden');"><span>小程序二维码</span>
+            </label>
+            {/if}
+            {if dzqrtype()}
+            <label class="lyear-radio radio-inline radio-primary">
+              <input type="radio" name="freeconfig[qrtype]" value="2" {if isset($config['freeconfig']['qrtype']) &&
+                $config['freeconfig']['qrtype']=='2' }checked{/if}
+                onclick="javascript:$('.freeminibox').addClass('hidden');"><span>系统公众号带参二维码</span>
+            </label>
+            {/if}
+            <div class="help-block">
+              <div>H5二维码即为微信用户扫码即可进入免费活动</div>
+              <div>小程序二维码即为微信用户扫小程序二维码即可进入免费活动活动，需要在后台管理->活动管理->基础设置->微信小程序配置内开启并配置好参数</div>
+              {if !dzqrtype()}
+              <div>系统公众号带参二维码即为微信用户扫大屏二维码后会先自动关注系统公众号再点击公众号回复的消息进入活动</div>
+              {/if}
+            </div>
+          </div>
+        </div>
+        {if dzqrtype() && dzqrreplymsgtype()}
+        <div
+          class="form-group freeqrtypemsgtypebox{if isset($config['freeconfig']['qrtype']) && $config['freeconfig']['qrtype']=='2'}{else /} hidden{/if}">
+          <label class="col-lg-2 control-label">* 带参二维码扫码回复消息链接类型</label>
+          <div class="col-lg-8">
+            <label class="lyear-radio radio-inline radio-primary">
+              <input type="radio" name="freeconfig[replymsgtype]" value="1" {if
+                !isset($config['freeconfig']['replymsgtype']) || $config['freeconfig']['replymsgtype']=='1'
+                }checked{/if}><span>H5链接</span>
+            </label>
+            <label class="lyear-radio radio-inline radio-primary">
+              <input type="radio" name="freeconfig[replymsgtype]" value="2" {if
+                isset($config['freeconfig']['replymsgtype']) && $config['freeconfig']['replymsgtype']=='2'
+                }checked{/if}><span>小程序链接</span>
+            </label>
+            <div class="help-block">
+              <div>H5链接即为微信用户点击回复的内容自动跳转到H5微信端</div>
+              <div>小程序链接即为微信用户点击回复的内容自动跳转到小程序微信端</div>
+              <div class="text-danger">小程序仅文字回复可跳转到小程序，图文消息暂不支持直接跳转小程序</div>
+            </div>
+          </div>
+        </div>
+        {/if}
+        {if $openwxmini}
+        <div
+          class="form-group freeminibox{if isset($config['freeconfig']['qrtype']) && $config['freeconfig']['qrtype']=='4'}{else /} hidden{/if}">
+          <label class="col-lg-2 control-label">* 强制小程序访问</label>
+          <div class="col-lg-8">
+            {:tpl_switch('freeconfig[inminiprogram]',$config['freeconfig']['inminiprogram']??'1')}
+            <span class="help-block">
+              <div>开启后当前用户组下用户创建新活动若活动选择小程序二维码默认即为强制小程序访问</div>
+            </span>
+          </div>
+        </div>
+        {/if}
+        <div class="form-group">
+          <label class="col-lg-2 control-label">* 禁止修改活动二维码类型</label>
+          <div class="col-lg-8">
+            {:tpl_switch('freeconfig[forceqrtype]',$config['freeconfig']['forceqrtype']??'2')}
+            <span class="help-block">
+              <div>开启后当前用户组下用户无法自己在活动二维码与链接内修改免费活动的大屏二维码类型，需管理员帮其修改</div>
+            </span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-lg-2 control-label">* 微信端开屏广告</label>
+          <div class="col-lg-8">
+            {:tpl_switch('freeconfig[openh5adv]',$config['freeconfig']['openh5adv']??'1')}
+            <span class="help-block">
+              <div>开启后当前用户组下的用户创建活动会自动开启微信端广告，并且普通用户无法关闭广告</div>
+            </span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-lg-2 control-label">* 大屏端开屏广告</label>
+          <div class="col-lg-8">
+            {:tpl_switch('freeconfig[openpcadv]',$config['freeconfig']['openpcadv']??'1')}
+            <span class="help-block">
+              <div>开启后当前用户组下的用户创建活动会自动开启大屏端广告，并且普通用户无法关闭广告</div>
+            </span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-lg-2 control-label">* 抽奖功能内定</label>
+          <div class="col-lg-9">
+            {:tpl_switch("freeconfig[opencjnd]",$config['freeconfig']['opencjnd']??'1')}
+            <span class="help-block">开启新创建的活动抽奖功能默认即可内定用户，关闭则无法内定用户需要管理员到活动信息->特殊功能里开启</span>
+          </div>
+        </div>
+        <div class="form-group{if !dzgamend()} hidden{/if}">
+          <label class="col-lg-2 control-label">* 游戏功能内定</label>
+          <div class="col-lg-9">
+            {:tpl_switch("freeconfig[opengamend]",$config['freeconfig']['opengamend']??'2')}
+            <span class="help-block">开启新创建的活动游戏功能默认即可内定用户，关闭则无法内定用户需要管理员到活动信息->特殊功能里开启</span>
+          </div>
+        </div>
+        <div class="form-group{if !dzguestopen()} hidden{/if}">
+          <label class="col-lg-3 control-label">* 准许设置游客浏览器访问</label>
+          <div class="col-lg-8">
+            {:tpl_switch("freeconfig[openguestopen]",$config['freeconfig']['openguestopen']??'2')}
+            <span class="help-block">开启新创建的活动默认可用户开启或者关闭游客浏览器访问，关闭则无法自行开启或者关闭游客浏览器访问，需要管理员到活动信息->特殊功能里开启</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-lg-2 control-label">* 可用模块</label>
+          <div class="col-lg-10">
+            {volist name="allcatemodules" id="cate"}
+            <div class="modulelist clearfix">
+              <div class="catenameitem col-lg-12 fa-1-5x">
+                <label class="lyear-checkbox checkbox-primary">
+                  <input type="checkbox">
+                  <span>{$cate['catename']}</span>
+                </label>
+              </div>
+              {volist name="cate.catemodules" id="module"}
+              <div class="catemoduleitem col-sm-4 col-lg-3">
+                <div class="card card-hdmodule">
+                  <div class="card-body clearfix">
+                    <div class="pull-left m-t-5">
+                      <label class="lyear-checkbox checkbox-primary ">
+                        <input name="freeconfig[modules][]" type="checkbox" {if !empty($config['freeconfig']['modules'])
+                          && in_array($module['id'],$config['freeconfig']['modules'])}checked{/if}
+                          value="{$module['id']}">
+                        <span>{$module['modulename']}</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {/volist}
+            </div>
+            {/volist}
+            <p class="col-lg-12 text-danger">注意:免费活动仅可使用已勾选的模块</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    {/if}
+    {if dzgroupoem()}
+    <div class="carditem hidden">
+      {include file="$Wpath/common/userglobconfig"}
+    </div>
+    {/if}
+    {include file='$Wpath/common/cancelsavepanel'}
+  </form>
+</div>
+<script type="text/javascript">
+  require(['webcore', 'jconfirmBox', 'zamnotice', "ueditor", 'zvalidator', "jquery.ui"], function (webcore, jconfirmBox, zamnotice,UE) {
+    if ($("#edui_fixedlayer").length > 0) UE.getEditor('globconfig[kefu][mobilecode]').destroy();
+    $(function () {
+      tpl_ueditor();
+      $('.icon-picker').fontIconPicker({
+        theme: 'fip-bootstrap',
+        source: webcore.fontarr,
+      });
+    })
+    $('.qq-lists,.toplinks-lists').sortable({ handle: ".mousemove" }).disableSelection();
+    $(".qq-lists,.toplinks-lists").disableSelection();
+    $(".addtoplink").click(function () {
+      var whtml = $(webcore.tpl($("#addtoplink"), {})).clone();
+      $(".toplinks-lists").append(whtml);
+      tpl_switch();
+      $('.icon-picker').fontIconPicker({
+        theme: 'fip-bootstrap',
+        source: webcore.fontarr,
+      });
+    });
+    $(".addqqkefu").click(function () {
+      var whtml = $(webcore.tpl($("#addqqkefu"), {})).clone();
+      $(".qq-lists").append(whtml);
+    });
+    $("table").on('click', '.btn-del', function () {
+      $(this).parent().parent().remove();
+    });
+    $(".confirmbox-pop .pop-btns a.btn").click(function () {
+      $(this).addClass('btn-primary').siblings().removeClass("btn-primary");
+      $(".confirmbox-pop .carditem").addClass('hidden').eq($(this).index()).removeClass('hidden');
+    });
+    $(".catenameitem").click(function () {
+      var $this = $(this), fcheck = $this.find('input[type="checkbox"]').is(':checked');
+      $this.parent().find('.lyear-checkbox').find('input[type="checkbox"]').prop('checked', !fcheck ? true : false);
+      $this.parent().find('.hdmodule-price').find('.moduleprice').attr("name", !fcheck ? "moduleprice[]" : "");
+    });
+    $('#formBox').formValidation({
+      framework: 'bootstrap',
+      excluded: [':disabled'],
+      message: '您填写的内容无效',
+      fields: {}
+    }).on('success.form.fv', function (e) {
+      e.preventDefault();
+      var $form = $(e.target);
+      var postData = webcore.serializeObject($form);
+      var bload = $form.find(".zam-fixedbottom button").lyearloading({ opacity: 0.2, spinnerSize: 'nm' });
+      $form.formValidation('disableSubmitButtons', true);
+      webcore.ajaxSubmit("{if isset($config['id'])}{:goweb('usergroup/edit')}{else}{:goweb('usergroup/add')}{/if}", postData).then(function (json) {
+        bload.hide();
+        if (json.code == 0) {
+          $form.formValidation('disableSubmitButtons', false);
+          zamnotice.showTips('success', '操作成功', 1e3, function () {
+            window.location.href = "{:goweb('usergroup/index')}";
+          });
+        } else {
+          zamnotice.showTips('error', json.msg);
+          $form.formValidation('disableSubmitButtons', false);
+        }
+      }, function (json) {
+        bload.hide();
+        zamnotice.showTips('error', '网络差。操作失败');
+        $form.formValidation('disableSubmitButtons', false);
+      });
+    });
+    $(".pubqrtypebox input").click(function () {
+      var type = $(this).val();
+      type == '2' ? $('.pubqrtypemsgtypebox').removeClass('hidden') : $('.pubqrtypemsgtypebox').addClass('hidden');
+    });
+    $(".freeqrtypebox input").click(function () {
+      var type = $(this).val();
+      type == '2' ? $('.freeqrtypemsgtypebox').removeClass('hidden') : $('.freeqrtypemsgtypebox').addClass('hidden');
+    });
+  });
+  function selonemodule(obj) {
+    var $this = $(obj), fcheck = $this.is(':checked');
+    $this.parent().parent().next().find('input').attr("name", !fcheck ? "" : "moduleprice[]");
+  }
+  function openforcesub(obj, status, url) {
+    if (status == '1') {
+      obj.prev().val('2');
+      obj.attr('data-status', '2');
+      $(".forcesubbox").addClass('hidden');
+    } else {
+      obj.prev().val('1');
+      obj.attr('data-status', '1');
+      $(".forcesubbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked", status == '1' ? false : true);
+  }
+  function openfreeconfig(obj, status, url) {
+    if (status == '1') {
+      obj.prev().val('2');
+      obj.attr('data-status', '2');
+      $(".freeconfigbox").addClass('hidden');
+    } else {
+      obj.prev().val('1');
+      obj.attr('data-status', '1');
+      $(".freeconfigbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked", status == '1' ? false : true);
+  }
+  function openfreecreatenumbox(obj, status, url) {
+    if (status == '1') {
+      obj.prev().val('2');
+      obj.attr('data-status', '2');
+      $(".freecreatenumbox").addClass('hidden');
+    } else {
+      obj.prev().val('1');
+      obj.attr('data-status', '1');
+      $(".freecreatenumbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked", status == '1' ? false : true);
+  }
+</script>
+{include file='$Wpath/common/footer'}

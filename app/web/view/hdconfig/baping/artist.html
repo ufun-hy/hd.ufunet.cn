@@ -1,0 +1,281 @@
+{include file='$Wpath/common/header'}
+<style>
+table tr th,table tr td{text-align: center;}
+table tr td span{display:block;text-align:center;}
+table tr td img{max-height:60px}
+.artistgroup-lists tr{cursor: pointer;}
+</style>
+<div class="zam-inner-title mb20">系统艺人</div>
+<div class="artistgroupbox clearfix">
+    <div class="col-lg-3" style="padding: 5px;">
+    	<div class="card">
+            <div class="card-header" style="padding: 10px 24px;">艺人分组<a class="btn btn-xs btn-primary btn-xs pull-right btn-addartistgroup" href="javascript:void(0)"> <i class="mdi mdi-plus"></i> 新增分组</a></div>
+            <div class="card-body" style="padding: 5px;">
+                <table class="table table-bordered" id="artistgroup">
+                    <thead>
+                      <tr>
+                      	<th class="hidden">id</th>
+                      	<th style="width:20%">序号</th>
+                        <th style="width:50%">分组名</th>
+                        <th style="width:30%">操作</th>
+                      </tr>
+                    </thead>
+                    <tbody class="artistgroup-lists">
+                    {foreach $artistgroups as $artkey=>$artistgroup}  
+                    <tr>
+                    	<td class="hidden">{$artistgroup['id']}</td>
+                    	<td class="text-center" style="border-right-color:transparent">{$artistgroup['displayorder']}</td>
+                        <td class="text-center" style="border-right-color:transparent">{$artistgroup['groupname']}</td>
+                        <td class="text-center">
+                            <a class="btn btn-xs btn-primary btn-xs btn-edit" data-id="{$artistgroup['id']}" href="javascript:void(0)"> <i class="mdi mdi-pencil"></i> </a>
+                            <a class="btn btn-xs btn-danger btn-xs btn-del" data-id="{$artistgroup['id']}" href="javascript:void(0)"> <i class="mdi mdi-delete"></i> </a>
+                        </td>
+                    </tr>
+                    {/foreach}
+                    </tbody>
+                </table>
+        	</div>
+    	</div>
+        <div class="help-block"></div>
+    </div>
+    <div class="col-lg-9" style="padding: 5px;">
+        <div class="card">
+            <div class="card-header" style="padding: 10px 24px;">艺人<a class="btn btn-xs btn-primary btn-xs pull-right btn-addartist" href="javascript:void(0)"> <i class="mdi mdi-plus"></i> 新增艺人</a></div>
+            <div class="card-body" style="padding: 5px;">
+                <table class="table table-bordered" id="artisttable">
+                    <thead>
+                      <tr>
+                      	<th style="width:10%" class="hidden">id</th>
+				  		<th style="width:10%;">序号</th>
+                      	<th style="width:10%">状态</th>
+                        <th style="width:15%">艺人</th>
+                        <th style="width:15%">类型</th>
+                        <th style="width:20%">微信用户</th>
+                        <th style="width:20%">分成</th>
+                        <th style="width:10%">操作</th>
+                      </tr>
+                    </thead>
+                    <tbody class="artist-lists"></tbody>
+            	</table>
+        		<div class="help-block"></div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<script id='artist-tpl' type="text/template">
+<tr>
+    <td class="hidden"><% d.id %></td>
+	<td>
+	 <span><% d.displayorder %></span>
+	</td>
+	<td data-id="<% d.id %>">
+	 <label class="lyear-switch switch-primary normal-swith switch-solid" style="height:38px">
+        <input type="checkbox" <%# if(d.isshow=='1'){ %>checked="checked"<%# } %> >
+        <input type="hidden" name="" value="<% d.isshow %>">
+        <span data-status="<% d.isshow %>" data-func="artistchange" class="normal-span has-func" data-ajax=""></span>
+     </label>
+	</td>
+    <td class="text-center">
+       <div class="">
+       		<img src="<% d.artistavatar %>"/>
+         	<p><% d.artistname %></p>
+       </div>
+    </td>
+    <td class="text-center">
+    	<% d.artisttypename %>
+    </td>
+    <td class="text-center">
+    	<%# if(d.artisttype=='0'){ %>
+    		-
+    	<%# }else{ %>
+	       <div class="">
+	       		<img src="<% d.binduser.avatar %>"/>
+	         	<p><% d.binduser.nickname %></p>
+	       </div>
+	    <%# } %>
+    </td>
+    <td class="text-center">
+    	<%# if(d.artisttype=='0'){ %>
+    		-
+    	<%# }else{ %>
+    	<div>打赏分成:<% d.dsfcb %>%</div>
+    	<div>点歌分成:<% d.songfcb %>%</div>
+    	<%# } %>
+    </td>
+    <td class="text-center">
+        <a href="javascript:;" class="btn btn-primary btn-xs btn-edit" data-id="<% d.id %>"><i class="mdi mdi-pencil"></i></a>
+	    <a href="javascript:;" class="btn btn-danger btn-xs btn-del" data-id="<% d.id %>"><i class="mdi mdi-delete"></i></a>
+    </td>
+</tr>
+</script>
+<script type="text/javascript">
+require(["webcore","zamnotice","layerBox","jconfirmBox","tablesorter"],function(webcore,zamnotice,layerBox,jconfirmBox){
+	$("#artisttable").tablesorter({sortList:[[1,1], [0,0]],headers:{2:{sorter:false},3:{sorter:false},4:{sorter:false},5:{sorter:false},6:{sorter:false},7:{sorter:false}}});
+	$(".btn-addartistgroup").click(function(){
+    	var $this = $(this),confirmobj = jconfirmBox.ajaxconfirm("新增分组","{:goweb('hdconfig/bapingartist')}",{stype:'addgroup'},'html','col-lg-8 col-lg-offset-2',function(e){
+			var formdata = webcore.serializeObject(e.find('form')),postData = {
+				stype:'addgroup',
+				data:formdata,
+			};
+			webcore.ajaxSubmit("{:goweb('hdconfig/bapingartist')}",postData,'').then(function(json){
+				if(json.code==0){
+					zamnotice.showTips('success','新增成功',15e2,function(){
+                    	window.location.reload();
+                    });
+					confirmobj.close();
+				}else{
+					zamnotice.showTips('error',json.msg);
+				}
+			}, function(json){
+				zamnotice.showTips('error','网络差。操作失败.');
+			});
+		});
+    });
+    $(".artistgroup-lists").on('click','.btn-edit',function(e){
+    	e.stopPropagation();
+    	var $this = $(this),groupid = $this.attr('data-id'),confirmobj = jconfirmBox.ajaxconfirm("编辑分组","{:goweb('hdconfig/bapingartist')}",{groupid:groupid,stype:'savegroup'},'html','col-lg-8 col-lg-offset-2',function(e){
+			var formdata = webcore.serializeObject(e.find('form')),postData = {
+				stype:'savegroup',
+				data:formdata,
+			};
+			postData.groupid = groupid;
+			webcore.ajaxSubmit("{:goweb('hdconfig/bapingartist')}",postData,'').then(function(json){
+				if(json.code==0){
+					zamnotice.showTips('success','修改成功',15e2,function(){
+                    	window.location.reload();
+                    });
+					confirmobj.close();
+				}else{
+					zamnotice.showTips('error',json.msg);
+				}
+			}, function(json){
+				zamnotice.showTips('error','网络差。操作失败.');
+			});
+		});
+    });
+    $(".artistgroup-lists").on('click','.btn-del',function(e){
+    	e.stopPropagation();
+    	var $this = $(this),groupid = $this.attr('data-id');
+		jconfirmBox.confirm('温馨提示','删除将无法恢复，您确定要删除么？',function(){
+            webcore.ajaxSubmit("{:goweb('hdconfig/bapingartist')}",{stype:'delgroup',groupid:groupid}).then(function(json){
+                if(json.code==0){
+                    zamnotice.showTips('success','删除成功',15e2,function(){
+                    	window.location.reload();
+                    });
+                }else{
+                    zamnotice.showTips('error',json.msg);
+                }
+            }, function(json){
+                zamnotice.showTips('error','网络差。操作失败');
+            });
+        });
+    });
+    $(".artistgroup-lists").on('click','tr',function(){
+    	//加载对应的分组艺人
+    	var $this = $(this);
+    	if($this.hasClass('active')) return false;
+    	$(".artistgroup-lists tr").removeClass('active');
+    	$this.addClass('active');
+    	webcore.ajaxSubmit("{:goweb('hdconfig/bapingartist')}",{stype:'ajaxgroupartist',groupid:$(".artistgroup-lists tr.active").find('a').attr('data-id')}).then(function(json){
+            if(json.code==0){
+            	var html = '';
+            	$.each(json.msg,function(i,v){
+            		html += webcore.tpl($("#artist-tpl"),v);
+            	});
+            	$(".artist-lists").html(html);
+            	tpl_switch();
+            }else{
+                zamnotice.showTips('error',json.msg);
+            }
+        }, function(json){
+            zamnotice.showTips('error','网络差。操作失败');
+        });
+    });
+    if($(".artistgroup-lists tr").length >0) $(".artistgroup-lists tr").eq(0).trigger('click');
+    {/*艺人*/}
+    $(".btn-addartist").click(function(){
+    	if($(".artistgroup-lists tr").length==0) return zamnotice.showTips('error','请先添加分组');
+    	var activegroup = $(".artistgroup-lists tr.active");
+    	if(activegroup.length==0) return zamnotice.showTips('error','请先选择分组');
+    	var $this = $(this),confirmobj = jconfirmBox.ajaxconfirm("新增艺人","{:goweb('hdconfig/bapingartist')}",{stype:'addartist'},'html','col-lg-8 col-lg-offset-2',function(e){
+			var formdata = webcore.serializeObject(e.find('form'));
+			formdata.stype = 'addartist';
+			formdata.groupid = activegroup.find('a').attr('data-id');
+			webcore.ajaxSubmit("{:goweb('hdconfig/bapingartist')}",formdata,'').then(function(json){
+				if(json.code==0){
+					zamnotice.showTips('success','新增成功');
+					$(".artist-lists").append(webcore.tpl($("#artist-tpl"),json.msg));
+					confirmobj.close();
+					$('#artisttable').trigger('update', [true,function(){
+						tpl_switch();
+					}]);
+				}else{
+					zamnotice.showTips('error',json.msg);
+				}
+			}, function(json){
+				zamnotice.showTips('error','网络差。操作失败.');
+			});
+		});
+    });
+    $(".artist-lists").on('click','.btn-edit',function(){
+    	var $this = $(this),artid = $this.attr('data-id'),confirmobj = jconfirmBox.ajaxconfirm("编辑艺人信息","{:goweb('hdconfig/bapingartist')}",{artid:artid,stype:'editartist','ishtml':'1'},'html','col-lg-8 col-lg-offset-2',function(e){
+			var formdata = webcore.serializeObject(e.find('form'));
+			formdata.stype = 'editartist';
+			formdata.artid = artid;
+			webcore.ajaxSubmit("{:goweb('hdconfig/bapingartist')}",formdata,'').then(function(json){
+				if(json.code==0){
+					zamnotice.showTips('success','修改成功');
+					$this.parent().parent().html($(webcore.tpl($("#artist-tpl"),json.msg)).html());
+					confirmobj.close();
+					$('#artisttable').trigger('update', [true,function(){
+						tpl_switch();
+					}]);
+				}else{
+					zamnotice.showTips('error',json.msg);
+				}
+			}, function(json){
+				zamnotice.showTips('error','网络差。操作失败.');
+			});
+		});
+    });
+    $(".artist-lists").on('click','.btn-del',function(){
+    	var $this = $(this),artid = $this.attr('data-id');
+		jconfirmBox.confirm('温馨提示','删除将无法恢复，您确定要删除么？',function(){
+            webcore.ajaxSubmit("{:goweb('hdconfig/bapingartist')}",{stype:"delartist",artid:artid}).then(function(json){
+                if(json.code==0){
+                	$this.parent().parent().remove();
+                    zamnotice.showTips('success','删除成功');
+                }else{
+                    zamnotice.showTips('error',json.msg);
+                }
+            }, function(json){
+                zamnotice.showTips('error','网络差。操作失败');
+            });
+        });
+    });
+});
+function artistchange(obj,status,url){
+	var artid = obj.parent().parent().attr('data-id');
+	require(['webcore','zamnotice'],function(webcore,zamnotice){
+		webcore.ajaxSubmit("{:goweb('hdconfig/bapingartist')}",{stype:"updateartistshow",artid:artid,isshow:(status=='1'?"2":"1")}).then(function(json){
+            if(json.code==0){
+                if(status=='1'){
+			        obj.prev().val('2');
+			        obj.attr('data-status','2');
+			    }else{
+			        obj.prev().val('1');
+			        obj.attr('data-status','1');
+			    }
+			    obj.prev().prev().prop("checked",status=='1'?false:true);
+			    zamnotice.showTips('success','操作成功');
+            }else{
+                zamnotice.showTips('error',json.msg);
+            }
+        }, function(json){
+            zamnotice.showTips('error','网络差。操作失败');
+        });
+    });
+}
+</script>
+{include file='$Wpath/common/footer'}

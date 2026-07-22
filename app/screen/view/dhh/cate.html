@@ -1,0 +1,591 @@
+{include file="common/header" /}
+<style>
+::-webkit-scrollbar {
+    width: 5px;
+    border-radius: 10px;
+}
+::-webkit-scrollbar-track {
+    background-color: rgba(0,0,0,0.22);
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    outline-offset: -2px;
+    background-color: rgba(255,255,255,0.32);
+}
+::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(255,255,255,0.32);
+}
+.headerTitle,.headerTips{opacity: 0;}
+.header{pointer-events: none;}
+.dhh-mainbox{
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	padding: 0;
+}
+.dhh-container{
+	width: 100%;
+	height: 100%;
+}
+.dhh-box{
+	position: absolute;
+	top:90px;
+	left: 0;
+	width: 100%;
+	height: 700px;
+	box-sizing: border-box;
+}
+.dhh-left{
+	width: 80%;
+	height: 100%;
+	overflow: hidden;
+	background: rgba(0,0,0,.5);
+	color: #fff;
+	border-radius: 10px;
+}
+.dhh-left .titlebox{
+	height: 50px;
+	line-height: 50px;
+	font-size: {$pcconfig['styleconfig']['lefttitle']['size']??'24'}px;
+	color:{$pcconfig['styleconfig']['lefttitle']['color']??'#fff'};
+	letter-spacing: 2px;
+	font-weight: 600;
+	text-align: center;
+}
+.dhh-left .titlebox div{
+	font-size: 13px;
+}
+.dhh-left .titlebox div span{
+	float: right;
+}
+.dhh-left .left-phb{
+	width: 100%;
+	padding: 0 10px;
+	height: calc(100% - 50px);
+	text-align: center;
+	overflow: hidden;
+}
+.dhh-left .left-phb ul{
+	height: 100%;
+	align-content: flex-start;
+	text-align: center;
+	overflow: hidden;
+}
+.dhh-left .left-phb li{
+	width: 25%;
+	height: 21.6px;
+	line-height: 21.6px;
+	padding: 0 5px;
+	box-sizing: border-box;
+}
+.dhh-left .left-phb li.hidden{
+	opacity: 1;
+}
+.dhh-left .left-phb li .phb-item{
+	width: 100%;
+	border-radius: 10px;
+	padding: 0 10px;
+	box-sizing: border-box;
+}
+.dhh-left .left-phb li .num{
+	width: 20px;
+	margin-right: 10px;
+}
+.dhh-left .left-phb li .num .numbox{
+	width: 20px;
+	height: 20px;
+	background-size: cover;
+	background-repeat: no-repeat;
+}
+.dhh-left .left-phb li .info{
+	width: calc(100% - 30px);
+	text-align: left;
+}
+.dhh-left .left-phb li .info .nickname{
+	width: 50%;
+}
+.dhh-left .left-phb li .info .order{
+	width: 50%;
+	color: #ffc453;
+    text-align: right;
+}
+/*右侧*/
+.dhh-right{
+	width: 20%;
+	height: 100%;
+	overflow: hidden;
+}
+.dhh-right .right-header{
+	background: rgba(0,0,0,.5);
+	color: #fff;
+	border-radius: 10px;
+	height: 100%;
+}
+.dhh-right .right-header .titlebox{
+	height: 50px;
+	line-height: 50px;
+	font-size: {$pcconfig['styleconfig']['righttitle']['size']??'24'}px;
+	color:{$pcconfig['styleconfig']['righttitle']['color']??'#fff'};
+	letter-spacing: 2px;
+	font-weight: 600;
+	text-align: center;
+}
+.right-header .right-list{
+	width: 100%;
+	/* height: calc(100% - 50px); */
+	box-sizing: border-box;
+	text-align: center;
+    padding: 0 8px
+}
+.right-header .right-list ul{
+	height: 100%;
+	overflow: hidden;
+}
+.right-header .right-list ul li{
+	width: calc(100% - 12px);
+    padding: 0 8px;
+    color: #fff;
+    box-sizing: border-box;
+    height: 21.6px;
+	line-height: 21.6px;
+	width: 100%;
+	border-bottom: 1px solid #fff;
+}
+.right-header .right-list ul li .grouppm{
+	width: 20px;
+	text-align: center;
+	margin-right: 10px;
+}
+.right-header .right-list ul li .groupname{
+	width: 50%;
+	text-align: left;
+}
+.right-header .right-list ul li .groupnum{
+	width: calc(60% - 30px);
+	text-align: right;
+}
+/*弹窗*/
+.dhh-popBox {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    z-index: 4;
+    pointer-events: none;
+}
+.dhh-popBox .poptip{
+    width: 100%;
+    text-align: center;
+    font-weight: 600;
+    opacity: 0;
+    transform: rotateX(90deg);
+    color: {$rotate['reachconfig']['color']??'#fff'};
+    font-size: {$rotate['reachconfig']['size']??'42'}px;
+}
+.dhh-popBox .poptip img{
+    border-radius: 2px;
+    margin:0 10px;
+    height: calc({$rotate['reachconfig']['size']??'42'}px + 6px);
+}
+.dhh-popBox.maskopen .poptip{
+    animation:poptipopen 0.8s linear 0s 1 normal forwards;
+}
+@keyframes poptipopen{
+    from{opacity:0;transform:rotateX(90deg)}
+    to{opacity:1;transform:rotateX(0deg)}
+}
+.dhh-popBox.maskclose .poptip{
+    animation: poptipclose 0.8s linear 0s 1 normal forwards;
+}
+@keyframes poptipclose{
+    from{opacity:1;transform:rotateX(0deg)}
+    to{opacity:0;transform:rotateX(90deg)}
+}
+.dhh-maskbox{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+.dhh-maskbox div{
+    width: 100%;
+    height: 0;
+    position: absolute;
+    left: 0px;
+    opacity: 1;
+    background: {$rotate['reachconfig']['bgcolor']??'rgba(0, 0, 0, 0.5)'};
+}
+.dhh-maskbox .masktop {
+    bottom: 50%;
+}
+.dhh-maskbox .maskbottom {
+    top: 50%;
+}
+.dhh-popBox.maskopen .dhh-maskbox div{
+    animation:maskopen 0.8s linear 0s forwards
+}
+@keyframes maskopen{
+    from{
+        height: 0;
+        opacity: 0;
+    }to{
+        height:50%;
+        opacity: 1;
+    }
+}
+.dhh-popBox.maskclose .dhh-maskbox div{
+    animation:maskclose 0.8s linear 0s forwards
+}
+@keyframes maskclose{
+    from{
+        height: 50%;
+        opacity: 1;
+    }to{
+        height:0;
+        opacity: 0;
+    }
+}
+.dhhyanhuabox{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+}
+.dhhyanhuabox.hidden{display: none;}
+.dhhyanhuabox .yanhuaitem{
+    position: absolute;
+    top: 0;
+    width: 480px;
+    height: 270px;
+    background-image: url(/static/images/screen/mapqd/yanhua.gif);
+    background-size: cover;
+}
+.dhhyanhuabox .yanhuaitem.yanhua-left{left:0;}
+.dhhyanhuabox .yanhuaitem.yanhua-right{right:0;}
+/*订单统计*/
+.right-footer{
+	position: absolute;
+	top: 20px;
+	right: 240px;
+	background: rgba(0,0,0,.5);
+	color: #fff;
+	border-radius: 10px;
+	padding: 0 20px;
+}
+.right-footer .titlebox{
+	line-height: 50px;
+	letter-spacing: 2px;
+	text-align: center;
+	font-weight: 600;
+	margin-right: 10px;
+	font-size: {$pcconfig['styleconfig']['tongjititle']['size']??'24'}px;
+	color:{$pcconfig['styleconfig']['tongjititle']['color']??'#fff'};
+}
+.right-footer .orderinfo{
+	line-height: 50px;
+    font-weight: 600;
+    font-size: {$pcconfig['styleconfig']['tongjinum']['size']??'16'}px;
+	color:{$pcconfig['styleconfig']['tongjinum']['color']??'#fff'};	
+}
+.right-footer .orderinfo .totalnum{margin-right: 20px;}
+.right-footer .orderinfo div{
+	text-align: center;
+}
+/*中间*/
+.dhh-title{
+	position: absolute;
+	top: 20px;
+	left: 0;
+	width: 100%;
+	text-align: center;
+	font-weight: 600;
+	pointer-events:none;
+	font-size: {$pcconfig['styleconfig']['rotatetitle']['size']??'36'}px;
+	color:{$pcconfig['styleconfig']['rotatetitle']['color']??'#fff'};
+}
+.dhh-container .selectbox{
+    position: absolute;
+    top: 20px;
+    right: 40px;
+    cursor: pointer;
+    z-index: 1;
+    width: 200px;
+}
+.dropdown {
+    width: 100%;
+    margin: 0 20px;
+}
+.dropdown__switch:checked+.dropdown__options-filter .dropdown__select {
+    transform: scaleY(1)
+}
+.dropdown__switch:checked+.dropdown__options-filter .dropdown__filter:after {
+    transform: rotate(-135deg)
+}
+.dropdown__options-filter {
+    width: 100%;
+    cursor: pointer
+}
+.dropdown__filter {
+    position: relative;
+    display: flex;
+    padding: 10px 20px;
+    color: #595959;
+    background-color: #fff;
+    border: 1px solid #d6d6d6;
+    //border-radius: 30px;
+    font-size: 14px;
+    text-transform: uppercase;
+    transition: .3s
+}
+.dropdown__filter:focus {
+    //border: 1px solid #918FF4;
+    outline: 0;
+    //box-shadow: 0 0 5px 3px #918FF4
+}
+.dropdown__filter::after {
+    position: absolute;
+    top: 16px;
+    right: 20px;
+    content: '';
+    width: 5px;
+    height: 5px;
+    border-right: 2px solid #595959;
+    border-bottom: 2px solid #595959;
+    transform: rotate(45deg) translateX(-45%);
+    transition: .2s ease-in-out
+}
+.dropdown__select {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    margin-top: 5px;
+    overflow: hidden;
+    box-shadow: 0 5px 10px 0 rgba(152, 152, 152, 0.6);
+    transform: scaleY(0);
+    transform-origin: top;
+    font-weight: 300;
+    transition: .2s ease-in-out;
+	overflow-y: scroll;
+    max-height: 600px;
+}
+.dropdown__select-option {
+    padding: 10px 20px;
+    background-color: #fff;
+    border-bottom: 1px solid #d6d6d6;
+    transition: .3s
+}
+.dropdown__select-option:last-of-type {
+    border-bottom: 0
+}
+.dropdown__select-option:hover {
+    background-color: #f9f9f9
+}
+</style>
+<section class="dhh-mainbox normal-box">
+	<div class="dhh-container zam-app-flex-ajCenter">
+		<div class="right-footer zam-app-flex">
+			<div class="titlebox">{$pcconfig['styleconfig']['tongjititle']['txt']??'订单统计'}</div>
+			<div class="orderinfo zam-app-flex">
+				<div class="totalnum">0元</div>
+				<div class="totalmoney">0{if $hdinfo['id']=='28822'}吨{elseif $hdinfo['id']=='36437'}箱{else /}{$rotate['weightunit']??'吨'}{/if}</div>
+			</div>
+		</div>
+		<div class="selectbox selectbox-cate">
+			<div class="dropdown">
+				<input type="checkbox" class="dropdown__switch" id="filter-switch" hidden="">
+				<label for="filter-switch" class="dropdown__options-filter">
+					<ul class="dropdown__filter">
+						<li class="dropdown__filter-selected" aria-selected="true" data-gid="-1">分类产品</li>
+						<li>
+							<ul class="dropdown__select">
+								<li class="dropdown__select-option" role="option" data-gid="-1">分类产品</li>
+								{foreach $cates as $c}
+								<li class="dropdown__select-option" role="option" data-gid="{$c['id']}">{$c['catename']}</li>
+								{/foreach}
+							</ul>
+						</li>
+					</ul>
+				</label>
+			</div>
+		</div>
+		<div class="dhh-title">分类产品订货信息</div>
+		<div class="dhh-box zam-app-flex zam-app-justifyspacearound">
+			<div class="dhh-left">
+				<!--<div class="titlebox">{$pcconfig['styleconfig']['lefttitle']['txt']??'实时金额榜'}</div>-->
+				<div class="titlebox zam-app-flex zam-app-justifyspacearound">
+					<div>公司{if $hdinfo['id']=='9379'}吨数{elseif $hdinfo['id']=='36437'}箱数{elseif $hdinfo['id']=='28822'}订单金额{else /}订单金额{/if}排行TOP1-30名<span>单位: {if $hdinfo['id']=='9379'}{$rotate['weightunit']??'吨'}{elseif $hdinfo['id']=='36437'}箱{elseif $hdinfo['id']=='28822'}万元{else /}元{/if}</span></div>
+					<div>公司{if $hdinfo['id']=='9379'}吨数{elseif $hdinfo['id']=='36437'}箱数{elseif $hdinfo['id']=='28822'}订单金额{else /}订单金额{/if}排行31-60名<span>单位: {if $hdinfo['id']=='9379'}{$rotate['weightunit']??'吨'}{elseif $hdinfo['id']=='36437'}箱{elseif $hdinfo['id']=='28822'}万元{else /}元{/if}</span></div>
+					<div>公司{if $hdinfo['id']=='9379'}吨数{elseif $hdinfo['id']=='36437'}箱数{elseif $hdinfo['id']=='28822'}订单金额{else /}订单金额{/if}排行61-90名<span>单位: {if $hdinfo['id']=='9379'}{$rotate['weightunit']??'吨'}{elseif $hdinfo['id']=='36437'}箱{elseif $hdinfo['id']=='28822'}万元{else /}元{/if}</span></div>
+					<div>公司{if $hdinfo['id']=='9379'}吨数{elseif $hdinfo['id']=='36437'}箱数{elseif $hdinfo['id']=='28822'}订单金额{else /}订单金额{/if}排行91-120名<span>单位: {if $hdinfo['id']=='9379'}{$rotate['weightunit']??'吨'}{elseif $hdinfo['id']=='36437'}箱{elseif $hdinfo['id']=='28822'}万元{else /}元{/if}</span></div>
+				</div>
+				<div class="left-phb">
+					<ul class="zam-app-flex zam-app-directionColumn zam-app-flex-wrap"></ul>
+				</div>
+			</div>
+			<div class="dhh-right">
+				<div class="right-header">
+					<div class="titlebox">{$pcconfig['styleconfig']['righttitle']['txt']??'实时订单'}</div>
+					<div class="right-list">
+						<ul class="zam-app-flex zam-app-directionColumn zam-app-flex-wrap"></ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="emptybox zam-app-flex-ajCenter display-none">
+	    <img src="/{:SIMGURL}common/empty.png">
+	    <p style="padding:20px;">暂无可用轮次，请到后台添加</p>
+	</div>
+</section>
+<section class="dhh-popBox zam-app-flex-ajCenter">
+    <div class="dhh-maskbox">
+        <div class="masktop"></div>
+        <div class="maskbottom"></div>
+    </div>
+    <div class="poptip zam-app-flex-ajCenter2"></div>
+    <div class="dhhyanhuabox hidden">
+        <div class="yanhuaitem yanhua-left"></div>
+        <div class="yanhuaitem yanhua-right"></div>
+    </div>
+</section>
+<script>
+require(['screencore','keyboard','layerBox','template'],function(screencore,keyboardJS,layerBox,template){
+	var screendhh = {
+		config:null,
+		ajaxtimer:null,
+		init:function(config){
+			var self = this;
+			self.config = config;
+			self.bindevent();
+			self.initajax();
+		},
+		initajax:function(){
+			var self = this;
+			clearInterval(self.ajaxtimer);
+			self.ajaxdata();
+			self.ajaxtimer = setInterval(function(){
+				self.ajaxdata();
+			},3e3);
+		},
+		bindevent:function(){
+			var self = this,label = $('.dropdown__filter-selected'),options = $('.dropdown__select-option');
+			options.each(function(){
+				var $this = $(this);
+				$this.click(function(){
+					label.text($this.text()).attr('data-gid',$this.attr('data-gid'));
+					$(".dhh-title").text($this.text()+'订货信息');
+					document.title = $this.text()+'订货信息';
+					self.initajax();
+				});
+			});
+			$(document).click(function(e){
+				var element = $(e.target),isDropdownChild = element.parents('.dropdown__filter');
+				if(element.hasClass('dropdown__switch')){
+					return;
+				}
+				if (isDropdownChild.length == 0) {
+					$(".dropdown__switch").prop('checked',false);
+				}
+			});
+		},
+		orderid:'0',
+		orders:[],
+		waitshowlist:[],
+		ajaxdata:function(){
+			var self = this;
+			screencore.ajaxSubmit("/screen/dhh/ajaxallcatedata",{cid:$('.dropdown__filter-selected').attr('data-gid')||'0'}).then(function(json){
+				 if(json.code==0){
+				 	var ranks = json.msg.ranks,grouplists = json.msg.grouplists;
+				 	var html = '';
+					$.each(grouplists,function(i,v){
+						v.xuhao = i + 1;
+						if(!v.totalnum) v.totalnum = 0;
+						if(XCV3Config.rhdid == '9379'){
+							v.totalnum = parseFloat(v.totalnum).toFixed(1);
+						} else if (XCV3Config.rhdid == '28822') {
+							v.totalnum = parseFloat(v.totalnum / 10000).toFixed(1);
+							if (v.totalnum < 0.1) {
+								v.totalnum = 0;
+							}
+						}else{
+							v.totalnum = parseInt(v.totalnum);
+						}
+			 			html += template('group-tpl',v);
+			 		});
+			 		$(".right-list ul").html(html);
+			 		var html = '';
+					$.each(ranks,function(i,v){
+						v.xuhao = i + 1;
+						if(XCV3Config.rhdid == '9379'){
+							v.totalmoney = parseFloat(v.totalmoney).toFixed(1);
+						} else if (XCV3Config.rhdid == '28822') {
+							v.totalmoney = parseFloat(v.totalmoney / 10000).toFixed(1);
+							if (v.totalmoney < 0.1) {
+								v.totalmoney = 0;
+							}
+						}else{
+							v.totalmoney = parseInt(v.totalmoney);
+						}
+			 			html += template('rank-tpl',v);
+			 		});
+			 		$(".left-phb ul").html(html);
+				 	if (['28822','36437'].includes(XCV3Config.rhdid)) {
+						var totalmoney = parseFloat(json.msg.totalmoney / 10000).toFixed(1);
+						if (totalmoney < 0.1) {
+							totalmoney = 0;
+						}
+						$(".right-footer .totalnum").text(totalmoney + '万元');
+					} else {
+						$(".right-footer .totalnum").text(json.msg.totalmoney + '元');
+					}
+					//第二个框显示总吨数
+					var totalweight = json.msg.totalweight;
+					if (XCV3Config.rhdid != '36437') {
+						totalweight = parseFloat(totalweight).toFixed(1);
+					}else{
+						totalweight = parseInt(totalweight);
+					}
+					$(".right-footer .totalmoney").text(totalweight + self.config.priceunit);
+				 }
+			}, function(){
+				  layerBox.showMsg('网络太差，请稍后重试');
+			});
+		},
+	};
+	screendhh.init({
+		priceunit:"{if $hdinfo['id']=='28822'}吨{elseif $hdinfo['id']=='36437'}箱{else /}{$rotate['weightunit']??'吨'}{/if}",
+	});
+})
+</script>
+<script type="text/html" id="group-tpl">
+<li class="groupli">
+	<div class="group-body zam-app-flex zam-app-alignCenter zam-app-justifyspacebetween">
+		<div class="grouppm">{{ xuhao }}</div>
+		<div class="groupname">{{ groupname }}</div>
+		<div class="groupnum">{{ totalnum }}{if $hdinfo['id']=='9379'}{$rotate['weightunit']??'吨'}{elseif $hdinfo['id']=='36437'}箱{elseif $hdinfo['id']=='28822'}万元{else /}元{/if}</div>
+	</div>
+</li>
+</script>
+<script type="text/html" id="rank-tpl">
+	<li class="zam-app-flex hidden">
+		<div class="phb-item zam-app-flex">
+			<div class="num zam-app-flex-ajCenter">
+				<span class="numbox zam-app-flex-ajCenter">{{ xuhao }}</span>
+			</div>
+			<div class="info zam-app-flex zam-app-justifyCenter">
+				<div class="nickname limitbox">{{ nickname }}</div>
+				<div class="order">
+					<div class="money"><span>{{ totalmoney }}</span>{if $hdinfo['id']=='9379'}{$rotate['weightunit']??'吨'}{elseif $hdinfo['id']=='36437'}箱{elseif $hdinfo['id']=='28822'}万元{else /}元{/if}</div>
+				</div>
+			</div>
+		</div>
+	</li>
+</script>
+{include file="common/footer" /}

@@ -1,0 +1,46 @@
+<!--
+ * @Author: 赞木
+ * @Company: 株洲米波网络科技有限公司
+ * @Project: 米波现场v3
+ * @Date: 2023-08-26 12:48:07
+ * @LastEditors: 赞木
+ * @LastEditTime: 2024-03-12 20:48:14
+ * @Link: 公司官网地址:https://miboxianchang.cn
+ * @Copyright: 本软件归株洲米波网络科技有限公司所有，非法渠道获得本系统或者未经授权使用本系统将依法追究当事人或公司法律责任
+-->
+<div class="confirmbox-pop">
+<form id="formBox" class="zam-formvalidation form-horizontal" method="post">
+  <div class="form-group filetypes">
+    <label class="col-lg-3 control-label">* 回复消息类型</label>
+    <div class="col-lg-8">
+        <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.imgmessagebox').addClass('hidden');">
+          <input type="radio" name="type" value="1" {if $config['type']=='1'}checked{/if}><span>文字消息</span>
+        </label>
+        <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.imgmessagebox').removeClass('hidden');">
+          <input type="radio" name="type" value="2" {if $config['type']=='2'}checked{/if}><span>图文消息</span>
+        </label>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-lg-3 control-label">* 标题</label>
+    <div class="col-lg-7">
+      <input class="form-control" type="text"  name="title" placeholder="请输入消息标题" value="{$config['title']}">
+    </div>
+  </div>
+  <div class="imgmessagebox{if $config['type']=='1'} hidden{/if}">
+    <div class="form-group">
+      <label class="col-lg-3 control-label"> 简介</label>
+      <div class="col-lg-7">
+        <input class="form-control" type="text"  name="desc" placeholder="请输入消息简介" value="{$config['desc']}">
+      </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-3 control-label"> icon图</label>
+        <div class="col-lg-8">
+            {:tpl_image_one('icon',$config['icon'])}
+            <span class="help-block">尺寸是60*60px</span>
+        </div>
+    </div>
+  </div>
+</form>
+</div>

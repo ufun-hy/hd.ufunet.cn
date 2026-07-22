@@ -1,0 +1,348 @@
+{include file='$Wpath/common/header'}
+<style>
+.rotate-lists tr td{text-align:center!important;}
+</style>
+<div class="alert alert-info">
+增加或删除轮次均需保存才可生效
+</div>
+<form id="itemForm" method="post" class="form-horizontal">
+<table class="we7-table table voteitemTable" style="margin-bottom:0px;">
+<thead>
+  <tr>
+	<th style="width:15%;text-align:center;">标题</th>
+	{if $gametype=='answerbs'}
+	<th style="width:15%;text-align:center;">答题时间</th>
+	{else}
+	<th style="width:15%;text-align:center;">游戏时间</th>
+	{/if}
+	<th style="width:10%;text-align:center;">开始后可加入</th>
+	<th style="width:10%;text-align:center;">倒计时</th>
+	<th style="width:15%;text-align:center;">倒计时时间</th>
+	<th style="width:20%;text-align:center;">操作</th>
+  </tr>
+</thead>
+<tbody class="rotate-lists">
+	{volist name="rotates" id="rotate"}
+		<tr>
+		<td>
+			<input type="hidden" name="title[]" value="{$rotate['title']}">
+			{$rotate['title']}
+		</td>
+		{if $gametype=='answerbs'}
+		<td>
+			<input type="hidden" name="answertime[]" value="{$rotate['answertime']}">
+			<input type="hidden" name="isauto[]" value="{$rotate['isauto']}">
+			<input type="hidden" name="autotime[]" value="{$rotate['autotime']}">
+			<input class="question" type="hidden" name="questions[]" value='{:json_encode($rotate['questions'])}' >
+			{$rotate['answertime']}
+		</td>
+		{elseif $gametype=='jjb'}
+		<td>
+			<input type="hidden" name="gametime[]" value="{$rotate['gametime']}">
+			{$rotate['gametime']}
+			<input type="hidden" name="coininc[]" value="{$rotate['coininc']}">
+			<input type="hidden" name="boomdec[]" value="{$rotate['boomdec']}">
+			<input type="hidden" name="maxcount[]" value="{$rotate['maxcount']}">
+		</td>
+		{elseif $gametype=='cutfruit'}
+		<td>
+			<input type="hidden" name="gametime[]" value="{$rotate['gametime']}">
+			{$rotate['gametime']}
+			<input type="hidden" name="applecut[]" value="{$rotate['applecut']}">
+			<input type="hidden" name="bananacut[]" value="{$rotate['bananacut']}">
+			<input type="hidden" name="basahacut[]" value="{$rotate['basahacut']}">
+			<input type="hidden" name="peachcut[]" value="{$rotate['peachcut']}">
+			<input type="hidden" name="sandiacut[]" value="{$rotate['sandiacut']}">
+			<input type="hidden" name="boomcut[]" value="{$rotate['boomcut']}">
+			<input type="hidden" name="maxcount[]" value="{$rotate['maxcount']}">
+		</td>
+		{elseif $gametype=='tug'}
+		<td>
+		    <input type="hidden" name="gametime[]" value="{$rotate['gametime']}">
+			{$rotate['gametime']}
+			<input type="hidden" name="redname[]" value="{$rotate['redname']}">
+			<input type="hidden" name="redlogo[]" value="{$rotate['redlogo']}">
+			<input type="hidden" name="bluename[]" value="{$rotate['bluename']}">
+			<input type="hidden" name="bluelogo[]" value="{$rotate['bluelogo']}">
+			<input type="hidden" name="maxjoin[]" value="{$rotate['maxjoin']}">
+			<input type="hidden" name="topadv[]" value="{$rotate['topadv']}">
+		</td>
+		{elseif $gametype=='mouse'}
+		<td>
+			<input type="hidden" name="gametime[]" value="{$rotate['gametime']}">
+			{$rotate['gametime']}
+			<input type="hidden" name="tigerinc[]" value="{$rotate['tigerinc']}">
+			<input type="hidden" name="foxdec[]" value="{$rotate['foxdec']}">
+			<input type="hidden" name="maxcount[]" value="{$rotate['maxcount']}">
+		</td>
+		{elseif $gametype=='jumprace'}
+		<td>
+			<input type="hidden" name="gametime[]" value="{$rotate['gametime']}">
+			{$rotate['gametime']}
+			<input type="hidden" name="jumpinc[]" value="{$rotate['jumpinc']}">
+			<input type="hidden" name="jump2inc[]" value="{$rotate['jump2inc']}">
+			<input type="hidden" name="faildec[]" value="{$rotate['faildec']}">
+			<input type="hidden" name="maxcount[]" value="{$rotate['maxcount']}">
+		</td>
+		{elseif $gametype=='clickrace'}
+		<td>
+			<input type="hidden" name="gametime[]" value="{$rotate['gametime']??30}">
+			{$rotate['gametime']}
+			<input type="hidden" name="coininc[]" value="{$rotate['coininc']??1}">
+			<input type="hidden" name="boomdec[]" value="{$rotate['boomdec']??1}">
+			<input type="hidden" name="maxcount[]" value="{$rotate['maxcount']??50}">
+		</td>
+		{elseif $gametype=='puzzle'}
+		<td>
+			<input type="hidden" name="gametime[]" value="{$rotate['gametime']??30}">
+			{$rotate['gametime']}
+			<input type="hidden" name="maxcount[]" value="{$rotate['maxcount']??50}">
+			<input type="hidden" name="roundimages[]" value="{$rotate['roundimages']}" >
+		</td>
+		{else}
+		<td>
+			<input type="hidden" name="gametime[]" value="{$rotate['gametime']}">
+			{$rotate['gametime']}
+		</td>
+		{/if}
+		<td>
+			<input type="hidden" name="autorun[]" value="{$rotate['autorun']}">
+			<input type="hidden" name="autorunnum[]" value="{$rotate['autorunnum']}">
+			<input type="hidden" name="needpayjoin[]" value="{$rotate['needpayjoin']}">
+			<input type="hidden" name="payfee[]" value="{$rotate['payfee']}">
+			<input type="hidden" name="appshowphbbtn[]" value="{$rotate['appshowphbbtn']}">
+			<input type="hidden" name="endphb[]" value="{$rotate['endphb']}">
+			<input type="hidden" name="startedjoin[]" value="{$rotate['startedjoin']}">
+			{if $rotate['startedjoin']=='1'}是{else}否{/if}
+		</td>
+		<td>
+			{if $rotate['opendjs']=='1'}开启{else}关闭{/if}
+			<input type="hidden" name="opendjs[]" value="{$rotate['opendjs']}">
+		</td>
+		<td>
+		    <input type="hidden" name="djstime[]" value="{$rotate['djstime']}">
+			<input type="hidden" name="gamephb[]" value="{$rotate['gamephb']}">
+			{$rotate['djstime']}
+		</td>
+		<td>
+		   <a href="javascript:;"  class="btn btn-danger btn-sm delitem">
+			  <i class="mdi mdi-close"></i>
+		  </a>
+		  <a href="javascript:;"  class="btn btn-info btn-sm mousemove zam-sortable" lay-tips="拖动排序">
+			 <i class="mdi mdi-arrow-all"></i>
+		  </a>
+		</td>
+        </tr>
+	{/volist}
+</tbody>
+<tfoot>
+	  <tr>
+		<td colspan="4">
+		  <a  class="btn btn-success btn-sm m-r-10 additem" href="javascript:;"><i class="mdi mdi-plus"></i> 添加轮次</a>
+		  <button type="submit" class="btn btn-primary btn-sm btn-save" /><i class="mdi mdi-content-save"></i> 保存轮次</button>
+		</td>
+	  </tr>
+	</tfoot>
+</table>
+<form>
+<script id='rotateitem-tpl' type="text/template">
+	<tr>
+		<td>
+			<input type="hidden" name="title[]" value="<% d.title %>">
+			<% d.title %>
+		</td>
+		{if $gametype=='answerbs'}
+		<td>
+			<input type="hidden" name="answertime[]" value="<% d.answertime %>">
+			<input type="hidden" name="isauto[]" value="<% d.isauto %>">
+			<input type="hidden" name="autotime[]" value="<% d.autotime %>">
+			<input class="question" type="hidden" name="questions[]" value='<% d.questions %>'>
+			<% d.answertime %>
+		</td>
+		{elseif $gametype=='jjb'}
+		<td>
+			<input type="hidden" name="gametime[]" value="<% d.gametime %>">
+			<% d.gametime %>
+			<input type="hidden" name="coininc[]" value="<% d.coininc %>">
+			<input type="hidden" name="boomdec[]" value="<% d.boomdec %>">
+			<input type="hidden" name="maxcount[]" value="<% d.maxcount %>">
+		</td>
+		{elseif $gametype=='cutfruit'}
+		<td>
+			<input type="hidden" name="gametime[]" value="<% d.gametime %>">
+			<% d.gametime %>
+			<input type="hidden" name="applecut[]" value="<% d.applecut %>">
+			<input type="hidden" name="bananacut[]" value="<% d.bananacut %>">
+			<input type="hidden" name="basahacut[]" value="<% d.basahacut %>">
+			<input type="hidden" name="peachcut[]" value="<% d.peachcut %>">
+			<input type="hidden" name="sandiacut[]" value="<% d.sandiacut %>">
+			<input type="hidden" name="boomcut[]" value="<% d.boomcut %>">
+			<input type="hidden" name="maxcount[]" value="<% d.maxcount %>">
+		</td>
+		{elseif $gametype=='tug'}
+		<td>
+			<input type="hidden" name="gametime[]" value="<% d.gametime %>">
+			<% d.gametime %>
+			<input type="hidden" name="redname[]" value="<% d.redname %>">
+			<input type="hidden" name="redlogo[]" value="<% d.redlogo %>">
+			<input type="hidden" name="bluename[]" value="<% d.bluename %>">
+			<input type="hidden" name="bluelogo[]" value="<% d.bluelogo %>">
+			<input type="hidden" name="topadv[]" value="<% d.topadv %>">
+			<input type="hidden" name="maxjoin[]" value="<% d.maxjoin %>">
+		</td>
+		{elseif $gametype=='mouse'}
+		<td>
+			<input type="hidden" name="gametime[]" value="<% d.gametime %>">
+			<% d.gametime %>
+			<input type="hidden" name="tigerinc[]" value="<% d.tigerinc %>">
+			<input type="hidden" name="foxdec[]" value="<% d.foxdec %>">
+			<input type="hidden" name="maxcount[]" value="<% d.maxcount %>">
+		</td>
+		{elseif $gametype=='jumprace'}
+		<td>
+			<input type="hidden" name="gametime[]" value="<% d.gametime %>">
+			<% d.gametime %>
+			<input type="hidden" name="jumpinc[]" value="<% d.jumpinc %>">
+			<input type="hidden" name="jump2inc[]" value="<% d.jump2inc %>">
+			<input type="hidden" name="faildec[]" value="<% d.faildec %>">
+			<input type="hidden" name="maxcount[]" value="<% d.maxcount %>">
+		</td>
+		{elseif $gametype=='clickrace'}
+		<td>
+			<input type="hidden" name="gametime[]" value="<% d.gametime %>">
+			<% d.gametime %>
+			<input type="hidden" name="coininc[]" value="<% d.coininc %>">
+			<input type="hidden" name="boomdec[]" value="<% d.boomdec %>">
+			<input type="hidden" name="maxcount[]" value="<% d.maxcount %>">
+		</td>
+		{elseif $gametype=='puzzle'}
+		<td>
+			<input type="hidden" name="gametime[]" value="<% d.gametime %>">
+			<% d.gametime %>
+			<input type="hidden" name="maxcount[]" value="<% d.maxcount %>">
+			<input type="hidden" name="roundimages[]" value='<% d.roundimages %>'>
+		</td>
+		{else}
+		<td>
+			<input type="hidden" name="gametime[]" value="<% d.gametime %>">
+			<% d.gametime %>
+		</td>
+		{/if}
+		<td>
+			<input type="hidden" name="autorun[]" value="<% d.autorun %>">
+			<input type="hidden" name="autorunnum[]" value="<% d.autorunnum %>">
+			<input type="hidden" name="needpayjoin[]" value="<% d.needpayjoin %>">
+			<input type="hidden" name="payfee[]" value="<% d.payfee %>">
+			<input type="hidden" name="appshowphbbtn[]" value="<% d.appshowphbbtn %>">
+			<input type="hidden" name="endphb[]" value="<% d.endphb %>">
+			<input type="hidden" name="startedjoin[]" value="<% d.startedjoin %>">
+			<%# if(d.startedjoin =='1'){ %>是<%# }else{ %>否<%# } %>
+		</td>
+		<td>
+			<input type="hidden" name="opendjs[]" value="<% d.opendjs %>">
+			<%# if(d.opendjs =='1'){ %>开启<%# }else{ %>关闭<%# } %>
+		</td>
+		<td>
+		    <input type="hidden" name="djstime[]" value="<% d.djstime %>">
+			<input type="hidden" name="gamephb[]" value="<% d.gamephb %>">
+			<% d.djstime %>
+		</td>
+		<td>
+		  <a href="javascript:;"  class="btn btn-danger btn-sm delitem">
+			  <i class="mdi mdi-close"></i>
+		  </a>
+		  <a href="javascript:;"  class="btn btn-info btn-sm mousemove zam-sortable" lay-tips="拖动排序">
+			 <i class="mdi mdi-arrow-all"></i>
+		  </a>
+		</td>
+   </tr>
+</script>
+<script>
+require(["zamnotice","layerBox","jconfirmBox","webcore","jquery.ui"],function(zamnotice,layerBox,jconfirmBox,webcore){
+	$('.rotate-lists').sortable({handle: ".mousemove"});
+	$(".rotate-lists").disableSelection();
+	$(".additem").on('click',function(){
+		var confirmObj = jconfirmBox.ajaxconfirm("新增轮次","{:goweb('hdconfig/'.$gametype.'rotate')}",{ishtml:'1'},'html','col-lg-8 col-lg-offset-2',function(e){
+			var postData = webcore.serializeObject(e.find('form'));
+			if(postData.title==''){
+				zamnotice.showTips('error','轮次标题必须填写');
+				return false;
+			}
+			{if $gametype=='answerbs'}
+				postData.questions = [];
+				if(!postData['questitle[]'] || postData['questitle[]']==''){
+					zamnotice.showTips('error','请先添加题目');
+					return false;
+				}
+				if($.isArray(postData['questitle[]'])){
+					$.each(postData['questitle[]'],function(k,v){
+						postData.questions.push({
+							questitle:v,
+							answera:postData['answera[]'][k],
+							answerb:postData['answerb[]'][k],
+							answerc:postData['answerc[]'][k],
+							answerd:postData['answerd[]'][k],
+							yesanswer:postData['yesanswer[]'][k],
+						});
+					})
+				}else{
+					postData.questions.push({
+						questitle:postData['questitle[]'],
+						answera:postData['answera[]'],
+						answerb:postData['answerb[]'],
+						answerc:postData['answerc[]'],
+						answerd:postData['answerd[]'],
+						yesanswer:postData['yesanswer[]'],
+					});
+				}
+				postData.questions = JSON.stringify(postData.questions);
+			{elseif $gametype=='puzzle'}
+				postData.roundimages = [];
+				if(!postData['roundimages[pimg][]'] || !postData['roundimages[pscore][]'] || !postData['roundimages[prows][]']){
+					zamnotice.showTips('error','请先添加关卡');
+					return false;
+				}
+				if($.isArray(postData['roundimages[pimg][]'])){
+					$.each(postData['roundimages[pimg][]'],function(k,v){
+						postData.roundimages.push({
+							pimg:v,
+							prows:postData['roundimages[prows][]'][k],
+							pscore:postData['roundimages[pscore][]'][k],
+						});
+					})
+				}else{
+					postData.roundimages.push({
+						prows:postData['roundimages[prows][]'],
+						pimg:postData['roundimages[pimg][]'],
+						pscore:postData['roundimages[pscore][]'],
+					});
+				}
+				postData.roundimages = JSON.stringify(postData.roundimages);
+			{/if}
+			var html = webcore.tpl($("#rotateitem-tpl"),postData);
+			$(".rotate-lists").append(html);
+			confirmObj.close();
+		});
+	});
+	$(".rotate-lists").on('click','.delitem',function(){
+		$(this).parent().parent().remove();
+	});
+	$(".btn-save").on('click',function(e){
+		e.preventDefault();
+		var $form = $("#itemForm");
+		var postData = $form.serialize();
+		layerBox.showLoading("数据提交中..");
+		$.post(window.location.href+"?ishtml=2",postData, function(result) {
+			layerBox.closeLayer();
+			if(result.code==0){
+				zamnotice.showTips('success','保存成功',500,function(){
+					window.location.reload();
+				});	
+			}else{
+				zamnotice.showTips('error',result.msg);
+			}
+		}, 'json');
+	});
+});
+</script>
+{include file='$Wpath/common/footer'}

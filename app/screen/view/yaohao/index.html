@@ -1,0 +1,530 @@
+{include file='common/header' /}
+<style>
+.headerTitle{opacity:0;}
+.yaohao-mainbox{
+	width: 100%;
+    height:680px;
+    padding: 0;
+	top:90px;
+	bottom:50px;
+	display:none;
+}
+/*滚动区域*/
+.page-yhuser{position:absolute;top:0;left:0;width:100%;height:100%;}
+.page-yhuser .yhuser-title{
+	position: absolute;
+    top: -90px;
+    left: 0;
+    height: 90px;
+    line-height: 90px;
+    color: {$pcconfig['topheadcolor']};
+    font-size:{$pcconfig['topheadsize']}px;
+    font-weight: 400;
+    text-align: center;
+    width: 100%;
+}
+.page-yhuser .yhuser-section{
+	width:calc(100% - 40px);
+	height:100%;
+	margin:0 auto;
+	border-radius: 10px;
+}
+.yhuser-section .yh-main{
+	width:100%;
+	height:100%;
+	display: flex;
+	{if $pcconfig['rightwidth']!='0'}
+		justify-content: space-around;
+	{else}
+		justify-content:center;
+	{/if}
+	flex-wrap: wrap;
+	overflow:hidden;
+}
+/*左侧滚动数据*/
+.yh-left{
+	width:calc({$pcconfig['leftwidth']}% - 10px);
+	height:100%;
+	display:flex;
+	{if $pcconfig['rightwidth']=='0'}
+		justify-content:center;
+	{/if}
+	flex-direction:column;
+}
+/*统一控制li高度*/
+.yh-left ul li{height:{$pcconfig['leftoneh']}px;}
+.yh-left-header{
+	display:flex;
+	background-color:{$pcconfig['leftheadbg']};
+	color:#fff;
+}
+.yh-left-header li{
+	display:flex;
+	justify-content:center;
+	align-items:center;
+	color:{$pcconfig['leftheadcolor']};
+	font-size:{$pcconfig['leftheadsize']}px
+}
+.yh-left-data{
+	max-height:520px;
+	display:flex;
+	flex-wrap:wrap;
+	background-color:{$pcconfig['leftdatabg']};
+	overflow:hidden;
+	overflow-y:scroll;
+}
+.yh-left-data ul{width:100%;display:flex}
+.yh-left-data ul li{
+	display:flex;
+	justify-content:center;
+	align-items:center;
+	color:{$pcconfig['leftdatacolor']};
+	font-size:{$pcconfig['leftdatasize']}px
+}
+.yh-left-btn{
+	height: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.yh-left-btn span{
+	display: inline-block;
+    background-color:{$pcconfig['btnbg']};
+    color:{$pcconfig['btncolor']};
+	font-size:{$pcconfig['btnsize']}px;
+    padding: 12px 60px;
+    border-radius: 8px;
+	letter-spacing:5px;
+	cursor:pointer;
+}
+/*右侧抽中数据*/
+.yh-right{width:calc({$pcconfig['rightwidth']}% - 10px);height:100%;display:flex;overflow:hidden;}
+.yh-round-item{
+	flex:1;
+	margin-right:10px;
+	overflow:hidden;
+}
+.yh-round-title{
+	height:{$pcconfig['rightoneh']}px;
+	line-height:{$pcconfig['rightoneh']}px;
+	text-align:center;
+	background-color:{$pcconfig['rightheadbg']};
+	color:{$pcconfig['rightheadcolor']};
+	font-size:{$pcconfig['rightheadsize']}px
+}
+.yh-round-datas{max-height:520px;overflow:hidden;overflow-y:scroll}
+.yh-round-data{
+	display:flex;
+	flex-wrap:wrap;
+	background-color:{$pcconfig['rightdatabg']};
+}
+.yh-round-data li{
+	display:flex;
+	justify-content:center;
+	align-items:center;
+	height:{$pcconfig['rightoneh']}px;
+	color:{$pcconfig['rightdatacolor']};
+	font-size:{$pcconfig['rightdatasize']}px
+}
+{foreach $pcconfig['yhfieldconfig'] as $fkey=>$fval}
+.yh-left li.{$fkey}{
+	width:{$fval['zuow']}%;
+}
+.yh-right li.{$fkey}{
+	width:{$fval['youw']}%;
+}
+{/foreach}
+</style>
+<section class="yaohao-mainbox normal-box">
+	<section class="page-yhuser">
+		<div class="yhuser-title"></div>
+		<div class="yhuser-section">
+			<div class="yh-main">
+				<div class="yh-left display-none">
+					<ul class="yh-left-header"></ul>
+					<div class="yh-left-data"></div>
+					<div class="yh-left-btn" data-status='1'><span>开始</span></div>
+				</div>
+				<div class="yh-right"></div>
+			</div>
+		</div>
+	</section>
+</section>
+<script>
+var onefieldcol = parseInt("{$pcconfig['onefieldcol']}");
+require(['screencore','layerBox','template','keyboard'],function (screencore,layerBox,template,keyboardJS) {
+	var screenyaohao = {
+		nowroundIndex:-1,
+		hadinit:false,
+		yhrotates:null,
+		allusers:[],
+		luckers:[],
+		ndusers:[],
+		fieldconfig:null,
+		hideconfig:{},
+		rightcolumn:3,
+		rightecolumn:5,
+		ulInterval:null,
+		init:function(g){
+			var self = this;
+			if (self.hadinit===false) {
+				screencore.ajaxSubmit('/screen/yaohao/initdata',{}).then(function(json){
+					 if(json.code==0){
+						self.hadinit = true;
+						self.resetdata(json.msg);
+						self.init();
+					 }else{
+						layerBox.showMsg(json.message);
+					 }
+				}, function(){
+					  layerBox.showMsg('网络太差，请稍后重试');
+				});
+				return;
+			}
+			$(".yaohao-mainbox").show().animateControl(screencore.anicssArr());
+		},
+		resetdata:function(data){
+			var self = this;
+			self.rightcolumn = data.rightcolumn;
+			self.rightecolumn = data.rightecolumn;
+			self.fieldconfig = data.fieldconfig;
+			self.hideconfig = {};
+			$.each(self.fieldconfig,function(i,v){
+				if(i!='xuhao' && v.fieldsecret=='1'){
+					self.hideconfig[i] = {left:v.lefthand,right:v.righthand,replaceword:v.replaceword};		
+				}
+			});
+			self.yhrotates = [];
+			if (data.hasOwnProperty("rotates")) {
+				self.yhrotates = data.rotates;
+				self.yhrotates.map(function(l,i) {
+					if (l.rangetype=='2' && l.hasOwnProperty("cateids") && l.cateids !== null && l.cateids !== "0") {
+						l.cateids = $.isArray(l.cateids)?l.cateids:l.cateids.split(",");
+					} else {
+						l.cateids = [];
+					}
+					return l;
+				})
+            }else{
+				return layerBox.showMsg('暂未添加轮次');
+			}
+			self.allusers = data.userdata;
+			$.map(self.allusers, function(l) {
+				$.each(self.hideconfig,function(i,v){
+					if(l[i]){
+						l[i] = screencore.hiddentxt(l[i],v.left,v.right,v.replaceword);
+					}
+				});
+				return l;
+			});
+			self.luckers = data.lucker;
+			$.map(self.luckers, function(l) {
+				var lucker = screencore.arrayremove(self.allusers, l.user_id, "id");
+				if (lucker !== null) {
+					l.cateid = lucker.cateid;
+					$.each(self.fieldconfig,function(i,v){
+						i!='xuhao' && (l[i] = lucker[i]);
+					});
+				}
+				screencore.arrayremove(self.ndusers, l.user_id, "id"); 
+				return l;
+			});
+			if (data.hasOwnProperty("ndusers")) {
+				self.ndusers = data.ndusers;
+				$.map(self.ndusers, function(l,lkey) {
+					var onend = screencore.arrayremove(self.allusers, l.id, "id");
+					if (onend) {
+						l.cateid = onend.cateid;
+						$.each(self.fieldconfig,function(i,v){
+							if(i!='xuhao'){
+								l[i] = onend[i];
+							}
+						});
+					} else {
+						l.rotateid = -1;
+					}
+					return l;
+				})
+			}
+			self.initUI();
+		},
+		initUI:function(){
+			var self = this;
+			self.initleftdata();
+			self.initrightdata();
+			self.bindevent();
+		},
+		initAlldata:function(){
+			var self = this;
+			self.initleftdata();
+			self.initrightdata();
+		},
+		//初始化左侧显示数据与顶部轮次名
+		initleftdata:function(){
+			var self = this;
+			self.nowroundIndex = -1;
+			$.each(self.yhrotates,function(i,v){
+				if(v.yaonums - v.outnums > 0){
+					self.nowroundIndex = i;
+					return false;
+				}
+			})
+			if(self.nowroundIndex==-1){
+				if(self.yhrotates.length==0){
+					return layerBox.showMsg('后台暂未添加摇号轮次','0');
+				}else{
+					$(".yh-left").addClass('display-none');
+					$(".yhuser-title").text('全部轮次数据');
+					$(".yh-right").css({"width":'100%'});
+					if($(".yh-main").css('justify-content')=='center'){
+						$(".yh-main").css({"justify-content":'space-around'});
+					}
+					return layerBox.showMsg('所有摇号轮次已经完成');
+				}
+			}else{
+				var leftH = '';
+				$.each(self.fieldconfig,function(i,v){
+					leftH += '<li class="'+i+'">'+v.fieldname+'</li>';
+				});
+				$(".yh-left-header").html(leftH);
+				var roundOne = self.yhrotates[self.nowroundIndex];
+				$(".yhuser-title").text(roundOne.rotatetitle);
+				var leftnums = roundOne.yaonums - roundOne.outnums;
+				if(Object.keys(self.fieldconfig).length!=1 && roundOne.lefttype=='1'){
+					leftnums = roundOne.leftnums;
+				}
+				{/*self.allusers.slice(0,len)*/}
+				var leftHtml = template("lefttpl",{xuhaoopen:self.fieldconfig.hasOwnProperty("xuhao")?self.fieldconfig['xuhao'].fieldstatus:'2',lists:self.getrandomUser(leftnums)});
+				$(".yh-left-data").html(leftHtml);
+				if(Object.keys(self.fieldconfig).length==1){
+					$(".yh-left-data ul").css({"width":(100/onefieldcol)+'%'});
+				}
+				$(".yh-left").removeClass('display-none');
+			}
+		},
+		initrightdata:function(){
+			var self = this,startround = -1;
+			if(self.yhrotates.length > 0){
+				if(self.nowroundIndex==-1){
+					startround = self.yhrotates.length - 1;
+				}else{
+					startround = self.nowroundIndex;
+				}
+			}
+			$(".yh-right").html('');
+			for(var m=startround;m>=0;m--){
+				var roundInfo = self.yhrotates[m],roundluckers = screencore.arraybyvalue(self.luckers,roundInfo.id, "rotate_id");
+				if(roundluckers.length <=0 ) continue;
+				if(self.nowroundIndex>-1){
+					if($(".yh-right .yh-round-item").length >= self.rightcolumn) break;
+				}else{
+					if($(".yh-right .yh-round-item").length >= self.rightecolumn) break;
+				}
+				var luckhtml = '<div class="yh-round-item"><div class="yh-round-title">'+(roundInfo.lucktitle?roundInfo.lucktitle:roundInfo.rotatetitle)+'</div><div class="yh-round-datas" data-roundid="'+roundInfo.id+'">';
+				$.each(roundluckers,function(index,val){
+					luckhtml += '<ul class="yh-round-data">';
+						$.each(self.fieldconfig,function(i,v){
+							if(i=='xuhao' && v.fieldisleft=='1'){
+								luckhtml += '<li class="xuhao">'+(index+1)+'</li>';
+							}else{
+								v.fieldisleft=='1' && (luckhtml += '<li class="'+i+'">'+val[i]+'</li>');								
+							}
+						});
+					luckhtml += '</ul>';
+				});
+				luckhtml += '</div></div>';
+				$(".yh-right").append(luckhtml);
+			}
+		},
+		bindevent:function(){
+			var self = this,randomarr;
+			$(".yh-left-btn").on('click',function(){
+				var $this = $(this),cjstatus = $this.attr('data-status');
+				if(cjstatus=='1'){
+					if (!self.isCanYaohao()) {
+						layerBox.showMsg("当前摇号数据不够，无法开始");
+						return
+					}
+					$this.attr('data-status','2');
+					$this.find('span').text('停止');
+					var ullength = $(".yh-left-data ul").length;
+					self.ulInterval = setInterval(function() {
+						randomarr = self.getrandomUser(ullength);
+						self.updateLeftdata(randomarr, ullength);
+					},50);
+				}else if(cjstatus=='2'){
+					clearInterval(self.ulInterval);
+					var rounduser = self.getroundUser();
+					rounduser = self.doroundUser(rounduser);
+					var userids = [];
+					for (var j=0;j<rounduser.length;j++) {
+						userids.push(rounduser[j].id);
+					}
+					var roundOne = self.yhrotates[self.nowroundIndex];
+					screencore.ajaxSubmit('/screen/yaohao/saverounduser',{rotateid:roundOne.id,userids:userids}).then(function(json){
+						if(json.code!=0){
+							layerBox.showMsg(json.msg+'，请刷新页面重试',0);
+						}
+					});
+					if(Object.keys(self.fieldconfig).length!=1 && roundOne.lefttype=='1' && $(".yh-left-data ul").length>(roundOne.yaonums - roundOne.outnums)){
+						$(".yh-left-data ul:gt("+(roundOne.yaonums - roundOne.outnums - 1)+")").remove();
+					}
+					self.updateLeftdata(rounduser,0);
+					var roundBox = $(".yh-right .yh-round-datas[data-roundid=" + roundOne.id + "]");
+					if(roundBox.length <= 0){
+						if($(".yh-right .yh-round-item").length >= self.rightcolumn) {
+							$(".yh-right .yh-round-item").eq((self.rightcolumn-1)).remove();
+						};
+						var luckhtml = '<div class="yh-round-item"><div class="yh-round-title">'+(roundOne.lucktitle?roundOne.lucktitle:roundOne.rotatetitle)+'</div><div class="yh-round-datas" data-roundid="'+roundOne.id+'">';
+						$.each(rounduser,function(index,val){
+							luckhtml += '<ul class="yh-round-data">';
+								$.each(self.fieldconfig,function(i,v){
+									if(i=='xuhao' && v.fieldisleft=='1'){
+										luckhtml += '<li class="xuhao">'+(index+1)+'</li>';
+									}else{
+										v.fieldisleft=='1' && (luckhtml += '<li class="'+i+'">'+val[i]+'</li>');								
+									}
+								});
+							luckhtml += '</ul>';
+						});
+						luckhtml += '</div></div>';
+						$(".yh-right").prepend(luckhtml);
+					}else{
+						var luckhtml = '';
+						$.each(rounduser,function(index,val){
+							luckhtml += '<ul class="yh-round-data">';
+								$.each(self.fieldconfig,function(i,v){
+									if(i=='xuhao' && v.fieldisleft=='1'){
+										luckhtml += '<li class="xuhao">'+(index+1)+'</li>';
+									}else{
+										v.fieldisleft=='1' && (luckhtml += '<li class="'+i+'">'+val[i]+'</li>');								
+									}
+								});
+							luckhtml += '</ul>';
+						});
+						roundBox.append(luckhtml);
+					}
+					var roundoutnums = roundOne.yaonums - roundOne.outnums - rounduser.length;
+					if(roundoutnums<=0){
+						$this.attr('data-status','3');
+						$this.find('span').text('下一轮');
+					}else{
+						$this.attr('data-status','1');
+						$this.find('span').text('开始');
+					}
+					self.yhrotates[self.nowroundIndex].outnums += rounduser.length;
+				}else{
+					self.initAlldata();
+					$this.attr('data-status','1');
+					$this.find('span').text('开始');
+				}
+			});
+			keyboardJS.bind('space', function(e) {
+				$(".yh-left-btn").trigger('click');
+			});
+		},
+		getroundUser:function(){
+			var self = this,roundOne = self.yhrotates[self.nowroundIndex];
+			{/*先从内定用户列表里拿到所有内定的用户 根据轮次id去拿*/}
+			var list = self.getndUserAll();
+			var len = list.length;
+			var ullength = roundOne.yaonums - roundOne.outnums;
+			{/*如果内定的用户数量比本次抽取的数量大则全部取内定用户*/}
+			if (len > 0 && len >= ullength) {
+				return screencore.arrayrandom(list, ullength)
+			}
+			{/*如果内定用户数量不足 考虑从全部用户里取*/}
+			if (self.allusers.length === 0) {
+				return list;
+			}else{
+				var addnum = ullength - len;
+				var list1 = self.getroundUserAll();
+				{/*是否考虑打乱*/}
+				var orderlist = list.concat(screencore.arrayrandom(list1, addnum));
+				return screencore.arrayrandom(orderlist,orderlist.length);
+			}
+		},
+		getndUserAll:function(){
+			var self = this,roundOne = self.yhrotates[self.nowroundIndex],arr = [];
+			if (self.ndusers.length > 0) {
+				arr = screencore.arraybyvalue(self.ndusers,roundOne.id, "rotateid");
+			}
+			return arr;
+		},
+		getroundUserAll:function(){
+			var self = this,roundOne = self.yhrotates[self.nowroundIndex],arr = [];
+			if (roundOne.cateids.length > 0) {
+				for (var i = 0; i < roundOne.cateids.length; i++) {
+					arr = arr.concat(screencore.arraybyvalue(self.allusers, roundOne.cateids[i], "cateid"));
+				}
+				return arr;
+			} else {
+				return self.allusers;
+			}
+		},
+		doroundUser:function(l){
+			var self = this;
+			var g = l.length;
+			if (g === 0) {
+				return l;
+			}
+			var roundOne = self.yhrotates[self.nowroundIndex];
+			var h = null
+			  , f = null;
+			for (var j = 0; j < g; j++) {
+				h = l[j];
+				screencore.arrayremove(self.ndusers, h.id, "id");
+				var deluser = screencore.arrayremove(self.allusers, h.id, "id");
+				f = screencore.arraysearch(self.luckers, h.id, "user_id");
+				if (f == null) {
+					h.rotate_id = roundOne.id;
+					self.luckers.push(h);
+				}
+			}
+			return l;
+		},
+		getrandomUser:function(len){
+			var self = this,ndusers = screencore.arraybynotvalue(self.ndusers,-1,'rotateid'),allUsers = self.allusers.concat(ndusers);
+			return screencore.arrayrandom(allUsers,len);
+		},
+		updateLeftdata:function(arr,l){
+			var self = this;
+			l = l === 0 ? $(".yh-left-data ul").length : l;
+			for (var i = 0; i < l; i++) {
+				if (arr[i]) {
+					var tli = $(".yh-left-data ul").eq(i);
+					var lis = (self.fieldconfig.hasOwnProperty("xuhao")&&self.fieldconfig['xuhao'].fieldstatus=='1') ? tli.find('li').eq(0).nextAll() : tli.find('li');
+					var j = 0;
+					$.each(arr[i],function(key,val){
+					  if(key.indexOf('field')!=-1){
+						lis.eq(j).text(val);
+						j++;
+					  }
+					})
+				}
+			}
+		},
+		isCanYaohao:function(){
+			var self = this,roundOne = self.yhrotates[self.nowroundIndex];
+			var len = self.getroundUserAll().length + self.getndUserAll().length;
+			return len >= (roundOne.yaonums - roundOne.outnums);
+		}
+	};
+	screenyaohao.init();
+});
+</script>
+<script type="text/html" id="lefttpl">
+{{each lists as vl ki}}
+<ul>
+	{{ if xuhaoopen=='1'}}
+		<li class="xuhao">{{ ki+1 }}</li>
+	{{ /if }}
+	{{each vl as v k}}
+		{{ if k.indexOf('field')!=-1 }}
+		<li class="{{ k }}">{{ v }}</li>
+		{{ /if }}
+	{{/each}}
+</ul>
+{{/each}}
+</script>
+{include file='common/footer' /}

@@ -1,0 +1,331 @@
+<style>
+table tr td{text-align:center!important}
+.confirmbox-pop .zam-titleBox{font-weight: 600;padding:5px 0;}
+.userimgbox img{height:40px!important;}
+.edui-default .edui-toolbar .edui-for-fullscreen {
+    display: none!important
+}
+#edui_fixedlayer{z-index: 9999!important}
+</style>
+<div class="form-horizontal confirmbox-pop rotate-pop">
+<form class="confirm-formbox" method="post">
+    <div class="text-center">
+        <div class="btn-group pop-btns" style="margin-bottom:10px;">
+          <a href="javascript:void(0)" class="btn btn-default btn-primary"><span>基础设置</span></a>
+          <a href="javascript:void(0)" class="btn btn-default"><span>奖品列表</span></a>
+        </div>
+    </div>
+    <div class="carditem">
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 轮次名</label>
+            <div class="col-lg-8">
+                <input class="form-control" type="text"  name="title" value="{$rotate['title']}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 游戏时间</label>
+            <div class="col-lg-8">
+                <input type="text" class="form-control numberincdec" name="gametime" 
+		                data-bts-min="1" data-bts-replacement-val="1"
+		                data-bts-max="null"
+		                data-bts-step="1"
+						data-bts-postfix="秒"
+                		data-bts-postfix-extra-class="touchspin-postfix"
+		                value="{$rotate['gametime']}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 每个用户最多中奖次数</label>
+            <div class="col-lg-8">
+                <input type="text" class="form-control numberincdec" name="maxget" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="null"
+                data-bts-step="1"
+				data-bts-postfix="次"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$rotate['maxget']}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 大屏显示奖品余量</label>
+            <div class="col-lg-8">
+                {:tpl_switch('showremain',$rotate['showremain'],'ylunit')}
+            </div>
+        </div>
+        <div class="form-group ylunitbox{if $rotate['showremain']=='2'} hidden{/if}">
+            <label class="col-lg-3 control-label">* 余量单位</label>
+            <div class="col-lg-8">
+                <input class="form-control" type="text"  name="ylunit" value="{$rotate['ylunit']}" maxlength='8'>
+                <span class="help-block">可以是红包，奖品，礼品等</span>
+            </div>
+        </div>
+    </div>
+    <div class="carditem hidden">
+        <div class="form-group col-lg-12" style="margin-right: 0;margin-left: 0">
+        	<table class="we7-table table" style="margin-bottom:0px;">
+				<thead>
+				  <tr>
+				  	<th style="width:10%;text-align:center;">类型</th>
+					<th style="width:20%;text-align:center;">奖品</th>
+					<th style="width:15%;text-align:center;">概率</th>
+					<th style="width:15%;text-align:center;">数量</th>
+					<th style="width:20%;text-align:center;">总金额</th>
+					<th style="width:20%;text-align:center;">操作</th>
+				  </tr>
+				</thead>
+				<tbody class="prize-list">
+					{volist name="rotate.prizes" id="item"}
+						<tr>
+							<td>
+					           <p>
+					            <span class="label label-{if $item['prizetype']=='2'}danger{else /}primary{/if}">{if $item['prizetype']=='2'}红包{else /}实物{/if}</span>
+					           </p>
+					           <input type="hidden" name="prizetype[]" value="{$item['prizetype']}">
+					        </td>
+							<td>
+							  <input type="hidden" name="prizeimg[]" value="{$item['prizeimg']}">
+							  <input type="hidden" name="prizename[]" value="{$item['prizename']}">
+							  <div class="userimgbox"><img src="{:tomedia($item['prizeimg']);}"></div>
+							  <span>{$item['prizename']}</span>
+							</td>
+							<td>
+							  <input type="hidden" name="prizegl[]" value="{$item['prizegl']}">
+							  <span>{$item['prizegl']}%</span>
+							</td>
+							<td>
+							  <input type="hidden" name="prizenum[]" value="{$item['prizenum']}">
+							  <span>{$item['prizenum']}个</span>
+							</td>
+							<td>
+							  <input type="hidden" name="prizemoney[]" value="{$item['prizemoney']}">
+							  <input type="hidden" name="prizemin[]" value="{$item['prizemin']}">
+							  <input type="hidden" name="prizemax[]" value="{$item['prizemax']??'8.80'}">
+							  <input type="hidden" name="opengroup[]" value="{$item['opengroup']}">
+							  <input type="hidden" name="groupid[]" value="{$item['groupid']}">
+							  {if $item['prizetype']=='2'}
+							  <div><span>{$item['prizemoney']}</span></div>
+							  <div><span>最小金额:{$item['prizemin']}</span></div>
+							  <div><span>最大金额:{$item['prizemax']??'8.80'}</span></div>
+							  {else /}
+							  -
+							  {/if}
+							</td>
+							<td>
+							  <a href="javascript:;" data-prizeid="{$item['id']}" class="btn btn-primary btn-xs btn-editprize">
+								  <i class="mdi mdi-pencil"></i>
+							  </a>
+							  <a href="javascript:;" data-prizeid="{$item['id']}" class="btn btn-danger btn-xs btn-delprize">
+								  <i class="mdi mdi-close"></i>
+							  </a>
+
+							</td>
+						</tr>
+					{/volist}
+				</tbody>
+				<tfoot style="border: 1px solid #efefef;">
+				  <tr>
+					<td colspan="6">
+					  <a  class="btn btn-primary btn-sm addprizeitem" href="javascript:;"> <i class="mdi mdi-plus"></i>&nbsp;<span>新增奖品</span></a>
+					</td>
+				  </tr>
+				</tfoot>
+			</table>
+        </div>
+    </div>
+</form>
+</div> 
+<script id='oneprize-tpl' type="text/template">
+<tr>
+	<td>
+       <p>
+        <span class="label label-<%# if(d.prizetype&&d.prizetype=='2'){ %>danger<%# }else{ %>primary<%# } %>"><%# if(d.prizetype&&d.prizetype=='2'){ %>红包<%# }else{ %>实物<%# } %></span>
+       </p>
+       <input type="hidden" name="prizetype[]" value="<% d.prizetype %>">
+    </td>
+	<td>
+	  <input type="hidden" name="prizeimg[]" value="<% d.prizeimg %>">
+	  <input type="hidden" name="prizename[]" value="<% d.prizename %>">
+	  <div class="userimgbox"><img src="<% d.prevprizeimg %>"></div>
+	  <span><% d.prizename %></span>
+	</td>
+	<td>
+	  <input type="hidden" name="prizegl[]" value="<% d.prizegl %>">
+	  <span><% d.prizegl %>%</span>
+	</td>
+	<td>
+	  <input type="hidden" name="prizenum[]" value="<% d.prizenum %>">
+	  <span><% d.prizenum %>个</span>
+	</td>
+	<td>
+	  <input type="hidden" name="prizemoney[]" value="<% d.prizemoney %>">
+	  <input type="hidden" name="prizemin[]" value="<% d.prizemin %>">
+	  <input type="hidden" name="prizemax[]" value="<% d.prizemax %>">
+	  <input type="hidden" name="opengroup[]" value="<% d.opengroup %>">
+	  <input type="hidden" name="groupid[]" value="<% d.groupid %>">
+	  <%# if(d.prizetype&&d.prizetype=='2'){ %>
+	  <div><span><% d.prizemoney %></span></div>
+	  <div><span>最小金额:<% d.prizemin %></span></div>
+	  <div><span>最大金额:<% d.prizemax %></span></div>
+	  <%# }else{ %>
+	  -
+	  <%# } %>
+	</td>
+	<td>
+	  <a href="javascript:;" <%# if(d.id){ %>data-prizeid="<% d.id %>"<%# } %> class="btn btn-primary btn-xs btn-editprize">
+		  <i class="mdi mdi-pencil"></i>
+	  </a>
+	  <a href="javascript:;" <%# if(d.id){ %>data-prizeid="<% d.id %>"<%# } %> class="btn btn-danger btn-xs btn-delprize">
+		  <i class="mdi mdi-close"></i>
+	  </a>
+	</td>
+</tr>
+</script>        
+<script>    
+require(['webcore','jconfirmBox','zamnotice','layerBox',"bootstrap-touchspin"],function(webcore,jconfirmBox,zamnotice,layerBox){
+	tpl_switch();
+	$("[data-toggle='tooltip']").tooltip({
+        trigger : 'hover',
+	});
+    $(".rotate-pop .pop-btns a.btn").click(function(){
+        $(this).addClass('btn-primary').siblings().removeClass("btn-primary");
+        $(".rotate-pop .carditem").addClass('hidden').eq($(this).index()).removeClass('hidden');
+    });
+    $(".confirmbox-pop .numberincdec").TouchSpin().on("change", function(){
+        var $this = $(this),funcstr = $this.data('func');
+        var func = window[funcstr];
+        func && func();
+    });
+    $(function(){
+      $(".sp-container").remove();
+      $(".js-colorpicker").each(function(){
+            tpl_colorpicker(this);
+      });
+    })
+    var rotateid = "{if isset($rotate['id'])}{$rotate['id']}{else}{/if}";
+	$(".addprizeitem").on('click',function(){
+		var confirmObj = jconfirmBox.ajaxconfirm("新增奖品","{:gohdmanage('configydj/editprize',['hdid'=>$hdid])}",{rotateid:rotateid},'html','col-lg-8 col-lg-offset-2',function(e){
+			var prizearr = webcore.serializeObject(e.find('form'));
+			prizearr.prevprizeimg = e.find('img').attr("src");
+			if(prizearr.prizename==''||prizearr.prizename=='') {
+				zamnotice.showTips('error','奖品名与奖品图必须设置');
+				return false;
+			}
+			if(prizearr.prizemoney==''){
+				prizearr.prizemoney = " ";
+			}
+			if(prizearr.prizemin==''){
+				prizearr.prizemin = " ";
+			}
+			if(prizearr.prizemax==''){
+				prizearr.prizemax = " ";
+			}
+			if(prizearr.opengroup=='1' && prizearr.groupid=='0'){
+				zamnotice.showTips('error','指定用户组必须选择一个组');
+				return false;
+			}
+			if(rotateid!=''){
+				webcore.ajaxSubmit("{:gohdmanage('configydj/saveprize',['hdid'=>$hdid])}",{rotateid:rotateid,prizearr:prizearr}).then(function(json){
+					if(json.code==0){
+						confirmObj.close();
+						prizearr.id = json.msg;
+						$(".prize-list").append(webcore.tpl($("#oneprize-tpl"),prizearr));
+						zamnotice.showTips('success','新增成功');
+					}else{
+						zamnotice.showTips('error',json.msg);
+					}
+				}, function(json){
+					zamnotice.showTips('error','网络差。操作失败');
+				});
+			}else{
+				$(".prize-list").append(webcore.tpl($("#oneprize-tpl"),prizearr));
+				confirmObj.close();
+			}
+		},false,true,[{'hidden':false,'txt':'确定新增'},{'hidden':false,'txt':'取消'}],true,function(){
+				tpl_switch();
+		});
+	});
+	$(".prize-list").on('click','.btn-editprize',function(){
+		var $this = $(this),fdom = $this.parent().parent(); 
+		var prizeid = $this.attr('data-prizeid');
+		var editprizearr = {};
+		if(!prizeid){
+			fdom.find("input").each(function(){
+				var $this = $(this),inputname = $this[0].name.replace("[]","");
+				editprizearr[inputname] = $this.val();
+			});
+		}
+		var confirmObj = jconfirmBox.ajaxconfirm("编辑奖品","{:gohdmanage('configydj/editprize',['hdid'=>$hdid])}",{rotateid:rotateid,prizeid:prizeid,editprizearr:editprizearr},'html','col-lg-8 col-lg-offset-2',function(e){
+			var prizearr = webcore.serializeObject(e.find('form'));
+			prizearr.prevprizeimg = e.find('img').attr("src");
+			if(prizearr.prizename==''||prizearr.prizename=='') {
+				zamnotice.showTips('error','奖品名与奖品图必须设置');
+				return false;
+			}
+			if(prizearr.prizemoney==''){
+				prizearr.prizemoney = " ";
+			}
+			if(prizearr.prizemin==''){
+				prizearr.prizemin = " ";
+			}
+			if(prizearr.prizemax==''){
+				prizearr.prizemax = " ";
+			}
+			if(prizearr.opengroup=='1' && prizearr.groupid=='0'){
+				zamnotice.showTips('error','指定用户组必须选择一个组');
+				return false;
+			}
+			if(prizeid){
+				webcore.ajaxSubmit("{:gohdmanage('configydj/saveprize',['hdid'=>$hdid])}",{rotateid:rotateid,prizeid:prizeid,prizearr:prizearr}).then(function(json){
+					if(json.code==0){
+						confirmObj.close();
+						prizearr.id = prizeid;
+						fdom.html($(webcore.tpl($("#oneprize-tpl"),prizearr)).html());
+						zamnotice.showTips('success','编辑成功');
+					}else{
+						zamnotice.showTips('error',json.msg);
+					}
+				}, function(json){
+					zamnotice.showTips('error','网络差。操作失败');
+				});
+			}else{
+				fdom.html($(webcore.tpl($("#oneprize-tpl"),prizearr)).html());
+				confirmObj.close();
+			}
+		},false,true,[{'hidden':false,'txt':'确定保存'},{'hidden':false,'txt':'取消'}],true,function(){
+				tpl_switch();
+		});
+	});
+	$(".prize-list").on('click','.btn-delprize',function(){
+		var $this = $(this);
+		var prizeid = $this.attr('data-prizeid');
+		jconfirmBox.confirm('温馨提示','删除将无法恢复，您确定要删除么？',function(){
+				if(prizeid){
+					webcore.ajaxSubmit("{:gohdmanage('configydj/delprize',['hdid'=>$hdid])}",{rotateid:rotateid,prizeid:prizeid}).then(function(json){
+						if(json.code==0){
+							zamnotice.showTips('success','删除成功');
+							$this.parent().parent().remove();
+						}else{
+							zamnotice.showTips('error',json.msg);
+						}
+					}, function(json){
+						zamnotice.showTips('error','网络差，操作失败');
+					});
+				}else{
+					$this.parent().parent().remove();
+				}
+		});
+	});
+});
+function ylunit(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".ylunitbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".ylunitbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+</script>

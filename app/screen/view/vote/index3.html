@@ -1,0 +1,86 @@
+{include file='common/header' /}
+<style type="text/css">
+.vote-container{
+	position: absolute;
+	width: calc(100% - 120px);
+	left:60px;
+	height: 710px;
+	top: 0px;
+    bottom: 90px;
+    color: #fff;
+}
+.vote-lists{
+	width: 100%;
+	height: 100%;
+	align-items: flex-end;
+	-webkit-align-items:flex-end;
+}
+.vote-item{
+	width: 300px;
+}
+.myout{
+	position:relative;
+	width:59px;
+	padding-top:35px;
+	background-size:100% auto;
+	background-image:url(../attachment/web/images/0/2022/10/Upwb7bHY9rJK7ZORwfPC709R97Q28PPJ.png);
+	background-repeat:no-repeat;
+	background-position:center top;
+	background-size:100% 35px;
+}
+.myout .votescore{
+  position:absolute;
+  top:10px;
+  left:0;
+  line-height:20px;
+  width:100%;
+  text-align:center;
+  color: #333;
+}
+.myin{
+	width:59px;
+	background-size:100% auto;
+	background:url(../attachment/web/images/0/2022/10/KD5UMbuwCUz9EbD5kJk6ufDUKvMdjlOL.png) repeat-y;
+	max-height: 400px;
+}
+.votename{margin-top: 20px;font-size: 20px;}
+.votename div{text-align: center;}
+.votename .zd{font-size: 14px;margin-top: 10px}
+</style>
+<div class="vote-container zam-app-flex zam-app-alignCenter zam-app-directionColumn">
+	<div class="vote-lists zam-app-flex-ajCenter2 zam-app-flex-alignflexstart">
+		{foreach $rotate['items'] as $ikey=>$ival}
+		<div class="vote-item zam-app-flex zam-app-alignCenter zam-app-justifyCenter zam-app-directionColumn vote{$ival['id']}">
+			<div class="myout zam-app-flex-ajCenter">
+			    <div class="votescore">{$ival['votenums']}</div>
+			    <div class="myin" style="height:{$ival['percent']*300}px"></div>
+			</div>
+			<div class="votename">
+				<div class="name">{$ival['votename']}</div>
+				<div class="zd">战队</div>
+			</div>
+		</div>
+		{/foreach}
+	</div>
+</div>
+<script>
+require(['screencore'],function(screencore){
+	function ajaxvoteuser(){
+		screencore.ajaxSubmit("/screen/vote/dzajaxvotedata",{}).then(function(json){
+			if(json.code==0){
+				$.each(json.msg.items,function(i,v){
+					if($(".vote"+v.id).length > 0){
+						$(".vote"+v.id).find('.votescore').text(v.votenums);
+						$(".vote"+v.id).find('.votename .name').eq(0).text(v.votename);
+						$(".vote"+v.id).find('.myin').css({"height":(v.percent*300)+'px'});
+					}
+				});
+			}
+		});
+	}
+	setInterval(function(){
+		ajaxvoteuser();
+	},3e3);
+});
+</script>
+{include file='common/footer' /}

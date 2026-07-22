@@ -1,0 +1,110 @@
+{include file="common/header" /}
+<style>
+.zam-app-tugbox{position:fixed;top:0;left:0;width:100%;height:100%;overflow: hidden;color:#333;}
+.tug-rotatetip{
+	font-size:16px;
+	padding:0.1rem 0;
+	text-align:center;
+}
+.tug-teams .tug-team{
+	width:3rem;
+	padding:0.3rem 0;
+}
+.tug-team-join{
+	font-size:16px;
+	text-align:center;
+	padding:0.2rem 0;
+}
+.tug-team-logo img{
+	width:calc(3rem - 10px);
+	border:5px solid #fff;
+}
+.tug-team-name{
+	font-size:20px;
+	text-align:center;
+	padding-top:0.2rem;
+}
+/*我的队伍*/
+.tug-myteam-name{
+	padding:0.3rem 0;
+	font-size:16px;
+	text-align:center;
+}
+.tug-myteam-status{
+	padding:0.3rem 0;
+	font-size:0.3rem;
+	text-align:center;
+}
+.tug-myteam-myscore{
+	padding:0.3rem 0;
+	font-size:0.3rem;
+	text-align:center;
+}
+.tug-myteam-myscore span{margin:0 0.3rem;font-size:0.5rem;font-weight:800}
+.tug-myteam-tuichu img{width:3.12rem}
+/*倒计时*/
+.zam-app-gametime{
+	position:fixed;
+	left:0;
+	top:0.4rem;
+	background-color:rgba(0,0,0,0.4);
+	color:#fff;
+	padding:0.3rem;
+	font-size:0.5rem;
+}
+.zam-app-gametime i{
+	margin-right:0.3rem;
+}
+</style>
+{if !empty($appconfig['style']['diycss'])}<style>{$appconfig['style']['diycss']}</style>{/if}
+<audio id="djsaudio" src="/{:WIMGURL}shake/count.mp3"></audio>
+<audio id="shakeaudio" src="/{:WIMGURL}shake/shake.mp3"></audio>
+<div class="zam-app-tugbox zam-app-flex-ajCenter">
+	<div class="tug-selteambox">
+		<p class="tug-rotatetip">请选择您的队伍</p>
+		<div class="tug-teams zam-app-flex">
+			<div class="tug-team r-team" data-team="r" style="margin-right:0.3rem;">
+				<div class="tug-team-join"><span>0</span>人</div>
+				<div class="tug-team-logo zam-app-flex-ajCenter">
+					<img>
+				</div>
+				<div class="tug-team-name">xxx</div>
+			</div>
+			<div class="tug-team b-team" data-team="b">
+				<div class="tug-team-join"><span>0</span>人</div>
+				<div class="tug-team-logo zam-app-flex-ajCenter">
+					<img>
+				</div>
+				<div class="tug-team-name">xxx</div>
+			</div>
+		</div>
+	</div>
+	<div class="tug-myteambox zam-app-flex-ajCenter hidden"><!--我的队伍-->
+		<p class="tug-myteam-name">您的队伍</p>
+		<div class="tug-myteam">
+			<div class="tug-team-logo zam-app-flex-ajCenter">
+				<img src="">
+			</div>
+			<div class="tug-team-name">xx队</div>
+		</div>
+		<div class="tug-myteam-status">xxxx</div>
+		<div class="tug-myteam-myscore hidden">
+			<div>您已经摇了<span>0</span>点</div>
+		</div>
+		<div class="tug-myteam-tuichu">
+			<img src="{:tomedia($appconfig['style']['apptc'])}">
+		</div>
+	</div>
+	<div class="tug-roundstatus tug-myteam-status hidden"></div>
+</div>
+<div class="zam-app-gametime hidden">
+	<i class="mxc-unie6b2"></i><span>0</span>
+</div>
+<script>
+require(['wechatcore','apptug'],function (wechatcore,apptug) {
+  wechatcore.gameInit(apptug);
+})
+</script>
+{include file="common/gamecommon" /}
+{include file="common/footermenu" /}
+{include file="common/footer" /}

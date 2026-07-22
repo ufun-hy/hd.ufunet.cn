@@ -1,0 +1,25 @@
+<div class="form-horizontal confirmbox-pop">
+    <div class="zam-flex-column-center">
+        <div style="border:1px solid #eceeef;border-radius: 5px;margin-bottom: 25px;">
+            <img src="{$qrcode}" width="200px" height="200px">
+        </div>
+        <a class="btn btn-primary mt10 zam-clip" data-url="{$url}"><i class="mdi mdi-content-copy"></i> 复制链接</a>
+    </div>
+</div>
+<script>
+var clipboard;
+require(["clipboard","zamnotice"],function(Clipboard,zamnotice){
+    if(clipboard){
+            clipboard.destroy();
+    }
+    clipboard = new Clipboard('.confirmbox-pop .zam-clip', {
+        text: function(e) {
+            return $(e).data('url') || $(e).data('href')
+        }
+    });
+    clipboard.on('success',function(e) {
+        zamnotice.showTips('success','复制成功',2e3);
+    })
+});
+</script>
+    

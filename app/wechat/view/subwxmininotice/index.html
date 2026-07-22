@@ -1,0 +1,25 @@
+{include file="common/header" /}
+<style type="text/css">
+.zam-app-subnoticeuser{position: absolute;top:0;left:0;width: 100%;height: 100%}
+.zam-app-subnoticeuser-content{width: 100%;height: 100%}
+.zam-app-subnoticeuser img{width:1.56rem;height:1.56rem;border-radius:50%;margin-bottom: 0.4rem;}
+.zam-app-subnoticeuser .nickname{width:80%;font-size:0.32rem;margin-bottom:0.2rem;text-align: center;}
+.zam-app-subnoticeuser .btn-confirm{
+    width: 60%;
+}
+</style>
+<section class="zam-app-subnoticeuser g-flexview zam-app-flex-ajCenter">
+<div class="zam-app-subnoticeuser-content zam-app-flex-ajCenter">
+	<img src="{$wxuser['avatar']}" />
+	<div class="nickname limitbox">{$wxuser['nickname']}</div>
+	<button type="button" class="btn-block btn-primary btn-confirm">订阅中奖通知</button>
+</div>
+</section>
+<script type="text/javascript">
+require(['wechatcore'],function(wechatcore){
+	$(".btn-confirm").click(function(){
+        wechatcore.towxminisubnoticepage("{$subtplid}");
+    });
+});
+</script>
+{include file="common/footer" /}

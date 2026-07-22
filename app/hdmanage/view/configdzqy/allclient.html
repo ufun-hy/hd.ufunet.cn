@@ -1,0 +1,199 @@
+<div class="alert alert-danger" role="alert">
+请务必在紧急情况才执行必要的操作<a class="btn btn-danger btn-md allresel ml10" data-rotateid="{$rotateid}">重选当前轮次所有客户端</a>		
+</div>
+<div class="col-lg-12 yautooverflow">
+<table class="table dzqy-allclientsBox" style="margin-bottom:0px;">
+<thead>
+  <tr>
+	<th style="width:15%;text-align:center;">客户端</th>
+	<th style="width:15%;text-align:center;">笔迹类型</th>
+	<th style="width:15%;text-align:center;">是否在线</th>
+	<th style="width:45%;text-align:center;">操作</th>
+  </tr>
+</thead>
+<tbody class="dzqy-clients" data-rotateid="{$rotateid}">
+	{volist name="list" id="client"}
+		<tr>
+			<td class="text-center">
+				<p class="mb10">
+					<a  lay-tips="点击进入本客户端签约地址" href="{$client['clienturl']}" target="__blank">{$client['apptitle']}</a>
+					{if $client['isfollowdraw']=='1'}<span class="text-danger">(跟随签名)</span>{/if}
+				</p>
+				<p>
+					<a class="zam-clip" data-href="{$client['clienturl']}" class="label label-primary" >复制连接</a>
+					<span class="mdi mdi-qrcode ml10 showclientqr cursor"></span>
+				</p>
+			</td>
+			<td class="text-center">
+				{if $client['isfollowdraw']=='1'}
+				-
+				{else}
+				<p>{if $client['drawtype']=='1'}<span class="label label-info">普通字</span>{else}<span class="label label-danger">毛笔字</span>{/if}</p>
+				{/if}
+			</td>
+			<td class="text-center"><p>{if $client['online']=='1'}<span class="label label-primary">在线</span>{else}<span class="label label-danger">离线</span>{/if}</p></td>
+			<td class="text-center">
+				<a href="javascript:;" data-rotateid="{$rotateid}" data-deviceid="{$client['id']}" class="btn btn-danger btn-sm refreshclient" lay-tips="一般在客户端连接云签约系统不稳定时使用">
+					刷新重连
+				</a>
+				<a href="javascript:;" data-rotateid="{$rotateid}" data-deviceid="{$client['id']}" class="btn btn-primary btn-sm cleardraw" lay-tips="点击后将清空该客户端与大屏签名笔迹">
+					清空笔迹
+				</a>
+				<a href="javascript:;" data-rotateid="{$rotateid}" data-deviceid="{$client['id']}" class="btn btn-info btn-sm showreadyimg" lay-tips="点击后将清空该客户端的大屏签名笔迹并且显示备用签名图">
+					显示备用签名
+				</a>
+				<a href="javascript:;" data-rotateid="{$rotateid}" data-deviceid="{$client['id']}" class="btn btn-primary btn-sm showdeviceimg" lay-tips="点击查看本客户端签名">
+					查看签约图
+				</a>
+			</td>
+		</tr>
+	{/volist}
+</tbody>
+<tfoot>
+	<tr><td colspan='4' class="text-center text-error">温馨提醒: 签约终端地址可以通过浏览器打开(即为不一定非要用微信打开签约客户端)</td></tr>
+	<tr>
+		<td colspan="4" class="text-center"><a class="btn btn-primary refreshall" data-rotateid="{$rotateid}" href="javascript:;"> <i class="mdi mdi-refresh"></i>&nbsp;<span>刷新</span></a></td>
+	</tr>
+</tfoot>
+</table>
+</div>
+<script id="showclient-tpl" type="text/template">
+<tr>
+	<td class="text-center">
+		<p class="mb10"><a  lay-tips="点击进入本客户端签约地址" href="<% d.clienturl %>" target="__blank"><% d.apptitle %></a><%# if(d.isfollowdraw=='1'){ %><span class="text-danger">(跟随签名)</span><%# } %></p>
+		<p><a class="zam-clip" data-href="<% d.clienturl %>" class="label label-primary" >复制连接</a><span class="mdi mdi-qrcode ml10 showclientqr cursor"></span></p>
+	</td>
+	<td class="text-center">
+		<%# if(d.isfollowdraw=='2'){ %>
+		<p><%# if(d.drawtype=='1'){ %><span class="label label-info">普通字</span><%# }else{ %><span class="label label-danger">毛笔字</span><%# } %></p>
+		<%# }else{ %>
+		-
+		<%# } %>
+	</td>
+	<td class="text-center"><p><%# if(d.online=='1'){ %><span class="label label-primary">在线</span><%# }else{ %><span class="label label-danger">离线</span><%# } %></p></td>
+	<td class="text-center">
+		<a href="javascript:;" data-rotateid="<% d.rotateid %>" data-deviceid="<% d.id %>" class="btn btn-danger btn-sm refreshclient" lay-tips="一般在客户端连接云签约系统不稳定时使用">
+			刷新重连
+		</a>
+		<a href="javascript:;" data-rotateid="<% d.rotateid %>" data-deviceid="<% d.id %>" class="btn btn-primary btn-sm cleardraw" lay-tips="点击后将清空该客户端与大屏签名笔迹">
+			清空笔迹
+		</a>
+		<a href="javascript:;" data-rotateid="<% d.rotateid %>" data-deviceid="<% d.id %>" class="btn btn-info btn-sm showreadyimg" lay-tips="点击后将清空该客户端的大屏签名笔迹并且显示备用签名图">
+			显示备用签名
+		</a>
+		<a href="javascript:;" data-rotateid="<% d.rotateid %>" data-deviceid="<% d.id %>" class="btn btn-primary btn-sm showdeviceimg" lay-tips="点击查看本客户端签名">
+			查看签约图
+		</a>
+	</td>
+</tr>
+</script>
+<script>
+require(["webcore",'jconfirmBox',"zamnotice",'layerBox',"clipboard"],function(webcore,jconfirmBox,zamnotice,layerBox,Clipboard){
+	var clipboard = new Clipboard('.zam-clip', {
+		text: function(e) {
+			return $(e).attr('data-href')
+		}
+	});
+	clipboard.on('success', function (e) {
+		zamnotice.showTips('success','复制客户端地址成功',2e3);
+	});
+	
+	$(".dzqy-allclientsBox").on('click','.showdeviceimg',function(){
+		var rotateid = $(this).attr('data-rotateid'),deviceid = $(this).attr('data-deviceid');
+		webcore.ajaxSubmit("{:gohdmanage('configdzqy/clientshowimg',['hdid'=>$hdid])}",{rotateid:rotateid,deviceid:deviceid},'稍等，正在查询..').then(function(json){
+			if(json.code==0){
+				prevshowattachs(json.msg,1,'z-index:9999');
+			}else{
+				zamnotice.showTips('error',json.msg);
+			}
+		}, function(json){
+			zamnotice.showTips('error','网络异常');
+		});
+	});
+	$(".dzqy-allclientsBox").on('click','.refreshclient',function(){
+		var rotateid = $(this).attr('data-rotateid'),deviceid = $(this).attr('data-deviceid');
+		jconfirmBox.confirm('温馨提示','刷新重连客户端将清空该客户端签名笔迹以及大屏签名笔迹，您确定要操作么？',function(){
+		webcore.ajaxSubmit("{:gohdmanage('configdzqy/clientrefresh',['hdid'=>$hdid])}",{rotateid:rotateid,deviceid:deviceid},'稍等，执行刷新客户端命令，请稍后..').then(function(json){
+			if(json.code==0){
+				zamnotice.showTips('success','操作成功');
+			}else{
+				zamnotice.showTips('error',json.msg);
+			}
+		}, function(json){
+			zamnotice.showTips('error','网络异常');
+		});
+		});
+	});
+	$(".dzqy-allclientsBox").on('click','.cleardraw',function(){
+		var rotateid = $(this).attr('data-rotateid'),deviceid = $(this).attr('data-deviceid');
+		jconfirmBox.confirm('温馨提示','清空签名将清空该客户端签名笔迹以及大屏签名笔迹，您确定要操作么？',function(){
+			webcore.ajaxSubmit("{:gohdmanage('configdzqy/clientclear',['hdid'=>$hdid])}",{rotateid:rotateid,deviceid:deviceid},'稍等，执行清空客户端签名命令，请稍后..').then(function(json){
+				if(json.code==0){
+					zamnotice.showTips('success','操作成功');
+				}else{
+					zamnotice.showTips('error',json.msg);
+				}
+			}, function(json){
+				zamnotice.showTips('error','网络异常');
+			});
+		});
+	});
+	$(".dzqy-allclientsBox").on('click','.showreadyimg',function(){
+		var rotateid = $(this).attr('data-rotateid'),deviceid = $(this).attr('data-deviceid');
+		jconfirmBox.confirm('温馨提示','显示签名备用图将清空该客户端签名笔迹，您确定要操作么？',function(){
+			webcore.ajaxSubmit("{:gohdmanage('configdzqy/clientshowreadyimg',['hdid'=>$hdid])}",{rotateid:rotateid,deviceid:deviceid},'稍等，执行显示客户端备用签名命令，请稍后..').then(function(json){
+				if(json.code==0){
+					zamnotice.showTips('success','操作成功');
+				}else{
+					zamnotice.showTips('error',json.msg);
+				}
+			}, function(json){
+				zamnotice.showTips('error','网络异常');
+			});
+		});
+	});
+	$(".dzqy-allclientsBox").on('click','.showclientqr',function(){
+		var $this = $(this),url = $this.prev().attr("data-href");
+		var qrbox = $('<div class="clientqr zam-flex-center" style="width:220px;height:220px"></div>');
+		layerBox.showHtml(qrbox.prop("outerHTML"),function(e,index){
+			$(e).find(".clientqr").qrcode({
+				width: 200,
+				height:200,
+				text: url
+			});
+		});
+	});
+	$(".dzqy-allclientsBox .refreshall").click(function(){
+			var rotateid = $(this).attr('data-rotateid');
+			webcore.ajaxSubmit("{:gohdmanage('configdzqy/showallclients',['hdid'=>$hdid])}",{rotateid:rotateid,gettype:'2'},'正在执行刷新命令，请稍后..').then(function(json){
+				var html = '';
+				if(json.code==0){
+					$.each(json.msg,function(i,v){
+					v.rotateid = rotateid;
+					html += webcore.tpl($("#showclient-tpl"),v);
+					});
+					$(".dzqy-clients").empty().html(html);
+				}else{
+					zamnotice.showTips('error',json.msg);
+				}
+			}, function(json){
+				zamnotice.showTips('error','网络异常');
+			});
+	});
+	
+	$(".allresel").click(function(){
+		var rotateid = $(this).attr('data-rotateid');
+		jconfirmBox.confirm('温馨提示','此操作将导致本轮所有客户端需重新选择对应客户端，您确定要这样操作么？',function(){
+			webcore.ajaxSubmit("{:gohdmanage('configdzqy/clientallresel',['hdid'=>$hdid])}",{rotateid:rotateid},'稍等，执行重选命令中，请稍后..').then(function(json){
+				if(json.code==0){
+					zamnotice.showTips('success','操作成功');
+				}else{
+					zamnotice.showTips('error',json.msg);
+				}
+			}, function(json){
+				zamnotice.showTips('error','网络异常');
+			});
+		});
+	});
+});
+</script>

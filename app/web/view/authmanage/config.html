@@ -1,0 +1,110 @@
+{include file='$Wpath/common/header'}
+<div class="alert alert-danger">
+    务必认真填写以下信息，一经授权无法更改
+</div>
+<form id="formBox" class="zam-formvalidation form-horizontal" method="post">
+  <div class="form-group">
+      <label class="col-lg-2 control-label">* 授权域名</label>
+      <div class="col-lg-8">
+        <input class="form-control" type="text" name="host" value="{$config['host']??''}" {if !empty($config['sitecode'])}readonly{/if} onKeyup="return trimSpace(this);">
+        <div class="help-block">注意:授权域名作为系统更新域名，不可解析到cdn服务或负载均衡ip</div>
+      </div>
+  </div>
+  <div class="form-group">
+      <label class="col-lg-2 control-label">* 授权ip</label>
+      <div class="col-lg-8">
+        <input class="form-control" type="text" name="ip" value="{$config['ip']??''}" {if !empty($config['sitecode'])}readonly{/if} onKeyup="return trimSpace(this);">
+        <div class="help-block">注意:授权ip与授权域名是一一匹配的，更新系统时若系统检测到域名与ip不匹配将导致更新失败</div>
+      </div>
+  </div>
+  <div class="form-group">
+      <label class="col-lg-2 control-label">* 站点id</label>
+      <div class="col-lg-8">
+        <input class="form-control" type="text" name="siteid" value="{$config['siteid']??''}" {if !empty($config['sitecode'])}readonly{/if} onKeyup="return trimSpace(this);">
+        <div class="help-block">此项需联系软件开发商获取</div>
+      </div>
+  </div>
+  <div class="form-group">
+      <label class="col-lg-2 control-label">* 站点授权码</label>
+      <div class="col-lg-8">
+        <input class="form-control" type="text" name="sitecode" value="{$config['sitecode']??''}" {if !empty($config['sitecode'])}readonly{/if} onKeyup="return trimSpace(this);">
+        <div class="help-block">此项需联系软件开发商获取</div>
+      </div>
+  </div>
+  <div class="form-group">
+      <label class="col-lg-2 control-label"></label>
+      <div class="col-lg-8">
+        {if empty($config['sitecode'])}
+          <button type="submit" class="btn btn-primary btn-sm sqpost">立即授权</button>
+        {else}
+        <div class="form-control-static text-primary">站点已授权</div>
+        {/if}
+      </div>
+  </div>
+</form>
+<script>
+require(['webcore','jconfirmBox','zamnotice','zvalidator'],function(webcore,jconfirmBox,zamnotice){
+  $('#formBox').formValidation({
+			framework: 'bootstrap',
+			excluded: [':disabled'],
+			message: '您填写的内容无效',
+			fields: {
+          host: {
+            message: '授权域名必须填写',
+            validators: {
+              notEmpty: {
+                message: '授权域名必须填写'
+              },
+            }
+          },
+          ip: {
+            message: '授权ip必须填写',
+            validators: {
+              notEmpty: {
+                message: '授权ip必须填写'
+              },
+            }
+          },
+          siteid: {
+            message: '授权站点id必须填写',
+            validators: {
+              notEmpty: {
+                message: '授权站点id必须填写'
+              },
+            }
+          },
+          sitecode: {
+            message: '授权码必须填写',
+            validators: {
+              notEmpty: {
+                message: '授权码必须填写'
+              },
+            }
+          },
+			}
+	}).on('success.form.fv', function(e) {
+		e.preventDefault();
+		var $form = $(e.target);
+		var postData = webcore.serializeObject($form);
+    var bload = $form.find(".sqpost").lyearloading({opacity: 0.2,spinnerSize: 'nm'});
+		$form.formValidation('disableSubmitButtons', true);
+		webcore.ajaxSubmit("{:goweb('authmanage/config')}",postData).then(function(json){
+      bload.hide();
+			if(json.code==0){
+			    $form.formValidation('disableSubmitButtons', false);
+			    zamnotice.showTips('success','操作成功',2e3,function(){
+			    	window.location.reload();
+			    });
+		    }else{
+		        zamnotice.showTips('error',json.msg);
+		        $form.formValidation('disableSubmitButtons', false);
+		    }
+		}, function(json){
+      bload.hide();
+			zamnotice.showTips('error','网络差。操作失败');
+			$form.formValidation('disableSubmitButtons', false);
+		});
+	});
+});
+</script>
+{include file='$Wpath/common/footer'}

@@ -1,0 +1,779 @@
+<style>
+table tr td{text-align:center!important}
+.confirmbox-pop .zam-titleBox{font-weight: 600;padding:5px 0;}
+.userimgbox img{height:40px!important;}
+.edui-default .edui-toolbar .edui-for-fullscreen {
+    display: none!important
+}
+#edui_fixedlayer{z-index: 1037!important}
+</style>
+<div class="form-horizontal confirmbox-pop rotate-pop">
+<form class="confirm-formbox" method="post">
+    <div class="text-center">
+        <div class="btn-group pop-btns" style="margin-bottom:10px;">
+          <a href="javascript:void(0)" class="btn btn-default btn-primary"><span>基础设置</span></a>
+          <a href="javascript:void(0)" class="btn btn-default"><span>投票规则</span></a>
+          <a href="javascript:void(0)" class="btn btn-default"><span>样式设置</span></a>
+          <a href="javascript:void(0)" class="btn btn-default"><span>投票项</span></a>
+        </div>
+    </div>
+    <div class="carditem" style="min-height: 300px;">
+        <div class="form-group">
+            <label class="col-lg-3 control-label">轮次名</label>
+            <div class="col-lg-8">
+                <input class="form-control" type="text"  name="title" value="{$rotate['title']??''}" maxlength="120" placeholder="120个字符内">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">起止时间</label>
+            <div class="col-lg-8">
+                {:tpl_daterangetime([
+                	'name'=>'startendtime',
+                	'autoval'=>'1',
+                	'needsfm'=>'1',
+                	'needsdd'=>'1',
+                	'val'=>[
+                		'start'=>$rotate['starttime'],
+                        'end'=>$rotate['endtime']
+                	]
+                ])}
+            </div>
+        </div>
+        <div class="form-group">
+			<label class="col-lg-3 control-label">票数模式</label>
+			<div class="col-lg-8">
+				<label class="lyear-radio radio-inline radio-primary" title="仅有一票，仅可选一个项目" onclick="javascript:$('.votetypeBox').addClass('hidden'),$('.votetypeBox2').removeClass('hidden');">
+                    <input type="radio" name="votetype" value="1" {if $rotate['votetype']=='1'}checked{/if}><span>单票</span>
+                </label>
+                <label class="lyear-radio radio-inline radio-primary" title="有多票，可选多个项目，但每个项目仅可投一票" onclick="javascript:$('.votetypeBox,.maxselect,.minselect').removeClass('hidden');$('.maxvote,.votetypeBox2').addClass('hidden');">
+                    <input type="radio" name="votetype" value="2" {if $rotate['votetype']=='2'}checked{/if}><span>多票</span>
+                </label>
+                <label class="lyear-radio radio-inline radio-primary" title="有多票，可随意选择投票项目，每个项目可投多票" onclick="javascript:$('.votetypeBox,.maxvote').removeClass('hidden');$('.maxselect,.minselect,.votetypeBox2').addClass('hidden');">
+                    <input type="radio" name="votetype" value="3" {if $rotate['votetype']=='3'}checked{/if}><span>自由票</span>
+                </label>
+                <div class="help-block">投票开始后，请勿随意更改此项</div>
+			</div>
+		</div>
+		<div class="votetypeBox{if $rotate['votetype'] == '1'} hidden{/if}">
+			<div class="form-group maxselect{if $rotate['votetype']=='3'} hidden{/if}">
+				<label class="col-lg-3 control-label text-right">可选项目数</label>
+				<div class="col-lg-5">
+					<div class="input-group">
+						<div class="input-group-btn not-allow"><a class="btn btn-default">最少可选</a></div>
+						<div class="touchspin">
+						<input type="text" class="form-control numberincdec" name="minselect" 
+		                data-bts-min="1" data-bts-replacement-val="1"
+		                data-bts-max="null"
+		                data-bts-step="1"
+		                value="{$rotate['minselect']}">
+		            	</div>
+						<div class="input-group-btn not-allow"><a class="btn btn-default">最多可选</a></div>
+						<div class="touchspin">
+						<input type="text" class="form-control numberincdec" name="maxselect" 
+		                data-bts-min="1" data-bts-replacement-val="1"
+		                data-bts-max="null"
+		                data-bts-step="1"
+		                value="{$rotate['maxselect']}">
+		                </div>
+					</div>
+					<div class="help-block">投票开始后，请勿随意更改此项</div>
+				</div>
+			</div>
+			<div class="form-group maxvote{if $rotate['votetype']=='2'} hidden{/if}">
+				<label class="col-lg-3 control-label text-right">最多可投</label>
+				<div class="col-lg-8">
+					<input type="text" class="form-control numberincdec" name="maxvote" 
+                    data-bts-min="1" data-bts-replacement-val="1"
+                    data-bts-max="null"
+                    data-bts-step="1"
+                    value="{$rotate['maxvote']}">
+					<div class="help-block">投票开始后，请勿随意更改此项</div>
+				</div>
+			</div>
+   		</div>
+		<div class="votetypeBox2{if $rotate['votetype'] != '1'} hidden{/if}">
+			<div class="form-group">
+				<label class="col-lg-3 control-label text-right">准许撤回</label>
+				<div class="col-lg-8">
+					{:tpl_switch('autocancel',$rotate['autocancel']??'2','opencanceltype')}
+					<span class="help-block">开启则投票后可撤回</span>
+				</div>
+			</div>
+			<div class="form-group canceltypebox{if !isset($rotate['autocancel']) || $rotate['autocancel'] == '2'} hidden{/if}">
+				<label class="col-lg-3 control-label">撤回方式</label>
+				<div class="col-lg-8">
+					<label class="lyear-radio radio-inline radio-primary">
+						<input type="radio" name="canceltype" value="1" {if !isset($rotate['canceltype']) || $rotate['canceltype']=='1'}checked{/if}><span>自动撤回</span>
+					</label>
+					<label class="lyear-radio radio-inline radio-primary">
+						<input type="radio" name="canceltype" value="2" {if isset($rotate['canceltype']) && $rotate['canceltype']=='2'}checked{/if}><span>手动撤回</span>
+					</label>
+					<div class="help-block">自动撤回即为投票后再投其他项目时系统会自动删除上次投票的记录<br>手动撤回即为投票后需要用户自己点击撤回按钮来撤回投票</div>
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-lg-3 control-label text-right">投票限制</label>
+			<div class="col-lg-8">
+				<label class="lyear-radio radio-inline radio-primary" title="本轮投票每个微信号仅可投一次">
+                    <input type="radio" name="jointype" value="1" {if $rotate['jointype']=='1'}checked{/if}><span>每个微信号1次</span>
+                </label>
+                <label class="lyear-radio radio-inline radio-primary" title="本轮投票每个微信号每天可投一次">
+                    <input type="radio" name="jointype" value="2" {if $rotate['jointype']=='2'}checked{/if}><span>每个微信号每天1次</span>
+                </label>
+				<div class="help-block">投票开始后，请勿随意更改此项</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-lg-3 control-label">大屏默认排行模式</label>
+			<div class="col-lg-8">
+				<label class="lyear-radio radio-inline radio-primary" title="普通模式投票项按默认顺序展示">
+                    <input type="radio" name="ranktype" value="2" {if !isset($rotate['ranktype']) || $rotate['ranktype']=='2'}checked{/if}><span>普通模式</span>
+                </label>
+                <label class="lyear-radio radio-inline radio-primary" title="排行模式投票项按总票数降序展示">
+                    <input type="radio" name="ranktype" value="1" {if isset($rotate['ranktype']) && $rotate['ranktype']=='1'}checked{/if}><span>排行模式</span>
+                </label>
+                <div class="help-block">默认是普通模式</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-lg-3 control-label text-right">排行榜百分比类型</label>
+			<div class="col-lg-8">
+				<label class="lyear-radio radio-inline radio-primary" title="投票项目票数除以总票数">
+                    <input type="radio" name="percenttype" value="2" {if $rotate['percenttype']=='2'}checked{/if}><span>以总得票数为标准</span>
+                </label>
+                <label class="lyear-radio radio-inline radio-primary" title="投票项目票数除以最高票数">
+                    <input type="radio" name="percenttype" value="1" {if $rotate['percenttype']=='1'}checked{/if}><span>以项目内最高得票数为标准</span>
+                </label>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-lg-3 control-label text-right">大屏倒计时</label>
+			<div class="col-lg-8">
+				{:tpl_switch('startautodjs',$rotate['startautodjs']??'2','opendjs')}
+				<span class="help-block">开启后在大屏端打开投票通道后会显示倒计时，倒计时结束后自动关闭通道</span>
+			</div>
+		</div>
+		<div class="form-group djssecondsbox{if !isset($rotate['startautodjs']) || $rotate['startautodjs'] == '2'} hidden{/if}">
+			<label class="col-lg-3 control-label text-right">倒计时秒数</label>
+			<div class="col-lg-8">
+				<input type="text" class="form-control numberincdec" name="djsseconds" 
+				data-bts-min="1" data-bts-replacement-val="1"
+				data-bts-max="600"
+				data-bts-step="1"
+				value="{$rotate['djsseconds']??60}">
+				<div class="help-block">最大为600秒，投票开始后，请勿随意更改此项</div>
+			</div>
+		</div>
+    </div>
+    <div class="carditem hidden">
+    	<div class="form-group">
+			<label class="col-lg-1 control-label text-right">规则</label>
+			<div class="col-lg-11">
+				{:tpl_ueditor('guize', $rotate['guize'],['height'=>300])}
+			</div>
+	   </div>
+    </div>
+    <div class="carditem hidden">
+    	<div class="form-group">
+			<label class="col-lg-3 control-label text-right">顶部幻灯片(微信端)</label>
+			<div class="col-lg-8">
+			  {:tpl_image_multi('topslides',$rotate['topslides'])}
+			  <span class="help-block">规格:800*250px 此处上传的图片必须统一相同的尺寸否则将会有图片变形的风险</span>
+			</div>
+	    </div>
+	    <div class="form-group">
+			<label class="col-lg-3 control-label text-right">显示参与人数(大屏端)</label>
+			<div class="col-lg-8">
+				{:tpl_switch('showjoin',$rotate['showjoin']??'1')}
+				<span class="help-block">关闭则大屏右上角不显示本轮投票参与人数</span>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-lg-3 control-label text-right">显示票数(大屏端)</label>
+			<div class="col-lg-8">
+				{:tpl_switch('shownum',$rotate['shownum'])}
+				<span class="help-block">关闭则大屏投票项目不显示得票数</span>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-lg-3 control-label text-right">显示百分比(大屏端)</label>
+			<div class="col-lg-8">
+				{:tpl_switch('showper',$rotate['showper'])}
+				<span class="help-block">关闭则大屏投票项目不显示得票百分比</span>
+			</div>
+		</div>
+		{if dznormalrequest('voteshowgrouplist')}
+		<div class="form-group">
+			<label class="col-lg-3 control-label text-right">大屏项目类型(大屏端)</label>
+			<div class="col-lg-8">
+				<label class="lyear-radio radio-inline radio-primary" title="展示投票项目">
+                    <input type="radio" name="screentype" value="1" {if !isset($rotate['screentype']) || $rotate['screentype']=='1'}checked{/if}><span>投票项列表</span>
+                </label>
+                <label class="lyear-radio radio-inline radio-primary" title="展示投票分组">
+                    <input type="radio" name="screentype" value="2" {if isset($rotate['screentype']) && $rotate['screentype']=='2'}checked{/if}><span>分组列表</span>
+                </label>
+                <label class="lyear-radio radio-inline radio-primary" title="展示投票分组与投票项的组合体">
+                    <input type="radio" name="screentype" value="3" {if isset($rotate['screentype']) && $rotate['screentype']=='3'}checked{/if}><span>分组与投票项组合列表</span>
+                </label>
+                <span class="help-block">
+                	<div>选择分组列表则大屏展示投票分组列表并且票数会自动计算分组内的所有项目的总票数</div>
+                	<div>选择分组与投票项目组合列表一页可展示2个分组，每个分组可展示5个投票项，分组超出5个投票项目的项目会自动滚动</div>
+                </span>
+			</div>
+		</div>
+		{/if}
+		<div class="form-group pctypebox">
+			<label class="col-lg-3 control-label text-right">大屏样式(大屏端)</label>
+			<div class="col-lg-8">
+				<label class="lyear-radio radio-inline radio-primary">
+                    <input type="radio" name="pctype" value="1" {if $rotate['pctype']=='1'}checked{/if}><span>柱状(竖排)</span>
+                </label>
+                <label class="lyear-radio radio-inline radio-primary">
+                    <input type="radio" name="pctype" value="2" {if $rotate['pctype']=='2'}checked{/if}><span>圆状(横排)</span>
+                </label>
+                <label class="lyear-radio radio-inline radio-primary">
+                    <input type="radio" name="pctype" value="3" {if $rotate['pctype']=='3'}checked{/if}><span>单项</span>
+                </label>
+			</div>
+		</div>
+		<div class="form-group pctypebox1{if $rotate['pctype']!='1'} hidden{/if}">
+			<label class="col-lg-3 control-label text-right">进度条类型(大屏端)</label>
+			<div class="col-lg-8">
+				<label class="lyear-radio radio-inline radio-primary">
+                    <input type="radio" name="cubetype" value="1" {if !isset($rotate['cubetype']) || $rotate['cubetype']=='1'}checked{/if}><span>固定色</span>
+                </label>
+                <label class="lyear-radio radio-inline radio-primary">
+                    <input type="radio" name="cubetype" value="2" {if isset($rotate['cubetype']) && $rotate['cubetype']=='2'}checked{/if}><span>炫酷气泡</span>
+                </label>
+                <label class="lyear-radio radio-inline radio-primary">
+                    <input type="radio" name="cubetype" value="3" {if isset($rotate['cubetype']) && $rotate['cubetype']=='3'}checked{/if}><span>多色气泡</span>
+                </label>
+			</div>
+		</div>
+		<div class="form-group pctypebox12{if $rotate['pctype']=='3'} hidden{/if}">
+			<label class="col-lg-3 control-label text-right">每页项目数</label>
+			<div class="col-lg-8">
+				<input type="text" class="form-control numberincdec" name="numpergroup" 
+                    data-bts-min="1" data-bts-replacement-val="10"
+                    data-bts-max="10"
+                    data-bts-step="1"
+                    value="{$rotate['numpergroup']??10}">
+				<span class="zam-help-block">注:最多可以设置10个，大屏样式为柱状(竖排)时当分页内项目不足每页项目数时会自动使用上一页的部分项目来凑足每页数量</span>
+			</div>
+		</div>
+		<div class="form-group pctypebox2{if $rotate['pctype']=='3' || ($rotate['pctype']=='1' && isset($rotate['cubetype']) && $rotate['cubetype'] > 1)} hidden{/if}">
+			<label class="col-lg-3 control-label text-right">进度条颜色(大屏端)</label>
+			<div class="col-lg-8">
+				{:tpl_color('typecolor',$rotate['typecolor'])}
+				<span class="help-block">大屏样式选择单项则无效</span>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-lg-3 control-label text-right">自动换页 <i class="fa fa-question-circle" lay-tips="当柱状或圆状投票项目大于10个时，会自动分页"></i>(大屏端)</label>
+			<div class="col-lg-8">
+				{:tpl_switch('autoplay',$rotate['autoplay'],'openautoplay')}
+				<span class="zam-help-block">开启则打开屏幕会自动翻页，也可以通过键盘问号键来控制自动翻页</span>
+			</div>
+		</div>
+		<div class="form-group autoplayBox{if $rotate['autoplay']=='2'} hidden{/if}">
+			<label class="col-lg-3 control-label text-right">换页时间间隔(秒)</label>
+			<div class="col-lg-8">
+				<input type="text" class="form-control numberincdec" name="autoplaytime" 
+                    data-bts-min="1" data-bts-replacement-val="1"
+                    data-bts-max="null"
+                    data-bts-step="1"
+                    value="{$rotate['autoplaytime']}">
+				<span class="zam-help-block">注:单位是秒，必须是大于0的整数</span>
+			</div>
+		</div>
+    </div>
+    <div class="carditem hidden">
+        <div class="form-group col-lg-12" style="margin-right: 0;margin-left: 0">
+        	<table class="we7-table table" style="margin-bottom:0px;">
+        		<thead style="border: 1px solid #efefef;">
+				  <tr>
+					<td colspan="3">
+					  <a  class="btn btn-primary btn-sm pull-left btn-showgroup" href="javascript:;"> <i class="mdi mdi-plus"></i>&nbsp;<span>管理分组</span></a>
+					</td>
+				  </tr>
+				</thead>
+				<thead>
+				  <tr>
+				  	<th style="width:10%;text-align:center;">微信状态</th>
+				  	<th style="width:10%;text-align:center;">大屏状态</th>
+					<th style="width:20%;text-align:center;">项目名</th>
+					<th style="width:20%;text-align:center;">项目图</th>
+					<th style="width:20%;text-align:center;">分组</th>
+					<th style="width:20%;text-align:center;">操作</th>
+				  </tr>
+				</thead>
+				<tbody class="vote-lists">
+					{volist name="rotate.items" id="item"}
+						<tr>
+							<td>
+								<label class="lyear-switch switch-primary normal-swith switch-solid" style="height:38px">
+									<input type="checkbox" {if $item['votestatus']=='1'}checked="checked"{/if}>
+									<input type="hidden" name="votestatus[]" value="{$item['votestatus']}">
+									<span data-status="{$item['votestatus']}" data-func="openwxshow" class="normal-span has-func" data-ajax=""></span>
+								</label>
+							</td>
+							<td>
+								<label class="lyear-switch switch-primary normal-swith switch-solid" style="height:38px">
+									<input type="checkbox" {if $item['screenstatus']=='1'}checked="checked"{/if}>
+									<input type="hidden" name="screenstatus[]" value="{$item['screenstatus']}">
+									<span data-status="{$item['screenstatus']}" data-func="openscreenshow" class="normal-span has-func" data-ajax=""></span>
+								</label>
+							</td>
+							<td>
+							  <input type="hidden" name="voteid[]" value="{$item['id']}">
+							  <input type="hidden" name="votename[]" value="{$item['votename']}">
+							  <span>{$item['votename']}</span>
+							</td>
+							<td>
+							  <input type="hidden" name="voteimg[]" value="{$item['voteimg']}">
+							  <input type="hidden" name="votebigimg[]" value="{$item['votebigimg']??''}">
+							  <div class="userimgbox"><img src="{:tomedia($item['voteimg'])}"></div>
+							</td>
+							<td>
+							  <input type="hidden" name="groupid[]" value="{$item['groupid']}">
+							  <span>{$groups[$item['groupid']]['groupname']??''}</span>
+							</td>
+							<td>
+								<a href="javascript:;" data-voteid="{$item['id']}" class="btn btn-primary btn-xs btn-addvotenum">加减票</a>
+								<a href="javascript:;" data-voteid="{$item['id']}" class="btn btn-primary btn-xs btn-edituser"><i class="mdi mdi-pencil"></i></a>
+								<a href="javascript:;" data-voteid="{$item['id']}" class="btn btn-danger btn-xs btn-deluser"><i class="mdi mdi-close"></i></a>
+								<a href="javascript:;"  class="btn btn-default btn-sm mousemove zam-sortable" title="拖动排序"><i class="mdi mdi-arrow-all"></i></a>
+							</td>
+						</tr>
+					{/volist}
+				</tbody>
+				<tfoot style="border: 1px solid #efefef;">
+				  <tr>
+					<td colspan="6">
+					  <a class="btn btn-primary btn-sm addvoteitem" href="javascript:;"> <i class="mdi mdi-plus"></i>&nbsp;<span>新增投票项</span></a>
+					  <a class="btn btn-warning btn-sm importvoteitem" href="javascript:;"> <i class="mdi mdi-plus"></i>&nbsp;<span>导入投票项</span></a>
+					</td>
+				  </tr>
+				</tfoot>
+			</table>
+        </div>
+    </div>
+</form>
+</div> 
+<script id='newitem-tpl' type="text/template">
+<tr>
+	<td>
+		<label class="lyear-switch switch-primary normal-swith switch-solid" style="height:38px">
+			<input type="checkbox" <%# if(d.votestatus=='1'){ %>checked="checked"<%# } %>>
+			<input type="hidden" name="votestatus[]" value="<% d.votestatus %>">
+			<span data-status="<% d.votestatus %>" data-func="openwxshow" class="normal-span has-func" data-ajax=""></span>
+		</label>
+	</td>
+	<td>
+		<label class="lyear-switch switch-primary normal-swith switch-solid" style="height:38px">
+			<input type="checkbox" <%# if(d.screenstatus=='1'){ %>checked="checked"<%# } %>>
+			<input type="hidden" name="screenstatus[]" value="<% d.screenstatus %>">
+			<span data-status="<% d.screenstatus %>" data-func="openscreenshow" class="normal-span has-func" data-ajax=""></span>
+		</label>
+	</td>
+	<td>
+	  <input type="hidden" name="voteid[]" value="<% d.id %>">
+	  <input type="hidden" name="votename[]" value="<% d.votename %>">
+	  <span><% d.votename %></span>
+	</td>
+	<td>
+	  <input type="hidden" name="voteimg[]" value="<% d.voteimg %>">
+	  <input type="hidden" name="votebigimg[]" value="<% d.votebigimg %>">
+	  <div class="userimgbox"><img src="<% d.userimgprev %>"></div>
+	</td>
+	<td>
+	  <input type="hidden" name="groupid[]" value="<% d.groupid %>">
+	  <span><% d.groupname %></span>
+	</td>
+	<td>
+	  <%# if(d.id){ %>
+	  <a href="javascript:;" data-voteid="<% d.id %>" class="btn btn-primary btn-xs btn-addvotenum">加减票</a>
+	  <%# } %>
+	  <a href="javascript:;" <%# if(d.id){ %>data-voteid="<% d.id %>"<%# } %> class="btn btn-primary btn-xs btn-edituser">
+		  <i class="mdi mdi-pencil"></i>
+	  </a>
+	  <a href="javascript:;" <%# if(d.id){ %>data-voteid="<% d.id %>"<%# } %> class="btn btn-danger btn-xs btn-deluser">
+		  <i class="mdi mdi-close"></i>
+	  </a>
+	  <a href="javascript:;"  class="btn btn-default btn-sm mousemove zam-sortable" title="拖动排序">
+	  	  <i class="mdi mdi-arrow-all"></i>
+	  </a>
+	</td>
+</tr>
+</script>        
+<script> 
+require(['webcore','jconfirmBox','zamnotice','layerBox',"bootstrap-touchspin","bootstrap-daterangepicker","jquery.ui"],function(webcore,jconfirmBox,zamnotice,layerBox){
+	if($('[data-tooltip="laytip"]').length) {
+        var tipindex;
+        $('[data-tooltip="laytip"]').on({
+            mouseover : function(){
+                var $this = this;
+                tipindex = layer.tips($($this).attr('title') || '', $this, {skin:'laytip',tips:1,anim:-1,offset:'t',time: 5e3}); //不自动关闭
+            },
+            mouseout : function(){
+                layer.close(tipindex);
+            }
+        });
+    }
+	tpl_switch();
+	$(".pctypebox label").click(function(){
+		var pctype = $(this).find('input').val();
+		if(pctype=='1'){
+			$(".pctypebox2").addClass('hidden');
+			$(".pctypebox1,.pctypebox12").removeClass('hidden');
+		}else if(pctype=='2'){
+			$(".pctypebox2,.pctypebox12").removeClass('hidden');
+			$(".pctypebox1").addClass('hidden');
+		}else{
+			$(".pctypebox1,.pctypebox2,.pctypebox12").addClass('hidden');
+		}
+	});
+	$(".pctypebox1 label").click(function(){
+		var pctcolorype = $(this).find('input').val();
+		if(pctcolorype=='1'){
+			$(".pctypebox2").removeClass('hidden');
+		}else{
+			$(".pctypebox2").addClass('hidden');
+		}
+	});
+	
+	$('.js-datetimepicker').each(function() {
+        var $input = $(this),$obj = {
+                singleDatePicker: $input.data('issingle')=='1'?true:false,
+                timePicker: $input.data('needsfm')=='1'?true:false,
+                showDropdowns: $input.data('needsdd')=='1'?true:false,
+                timePicker24Hour:true,
+                timePickerSeconds:true,
+                autoUpdateInput:$input.data('autoval')=='1'?true:false,
+                locale: {
+                    format: $input.attr('data-format'),
+                }
+            };
+            if($input.data('start')) $obj.startDate = $input.data('start');
+            if($input.data('end')) $obj.endDate = $input.data('end');
+            if($input.data('mintime')) $obj.minDate = $input.data('mintime');
+            if($input.data('maxtime')) $obj.maxDate = $input.data('maxtime');
+            $input.daterangepicker($obj,function(start, end, label){
+                var funcstr = $input.data('func');
+                var func = window[funcstr];
+                func && func(start,end);
+            });
+    });
+	$('.vote-lists').sortable({handle: ".mousemove"}).disableSelection();
+    $(".vote-lists").disableSelection();
+    $(".rotate-pop .pop-btns a.btn").click(function(){
+        $(this).addClass('btn-primary').siblings().removeClass("btn-primary");
+        $(".rotate-pop .carditem").addClass('hidden').eq($(this).index()).removeClass('hidden');
+    });
+    $(".confirmbox-pop .numberincdec").TouchSpin().on("change", function(){
+        var $this = $(this),funcstr = $this.data('func');
+        var func = window[funcstr];
+        func && func();
+    });
+    $(function(){
+      $(".sp-container").remove();
+      $(".js-colorpicker").each(function(){
+            tpl_colorpicker(this);
+      });
+    })
+    var rotateid = "{if isset($rotate['id'])}{$rotate['id']}{else}{/if}";
+    $(".btn-showgroup").click(function(){
+		if(rotateid=='') return zamnotice.showTips('error','请先添加好轮次，再编辑轮次中添加分组');
+		var confirmobj = jconfirmBox.ajaxconfirm("管理分组","{:gohdmanage('configvote/showvotegroup',['hdid'=>$hdid])}",{rotateid:rotateid},'html','col-lg-8 col-lg-offset-2',function(e){},false,'2');
+	});
+	$(".addvoteitem").on('click',function(){
+		var confirmObj = jconfirmBox.ajaxconfirm("新增投票项","{:gohdmanage('configvote/editvoteuser',['hdid'=>$hdid])}",{rotateid:rotateid},'html','col-lg-8 col-lg-offset-2',function(e){
+			var userarr = webcore.serializeObject(e.find('form'));
+			userarr.groupid = e.find('form').find("option:selected").val()||'';
+			userarr.groupname = '';
+			if(userarr.groupid){
+				userarr.groupname = e.find('form').find("option:selected").text()||'';
+			}
+			userarr.userimgprev = e.find('img').attr("src");
+			if(userarr.votename=='') {
+				zamnotice.showTips('error','项目名必须设置');
+				return false;
+			}
+			if(rotateid!=''){
+				webcore.ajaxSubmit("{:gohdmanage('configvote/savevoteuser',['hdid'=>$hdid])}",{rotateid:rotateid,userarr:userarr}).then(function(json){
+					if(json.code==0){
+						confirmObj.close();
+						userarr.id = json.msg;
+						$(".vote-lists").append(webcore.tpl($("#newitem-tpl"),userarr));
+						setTimeout(function(){
+					        tpl_switch();
+					    },1e2);
+						zamnotice.showTips('success','新增成功');
+					}else{
+						zamnotice.showTips('error',json.msg);
+					}
+				}, function(json){
+					zamnotice.showTips('error','网络差。操作失败');
+				});
+			}else{
+				$(".vote-lists").append(webcore.tpl($("#newitem-tpl"),userarr));
+				setTimeout(function(){
+			        tpl_switch();
+			    },1e2);
+				confirmObj.close();
+			}
+		});
+	});
+	$(".importvoteitem").on('click',function(){
+		webcore.importxls({title:'导入投票项',url:"{:gohdmanage('configvote/importuser',['hdid'=>$hdid])}&rotateid="+rotateid,moban:"/{:SYSIMGURL}excel/voteuser.xls",uptxt:"点击上传投票项xls文件",xlstxt:"注:请务必严格按照模板内容制作xls文件"},function(data){
+			var html = '';
+			if(data.length > 0){
+				$.each(data,function(i,v){
+					html += webcore.tpl($("#newitem-tpl"),v);
+				});
+				setTimeout(function(){
+			        tpl_switch();
+			    },1e3);
+			}
+			$(".vote-lists").append(html);
+        });
+	});
+	$(".vote-lists").on('click','.btn-edituser',function(){
+		var $this = $(this),fdom = $this.parent().parent(); 
+		var voteid = $this.attr('data-voteid');
+		var edituserarr = {};
+		if(!voteid){
+			fdom.find("input").each(function(){
+				var $this = $(this),inputname = $this[0].name.replace("[]","").replace("pf","");
+				edituserarr[inputname] = $this.val();
+			});
+		}
+		var confirmObj = jconfirmBox.ajaxconfirm("编辑投票项","{:gohdmanage('configvote/editvoteuser',['hdid'=>$hdid])}",{rotateid:rotateid,voteid:voteid,edituserarr:edituserarr},'html','col-lg-8 col-lg-offset-2',function(e){
+			var userarr = webcore.serializeObject(e.find('form'));
+			userarr.groupid = e.find('form').find("option:selected").val()||'';
+			userarr.groupname = '';
+			if(userarr.groupid){
+				userarr.groupname = e.find('form').find("option:selected").text()||'';
+			}
+			userarr.userimgprev = e.find('img').attr("src");
+			if(userarr.votename=='') {
+				zamnotice.showTips('error','项目名必须设置');
+				return false;
+			}
+			if(voteid){
+				webcore.ajaxSubmit("{:gohdmanage('configvote/savevoteuser',['hdid'=>$hdid])}",{rotateid:rotateid,voteid:voteid,userarr:userarr}).then(function(json){
+					if(json.code==0){
+						confirmObj.close();
+						userarr.id = voteid;
+						fdom.html($(webcore.tpl($("#newitem-tpl"),userarr)).html());
+						setTimeout(function(){
+					        tpl_switch();
+					    },1e2);
+						zamnotice.showTips('success','编辑成功');
+					}else{
+						zamnotice.showTips('error',json.msg);
+					}
+				}, function(json){
+					zamnotice.showTips('error','网络差。操作失败');
+				});
+			}else{
+				fdom.html($(webcore.tpl($("#newitem-tpl"),userarr)).html());
+				setTimeout(function(){
+			        tpl_switch();
+			    },1e2);
+				confirmObj.close();
+			}
+		});
+	});
+	$(".vote-lists").on('click','.btn-deluser',function(){
+		var $this = $(this);
+		var voteid = $this.attr('data-voteid');
+		jconfirmBox.confirm('温馨提示','删除将无法恢复，您确定要删除么？',function(){
+				if(voteid){
+					webcore.ajaxSubmit("{:gohdmanage('configvote/delvoteuser',['hdid'=>$hdid])}",{rotateid:rotateid,voteid:voteid}).then(function(json){
+						if(json.code==0){
+							zamnotice.showTips('success','删除成功');
+							$this.parent().parent().remove();
+						}else{
+							zamnotice.showTips('error',json.msg);
+						}
+					}, function(json){
+						zamnotice.showTips('error','网络差，操作失败');
+					});
+				}else{
+					$this.parent().parent().remove();
+				}
+		});
+	});
+	$(".vote-lists").on('click','.btn-addvotenum',function(){
+		var $this = $(this);
+		var voteid = $this.attr('data-voteid');
+		var confirmObj = jconfirmBox.ajaxconfirm("加减票","{:gohdmanage('configvote/adduservote',['hdid'=>$hdid])}",{ishtml:'1',rotateid:rotateid,voteid:voteid},'html','col-lg-8 col-lg-offset-2',function(e){
+			var addarr = webcore.serializeObject(e.find('form'));
+			if(addarr.votenum==''||parseInt(addarr.votenum) <= 0) {
+				zamnotice.showTips('error','加减票数必须大于0');
+				return false;
+			}
+			webcore.ajaxSubmit("{:gohdmanage('configvote/adduservote',['hdid'=>$hdid])}",{ishtml:'2',rotateid:rotateid,voteid:voteid,binddata:addarr}).then(function(json){
+				if(json.code==0){
+					confirmObj.close();
+					zamnotice.showTips('success','操作成功');
+				}else{
+					zamnotice.showTips('error',json.msg);
+				}
+			}, function(json){
+				zamnotice.showTips('error','网络差。操作失败');
+			});
+		});
+	});
+});
+function openautoplay(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".autoplayBox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".autoplayBox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function opencanceltype(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".canceltypebox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".canceltypebox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function opendjs(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".djssecondsbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".djssecondsbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openwxshow(obj,status,url){
+	var voteid = obj.parent().parent().parent().find('td:last').find('.btn-primary').attr('data-voteid') || '';
+	if(voteid==''){
+	    if(status=='1'){
+	        obj.prev().val('2');
+	        obj.attr('data-status','2');
+	    }else{
+	        obj.prev().val('1');
+	        obj.attr('data-status','1');
+	    }
+	    obj.prev().prev().prop("checked",status=='1'?false:true);
+	}else{
+		require(["webcore","zamnotice"],function(webcore,zamnotice){
+			var rotateid = "{if isset($rotate['id'])}{$rotate['id']}{else}{/if}";
+	        webcore.ajaxSubmit("{:gohdmanage('configvote/changeuserstatus',['hdid'=>$hdid])}",{type:'1',rotateid:rotateid,voteid:voteid,status:(status=='1'?'2':'1')},'正在执行操作...').then(function(json){
+	            if(json.code==0){
+	                if(status=='1'){
+				        obj.prev().val('2');
+				        obj.attr('data-status','2');
+				    }else{
+				        obj.prev().val('1');
+				        obj.attr('data-status','1');
+				    }
+				    obj.prev().prev().prop("checked",status=='1'?false:true);
+	            }
+	        })
+		})
+	}
+}
+function openscreenshow(obj,status,url){
+	var voteid = obj.parent().parent().parent().find('td:last').find('.btn-primary').attr('data-voteid') || '';
+	if(voteid==''){
+	    if(status=='1'){
+	        obj.prev().val('2');
+	        obj.attr('data-status','2');
+	    }else{
+	        obj.prev().val('1');
+	        obj.attr('data-status','1');
+	    }
+	    obj.prev().prev().prop("checked",status=='1'?false:true);
+	}else{
+		require(["webcore","zamnotice"],function(webcore,zamnotice){
+			var rotateid = "{if isset($rotate['id'])}{$rotate['id']}{else}{/if}";
+	        webcore.ajaxSubmit("{:gohdmanage('configvote/changeuserstatus',['hdid'=>$hdid])}",{type:'2',rotateid:rotateid,voteid:voteid,status:(status=='1'?'2':'1')},'正在执行操作...').then(function(json){
+	            if(json.code==0){
+	                if(status=='1'){
+				        obj.prev().val('2');
+				        obj.attr('data-status','2');
+				    }else{
+				        obj.prev().val('1');
+				        obj.attr('data-status','1');
+				    }
+				    obj.prev().prev().prop("checked",status=='1'?false:true);
+	            }
+	        })
+		})
+	}
+}
+var ruleue;
+$(function(){
+	if($(".utextarea").length > 0) {
+		ruleue && ruleue.destroy();
+		tpl_ueditor(function(ue){
+			ruleue = ue;
+		});
+	}
+})
+</script>
+<script id="voteitem-tpl" type="text/template">
+<tr>
+	
+	<td>
+		<label class="lyear-switch switch-primary normal-swith switch-solid" style="height:38px">
+			<input type="checkbox" <%# if(d.votestatus=='1'){ %>checked="checked"<%# } %>>
+			<input type="hidden" name="votestatus[]" value="<% d.votestatus %>">
+			<span data-status="<% d.votestatus %>" data-func="openwxshow" class="normal-span has-func" data-ajax=""></span>
+		</label>
+	</td>
+	<td>
+		<label class="lyear-switch switch-primary normal-swith switch-solid" style="height:38px">
+			<input type="checkbox" <%# if(d.screenstatus=='1'){ %>checked="checked"<%# } %>>
+			<input type="hidden" name="screenstatus[]" value="<% d.screenstatus %>">
+			<span data-status="<% d.screenstatus %>" data-func="openscreenshow" class="normal-span has-func" data-ajax=""></span>
+		</label>
+	</td>
+	<td>
+	  <input type="hidden" name="voteid[]" value="<% d.id %>">
+	  <input type="hidden" name="votename[]" value="<% d.votename %>">
+	  <span><% d.votename %></span>
+	</td>
+	<td>
+	  <input type="hidden" name="voteimg[]" value="<% d.voteimg %>">
+	  <input type="hidden" name="votebigimg[]" value="<% d.votebigimg %>">
+	  <div class="userimgbox"><img src="<% d.userimgprev %>"></div>
+	</td>
+	<td>
+	  <input type="hidden" name="groupid[]" value="<% d.groupid %>">
+	  <span><% d.groupname %></span>
+	</td>
+	<td>
+		<a href="javascript:;" data-voteid="<% d.id %>" class="btn btn-primary btn-xs btn-addvotenum">加减票</a>
+		<a href="javascript:;" data-voteid="<% d.id %>" class="btn btn-primary btn-xs btn-edituser">
+			<i class="mdi mdi-pencil"></i>
+		</a>
+		<a href="javascript:;" data-voteid="<% d.id %>" class="btn btn-danger btn-xs btn-deluser">
+			<i class="mdi mdi-close"></i>
+		</a>
+		<a href="javascript:;"  class="btn btn-default btn-sm mousemove zam-sortable" title="拖动排序">
+	  	  <i class="mdi mdi-arrow-all"></i>
+	  	</a>
+	</td>
+</tr>
+</script>

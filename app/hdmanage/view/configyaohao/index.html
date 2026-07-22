@@ -1,0 +1,414 @@
+{include file='$Wpath/common/header'}
+<style type="text/css">
+.fieldlists tr td{text-align:center!important;}
+.fieldlists tr td .input-group-addon{padding:6px 4px}
+.fieldlists tr td .btn{padding:8px 4px}
+</style>
+<form id="formBox" class="zam-formvalidation form-horizontal" method="post">
+    <div class="config-titlebox">
+        <span class="config-titlename">大屏设置</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#screenconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+    </div>
+    <div id="screenconfigbox" class="collapse in">
+        {include file="$Wpath/common/configscreencommon" /}
+        {include file="$Wpath/common/configscreenmusic" /}
+        <div class="zam-titleBox">项目设置</div>
+        <div class="form-group">
+		<div class="col-lg-12">
+			<table class="table" style="margin-bottom:0px;">
+				<thead>
+				  <tr>
+					<th style="width:8%;text-align:center;">列名</th>
+					<th style="width:8%;text-align:center;">左侧显示</th>
+					<th style="width:13%;text-align:center;">左侧列宽(%)</th>
+					<th style="width:8%;text-align:center;">右侧显示</th>
+					<th style="width:13%;text-align:center;">右侧列宽(%)</th>
+					<th style="width:50%;text-align:center;">隐私设置</th>
+				  </tr>
+				</thead>
+				<tbody class="fieldlists">
+					{foreach name="config.yhfieldconfig" id="fieldone" key="fieldkey"}
+					<tr>
+						<td>
+							<input type="hidden" name="fieldzd[]" value="{$fieldkey}">
+							<input class="form-control" type="text" name="fieldname[]" value="{$fieldone['fieldname']}">
+						</td>
+						<td>
+						{:tpl_switch('fieldstatus[]',$fieldone['fieldstatus'],'fieldstatus')}
+						</td>
+						<td>
+							<div class="touchspin">
+							<input type="text" class="form-control numberincdec" name="zuow[]" 
+			                data-bts-min="0" data-bts-replacement-val="0"
+			                data-bts-max="999"
+			                data-bts-step="1"
+							data-bts-postfix="px"
+                			data-bts-postfix-extra-class="touchspin-postfix"
+			                value="{$fieldone['zuow']}">
+			                </div>
+						</td>
+						<td>
+							{:tpl_switch('fieldisleft[]',$fieldone['fieldisleft'],'fieldisleft')}
+						</td>
+						<td>
+							<div class="touchspin">
+							<input type="text" class="form-control numberincdec" name="youw[]" 
+			                data-bts-min="0" data-bts-replacement-val="0"
+			                data-bts-max="999"
+			                data-bts-step="1"
+							data-bts-postfix="px"
+                			data-bts-postfix-extra-class="touchspin-postfix"
+			                value="{$fieldone['youw']}">
+			                </div>
+						</td>
+						<td>
+							<div class="input-group{if $fieldkey=='xuhao'} hidden{/if}">
+								<div class="input-group-addon">
+									<label class="lyear-checkbox checkbox-primary">
+		                                <input type="hidden" name="fieldsecret[]" value="{$fieldone['fieldsecret']}">
+		                                <input type="checkbox" {if $fieldone['fieldsecret']=='1'}checked{/if} onchange="changefieldsecret(this)">
+		                                <span>开启</span>
+		                            </label>
+								</div>
+								<div class="input-group-btn not-allow"><a class="btn btn-default">左侧保留</a></div>
+								<div class="touchspin">
+								<input type="text" class="form-control numberincdec" name="lefthand[]" 
+				                data-bts-min="0" data-bts-replacement-val="0"
+				                data-bts-max="999"
+				                data-bts-step="1"
+								data-bts-postfix="位"
+                				data-bts-postfix-extra-class="touchspin-postfix"
+				                value="{$fieldone['lefthand']}">
+				                </div>
+								<div class="input-group-btn not-allow"><a class="btn btn-default">右侧保留</a></div>
+								<div class="touchspin">
+								<input type="text" class="form-control numberincdec" name="righthand[]" 
+				                data-bts-min="0" data-bts-replacement-val="0"
+				                data-bts-max="999"
+				                data-bts-step="1"
+								data-bts-postfix="位"
+                				data-bts-postfix-extra-class="touchspin-postfix"
+				                value="{$fieldone['righthand']}">
+				                </div>
+								<div class="input-group-btn not-allow"><a class="btn btn-default">中间使用</a></div>
+								<div class="touchspin">
+								<input type="text" class="form-control text-center" style="width: 36px" name="replaceword[]"
+				                value="{$fieldone['replaceword']}">
+				                </div>
+							</div>
+							{if $fieldkey=='xuhao'}<span class="label label-danger">此列由系统生成，无隐私设置</span>{/if}
+						</td>
+					</tr>
+					{/foreach}
+				</tbody>
+			</table>
+			<div class="help-block">
+				<p class="text-danger">1:开启右侧显示的列必须同时也开启左侧显示。</p>
+				<p class="text-danger">2:左侧显示的列宽总和与右侧显示的列宽总和均必须是100%</p>
+				<p>3:开启列隐私设置后，请尽量保证列数据长度大于左右保留位的和</p>
+				<p>4:请合理选择您需要显示的数据列</p>
+			</div>
+		</div>
+	  </div>
+	  <div class="zam-titleBox">页面设置</div>
+	  <div class="form-group">
+		<label class="col-lg-2 control-label text-right">* 顶部轮次文字</label>
+		<div class="col-lg-10">
+			<div class="input-group">
+				<div class="input-group-btn not-allow"><a class="btn btn-default">顶部文字颜色</a></div>
+				{:tpl_color('topheadcolor',$config['topheadcolor'])}
+				<div class="input-group-btn not-allow"><a class="btn btn-default">顶部文字大小</a></div>
+				<div class="touchspin">
+				<input type="text" class="form-control numberincdec" name="topheadsize" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="999"
+                data-bts-step="1"
+				data-bts-postfix="px"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['topheadsize']}">
+                </div>
+			</div>
+		</div>
+	  </div>
+	  <div class="form-group">
+		<label class="col-lg-2 control-label text-right">* 左右两侧宽度百分比</label>
+		<div class="col-lg-10">
+			<div class="input-group">
+				<div class="input-group-btn not-allow"><a class="btn btn-default">左侧抽取区宽度</a></div>
+				<div class="touchspin">
+				<input type="text" class="form-control numberincdec" name="leftwidth" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="999"
+                data-bts-step="1"
+				data-bts-postfix="%"
+				data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['leftwidth']}">
+                </div>
+				<div class="input-group-btn not-allow"><a class="btn btn-default">右侧结果区宽度</a></div>
+				<div class="touchspin">
+				<input type="text" class="form-control numberincdec" name="rightwidth" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="999"
+                data-bts-step="1"
+				data-bts-postfix="%"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['rightwidth']}">
+                </div>
+			</div>
+			<span class="help-block">请根据实际情况设置此值</span>
+		</div>
+	  </div>
+	  <div class="form-group">
+		<label class="col-lg-2 control-label text-right">* 左右两侧行高</label>
+		<div class="col-lg-10">
+			<div class="input-group">
+				<div class="input-group-btn not-allow"><a class="btn btn-default">左侧抽取区一行数据高度</a></div>
+				<div class="touchspin">
+				<input type="text" class="form-control numberincdec" name="leftoneh" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="999"
+                data-bts-step="1"
+				data-bts-postfix="px"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['leftoneh']}">
+                </div>
+				<div class="input-group-btn not-allow"><a class="btn btn-default">右侧结果区一行数据高度</a></div>
+				<div class="touchspin">
+				<input type="text" class="form-control numberincdec" name="rightoneh" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="999"
+                data-bts-step="1"
+				data-bts-postfix="px"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['rightoneh']}">
+                </div>
+			</div>
+			<span class="help-block">请根据实际情况设置此值</span>
+		</div>
+	  </div>
+	  <div class="form-group">
+		<label class="col-lg-2 control-label text-right">* 左侧标题行</label>
+		<div class="col-lg-10">
+			<div class="input-group">
+				<div class="input-group-btn not-allow"><a class="btn btn-default">背景色</a></div>
+				{:tpl_color('leftheadbg',$config['leftheadbg'])}
+				<div class="input-group-btn not-allow"><a class="btn btn-default">文字色</a></div>
+				{:tpl_color('leftheadcolor',$config['leftheadcolor'])}
+				<div class="input-group-btn not-allow"><a class="btn btn-default">文字大小</a></div>
+				<div class="touchspin">
+				<input type="text" class="form-control numberincdec" name="leftheadsize" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="999"
+                data-bts-step="1"
+				data-bts-postfix="px"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['leftheadsize']}">
+                </div>
+			</div>
+		</div>
+	  </div>
+	  <div class="form-group">
+		<label class="col-lg-2 control-label text-right">* 左侧数据行</label>
+		<div class="col-lg-10">
+			<div class="input-group">
+				<div class="input-group-btn not-allow"><a class="btn btn-default">背景色</a></div>
+				{:tpl_color('leftdatabg',$config['leftdatabg'])}
+				<div class="input-group-btn not-allow"><a class="btn btn-default">文字色</a></div>
+				{:tpl_color('leftdatacolor',$config['leftdatacolor'])}
+				<div class="input-group-btn not-allow"><a class="btn btn-default">文字大小</a></div>
+				<div class="touchspin">
+				<input type="text" class="form-control numberincdec" name="leftdatasize" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="999"
+                data-bts-step="1"
+				data-bts-postfix="px"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['leftdatasize']}">
+                </div>
+			</div>
+		</div>
+	  </div>
+	  <div class="form-group">
+		<label class="col-lg-2 control-label text-right">* 右侧标题行</label>
+		<div class="col-lg-10">
+			<div class="input-group">
+				<div class="input-group-btn not-allow"><a class="btn btn-default">背景色</a></div>
+				{:tpl_color('rightheadbg',$config['rightheadbg'])}
+				<div class="input-group-btn not-allow"><a class="btn btn-default">文字色</a></div>
+				{:tpl_color('rightheadcolor',$config['rightheadcolor'])}
+				<div class="input-group-btn not-allow"><a class="btn btn-default">文字大小</a></div>
+				<div class="touchspin">
+				<input type="text" class="form-control numberincdec" name="rightheadsize" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="999"
+                data-bts-step="1"
+				data-bts-postfix="px"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['rightheadsize']}">
+                </div>
+			</div>
+		</div>
+	  </div>
+	  <div class="form-group">
+		<label class="col-lg-2 control-label text-right">* 右侧数据行</label>
+		<div class="col-lg-10">
+			<div class="input-group">
+				<div class="input-group-btn not-allow"><a class="btn btn-default">背景色</a></div>
+				{:tpl_color('rightdatabg',$config['rightdatabg'])}
+				<div class="input-group-btn not-allow"><a class="btn btn-default">文字色</a></div>
+				{:tpl_color('rightdatacolor',$config['rightdatacolor'])}
+				<div class="input-group-btn not-allow"><a class="btn btn-default">文字大小</a></div>
+				<div class="touchspin">
+				<input type="text" class="form-control numberincdec" name="rightdatasize" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="999"
+                data-bts-step="1"
+				data-bts-postfix="px"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['rightdatasize']}">
+                </div>
+			</div>
+		</div>
+	  </div>
+	  <div class="form-group">
+		<label class="col-lg-2 control-label text-right">* 右侧结果区显示轮次数</label>
+		<div class="col-lg-10">
+			<div class="input-group">
+				<div class="input-group-btn not-allow"><a class="btn btn-default">抽取过程中右侧轮次数</a></div>
+				<div class="touchspin">
+				<input type="text" class="form-control numberincdec" name="rightcolumn" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="999"
+                data-bts-step="1"
+				data-bts-postfix="轮"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['rightcolumn']}">
+                </div>
+				<div class="input-group-btn not-allow"><a class="btn btn-default">抽取完成后显示轮次数</a></div>
+				<div class="touchspin">
+				<input type="text" class="form-control numberincdec" name="rightecolumn" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="999"
+                data-bts-step="1"
+				data-bts-postfix="轮"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['rightecolumn']}">
+                </div>
+			</div>
+			<span class="help-block">请根据实际情况设置此值</span>
+		</div>
+	  </div>
+	  <div class="form-group">
+		<label class="col-lg-2 control-label text-right">* 右侧开始按钮</label>
+		<div class="col-lg-10">
+			<div class="input-group">
+				<div class="input-group-btn not-allow"><a class="btn btn-default">背景色</a></div>
+				{:tpl_color('btnbg',$config['btnbg'])}
+				<div class="input-group-btn not-allow"><a class="btn btn-default">文字色</a></div>
+				{:tpl_color('btncolor',$config['btncolor'])}
+				<div class="input-group-btn not-allow"><a class="btn btn-default">文字大小</a></div>
+				<div class="touchspin">
+				<input type="text" class="form-control numberincdec" name="btnsize" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="999"
+                data-bts-step="1"
+				data-bts-postfix="px"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['btnsize']}">
+                </div>
+			</div>
+		</div>
+	  </div>
+	  <div class="form-group">
+            <label class="col-lg-2 control-label">单项摇号区显示列数</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec" name="onefieldcol" value="{$config['onefieldcol']}"
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="null"
+                data-bts-step="1"
+                data-bts-postfix="列"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                >
+                <span class="zam-help-block">注:左侧摇号区仅开启1项时有效</span>
+            </div>
+      </div>
+    </div>
+    {include file='$Wpath/common/configsavepanel'}
+</form>
+<script>
+require(['webcore','jconfirmBox','zamnotice','layerBox','zvalidator'],function(webcore,jconfirmBox,zamnotice,layerBox){
+    $('#formBox').formValidation({
+        framework: 'bootstrap',
+        excluded: [':disabled'],
+        message: '您填写的内容无效',
+        fields: {
+            apptitle:{
+                message: '请输入网页标题',
+                validators: {
+                    notEmpty: {
+                        message: '请输入网页标题'
+                    },
+                }
+            },
+        }
+    }).on('success.form.fv', function(e) {
+        e.preventDefault();
+        var $form = $(e.target);
+        var postData = webcore.serializeObject($form);
+        var bload = $form.find(".zam-fixedbottom button").lyearloading({opacity: 0.2,spinnerSize: 'nm'});
+        $form.formValidation('disableSubmitButtons', true);
+        webcore.ajaxSubmit("{:gohdmanage('configyaohao/index',['hdid'=>$hdid])}",postData).then(function(json){
+            bload.hide();
+            if(json.code==0){
+                $form.formValidation('disableSubmitButtons', false);
+                zamnotice.showTips('success','操作成功',2e3,function(){
+                    window.location.reload();
+                });
+            }else{
+                zamnotice.showTips('error',json.msg);
+                $form.formValidation('disableSubmitButtons', false);
+            }
+        }, function(json){
+            bload.hide();
+            zamnotice.showTips('error','网络差。操作失败');
+            $form.formValidation('disableSubmitButtons', false);
+        });
+    });
+});
+function fieldstatus(obj,status,url){
+require(['layerBox'],function(layerBox){
+	if(status=='1'){
+	    obj.prev().val('2');
+	    obj.attr('data-status','2');
+	    var fieldleftobj = obj.parent().parent().next().next().find('label');
+	    if(fieldleftobj.find('input[type="checkbox"]').is(':checked')) fieldleftobj.trigger('click');
+	}else{
+	    obj.prev().val('1');
+	    obj.attr('data-status','1');
+	}
+	obj.prev().prev().prop("checked",status=='1'?false:true);
+});
+}
+function fieldisleft(obj,status,url){
+require(['layerBox'],function(layerBox){
+	if(status=='1'){
+	    obj.prev().val('2');
+	    obj.attr('data-status','2');
+	}else{
+		var fieldstatusobj = obj.parent().parent().prev().prev().find('label');
+	    if(!fieldstatusobj.find('input[type="checkbox"]').is(':checked')) {
+	    	layerBox.showMsg('请先开启本列左侧显示');
+	    	return false;
+	    }
+	    obj.prev().val('1');
+	    obj.attr('data-status','1');
+	}
+	obj.prev().prev().prop("checked",status=='1'?false:true);
+});
+}
+function changefieldsecret(obj){
+	var check = $(obj).prop('checked');
+    $(obj).prev().val(check?"1":"2");
+}
+</script>
+{include file='$Wpath/common/footer'}

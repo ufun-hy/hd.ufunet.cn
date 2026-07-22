@@ -1,0 +1,318 @@
+{include file="common/header" /}
+<style type="text/css">
+body{overflow-y: auto;}
+.zam-app-bodyBg{min-height: 100%;height: auto;overflow:hidden;overflow-y: auto;background-position: 100% 100%;}
+.vote-box{position: relative;height: 100%;color: #fff;}
+.vote-scroll-box{padding: 0;}
+html{
+    line-height: 1;
+    /* font-family: 微软雅黑,"PingFang"; */
+    font: 12px/1.5 Helvetica Neue,Helvetica,Arial,Hiragino Sans GB,\5FAE\8F6F\96C5\9ED1,tahoma,simsun,\5b8b\4f53;
+    letter-spacing: 0;
+}
+
+/* 公共类 */
+.clear::after{
+    display: block;
+    clear: both;
+    content: "";
+}
+
+/* 浮动设置 */
+.pull-left{
+    float: left;
+}
+.pull-right{
+    float: right;
+}
+
+/* 块级转换 */
+.block{
+    display: block;
+}
+.iBlock{
+    display: inline-block;
+}
+
+/* 居中 */
+.block-center{
+    display: block;
+    margin: auto;
+}
+.text-center{
+    text-align: center;
+}
+
+
+/* 内容区域大小 */
+
+
+/* 行元素顶对其 */
+.iBlock-top{
+    display: inline-block;
+    vertical-align: top;
+}
+.iBlock-middle{
+    display: inline-block;
+    vertical-align: middle;
+}
+.iBlock-bottom{
+    display: inline-block;
+    vertical-align: bottom;
+}
+
+/* 字体颜色自定义 */
+.text-muted{
+    color: #999;
+}
+.border-color{
+    color: #e0e0e0;
+}
+.bg-color{
+    background-color: #f2f2f2;
+}
+
+/* 强制不换行 */
+.nowrap{
+    white-space: nowrap;
+}
+
+
+
+/* 图片100%,占满父级宽 */
+.imgFull{
+    width: 100%;
+    display: block;
+}
+
+
+/* 文字超出隐藏 */
+.text-hidden{
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 绝对居中 */
+.zz{
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    top: 0;
+    margin: auto;
+    z-index: 11;
+}
+/* 初始化 */
+html {
+    font-size: calc(100vw * 100 / 375) !important;
+    line-height: 1;
+    letter-spacing: 0;
+    font-family: bmwTypeNextWeb,Arial,Helvetica,"Noto Sans CJK SC","Noto Sans",sans-serif;
+}
+.flex{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.flex-wrap{
+    flex-wrap: wrap;
+}
+body {
+    margin: 0;
+    font-size: .16rem;
+    background-color: #170900;
+}
+.wrap {
+    width: 3.75rem;
+}
+
+.headBg {
+    width: 3.75rem;
+    height: 2.2rem;
+    display: block;
+    margin: 0;
+}
+
+.heade {
+    background-color: #f2d3b7;
+    height: .5rem;
+    line-height: .5rem;
+
+}
+
+.heade div {
+    flex-grow: 1;
+    text-align: center;
+    font-size: .16rem;
+    font-weight: bold;
+}
+
+.content {
+    background-color: #170900;
+    padding: .4rem;
+    box-sizing: border-box;
+}
+
+.numberImg {
+    width: .3rem;
+    height: .3rem;
+}
+.numberTiele{
+    width: .4rem;
+    height: .4rem;
+    text-align: center;
+    line-height: .4rem;
+    color: #fff;
+    font-size: .16rem;
+    font-weight: bold;
+}
+
+.title {
+    color: #fff;
+    margin-left: .2rem;
+}
+.title1{
+    margin-bottom: .05rem;
+}
+
+.line-left {
+    align-items: flex-end;
+}
+
+.endImg {
+    width: .8rem;
+    height: .24rem;
+}
+.number{
+    color: #fff;
+    font-size: .12rem;
+
+}
+.sdImg{
+    width: .15rem;
+    height: .15rem;
+}
+.line{
+    margin-bottom: .25rem;
+}
+.line-end{
+    position: relative;
+}
+.numberEnd{
+    position: absolute;
+    left: .2rem;
+    right: 0;
+    width: .4rem;
+    top: .3rem;
+}
+.content1{
+    padding-left: 0;
+    padding-right: 0;
+}
+.js{
+    width: 2rem;
+    height: 1.2rem;
+    display: block;
+    margin: auto;
+}
+.vs{
+    position: relative;
+}
+.vsImg{
+    width: 3.4rem;
+    display: block;
+    height: 2.2rem;
+    /* margin: 0; */
+    margin: auto;
+}
+.vs div{
+    color: #fff;
+    font-size: .16rem;
+    font-weight: bold;
+}
+.vsLfet{
+    position: absolute;
+    left: .55rem;
+    top: 1rem;
+}
+.vsRight{
+    position: absolute;
+    right: .55rem;
+    top: 1rem;
+}
+.vsLeftImg,.vsRightImg{
+    width: 1rem;
+    height: .25rem;
+}
+.vsLeftImg{
+    position: absolute;
+    left: .5rem;
+    top: 1.5rem;
+}
+.vsRightImg{
+    top: 1.5rem;
+    position: absolute;
+    right: .5rem;
+}
+</style>
+<div class="vote-box zam-app-flex-ajCenter">
+<section class="g-scrollview vote-scroll-box zam-app-flex-ajCenter">
+<div class="wrap">
+	{if isset($rotate['topslides'][0])}
+    	<img src="{:tomedia($rotate['topslides'][0])}" alt="" class="headBg">
+    {/if}
+	<div class="heade flex">
+		<div id="zd">战队</div>
+		<div id="tp">投票</div>
+	</div>
+	<div id="banner">
+		<div class="content">
+			{foreach $rotate['items'] as $ikey=>$ival}
+			<div class="line flex">
+				<div class="line-left flex">
+					{if $ikey < 3}
+						<img class="numberImg" src="https://xingxianchang-1255438324.cos.ap-shanghai.myqcloud.com/toupiao/{if $ikey=='0'}6{elseif $ikey=='1'}9{else/}8{/if}.png" alt="">
+						<div class="title">{$ival['votename']}</div>
+					{else /}
+						<div class="numberTiele">{$ikey+1}</div>
+						<div class="title title1">{$ival['votename']}</div>
+					{/if}
+				</div>
+				<div class="line-end">
+					<img class="endImg" data-voteid="{$ival['id']}" src="https://xingxianchang-1255438324.cos.ap-shanghai.myqcloud.com/toupiao/2.png" alt="">
+					<div class="numberEnd flex">
+						<img class="sdImg" src="https://xingxianchang-1255438324.cos.ap-shanghai.myqcloud.com/toupiao/5.png" alt="">
+						<div class="number">{$ival['votenums']}</div>
+					</div>
+				</div>
+			</div>
+			{/foreach}
+		</div>
+	</div>
+</div>
+</section>
+</div>
+<script type="text/javascript">
+require(['wechatcore'],function (wechatcore) {
+	var clicked = false;
+	$(".endImg").on('click',function(){
+		if (clicked) return;
+		clicked = true;
+		var $this = $(this),voteid = $this.attr("data-voteid"),scorenum = $this.parent().find('.number');
+		wechatcore.ajaxSubmit("{:gowechat('vote/ajaxvote')}",{rotateid:"{$rotate['id']}",voteid:voteid},'正在处理请求...').then(function(data){
+			if(data.code==0){
+				scorenum.text(parseInt(scorenum.text()) + 1);
+				wechatcore.msg('加buff成功');
+			}else{
+				wechatcore.msg(data.msg);
+			}
+			clicked = false;
+		}, function(){
+			clicked = false;
+			wechatcore.msg('网络太差，请稍后重试');
+		});
+	});
+})
+</script>
+{include file="common/footer" /}

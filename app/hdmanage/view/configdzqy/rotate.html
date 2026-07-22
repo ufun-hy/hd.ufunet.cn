@@ -1,0 +1,234 @@
+{include file='$Wpath/common/header'}
+<div class="alert alert-danger">
+注意事项：<br>
+1 键盘方向键右键用于切换到下一轮，方向键左键用于切换上一轮<br>
+2 键盘空格键是用于签名飞到落点，如果您未开启签名落点可忽略<br>
+3 键盘enter键用于保存当前轮次的签约整图以及签名图片<span  class="m-l-5" style="color: red;font-size: 12px">(保存成功右上角会有提示)，如果您不需要保存这些图片可不按enter键</span><br> 
+4 键盘大于号键(英文的句号)是用来控制烟花效果开关<br>
+</div>
+{include file='$Wpath/common/tabletoolbar'}
+<table id="listtable" class="zam-btable"></table>
+<script>    
+require(['webcore','webtable','jconfirmBox','zamnotice','clipboard','layerBox','jcode'],function(webcore,webtable,jconfirmBox,zamnotice,Clipboard,layerBox){
+var initConfig = {
+    tableId:'#listtable',
+    url:"{:gohdmanage('configdzqy/rotate',['hdid'=>$hdid])}",
+    columnoperate:{
+        btns:{
+            edit:true,
+            del:true,
+            shenhe:{title:"复制",icon:"mdi-content-copy",class:"success"},
+            reset:{title:"重置",icon:"mdi-gavel",'except':{'not':['1']}},
+        },
+        func:{
+            edit:function(value, row, index){
+                var confirmObj = jconfirmBox.ajaxconfirm("编辑轮次","{:gohdmanage('configdzqy/editrotate',['hdid'=>$hdid])}",{rotateid:row.id},'html','col-lg-10 col-lg-offset-1',function(e){
+                    var postData = webcore.serializeObject(e.find('form'));
+                    postData.rotateid = row.id;
+                    webcore.ajaxSubmit("{:gohdmanage('configdzqy/saverotate',['hdid'=>$hdid])}",postData).then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','保存成功');
+                            confirmObj.close();
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                             return false;
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                         return false;
+                    });
+                });
+            },
+            del:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','删除将删除当前轮次以及轮次下的客户端数据并且无法恢复，您确定要删除么？',function(){
+                        webcore.ajaxSubmit("{:gohdmanage('configdzqy/delrotate',['hdid'=>$hdid])}",{rotateid:row.id}).then(function(json){
+                            if(json.code==0){
+                                webtable.refresh();
+                                zamnotice.showTips('success','删除成功');
+                            }else{
+                                zamnotice.showTips('error',json.msg);
+                            }
+                        }, function(json){
+                            zamnotice.showTips('error','网络差。操作失败');
+                        });
+                });
+            },
+            reset:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','重置轮次将删除本轮签约整图以及轮次下所有客户端的签名图片并且无法恢复，您确定要重置当前轮次么？',function(){
+                        webcore.ajaxSubmit("{:gohdmanage('configdzqy/resetrotate',['hdid'=>$hdid])}",{rotateid:row.id}).then(function(json){
+                            webtable.refresh();
+                            zamnotice.showTips('success','重置成功');
+                        }, function(json){
+                            zamnotice.showTips('error','网络差。操作失败');
+                        });
+                });
+            },
+            shenhe:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','复制轮次将复制模板轮次内的轮次设置以及客户端数据，您确定要复制当前轮次生成新的一轮么？',function(){
+                    webcore.ajaxSubmit("{:gohdmanage('configdzqy/copyrotate',['hdid'=>$hdid])}",{rotateid:row.id}).then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','复制成功');
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                    });
+                });
+            },
+        }
+    },
+    columns:[{
+            checkbox: true,
+        }, 
+        {
+            field: 'id',
+            title: 'id',
+            align: 'center',
+            visible: false
+        }, 
+        {
+            field: 'displayorder',
+            title: '排序序号',
+            align: 'center',
+        }, 
+        {
+            field: 'hytitle',
+            title: '轮次',
+            align: 'center',
+            formatter:function(value,row,index){
+                var html = row.status == '2' ? '<div><label class="label label-danger">展示中</label></div>' : '';
+                html += '<p class="mb10"><a href="{:goscreen('dzqy/index',['hdid'=>$hdid],'1')}&rotateid='+row.id+'" target="__blank">'+value+'</a></p>';
+                html += '<p><span class="label label-primary zam-clip cursor mr10" {if request()->screenloadtype=='1'}data-href="{:goscreen('dzqy/index',['hdid'=>$hdid],'1')}&rotateid='+row.id+'"{else /}data-href="{:goscreen('frame/index',['hdid'=>$hdid,'module'=>'dzqy'],'1')}&rotateid='+row.id+'"{/if}>复制链接</span><span class="label label-success clickdownmainimg cursor" data-rotateid="'+row.id+'">查看签约整图</span></p>';
+                return html;
+            }
+        }, {
+            field: 'clients',
+            title: '客户端',
+            align: 'center',
+            formatter:function(value,row,index){
+                var html = '<p class="mb10"><span class="label label-primary">'+value+'个</span></p>';
+                html += '<p class="clickshowclients cursor" data-rotateid="'+row.id+'"><span class="label label-info">查看全部客户端</span></p>';
+                return html;
+            }
+        },{
+            field: 'hyimg',
+            title: '合约图',
+            align: 'center',
+            formatter:function(value,row,index){
+                return '<img style="max-width:120px;" onclick="prevshowattachs(this,1);" src="'+value+'">';
+            },
+        }
+        ,{
+            field: 'create_time',
+            title: '创建时间',
+            align: 'center',
+        }
+    ],
+    searchParamas:[],
+    toolbar:{
+        add:function(){
+            var confirmObj = jconfirmBox.ajaxconfirm("新增轮次","{:gohdmanage('configdzqy/editrotate',['hdid'=>$hdid])}",{},'html','col-lg-10 col-lg-offset-1',function(e){
+	            var postData = webcore.serializeObject(e.find('form'));
+	            webcore.ajaxSubmit("{:gohdmanage('configdzqy/saverotate',['hdid'=>$hdid])}",postData,'正在创建轮次...').then(function(json){
+	                if(json.code==0){
+	                    webtable.refresh();
+	                    zamnotice.showTips('success','创建成功');
+	                    confirmObj.close();
+	                }else{
+	                    zamnotice.showTips('error',json.msg);
+	                     return false;
+	                }
+	            }, function(json){
+	                zamnotice.showTips('error','网络差。操作失败');
+	                 return false;
+	            });
+	        });
+        },
+        del:function(){
+            var getSelects = webtable.getSelections();
+            if(!getSelects.length){
+                return zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+            jconfirmBox.confirm('温馨提示','删除将删除所选轮次以及轮次内的签约图以及客户端数据并且无法恢复，您确定要删除么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('configdzqy/delrotate',['hdid'=>$hdid])}",{rotateid:getSelects}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','删除成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+        },
+        reset:function(){
+            jconfirmBox.confirm('温馨提示','清空将删除所有轮次以及轮次内的客户端数据并且无法恢复，您确定要清空么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('configdzqy/resetallrotate',['hdid'=>$hdid])}",{}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','清空成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+        },
+        {/*
+         当成重置
+        */}
+        shenhe:function(){
+            var getSelects = webtable.getSelections();
+            if(!getSelects.length){
+                return zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+            jconfirmBox.confirm('温馨提示','重置将删除所选轮次下数据，轮次重置为初始状态，并且无法恢复，您确定要重置么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('configdzqy/resetrotate',['hdid'=>$hdid])}",{rotateid:getSelects}).then(function(json){
+                    webtable.refresh();
+                    zamnotice.showTips('success','重置成功');
+                }, function(json){
+                    zamnotice.showTips('error','网络差。操作失败');
+                });
+            });
+        },
+    },
+};
+webtable.init(initConfig);
+var clickedshow = false;
+$(".zam-Table").on('click','.clickdownmainimg',function() {
+    var rotateid = $(this).attr('data-rotateid');
+    webcore.ajaxSubmit("{:gohdmanage('configdzqy/showrotateimg',['hdid'=>$hdid])}",{rotateid:rotateid},'稍等，正在查询..').then(function(json){
+        clickedshow = false;
+        if(json.code==0){
+            prevshowattachs(json.msg,1);
+        }else{
+            zamnotice.showTips('error',json.msg);
+        }
+    }, function(json){
+        clickedshow = false;
+        zamnotice.showTips('error','网络异常');
+    });
+});
+var clipboard = new Clipboard('.zam-clip', {
+    text: function(e) {
+      return $(e).data('url') || $(e).data('href')
+    }
+});
+clipboard.on('success',function(e) {
+ zamnotice.showTips('success','复制成功',2e3);
+ return;
+});
+$(".zam-Table").on('click','.clickshowclients',function() {
+    var rotateid = $(this).attr('data-rotateid');
+    var confirmobj = jconfirmBox.ajaxconfirm("本轮签约客户端一览","{:gohdmanage('configdzqy/showallclients',['hdid'=>$hdid])}",{rotateid:rotateid},'html','col-lg-10 col-lg-offset-1',function(e){
+            
+    },false,'2');
+});
+});
+</script>
+{include file='$Wpath/common/footer'}

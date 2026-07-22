@@ -1,0 +1,59 @@
+{include file='$Wpath/common/header'}
+<style type="text/css">
+.panel-body .item{margin-top: 10px;}
+.money{font-size: 20px;font-weight: 600;}
+</style>
+<div class="panel panel-default">
+		<div class="panel-heading"><span class="label label-primary">后台收入统计</span></div>
+		<div class="panel-body">
+		<div class="item col-sm-4 col-lg-2 col-lg-offset-1">
+			<div>总收入</div>
+			<div class="money">{$webmoney['totalmoney']}元</div>
+			<h6>真实支付:<span class="text-danger">{$webmoney['totalrealmoney']}元</span></h6>
+		</div>
+		<div class="item col-sm-4 col-lg-2">
+			<div>发布活动</div>
+		    <div class="money">{$webmoney['totalpub']}元</div>
+		    <h6>真实支付:<span class="text-danger">{$webmoney['totalrealpub']}元</span></h6>
+		</div>
+		<div class="item col-sm-4 col-lg-2">
+			<div>购买增值功能</div>
+		    <div class="money">{$webmoney['totaladd']}元</div>
+		    <h6>真实支付:<span class="text-danger">{$webmoney['totalrealadd']}元</span></h6>
+		</div>
+		<div class="item col-sm-4 col-lg-2">
+			<div>充值红包账号</div>
+		    <div class="money">{$webmoney['totalhb']}元</div>
+		    <h6>真实支付:<span class="text-danger">{$webmoney['totalrealhb']}元</span></h6>
+		</div>
+		<div class="item col-sm-4 col-lg-2">
+			<div>充值短信账号</div>
+		    <div class="money">{$webmoney['totalsms']}元</div>
+		    <h6>真实支付:<span class="text-danger">{$webmoney['totalrealsms']}元</span></h6>
+		</div>
+	</div>
+</div>
+<div class="alert alert-danger">微信端收入仅统计使用了系统支付模板的支付记录。<br>其中霸屏红包支付记录产生的收入，因用户领取后直接通过系统红包模板对应的商户发放到用户零钱，所有此类记录仅视作系统平台方收入，不计入用户活动收入账户</div>
+<div class="panel panel-default">
+		<div class="panel-heading"><span class="label label-success">微信端收入统计</span></div>
+		<div class="panel-body">
+		<div class="item col-sm-6 col-lg-2 col-lg-offset-1">
+			<div>总收入</div>
+			<div class="money">{$appmoney['totalmoney']}元</div>
+			<div style="font-size: 12px">含霸屏红包:<span class="text-danger">{$appmoney['appbphbmoney']}元</span></div>
+		</div>
+		<div class="item col-sm-6 col-lg-2">
+			<div>待提现</div>
+		    <div class="money">{$appmoney['waittxmoney']}元</div>
+		</div>
+		<div class="item col-sm-6 col-lg-2">
+			<div>已提现</div>
+		    <div class="money">{$appmoney['hadtxmoney']}元</div>
+		</div>
+		<div class="item col-sm-6 col-lg-2">
+			<div>待审核</div>
+		    <div class="money">{$appmoney['txingmoney']}元</div>
+		</div>
+	</div>
+</div>
+{include file='$Wpath/common/footer'}

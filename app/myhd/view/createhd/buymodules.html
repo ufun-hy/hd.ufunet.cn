@@ -1,0 +1,892 @@
+{include file='$Wpath/common/header'}
+<style type="text/css">
+.daterangepicker{z-index: 1}
+.daybox .btn{position:relative;margin-bottom: 5px;}
+.daybox .btn .badge{
+	position: absolute;
+    z-index: 1;
+    top: -9px;
+    right: -3px;
+    padding: 3px;
+    overflow: hidden;
+    background-color: #ff7300;
+    color: #fff;
+    -webkit-transform: scale(.8);
+    transform: scale(.8);
+    border-radius: 0;
+}
+.daybox .btn:first-child{border-top-left-radius: 8px;border-bottom-left-radius: 8px}
+.daybox .btn:last-child{border-top-right-radius: 8px;border-bottom-right-radius: 8px}
+.zam-modulebox{padding: 20px 40px 0 40px}
+.zam-modulebox ul{
+	display:flex;
+	flex-wrap: wrap;
+	height:auto;
+}
+
+.zam-modulebox ul li{
+	position:relative;
+	width:184px;
+	margin:0 10px 10px 0;
+	cursor:pointer;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+.zam-modulebox ul li .zam-modulebox-item{
+	border:2px solid rgba(0, 0, 0, .1);
+	border-radius: 4px;
+	box-shadow: -3px 5px 15px rgb(64 102 178 / 30%);
+	overflow: hidden;
+}
+.zam-modulebox ul li.isactive .zam-modulebox-item,.zam-modulebox ul li:hover .zam-modulebox-item{
+	border-color:#48b0f7;
+}
+.zam-modulebox ul li.isactive:after {
+    content: '';
+    clear: both;
+    display: block;
+	width: 0;
+    height: 0;
+    border-top: 40px solid #48b0f7;
+    border-left: 40px solid transparent;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+}
+.zam-modulebox ul li .hadsel{
+	position: absolute;
+    top: 0px;
+    right:4px;
+    z-index: 1;
+	font-size:16px;
+	color:#fff;
+	display:none;
+}
+.zam-modulebox ul li.isactive .hadsel{
+	display:block
+}
+.zam-modulebox ul li .moduleimgbox{
+	width:180px;
+	height:101px;
+	background-color: #f0f0f0
+}
+.zam-modulebox ul li img{
+	width:100%;
+	height:100%;
+}
+.pub-module-name-price{
+	height:30px;
+	line-height:30px;
+	font-size:15px;
+	padding: 0 5px;
+}
+.pub-module-name-price .pub-module-name{
+	flex: 1;
+}
+.pub-module-name-price .pub-module-price{
+	max-width: 100px;
+}
+/*已选功能*/
+.sel-modules-ul li{
+	position:relative;
+	width:104px;
+	margin:0 10px 10px 0;
+	padding:10px 0;
+	border:1px solid #48b0f7;
+	border-radius:3px;
+	cursor:pointer;
+	float:left;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+.sel-modules-ul li:after {
+    width: 0;
+    height: 0;
+    border-top: 40px solid #48b0f7;
+    border-left: 40px solid transparent;
+    display: block;
+    content: '';
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    clear: both;
+}
+.sel-modules-ul li .delsel {
+    position: absolute;
+    right: 3px;
+    top: 1px;
+    color: #fff;
+	font-size:15px;
+    z-index: 1;
+}
+.sel-modules-ul li .tctxt{
+	position: absolute;
+    right: 6px;
+    top: -4px;
+    width: 12px;
+    font-size: 10px;
+    color: #fff;
+    z-index: 1;
+    transform: rotate(-30deg);
+	-ms-transform:  rotate(-30deg);
+	-moz-transform:  rotate(-30deg);
+	-webkit-transform:  rotate(-30deg);
+	-o-transform:  rotate(-30deg);
+}
+.sel-modules-ul li .sel-module-icon{
+	width:60px;
+	height:60px;
+	border-radius:50%;
+}
+.sel-modules-ul li .sel-module-icon img{
+	width:100%;
+	height:100%;
+	border-radius:50%;
+}
+.sel-modules-ul li .sel-module-name{
+	height:30px;
+	line-height:30px;
+}
+.pub-totalMoney span{font-size:20px;color:red} 
+.mjinfo{display:inline-block}
+.mjinfo span{margin:0 5px;}
+.discountmoney{display:inline-block}
+.discountmoney span{margin:0 5px;}
+.fixed-left{
+	position: absolute;
+    left: 40px;
+    top: 16px;
+}
+.fixed-right{
+	position: absolute;
+    right: 40px;
+    top: 16px;
+}
+</style>
+<div class="row">
+<div class="col-lg-12">
+<div class="card zam-createactivitybox">
+   <div class="card-top">
+      <div class="zam-createactivitybox-title">
+		<button type="button" class="btn btn-default" disabled="">正式购买指引</button>
+	  </div>
+	  <ul class="nav-step step-dots">
+        <li class="nav-step-item active">
+          <span>设置活动人数</span>
+          <a class="active"data-toggle="tab"  aria-expanded="false"></a>
+        </li>
+        <li class="nav-step-item active">
+          <span>设置活动时间</span>
+          <a class="active" data-toggle="tab"  aria-expanded="false"></a>
+        </li>
+        <li class="nav-step-item active">
+          <span>选择活动功能</span>
+          <a class="active" data-toggle="tab"  aria-expanded="false"></a>
+        </li>
+        <li class="nav-step-item active">
+          <span>发布活动</span>
+          <a class="active" data-toggle="tab" aria-expanded="false"></a>
+        </li>         
+       </ul>
+   </div>
+   <div class="card-body">
+        <form id="formBox" class="zam-formvalidation form-horizontal" method="post"  style="margin-bottom:20px">
+          <div class="zam-titleBox">设置活动人数</div>
+          <div class="form-group cateItem-hdpersons">
+			<div class="col-lg-4" style="padding: 5px 40px">
+                <input type="text" name="persons" class="form-control numberincdec" value="{$createperson}"
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="{if $pubconfig['maxperson'] > 0}{$pubconfig['maxperson']}{else}null{/if}"
+                data-bts-step="1"
+                data-func="personchange"
+                />
+                <div class="help-block">{if $pubconfig['openfree']=='1'}用户不计费{else /}{if $pubconfig['freeperson'] > 0}{$pubconfig['freeperson']}人以内不收取人数费用，超出按{$pubconfig['oneprice']}元/个人计费{else/}按{$pubconfig['oneprice']}元/个人计费{/if}{/if}</div>
+			</div>
+		  </div>
+		  <div class="zam-titleBox">设置活动正式开始时间与天数</div>
+          <div class="form-group timebox" style="margin-left: 10px;">
+          	   <div class="col-lg-4">
+          	   	{:tpl_daterangetime([
+          	   		'name'=>'starttime',
+          	   		'val'=>'',
+          	   		'placeholder'=>'点击选择活动正式开始日期',
+          	   		'mintime'=>time(),
+          	   		'issingle'=>'1',
+          	   		'format'=>'YYYY-MM-DD'
+          	   	])}
+          	   	<span class="zam-help-block">请选择活动正式时间，不会影响当前活动前期测试</span>
+          	   	{if empty($pubdays)}
+          	   	<div class="zam-help-block stabletime hidden">
+					<b>活动时间: <span></span> 至 <span></span></b>
+				</div>
+				<input class="daynum" type="hidden" name="daynum" value="1" />
+				{/if}
+          	   </div>
+          </div>
+          {if !empty($pubdays)}
+          <div class="form-group daybox" style="margin-left: 10px;">
+          		<div class="col-lg-12">
+					<div class="btn-group daybox-btns">
+						{foreach $pubdays as $day}
+							<a class="btn btn-default{if isset($day['isdefault']) && $day['isdefault']=='1'} isdefault{/if}" data-day="{$day['day']}" data-discount="{$day['discount']}">
+								{$day['name']}{if $day['discount'] > 0}<span class="badge">{$day['discount']}折</span>{/if}
+							</a>
+						{/foreach}
+					</div>
+					<input class="daynum" type="hidden" name="daynum" value="{$pubdays[0]['day']??'1'}" />
+					<div class="zam-help-block stabletime hidden">
+						<b>活动时间: <span></span> 至 <span></span></b>
+					</div>
+				</div>
+          </div>
+          {/if}
+          <div class="zam-titleBox">选择活动功能</div>
+          <div class="form-group m-b-5">
+          <div class="hdmodule-Box">
+			  <div class="zam-inner-highconfig zam-publish-highconfig">
+				  <div class="text-center">
+					  <div class="btn-group zam-inner-highconfig-btns">
+					  	  {if !empty($usersetmeals)}
+					  	  <a href="javascript:;" class="btn btn-default">超值套餐</a>
+					  	  {/if}
+						  {volist name="catemodules" id="cm"}
+							{if !empty($cm['catemodules'])}
+							  <a href="javascript:;" class="btn btn-default">{$cm['catename']}</a>
+							{/if}
+						  {/volist}
+						  {if !empty($userfws)}
+					  	  <a href="javascript:;" class="btn btn-default">增值服务</a>
+					  	  {/if}
+					  </div>
+				  </div>
+				  {if !empty($usersetmeals)}
+				  <div class="zam-modulebox setmealbox hidden">
+						<ul>
+						  {volist name="usersetmeals" id="setmeal"}
+							<li class="setmeal-module" data-id="{$setmeal['id']}" data-price="{$setmeal['setmealprice']}" data-person="{$setmeal['personnum']}" data-modules="{:implode(',',$setmeal['modules'])}" data-fws="{:implode(',',$setmeal['fws'])}">
+							<div class="zam-modulebox-item">
+								<div class="moduleimgbox">
+									<img src="{:tomedia($setmeal['setmealimg'])}" onerror="javascript:this.src='/static/images/sys/nopic.jpg';this.title='暂无图片'">
+								</div>
+								<div class="pub-module-name-price zam-flex">
+									<span class="pub-module-name limitbox" title="{$setmeal['setmealname']}">{$setmeal['setmealname']}</span>
+									<span  class="pub-module-price">￥ {$setmeal['setmealprice']}</span>
+								</div>
+								<div class="hadsel mdi mdi-check"></div>
+							</div>
+							</li>									
+						  {/volist}
+						</ul>
+				  </div>
+				  {/if}
+				  {volist name="catemodules" id="cm"}
+						{if !empty($cm['catemodules'])}
+						<div class="zam-modulebox modulebox hidden">
+							<ul>
+							  {volist name="cm.catemodules" id="cmm"}
+								<li class="normal-module" data-id="{$cmm['id']}" data-price="{$cmm['moduleprice']}" data-field="{$cmm['modulefield']}" data-img="{:tomedia($cmm['moduleimg'])}"  data-bgcolor="{$cmm['modulebgcolor']??''}">
+									<div class="zam-modulebox-item">
+									<div class="moduleimgbox">
+										<img src="{:tomedia($cmm['moduleprev'])}" onerror="javascript:this.src='/static/images/sys/nopic.jpg';this.title='暂无图片'">
+									</div>
+									<div class="pub-module-name-price zam-flex">
+										<span class="pub-module-name limitbox" title="{$cmm['modulename']}">{$cmm['modulename']}</span>
+										<span  class="pub-module-price">￥ {$cmm['moduleprice']}</span>
+									</div>
+									<div class="hadsel mdi mdi-check"></div>
+									</div>
+								</li>							
+							  {/volist}
+							</ul>
+						</div>
+						{/if}
+				  {/volist}
+				  {if !empty($userfws)}
+				  <div class="zam-modulebox fwbox hidden">
+						<ul>
+						  {volist name="userfws" id="fw"}
+							<li class="fw-module" data-id="{$fw['id']}" data-price="{$fw['fwprice']}" data-img="{:tomedia($fw['fwicon'])}">
+							<div class="zam-modulebox-item">
+								<div class="moduleimgbox">
+									<img src="{:tomedia($fw['fwimg'])}" onerror="javascript:this.src='/static/images/sys/nopic.jpg';this.title='暂无图片'">
+								</div>
+								<div class="pub-module-name-price zam-flex">
+									<span class="pub-module-name limitbox" title="{$fw['fwname']}">{$fw['fwname']}</span>
+									<span  class="pub-module-price">￥ {$fw['fwprice']}</span>
+								</div>
+								<div class="hadsel mdi mdi-check"></div>
+							</div>
+							</li>									
+						  {/volist}
+						</ul>
+				  </div>
+				  {/if}
+			  </div>
+		  </div>
+          </div>
+          
+		  <div class="zam-titleBox">已选功能与人数</div>
+		  <div class="sel-modules form-group">
+			<ul class="sel-modules-ul clearfix" style="padding: 20px 40px"></ul>
+		  </div>
+		  <div class="zam-titleBox">支付方式</div>
+		  <div class="form-group"  style="padding: 20px 40px">
+		  {include file='$Wpath/common/paytype'}
+		  </div>
+          <div class="form-group">
+			<div class="zam-fixedbottom">
+				<div class="fixed-left">
+					<div class="pub-totalMoney">订单详情：人数共<span class="totalperson m-l-5 m-r-5">0</span>人，功能共<span class="totalmodule m-l-5 m-r-5">0</span>个，增值服务共<span class="totalfw m-l-5 m-r-5">0</span>个，天数<span class="totalday m-l-5 m-r-5">1</span>天，合计:<span>￥<span class="totalMoney">0.00</span></span><div class="mjinfo hidden">，满<span class="mjprice m-l-5 m-r-5"></span>减<span class="mjreduce m-l-5 m-r-5"></span>，仅需支付:￥<span class="endtotalmoney">0.00</span></div><div class="discountmoney m-l-5 hidden">，折扣价(<span class="discountnum">0</span>折)：￥<span class="dismoney">0.00</span></div></div>
+				</div>
+				<div class="fixed-right">
+					<a class="btn btn-default zam-btn m-r-10" href="{if isset($cancel) && isset($cancel['url'])}{$cancel['url']}{/if}">{if isset($cancel) && isset($cancel['txt'])}{$cancel['txt']}{else/}取 消{/if}</a>
+					<button class="btn btn-primary zam-btn  m-l-10" type="submit">{if isset($confirm) && isset($confirm['txt'])}{$confirm['txt']}{else/}确 定{/if}</button>
+				</div>
+			</div>
+		  </div>
+		</form>        
+   </div>             
+</div>
+</div>
+</div>
+<script id='selperson-tpl' type="text/template">
+	<li class="zam-flex-column-center sel-person<%# if(d.setmealid!='0'){ %> fromsetmeal<%# } %>" data-setmealid="<% d.setmealid %>" data-person="<% d.person %>" data-price="<% d.price %>" >
+		<div class="sel-module-icon">
+			<img src="__STATIC__/images/sys/module/home.png">
+		</div>
+		<div class="sel-module-name"><% d.name %></div>
+		<div class="sel-module-price">￥ <span class="signal-price"><% d.price %></span></div>
+		<div class="tctxt"><%# if(d.setmealid=='0'){ %>人数<%# }else{ %>套餐<%# } %></div>
+	</li>
+</script>
+<script id='selmodule-tpl' type="text/template">
+	<li class="zam-flex-column-center sel-module<%# if(d.setmealid!='0'){ %> fromsetmeal<%# } %>" data-id="<% d.id %>" data-setmealid="<% d.setmealid %>" data-field="<% d.field %>" data-price="<% d.price %>">
+		<div class="sel-module-icon" <%# if(d.bgcolor){ %>style="background-color:<% d.bgcolor %>"<%# } %>>
+			<img src="<% d.img %>" onerror="javascript:this.src='/static/images/sys/nopic.jpg';this.title='暂无图片'">
+		</div>
+		<div class="sel-module-name"><% d.name %></div>
+		<div class="sel-module-price">￥ <span class="signal-price"><% d.price %></span></div>
+		<%# if(d.setmealid=='0'){ %>
+			<div class="delsel mdi mdi-close"></div>
+		<%# }else{ %>
+			<div class="tctxt">套餐</div>
+		<%# } %>
+	</li>
+</script>
+<script id='selfw-tpl' type="text/template">
+	<li class="zam-flex-column-center sel-fw<%# if(d.setmealid!='0'){ %> fromsetmeal<%# } %>" data-id="<% d.id %>" data-setmealid="<% d.setmealid %>" data-price="<% d.price %>" >
+		<div class="sel-module-icon">
+			<img src="<% d.img %>" onerror="javascript:this.src='/static/images/sys/nopic.jpg';this.title='暂无图片'">
+		</div>
+		<div class="sel-module-name"><% d.name %></div>
+		<div class="sel-module-price">￥ <span class="signal-price"><% d.price %></span></div>
+		<div class="tctxt"><%# if(d.setmealid=='0'){ %>服务<%# }else{ %>套餐<%# } %></div>
+	</li>
+</script>
+<script>
+var createperson = parseInt("{$createperson}");
+var minperson = parseInt("{$pubconfig['minperson']}");
+var personfree = "{$pubconfig['openfree']}";
+var onepersonprice = parseFloat("{$pubconfig['oneprice']}");
+var freepersonnums = parseInt("{$pubconfig['freeperson']}");
+var hdjghour = parseInt("{$pubconfig['maxhour']}");
+var mjlists = {:json_encode(array_values($usermjs))};
+var mjkey = -1;
+require(['webcore','jconfirmBox','zamnotice','zvalidator'],function(webcore,jconfirmBox,zamnotice){
+	$(".zam-publish-highconfig .btn-group a").eq(0).addClass('btn-primary');
+	$(".zam-publish-highconfig .zam-modulebox").eq(0).removeClass('hidden');
+	//切换分类
+	$(".zam-publish-highconfig .btn-group a.btn").click(function(){
+		$(this).addClass('btn-primary').siblings().removeClass("btn-primary");
+		$(".zam-publish-highconfig .zam-modulebox").addClass('hidden');
+		$(".zam-publish-highconfig .zam-modulebox").eq($(this).index()).removeClass('hidden');
+	});
+    $('#formBox').formValidation({
+			framework: 'bootstrap',
+			excluded: [':disabled'],
+			message: '您填写的内容无效',
+			fields: {
+				starttime: {
+					message: '活动正式开始时间必须选择',
+					validators: {
+						notEmpty: {
+							message: '活动正式开始时间必须选择'
+						},
+					}
+				}
+			}
+	}).on('success.form.fv', function(e) {
+		e.preventDefault();
+		var $form = $(e.target);
+		var postData = {hdid:"{$hdid}",totalmoney:($(".discountmoney").is(':hidden') ? ( $(".mjinfo").is(':hidden') ? $(".totalMoney").text() : $(".endtotalmoney").text() ) : $(".discountmoney .dismoney").text()),daynum:$(".daynum").val()||'2'};
+		postData.paytype = $(".paytype").val()||'1';
+		var createValidation = $form.data('formValidation');
+		var selectedmodules = $(".sel-modules-ul li.sel-module");
+		if(selectedmodules.length <= 0 ){
+			zamnotice.showTips('error','请先选择活动功能');
+			$form.formValidation('disableSubmitButtons', false);
+			return;
+		}
+		var addpersons = $("input[name='persons']").val();
+		if((addpersons=='' || addpersons=='0') && $(".sel-modules-ul li.sel-person.fromsetmeal").length <= 0){
+			zamnotice.showTips('error','请先设置活动人数');
+			$form.formValidation('disableSubmitButtons', false);
+			return;
+		}
+		postData.addperson = 0;
+		$(".sel-modules-ul li.sel-person").each(function(){
+			postData.addperson += parseInt($(this).attr('data-person'));
+		});
+		var starttime = createValidation.getFieldElements('starttime').val();
+		if(starttime==''){
+			zamnotice.showTips('error','请先选择活动开始时间');
+			$form.formValidation('disableSubmitButtons', false);
+			return;
+		}
+		var selmodules = [];
+		selectedmodules.each(function(){
+			selmodules.push({moduleid:$(this).attr('data-id'),module:$(this).attr('data-field')});
+		});
+		postData.addmodules = selmodules;
+		postData.hassetmeal = '2';
+		postData.setmealid = [];
+		var selsetmeal = $(".setmeal-module.isactive");
+		if(selsetmeal.length > 0 ){
+			postData.hassetmeal = '1';
+			selsetmeal.each(function(){
+				postData.setmealid.push($(this).attr('data-id'));
+			});
+		}
+		postData.starttime = starttime;
+		postData.hasfw = '2';
+		postData.fwid = [];
+		postData.mjkey = (mjkey!=-1?mjlists[mjkey].id:-1);
+		var selfw = $(".sel-modules-ul li.sel-fw");
+		if(selfw.length > 0 ){
+			postData.hasfw = '1';
+			selfw.each(function(){
+				postData.fwid.push($(this).attr('data-id'));
+			});
+		};
+		$form.formValidation('disableSubmitButtons', true);
+		var bload = $form.find(".zam-fixedbottom button").lyearloading({opacity: 0.2,spinnerSize: 'nm'});
+		webcore.ajaxSubmit("{:gomyhd('buymodules/checkprice')}",postData).then(function(json){
+			 if(json.code==0){
+			 	webcore.showConfirm('温馨提示',webcore.tpl($("#resettip-tpl"),{}),['确定发布','取消'],function(){
+					var confirmobj2 = jconfirmBox.ajaxconfirm("正式发布活动","{:gomyhd('buymodules/index')}",postData,'html','col-lg-6 col-lg-offset-3',function(e){
+						var payBox = e.find(".payInfoBox"),orderid = payBox.attr('data-id');
+						webcore.ajaxSubmit("{:gomyhd('buymodules/queryorder')}",{orderid:orderid}).then(function(json){
+							$form.formValidation('disableSubmitButtons', false);
+							bload.hide();
+							if(json.code==0){
+								confirmobj2.close();
+								zamnotice.showTips('success','支付成功',1e3,function(){
+									window.location.href = "{:gomyhd()}";
+								});
+							}else{
+								zamnotice.showNotice('提示',json.msg,2e3,false,'info','info');
+							}
+						});
+					},function(){
+						bload.hide();
+						$form.formValidation('disableSubmitButtons', false);
+					},'1',[{'hidden':false,'txt':'已完成支付'},{'hidden':false,'txt':'取消'}],false);
+				},function(){
+					bload.hide();
+					$form.formValidation('disableSubmitButtons', false);
+				});
+			 }else if(json.code==1){
+			 	bload.hide();
+				zamnotice.showTips('success','发布成功',1e3,function(){
+					window.location.href = "{:gomyhd()}";
+				});
+			 }else{
+			 	bload.hide();
+				zamnotice.showTips('error',json.msg);
+				$form.formValidation('disableSubmitButtons', false);
+			 }
+		})
+	});
+	$(".daybox .btn").click(function(){
+		$(this).addClass('btn-primary').siblings().removeClass('btn-primary');
+		var selday = $(this).attr('data-day'),seldate = $('input[name="starttime"]').val(),stabletime = $(".stabletime");
+		if(typeof(seldate)!='undefined' && seldate!=''){
+			var starttime = seldate+" 00:00:00",endtime = new Date(starttime).getTime();
+			endtime = timeTostring(endtime + parseInt(selday)*24*3600000 - 1);
+			stabletime.find('span').eq(0).text(seldate+" 00:00:00");
+			stabletime.find('span').eq(1).text(endtime);
+			stabletime.removeClass('hidden');
+		}
+		$(this).parent().next().val(selday);
+		$(".totalday").text(selday);
+		$(".discountnum").text($(this).attr('data-discount'));
+		calcMoney();
+	});
+
+	if($(".daybox .btn").length > 0 ){
+		if($(".daybox .isdefault").length > 0){
+			$(".daybox .isdefault").eq(0).trigger('click');
+		}else{
+			$(".daybox .btn").eq(0).trigger('click');
+		}
+	}
+	$('input[name="starttime"]').on('apply.daterangepicker', function(ev, picker) {
+		var selday = $('.daybox .btn-primary').attr('data-day')||'1',seldate = picker.startDate.format('YYYY-MM-DD'),stabletime = $(".stabletime");
+		$(this).val(seldate);
+		var endtime = new Date(picker.startDate.format('YYYY-MM-DD HH:mm:ss')).getTime();
+		endtime = timeTostring(endtime + parseInt(selday)*24*3600000 - 1);
+		stabletime.find('span').eq(0).text(seldate+" 00:00:00");
+		stabletime.find('span').eq(1).text(endtime);
+		stabletime.removeClass('hidden');
+		$('#formBox').data('formValidation').revalidateField('starttime');
+	});
+	//选择套餐
+	$(".zam-modulebox ul li.setmeal-module").on('click',function(e){
+		var $this = $(this);
+		if(!$this.hasClass('isactive')){
+			//先拿到已选的套餐
+			var isactivesetmeal = $(".zam-modulebox ul li.setmeal-module.isactive"),activesetmealmodules = [],activefwmodules = [];
+			if(isactivesetmeal.length > 0 ){
+				isactivesetmeal.each(function(){
+					var moduleids = $(this).attr('data-modules');
+					if(moduleids!=''){
+						activesetmealmodules.push.apply(activesetmealmodules, moduleids.split(','));
+					}
+					var fwids = $(this).attr('data-fws');
+					if(fwids!=''){
+						activefwmodules.push.apply(activefwmodules, fwids.split(','));
+					}
+				});
+			}
+			var setmealmodules = $this.attr('data-modules'),setmealmoduleids = [],setmealfws = $this.attr('data-fws'),fwmoduleids = [];
+			if(setmealmodules!='') setmealmoduleids = setmealmodules.split(',');
+			if(setmealfws!='') fwmoduleids = setmealfws.split(',');
+			var triggerArr = [];
+			if(webcore.getArrEqual(activesetmealmodules,setmealmoduleids).length > 0 ){
+				isactivesetmeal.each(function(){
+					var $obj = $(this),onemoduleids = $obj.attr('data-modules');
+					if(onemoduleids!='' && webcore.getArrEqual(onemoduleids.split(','),setmealmoduleids).length > 0){
+						triggerArr.push($obj.attr('data-id'));
+						$obj.trigger('click');
+					}
+				});
+			}
+			if(webcore.getArrEqual(activefwmodules,fwmoduleids).length > 0 ){
+				isactivesetmeal.each(function(){
+					var onefwids = $(this).attr('data-fws');
+					if(onefwids!='' && webcore.getArrEqual(onefwids.split(','),fwmoduleids).length > 0){
+						if($.inArray($(this).attr('data-id'),triggerArr)==-1){
+							$(this).trigger('click');
+						}
+						
+					}
+				});
+			}
+			if(setmealmoduleids.length > 0){
+				$.each(setmealmoduleids,function(i,v){
+					var moduledom = $(".hdmodule-Box ul li.normal-module[data-id=" + v + "]");
+					if(moduledom.length == 0){
+						return true;
+					}
+					//先取消通过单个点击模块选中的模块
+					if(moduledom.hasClass('isactive')){
+						moduledom.removeClass('isactive');
+						$(".sel-modules-ul li.sel-module[data-id=" + v + "]").remove();
+					}
+					moduledom.addClass('fromsetmeal');
+					var tpldata = {
+						setmealid:$this.attr('data-id'),
+						id:moduledom.attr('data-id'),
+						field:moduledom.attr('data-field'),
+						name:moduledom.find('.pub-module-name').text(),
+						img:moduledom.attr('data-img'),
+						price:moduledom.attr('data-price'),
+						bgcolor:moduledom.attr('data-bgcolor')||'',
+					};
+					var tplhtml = webcore.tpl($("#selmodule-tpl"),tpldata);
+					$(".sel-modules-ul").append(tplhtml);
+					moduledom.addClass('isactive');
+				});
+			}
+			if(fwmoduleids.length > 0){
+				$.each(fwmoduleids,function(i,v){
+					var fwdom = $(".hdmodule-Box ul li.fw-module[data-id=" + v + "]");
+					if(fwdom.length == 0){
+						return true;
+					}
+					//先取消通过单个点击模块选中的模块
+					if(fwdom.hasClass('isactive')){
+						fwdom.removeClass('isactive');
+						$(".sel-modules-ul li.sel-fw[data-id=" + v + "]").remove();
+					}
+					fwdom.addClass('fromsetmeal');
+					var tpldata = {
+						setmealid:$this.attr('data-id'),
+						id:fwdom.attr('data-id'),
+						field:fwdom.attr('data-field'),
+						name:fwdom.find('.pub-module-name').text(),
+						img:fwdom.attr('data-img'),
+						price:fwdom.attr('data-price'),
+					};
+					var tplhtml = webcore.tpl($("#selfw-tpl"),tpldata);
+					$(".sel-modules-ul").append(tplhtml);
+					fwdom.addClass('isactive');
+				});
+			}
+			var setmealperson = $this.attr('data-person');
+			if(parseInt(setmealperson) > 0 ){
+				$(".sel-modules-ul").append(webcore.tpl($("#selperson-tpl"),{
+					setmealid:$this.attr('data-id'),
+					person:setmealperson,
+					name:setmealperson+'人',
+					price:'0.00',
+				}));
+			}
+			$this.addClass('isactive');
+		}else{
+			var setmealmodules = $this.attr('data-modules');
+			if(setmealmodules!=''){
+				$.each(setmealmodules.split(','),function(i,v){
+					var moduledom = $(".hdmodule-Box ul li.normal-module[data-id=" + v + "]");
+					if(moduledom.length==0){
+						return true;
+					}
+					moduledom.removeClass('fromsetmeal isactive');
+				});
+			}
+			var setmealfws = $this.attr('data-fws');
+			if(setmealfws!=''){
+				$.each(setmealfws.split(','),function(i,v){
+					var fwdom = $(".hdmodule-Box ul li.fw-module[data-id=" + v + "]");
+					if(fwdom.length==0){
+						return true;
+					}
+					fwdom.removeClass('fromsetmeal isactive');
+				});
+			}
+			$(".sel-modules-ul li.fromsetmeal[data-setmealid=" + $this.attr('data-id') + "]").remove();
+			$this.removeClass('isactive');
+		}
+		//选取套餐自动更改输入框内人数
+		var selsetmealpersondom = $(".sel-modules-ul li.sel-person.fromsetmeal");
+		var setmealperson2 = 0;
+		if(selsetmealpersondom.length>0){
+			selsetmealpersondom.each(function(){
+				setmealperson2 += parseInt($(this).attr('data-person'));
+			});
+		}
+		if(setmealperson2 >= createperson){
+			$(".cateItem-hdpersons input[name='persons']").val(0);
+		}else{
+			if(setmealperson2==0) {
+				$(".cateItem-hdpersons input[name='persons']").val(createperson);
+			}else{
+				$(".cateItem-hdpersons input[name='persons']").val(createperson - setmealperson2);
+			}
+		}
+		calcMoney();
+	});
+	//选择模块
+	$(".zam-modulebox ul li.normal-module").on('click',function(){
+		var $this = $(this);
+		if(!$this.hasClass('isactive')){
+			var tpldata = {
+				setmealid:'0',
+				id:$this.attr('data-id'),
+				field:$this.attr('data-field'),
+				name:$this.find('.pub-module-name').text(),
+				img:$this.attr('data-img'),
+				price:$this.attr('data-price'),
+				bgcolor:$this.attr('data-bgcolor')||'',
+			};
+			var tplhtml = webcore.tpl($("#selmodule-tpl"),tpldata);
+			$(".sel-modules-ul").append(tplhtml);
+			$this.addClass('isactive');
+		}else{
+			if($this.hasClass('fromsetmeal')) return zamnotice.showTips('error','套餐功能无法单个取消，如必须取消，请先取消所选套餐');
+			$(".sel-modules-ul li.sel-module[data-id=" + $this.attr('data-id') + "]").remove();
+			$this.removeClass('isactive');
+		}
+		calcMoney();
+	});
+	//选择模块
+	$(".zam-modulebox ul li.fw-module").on('click',function(){
+		var $this = $(this);
+		if(!$this.hasClass('isactive')){
+			var tpldata = {
+				setmealid:'0',
+				id:$this.attr('data-id'),
+				field:$this.attr('data-field'),
+				name:$this.find('.pub-module-name').text(),
+				img:$this.attr('data-img'),
+				price:$this.attr('data-price'),
+			};
+			var tplhtml = webcore.tpl($("#selfw-tpl"),tpldata);
+			$(".sel-modules-ul").append(tplhtml);
+			$this.addClass('isactive');
+		}else{
+			if($this.hasClass('fromsetmeal')) return zamnotice.showTips('error','套餐功能无法单个取消，如必须取消，请先取消所选套餐');
+			$(".sel-modules-ul li.sel-fw[data-id=" + $this.attr('data-id') + "]").remove();
+			$this.removeClass('isactive');
+		}
+		calcMoney();
+	});
+	$(".sel-modules-ul").on('click','li .delsel',function(){
+		var $this = $(this).parent();
+		var moduleid = $this.attr('data-id');
+		$(".hdmodule-Box ul li.normal-module[data-id=" + moduleid + "]").removeClass('isactive');
+		$this.remove();
+		calcMoney();
+	});
+	$(".sel-modules-ul").append(webcore.tpl($("#selperson-tpl"),{
+		setmealid:0,
+		person:0,
+		name:'0人',
+		price:'0.00',
+	}));
+	calcMoney();
+});
+function personchange(){
+	calcMoney();
+}
+function calcMoney(){
+	calcPersonMoney();
+	var totalpersons = 0;
+	var selmodulepersonnums = $(".sel-modules-ul li.sel-person");
+	selmodulepersonnums.each(function(){
+		totalpersons += parseInt($(this).attr('data-person'));
+	});
+	var selsetmealpersons = 0;
+	var selsetmealpersondom = $(".sel-modules-ul li.sel-person.fromsetmeal");
+	if(selsetmealpersondom.length>0){
+		selsetmealpersondom.each(function(){
+			selsetmealpersons += parseInt($(this).attr('data-person'));
+		});
+	}
+	if(selsetmealpersons>0){
+		totalpersons += "<span style='font-size:12px;'>(套餐含:"+selsetmealpersons+")</span>";
+	}
+	$(".totalperson").html(totalpersons);
+	//总模块
+	var totalmodulenums = 0;
+	var selmodulenums = $(".sel-modules-ul li.sel-module");
+	selmodulenums.each(function(){
+		totalmodulenums++;
+	});
+	$(".totalmodule").text(totalmodulenums);
+	//总服务
+	var selectedfws = $(".sel-modules-ul li.sel-fw");
+	var fwnums = selectedfws.length;
+	$(".totalfw").text(fwnums);
+	var tmoney = parseFloat($(".sel-modules-ul li.sel-person[data-setmealid='0']").attr('data-price'));
+	var selsetmeal = $(".setmeal-module.isactive");
+	if(selsetmeal.length>0){
+		selsetmeal.each(function(){
+			tmoney += parseFloat($(this).attr('data-price'));
+		});
+	}
+	//单选的模块
+	$(".sel-modules-ul li.sel-module[data-setmealid='0']").each(function(){
+		tmoney += parseFloat($(this).attr('data-price'));
+	});
+	//单选的服务
+	$(".sel-modules-ul li.sel-fw[data-setmealid='0']").each(function(){
+		tmoney += parseFloat($(this).attr('data-price'));
+	});
+	var daynum = $(".daynum").val()||'1';
+	daynum = parseInt(daynum);
+	var totalmoney = (tmoney*daynum).toFixed(2);
+	$(".totalMoney").text(totalmoney);
+	var mjcheck = false,mjallprice = [];
+	$.each(mjlists,function(k,v){
+		if(totalmoney * 100 >= v.mjprice*100){
+			mjallprice.push({key:k,money:v.reduceprice});
+			mjcheck = true;
+		}
+	});
+	var discount = $(".daybox .btn-primary").attr('data-discount')||'0',discountmoney = $(".discountmoney");
+	if(!mjcheck) {
+		mjkey = -1;
+	}else{
+		mjallprice = mjallprice.sort(compare('money'));
+		mjkey = mjallprice[0].key;
+	}
+	if(mjkey==-1){
+		$(".mjinfo").addClass('hidden');
+		if(discount > 0){
+			discountmoney.find('.dismoney').text((totalmoney * parseFloat(discount)/10).toFixed(2));
+			discountmoney.removeClass('hidden');
+		}else{
+			discountmoney.addClass('hidden');
+		}
+	}else{
+		$(".mjprice").text(mjlists[mjkey].mjprice);
+		$(".mjreduce").text(mjlists[mjkey].reduceprice);
+		var endtotalmoney = (totalmoney - mjlists[mjkey].reduceprice).toFixed(2);
+		$(".endtotalmoney").text(endtotalmoney);
+		$(".mjinfo").removeClass('hidden');
+		if(discount > 0){
+			discountmoney.find('.dismoney').text((endtotalmoney * parseFloat(discount)/10).toFixed(2));
+			discountmoney.removeClass('hidden');
+		}else{
+			discountmoney.addClass('hidden');
+		}
+	}
+}
+{/*默认降序*/}
+function compare(key, asc) {
+  asc = asc||false;
+  return function(a, b) {
+    var value1 = a[key];
+    var value2 = b[key];
+    if (asc) {
+      return value1 - value2;
+    } else {
+      return value2 - value1;
+    }
+  };
+}
+function calcPersonMoney(){
+	var pmoney = 0.00;
+	var inputperson = parseInt($(".cateItem-hdpersons input[name='persons']").val());
+	if(personfree=='2'){
+		if(freepersonnums < inputperson){
+			var personmoney = (inputperson - freepersonnums) * onepersonprice;
+			pmoney += parseFloat(personmoney);
+		}
+		
+	}
+	pmoney = pmoney.toFixed(2);
+	var personBox = $(".sel-modules-ul li.sel-person[data-setmealid='0']");
+	personBox.attr('data-price',pmoney);
+	personBox.attr('data-person',inputperson);
+	personBox.find('.sel-module-name').text(inputperson+'人');
+	personBox.find('.sel-module-price span').text(pmoney);
+}
+function timeTostring(time){
+  var    now     = new Date(time);
+  var    year     =now.getFullYear();     
+  var   month  =now.getMonth()+1;     
+  var   date      =now.getDate();     
+  var   hour     =now.getHours();     
+  var   minute =now.getMinutes();     
+  var   second =now.getSeconds(); 
+  return year+'-'+(month<10?'0'+month:month)+"-"+(date<10?'0'+date:date)+" "+(hour<10?'0'+hour:hour)+":"+(minute<10?'0'+minute:minute)+":"+(second<10?'0'+second:second);		
+}
+function checkmaxperson(obj){
+	$('#formBox').data('formValidation').revalidateField('maxperson');
+}
+</script>
+<script id='resettip-tpl' type="text/template">
+	<h4 class="mb10">正式发布活动将清除以下数据</h4>
+	<ul>
+		<li class="mb10">· 用户以及签到信息 </li>
+		<li class="mb10">· 抽奖功能特别用户以及互动结果数据 (上墙、抽奖、投票结果等数据)</li>
+	</ul>
+	<p class="text-danger">活动功能设置数据以及轮次数据将不会被清除</p>
+</script>
+{include file='$Wpath/common/footer'}

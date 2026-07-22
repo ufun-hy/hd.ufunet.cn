@@ -1,0 +1,78 @@
+{include file='$Wpath/common/header'}
+<div id="toolbar" class="toolbar-btn-action zam-toolbar">
+    <a class="btn btn-sm btn-danger btn-reset" href="javascript:void(0)"><i class="mdi mdi-gavel"></i> 重置权限集</a>
+</div>
+<table id="treetable" class="zam-btable"></table>
+<script>
+require(['webcore','webtree','jconfirmBox','zamnotice'],function(webcore,webtree,jconfirmBox,zamnotice){
+var initConfig = {
+	tableId:'#treetable',
+	url:"{:goweb('permission/index')}",
+	pid:'fid',
+	treecolumn:'permis_name',
+	columnoperate:false,
+	columns:[
+        {
+            field: 'check',
+            align:'center',
+            checkbox: true
+        },
+        {
+            field: 'permis_name',
+            title: '名称',
+            align:'center',
+        },
+        {
+            field: 'status',
+            title: '状态',
+            sortable: false,
+            align:'center',
+            formatter: function (value, row, index) {
+                return '<span class="label label-success">正常</span>';
+            },
+        },
+        {
+            field: 'permis_type',
+            title: '类型',
+            align:'center',
+            formatter: function (value, row, index) {
+                return value=='1'?'<a class="label label-primary">菜单</a>':'<a class="label label-success">目录</a>'
+            }
+        },
+        {
+            field: 'permis_icon',
+            title: '图标',
+            align:'center',
+            formatter: function (value, row, index) {
+                return '<i class="'+value+'"></i>'
+            }
+        },
+        {
+            field: 'permis_url',
+            title: '权限值',
+            align:'center',
+        }
+    ],
+	toolbar:{
+	    reset:function(){
+            jconfirmBox.confirm('温馨提示','您确定要重置么？',function(){
+                webcore.ajaxSubmit("{:goweb('permission/reset')}",{}).then(function(json){
+                    if(json.code==0){
+                        zamnotice.showTips('success','操作成功');
+                        setTimeout(function(){
+                            window.location.reload();
+                        },1e3);
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差。操作失败');
+                });
+            });
+        },
+	},
+};
+webtree.init(initConfig);
+});
+</script>
+{include file='$Wpath/common/footer'}

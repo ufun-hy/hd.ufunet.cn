@@ -1,0 +1,43 @@
+<div class="form-horizontal confirmbox-pop">
+    <form class="confirm-formbox" method="post">
+      {foreach $bddatas as $bditem}
+        <div class="form-group">
+          <label class="col-lg-3 control-label">{if $bditem['bdmust']=='1'}<span class="text-danger">*</span>{/if} {$bditem['bdtitle']}</label>
+          <div class="col-lg-8">
+            {if !in_array($bditem['bdtype'],['select','sex'])}
+              {if $bditem['bdtype'] == 'number' && $bditem['isfloat']=='2'}
+                <div class="touchspin">
+                <input type="text" class="form-control numberincdec" name="{$bditem['bdzd']}" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="null"
+                data-bts-step="1"
+                value="{$user[$bditem['bdzd']]??'0'}">
+                </div>
+              {else /}
+              <input class="form-control" type="text"  name="{$bditem['bdzd']}" value="{$user[$bditem['bdzd']]??''}">
+              {/if}
+            {else}
+              {if $bditem['bdtype']=='select'}
+                <select class="form-control" name="{$bditem['bdzd']}">
+                    <option value="" {if !isset($user[$bditem['bdzd']]) || empty($user[$bditem['bdzd']])}selected{/if}>-----请选择-----</option>
+                    {foreach $bditem['items'] as $selectitem}
+                        <option value="{$selectitem}" {if isset($user[$bditem['bdzd']]) && $user[$bditem['bdzd']] == $selectitem}selected{/if}>{$selectitem}</option>
+                    {/foreach}
+                </select>
+              {else /}
+                  <select class="form-control" name="sex">
+                      <option value="男" {if isset($user['sex']) && $user['sex']=='男'}selected{/if}>男</option>
+                      <option value="女" {if isset($user['sex']) && $user['sex']=='女'}selected{/if}>女</option>
+                  </select>
+              {/if}
+            {/if}
+          </div>
+        </div>
+      {/foreach}
+  </form>
+  </div>
+  <script type="text/javascript">
+    require(['webcore','jconfirmBox','zamnotice',"bootstrap-touchspin"],function(webcore,jconfirmBox,zamnotice){
+      $(".confirmbox-pop .numberincdec").TouchSpin();
+    });
+  </script>

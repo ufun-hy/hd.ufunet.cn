@@ -1,0 +1,952 @@
+{include file="common/header" /}
+<style>
+.phbbtn{
+	position: fixed;
+    left: .1rem;
+    top: .5rem;
+    z-index:1;
+    padding: 0 .24rem;
+    min-width: 1.58rem;
+    height: .6rem;
+    background: rgba(0,0,0,.3);
+    color: #fff;
+    border-radius: .5rem;
+}
+.phbbtn i{margin-right:0.08rem}
+
+.markrefresh{
+	position: fixed;
+    right: .3rem;
+    top: .5rem;
+    z-index:1;
+    padding: 0 .24rem;
+    min-width: 1.58rem;
+    height: .6rem;
+    background: rgba(0,0,0,.3);
+    color: #fff;
+    border-radius: .5rem;
+}
+.markrefresh i{margin-right:0.08rem}
+.livemark-pf-dz{
+	width:100%;
+	height:calc(100% - 0.9rem);
+}
+.livemark-userinfo{
+    margin: 0 auto;
+    width: 92vw;
+    border: 1px solid {$rotate['maincolor']};
+    border-radius: .08rem;
+	margin-top: 1.36rem;
+    padding: 3vw 4vw;
+}
+.livemark-userinfo img{
+    width: 17.4vw;
+    height: 17.4vw;
+    border-radius: .08rem;
+    -o-object-fit: cover;
+    object-fit: cover;
+    -o-object-position: center;
+    object-position: center;
+}
+.livemark-userinfo dl{
+	width: 64vw;
+}
+.livemark-userinfo dl dt{
+	margin-bottom: .2rem;
+	font-size: .36rem;
+	white-space: nowrap;
+    word-break: break-all;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+.livemark-userinfo dl dd{
+	line-height: 1.4;
+    word-break: break-all;
+}
+.livemark-pfdz{
+	margin: 0 auto;
+    width: 85.6vw;
+}
+.stoppf{
+	margin-top:0.2rem;
+	text-align:center;
+	color:red;
+	font-size:0.32rem;
+}
+.livemark-pfdz ul{width: 100%;}
+.livemark-pfdz ul li{padding: .42rem 0;border-bottom: 1px dashed #a0a0a0;}
+.livemark-pfdz ul li h3{margin-bottom: .3rem;font-size: .3rem;}
+.livemark-pfdz ul li .slider .num{color: #000;font-size: .5rem;margin-right: 5vw}
+.livemark-pfdz ul li .slider .mt-range-content{position: relative;top: -12px;margin-right: .5rem;}
+/*Ionrangeslider覆盖*/
+.livemark-pfdz ul li .slider .irs--round .irs-bar{
+	background-color:{$rotate['maincolor']}
+}
+.irs--round .irs-handle{
+	border-color:{$rotate['maincolor']}
+}
+.livemark-pfdz ul li .slider .input{    
+	padding: 0 .1rem;
+    width: 18.5vw;
+    height: 8.7vw;
+    border-radius: .08rem;
+    border: 1px solid {$rotate['maincolor']};
+    font-size: .36rem;
+    text-align: center;
+    color: #000;
+}
+.livemark-pfdz ul li .slider .input.disable{background-color: rgb(235, 235, 228);}
+.livemark-pfdz .desc-box{    
+	margin-top: .45rem;
+    width: 100%;
+    {if $hdinfo['id']=="zam"}
+    display:none;
+    {/if}
+}
+.livemark-pfdz .desc-box h4{
+	font-size: .3rem;
+    margin-bottom: .16rem;
+}
+.livemark-pfdz .desc-box textarea{
+	padding: .16rem;
+    width: 100%;
+    color: #000;
+    line-height: 1.5;
+    border: 1px solid #999;
+    border-radius: .08rem;
+    cursor: pointer;
+}
+.livemark-pfdz .desc-box .signarea{
+    width: 100%;
+    height: 3.22rem;
+    background-color: #fff;
+    border: 1px solid #999;
+    border-radius: .08rem;
+    cursor: pointer;
+}
+.livemark-pfdz .desc-box .signarea img{max-height: 2rem;}
+.livemark-pfdz .desc-box .signarea .btn{color: #fff}
+
+.livemark-pfdz .btn-pwpf{
+	position: relative;
+	margin: .58rem 0;
+    font-size: .3rem;
+}
+.livemark-pfdz .btn-pwpf button{
+	width: 37.6vw;
+    line-height: .84rem;
+    height: .84rem;
+    text-align: center;
+    border-radius: .42rem;
+    color: #000;
+    font-size: .36rem;
+    -webkit-transition: all .2s;
+    transition: all .2s;
+	border:1px solid #000;
+	background-color: #fff;
+}
+.livemark-pfdz .btn-pwpf .totalscore{
+	font-size:0.38rem;
+	color: {$rotate['maincolor']};
+}
+.livemark-pfdz .btn-pwpf .totalscore span{
+	font-weight:600;
+}
+.livemark-pfdz .btn-pwpf .disablepf{
+	color:red;
+}
+.livemark-pfdz .btn-pwpf .submittip{
+	position: absolute;
+	top: 1rem;
+	right: 0;
+	color: red;
+}
+.repftip{
+	color:red;
+}
+/*普通用户赞*/
+.zanbox{
+	margin-top:0.5rem;
+}
+.zanbox .sendzan{text-align:center;font-size:0.32rem}
+.zanbox .sendzan span{margin: 0 0.1rem;}
+.zanbox .zanicon{
+	width:2.2rem;
+	height:2.2rem;
+	border:1px solid {$rotate['maincolor']};
+	border-radius:50%;
+	text-align:center;
+	line-height:2.2rem;
+	margin: 0.4rem auto;
+	transform: rotateX(180deg);
+	-webkit-transform: rotateX(180deg);
+	cursor:pointer;
+}
+.zanbox .zanicon i{font-size:1.4rem;color:{$rotate['maincolor']};font-weight:800}
+.zanbox .waitzan{text-align:center;font-size:0.32rem}
+.zanbox .waitzan span{margin: 0 0.1rem;}
+/*payzan box*/
+.livemark-payzantitle i{
+	float: right;
+    font-size: 0.5rem;
+}
+.selzantip{   
+	padding-left:10px;
+	height: 0.8rem;
+    line-height: 0.8rem;
+	font-size:0.3rem
+}
+.selzantip span{color:{$rotate['maincolor']};font-size:0.36rem;;font-weight:400}
+.zanmoney{padding-bottom:0.3rem;text-align:center;font-size:0.32rem;}
+.zanmoney span{color:{$rotate['maincolor']};font-size:0.46rem;;font-weight:400}
+.payzanbtn{
+	width:80vw;
+	margin: 0 auto;
+    line-height: .84rem;
+    height: .84rem;
+    text-align: center;
+    border-radius:5px;
+    color: #fff;
+    font-size: .36rem;
+    -webkit-transition: all .2s;
+    transition: all .2s;
+	border:0;
+	background-color:{$rotate['maincolor']};
+	margin-bottom: 0.3rem;
+}
+.payzanbtn.disabled{pointer-events: none}
+.livemark-zanitemlist{padding:10px}
+.livemark-zanitemlist .zanitem{width:20%;margin-bottom:0.2rem}
+.livemark-zanitemlist .zanitem div{
+	position:relative;
+	width:1.2rem;
+	height:1.2rem;
+	line-height:1.2rem;
+	text-align:center;
+	border:1px solid {$rotate['maincolor']};
+	border-radius:50%;
+	font-size:0.28rem;
+}
+.livemark-zanitemlist .zanitem i{
+	font-size: 0.32rem;
+    position: absolute;
+    right: 0;
+    top: -0.4rem;
+	color:{$rotate['maincolor']};
+	display:none;
+}
+.livemark-zanitemlist .zanitem.active i{
+	display:block;
+}
+.zam-app-tipsmsg{z-index:99999999!important}
+
+.signnamebox{
+	position: fixed;
+	top:0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0,0,0,0.8);
+	color: #fff;
+	z-index: 1
+}
+.signnamebox .signtitle{
+	position: relative;
+	width: 100%;
+	height: 1rem;
+	line-height: 1rem;
+	text-align: center;
+	font-size: 0.42rem;
+}
+.signnamebox .close{
+	position: absolute;
+	top: 0;
+	right: 0.4rem;
+	color: #fff;
+}
+.signnamebox .close i{
+	font-size: 0.46rem;
+}
+.signnamebox .signareabody{
+    width: calc(100% - 1rem);
+    height: 4rem;
+    background-color: #fff;
+    border: 1px solid #999;
+    border-radius: .2rem;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+.signnamebox .signareabody canvas{
+	width: 100%;
+	height: 100%;
+}
+.signnamebox .signareabtns{margin-top: 0.52rem;}
+.signnamebox .signareabtns .btn{padding: 0.2rem 0.42rem;line-height: inherit;}
+.signnamebox .signareabtns .btn:first-child{
+	margin-right: 1rem;
+}
+input::-webkit-input-placeholder{
+	font-size: 0.26rem;
+	color:{$rotate['maincolor']};
+}
+.slidebtns .btn{
+	height: 0.6rem;
+	line-height: 0.6rem;
+	padding: 0 0.36rem;
+	margin-right: 0.2rem;
+}
+.slidebtns .btn-hollow{
+	color: #000;
+}
+.slidebtns .btn-primary{
+	color: #fff;
+}
+</style>
+<section class="g-flexview" style="width:100%;min-width:100%;max-width:100%;">
+	<a href="javascript:;" data-href="{:gowechat(!$pwclient ? 'livemark/index' : 'livemarkpw/index',['hdid' => $hdinfo['hdid']])}" data-module="livemark" class="phbbtn zam-app-flex-ajCenter2"><i class="mxc-untitled109"></i><span>返回列表</span></a>
+	<div class="markrefresh zam-app-flex-ajCenter2"><i class="mxc-refresh"></i><span>刷新页面</span></div>
+	{if $pwclient}
+		<div class="pwclientname limitbox">评委:{$pwname??''}</div>
+	{/if}
+	<div class="g-scrollview livemark-pf-dz">
+		<section class="livemark-userinfo zam-app-flex zam-app-justifyspacebetween">
+			<img src="{$pfuser['userimg']}"> 
+			<dl>
+				<dt class="option-name limit">{:$pfuser['username']}</dt> 
+				<dd class="desc">{:$pfuser['userdes']}</dd>
+			</dl>
+		</section>
+		<section class="livemark-pfdz">
+			{if $pwclient}
+			{if $pfuser['userstatus'] == '2'}<div class="stoppf">当前参评选手已暂停评分</div>{/if}
+				<div class="pfbox">
+					<ul>
+						{if $rotate['pftype'] == '1'}
+						<li>
+							{if request()->host(true) == 'xile.hnzsnetwork.cn' && $hdinfo['id'] == '576'}
+							<h3 >选择分数</h3>
+							<div class="slidebtns">
+								<div class="btn btn-hollow" data-fenshu="70">70分</div>
+								<div class="btn btn-hollow" data-fenshu="80">80分</div>
+								<div class="btn btn-hollow" data-fenshu="90">90分</div>
+								<input type="hidden" class="input" value="{if !empty($mypfrecord)}{$mypfrecord['scoredetail'][0]['score']??'0'}{/if}">
+							</div>
+							{else /}
+							<h3 >分数</h3>
+							<div class="slider zam-app-flex-alignCenter">
+								<span class="num">{$rotate['pfmin']}</span> 
+								<div class="mt-range-content flex1">
+									<input type="text" class="js-range-slider" name="normal_01" data-type="single" data-hide-min-max="true" data-hide-from-to="true" data-grid="false"  data-min="{$rotate['pfmin']}" data-max="{$rotate['pfmax']}" data-step="{if isset($rotate['pfinteger']) && $rotate['pfinteger']=='1'}1{elseif isset($rotate['pfinteger']) && $rotate['pfinteger']=='3'}0.1{else /}0.01{/if}" {if !empty($mypfrecord)&&$rotate['canresave']=='2'}data-disable="true"{/if} value="{if empty($mypfrecord)}{$rotate['pfmin']}{else}{$mypfrecord['scoredetail'][0]['score']}{/if}"  />
+								</div>
+								<span class="num">{$rotate['pfmax']}</span> 
+								<input type="number" class="input{if !empty($mypfrecord)&&$rotate['canresave']=='2'} disable{/if}" value="{if !empty($mypfrecord)}{$mypfrecord['scoredetail'][0]['score']}{/if}" {if !empty($mypfrecord)&&$rotate['canresave']=='2'}disabled="disabled"{/if} readonly="readonly" placeholder="点击评分">
+							</div>
+							{/if}
+						</li>
+						{else}
+						{php}$pfkey=0;{/php}
+						{volist name="rotate.pfitem" id="pfitem"}
+						<li>
+							<h3>{$pfitem['dfname']}</h3> 
+							<div class="slider zam-app-flex-alignCenter">
+								<span class="num">{$pfitem['dfmin']}</span> 
+								<div class="mt-range-content flex1">
+									<input type="text" class="js-range-slider" name="{$pfitem['dffield']}" data-type="single" data-hide-min-max="true" data-hide-from-to="true" data-grid="false" data-min="{$pfitem['dfmin']}" data-max="{$pfitem['dfmax']}" data-step="{if isset($rotate['pfinteger']) && $rotate['pfinteger']=='1'}1{elseif isset($rotate['pfinteger']) && $rotate['pfinteger']=='3'}0.1{else /}0.01{/if}" {if !empty($mypfrecord)&&$rotate['canresave']=='2'}data-disable="true"{/if} value="{if empty($mypfrecord)}{$pfitem['dfmin']}{else}{$mypfrecord['scoredetail'][$pfkey]['score']}{/if}" />
+								</div>
+								<span class="num">{$pfitem['dfmax']}</span> 
+								<input type="number" class="input{if !empty($mypfrecord)&&$rotate['canresave']=='2'} disable{/if}" value="{if !empty($mypfrecord)}{$mypfrecord['scoredetail'][$pfkey]['score']}{/if}" {if !empty($mypfrecord)&&$rotate['canresave']=='2'}disabled="disabled"{/if} readonly="readonly" placeholder="点击评分">
+							</div>
+						</li>
+						{php}$pfkey++;{/php}
+						{/volist}
+						{/if}
+					</ul> 
+					<div class="desc-box{if isset($rotate['showpl']) && $rotate['showpl']=='2'} hidden{/if}">
+						<h4>评委点评</h4> 
+						<textarea rows="4" placeholder="不超过100字" {if !empty($mypfrecord)&&$rotate['canresave']=='2'}readonly{/if}>{if !empty($mypfrecord)}{$mypfrecord['pfword']}{/if}</textarea>
+					</div>
+					{if isset($rotate['showsign']) && $rotate['showsign']=='1'}
+					<div class="desc-box">
+						<h4>评委签名</h4> 
+						<div class="signarea zam-app-flex-ajCenter">
+							{if !empty($mypfrecord['pfsignimg'])}
+								<img class="canvasimg" src="{:tomedia($mypfrecord['pfsignimg'])}" data-src="{$mypfrecord['pfsignimg']}" />
+							{else /}
+								<img class="canvasimg hidden" src="" data-src="" />
+							{/if}
+							{if empty($mypfrecord)}
+	    						{if $pfuser['userstatus']=='1'}
+	    							<a class="btn btn-primary">点击签名</a>
+	    						{else}
+	    							<span class="disablepf">该用户已暂停评分</span>
+	    						{/if}
+	    					{else}
+	    						{if $rotate['canresave']=='2'}
+	    							<span class="disablepf">您已评分，无法修改</span>
+	    						{else}
+	    							<a class="btn btn-primary">重新签名</a>
+	    						{/if}
+	    					{/if}
+						</div>
+					</div>
+					{/if}
+					<div class="btn-pwpf zam-app-flex zam-app-alignCenter zam-app-justifyspacebetween">
+						<div class="totalscore">总分：<span>{if !empty($mypfrecord)}{$mypfrecord['totalscore']}{else}0{/if}</span></div>
+						{if empty($mypfrecord)}
+							{if $pfuser['userstatus']=='1'}
+								<button class="submit-btn">提交</button>
+								{if $rotate['canresave']=='2'}
+		    						<span class="submittip">评分一经提交不可修改</span>
+		    					{/if}
+							{else}
+							<span class="disablepf">该用户已暂停评分</span>
+							{/if}
+						{else}
+							{if $rotate['canresave']=='2'}
+								<span class="disablepf">您已评分，无法修改</span>
+							{else}
+								<div>
+									<span class="repftip">您已评分</span>
+									{if $pfuser['userstatus']=='1'}
+									<button class="submit-btn">重新提交</button>
+									{else}
+									<span class="disablepf">该用户已暂停评分</span>
+									{/if}
+								</div>
+							{/if}
+						{/if}
+					</div>
+				</div>
+			{else}
+    			{if $rotate['openpubpw']=='1'}
+    			    {if $pfuser['userstatus']=='2'}<div class="stoppf">当前参评选手已暂停评分</div>{/if}
+    			    <div class="pfbox">
+	    				<ul>
+	    					{if $rotate['pftype']=='1'}
+		    					<li>
+									{if request()->host(true) == 'xile.hnzsnetwork.cn' && $hdinfo['id'] == '576'}
+									<h3>选择分数</h3>
+									<div class="slidebtns">
+										<div class="btn btn-hollow" data-fenshu="70">70分</div>
+										<div class="btn btn-hollow" data-fenshu="80">80分</div>
+										<div class="btn btn-hollow" data-fenshu="90">90分</div>
+										<input type="hidden" class="input" value="{if !empty($mypfrecord)}{$mypfrecord['scoredetail'][0]['score']??'0'}{/if}">
+									</div>
+									{else /}
+									<h3>分数</h3>
+		    						<div class="slider zam-app-flex-alignCenter">
+		    							<span class="num">{$rotate['pfmin']}</span> 
+		    							<div class="mt-range-content flex1">
+		    								<input type="text" class="js-range-slider" name="normal_01" data-type="single" data-hide-min-max="true" data-hide-from-to="true" data-grid="false"  data-min="{$rotate['pfmin']}" data-max="{$rotate['pfmax']}" data-step="{if isset($rotate['pfinteger']) && $rotate['pfinteger']=='1'}1{elseif isset($rotate['pfinteger']) && $rotate['pfinteger']=='3'}0.1{else /}0.01{/if}" {if !empty($mypfrecord)&&$rotate['canresave']=='2'}data-disable="true"{/if} value="{if empty($mypfrecord)}{$rotate['pfmin']}{else}{$mypfrecord['scoredetail'][0]['score']??'0'}{/if}" />
+		    							</div>
+		    							<span class="num">{$rotate['pfmax']}</span> 
+		    							<input type="number" class="input{if !empty($mypfrecord)&&$rotate['canresave']=='2'} disable{/if}" value="{if !empty($mypfrecord)}{$mypfrecord['scoredetail'][0]['score']??'0'}{/if}" {if !empty($mypfrecord)&&$rotate['canresave']=='2'}disabled="disabled"{/if} readonly="readonly" placeholder="点击评分">
+		    						</div>
+									{/if}
+		    					</li>
+	    					{else}
+								{//huobapf}
+		    					{if $hdinfo['id']=='huobapf'}
+		    						<li>
+			    						<h3>{$mypwgroupname??'评委评分'}</h3> 
+			    						<div class="slider zam-app-flex-alignCenter">
+			    							<span class="num">{$rotate['pfmin']}</span> 
+			    							<div class="mt-range-content flex1">
+			    								<input type="text" class="js-range-slider" name="normal_01" data-type="single" data-hide-min-max="true" data-hide-from-to="true" data-grid="false"  data-min="{$rotate['pfmin']}" data-max="{$rotate['pfmax']}" data-step="{if isset($rotate['pfinteger']) && $rotate['pfinteger']=='1'}1{elseif isset($rotate['pfinteger']) && $rotate['pfinteger']=='3'}0.1{else /}0.01{/if}" {if !empty($mypfrecord)&&$rotate['canresave']=='2'}data-disable="true"{/if} value="{if empty($mypfrecord)}{$rotate['pfmin']}{else}{$mypfrecord['scoredetail'][0]['score']}{/if}" />
+			    							</div>
+			    							<span class="num">{$rotate['pfmax']}</span> 
+			    							<input type="number" class="input{if !empty($mypfrecord)&&$rotate['canresave']=='2'} disable{/if}" value="{if !empty($mypfrecord)}{$mypfrecord['scoredetail'][0]['score']}{/if}" {if !empty($mypfrecord)&&$rotate['canresave']=='2'}disabled="disabled"{/if} readonly="readonly" placeholder="点击评分">
+			    						</div>
+			    					</li>
+		    					{else /}
+			    					{php}$pfkey=0;{/php}
+			    					{volist name="rotate.pfitem" id="pfitem"}
+				    					<li>
+				    						<h3>{$pfitem['dfname']}</h3> 
+				    						<div class="slider zam-app-flex-alignCenter">
+				    							<span class="num">{$pfitem['dfmin']}</span> 
+				    							<div class="mt-range-content flex1">
+				    								<input type="text" class="js-range-slider" name="{$pfitem['dffield']}" data-type="single" data-hide-min-max="true" data-hide-from-to="true" data-grid="false" data-min="{$pfitem['dfmin']}" data-max="{$pfitem['dfmax']}" data-step="{if isset($rotate['pfinteger']) && $rotate['pfinteger']=='1'}1{elseif isset($rotate['pfinteger']) && $rotate['pfinteger']=='3'}0.1{else /}0.01{/if}" {if !empty($mypfrecord)&&$rotate['canresave']=='2'}data-disable="true"{/if} value="{if empty($mypfrecord)}{$pfitem['dfmin']}{else}{$mypfrecord['scoredetail'][$pfkey]['score']??'0'}{/if}" />
+				    							</div>
+				    							<span class="num">{$pfitem['dfmax']}</span> 
+				    							<input type="number" class="input{if !empty($mypfrecord)&&$rotate['canresave']=='2'} disable{/if}" value="{if !empty($mypfrecord)}{$mypfrecord['scoredetail'][$pfkey]['score']??'0'}{/if}" {if !empty($mypfrecord)&&$rotate['canresave']=='2'}disabled="disabled"{/if} readonly="readonly" placeholder="点击评分">
+				    						</div>
+				    					</li>
+			    					{php}$pfkey++;{/php}
+			    					{/volist}
+		    					{/if}
+	    					{/if}
+	    				</ul>
+	    				<div class="desc-box{if isset($rotate['showpl']) && $rotate['showpl']=='2'} hidden{/if}">
+	    					<h4>评委点评</h4> 
+	    					<textarea rows="4" placeholder="不超过100字" {if !empty($mypfrecord)&&$rotate['canresave']=='2'}readonly{/if}>{if !empty($mypfrecord)}{$mypfrecord['pfword']}{/if}</textarea>
+	    				</div>
+	    				{if isset($rotate['showsign']) && $rotate['showsign']=='1'}
+	    				<div class="desc-box">
+							<h4>评委签名</h4> 
+							<div class="signarea zam-app-flex-ajCenter">
+								{if !empty($mypfrecord['pfsignimg'])}
+									<img class="canvasimg" src="{:tomedia($mypfrecord['pfsignimg'])}" data-src="{$mypfrecord['pfsignimg']}" />
+								{else /}
+									<img class="canvasimg hidden" src="" data-src="" />
+								{/if}
+								{if empty($mypfrecord)}
+		    						{if $pfuser['userstatus']=='1'}
+		    							<a class="btn btn-primary">点击签名</a>
+		    						{else}
+		    							<span class="disablepf">该用户已暂停评分</span>
+		    						{/if}
+		    					{else}
+		    						{if $rotate['canresave']=='2'}
+		    							<span class="disablepf">您已评分，无法修改</span>
+		    						{else}
+		    							<a class="btn btn-primary">重新签名</a>
+		    						{/if}
+		    					{/if}
+							</div>
+						</div>
+						{/if}
+	    				<div class="btn-pwpf zam-app-flex zam-app-alignCenter zam-app-justifyspacebetween">
+	    					<div class="totalscore">总分：<span>{if !empty($mypfrecord)}{$mypfrecord['totalscore']}{else}0{/if}</span></div>
+	    					{if empty($mypfrecord)}
+	    						{if $pfuser['userstatus']=='1'}
+		    						<button class="submit-btn">提交</button>
+		    						{if $rotate['canresave']=='2'}
+		    							<span class="submittip">评分一经提交不可修改</span>
+		    						{/if}
+	    						{else}
+	    							<span class="disablepf">该用户已暂停评分</span>
+	    						{/if}
+	    					{else}
+	    						{if $rotate['canresave']=='2'}
+	    							<span class="disablepf">您已评分，无法修改</span>
+	    						{else}
+	    							<div>
+	    								<span class="repftip">您已评分</span>
+	    								{if $pfuser['userstatus']=='1'}
+	    								<button class="submit-btn">重新提交</button>
+	    								{else}
+	    								<span class="disablepf">该用户已暂停评分</span>
+	    								{/if}
+	    							</div>
+	    						{/if}
+	    					{/if}
+	    				</div>
+    				</div>
+    			{else}
+	    			<div class="zanbox{if $rotate['openzan']=='2'} hidden{/if}">
+	    				<p class="sendzan">已送<span>{$zantoone}</span>个赞</p>
+	    				<div class="zanicon"><i class="mxc-oppose_fill_light"></i></div>
+	    				<p class="waitzan">可送<span>{$waitfreezan}</span>赞</p>
+	    			</div>
+    			{/if}
+			{/if}
+		</section>
+	</div>
+</section>
+<section class="signnamebox zam-app-flex-ajCenter hidden">
+	<div class="signtitle">签名区域<span class="close"><i class="mxc-roundclose"></i></span>
+</div>
+	<div class="signareabody" id="signareabody">
+		<canvas id="signarea"></canvas>
+	</div>
+	<div class="signareabtns">
+		<a class="btn btn-danger btn-reset">清空</a>
+		<a class="btn btn-primary btn-confirm">确定</a>
+	</div>
+</section>
+<script>
+var onezanfee = "{$rotate['onezanfee']}",openpayzan = "{$rotate['openpayzan']}",pfinteger = "{$rotate['pfinteger']??'2'}",openpubpw = "{if isset($rotate['openpubpw']) && $rotate['openpubpw']=='1'}1{else /}2{/if}",pwclient = {if isset($pwclient) && $pwclient}true{else /}false{/if};
+require(['wechatcore','numkeyboard','ionrangeslider'],function (wechatcore,numkeyboard) {
+	if(pwclient || openpubpw == '1'){
+		$(".slidebtns .btn").click(function(){
+			$(this).parent().find('input').val($(this).data('fenshu'));
+			$(this).removeClass('btn-hollow').addClass('btn-primary').siblings().removeClass('btn-primary').addClass('btn-hollow');
+		});
+		$(".livemark-pfdz li .js-range-slider").ionRangeSlider({ skin: "round",onFinish: function (data) {
+			var inputval = data.input.parent().parent().find('.input');
+			if(pfinteger=='1'){
+				inputval.val(parseInt(data.from));
+			}else if(pfinteger=='2'){
+				inputval.val(data.from > 0 ? parseFloat(data.from).toFixed(2) : data.from);
+			}else{
+				inputval.val(data.from > 0 ? parseFloat(data.from).toFixed(1) : data.from);
+			}
+			calctotalscore();
+		}});
+		$(".livemark-pfdz li .input").on("click",function(){
+			var $this = $(this),paramobj = $this.prev().prev().find('input');
+			numkeyboard.open({
+				pftype:"{$rotate['pftype']??'1'}",
+				pfname:$(".livemark-userinfo .option-name").text(),
+				sname:$this.parent().prev().text(),
+				min:paramobj.attr('data-min'),
+				max:paramobj.attr('data-max'),
+				inttype:pfinteger,
+				inputval:$this.val(),
+			},function(inputval){
+				$this.val(inputval);
+				var sliderDom = $this.parent().find('input').eq(0);
+				sliderDom.data("ionRangeSlider").update({
+					from:inputval,
+				});
+				calctotalscore();
+			});
+		});
+		$(".btn-pwpf button").on('click',function(){
+			var pfinputs = $(".pfbox .input"),pfitems = [],inputisfill = '1',inputmax;
+			if(pfinputs.length<=0) {
+				return wechatcore.msg('无评分项，无法评分');
+			}
+			pfinputs.each(function(){
+				var fnode = $(this).parent().find('.js-range-slider'),inputscore = $(this).val(),inputfield = fnode.attr('name'),inputmin = fnode.attr('data-min'),inputmax = fnode.attr('data-max');
+				if(inputfield=='' || inputscore==''){
+					 inputisfill = '2';
+					 return false;
+				}else{
+					inputscore = parseFloat(inputscore).toFixed(2);
+					if(inputscore==0 || inputscore*100 < parseInt(inputmin)*100 || inputscore*100 > parseInt(inputmax)*100){
+						inputisfill = '3';
+						return false;
+					}
+				}
+				pfitems.push({field:inputfield,score:inputscore});
+			});
+			if(inputisfill != '1'){
+			    if(inputisfill == '2'){
+			        return wechatcore.msg('请将评分项目完成评分后提交');
+			    }else{
+			        return wechatcore.msg('评分应>最低分并且≤最高分');
+			    }
+			}
+			if($(".signarea").length > 0 && $(".canvasimg").attr('src')==''){
+				return wechatcore.msg('请签名后提交');
+			}
+			wechatcore.ask('温馨提示','您是否确认提交评分？',['确定','取消'],function(index){
+		        wechatcore.close(index);
+				wechatcore.ajaxSubmit((pwclient?'/wechat/livemarkpw/pwpfpost':'/wechat/livemark/pwpfpost'),{pfuserid:"{$pfuserid}",pfdata:pfitems,pfword:$(".desc-box textarea").val(),pfsignimg:$(".canvasimg").attr('data-src')||'',ispw:(pwclient?'1':'2')},'评分中..').then(function(json){
+    				if(json.code==0){
+    					wechatcore.msg('评分提交成功');
+    					setTimeout(function(){
+    						window.location.reload();
+    					},3e2);
+    				}else{
+    					wechatcore.msg(json.msg);
+    				}
+    			}, function(){
+    				wechatcore.msg('网络太差，评分失败');
+    			});
+			},function(index){
+				wechatcore.close(index);
+			});
+		});
+	}else{
+		var clickedzan = false;
+		$(".zanbox .zanicon").on('click',function(){
+			var $this = $(this),remainzan = parseInt($this.next().find('span').text());
+			if(remainzan <= 0) {
+				if(openpayzan=='2'){
+					return wechatcore.msg('您的赞已经全部送出');
+				}else{
+					var zanlayindex = wechatcore.bpopupbyhtml(wechatcore.tpl($("#payzan-tpl"),{}));
+					$("body .close-payzan").click(function(){
+						wechatcore.close(zanlayindex);
+					});
+					return false;
+				}
+			}
+			if(clickedzan) return;
+			clickedzan = true;
+			wechatcore.ajaxSubmit('{:gowechat('livemark/clickzan',['hdid'=>$hdinfo['hdid']])}',{pfuserid:"{$pfuserid}"},'点赞中..').then(function(json){
+				clickedzan = false;
+				if(json.code==0){
+					$this.next().find('span').text(json.msg);
+					$this.prev().find('span').text(parseInt($this.prev().find('span').text()) + 1);
+					wechatcore.msg('送赞成功');
+				}else if(json.code==-2){
+					 var zanlayindex2 = wechatcore.bpopupbyhtml(wechatcore.tpl($("#payzan-tpl"),{}));
+					 $("body .close-payzan").click(function(){
+						wechatcore.close(zanlayindex2);
+					 });
+				}else{
+					wechatcore.msg(json.msg);
+				}
+			}, function(){
+				clickedzan = false;
+				wechatcore.msg('网络太差，点赞失败');
+			});
+		});
+		$("body").on('click','.livemark-zanitemlist li',function(){
+			var $this = $(this),activeli = $this.parent().find('.active');
+			$this.addClass('active').siblings().removeClass('active');
+			if($this.hasClass('diynum')){
+				wechatcore.ask('请输入送赞个数','<div class="zam-input-box"> <input type="text" class="cell-input zam-app-cell-input flex7 diyzannum" placeholder="输入大于0的整数" autocomplete="off"> </div>',['确定','取消'],function(index){
+					var diyzannum = $('.diyzanpop .diyzannum').val();
+					if(diyzannum=='') {
+						return wechatcore.showtopmsg('请输入赞个数');
+					}else{
+						if (!(/(^[1-9]\d*$)/.test(diyzannum))){
+							 return wechatcore.showtopmsg('请输入大于0的整数');
+						}
+						$(".selzantip span").text(diyzannum+'个');
+						var totalmoney = parseFloat(diyzannum * onezanfee).toFixed(2); 
+						$(".zanmoney span").text(totalmoney+'元');
+						wechatcore.close(index);
+					}
+				},function(index){
+					wechatcore.close();
+					activeli.addClass('active').siblings().removeClass('active');
+					$(".selzantip span").text(activeli.attr('data-num')+'个');
+					$(".zanmoney span").text(activeli.attr('data-fee')+'元');
+				},'diyzanpop');
+			}else{
+				$(".selzantip span").text($this.attr('data-num')+'个');
+				$(".zanmoney span").text($this.attr('data-fee')+'元');
+			}
+		});
+		$("body").on('click','.payzanbtn',function(){
+			var $this = $(this),fdom = $this.parent(),activeli = fdom.find("ul .active"),isdiy='2';
+			if(activeli.length<=0) return wechatcore.showtopmsg('请选择送赞数量或输入赞数');
+			activeli.hasClass('diynum') && (isdiy = '1');
+			var postdata = {
+				pfuserid:"{$pfuserid}",
+				isdiy:isdiy,
+				zannum:fdom.find(".selzantip span").text().replace('个',''),
+				zanfee:fdom.find(".zanmoney span").text().replace('元',''),
+				iswxprogram:XCV3Config.isminiProgram,
+			};
+			$this.addClass('disabled');
+			wechatcore.ajaxSubmit('/wechat/livemark/payzan',postdata,'正在发起支付..').then(function(json){
+				$this.removeClass('disabled');
+				$("body .close-payzan").trigger('click');
+				if(json.code==0){
+					wechatcore.showWxpay(json.msg,function(res){
+						wechatcore.msg('真棒，您送出了'+postdata.zannum+'个赞');
+						fdom.find('.sendzan span').text(parseInt($this.prev().find('span').text()) + postdata.zannum);
+					},function(err){
+						wechatcore.msg('您已取消支付');
+					});
+				}else if(json.code==1){
+					wechatcore.reloadpage(json.msg);
+				}else if(json.code==3){
+					(parent.wx||wx).miniProgram.navigateTo({'url':'/pages/minipay/index?orderdata=' + encodeURIComponent(JSON.stringify(json.msg))});
+				}else{
+					wechatcore.msg(json.msg);
+				}
+			}, function(){
+				$this.removeClass('disabled');
+				wechatcore.msg('网络太差,发起支付失败');
+			});
+		});
+	}
+	
+	if($(".signarea").length > 0){
+		var hadpaint = false;
+		var ppcanvas = document.getElementById("signarea");
+		var ppctx = ppcanvas.getContext("2d");
+		var reSetppcanvas = document.getElementById("clear");
+		var aColorBtn = document.getElementsByClassName("color-item");
+		var save = document.getElementById("save");
+		var clear = false;
+		var activeColor = 'black';
+		var lWidth = 5;
+		var particles = [];
+		function autoSetSize(ppcanvas) {
+		    ppcanvasSetSize();
+		    function ppcanvasSetSize() {
+		        var pageWidth = document.getElementById('signareabody').clientWidth;
+		        var pageHeight = document.getElementById('signareabody').clientHeight;
+		        ppcanvas.width = pageWidth;
+		        ppcanvas.height = pageHeight;
+		    }
+		    window.onresize = function () {
+		        ppcanvasSetSize();
+		    }
+		}	
+		function setppcanvasBg(color) {
+		    ppctx.fillStyle = color;
+		    ppctx.fillRect(0, 0, ppcanvas.width, ppcanvas.height);
+		    ppctx.fillStyle = "black";
+		}
+		function listenToUser(ppcanvas) {
+		    var painting = false;
+		    var lastPoint = {x: undefined, y: undefined};
+			var supportTouch = "ontouchend" in document ? true : false;
+		    if (supportTouch) {
+		        ppcanvas.ontouchstart = function (e) {
+		            painting = true;
+		            var x = e.touches[0].clientX - ppcanvas.offsetLeft;
+		            var y = e.touches[0].clientY  - ppcanvas.offsetTop;
+		            lastPoint = {"x": x, "y": y};
+		            ppctx.save();
+		            drawCircle(x, y, 0);
+		        };
+		        ppcanvas.ontouchmove = function (e) {
+		            if (painting) {
+		                var x = e.touches[0].clientX - ppcanvas.offsetLeft;
+		            	var y = e.touches[0].clientY  - ppcanvas.offsetTop;
+		                var newPoint = {"x": x, "y": y};
+		                drawLine(lastPoint.x, lastPoint.y, newPoint.x, newPoint.y);
+		                lastPoint = newPoint;
+						hadpaint = true;
+		            }
+		        };
+
+		        ppcanvas.ontouchend = function () {
+		            painting = false;
+		        }
+		    } else {
+		        ppcanvas.onmousedown = function (e) {
+		            painting = true;
+		            var x = e.clientX - ppcanvas.offsetLeft;
+		            var y = e.clientY  - ppcanvas.offsetTop;
+		            lastPoint = {"x": x, "y": y};
+		            ppctx.save();
+		            drawCircle(x, y, 0);
+		        };
+		        ppcanvas.onmousemove = function (e) {
+		            if (painting) {
+		                var x = e.clientX - ppcanvas.offsetLeft;
+		            	var y = e.clientY  - ppcanvas.offsetTop;
+		                var newPoint = {"x": x, "y": y};
+		                drawLine(lastPoint.x, lastPoint.y, newPoint.x, newPoint.y,clear);
+		                lastPoint = newPoint;
+						hadpaint = true;
+
+		            }
+		        };
+		        ppcanvas.onmouseup = function () {
+		            painting = false;
+		        };
+		        ppcanvas.mouseleave = function () {
+		            painting = false;
+		        }
+		    }
+		}
+		function drawCircle(x, y, radius) {
+		    ppctx.save();
+		    ppctx.beginPath();
+		    ppctx.arc(x, y, radius, 0, Math.PI * 2);
+		    ppctx.fill();
+		    if (clear) {
+		        ppctx.clip();
+		        ppctx.clearRect(0,0,ppcanvas.width,ppcanvas.height);
+		        ppctx.restore();
+		    }
+		}
+		function drawLine(x1, y1, x2, y2) {
+		    ppctx.lineWidth = lWidth;
+		    ppctx.lineCap = "round";
+		    ppctx.lineJoin = "round";
+		    if (clear) {
+		        ppctx.save();
+		        ppctx.globalCompositeOperation = "destination-out";
+		        ppctx.moveTo(x1, y1);
+		        ppctx.lineTo(x2, y2);
+		        ppctx.stroke();
+		        ppctx.closePath();
+		        ppctx.clip();
+		        ppctx.clearRect(0,0,ppcanvas.width,ppcanvas.height);
+		        ppctx.restore();
+		    }else{
+		        ppctx.moveTo(x1, y1);
+		        ppctx.lineTo(x2, y2);
+		        ppctx.stroke();
+		        ppctx.closePath();
+		    }
+		}
+		$(".signarea .btn").click(function(){
+			$(".signnamebox").removeClass('hidden');
+			if(hadpaint){
+				 ppctx.clearRect(0, 0, ppcanvas.width, ppcanvas.height);
+			 	 hadpaint = false;
+			}
+			setTimeout(function(){
+				autoSetSize(ppcanvas);
+				listenToUser(ppcanvas);
+			},3e2);
+		});
+		$(".signnamebox .close").click(function(){
+			$(".signnamebox").addClass('hidden');
+		});
+		$(".signnamebox .btn-reset").click(function(){
+			 ppctx.clearRect(0, 0, ppcanvas.width, ppcanvas.height);
+			 hadpaint = false;
+		});
+		$(".signnamebox .btn-confirm").click(function(){
+			if(!hadpaint) return wechatcore.msg('请先签名');
+		    var imgUrl = ppcanvas.toDataURL("image/png");
+			$(".canvasimg").attr({
+				'src':imgUrl,
+				'data-src':imgUrl,
+			}).removeClass('hidden');
+			$(".signnamebox .close").trigger('click');
+		});
+	}
+	var clickrefresh = false;
+	$(".markrefresh").click(function(){
+		if(clickrefresh) return false;
+		clickrefresh = true;
+		wechatcore.ajaxSubmit((pwclient?'/wechat/livemarkpw/refresh':'/wechat/livemark/refresh'),{ispw:(pwclient ? '1' : '2'), pfuserid:"{$pfuserid}"},'正在刷新..').then(function(json){
+			
+			if(json.code==0){
+				clickrefresh = false;
+				window.location.href = json.msg;	
+			}else{
+				wechatcore.msg(json.msg);
+				setTimeout(function(){
+					clickrefresh = false;
+					window.location.href = "{:gowechat(!$pwclient ? 'livemark/index' : 'livemarkpw/index',['hdid' => $hdinfo['hdid']])}";	
+				},3e3);
+			}
+		}, function(){
+			clickrefresh = false;
+			wechatcore.msg('网络太差，点赞失败');
+		});
+	});
+});
+var accAdd = function (arg1, arg2) {
+    var r1, r2, m;
+    try {
+        r1 = arg1.toString().split(".")[1].length
+    } catch (e) {
+        r1 = 0
+    }
+    try {
+        r2 = arg2.toString().split(".")[1].length
+    } catch (e) {
+        r2 = 0
+    }
+    m = Math.pow(10, Math.max(r1, r2))
+    return (arg1 * m + arg2 * m) / m
+}
+function calctotalscore(){
+	var pfinputs = $(".pfbox .js-range-slider"),totalscore = (pfinteger=='1'?0:(pfinteger=='2'?0.00:0));
+	pfinputs.each(function(index,val){
+		if(pfinteger=='1'){
+			totalscore += parseInt($(this).val());
+		}else if(pfinteger=='2'){
+			totalscore =  accAdd( totalscore,parseFloat($(this).val()).toFixed(2) );
+		}else{
+			totalscore =  accAdd( totalscore,parseFloat($(this).val()).toFixed(1) );
+		}
+	});
+	$(".totalscore span").text(parseFloat(totalscore).toFixed(2));
+}
+</script>
+<script id="payzan-tpl" type="text/html">
+<h3 class="livemark-payzantitle close-payzan" style="padding:0 10px;">可用赞不足，马上补充<i class="mxc-roundclose"></i></h3>
+<div class="selzantip">选择送出赞个数: <span>{if !empty($rotate['zanpayitem'])}{$rotate['zanpayitem'][0]['zannum']}{else}0{/if}个</span></div>
+<ul class="livemark-zanitemlist zam-app-flex zam-app-flex-wrap">
+	{volist name="rotate.zanpayitem" id="zanitem" key="zankey"}
+	<li class="zanitem zam-app-flex-ajCenter2{if $zankey==0} active{/if}" data-num="{$zanitem['zannum']}" data-fee="{$zanitem['zanfee']}">
+		<div>{$zanitem['zannum']}个<i class="mxc-unie656"></i></div>
+	</li>
+	{/volist}
+	<li class="zanitem diynum"><div>自定义<i class="mxc-unie656"></div></i></li>
+</ul>
+<div class="zanmoney">支付金额: <span>{if !empty($rotate['zanpayitem'])}{$rotate['zanpayitem'][0]['zanfee']}{else}0.00{/if}元</span></div>
+<div class="payzanbtn">马上送赞</div>
+</script>
+{include file="livemark/footer" /}
+{include file="common/footer" /}

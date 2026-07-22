@@ -1,0 +1,1116 @@
+<style>
+.attachmentpop .jconfirm-content-pane{
+    overflow: hidden!important;
+}
+/*方形选择框*/
+.uploadattachments-card{
+    margin:0;
+    box-shadow:unset;
+}
+
+.uploadattachments-card .card-header{
+    padding:8px 0;
+    border-bottom:1px solid #e2e6e9
+}
+.attachment-category{
+    width:20%;
+    height: 100%;
+    overflow-y: auto;
+}
+.category-add{height:40px;line-height: 40px;text-align: center;}
+.attachment-files{
+    display: flex;
+    flex-direction: column;
+    width:80%;
+    overflow: hidden;
+    height: 100%;
+    border-left: 1px solid #e2e6e9;
+}
+.uploadattachments-card .attachment-files-wrapper{
+    position: relative;
+    flex: 1;
+    overflow: hidden auto;
+}
+.uploadattachments-card .attachment-files-wrapper .uploadattachments-box{
+    min-height: 100%;
+}
+.uploadattachments-card .uploadattachments-box .uploadattachments-item{
+    position: relative;
+    width: calc(20% - 20px);
+    margin: 10px 10px 0 10px;
+    text-align: center;
+    vertical-align: middle;
+    background-color: #eee;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+    border: 2px solid transparent;
+    box-sizing: border-box;
+    float: left;
+}
+.uploadattachments-card .uploadattachments-box.uploadattachments-type1 li:nth-child(n+11){
+    margin-bottom:10px;
+}
+.uploadattachments-card .uploadattachments-box .uploadattachments-item:before{
+    content: "";
+    display: inline-block;
+    padding-bottom: 100%;
+    width: .1px;
+    vertical-align: middle;
+    border: 2px solid transparent;
+    box-sizing: border-box;
+}
+
+.uploadattachments-card .uploadattachments-box .uploadattachments-item.active,.uploadattachments-card .uploadattachments-box .uploadattachments-item:hover{
+    border-color:#48b0f7;
+}
+.uploadattachments-card .uploadattachments-box .uploadattachments-item .uploadattachment-name {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    line-height: 20px;
+    background: rgba(0,0,0,.5);
+    color: #fff;
+    padding: 0 5px;
+    text-align: left;
+    z-index: 2;
+    user-select: none;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+.uploadattachment-icon{
+    position: absolute;
+    top: 0;
+    left:0;
+    width: 100%;
+    height: 80px;
+    line-height: 80px;
+}
+.uploadattachment-icon i{
+    font-size:40px;
+}
+.uploadattachment-createtime{
+    position: absolute;
+    top: 80px;
+    width: 100%;
+    color: #999;
+    line-height: 34px;
+    font-size:14px;
+}
+
+.uploadattachments-card .uploadattachments-box .uploadattachments-item .uploadattachment-checkbox{
+    position: absolute;
+    width: 34px;
+    line-height: 34px;
+    text-align: center;
+    cursor: pointer;
+    top: 5px;
+    left: 5px;
+    pointer-events: none;
+    display: none;
+}
+.uploadattachments-card .uploadattachments-box .uploadattachments-item.active .uploadattachment-checkbox,.uploadattachments-card .uploadattachments-box .uploadattachments-item:hover .uploadattachment-checkbox{
+    display: block
+}
+.uploadattachments-card .uploadattachments-box .uploadattachments-item .uploadattachment-more {
+    position: absolute;
+    width: 18px;
+    line-height: 18px;
+    text-align: center;
+    background-color: #cecccc;
+    border-radius: 1px;
+    cursor: pointer;
+    top: 5px;
+    right: 5px;
+    color:#fff;
+    display: none;
+}
+.uploadattachments-card .uploadattachments-box .uploadattachments-item:hover .uploadattachment-more,.uploadattachments-card .uploadattachments-box .uploadattachments-item .uploadattachment-more[aria-describedby^=popover]{
+    display: block
+}
+.uploadattachments-card .uploadattachment-upload{
+    position: relative;
+    display: inline-block;
+    vertical-align: top;
+    cursor: pointer;
+    padding: 6px 12px;
+    color: #fff;
+    text-align: center;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-right: 6px;
+}
+.uploadattachments-card .uploadattachment-get{
+    position: relative;
+    display: inline-block;
+    vertical-align: top;
+    cursor: pointer;
+    padding: 6px 12px;
+    color: #fff;
+    text-align: center;
+    border-radius: 3px;
+    overflow: hidden;
+}
+.uploadattachments-card .uploadattachment-upload .h5file{
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    opacity: 0;
+}
+.uploadattachment-upload.disabled{
+    pointer-events: none;
+}
+.uploadattachments-card .uploadattachment-upload.disabled,.uploadattachments-card .uploadattachment-get.disabled{
+    pointer-events: none;
+}
+.uploadattachments-card .uploadattachment-tip{
+    display: inline-block;
+    line-height: 33px;
+    margin-right: 20px;
+}
+/* 分页 */
+.uploadattachments-card .attachment-files-footer{
+    padding: 0 10px;
+    height: 46px;
+    border-top: 1px solid #e2e6e9;
+}
+.uploadattachments-card .attachment-files-footer .uploadattachment-file-checkall{
+    margin-right: 10px;
+}
+.uploadattachments-card .attachment-files-footer .uploadattachment-file-checkall.disabled{
+    pointer-events: none;
+    color: gray;
+}
+.lyear-checkbox{
+    padding-right: 0;
+    padding-left: 24px;
+}
+.uploadattachments-card .attachment-files-footer .pagerbox{
+    margin-left: auto;
+}
+.uploadattachments-card .attachment-files-footer .pagerbox .pagination{
+    margin:0;
+    display: block;
+}
+/*
+.uploadattachments-card .attachment-files-footer .pagerbox .pagination>li>a, .uploadattachments-card .attachment-files-footer .pagerbox .pagination>li>span {
+    padding: 0px 3px;
+    margin: 0 1px;
+} */
+.uploadattachments-card .nofiletip{
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    font-size: 20px;
+}
+.uploadattachments-card .nofiletip img{
+    width: 200px;
+}
+.category-menu {font-size: 14px;}
+.category-menu li{
+    position: relative;
+    padding-left: 18px;
+    line-height: 40px;
+    text-align:left;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select:none;
+}
+.category-menu li .btn-addgroup{
+    margin-top:8px;
+    margin-right: 10px;
+}
+.category-menu li .btn-more{
+    position: absolute;
+    right: 10px;
+    font-size: 16px;
+    top: 0;
+    cursor: pointer;
+    color: #3296fa;
+    display: none;
+}
+.category-menu li:not(.nav-item):hover .btn-more,.category-menu li.nav-item a:hover .btn-more,.category-menu li .btn-more[aria-describedby^=popover]{
+    display: block;
+}
+.category-menu li a{
+    position: unset;
+    color: inherit;
+    white-space: nowrap;
+    padding: 0px;
+}
+.category-menu li.nav-item a:after {
+    position: absolute;
+    top: 4px;
+    right: unset;
+    left: -5px;
+    font-family: 'Material Design Icons';
+    font-size: 18px;
+    line-height: 1.75;
+    content: '\f142';
+    -webkit-transition: -webkit-transform 0.1s linear;
+    transition: transform 0.1s linear;
+}
+.category-menu ul > li.active{
+    color: #48b0f7;
+    background-color: #edf6ff;
+}
+.category-menu .open>a, .category-menu .open>a:focus, .category-menu .open>a:hover {
+    background-color: transparent;
+    border-color: none;
+}
+/*上传进度条*/
+.attachment-files .progress {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 60%;
+    transform: translate(-50%,-60%);
+    height: 6px;
+    background-color: #e1e2e6;
+}
+.uploadresulttip{position: absolute;top: 0;left: 0;width:100%;height: 100%;padding:10px;overflow: hidden;}
+
+
+
+/* 更多操作pophover */
+.popover--material .popover-content {
+    padding: 30px;
+}
+.popover--material .action-img-popover__content {
+    width: 200px;
+    margin: 20px -31px -10px
+}
+
+.popover--material .action-img-popover__title {
+    font-size: 16px;
+    line-height: 1.1;
+    margin-bottom: -4px;
+    color: #333;
+    font-weight: 600;
+}
+.popover--material .action-img-popover__title .closepopover{
+    position: absolute;
+    top: 7px;
+    right: 12px;
+    font-weight: bold;
+    font-size: 20px;
+    cursor: pointer;
+}
+.popover--material .action-img-popover__content .action {
+    height: 40px;
+    line-height: 40px;
+    padding-left: 30px;
+    cursor: pointer
+}
+.popover--material .action-img-popover__content .action:hover {
+    background-color: #f1f2f6;
+}
+.popover--material .action-img-popover__content .action i{
+    margin-right: 10px;
+}
+
+</style>
+<div class="row" style="margin:0;">
+<div class="card uploadattachments-card">
+    <div class="card-header">
+        <div class="uploadattachment-category-father pull-left">
+            <a class="btn btn-default btn-sm" data-gid="self" style="margin-right: 5px;">我的{if $type=='1' }图片{elseif $type=='3' /}视频{else /}音频{/if}库</a>
+            <a class="btn btn-default btn-sm" data-gid="sys">系统{if $type=='1' }图片{elseif $type=='3' /}视频{else /}音频{/if}库</a>
+        </div>
+        <div class="uploadattachment-upload-btn pull-right">
+            <div class="uploadattachment-tip">最大支持上传<span class="text-danger">{$fileconfig['msize']}M</span>的{if $type=='1' }图片{elseif $type=='3' /}视频{else /}音频{/if}文件</div>
+            <div class="uploadattachment-upload btn-primary"><i class="mdi mdi-plus"></i> 上传{if $type=='1' }图片{elseif $type=='3' /}视频{else /}音频{/if}</div>
+            {if $type=='1' && request()->userid == '1'}
+            <div class="uploadattachment-get btn-warning hidden"><i class="mdi mdi-inbox-arrow-down"></i> 提取图片</div>
+            {/if}
+        </div>
+    </div>
+    <div class="card-body clearfix zam-flex" style="padding:0;">
+        <div class="attachment-category">
+            <div class="category-menu">
+                <ul class="nav attachment-navs"></ul>
+            </div>
+        </div>
+        <div class="attachment-files pull-right">
+            <div class="attachment-files-wrapper">
+                <ul class="uploadattachments-box uploadattachments-type{$type} clearfix"></ul>
+            </div>
+            <div class="attachment-files-footer zam-flex">
+                <div class="uploadattachment-file-checkall zam-flex zam-alignItems">
+                    <label class="lyear-checkbox checkbox-info">
+                        <input type="checkbox"><span>全选</span>
+                    </label>
+                </div>
+                <div class="control-btns zam-flex zam-alignItems">
+                    <a class="btn btn-primary btn-sm disabled uploadattachment-move" style="margin-right: 10px;"><i class="mdi mdi-arrow-right"></i> 移动</a>
+                    <a class="btn btn-danger btn-sm disabled uploadattachment-del"><i class="mdi mdi-delete"></i> 删除</a>
+                </div>
+                <div class="pagerbox zam-flex zam-alignItems"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script id="cate-tpl" type="text/template">
+    <%# if(!d.children || !d.children.length){ %>
+        <li data-cateid="<% d.id %>">
+            <span class="catename"><% d.catename %></span>
+            <%# if(d.id == -1){ %>
+                <div class="btn btn-primary btn-xs btn-addgroup pull-right"><i class="mdi mdi-plus"></i> 新增分组</div>
+            <%# }else if(d.id > 0 && d.gid == 'self'){ %>
+                <span class="btn-more"><i class="mdi mdi-dots-horizontal"></i></span>
+            <%# } %>
+        </li>
+    <%# }else{ %>
+        <li class="nav-item nav-item-has-subnav open">
+            <a href="javascript:void(0)" data-cateid="<% d.id %>">
+                <span class="catename"><% d.catename %></span>
+                <%# if(d.gid == 'self'){ %>
+                    <span class="btn-more"><i class="mdi mdi-dots-horizontal"></i></span>
+                <%# } %>
+            </a>
+            <ul class="nav-subnav">
+                <%# $.each(d.children,function(i,s){ %>
+                <li class="nav-sitem" data-cateid="<% s.id %>">
+                    <span class="catename"><% s.catename %></span>
+                    <%# if(d.gid == 'self'){ %>
+                        <span class="btn-more"><i class="mdi mdi-dots-horizontal"></i></span>
+                    <%# } %>
+                </li>
+                <%# }); %>
+            </ul>
+        </li>
+    <%# } %>
+</script>
+<script id="uploadimgs-tpl" type="text/template">
+    <li class="uploadattachments-item cursor" data-issys="<% d.issys %>" data-fileid="<% d.id %>" data-filepath= "<% d.filepath %>" data-filesrc="<% d.filesrc %>" {if $type=='1'}style="background-image: url(<% d.filesrc %>);"{elseif $type=='3' /}<%# if (d.videoicon){ %>style="background-image: url('<% d.videoicon %>');"<%# } %>{/if}>
+        {if $type > 1}
+            <div class="uploadattachment-playone hidden"><span class="mdi mdi-play-circle"></span></div>
+            <div class="uploadattachment-icon<%# if (d.videoicon){ %> hidden<%# } %>">
+                <i class="mdi {if $type=='2'}mdi-file-music{else/}mdi-file-video{/if}"></i>
+            </div>
+            <div class="uploadattachment-createtime<%# if (d.videoicon){ %> hidden<%# } %>"><% d.create_time %></div>
+        {/if}
+        <div class="uploadattachment-name"><% d.filename %></div>
+        <div class="uploadattachment-checkbox">
+            <label class="lyear-checkbox checkbox-info">
+                <input type="checkbox" value="<% d.id %>"><span></span>
+            </label>
+        </div>
+        <div class="uploadattachment-more">
+            <i class="mdi mdi-dots-horizontal"></i>
+        </div>
+    </li>
+</script>
+<script id="progress-tpl" type="text/template">
+    <li class="uploadattachments-item upprogress<% d.fileid %>">
+        <div class="progress">
+            <div class="progress-bar progress-bar-info progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
+              <span class="sr-only">0% Complete</span>
+            </div>
+        </div>
+    </li>
+</script>
+<script id='editcate-tpl' type="text/template">
+<div id="formBox" class="zam-formvalidation form-horizontal">
+    <div class="form-group">
+        <label class="col-lg-3 control-label">* 分组名称</label>
+        <div class="col-lg-9">
+        <input class="form-control catename" type="text"  name="catename" placeholder="请输入分组名称" value="<% d.catename %>" maxlength="10">
+        <%# if(d.isson){ %><span class="help-block"></span><%# } %>
+        </div>
+    </div>
+</div>
+</script>
+<script id='getimg-tpl' type="text/template">
+<div id="formBox" class="zam-formvalidation form-horizontal">
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 图片地址</label>
+        <div class="col-lg-10">
+            <input class="form-control imgurl" type="text"  name="imgurl" placeholder="请输入完整的图片url地址" value="">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 图片预览</label>
+        <div class="col-lg-10">
+            <div class="form-control-static getimg-previewbox">
+                <img src="" onerror="javascript:this.src='/static/images/sys/nopic.jpg';this.title='暂无图片';"/>
+                <span class="help-block"><span class="text-danger">如果填写了完整的图片地址仍然显示暂无图片，请核实图片url是否完整或网络图片开启了防盗链无法提取</span></span>
+            </div>
+        </div>
+    </div>
+</div>
+</script>
+<script>
+var amtype = "{$type}",psize = 15,uploader;
+require(['webcore','zamnotice','jconfirmBox','layerBox','webupload'],function(webcore,zamnotice,jconfirmBox,layerBox,WebUploader){
+    var uptotype = XCV3Config.amconfig.type||'0',isstsup = true;
+    if(uptotype == '0'){
+        isstsup = false;
+    }else{
+        var filecount = 0,upfail = 0,upsuccess = 0;
+    }
+    var activeCateObj = $(".category-menu li.active"),uploadObj = {
+        auto: true,
+        server:"{:gocommon('attachment/upload')}",
+        duplicate: true,
+        swf: '__STATIC__/js/webupload/Uploader.swf',
+        formData: {
+            amtype: "{$type}",
+            fcateid: activeCateObj.parent().hasClass('nav-subnav') ? activeCateObj.parent().prev().data('cateid') : '0',
+            cateid: activeCateObj.data('cateid') || '0',
+        },
+        pick: {
+            id: '.uploadattachment-upload',
+            multiple: true
+        },
+        compress:false,
+        threads:1,
+        prepareNextFile:true,
+        accept: {
+            title: "{$typename}s",
+            extensions: "{$fileconfig['ext']}",
+            mimeTypes: "{$typename}/*",
+        },
+    };
+    if(!isstsup){
+        uploadObj.fileSingleSizeLimit = {$fileconfig['size']};
+    }
+    if(uploader){
+        uploader.destroy();
+    }
+    uploader = WebUploader.create(uploadObj);
+    if(isstsup){
+        uploader.on('filesQueued', function(files){
+            filecount = files.length;
+            $(".uploadattachment-upload,.uploadattachment-get").addClass('disabled');
+            $.each(files,function(i,file){
+                uploader.removeFile(file, true);
+                var firstli = $(".uploadattachments-box li").eq(0);
+                if(firstli.length > 0){
+                    if($(".uploadattachments-box li").length >= psize){
+                        $(".uploadattachments-box li").eq(-1).remove();
+                    }
+                    firstli.before(webcore.tpl($("#progress-tpl"),{fileid:file.id}));
+                }else{
+                    $(".uploadattachments-box").html(webcore.tpl($("#progress-tpl"),{fileid:file.id}));
+                }
+                webcore.uploadStsFile({
+                    file:file,
+                    filetype:amtype,
+                    amtype:uptotype,
+                    fcateid: uploadObj.formData.fcateid,
+                    cateid: uploadObj.formData.cateid,
+                },function(json){
+                    var uploadbox = $( '.upprogress'+file.id ),uploadtype = $(".uploadattachments-box").hasClass('.uploadattachments-type1')?'1':($(".uploadattachments-box").hasClass('.uploadattachments-type2')?'2':'3');
+                    if(json.code==0){
+                        upsuccess++;
+                        uploadbox.attr('class','uploadattachments-item cursor').find('.progress').remove();
+                        uploadbox.html('<div class="zam-flex-column-center uploadresulttip"><div style="width:90%;max-height:100px;overflow-x:hidden;word-wrap: break-all; word-break: break-all;">'+file.name+'</div><div class="text-info m-t-5">上传成功</div></div>');
+                    }else{
+                        upfail++;
+                        uploadbox.attr('class','uploadattachments-item cursor').find('.progress').remove();
+                        uploadbox.html('<div class="zam-flex-column-center uploadresulttip"><div style="width:90%;max-height:100px;overflow-x:hidden;word-break: break-all;">'+file.name+'</div><div class="text-danger m-t-5" style="max-height:80px;overflow:hidden">上传失败，'+json.msg+'</div></div>');
+                    }
+                    if(upsuccess > 0 && filecount > 0 && upsuccess + upfail >= filecount){
+                        setTimeout(function(){
+                            refreshuplist($(".uploadattachments-card .pagination .active a").attr('data-page')||1);
+                        },3e2);
+                        filecount = 0;
+                        upfail = 0;
+                        upsuccess = 0;
+                        $(".uploadattachment-upload,.uploadattachment-get").removeClass('disabled');
+                    }
+                },function(per){
+                    $('.upprogress'+file.id).find('.progress-bar').css({"width":per +'%'});
+                });
+                
+            });
+            return false;
+        });
+        uploader.on('uploadFinished', function() {
+            if(upfail > 0 && filecount > 0 && upfail == filecount){
+                setTimeout(function(){
+                    refreshuplist($(".uploadattachments-card .pagination .active a").attr('data-page')||1);
+                    filecount = 0;
+                    upfail = 0;
+                    upsuccess = 0;
+                    $(".uploadattachment-upload,.uploadattachment-get").removeClass('disabled');
+                },1e3);
+            }
+        });
+    }else{
+        uploader.on( 'fileQueued', function( file ) {
+            var firstli = $(".uploadattachments-box li").eq(0);
+            if(firstli.length > 0){
+                if($(".uploadattachments-box li").length >= psize){
+                    $(".uploadattachments-box li").eq(-1).remove();
+                }
+                firstli.before(webcore.tpl($("#progress-tpl"),{fileid:file.id}));
+            }else{
+                $(".uploadattachments-box").html(webcore.tpl($("#progress-tpl"),{fileid:file.id}));
+            }
+        });
+        uploader.on( 'uploadProgress', function( file, percentage ) {
+            $( '.upprogress'+file.id ).find('.progress-bar').css({"width":parseInt(percentage * 100) +'%'});
+        });
+        uploader.on('uploadFinished', function(file, percentage) {
+            refreshuplist($(".uploadattachments-card .pagination .active a").attr('data-page')||1);
+        });
+        uploader.on('uploadSuccess', function(file, json) {
+            var uploadbox = $( '.upprogress'+file.id ),uploadtype = $(".uploadattachments-box").hasClass('.uploadattachments-type1')?'1':($(".uploadattachments-box").hasClass('.uploadattachments-type2')?'2':'3');
+            if(json.code==0){
+                zamnotice.showTips('success','上传成功');
+                uploadbox.attr('class','uploadattachments-item cursor').find('.progress').remove();
+                uploadbox.html('<div class="zam-flex-column-center uploadresulttip"><div style="width:90%;max-height:100px;overflow-x:hidden;word-wrap: break-all; word-break: break-all;">'+file.name+'</div><div class="text-info m-t-5">上传成功</div></div>');
+            }else{
+                zamnotice.showTips('error',json.msg);
+                uploadbox.attr('class','uploadattachments-item cursor').find('.progress').remove();
+                uploadbox.html('<div class="zam-flex-column-center uploadresulttip"><div style="width:90%;max-height:100px;overflow-x:hidden;word-break: break-all;">'+file.name+'</div><div class="text-danger m-t-5">上传失败</div></div>');
+            }
+        });
+        uploader.on('uploadError', function(file) {
+            $( '.upprogress'+file.id ).remove();
+            zamnotice.showTips('error','上传出错，上传失败');
+        });
+        uploader.on('error', function(type) {
+            switch (type) {
+                case 'Q_TYPE_DENIED':
+                    webcore.showMsg('部分文件类型不正确，已从上传队列移除');
+                    break;
+                case 'F_EXCEED_SIZE':
+                    webcore.showMsg('部分文件大小不符，已从上传队列移除');
+                    break;
+                default:
+                    webcore.showMsg('error','部分文件上传失败');
+            }
+        });
+    }
+    $(".uploadattachment-category-father .btn").click(function(){
+        var gid = $(this).data('gid')||'self',catebox = $(".category-menu ul");
+        $(this).addClass('btn-primary').siblings().removeClass('btn-primary');
+        //加载分组 loadcate
+        webcore.ajaxSubmit("{:gocommon('attachment/loadcate')}",{gid:gid,amtype:amtype},'分组加载中...').then(function(json){
+            if(json.code==0){
+                var html = '',cates = json.msg||[];
+                $.each(cates,function(i,v){
+                    v.gid = gid;
+                    html += webcore.tpl($("#cate-tpl"),v);
+                });
+                catebox.html(html);
+                if(gid == 'sys'){
+                    $(".uploadattachment-upload,.uploadattachment-get").addClass('disabled');
+                }
+                catebox.find('li:not(.nav-item)').eq(0).trigger('click');
+            }else{
+                catebox.html('');
+                zamnotice.showTips('error',json.msg);   
+            }
+        }, function(json){
+            catebox.html('');
+            zamnotice.showTips('error','网络差。操作失败');
+        });
+    });
+    $(".uploadattachment-category-father .btn").eq(0).trigger('click');
+    $('.category-menu').on('click', '.nav-item-has-subnav > a', function() {
+        $("[aria-describedby^=popover]").popover("destroy");
+        var $subnavToggle = $(this),$navHasSubnav = $subnavToggle.parent(),$subnav = $navHasSubnav.find('.nav-subnav').first();
+        $navHasSubnav.siblings().find('.nav-subnav:visible').slideUp(500).parent().removeClass('open');
+        $subnav.slideToggle(300, function() {
+            $navHasSubnav.toggleClass('open');
+        });
+    });
+    $('.category-menu').on('click', "li:not(.nav-item)", function(e) {
+        e.stopPropagation();
+        $("[aria-describedby^=popover]").popover("destroy");
+        $(".category-menu li:not(.nav-item)").removeClass('active');
+        $(this).addClass('active');
+        var activeCateObj = $(".category-menu li.active");
+        uploadObj.formData.fcateid = activeCateObj.parent().hasClass('nav-subnav') ? activeCateObj.parent().prev().data('cateid') : '0',
+        uploadObj.formData.cateid = activeCateObj.data('cateid') || '0',
+        refreshuplist('1');
+    });
+    $('.category-menu').on('click', '.btn-addgroup', function(e) {
+        e.stopPropagation();
+        $("[aria-describedby^=popover]").popover("destroy");
+        var confirmobj = jconfirmBox.confirm('新增分组',webcore.tpl($("#editcate-tpl"),{catename:''}),function(e){
+            var catename = e.$content.find('.catename').val();
+            if(catename==''){
+                zamnotice.showTips('error','分组名必须填写');
+                return false;
+            }
+            webcore.ajaxSubmit("{:gocommon('attachment/savecate')}",{amtype:amtype,catename:catename}).then(function(json){
+                if(json.code==0){
+                    confirmobj.close();
+                    var navobj = $('.category-menu .attachment-navs');
+                    navobj.append(webcore.tpl($("#cate-tpl"),{id:json.msg,catename:catename,gid:'self'}));
+                    navobj.find('li:last-child').trigger('click');
+                    zamnotice.showTips('success','新增成功');
+                }else{
+                    zamnotice.showTips('error',json.msg);
+                    return false;
+                }
+            }, function(json){
+                zamnotice.showTips('error','网络差。操作失败.');
+                confirmobj.close();
+            });
+        },false,false,true,[{'hidden':false,'txt':'确定新增'},{'hidden':false,'txt':'取消'}]);
+    });
+    $(".uploadattachment-get").on('click',function(){
+        //抓取网络图片
+        var confirmobj = jconfirmBox.confirm('提取网络图片',webcore.tpl($("#getimg-tpl"),{}),function(e){
+            var imgurl = e.$content.find('.imgurl').val();
+            if(!imgurl){
+                zamnotice.showTips('error','图片地址必须填写');
+                return false;
+            }
+            webcore.ajaxSubmit("{:gocommon('attachment/savenetworkimg')}",{imgurl:imgurl},'提前中，请稍后...').then(function(json){
+                if(json.code==0){
+                    confirmobj.close();
+                    zamnotice.showTips('success','提取成功');
+                }else{
+                    zamnotice.showTips('error',json.msg);
+                    return false;
+                }
+            }, function(json){
+                zamnotice.showTips('error','网络差。操作失败.');
+                confirmobj.close();
+            });
+        },false,'col-lg-12 col-lg-offset-0',true,[{'hidden':false,'txt':'开始提取'},{'hidden':false,'txt':'取消'}],function(e){
+            var $this = confirmobj.$content;
+            $this.find('input').on('input',function(){
+                $this.find('img').attr('src',$(this).val() || '');
+            });
+        });
+    });
+    $(".uploadattachment-del").on('click',function(){
+        var selectimgs = $(".uploadattachments-box .active");
+        if(!selectimgs.length) {
+            return zamnotice.showTips('error','请先选择文件');
+        }
+        var $imgid = [];
+        selectimgs.each(function(){
+            $imgid.push($(this).attr('data-fileid'));
+        });
+        webcore.showConfirm('温馨提示','删除将无法恢复，您确定要删除所选文件么？',['确定','取消'],function(){
+            webcore.ajaxSubmit("{:gocommon('attachment/deluploadfile')}",{imgid:$imgid},'删除中...').then(function(json){
+                if(json.code==0){
+                    refreshuplist($(".uploadattachments-card .pagination li.active a").attr('data-page') || 1);
+                    setTimeout(function(){
+                        zamnotice.showTips('success','删除成功');
+                    },2e2);
+                }else{
+                    zamnotice.showTips('error',json.msg);
+                }
+            }, function(json){
+                zamnotice.showTips('error','网络差。操作失败');
+            });
+        });
+    });
+    $(".uploadattachment-move").on('click',function(){
+        var selectimgs = $(".uploadattachments-box .active");
+        if(selectimgs.length == 0) {
+            return zamnotice.showTips('error','请先选择文件');
+        }
+        var imgid = [];
+        selectimgs.each(function(){
+            imgid.push($(this).attr('data-fileid'));
+        });
+        var confirmObj = jconfirmBox.ajaxconfirm("移动分组","{:gocommon('attachment/pullgroup')}",{ishtml:'1',amtype:amtype,fileid:imgid},'html','col-lg-10 col-lg-offset-1',function(e){
+            var postData = webcore.serializeObject(e.find('form'));
+            var cateid = postData.cateid||'';
+            var scateid = postData.scateid||'';
+            if(!cateid && !scateid){
+                zamnotice.showTips('error','请选择分组');
+                return false;
+            }
+            postData.fileid = imgid;
+            webcore.ajaxSubmit("{:gocommon('attachment/pullgroup')}",postData).then(function(json){
+                if(json.code==0){
+                    zamnotice.showTips('success','移动成功');
+                    $(`.category-menu ul li[data-cateid='${scateid || cateid}']`).trigger('click');
+                    confirmObj.close();
+                }else{
+                    zamnotice.showTips('error',json.msg);
+                    return false;
+                }
+            }, function(json){
+                zamnotice.showTips('error','网络差。操作失败');
+                return false;
+            });
+        });
+    });
+    $(".uploadattachments-box").on('click','.uploadattachments-item',function(){
+        var boxobj = $(this),inputObj = boxobj.find('input'),ischeck = inputObj.prop('checked');
+        var checkallInput = $(".uploadattachments-card .attachment-files-footer .uploadattachment-file-checkall label input");
+        if(ischeck){
+            boxobj.removeClass('active');
+            inputObj.prop('checked', false);
+            checkallInput.prop('checked', false);
+            var hascheck = false;
+            $(".uploadattachments-box .uploadattachments-item input").each(function(){
+                if($(this).prop('checked')){
+                    hascheck = true;
+                    return false;
+                } 
+            });
+            if(!hascheck){
+                $(".attachment-files-footer .control-btns .btn").addClass('disabled');
+            }
+        }else{
+            boxobj.addClass('active');
+            inputObj.prop('checked', true);
+            var ischeckall = true;
+            $(".uploadattachments-box .uploadattachments-item input").each(function(){
+                if(!$(this).prop('checked')){
+                    ischeckall = false;
+                    return false;
+                } 
+            });
+            if(ischeckall){
+                checkallInput.prop('checked', true);
+            }
+            $(".attachment-files-footer .control-btns .btn").removeClass('disabled');
+        }
+    });
+    $(".uploadattachments-box").on('click','.uploadattachment-more',function(e){
+        e.stopPropagation();
+        var moreobj = $(this),issysfile = $(this).parent().attr('data-issys')||'1',filesrc = $(this).parent().attr('data-filesrc'),imgid = $(this).parent().attr('data-fileid');
+        $("[aria-describedby^=popover]").not(moreobj).popover("destroy"),
+        moreobj.data("bs.popover") ? moreobj.popover("destroy") : moreobj.popover({
+			html: !0,
+			placement: "auto bottom",
+			title: "",
+			template: `<div class="popover popover--material" role="tooltip">
+                <div class="popover-content"></div>
+            </div>`,
+			trigger: "manual",
+			container: "body",
+			content: function() {
+                //<div class="action editname"><i class="mdi mdi-pencil"></i>编辑名称</div>
+                var content = '<div class="action viewfile"><i class="mdi mdi-eye"></i>查看文件</div>';
+                if(issysfile == '2'){
+                    content += '<div class="action pullfile"><i class="mdi mdi-arrow-right" ></i>移动分组</div>'
+                    content += '<div class="action delfile"><i class="mdi mdi-delete"></i>删除文件</div>';
+                }
+				var e = `<div class="action-img-popover">
+                    <div class="action-img-popover__title">更多操作<i class="mdi mdi-close closepopover"></i></div>
+                    <div class="action-img-popover__content">${content}</div>
+                    </div>`;
+				return e;
+			}
+		}).popover("show");
+        moreobj.on('shown.bs.popover', function () {
+            $('.closepopover').on('click', function(e) {
+                moreobj.popover('destroy');
+                //e.preventDefault();
+            });
+            $('.viewfile').on('click', function(e) {
+                if(!filesrc) {
+                    return zamnotice.showTips('error','请选择播放文件');
+                }
+                moreobj.popover('destroy');
+                webcore.showVideos([filesrc],amtype,'z-index:9999');
+                //e.preventDefault();
+            });
+            $('.pullfile').on('click', function(e) {
+                e.stopPropagation();
+                if(imgid == '') {
+                    return zamnotice.showTips('error','请先选择文件');
+                }
+                moreobj.popover('destroy');
+                var confirmObj = jconfirmBox.ajaxconfirm("移动分组","{:gocommon('attachment/pullgroup')}",{ishtml:'1',amtype:amtype,fileid:imgid},'html','col-lg-10 col-lg-offset-1',function(e){
+                    var postData = webcore.serializeObject(e.find('form'));
+                    var cateid = postData.cateid||'';
+                    var scateid = postData.scateid||'';
+                    if(!cateid && !scateid){
+                        zamnotice.showTips('error','请选择分组');
+                        return false;
+                    }
+                    postData.fileid = imgid;
+                    webcore.ajaxSubmit("{:gocommon('attachment/pullgroup')}",postData).then(function(json){
+                        if(json.code==0){
+                            zamnotice.showTips('success','移动成功');
+                            $(`.category-menu ul li[data-cateid='${scateid || cateid}']`).trigger('click');
+                            confirmObj.close();
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                            return false;
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                        return false;
+                    });
+                });
+                //e.preventDefault();
+            });
+            $('.delfile').on('click', function(t) {
+                t.stopPropagation();
+                if(imgid == '') {
+                    return zamnotice.showTips('error','请先选择文件');
+                }
+                moreobj.popover('destroy');
+                var $imgid = [];
+                $imgid.push(imgid);
+                webcore.showConfirm('温馨提示','删除将无法恢复，您确定要删除么？',['确定','取消'],function(){
+                    webcore.ajaxSubmit("{:gocommon('attachment/deluploadfile')}",{imgid:$imgid},'删除中...').then(function(json){
+                        if(json.code==0){
+                            refreshuplist($(".uploadattachments-card .pagination li.active a").attr('data-page') || 1);
+                            zamnotice.showTips('success','删除成功');
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                    });
+                });
+                e.preventDefault();
+            });
+        });
+    });
+    $(".uploadattachments-card .attachment-files-footer .uploadattachment-file-checkall label").click(function(e){
+        e.preventDefault();
+        var inputObj = $(this).find('input');
+        var lis=  $(".uploadattachments-box .uploadattachments-item");
+        if(!lis.length){
+            return false;
+        }
+        var ischeck = inputObj.prop('checked');
+        inputObj.prop('checked', !ischeck);
+        if(ischeck){
+            lis.removeClass('active');
+            lis.find('input').prop('checked',false);
+            $(".attachment-files-footer .control-btns .btn").addClass('disabled');
+        }else{
+            lis.addClass('active');
+            lis.find('input').prop('checked',true);
+            $(".attachment-files-footer .control-btns .btn").removeClass('disabled');
+        }
+    });
+    $(document).on('click', function (e) {
+        $('[data-toggle="popover"],[data-original-title]').each(function () {
+            //the 'is' for buttons that trigger popups
+            //the 'has' for icons within a button that triggers a popup
+            if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+                (($(this).popover('hide').data('bs.popover')||{}).inState||{}).click = false  // fix for BS 3.3.6
+            }
+        });
+    });
+    $('.category-menu').on('click', '.btn-more', function(e) {
+        e.stopPropagation();
+        var moreobj = $(this),fobj = moreobj.parent(), cateid = fobj.data('cateid');
+        $("[aria-describedby^=popover]").not(moreobj).popover("destroy"),
+        moreobj.data("bs.popover") ? moreobj.popover("destroy") : moreobj.popover({
+			html: !0,
+			placement: "auto bottom",
+			title: "",
+			template: `<div class="popover popover--material" role="tooltip">
+                <div class="popover-content"></div>
+            </div>`,
+			trigger: "manual",
+			container: "body",
+			content: function() {
+                var content = '';
+                if(!fobj.hasClass('nav-sitem')){
+                    content += `<div class="action addgroup"><i class="mdi mdi-plus"></i>新增分组</div>`;
+                }
+                content += `
+                    <div class="action editgroup"><i class="mdi mdi-eye"></i>编辑分组</div>
+                    <div class="action delgroup"><i class="mdi mdi-delete"></i>删除分组</div>
+                `;
+				var e = `<div class="action-img-popover">
+                    <div class="action-img-popover__title">更多操作<i class="mdi mdi-close closepopover"></i></div>
+                    <div class="action-img-popover__content">${content}</div>
+                    </div>`;
+				return e
+			}
+		}).popover("show");
+        moreobj.on('shown.bs.popover', function () {
+            $('.closepopover').on('click', function(e) {
+                e.preventDefault();
+                moreobj.popover('destroy');
+            });
+            $('.addgroup').on('click', function(e) {
+                e.preventDefault();
+                moreobj.popover('destroy');
+                var confirmobj = jconfirmBox.confirm('新增二级分组',webcore.tpl($("#editcate-tpl"),{catename:''}),function(e){
+                    var catename = e.$content.find('.catename').val();
+                    if(catename==''){
+                        zamnotice.showTips('error','分组名必须填写');
+                        return false;
+                    }
+                    webcore.ajaxSubmit("{:gocommon('attachment/savecate')}",{amtype:amtype,fcateid:cateid,catename:catename}).then(function(json){
+                        if(json.code==0){
+                            confirmobj.close();
+                            var navobj = $('.category-menu');
+                            if(fobj.parent().hasClass('nav-item')){
+                                fobj.next().append(`<li class="nav-sitem" data-cateid="${json.msg}">
+                                    <span class="catename">${catename}</span>
+                                    <span class="btn-more"><i class="mdi mdi-dots-horizontal"></i></span>
+                                </li>`);
+                                fobj.next().find('li:last-child').trigger('click');
+                            }else{
+                                var newfli = $(webcore.tpl($("#cate-tpl"),{
+                                    id:cateid,
+                                    catename:fobj.find('.catename').text(),
+                                    gid:'self',
+                                    children:[
+                                        {id:json.msg,catename:catename},
+                                    ]
+                                }));
+                                fobj.replaceWith(newfli);
+                                newfli.find('li:last-child').trigger('click');
+                            }
+                            zamnotice.showTips('success','新增成功');
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                            return false;
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败.');
+                        confirmobj.close();
+                    });
+                },false,false,true,[{'hidden':false,'txt':'确定新增'},{'hidden':false,'txt':'取消'}]);
+            });
+            $('.editgroup').on('click', function(e) {
+                e.preventDefault();
+                moreobj.popover('destroy');
+                var confirmobj = jconfirmBox.confirm('编辑分组',webcore.tpl($("#editcate-tpl"),{catename:moreobj.prev().text() || ''}),function(e){
+                    var catename = e.$content.find('.catename').val();
+                    if(catename==''){
+                        zamnotice.showTips('error','分组名必须填写');
+                        return false;
+                    }
+                    webcore.ajaxSubmit("{:gocommon('attachment/savecate')}",{isedit:'1',cateid:cateid,catename:catename}).then(function(json){
+                        if(json.code==0){
+                            confirmobj.close();
+                            moreobj.prev().text(catename);
+                            zamnotice.showTips('success','保存成功');
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                            return false;
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败.');
+                        confirmobj.close();
+                    });
+                },false,false,true,[{'hidden':false,'txt':'保存'},{'hidden':false,'txt':'取消'}]);
+            });
+            $('.delgroup').on('click', function(t) {
+                t.stopPropagation();
+                moreobj.popover('destroy');
+                webcore.showConfirm('温馨提示','删除将无法恢复，您确定要删除当前分组么？',['确定','取消'],function(){
+                    webcore.ajaxSubmit("{:gocommon('attachment/delcate')}",{cateid:cateid},'删除中...').then(function(json){
+                        if(json.code==0){
+                            zamnotice.showTips('success','删除成功');
+                            var navitem = fobj.parent().parent();
+                            if(navitem.hasClass('nav-item')){
+                                var sli = navitem.find('li');
+                                if(sli.length == 1){
+                                    var newfli = $(webcore.tpl($("#cate-tpl"),{
+                                        id:navitem.find('a').data('cateid'),
+                                        catename:navitem.find('a .catename').text(),
+                                        gid:'self'
+                                    }));
+                                    navitem.replaceWith(newfli);
+                                    newfli.trigger('click');
+                                }else{
+                                    fobj.remove();
+                                    navitem.find('li').eq(0).trigger('click');
+                                }
+                            }else{
+                                if(fobj.next().hasClass('nav-subnav')){
+                                    fobj.parent().remove();
+                                }else{
+                                    fobj.remove();
+                                }
+                                $(".category-menu ul li").eq(0).trigger('click');
+                            }
+                            
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                    });
+                });
+                e.preventDefault();
+            });
+        });
+    });
+});
+/*上传或者删除文件均需刷新当前页*/
+function refreshuplist(page,obj){
+    var typename = amtype == '1' ? '图片' : (amtype == '2' ? '音频' : '视频'),
+    gid = $(".uploadattachment-category-father .btn-primary").data('gid');
+    if(!['self','sys'].includes(gid)) {
+        return false;
+    }
+    var cateid = $(".category-menu li.active").data('cateid');
+    $(".uploadattachments-card .attachment-files-footer .uploadattachment-file-checkall label input").prop('checked',false);
+    var pagerbox = $(".uploadattachments-card .attachment-files-footer .pagerbox");
+    var boxobj = $(".uploadattachments-card .uploadattachments-box");
+    boxobj.html(`
+        <div class="nofiletip">
+            <div><i class="mdi mdi-36px mdi-spin mdi-loading"></i></div>
+            <div>数据加载中...</div>
+        </div>
+    `);
+    $(".attachment-files-footer .btn").addClass('disabled');
+    if(gid == 'self'){
+        $(".uploadattachment-upload,.uploadattachment-get").removeClass('disabled');
+        $(".attachment-files-footer .uploadattachment-file-checkall,.attachment-files-footer .control-btns").removeClass('hidden');
+    } else{
+        $(".uploadattachment-upload,.uploadattachment-get").addClass('disabled');
+        $(".attachment-files-footer .uploadattachment-file-checkall,.attachment-files-footer .control-btns").addClass('hidden');
+    }
+    require(["zamnotice","jconfirmBox","webcore"],function(zamnotice,jconfirmBox,webcore){
+        webcore.ajaxSubmit("{:gocommon('attachment/ajaxupload')}",{gid:gid,cateid:cateid,type:amtype,page:page,psize:psize}).then(function(json){
+            var html = '';
+            if(json.code==0){
+                $.each(json.msg.list,function(i,v){
+                    v.issys = (gid == 'self' ? '2' : '1');
+                    html += webcore.tpl($("#uploadimgs-tpl"),v);
+                });
+                if(html){
+                    boxobj.html(html);
+                    pagerbox.html(json.msg.pager).removeClass('hidden');
+                }else{
+                    if(json.msg.total == '0'){
+                        // html += `<div class="nofiletip">暂无${typename}</div>`;
+                        html += `<div class="nofiletip"><img src="/static/images/sys/empty.png" /></div>`;
+                        boxobj.html(html);
+                        pagerbox.addClass('hidden');
+                    }else{
+                        refreshuplist(page - 1);
+                    }
+                }
+            }else{
+                zamnotice.showTips('error',json.msg);
+            }
+        }, function(json){
+            zamnotice.showTips('error','网络差，操作失败');
+        });
+    });
+}
+function gopageto(obj){
+    var gobtn = $(obj),pagemin = gobtn.data('min')||1,pagemax = gobtn.data('max');
+    var inputpage = gobtn.prev().val()||'';
+    if(+inputpage > 0){
+        if(inputpage > pagemax){
+            inputpage = pagemax;
+        }
+        refreshuplist(inputpage);
+    }
+}
+</script>

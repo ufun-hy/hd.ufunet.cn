@@ -1,0 +1,22 @@
+<div class="text-center">
+	<div class="btn-group type-btns" style="margin:15px 0 20px 0;">
+        <a href="javascript:void(0)" class="btn btn-default btn-primary"><span>默认风格</span></a>
+        <a href="javascript:void(0)" class="btn btn-default"><span>孔明灯风格</span></a>
+        <a href="javascript:void(0)" class="btn btn-default"><span>弹幕风格</span></a>
+	</div>
+</div>
+<div class="typeitem">
+{if isset($gametype) && in_array($gametype,['swingsnake'])}
+{include file='$Wpath/common/gamestyle/types/snakeshake'}
+{else /}
+{include file='$Wpath/common/gamestyle/types/shake'}
+{/if}
+</div>
+<div class="typeitem hidden">
+{include file='$Wpath/common/gamestyle/types/rotate'}
+</div>
+{if isset($gametype) && in_array($gametype,['horse','monkey','swingsnake'])}
+<div class="typeitem hidden">
+	{include file='$Wpath/common/gamestyle/types/click'}
+</div>
+{/if}

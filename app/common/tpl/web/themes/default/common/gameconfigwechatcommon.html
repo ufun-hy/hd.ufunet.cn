@@ -1,0 +1,108 @@
+{if in_array($gametype,['shake','monkey','horse','car','bike','mls','swim','swingsnake','lightfire'])}
+<div class="form-group filetypes">
+    <label class="col-lg-2 control-label">* 网页标题类型</label>
+    <div class="col-lg-8">
+      <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.apptitlebox').addClass('hidden')">
+       <input type="radio" name="apptitletype" value="1" {if $config['apptitletype']=='1'}checked{/if}><span>风格名称</span>
+      </label>
+      <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.apptitlebox').removeClass('hidden')">
+       <input type="radio" name="apptitletype" value="2" {if $config['apptitletype']=='2'}checked{/if}><span>自定义</span>
+      </label>
+    </div>
+</div>
+<div class="form-group apptitlebox{if $config['apptitletype']=='1'} hidden{/if}">
+    <label class="col-lg-2 control-label">* 网页标题</label>
+    <div class="col-lg-8">
+        <input class="form-control" type="text"  name="apptitle" value="{$config['apptitle']}">
+    </div>
+</div>
+{else}
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 网页标题</label>
+    <div class="col-lg-8">
+        <input class="form-control" type="text"  name="apptitle" value="{$config['apptitle']}">
+    </div>
+</div>
+{/if}
+<div class="form-group filetypes">
+    <label class="col-lg-2 control-label">* 背景图类型</label>
+    <div class="col-lg-8">
+      <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.appbgbox').addClass('hidden')">
+       <input type="radio" name="appbgtype" value="1" {if $config['appbgtype']=='1'}checked{/if}><span>风格背景图</span>
+      </label>
+      <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.appbgbox').removeClass('hidden')">
+       <input type="radio" name="appbgtype" value="2" {if $config['appbgtype']=='2'}checked{/if}><span>自定义</span>
+      </label>
+    </div>
+ </div>
+<div class="form-group appbgbox{if $config['appbgtype']=='1'} hidden{/if}">
+    <label class="col-lg-2 control-label">* 背景图片</label>
+    <div class="col-lg-8">
+        {:tpl_image_one('appbgimg',$config['appbgimg'])}
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 背景音效</label>
+    <div class="col-lg-3">
+        {:tpl_switch('appbgmusicoff',$config['appbgmusicoff'],'appbgmusic')}
+    </div>
+</div>
+<div class="bgmusicbox appmusicoffbox{if $config['appbgmusicoff']=='2'} hidden{/if}">
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 背景音效类型</label>
+    <div class="col-lg-8">
+      <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.appmusicbox').addClass('hidden')">
+       <input type="radio" name="appbgmusictype" value="1" {if $config['appbgmusictype']=='1'}checked{/if}><span>风格背景音效</span>
+      </label>
+      <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.appmusicbox').removeClass('hidden')">
+       <input type="radio" name="appbgmusictype" value="2" {if $config['appbgmusictype']=='2'}checked{/if}><span>自定义</span>
+      </label>
+    </div>
+ </div>
+<div class="form-group appmusicbox{if $config['appbgmusictype']=='1'} hidden{/if}">
+    <label class="col-lg-2 control-label">* 背景音效</label>
+    <div class="col-lg-8">
+        {:tpl_audio('appbgmusic',$config['appbgmusic'])}
+    </div>
+</div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 游戏规则</label>
+    <div class="col-lg-3">
+        {:tpl_switch('ruleinfo[open]',$config['ruleinfo']['open'],'appruleinfo')}
+        <span class="help-block">开启后微信端将显示规则按钮</span>
+    </div>
+</div>
+<div class="form-group apprulebox{if !isset($config['ruleinfo']['open']) || $config['ruleinfo']['open']=='2'} hidden{/if}">
+    <label class="col-lg-2 control-label">* 规则内容</label>
+    <div class="col-lg-8">
+        {:tpl_ueditor('ruleinfo[rulecont]',$config['ruleinfo']['rulecont'])}
+    </div>
+</div>
+
+<script>
+function appbgmusic(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".appmusicoffbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".appmusicoffbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function appruleinfo(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".apprulebox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".apprulebox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+</script>

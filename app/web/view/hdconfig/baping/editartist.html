@@ -1,0 +1,82 @@
+<div class="form-horizontal confirmbox-pop artistpopbox">
+<form class="confirm-formbox" method="post">
+    <div class="text-center">
+        <div class="btn-group pop-btns" style="margin-bottom:10px;">
+          <a href="javascript:void(0)" class="btn btn-default btn-primary"><span>基础设置</span></a>
+          <a href="javascript:void(0)" class="btn btn-default hidden"><span>分成设置</span></a>
+        </div>
+    </div>
+    <div class="carditem">
+    	<div class="form-group">
+			<label class="col-lg-3 control-label text-right">* 排序序号</label>
+			<div class="col-lg-6">
+			  <input type="text" class="form-control"  name="displayorder" value="{$config['displayorder']}">
+			  <div class="help-block">注意:排序按降序排序，序号越大越排在前面</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-lg-3 control-label text-right">* 艺人类型</label>
+			<div class="col-lg-9">
+				<label class="lyear-radio radio-inline radio-primary">
+					<input type="radio" name="artisttype" value="0" checked><span>现场</span>
+				</label>
+				<span class="help-block">注:默认艺人只能是现场类型，无需设置分成和微信用户</span>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-lg-3 control-label text-right">* 艺人名称</label>
+			<div class="col-lg-6">
+			  <input type="text" class="form-control"  name="artistname" value="{$config['artistname']}">
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-lg-3 control-label text-right">* 艺人头像(100*100px)</label>
+			<div class="col-lg-6">
+			   {:tpl_image_one('artistavatar',$config['artistavatar'])}
+			</div>
+		</div>
+		
+	</div>
+	<div class="carditem hidden">
+		<div class="form-group">
+            <label class="col-lg-3 control-label">* 打赏分成</label>
+            <div class="col-lg-4">
+                <input type="text" class="form-control numberincdec" name="dsfcb" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="100"
+                data-bts-decimals="2"
+                data-bts-step="1"
+                data-bts-force-step-divisibility="xstwo"
+                data-bts-postfix="%"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['dsfcb']}">
+                <span class="help-block m-0">注:0为不分成，100即为全部给艺人</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 点歌分成</label>
+            <div class="col-lg-4">
+                <input type="text" class="form-control numberincdec" name="songfcb" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="100"
+                data-bts-decimals="2"
+                data-bts-step="1"
+                data-bts-force-step-divisibility="xstwo"
+                data-bts-postfix="%"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['songfcb']}">
+                <span class="help-block m-0">注:0为不分成，100即为全部给艺人</span>
+            </div>
+        </div>
+	</div>
+</form>
+</div>
+<script>
+require(['webcore','jconfirmBox','zamnotice','layerBox',"bootstrap-touchspin"],function(webcore,jconfirmBox,zamnotice,layerBox){
+	$(".confirmbox-pop .numberincdec").TouchSpin();
+    $(".confirmbox-pop .pop-btns a.btn").click(function(){
+        $(this).addClass('btn-primary').siblings().removeClass("btn-primary");
+        $(".confirmbox-pop .carditem").addClass('hidden').eq($(this).index()).removeClass('hidden');
+    });
+});
+</script>

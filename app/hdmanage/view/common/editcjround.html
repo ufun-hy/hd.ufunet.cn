@@ -1,0 +1,262 @@
+<style type="text/css">
+.roundawardboxs tr td,.roundawardboxs tr th{text-align: center;}
+.prize-lists tr td img{width: 100px;height: 100px;}
+</style>
+<div class="form-horizontal confirmbox-pop roundawardboxs">
+<form class="confirm-formbox" method="post">
+    <div class="carditem">
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 轮次名称</label>
+            <div class="col-lg-9">
+                <input class="form-control" type="text"  name="roundtitle" value="{$config['roundtitle']}" maxlength="40" placeholder="40字内">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 奖品列表</label>
+            <div class="col-lg-9" style="padding-right: 5px;">
+                <table class="table table-bordered">
+                    <thead>
+                      <tr>
+                        <th style="width:40%">奖品</th>
+                        <th style="width:18%">抽取数量</th>
+                        <th style="width:12%">操作</th>
+                      </tr>
+                    </thead>
+                    <tbody class="prize-lists">
+                    {volist name="config.roundawards" id="raward"}    
+                        <tr>
+                            <td class="text-center">
+                                <div>
+                                    <img src="{$raward['prize']['prizeimg']}" />
+                                    <div><span>{$raward['prize']['prizename']}</span><span>({$raward['prize']['awardname']})</span></div>
+                                </div>
+                                <input type="hidden" name="roundawards[prizeid][]" value="{$raward['prizeid']}" /> 
+                            </td>
+                            <td class="text-center">
+                                <input type="text" class="form-control numberincdec" name="roundawards[num][]" 
+                                data-bts-min="1" data-bts-replacement-val="1"
+                                data-bts-max="null"
+                                data-bts-step="1"
+                                value="{$raward['num']}">
+                            </td>
+                            <td class="text-center">
+                                <a class="btn btn-xs btn-primary zam-sortable sortmove" href="javascript:void(0)"> <i class="mdi mdi-arrow-all"></i> </a>
+                                <a class="btn btn-xs btn-danger btn-delshowitem" href="javascript:void(0)"> <i class="mdi mdi-close"></i> </a>
+                            </td>
+                        </tr>
+                    {/volist}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3">
+                                <a class="btn btn-primary btn-xs btn-addaward"><span class="mdi mdi-plus"></span>新增奖品</a>
+                                <div class="m-t-10">注：删除或新增奖品需要点击确定按钮才生效，每轮最多可添加10种不同的奖品</div>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+        {if $gametype=='lottery'}
+            {include file="$Wpath/common/lotteryshape" title='轮次'/}
+        {/if}
+        <div class="form-group">
+            <label class="col-lg-3 control-label text-right">* 奖品排列布局</label>
+            <div class="col-lg-9">
+                <div class="input-group">
+                    <div class="input-group-btn not-allow hidden"><a class="btn btn-default">一行奖品数</a></div>
+                    <div class="touchspin hidden">
+                    <input type="text" class="form-control numberincdec" name="style[cols]" 
+                    data-bts-min="1" data-bts-replacement-val="1"
+                    data-bts-max="20"
+                    data-bts-step="1"
+                    data-bts-postfix="个"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                    value="{$config['style']['cols']??5}">
+                    </div>
+                    <div class="input-group-btn not-allow"><a class="btn btn-default">单个奖品宽度</a></div>
+                    <div class="touchspin">
+                    <input type="text" class="form-control numberincdec" name="style[width]" 
+                    data-bts-min="50" data-bts-replacement-val="50"
+                    data-bts-max="1000"
+                    data-bts-step="1"
+                    data-bts-postfix="px"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                    value="{$config['style']['width']??300}">
+                    </div>
+                    <div class="input-group-btn not-allow"><a class="btn btn-default">奖品间距</a></div>
+                    <div class="touchspin">
+                    <input type="text" class="form-control numberincdec" name="style[gap]" 
+                    data-bts-min="1" data-bts-replacement-val="1"
+                    data-bts-max="500"
+                    data-bts-step="1"
+                    data-bts-postfix="px"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                    value="{$config['style']['gap']??20}">
+                    </div>
+                </div>
+                <div class="help-block">如需一行显示更多奖品可以将单个奖品宽度调小</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label text-right">* 奖品名</label>
+            <div class="col-lg-9">
+                <div class="input-group">
+                    <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+                    {:tpl_color('style[prizecolor]',$config['style']['prizecolor']??'#FF9800')}
+                    <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
+                    <div class="touchspin">
+                    <input type="text" class="form-control numberincdec" name="style[prizesize]" 
+                    data-bts-min="0" data-bts-replacement-val="0"
+                    data-bts-max="999"
+                    data-bts-step="1"
+                    data-bts-postfix="px"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                    value="{$config['style']['prizesize']??18}">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label text-right">* 奖品数量</label>
+            <div class="col-lg-9">
+                <div class="input-group">
+                    <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+                    {:tpl_color('style[numcolor]',$config['style']['numcolor']??'#fff')}
+                    <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
+                    <div class="touchspin">
+                    <input type="text" class="form-control numberincdec" name="style[numsize]" 
+                    data-bts-min="0" data-bts-replacement-val="0"
+                    data-bts-max="999"
+                    data-bts-step="1"
+                    data-bts-postfix="px"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                    value="{$config['style']['numsize']??18}">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label text-right">* {if $gametype !='importcj'}弹窗内{/if}中奖记录一排多少个</label>
+            <div class="col-lg-9">
+                <input type="text" class="form-control numberincdec" name="style[rows]" 
+                        data-bts-min="1" data-bts-replacement-val="1"
+                        data-bts-max="20"
+                        data-bts-step="1"
+                        data-bts-postfix="个"
+                        data-bts-postfix-extra-class="touchspin-postfix"
+                        value="{$config['style']['rows']??8}">
+                <div class="help-block">一排显示多少个中奖用户推荐以添加的奖品中抽取数量最多的数量来设置{if $gametype !='importcj'}，设置的个数越大用户头像就越小{/if}</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label text-right">* {if $gametype !='importcj'}弹窗内{/if}中奖记录上奖品名</label>
+            <div class="col-lg-9">
+                <div class="input-group">
+                    <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+                    {:tpl_color('style[awardcolor]',$config['style']['awardcolor']??'#FF9800')}
+                    <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
+                    <div class="touchspin">
+                    <input type="text" class="form-control numberincdec" name="style[awardsize]" 
+                    data-bts-min="0" data-bts-replacement-val="0"
+                    data-bts-max="999"
+                    data-bts-step="1"
+                    data-bts-postfix="px"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                    value="{$config['style']['awardsize']??18}">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label text-right">* {if $gametype !=''}弹窗内中奖用户名{else /}中奖记录文字{/if}</label>
+            <div class="col-lg-9">
+                <div class="input-group">
+                    {if $gametype != 'importcj'}
+                    <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+                    {:tpl_color('style[namecolor]',$config['style']['namecolor']??'#fff')}
+                    {/if}
+                    <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
+                    <div class="touchspin">
+                    <input type="text" class="form-control numberincdec" name="style[namesize]" 
+                    data-bts-min="0" data-bts-replacement-val="0"
+                    data-bts-max="999"
+                    data-bts-step="1"
+                    data-bts-postfix="px"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                    value="{$config['style']['namesize']??18}">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+</div>
+<script>
+require(['webcore','jconfirmBox','zamnotice','layerBox',"bootstrap-touchspin","jquery.ui"],function(webcore,jconfirmBox,zamnotice,layerBox){
+    tpl_colorpicker();
+    $('.prize-lists').sortable({handle: ".sortmove"}).disableSelection();
+    $('.prize-lists').on('click','.btn-delshowitem',function(){
+        var $this = $(this);
+		jconfirmBox.confirm('温馨提示','您确定要删除么？',function(){
+			$this.parent().parent().remove();
+			zamnotice.showTips('success','删除成功');
+		});
+    });
+    $(".confirmbox-pop .numberincdec").TouchSpin();
+    $(".btn-addaward").click(function(){
+        var hadprizeids = [];
+        $(".prize-lists tr").each(function(){
+            hadprizeids.push($(this).find('input').eq(0).val());
+        });
+		var confirmObj = jconfirmBox.ajaxconfirm("新增奖品","{:gohdmanage('common/pluscjaward',['hdid'=>$hdid,'gametype'=>$gametype])}",{ishtml:'1',hadprizeids:hadprizeids},'html','col-lg-10 col-lg-offset-1',function(e){
+			var selectprizes = e.find("input:checked");
+			if(selectprizes.length>0){
+				var html = '';
+                var existsdone = false,existpname = '';
+				selectprizes.each(function(){
+					var $this = $(this),pobj = $this.parent().parent().parent(),prizeid = pobj.attr('data-pid'),pname = pobj.attr('data-pname'),aname = pobj.attr('data-aname'),pimgprev = pobj.find('img').attr('src');
+                    if($.inArray(prizeid,hadprizeids) > -1){
+                        existsdone = true;
+                        existpname = pname;
+                        return false;
+                    } 
+					html += webcore.tpl($("#prize-tpl"),{prizeid:prizeid,pname:pname,aname:aname,pimgprev:pimgprev});
+				});
+                if(existsdone){
+                    zamnotice.showTips('error',existpname+'已添加过了');
+                    return false;
+                }
+				$(".prize-lists").append(html);
+                $(".confirmbox-pop .numberincdec").TouchSpin();
+				confirmObj.close();
+			}else{
+				zamnotice.showTips('error','请至少选择一种奖品');
+			}
+		});
+	});
+    
+});
+</script>
+<script id='prize-tpl' type="text/template">
+    <tr>
+    <td class="text-center">
+        <div>
+            <img src="<% d.pimgprev %>" />
+            <div><span><% d.pname %></span><span>(<% d.aname %>)</span></div>
+        </div>
+        <input type="hidden" name="roundawards[prizeid][]" value="<% d.prizeid %>" /> 
+    </td>
+    <td class="text-center">
+        <input type="text" class="form-control numberincdec" name="roundawards[num][]" 
+        data-bts-min="1" data-bts-replacement-val="1"
+        data-bts-max="null"
+        data-bts-step="1"
+        value="1">
+    </td>
+    <td class="text-center">
+        <a class="btn btn-xs btn-primary zam-sortable sortmove" href="javascript:void(0)"> <i class="mdi mdi-arrow-all"></i> </a>
+        <a class="btn btn-xs btn-danger btn-delshowitem" href="javascript:void(0)"> <i class="mdi mdi-close"></i> </a>
+    </td>
+</tr>
+</script>

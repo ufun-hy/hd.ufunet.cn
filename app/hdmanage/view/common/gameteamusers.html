@@ -1,0 +1,168 @@
+<style type="text/css">
+.gameteamuser-lists td{text-align: center!important;}
+</style>
+<div class="zam-inline-searchbar searchplan">
+	<div class="form-inline">
+		<a class="btn btn-primary btn-sm m-b-5 btn-addteamuser" href="javascript:;" onclick="addteamuser()"><i class="mdi mdi-plus"></i> 新增</a>
+        <a class="btn btn-danger btn-sm m-b-5 btn-delteamuser hidden" href="javascript:;"><i class="mdi mdi-close"></i> 删除</a>
+        <div class="pull-right">
+			<div class="form-group m-b-5">
+	          <select name="teamid" class="form-control input-sm" id="rotateteamid" onchange="changeteamid(this)">
+	            <option value="0" selected="selected">全部</option>
+	            {if !empty($teams)}
+	            {foreach $teams as $oneteam}
+	           		<option value="{$oneteam['id']}">{$oneteam['teamname']}</option>
+	            {/foreach}
+	            {/if}
+	          </select>
+			</div>
+	        <div class="form-group m-b-5">
+	          <input class="form-control input-sm" type="text" name="keywords" placeholder="请输入用户昵称">
+	        </div>
+	        <a class="btn btn-primary btn-sm m-b-5 btn-search-teamuser" href="javascript:;" onclick="teamusersearch()"><i class="mdi mdi-magnify"></i> 搜索</a>
+        </div>
+     </div>
+</div>
+<table class="table gameteamuser-lists" style="margin-bottom:0px;">
+<thead>
+  <tr>
+  	<th style="width:30%;text-align:center;">团队</th>
+	<th style="width:40%;text-align:center;">用户</th>
+	<th style="width:30%;text-align:center;">操作</th>
+  </tr>
+</thead>
+<tbody class="teamuser-lists"></tbody>
+</table>
+<div class="teamuser-pager" style="padding:10px;text-align: center;"></div>
+<script id="oneuser-tpl" type="text/template">
+	<tr>
+		<td class="text-center">
+			<% d.teamname %>
+		</td>
+		<td class="text-center">
+		   <div>
+				<img style="width:50px;height:50px;border-radius:50%;" src="<% d.avatar %>" />
+				<p><% d.nickname %><%# if(d.bddata && d.bddata.realname){ %>(<% d.bddata.realname %>)<%# } %></p>
+				<%# if(d.bddata && d.bddata.mobile){ %><p><% d.bddata.mobile %></p><%# } %>
+		  </div>
+		</td>
+		<td>
+			<div class="btn-groups">
+				<a href="javascript:;"  class="btn btn-danger btn-xs btn-del" data-userid="<% d.id %>" onclick="delteamuser(this)"><i class="mdi mdi-close"></i></a>
+			</div>
+		</td>
+	</tr>
+</script>
+<script>
+function addteamuser(){
+	require(["zamnotice","layerBox","jconfirmBox","webcore"],function(zamnotice,layerBox,jconfirmBox,webcore){
+		 var confirmObj = jconfirmBox.ajaxconfirm("新增团队用户用户","{:gohdmanage('common/searchuser',['hdid'=>$hdid])}",{ishtml:'1',isteamadduser:'1',gametype:"{$gametype}",rotateid:"{$rotateid}"},'html','col-lg-8 col-lg-offset-2',function(e){
+            var selectuser = e.find("input:checked");
+            if(selectuser.length == 1){
+                selectuser.each(function(){
+                    var $this = $(this),userid = $this.attr('data-id'),teamid = e.find("#jointeamid option:selected").val()||'';
+                   	
+                    if(teamid=='' || teamid=='0'){
+                    	return zamnotice.showTips('error','请先选择要加入的团队');
+                    }
+                    webcore.ajaxSubmit("{:gohdmanage('common/addteamuser',['hdid'=>$hdid])}",{gametype:"{$gametype}",rotateid:"{$rotateid}",teamid:teamid,userid:userid},'正在执行加入团队操作..').then(function(json){
+						var html = '';
+						if(json.code==0){
+							zamnotice.showTips('success','加入团队成功');
+							initteamuserlist();
+							confirmObj.close();
+						}else{
+							zamnotice.showTips('error',json.msg);
+						}
+					}, function(json){
+						zamnotice.showTips('error','网络差。操作失败');
+					});
+                });
+               
+            }else if(selectuser.length > 1){
+            	zamnotice.showTips('error','一次只能选择一个用户');
+            }else{
+                zamnotice.showTips('error','请先搜索再选择一个用户');
+            }
+        });
+	});
+}
+function delteamuser(obj){
+	var userid = $(obj).attr('data-userid');
+	require(["zamnotice","layerBox","jconfirmBox","webcore"],function(zamnotice,layerBox,jconfirmBox,webcore){
+		 jconfirmBox.confirm('温馨提示','删除将无法恢复，您确定要删除么？',function(){
+            webcore.ajaxSubmit("{:gohdmanage('common/delteamuser',['hdid'=>$hdid])}",{gametype:"{$gametype}",rotateid:"{$rotateid}",userid:userid}).then(function(json){
+                if(json.code==0){
+                    zamnotice.showTips('success','删除成功');
+                    initteamuserlist();
+                }else{
+                    zamnotice.showTips('error',json.msg);
+                }
+            }, function(json){
+                zamnotice.showTips('error','网络差，操作失败');
+            });
+        });
+	});
+}
+function ajaxteamuserlist(page,obj){ 
+	require(["zamnotice","layerBox","jconfirmBox","webcore"],function(zamnotice,layerBox,jconfirmBox,webcore){
+		webcore.ajaxSubmit("{:gohdmanage('common/ajaxgameteamusers',['hdid'=>$hdid])}",{gametype:"{$gametype}",rotateid:"{$rotateid}",teamid:$("#rotateteamid option:selected").val(),page:page,keyword:$(".searchplan input").val()},'正在加载..').then(function(json){
+			if(json.code==0){
+				var html = '';
+				var detaildata = json.msg.item;
+				$.each(detaildata,function(i,v){
+					html += webcore.tpl($("#oneuser-tpl"),v);
+				});
+				$(".teamuser-lists").html(html);
+				$(".teamuser-pager").html(json.msg.pager);
+			}else{
+				zamnotice.showTips('error','网络差。操作失败');
+			}
+		}, function(json){
+			zamnotice.showTips('error','网络差。操作失败');
+		});
+	});
+}
+function initteamuserlist(){
+	require(["zamnotice","layerBox","jconfirmBox","webcore"],function(zamnotice,layerBox,jconfirmBox,webcore){
+		webcore.ajaxSubmit("{:gohdmanage('common/ajaxgameteamusers',['hdid'=>$hdid])}",{gametype:"{$gametype}",rotateid:"{$rotateid}",keyword:$(".searchplan input").val(),teamid:$("#rotateteamid option:selected").val()},'正在加载..').then(function(json){
+			var html = '';
+			if(json.code==0){
+				var detaildata = json.msg.item;
+				$.each(detaildata,function(i,v){
+					html += webcore.tpl($("#oneuser-tpl"),v);
+				});
+				$(".teamuser-lists").html(html);
+				$(".teamuser-pager").html(json.msg.pager);
+			}else{
+				zamnotice.showTips('error','网络差。操作失败');
+			}
+		}, function(json){
+			zamnotice.showTips('error','网络差。操作失败');
+		});
+	});
+}
+function teamusersearch(){ 
+	require(["zamnotice","layerBox","jconfirmBox","webcore"],function(zamnotice,layerBox,jconfirmBox,webcore){
+		webcore.ajaxSubmit("{:gohdmanage('common/ajaxgameteamusers',['hdid'=>$hdid])}",{gametype:"{$gametype}",rotateid:"{$rotateid}",teamid:$("#rotateteamid option:selected").val(),keyword:$(".searchplan input").val()},'正在加载..').then(function(json){
+			var html = '';
+			if(json.code==0){
+				var detaildata = json.msg.item;
+				$.each(detaildata,function(i,v){
+					html += webcore.tpl($("#oneuser-tpl"),v);
+				});
+				$(".teamuser-lists").html(html);
+				$(".teamuser-pager").html(json.msg.pager);
+			}else{
+				zamnotice.showTips('error','网络差。操作失败');
+			}
+		}, function(json){
+			zamnotice.showTips('error','网络差。操作失败');
+		});
+	});
+}
+function changeteamid(){
+	$(".btn-search-teamuser").trigger('click');
+}
+initteamuserlist();
+</script>

@@ -1,0 +1,185 @@
+{include file='$Wpath/common/header'}
+{include file='$Wpath/common/redpacktoptip'}
+{include file='$Wpath/common/tabletoolbar'}
+<table id="listtable" class="zam-btable"></table>
+<script>    
+require(['webcore','webtable','jconfirmBox','zamnotice'],function(webcore,webtable,jconfirmBox,zamnotice){
+var initConfig = {
+    tableId:'#listtable',
+    url:"{:gohdmanage('configydj/rotate',['hdid'=>$hdid])}",
+    columnoperate:{
+        btns:{
+            edit:true,
+            del:true,
+            data:true,
+            shenhe:{title:"复制",icon:"mdi-content-copy",class:"success"},
+            reset:{title:"立即结束",icon:"mdi-gavel",class:"danger",except:{'only':'2'}},
+        },
+        func:{
+            edit:function(value, row, index){
+                var confirmObj = jconfirmBox.ajaxconfirm("编辑轮次","{:gohdmanage('configydj/editrotate',['hdid'=>$hdid])}",{rotateid:row.id},'html','col-lg-8 col-lg-offset-2',function(e){
+                    var postData = webcore.serializeObject(e.find('form'));
+                    postData.rotateid = row.id;
+                    webcore.ajaxSubmit("{:gohdmanage('configydj/saverotate',['hdid'=>$hdid])}",postData).then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','保存成功');
+                            confirmObj.close();
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                             return false;
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                         return false;
+                    });
+                });
+            },
+            del:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','删除将删除当前轮次用户以及中奖数据并且无法恢复，您确定要删除么？',function(){
+                        webcore.ajaxSubmit("{:gohdmanage('configydj/delrotate',['hdid'=>$hdid])}",{rotateid:row.id}).then(function(json){
+                            if(json.code==0){
+                                webtable.refresh();
+                                zamnotice.showTips('success','删除成功');
+                            }else{
+                                zamnotice.showTips('error',json.msg);
+                            }
+                        }, function(json){
+                            zamnotice.showTips('error','网络差。操作失败');
+                        });
+                });
+            },
+            data:function(value, row, index){
+                window.location.href = "{:gohdmanage('dataydj/index',['hdid'=>$hdid])}&rotateid="+row.id;
+            },
+            reset:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','您确定要强制结束么？',function(){
+                    webcore.ajaxSubmit("{:gohdmanage('configydj/endrotate',['hdid'=>$hdid])}",{rotateid:row.id}).then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','操作成功');
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                    });
+                });
+            },
+            shenhe:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','您确定要复制当前轮次生成新的一轮么？',function(){
+                    webcore.ajaxSubmit("{:gohdmanage('configydj/copyrotate',['hdid'=>$hdid])}",{rotateid:row.id}).then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','复制成功');
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                    });
+                });
+            },
+        }
+    },
+    columns:[{
+            checkbox: true,
+        }, 
+        {
+            field: 'id',
+            title: 'Id',
+            align: 'center',
+            visible: false
+        },{
+            field: 'title',
+            title: '轮次',
+            align: 'center',
+            formatter:function(value,row,index){
+                return value;
+            }
+        },  {
+            field: 'statushtml',
+            title: '状态',
+            align: 'center',
+            
+        }, {
+            field: 'gametime',
+            title: '游戏时间(秒)',
+            align: 'center',
+        },{
+            field: 'totalmoney',
+            title: '红包总金额(元)',
+            align: 'center',
+        },{
+            field: 'prizenum',
+            title: '奖品',
+            align: 'center',
+            formatter:function(value,row,index){
+                return '<div class="m-b-5">' + value + '种</div><a href="javascript:;" class="btn btn-primary btn-sm btn-detail-row" data-id="'+row.id+'"">发放余量</a>';
+            }
+        }
+        ,{
+            field: 'create_time',
+            title: '创建时间',
+            align: 'center',
+        }
+    ],
+    searchParamas:[],
+    toolbar:{
+        add:function(){
+            var confirmObj = jconfirmBox.ajaxconfirm("新增轮次","{:gohdmanage('configydj/editrotate',['hdid'=>$hdid])}",{},'html','col-lg-8 col-lg-offset-2',function(e){
+	            var postData = webcore.serializeObject(e.find('form'));
+	            webcore.ajaxSubmit("{:gohdmanage('configydj/saverotate',['hdid'=>$hdid])}",postData,'正在创建轮次...').then(function(json){
+	                if(json.code==0){
+	                    webtable.refresh();
+	                    zamnotice.showTips('success','创建成功');
+	                    confirmObj.close();
+	                }else{
+	                    zamnotice.showTips('error',json.msg);
+	                     return false;
+	                }
+	            }, function(json){
+	                zamnotice.showTips('error','网络差。操作失败');
+	                 return false;
+	            });
+	        });
+        },
+        del:function(){
+            var getSelects = webtable.getSelections();
+            if(getSelects.length>0){
+                jconfirmBox.confirm('温馨提示','删除将删除所选轮次下的的用户以及中奖数据并且无法恢复，您确定要删除么？',function(){
+                    webcore.ajaxSubmit("{:gohdmanage('configydj/delrotate',['hdid'=>$hdid])}",{rotateid:getSelects}).then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','删除成功');
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差,操作失败');
+                    });
+                });
+            }else{
+                zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+        },
+        reset:function(){
+            jconfirmBox.confirm('温馨提示','清空轮次将清空所有轮次的用户以及中奖数据，您确定要清空么？',function(){
+                    webcore.ajaxSubmit("{:gohdmanage('configydj/resetallrotate',['hdid'=>$hdid])}",{}).then(function(json){
+                        webtable.refresh();
+                        zamnotice.showTips('success','操作成功');
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                    });
+            });
+        }
+    },
+};
+webtable.init(initConfig);
+$("#listtable").on('click','.btn-detail-row',function() {
+    var rotateid = $(this).attr('data-id');
+    var confirmobj = jconfirmBox.ajaxconfirm("本轮奖品余量","{:gohdmanage('configydj/rotateprizedetail',['hdid'=>$hdid])}",{rotateid:rotateid},'html','col-lg-8 col-lg-offset-2',function(e){},false,'2');
+});
+});
+</script>
+{include file='$Wpath/common/footer'}

@@ -1,0 +1,40 @@
+<div class="form-horizontal confirmbox-pop editpuzzle-pop">
+    <div class="form-group prows">
+       <label class="col-lg-3 control-label">* 类型</label>
+       <div class="col-lg-8">
+            <label class="lyear-radio radio-inline radio-primary">
+                <input type="radio" name="prows" value="2" {if $config['prows']=='2'}checked{/if}><span>4宫格</span>
+            </label>
+            <label class="lyear-radio radio-inline radio-primary">
+                <input type="radio" name="prows" value="3" {if $config['prows']=='3'}checked{/if}><span>9宫格</span>
+            </label>
+            <label class="lyear-radio radio-inline radio-primary">
+                <input type="radio" name="prows" value="4" {if $config['prows']=='4'}checked{/if}><span>16宫格</span>
+            </label>
+            <span class="help-block">难度：4宫格 < 9宫格 < 16宫格</span>
+       </div>
+    </div>
+    <div class="form-group pimg">
+       <label class="col-lg-3 control-label">* 拼图</label>
+       <div class="col-lg-8">
+          {:tpl_image_one('pimg',$config['pimg'])}
+          <span class="zam-help-block"><span class="text-danger">图片大小尽量不要超过200kb，</span>推荐规格:650*900px，尺寸太大会自动截取以适应屏幕</span>
+       </div>
+    </div>
+    <div class="form-group">
+           <label class="col-lg-3 control-label">* 闯关分数</label>
+           <div class="col-lg-8">
+               <input type="text" class="form-control numberincdec pscore" name="pscore" 
+                   data-bts-min="1" data-bts-replacement-val="1"
+                   data-bts-max="100"
+                   data-bts-step="1"
+                   value="{$config['pscore']}">
+               <span class="zam-help-block">注:最小1，最大100</span>
+           </div>
+    </div>
+   </div>
+<script>
+require(['webcore',"bootstrap-touchspin"],function(webcore){
+    $(".editpuzzle-pop .numberincdec").TouchSpin();
+});
+</script>

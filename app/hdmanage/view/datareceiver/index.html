@@ -1,0 +1,116 @@
+{include file='$Wpath/common/header'}
+<style type="text/css">
+table thead tr th{text-align:center;font-size: 13px;font-weight: 400}
+</style>
+<div class="alert alert-danger">
+	支付推送用户主要用于接受活动内的的用户发起支付后系统推送支付成功模板消息，具体包括霸屏上墙内的霸屏，打赏，发红包以及点歌等
+    {if !empty($qrcode)}<br><br>此处添加的用户必须先关注公众号才可以接收到推送<a class="btn btn-primary btn-xs m-l-15" onclick="showqrcode()">点我扫码关注</a>{/if}
+</div>
+<div class="btns clearfix m-b-15">
+ <a class="btn btn-sm btn-info btn-add" href="javascript:;" ><i class="mdi mdi-plus"></i> 新增</a>
+ <a class="btn btn-sm btn-danger btn-reset" href="javascript:;"><i class="mdi mdi-delete"></i> 清空</a> 
+</div>
+<div class="m-t-10">
+	<table class="table table-bordered">
+    <thead>
+      <tr>
+        <th style="width:50%">用户</th>
+        <th style="width:50%">操作</th>
+      </tr>
+    </thead>
+    <tbody class="receiver-lists">
+	    {volist name="lists" id="one"}    
+	    <tr>
+	        <td class="text-center">
+	           <div class="zam-flex-column-center">
+	           	<img src="{:tomedia($one['avatar'])}" class="avatarImg m-b-5">
+	           	<span>{$one['nickname']}</span>
+	           </div>
+	        </td>
+	        <td class="text-center" data-id="{$one['id']}">
+	            <a class="btn btn-xs btn-danger btn-delitem" href="javascript:void(0)"> <i class="mdi mdi-close"></i> </a>
+	        </td>
+	    </tr>
+	    {/volist}
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="6">
+                
+            </td>
+        </tr>
+    </tfoot>
+</table>
+</div>
+<script type="text/javascript">
+require(['webcore','jconfirmBox','zamnotice','layerBox'],function(webcore,jconfirmBox,zamnotice,layerBox){
+	$(".btn-add").click(function(){
+		var confirmObj = jconfirmBox.ajaxconfirm("新增推送用户","{:gohdmanage('common/searchuser',['hdid'=>$hdid])}",{ishtml:'1'},'html','col-lg-8 col-lg-offset-2',function(e){
+			var selectuser = e.find("input:checked");
+			if(selectuser.length>0){
+				var html = '',userids = [];
+				selectuser.each(function(){
+					userids.push($(this).attr('data-id'));
+				});
+				webcore.ajaxSubmit("{:gohdmanage('datareceiver/adduser',['hdid'=>$hdid])}",{userids:userids},'正在执行新增命令...').then(function(json){
+                    if(json.code==0){
+                    	confirmObj.close();
+                    	zamnotice.showTips('success','新增成功',2e3,function(){
+	                    	window.location.reload();
+	                    });
+                    }else{
+                    	zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差。操作失败');
+                });
+			}else{
+				zamnotice.showTips('error','请选择用户');
+			}
+		});
+	});
+	$(".btn-delitem").click(function(){
+		var userid = $(this).parent().attr('data-id');
+		jconfirmBox.confirm('温馨提示','删除将无法恢复，您确定要删除么？',function(){
+            webcore.ajaxSubmit("{:gohdmanage('datareceiver/deluser',['hdid'=>$hdid])}",{userid:userid}).then(function(json){
+                if(json.code==0){
+                    zamnotice.showTips('success','删除成功',2e3,function(){
+                    	window.location.reload();
+                    });
+                }else{
+                    zamnotice.showTips('error',json.msg);
+                }
+            }, function(json){
+                zamnotice.showTips('error','网络差。操作失败');
+            });
+        });
+	});
+	$(".btn-reset").click(function(){
+		jconfirmBox.confirm('温馨提示','清空将删除所有的推送用户并且无法恢复，您确定要清空么？',function(){
+            webcore.ajaxSubmit("{:gohdmanage('datareceiver/resetuser',['hdid'=>$hdid])}",{}).then(function(json){
+                if(json.code==0){
+                    zamnotice.showTips('success','清空成功',2e3,function(){
+                    	window.location.reload();
+                    });
+                }else{
+                    zamnotice.showTips('error',json.msg);
+                }
+            }, function(json){
+                zamnotice.showTips('error','网络差。操作失败');
+            });
+        });
+	});
+});
+{if !empty($qrcode)}
+function showqrcode(){
+    require(['webcore'],function(webcore){
+        var qrimg = "{:tomedia($qrcode)}";
+        if(qrimg==''){
+            return webcore.showMsg('公众号二维码未设置');
+        }
+        webcore.showVideos([qrimg],'1');
+    });
+}
+{/if}
+</script>
+{include file='$Wpath/common/footer'}

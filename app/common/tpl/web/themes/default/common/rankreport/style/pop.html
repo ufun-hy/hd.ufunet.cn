@@ -1,0 +1,107 @@
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 达标弹层</label>
+    <div class="col-lg-8">
+        {:tpl_switch('popconfig[open]',$config['popconfig']['open']??'2','openpop')}
+        <span class="help-block m-t-0">开启后用户提交的数目达标会有弹窗提示</span>
+    </div>
+</div>
+<div class="popconfigbox{if !isset($config['popconfig']['open']) || $config['popconfig']['open']=='2'} hidden{/if}">
+    <div class="form-group">
+        <label class="col-lg-3 control-label">* 达标量</label>
+        <div class="col-lg-8">
+            <input type="text" class="form-control numberincdec" name="popconfig[max]" 
+            data-bts-min="1" data-bts-replacement-val="1"
+            data-bts-max="null"
+            data-bts-step="1"
+            value="{$config['popconfig']['max']??100}">
+            <span class="help-block m-b-0">达标量指的是勾选了统计项对应的表单用户提交的值达到此数值以上即为达标</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-3 control-label">* 弹窗话术</label>
+        <div class="col-lg-8">
+            <input type="text" class="form-control"  name="popconfig[txt]" value="{$config['popconfig']['txt']??'恭喜完成订购目标'}" placeholder="">
+            
+        </div>
+    </div>
+    <div class="form-group qrbottomtxt-command">
+        <label class="col-lg-3 control-label"><span class="text-danger">* 弹窗话术注意事项</span></label>
+        <div class="col-lg-8">
+            <div class="form-control-static">
+                <div>1 弹窗话术文字如果较长可使用<pre style="display:inline;background:none;border:0;">&lt;br&gt;</pre>换行</div>
+                {if isset($config['id']) && isset($config['appbddata']) && !empty($config['appbddata']) }
+                {php}$bindex = 2;{/php}
+                {foreach $config['appbddata'] as $bkey=>$bd}
+                <div class="m-t-10">
+                    {$bindex} 调用用户{$bd['bdtitle']}可使用变量<pre style="margin: 0;display: inline;border: none;">[{$bd['bdzd']}] <a class="btn btn-primary btn-xs zam-clip" data-text="[{$bd['bdzd']}]" style="margin-left: 10px;">点我复制</a></pre><br>
+                </div>
+                {php}$bindex++;{/php}
+                {/foreach}
+                {/if}
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-3 control-label text-right">* 弹窗文字设置</label>
+        <div class="col-lg-5">
+            <div class="input-group">
+                <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+                {:tpl_color('popconfig[color]',$config['popconfig']['color']??'#fff')}
+                <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
+                <div class="touchspin">
+                <input type="text" class="form-control numberincdec" name="popconfig[size]" 
+                    data-bts-min="1" data-bts-replacement-val="1"
+                    data-bts-max="100"
+                    data-bts-step="1"
+                    data-bts-postfix="px"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                    value="{$config['popconfig']['size']??42}">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-3 control-label text-right">* 弹窗背景色</label>
+        <div class="col-lg-5">
+            {:tpl_color('popconfig[bgcolor]',$config['popconfig']['bgcolor']??'rgba(0,0,0,0.6)')}
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-3 control-label">* 弹窗时长</label>
+        <div class="col-lg-8">
+            <input type="text" class="form-control numberincdec" name="popconfig[seconds]" 
+            data-bts-min="1" data-bts-replacement-val="1"
+            data-bts-max="null"
+            data-bts-step="1"
+            data-bts-postfix="秒"
+            data-bts-postfix-extra-class="touchspin-postfix"
+            value="{$config['popconfig']['seconds']??'6'}">
+            <div class="help-block">最低是1秒</div>
+        </div>
+    </div>
+</div>
+<script>
+    function openpop(obj,status){
+        if(status=='1'){
+            obj.prev().val('2');
+            obj.attr('data-status','2');
+            $(".popconfigbox").addClass('hidden');
+        }else{
+            obj.prev().val('1');
+            obj.attr('data-status','1');
+            $(".popconfigbox").removeClass('hidden');
+        }
+        obj.prev().prev().prop("checked",status=='1'?false:true);
+    }
+    require(['webcore','zamnotice','clipboard'],function(webcore,zamnotice,Clipboard){
+        var clipboard = new Clipboard('.zam-clip', {
+        text: function(e) {
+            return $(e).data('text') ||'';
+        }
+        });
+        clipboard.on('success',function(e) {
+        zamnotice.showTips('success','复制成功',2e3);
+        return;
+        });
+    });
+</script>

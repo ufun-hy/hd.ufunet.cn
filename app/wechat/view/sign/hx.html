@@ -1,0 +1,189 @@
+{include file="common/header" /}
+<style>
+body{overflow-y:auto}
+.zam-app-sign{
+	height:100%;
+}
+.zam-app-signbglogo{
+	width: 6.2rem;
+	margin-bottom: 0.42rem;
+}
+.zam-app-signbox{
+	width:6.2rem;
+	padding:0.82rem 0.32rem;
+	margin:0 auto;
+	border-radius: 0.24rem;
+    background-color:{if isset($appconfig['appbdbgcolor'])}{$appconfig['appbdbgcolor']}{else /}rgba(0,0,0,0.5){/if};
+    color: #fff;
+    text-align: center;
+    margin-top:{if isset($appconfig['appbdbgmargintop'])}{$appconfig['appbdbgmargintop']}{else /}0{/if}px;
+    margin-bottom:1rem;
+}
+.datatitle{
+	font-size: 0.42rem;
+	margin-bottom: 0.32rem;
+}
+.bddata{
+	width: 100%;
+	padding: 0 0.24rem;
+	font-size: 0.32rem;
+	margin-bottom: 0.12rem;
+}
+.bddata li{
+	text-align: left;
+	margin-bottom: 0.16rem;
+}
+.bddata li img{
+	max-width: 2.4rem;
+}
+.bddata li .uploadvideobox{
+	position: relative;
+}
+.bddata li .uploadvideobox .playicon{
+	position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 1.2rem;
+    height: 1.2rem;
+    cursor: pointer;
+    transform: translate(-50%,-50%);
+}
+.bddata li .uploadvideobox .playicon i{
+	font-size: 1rem;
+	color: #fff;
+}
+.btns{
+	margin-top: 0.32rem;
+}
+.btns a{
+	padding: 0.2rem 0.62rem;
+	height: auto;
+	line-height: inherit;
+	margin: 0 0.32rem;
+}
+.btns .hashxed{
+	text-align: center;
+	color: #fff;
+	font-size: 0.32rem;
+}
+.playbpvideo{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0);z-index:5}
+.closevideo{position:absolute;top:20px;left:0;height:40px;line-height:40px;text-align:center;width:100%;color:#fff;font-size:.4rem margin:0 auto;z-index:1}
+</style>
+<section class="zam-app-sign signhxbox g-flexview zam-app-flex-ajCenter">
+	 {if !empty($appconfig['appbdlogo'])}<img class="zam-app-signbglogo" src="{:tomedia($appconfig['appbdlogo'])}" />{/if}
+	 <div class="zam-app-signbox zam-app-flex-ajCenter">
+	 	{if isset($appconfig['waitscanconfig']['hxtoptitle']) && !empty($appconfig['waitscanconfig']['hxtoptitle'])}
+	 		<div class="datatitle">{$appconfig['waitscanconfig']['hxtoptitle']}</div>
+	 	{/if}
+	 	<div class="bddata">
+	 		{if !empty($zdtitles) && isset($hxuser['bddata']) && !empty($hxuser['bddata'])}
+	 		<ul>
+		 		{foreach $zdtitles as $k=>$zd}
+		 			<li class="zam-app-flex">
+		 				<span>{$zd['title']}:</span>
+		 				{if $k=='uploadimg'}
+		 					{if isset($hxuser['bddata'][$k]) && !empty($hxuser['bddata'][$k])}
+		 					<img class="uploadimg" src="{:tomedia($hxuser['bddata'][$k])}"  />
+		 					{else /}
+		 						-
+		 					{/if}
+		 				{else /}
+		 					{if isset($hxuser['bddata'][$k]) && !empty($hxuser['bddata'][$k])}
+		 						{if $zd['type']=='file'}
+			                        {if $zd['isimg']=='1'}
+			                            <img class="uploadimg" src="{:tomedia($hxuser['bddata'][$k])}"  />
+			                        {else /}
+			                        <span class="uploadvideobox">
+			                            <div><img src="{:tomedia($hxuser['bddata'][$k])}.jpg" /></div>
+			                            <div class="playicon zam-app-flex-ajCenter" data-videosrc="{:tomedia($hxuser['bddata'][$k])}"><i class="mxc-videofill"></i></div>
+			                        </span>
+			                        {/if}
+			                    {else /}
+			                        {$hxuser['bddata'][$k]}
+			                    {/if}
+		 					{else /}
+		 						-
+		 					{/if}
+		 				{/if}
+		 			</li>
+		 		{/foreach}
+		    </ul>
+		    {/if}
+	 	</div>
+	 	<div class="btns">
+	 		{if $hxuser['status']=='2'}
+		 		<a class="btn btn-primary btn-confirm" data-id="{$hxuser['id']??''}">{$appconfig['waitscanconfig']['hxconfirm']??'同意'}</a>
+		 		<a class="btn btn-danger btn-close">{$appconfig['waitscanconfig']['hxcancel']??'拒绝'}</a>
+	 		{else /}
+	 			{if isset($appconfig['waitscanconfig']['hxsuccess']) && !empty($appconfig['waitscanconfig']['hxsuccess'])}
+	 			<p class="hashxed">{$appconfig['waitscanconfig']['hxsuccess']}</p>
+	 			{/if}
+	 		{/if}
+	 	</div>
+	</div>
+</section>
+<script>
+require(['wechatcore','videojs'],function (wechatcore,videojs) {
+	if($(".zam-app-signbox").outerHeight(true) >= $(window).height()){
+		$('.zam-app-sign').css({
+			"height":"auto",
+			'margin':'0.3rem 0',
+			'overflow-y':'scroll',
+			'background':'none'
+		});
+		$(".zam-app-bodyBg").css({"opacity":'1'});
+	}
+	$(".btn-close").click(function(){
+		wechatcore.closewxwindow();
+	});
+	$(".btn-confirm").click(function(){
+		var uid = $(this).attr("data-id") || '';
+		wechatcore.ask('温馨提示','确定要核销此用户么?',['确定','取消'],function(index){
+			wechatcore.close(index);
+			wechatcore.ajaxSubmit("/wechat/sign/hx",{uid:uid},'正在执行核销操作...').then(function(json){
+				if(json.code==0){
+					wechatcore.msg('核销成功');
+					setTimeout(function(){
+						wechatcore.closewxwindow();
+					},1e3);
+				}else{
+					wechatcore.msg(json.msg);
+					if(json.code==-2){
+						setTimeout(function(){
+							window.location.reload();
+						},1e3);
+					}
+				}
+			}, function(){
+				wechatcore.msg('网络太差，请稍后重试');
+			});
+		});
+	});
+	$(".uploadimg").click(function(){
+		wechatcore.previewImage(this);
+	});
+	$(".playicon").click(function(){
+		var $this = $(this),videosrc = $this.attr('data-videosrc') || '',poster = $this.prev().find('img').attr('src');
+		 $("body").append('<div class="playbpvideo zam-app-flex-ajCenter2 "><div class="closevideo">点我关闭视频</div><video id="my-player" class="video-js vjs-default-skin vjs-big-play-centered vjs-fluid " controls preload="auto"  data-setup="{}" webkit-playsinline="true" x-webkit-airplay="true" playsinline="true"><source src="'+videosrc+'" ></source></video></div>');
+		var player = videojs('my-player',{
+			loop : true,
+			poster:poster,
+		}, function onPlayerReady() {
+		  this.play();
+		  this.on('error', function() {
+			    $(".playbpvideo .closevideo").unbind('click');
+				player.dispose();
+				$(".playbpvideo").remove();
+				wechatcore.msg('视频加载出错,请稍后重试');
+		  });
+		});
+		$(".playbpvideo .closevideo").bind('click',function(){
+			$(this).parent().remove();
+			player.dispose();
+		});
+	});
+})
+</script>
+
+{include file="sign/xieyi" /}
+{include file="common/footer" /}

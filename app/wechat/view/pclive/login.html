@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no">
+    <title>微信扫码授权登录</title>
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="msapplication-tap-highlight" content="no">
+    <script type="text/javascript" src="__STATIC__/js/jquery.2.1.4.js"></script>
+    <link rel="stylesheet" href="__STATIC__/css/mxc-icon.css" media="all" />
+	<script type="text/javascript"  src="__STATIC__/js/require.js"></script>
+	<script type="text/javascript">
+		!function (window) {
+		    var docWidth = 1920,doc = window.document,docEl = doc.documentElement,resizeEvt = 'orientationchange' in window ? 'orientationchange' : 'resize';
+		    var recalc = (function refreshRem () {
+		        var clientWidth = docEl.getBoundingClientRect().width;
+		        docEl.style.fontSize = Math.max(Math.min(20 * (clientWidth / docWidth), 20), 20) * 5 + 'px';
+		        return refreshRem;
+		    })();
+		    docEl.setAttribute('data-dpr', window.navigator.appVersion.match(/iphone/gi) ? window.devicePixelRatio : 1);
+		    if (/iP(hone|od|ad)/.test(window.navigator.userAgent)) {
+		        doc.documentElement.classList.add('ios');
+		        if (parseInt(window.navigator.appVersion.match(/OS (\d+)_(\d+)_?(\d+)?/)[1], 10) >= 8)
+		            doc.documentElement.classList.add('hairline');
+		    }
+		    if (!doc.addEventListener) return;
+		    window.addEventListener(resizeEvt, recalc, false);
+		    doc.addEventListener('DOMContentLoaded', recalc, false);
+	    }(window);
+	 </script>
+	<script type="text/javascript">
+		var XCV3Config = {
+		  staticurl:"__STATIC__/",
+		  amconfig:{:json_encode(amconfig())},
+		  hdid:"{$hdinfo['hdid']}",
+		  rhdid:"{$hdinfo['id']}",
+		  wsAddress:"{:wssaddress()}",
+		  userid:"",
+		  clienttype:"{if isset($clienttype)}{$clienttype}{else}1{/if}",
+		};
+		require.config({
+			baseUrl: XCV3Config.staticurl + "js",
+			urlArgs:'v=2.1.011',//+(new Date()).getTime(),
+			waitSeconds:0,
+			paths: {
+				 css: "css.min",
+				 jquery:"jquery.2.1.4",
+				 jquerytrans:'screenjs/jquery.transit.min',
+				 livecore:'wechatjs/livecore',
+				 template:"template/template",
+				 layer:'layer/layer',
+				 layerBox:'layer/layerBox',
+				 laytpl:"laytpl/laytpl",
+				 keyboard:'keyboard/keyboard.min',
+				 livecore:"wechatjs/livecore",
+				 marqueen:"wechatjs/marqueen",
+				 bscroll:'wechatjs/bscroll/bscroll',
+				 swiper:'swiper/swiper.min',
+				 emojicore:"wechatjs/emojicore",
+				 appsocket:"wechatjs/appsocket",
+				 videojs:'videojs/video',
+				 TcPlayer:'videojs/TcPlayer-2.4.1/TcPlayer-2.4.1',
+				 TXLivePlayer:'videojs/TcPlayer-2.4.1/TXLivePlayer.min',
+				 hls:'videojs/TcPlayer-2.4.1/hls.min',
+				 qnrtplayer:'videojs/qiniu/qn-web',
+				 domtoimage:'domtoimg/domtoimage',
+				 html2canvas:"wechatjs/html2canvas",
+				 danmuku:'screenjs/danmuku',
+				 fulldm:'wechatjs/fulldm',
+				 dialog:'dialog/js/dialog',
+				 glightbox:'glightbox/glightbox.min',
+			},
+			shim:{
+				'template':{
+					exports: 'template',
+				},
+				'layer':{
+					exports: 'layer',
+					deps: ['css!../js/layer/theme/default/layer.css']
+				},
+				'bscroll':{
+					exports:'BScroll',
+				},
+				'swiper':{
+					exports:'Swiper',
+					deps: ['css!../js/swiper/swiper.min.css']
+				},
+				'appsocket':{
+					exports:'appsocket',
+				},
+				'videojs':{
+					exports:'videojs',
+					deps:['css!../js/videojs/video.css'],
+				},
+				'domtoimage':{
+					exports:'domtoimage'
+				},
+				'dialog':{
+					exports:'dialog',
+					deps:['css!../js/dialog/css/dialog.css'],
+				},
+				'glightbox':{
+					exports:'GLightbox',
+					deps: ['css!../js/glightbox/glightbox.min.css'],
+				},
+			},
+		});
+		define("jquery", [], function () {
+			return jQuery;
+		});
+	</script>
+    <style>
+    	html, body, div, span,  h1, h2, h3, h4, h5, h6, p, a, em, img,small, tt, b, i, ul, li, label, nav, section, audio, video {
+		    margin: 0;
+		    padding: 0;
+		    border: 0;
+		    font-size: 100%;
+		    font: inherit;
+		    vertical-align: baseline;
+		}
+		.hidden{display: none;}
+		.layui-layer{
+			font-size: 0.16rem;
+		}
+		.zam-app-flex{
+		  display: -webkit-box;
+		  display: -webkit-flex;
+		  display: -ms-flexbox;
+		  display: flex;
+		}
+		.zam-app-alignCenter{
+		  -webkit-box-align: center;
+		  -webkit-align-items: center;
+		  -ms-flex-align: center;
+		  align-items: center;
+		}
+		.zam-app-justifyCenter{
+		  -webkit-box-pack: center;
+		  -webkit-justify-content: center;
+		  -ms-flex-pack: center;
+		  justify-content: center;
+		}
+		.zam-app-directionColumn{
+		  -webkit-box-orient: vertical;
+		  -webkit-box-direction: normal;
+		  -webkit-flex-direction: column;
+		  -ms-flex-direction: column;
+		  flex-direction: column;
+		}
+		.zam-app-flex-wrap{flex-wrap:wrap;-webkit-flex-wrap:wrap;}
+		.zam-app-flex-alignCenter{
+		  display: -webkit-box;
+		  display: -webkit-flex;
+		  display: -ms-flexbox;
+		  display: flex;
+		  -webkit-box-align: center;
+		  -webkit-align-items: center;
+		  -ms-flex-align: center;
+		  align-items: center;
+		}
+		.zam-app-flex-justifyCenter{
+		  display: -webkit-box;
+		  display: -webkit-flex;
+		  display: -ms-flexbox;
+		  display: flex;
+		  -webkit-box-orient: vertical;
+		  -webkit-box-direction: normal;
+		  -webkit-flex-direction: column;
+		  -ms-flex-direction: column;
+		  flex-direction: column;
+		}
+		.zam-app-flex-ajCenter{
+		  display: -webkit-box;
+		  display: -webkit-flex;
+		  display: -ms-flexbox;
+		  display: flex;
+		  -webkit-box-orient: vertical;
+		  -webkit-box-direction: normal;
+		  -webkit-flex-direction: column;
+		  -ms-flex-direction: column;
+		  flex-direction: column;
+		  -webkit-box-pack: center;
+		  -webkit-justify-content: center;
+		  -ms-flex-pack: center;
+		  justify-content: center;
+		  -webkit-box-align: center;
+		  -webkit-align-items: center;
+		  -ms-flex-align: center;
+		  align-items: center;
+		}
+		.zam-app-flex-ajCenter2{
+		  display: -webkit-box;
+		  display: -webkit-flex;
+		  display: -ms-flexbox;
+		  display: flex;
+		  -webkit-box-pack: center;
+		  -webkit-justify-content: center;
+		  -ms-flex-pack: center;
+		  justify-content: center;
+		  -webkit-box-align: center;
+		  -webkit-align-items: center;
+		  -ms-flex-align: center;
+		  align-items: center;
+		}
+		.zam-app-justifyspacearound{
+		  justify-content: space-around;
+		  -webkit-justify-content: space-around;
+		    -ms-flex-pack: space-around;
+		}
+		.zam-app-justifyspacebetween{
+		  justify-content: space-between;
+		  -webkit-justify-content: space-between;
+		    -ms-flex-pack: space-between;
+		}
+		{/*互动登录框*/}
+		.login-pop{border-radius: 0.12rem!important}
+		.login-pop-main{
+			position: relative;
+			display: flex;
+		    flex-direction: column;
+		    align-items: center;
+		    padding: 0.72rem;
+		    padding-top: 0.7rem;
+		}
+		.login-pop-main .close{
+			position: absolute;
+			top: 0.1rem;
+			right:0.1rem;
+			font-size: 0.26rem;
+			font-weight: 100;
+			cursor: pointer;
+			color: #999;
+		}
+		.login-pop-main .qrcode {
+		    width: 2rem;
+		    height: 2rem;
+		    padding: 0.02rem;
+		    border: 1px solid #d5d5d5;
+		    border-radius: 0.12rem;
+		}
+		.login-pop-main .qrcode .qrimg{
+		    width: 100%;
+		    height: 100%;
+		}
+		.qrcode-loading{
+			height: 100%;
+			width: 100%;
+		}
+		.qrcode-loading img{
+			margin-bottom: 0.2rem;
+			animation: foreverrotate 2s linear infinite;
+		}
+		@keyframes foreverrotate {
+			0% {
+				transform: rotate(0)
+			}
+
+			to {
+				transform: rotate(-1turn)
+			}
+		}
+		.qrcode-loading p,.errortip{font-size: 0.14rem;color: #999}
+		.login-pop-main .tip {
+			height: 0.4rem;
+			line-height: 0.4rem;
+		    font-size: .16rem;
+		    color: #000;
+		    font-weight: 300;
+		}
+		.login-type-icon{width: 0.32rem;height: 0.28rem;background-image: url("/{:SIMGURL}pclive/wechat.png");background-size: cover;background-repeat: no-repeat;}
+</style>
+</head>
+<body>
+<script id="login-tpl" type="text/html">
+	<div class="login-pop-main">
+		<div class="qrcode zam-app-flex-ajCenter">
+			<img class="qrimg hidden" src="">
+			<div class="qrcode-loading zam-app-flex-ajCenter">
+				<img src="__STATIC__/images/sys/loading2.png">
+				<p>正在生成二维码</p>
+			</div>
+			<div class="errortip hidden"></div>
+		</div>
+		<p class="tip">微信扫码登录</p>
+		<div class="login-type-icon"></div>
+	</div>
+</script>
+<script type="text/javascript">
+require(['livecore','appsocket'],function(livecore,appsocket){
+appsocket.init({
+	onmessage:function(data){
+		if(data.type=='connected'){
+			appsocket.isclose = false;
+			livecore.clientid = data.clientid;
+			livecore.showloginbox('1');
+		}else if(data.type=='pclivelogin'){
+			if(data.authinfo){
+				livecore.ajaxSubmit('/wechat/pclive/login',{authinfo:data.authinfo},false).then(function(data){
+					if(data.code==0){
+						livecore.closeall();
+						livecore.msg('授权成功');
+						setTimeout(function(){
+							livecore.reloadpage();
+						},1e3);
+					}else{
+						livecore.msg(data.msg);
+					}
+				}, function(){
+					livecore.msg('网络太差，请稍后重试');
+				});
+			}
+		}
+	}
+})
+})
+</script>
+</body>
+</html>

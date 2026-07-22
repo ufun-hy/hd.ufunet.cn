@@ -1,0 +1,160 @@
+{include file='$Wpath/common/header'}
+<div class="alert alert-danger">
+    温馨提醒:键盘空格键用于开启抽奖，上一轮抽取完毕，将自动切换至下一轮，一个轮次只能抽取一个名单，
+</div>
+{include file='$Wpath/common/tabletoolbar'}
+<table id="listtable" class="zam-btable"></table>
+<script>    
+require(['webcore','webtable','jconfirmBox','zamnotice'],function(webcore,webtable,jconfirmBox,zamnotice){
+var initConfig = {
+    tableId:'#listtable',
+    url:"{:gohdmanage('configlabaji/rotate',['hdid'=>$hdid])}",
+    columnoperate:{
+        btns:{
+            edit:true,
+            del:true,
+            reset:true,
+            data:true,
+        },
+        func:{
+            edit:function(value, row, index){
+                var confirmObj = jconfirmBox.ajaxconfirm("编辑轮次","{:gohdmanage('configlabaji/editrotate',['hdid'=>$hdid])}",{rotateid:row.id},'html','col-lg-10 col-lg-offset-1',function(e){
+                    var postData = webcore.serializeObject(e.find('form'));
+                    postData.rotateid = row.id;
+                    webcore.ajaxSubmit("{:gohdmanage('configlabaji/saverotate',['hdid'=>$hdid])}",postData).then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','保存成功');
+                            confirmObj.close();
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                             return false;
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                         return false;
+                    });
+                });
+            },
+            del:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','删除将删除当前轮次的中奖记录并且无法恢复，您确定要删除么？',function(){
+                        webcore.ajaxSubmit("{:gohdmanage('configlabaji/delrotate',['hdid'=>$hdid])}",{rotateid:row.id}).then(function(json){
+                            if(json.code==0){
+                                webtable.refresh();
+                                zamnotice.showTips('success','删除成功');
+                            }else{
+                                zamnotice.showTips('error',json.msg);
+                            }
+                        }, function(json){
+                            zamnotice.showTips('error','网络差。操作失败');
+                        });
+                });
+            },
+            data:function(value, row, index){
+                window.location.href = "{:gohdmanage('datalabaji/index',['hdid'=>$hdid])}&rotateid="+row.id;
+            },
+            reset:function(value, row, index){
+                jconfirmBox.confirm('温馨提示',"<div class='m-b-5'><span class='text-danger'>如果活动正在进行中，请不要进行此操作</span></div><div>重置本轮将清空本轮中奖记录，您确定要强制重置本轮么？</div>",function(){
+                    webcore.ajaxSubmit("{:gohdmanage('configlabaji/resetrotate',['hdid'=>$hdid])}",{rotateid:row.id},'正在重置轮次数据并重新生成中....').then(function(json){
+                        webtable.refresh();
+                        zamnotice.showTips('success','操作成功');
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                    });
+                });
+            },
+        }
+    },
+    columns:[{
+            checkbox: true,
+            width:'5',
+        }, 
+        {
+            field: 'id',
+            title: 'Id',
+            align: 'center',
+            visible: false,
+            width:'5',
+        },{
+            field: 'title',
+            title: '轮次',
+            align: 'center',
+            width:'15',
+        },{
+            field: 'statushtml',
+            title: '状态',
+            align: 'center',
+            width:'8',
+            
+        },{
+            field: 'isndhtml',
+            title: '内定',
+            align: 'center',
+            width:'8',
+            formatter:function(value,row,index){
+                return value;
+            }
+        },
+        {
+            field: 'create_time',
+            title: '创建时间',
+            align: 'center',
+            width:'11',
+        }
+        
+    ],
+    searchParamas:[],
+    toolbar:{
+        add:function(){
+            var confirmObj = jconfirmBox.ajaxconfirm("新增轮次","{:gohdmanage('configlabaji/editrotate',['hdid'=>$hdid])}",{},'html','col-lg-10 col-lg-offset-1',function(e){
+                var postData = webcore.serializeObject(e.find('form'));
+                webcore.ajaxSubmit("{:gohdmanage('configlabaji/saverotate',['hdid'=>$hdid])}",postData,'正在创建轮次...').then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','创建成功');
+                        confirmObj.close();
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                         return false;
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差。操作失败');
+                     return false;
+                });
+            });
+        },
+        del:function(){
+            var getSelects = webtable.getSelections();
+            if(getSelects.length>0){
+                jconfirmBox.confirm('温馨提示','删除将删除所选轮次下的中奖记录并且无法恢复，您确定要删除么？',function(){
+                    webcore.ajaxSubmit("{:gohdmanage('configlabaji/delrotate',['hdid'=>$hdid])}",{rotateid:getSelects}).then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','删除成功');
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差,操作失败');
+                    });
+                });
+            }else{
+                zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+        },
+        reset:function(){
+            jconfirmBox.confirm('温馨提示','清空轮次将清空所有轮次的的中奖记录数据，您确定要清空么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('configlabaji/resetallrotate',['hdid'=>$hdid])}",{}).then(function(json){
+                    webtable.refresh();
+                    zamnotice.showTips('success','操作成功');
+                }, function(json){
+                    zamnotice.showTips('error','网络差。操作失败');
+                });
+            });
+        }
+    },
+};
+webtable.init(initConfig);
+});
+</script>
+{include file='$Wpath/common/footer'}

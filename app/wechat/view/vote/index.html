@@ -1,0 +1,949 @@
+{include file="vote/header" /}
+<div class="num_box">
+	<ul class="num_box_ul">
+		<li><span class="text"><i class="mxc-news_hot_light"></i> {$appconfig['votetxt']??'投票'}项目</span> <span>{$appconfig['allitem']}</span></li>
+		<li><span class="text"> <i class="mxc-appreciate_light"></i> {$appconfig['votetxt']??'投票'}量</span> <span>{$appconfig['allvote']}</span></li>
+		<li><span class="text"><i class="mxc-unie6cc"></i> 参与人次</span> <span>{$appconfig['alljoin']}</span></li>
+	</ul>
+</div>
+<div class="timeremain">
+    <div class="timeremain-title"><i class="mxc-unie6b2"></i> <span>距离{$appconfig['votetxt']??'投票'}结束时间</span></div>
+	<div class="timerremain-box">
+		<strong id="timeremain-day">0天</strong>
+		<strong id="timeremain-hour">0时</strong>
+		<strong id="timeremain-min">00分</strong>
+		<strong id="timeremain-sec">00秒</strong>
+	</div>
+	<div class="remainnums">您还剩余<span>{$rotate['myremain']}</span>{$appconfig['voteunit']??'票'}</div>
+</div>
+<script>
+var remainSec,votetxt = "{$appconfig['votetxt']??'投票'}";
+$(function(){
+	{if $rotate['endtime'] < time()}
+		$(".timeremain .timeremain-title span").text(votetxt+'已结束');
+		$(".remainnums").remove();
+	{elseif $rotate['starttime'] > time() /}
+		$(".timeremain .timeremain-title span").text('距离'+votetxt+'开始时间');
+		remainSec = parseInt("{$rotate['starttime'] - time()}");
+		timerun(remainSec);
+		$(".remainnums").remove();
+	{else /}
+		{// 进行中}
+		$(".timeremain .timeremain-title span").text('距离'+votetxt+'结束时间');
+		remainSec = parseInt("{$rotate['endtime'] - time()}");
+		timerun(remainSec);
+	{/if}
+})
+{// 倒计时逻辑}
+function timerun(remainSec){
+	var t = setInterval(function(){
+		var day = 0,hour = 0,minute = 0,second = 0;		
+		if(remainSec > 0){
+			day = Math.floor(remainSec / (60 * 60 * 24));
+			hour = Math.floor(remainSec / (60 * 60)) - (day * 24);
+			minute = Math.floor(remainSec / 60) - (day * 24 * 60) - (hour * 60);
+			second = Math.floor(remainSec) - (day * 24 * 60 * 60) - (hour * 60 * 60) - (minute * 60);
+		}
+		if (minute <= 9) minute = '0' + minute;
+		if (second <= 9) second = '0' + second;
+		$('#timeremain-day').html(day+"天");
+		$('#timeremain-hour').html(hour+'时');
+		$('#timeremain-min').html(minute+'分');
+		$('#timeremain-sec').html(second+'秒');
+		remainSec--;
+		if(remainSec < 0){
+			clearInterval(t);
+			window.location.reload();
+		}
+	}, 1e3);
+} 
+</script>
+<div class="vote-searchBox{if isset($appconfig['apppageconfig']['opensearch']) && $appconfig['apppageconfig']['opensearch']=='2'} hidden{/if}">
+	<div class="zam-input-box zam-app-flex-ajCenter2">
+		<input type="text" class="cell-input zam-app-cell-input" placeholder="请输入项目名称" autocomplete="off">
+		<a href="javascript:;" class="btn btn-primary"><i class="mxc-3"></i></a>
+	</div>
+</div>
+<style>
+.list-checkbox{
+	position:relative;
+    text-align:center;
+}
+.list-checkbox input[type="checkbox"]{
+	width:0.44rem;
+	height:0.44rem;
+	-webkit-appearance: checkbox;
+    -moz-appearance: checkbox;
+	appearance: checkbox;
+	opacity: 0;
+}
+.list-checkbox label {
+    width:100%;
+    height:100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    border: 1px solid #CCC;
+    background: #fff;
+    cursor: pointer;
+	border-radius:6px;
+}
+.list-checkbox label:after {
+    content: '';
+    width: 0.26rem;
+    height: 0.14rem;
+    position: absolute;
+    top: 0.1rem;
+    left: 0.1rem;
+    border: 1px solid #98BDF5;
+    border-top: none;
+    border-right: none;
+    opacity: 0;
+    transform: rotate(-45deg);
+	-webkit-transform: rotate(-45deg);
+}
+.list-checkbox input[type="checkbox"]:checked + label:after {
+    opacity: 1;
+    border: 2px solid #FFF;
+    border-top: none;
+    border-right: none;
+}
+.list-checkbox input[type="checkbox"]:checked + label {
+    background: #1E70EA;
+    border: none;
+}
+.list-checkbox input[type="checkbox"]:disabled + label {
+    background: #E9E7E3;
+    border: none;
+}
+.list-checkbox input[type=checkbox]:disabled +label:after {
+   opacity: 1;
+    border: 2px solid #FFF;
+    border-top: none;
+    border-right: none;
+}
+.votetype2-btn{clear:both;margin:0.2rem 0;}
+.votetype2-btn span{width:3rem;height:0.86rem;line-height:0.86rem;margin:0 auto;}
+{if $hdinfo['id']=='boshengvotebadge'}
+	.list-number {
+	    position: absolute;
+	    top: 0px;
+	    left: -3px;
+	}
+	.list-number span.badge{
+	    width: 20px;
+	    border-radius: 50%;
+	    height: 20px;
+	    line-height: 20px;
+	    font-size: 7px;
+	    padding: 0!important;
+	    border: 1px solid #fff;
+	} 
+	.list-number .badge-primary:after{
+	    border: none!important;
+	} 
+{/if}
+.votegroups{margin:5px auto 20px auto;}
+.votegroups ul {
+    height: auto;
+    overflow: hidden;
+}
+.votegroups ul li {
+    float: left;
+    font-size: 0.24rem;
+    text-align: center;
+    width:2.15rem;
+    height: 0.58rem;
+    padding:0 0.12rem;
+    box-sizing: border-box;
+    line-height: 0.58rem;
+    color: #919499;
+    border-radius: 5px;
+    cursor: pointer;
+    background: #f5f6f7;
+    margin:0 5px;
+    box-shadow: 0px 0px 5px rgb(157 179 208 / 40%);
+}
+.votegroups ul li.active {
+    color: #fff;
+    background: #00aeff;
+}
+.numcontrolbox div{
+	color:rgb(157 121 86);
+}
+.numcontrolbox .numdec,.numcontrolbox .numinc{
+	font-size: 0.42rem;
+	font-weight: bold;
+}
+.numcontrolbox .numshuzi{
+	width: 0.52rem;
+	height: 0.52rem;
+	border: 2px solid #333;
+	border-radius: 50%;
+	margin: 0.12rem 0.2rem;
+	font-size: 0.32rem;
+}
+{php}
+$voteitembadgecolor = $appconfig['apppageconfig']['voteitembadgecolor']??'';
+$voteitembtncolor = $appconfig['apppageconfig']['voteitembtncolor']??'';
+$votenamecolor = $appconfig['apppageconfig']['votenamecolor']??'';
+{/php}
+{if !empty($voteitembadgecolor)}
+.vote-itemlists .badge-primary{background-color: {$voteitembadgecolor};}
+.vote-itemlists .badge-primary:after{border-color: {$voteitembadgecolor};}
+{/if}
+{if !empty($voteitembtncolor)}
+.voteBox .btn-primary{background-color: {$voteitembtncolor};}
+{/if}
+{if !empty($votenamecolor)}
+.vote-itemlists .list-mes .list-title{color: {$votenamecolor}}
+{/if}
+</style>
+<section class="vote-itemlists">
+	{if !empty($groups)}
+	<div class="votegroups">
+		<ul class="zam-app-flex zam-app-justifyCenter">
+		{foreach $groups as $gkey=>$group}
+        	<li class="limitbox" data-groupid="{$group['id']}">{$group['groupname']}</li>
+        {/foreach}
+        </ul>
+	</div>
+	{/if}
+	<div class="list-theme1 vote-item zam-app-flex zam-app-flex-wrap">
+	{if empty($groups)}
+		{foreach $rotate['items'] as $ikey=>$ival}
+		<div class="list-item item-{$ival['id']}">
+			<div class="list-img{if empty($ival['voteimg'])} hidden{/if}" {if isset($ival['votebigimg']) && !empty($ival['votebigimg'])}data-bigimg="{$ival['votebigimg']}"{/if}>
+				<img src="{$ival['voteimg']}">
+			</div>
+			<div class="list-mes">
+					<h3 class="list-title">{:$ival['votename']}</h3>
+					{if $rotate['votetype'] != '2'}
+							{if $hdinfo['id']=='-1'}
+								<div class="zam-app-flex-ajCenter2 numcontrolbox">
+									<div class="numdec">-</div>
+									<div class="numshuzi zam-app-flex-ajCenter">1</div>
+									<div class="numinc">+</div>
+								</div>
+								<div class="list-mes-item">
+									<a href="javascript:;" class="btn btn-primary btn-votemore{if in_array($ival['id'],$rotate['myvotedids'])} btn-disabled{/if}" data-voteid="{$ival['id']}">
+										{if in_array($ival['id'],$rotate['myvotedids'])}
+											已{$appconfig['votetxt']??'投票'}此项
+										{else}
+											<i class="mxc-appreciate_light"></i> {$appconfig['votetxt']??'投票'}
+										{/if}
+									</a>
+								</div>
+							{else /}
+								<div class="list-mes-item">
+									{if $rotate['votetype']=='1'}
+										<a href="javascript:;" class="btn btn-{if !in_array($ival['id'],$rotate['myvotedids'])}primary{else /}{if isset($rotate['autocancel']) && $rotate['autocancel'] == '1' && isset($rotate['canceltype']) && $rotate['canceltype'] == '2'}danger{else /}disabled{/if}{/if} btn-vote" data-voteid="{$ival['id']}">
+											{if in_array($ival['id'],$rotate['myvotedids'])}
+												{if isset($rotate['autocancel']) && $rotate['autocancel'] == '1' && isset($rotate['canceltype']) && $rotate['canceltype'] == '2'}
+												<i class="mxc-close"></i> 撤回
+												{else /}
+												已{$appconfig['votetxt']??'投票'}此项
+												{/if}
+											{else}
+												<i class="mxc-appreciate_light"></i> {$appconfig['votetxt']??'投票'}
+											{/if}
+										</a>
+									{else /}
+										<a href="javascript:;" class="btn btn-primary {if $hdinfo['id']=='tzyhd'}btn-popvote{else /}btn-vote{/if}" data-voteid="{$ival['id']}">
+											<i class="mxc-appreciate_light"></i> {$appconfig['votetxt']??'投票'}
+										</a>
+									{/if}
+								</div>
+							{/if}
+					{else /}
+						{if $hdinfo['id']=='chehuivoteandcomment'}
+							<div class="list-mes-item">
+								<a href="javascript:;" class="btn btn-{if !in_array($ival['id'],$rotate['myvotedids'])}primary{else /}danger{/if} btn-vote" data-voteid="{$ival['id']}">
+									{if in_array($ival['id'],$rotate['myvotedids'])}
+										<i class="mxc-close"></i> 撤回
+									{else /}
+										<i class="mxc-appreciate_light"></i> {$appconfig['votetxt']??'投票'}
+									{/if}
+								</a>
+								<a href="javascript:;" class="btn btn-primary btn-comment" data-voteid="{$ival['id']}">
+									<i class="mxc-edit"></i> 点评
+								</a>
+							</div>
+						{else /}
+							{if $rotate['minselect']=='1' && $rotate['maxselect']=='1'}
+								<div class="list-mes-item">
+									<a href="javascript:;" class="btn btn-primary btn-vote{if in_array($ival['id'],$rotate['myvotedids'])} btn-disabled{/if}" data-voteid="{$ival['id']}">
+										{if in_array($ival['id'],$rotate['myvotedids'])}已{$appconfig['votetxt']??'投票'}此项{else}<i class="mxc-appreciate_light"></i> {$appconfig['votetxt']??'投票'}{/if}
+									</a>
+								</div>
+							{else /}
+								<div class="list-mes-item zam-app-justifyCenter zam-app-alignCenter" style="padding:0.12rem 0;">
+									<span class="list-checkbox">
+										<input id="voteitem-{$ival['id']}" type="checkbox" value="{$ival['id']}" name="voteids[]" {if in_array($ival['id'],$rotate['myvotedids'])}disabled{/if} onclick="moreselect(this)">
+										<label for="voteitem-{$ival['id']}"></label>
+									</span>
+								</div>
+							{/if}
+						{/if}
+					{/if}
+			</div>
+			{if $hdinfo['id']=='boshengvotebadge'}
+				<div class="list-number">
+					<span class="badge badge-radius badge-primary">
+					{if $ikey < 9}00{elseif $ikey >= 9 && $ikey < 100}0{/if}{$ikey+1}
+					</span>
+				</div>
+			{else /}
+				<div class="list-number"><span class="badge badge-radius badge-primary">{$ikey+1}</span></div>
+			{/if}
+		</div>
+		{/foreach}
+	{/if}
+	</div>
+</section>
+{if $rotate['votetype']=='2' && $rotate['myremain'] > 0 && ($rotate['minselect']!='1' || $rotate['maxselect']!='1')}
+<div class="votetype2-btn">
+	<span class="btn btn-primary btn-block"><i class="mxc-appreciate_light"></i> {$appconfig['votetxt']??'投票'}</span>
+</div>
+{/if}
+<footer class="m-tabbar m-tabbar tabbar-fixed vote-ftab">
+    <a href="javascript:;" data-href="{:gowechat('vote/index',array('hdid'=>$hdinfo['hdid']))}" data-module="vote" class="tabbar-item tabbar-active">
+        <span class="tabbar-icon">
+            <i class="mxc-unie6cc"></i>
+        </span>
+        <span class="tabbar-txt">{$appconfig['votetxt']??'投票'}</span>
+    </a>
+    {if !isset($appconfig['apppageconfig']['openwxphb']) || (isset($appconfig['apppageconfig']['openwxphb']) && $appconfig['apppageconfig']['openwxphb']=='1')}
+    <a href="javascript:;" data-href="{:gowechat('vote/phb',array('hdid'=>$hdinfo['hdid']))}" data-module="vote" class="tabbar-item">
+        <span class="tabbar-icon">
+            <i class="mxc-unie722"></i>
+        </span>
+        <span class="tabbar-txt">排行榜</span>
+    </a>
+    {/if}
+    {if !isset($appconfig['apppageconfig']['openrule']) || (isset($appconfig['apppageconfig']['openrule']) && $appconfig['apppageconfig']['openrule']=='1')}
+    <a href="javascript:;" data-href="{:gowechat('vote/guize',array('hdid'=>$hdinfo['hdid']))}" data-module="vote" class="tabbar-item">
+        <span class="tabbar-icon">
+            <i class="mxc-unie699"></i>
+        </span>
+        <span class="tabbar-txt">规则</span>
+    </a>
+    {/if}
+</footer>
+<style type="text/css">
+.votecommentbox{
+	position: fixed;
+	top:0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0,0,0,0.8);
+	color: #fff;
+	z-index: 49
+}
+.votecommentbox .votecommentbody{
+	position: relative;
+	width: calc(100% - 2rem);
+    background-color: #f0f0f0;
+    border: 1px solid #cfcfcf;
+    border-radius: .2rem;
+    cursor: pointer;
+    padding:0.4rem;
+    box-sizing: border-box;
+}
+.votecommentbox .votecommentbody .commentcont{
+	width: 100%;
+	border: 1px solid #cfcfcf;
+	box-sizing: border-box;
+	height: 4.6rem;
+	border-radius: .1rem;
+	font-size: 0.28rem;
+	padding: 0.1rem;
+	box-sizing: border-box;
+}
+.votecommentbox .votecommentbody .close{
+	position: absolute;
+	width: 0.6rem;
+	height: 0.6rem;
+	background-color: #f0f0f0;
+	top: -0.2rem;
+	right: -0.2rem;
+	color: #292929;
+	border-radius: 50%;
+	cursor: pointer;
+}
+.votecommentbox .votecommentbody .close i{
+	font-size: 0.44rem;
+	font-weight: 600;
+}
+.votecommentbox .votecommentbody .votecommentbtn{margin-top: 0.32rem;}
+.votecommentbox .votecommentbody .votecommentbtn .btn{padding: 0.2rem 0.42rem;line-height: inherit;}
+</style>
+<section class="votecommentbox zam-app-flex-ajCenter hidden" data-voteid="0">
+	<div class="votecommentbody zam-app-flex-ajCenter">
+		<span class="close"><i class="mxc-close"></i></span>
+		<textarea class="commentcont" placeholder="请输入点评内容"></textarea>
+		<div class="votecommentbtn">
+			<a class="btn btn-primary btn-confirm" href="javascript:;">提交点评</a>
+		</div>
+	</div>
+</section>
+<style type="text/css">
+.votepopbox{
+	position: fixed;
+	top:0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0,0,0,0.8);
+	color: #fff;
+	z-index: 49;
+	user-select: none;
+	-webkit-tap-highlight-color:transparent;
+}
+.votepopbox .votepopbody{
+	position: relative;
+	width: calc(100% - 1.2rem);
+    background-color: #f0f0f0;
+    border: 1px solid #cfcfcf;
+    border-radius: .2rem;
+    cursor: pointer;
+    padding:0.4rem;
+    box-sizing: border-box;
+}
+.votepopbox .votepopbody .controlbox{
+	width: 100%;
+	border: 1px solid #cfcfcf;
+	box-sizing: border-box;
+	border-radius: .1rem;
+	font-size: 0.28rem;
+	padding: 0.1rem;
+	box-sizing: border-box;
+	color: #333;
+	padding: 0.42rem;
+}
+.votepopbox .votepopbody .controlbox .votetitle{
+	text-align: center;
+	font-size: 0.32rem;
+	margin-bottom: 0.32rem;
+}
+.votepopbox .votepopbody .controlbox .votetitle .votename{
+	font-weight: bold;
+}
+.votepopbox .votepopbody .close{
+	position: absolute;
+	width: 0.6rem;
+	height: 0.6rem;
+	top: -0.2rem;
+	right: -0.2rem;
+	cursor: pointer;
+	background-image: url(/static/images/wechat/vote/pop/close.png);
+	background-size: cover;
+    background-repeat: no-repeat;
+}
+.votepopbox .votepopbody .votepopbtn{margin-top: 0.32rem;}
+.votepopbox .votepopbody .votepopbtn .btn{
+	height: 0.8rem;
+    line-height: 0.8rem;
+    margin: 0.1rem auto;
+    padding: 0 0.6rem;
+    font-size: 0.32rem;
+}
+.votepopbox .votepopbody .spinner{
+	height: 0.86rem;
+	background-color: #595858;
+	border-color: #cfcfcf;
+	padding: 0 0.2rem;
+	border-radius: 0.12rem;
+}
+.votepopbox .votepopbody .spinner div {
+    width: .6rem;
+    height: .6rem;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+.votepopbox .votepopbody .spinner .dec {
+	background-image: url(/static/images/wechat/vote/pop/dec.png);
+}
+.votepopbox .votepopbody .spinner .inc {
+	background-image: url(/static/images/wechat/vote/pop/inc.png);
+}
+.votepopbox .votepopbody .spinner .zannum {
+    width: 1.8rem;
+    height: .6rem;
+    line-height: normal;
+    text-align: center;
+    color: #666;
+    border: none;
+    font-size: .26rem;
+    background-color: #fff;
+    border: 1px solid #cfcfcf;
+    border-top-width: 0;
+    border-bottom-width: 0;
+    margin: 0 0.2rem;
+    border-radius: 0.12rem;
+}
+</style>
+<section class="votepopbox zam-app-flex-ajCenter hidden" data-voteid="0">
+	<div class="votepopbody zam-app-flex-ajCenter">
+		<span class="close"></span>
+		<div class="controlbox">
+			<div class="votetitle">给<span class="votename"></span>{$appconfig['votetxt']??'投票'}</div>
+			<div class="votenum zam-app-flex-ajCenter2">
+				<div class="spinner zam-app-flex-ajCenter2">
+	                <div class="dec"></div>
+	                <input type="number" class="zannum" value="1"  />
+	                <div class="inc"></div> 
+            	</div>
+			</div>
+		</div>
+		<div class="votepopbtn">
+			<a class="btn btn-primary btn-confirm" href="javascript:;">确定</a>
+		</div>
+	</div>
+</section>
+<style type="text/css">
+.votebigpopbox{
+	position: fixed;
+	top:0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0,0,0,0.8);
+	color: #fff;
+	z-index: 49;
+	user-select: none;
+	-webkit-tap-highlight-color:transparent;
+}
+.votebigpopbox .votebigpopbody{
+	position: relative;
+	top:0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+.votebigpopbox .votebigpopbody .bigimgbox{
+	position: relative;
+	background-color: #fcebb5;
+    border-radius: .2rem;
+    padding:0.2rem;
+	max-width: calc(100% - 0.8rem);
+	max-height: calc(100% - 2rem);
+}
+.bigimgbox.imgani{
+	animation: imgscale 1.5s ease;
+    -webkit-animation: imgscale 1.5s ease;
+}
+.votebigpopbox .votebigpopbody .bigimgbox .close{
+	position: absolute;
+	width: 0.6rem;
+	height: 0.6rem;
+	top: 0.4rem;
+	right: 0.4rem;
+	cursor: pointer;
+	background-color: rgba(0,0,0,0.42);
+	border-radius: 50%;
+	color: #fcebb5
+}
+.votebigpopbox .votebigpopbody .bigimgbox .close i{
+	font-size: 0.42rem;
+	font-weight: bold;
+}
+.votebigpopbox .votebigpopbody .bigimgbox img{
+	max-width: 100%;
+	max-height: 100%;
+	border-radius: .2rem;
+	
+}
+@keyframes imgscale {
+    from {
+        transform: scale(1.2);
+    }
+
+    to {
+        transform: scale(1);
+    }
+}
+.votebigpopbox .loadadv-iconbox{
+	position: absolute;
+	top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+	width: 3rem;
+	height: 3rem;
+}
+.votebigpopbox .loadadv-iconbox .loadadv-icon{
+	width: 0.52rem;
+    height: 0.52rem;
+    margin: 0 auto;
+    border: 2px solid #999;
+    border-radius: 50%;
+    border-left-color: transparent;
+    border-right-color: transparent;
+    animation: cssload-spins .4s infinite linear;
+    -webkit-animation: cssload-spins .4s infinite linear;
+}
+@keyframes cssload-spins{100%{transform:rotate(360deg);transform:rotate(360deg)}}
+.votebigpopbox .loadadv-iconbox .loadadv-txt{
+	margin-top: 0.32rem;
+	text-align: center;
+	font-size: 0.32rem;
+	color: #fff;
+}
+</style>
+<section class="votebigpopbox zam-app-flex-ajCenter hidden">
+	<div class="votebigpopbody zam-app-flex-ajCenter">
+		<div class="loadadv-iconbox zam-app-flex-ajCenter hidden">
+	        <div class="loadadv-icon"></div>
+	        <div class="loadadv-txt">图片加载中...</div>
+	    </div>
+	    <div class="bigimgbox zam-app-flex-ajCenter2 hidden">
+			<span class="close zam-app-flex-ajCenter2" onclick="javascript:$('.votebigpopbox,.votebigpopbox .loadadv-iconbox,.votebigpopbox .bigimgbox').addClass('hidden');"><i class="mxc-close"></i></span>
+			<img src="" />
+		</div>
+	</div>
+</section>
+<script>
+var clicked = false,maxselect = parseInt("{$rotate['maxselect']}"),minselect = parseInt("{$rotate['minselect']}"),rotateid = "{$rotate['id']}",votetype = "{$rotate['votetype']}",autocancel = "{$rotate['autocancel']??2}",canceltype = "{$rotate['canceltype']??1}",selvoteids = [];
+require(['wechatcore'],function (wechatcore) {
+$(".vote-searchBox .btn").click(function(){
+	var $this = $(this),inputval = $this.prev().val(),listitems = $(".list-theme1 .list-item");
+	if(inputval==''){
+		listitems.removeClass('hidden');
+		return false;
+	}
+	listitems.addClass('hidden');
+	var filtertitles = listitems.find('.list-title').filter(":contains('"+inputval+"')");
+	if(filtertitles.length > 0){
+		filtertitles.each(function(){
+			$(this).parent().parent().removeClass('hidden');
+		});
+	}
+	//listitems.addClass('hidden').filter(":contains('"+inputval+"')").removeClass('hidden');
+});
+$(".vote-itemlists").on('click','.list-img',function(){
+	var $this = $(this),bigimg = $this.attr('data-bigimg') || '';
+	if(bigimg!=''){
+		$(".votebigpopbox,.votebigpopbox .loadadv-iconbox").removeClass('hidden');
+		var img = new Image();
+        img.onload = img.onerror = function(){
+        	setTimeout(function(){
+        		$(".votebigpopbox img").attr('src',bigimg);
+        		$(".votebigpopbox .loadadv-iconbox").addClass('hidden');
+        		$(".votebigpopbox .bigimgbox").removeClass('hidden').addClass('imgani').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function () {
+        			$(this).removeClass('imgani');
+        		});
+        	},1e2);
+        };
+        img.src = bigimg;
+	}
+});
+$(".vote-item").on('click','.list-mes-item .btn-vote',function(){
+	var $this = $(this),openautocancel = (votetype == '1' && autocancel == '1'),isaddnum = $this.hasClass('btn-primary') ? '1' : '2';
+	var remainnum = parseInt($(".timeremain .remainnums span").text());
+	if(isaddnum == '1' && remainnum <= 0) {
+		if(!openautocancel || (openautocancel && canceltype == '2')){
+			return wechatcore.msg('您已无可'+votetxt+'数');
+		}
+	}
+	if(isaddnum == '2' && (!openautocancel || (openautocancel && canceltype == '1'))){
+		return false;
+	}
+	var voteid = $(this).attr('data-voteid');
+	var votename = $(this).parent().parent().find('.list-title').text();
+	if(clicked) return;
+	clicked = true;
+	var warntitle = isaddnum=='1' ? '温馨提醒' : '警告';
+	var warndes = isaddnum=='1' ? '确定给'+votename+votetxt+'么?' : '确定要撤回'+votename+'的'+votetxt+'么?';
+	wechatcore.ask(warntitle,warndes,['确定','取消'],function(k){
+		wechatcore.ajaxSubmit('{:gowechat("vote/ajaxvote")}',{rotateid:rotateid,voteid:voteid,isaddnum:isaddnum,votetxt:votetxt},'正在处理请求..').then(function(data){
+			clicked = false;
+			wechatcore.close(k);
+			if(data.code==0){
+				if(isaddnum=='1'){
+					$(".timeremain .remainnums span").text(remainnum>0?remainnum-1:0);
+					if(votetype == '1') {
+						$this.removeClass('btn-primary');
+						if(openautocancel){
+							if(canceltype == '1'){
+								$('.vote-itemlists .btn-vote.btn-disabled').html(`<i class="mxc-appreciate_light"></i> ${votetxt}`).removeClass('btn-disabled').addClass('btn-primary');
+								$this.text('已'+votetxt+'此项').addClass('btn-disabled');
+							}else{
+								$this.html('<i class="mxc-close"></i> 撤回').addClass('btn-danger');
+							}
+						} else {
+							$this.text('已'+votetxt+'此项').addClass('btn-disabled');
+						}
+					}
+					wechatcore.msg(votetxt+'成功');
+				}else{
+					$(".timeremain .remainnums span").text(remainnum+1);
+					$this.html('<i class="mxc-appreciate_light"></i> '+votetxt).removeClass('btn-danger').addClass('btn-primary');
+					wechatcore.msg('撤回成功');
+				}
+			}else if(data.code==-2){
+				wechatcore.showtopmsg(data.msg,1e3,function(){
+					wechatcore.reloadpage();
+				});
+			}else{
+				wechatcore.msg(data.msg);
+			}
+		}, function(){
+			clicked = false;
+			wechatcore.close(k);
+			wechatcore.msg('请求失败，请稍后重试');
+		});
+	},function(){
+		clicked = false;
+	});
+});
+{// bosheng定制评论}
+{if $hdinfo['id']!='chehuivoteandcomment'}
+	$(".vote-item").on('click','.list-mes-item .btn-comment',function(){
+		var $this = $(this),voteid = $(this).attr('data-voteid');
+		$(".votecommentbox").removeClass('hidden').attr('data-voteid',voteid);
+	});
+	$(".votecommentbox .close").click(function(){
+		$('.votecommentbox').addClass('hidden');
+	});
+	var clickconfirm = false;
+	$(".votecommentbox .btn-confirm").click(function(){
+		var voteid = $(".votecommentbox").attr('data-voteid'),commentdes = $(".votecommentbox textarea").val();
+		if(typeof(commentdes)==='undefined' || commentdes==''){
+			return wechatcore.msg('请输入点评内容');
+		}
+		if(clickconfirm) return false;
+		clickconfirm = true;
+		wechatcore.ajaxSubmit('{:gowechat("vote/ajaxcomment")}',{rotateid:rotateid,voteid:voteid,comment:commentdes},'正在提交点评内容..').then(function(data){
+			if(data.code==0){
+				$(".votecommentbox textarea").val('');
+				$(".votecommentbox .close").trigger('click');
+				wechatcore.msg('提交成功');
+			}else{
+				wechatcore.msg(data.msg);
+			}
+			clickconfirm = false;
+			
+		}, function(){
+			clickconfirm = false;
+			wechatcore.msg('请求失败，请稍后重试');
+		});
+	});
+{/if}
+{// 其他功能}
+$(".vote-item").on('click','.list-mes-item .btn-votemore',function(){
+	var $this = $(this),remainnum = parseInt($(".timeremain .remainnums span").text()),voteid = $(this).attr('data-voteid'),votename = $(this).parent().parent().find('.list-title').text(),voteshuzi = $(this).parent().prev().find(".numshuzi").text() || '1';
+	if(clicked) return;
+	clicked = true;
+	wechatcore.ask('温馨提醒','确定给'+votename+votetxt+'么?',['确定','取消'],function(k){
+		wechatcore.ajaxSubmit('{:gowechat("vote/ajaxvote3")}',{rotateid:rotateid,voteid:voteid,votetxt:votetxt,voteshuzi:voteshuzi},'正在处理请求..').then(function(data){
+			clicked = false;
+			wechatcore.close(k);
+			if(data.code==0){
+				$(".timeremain .remainnums span").text(remainnum>0?remainnum-1:0);
+				$this.text('已'+votetxt+'此项').addClass('btn-disabled');
+				wechatcore.msg(votetxt+'成功');
+			}else if(data.code==-2){
+				wechatcore.showtopmsg(data.msg,1e3,function(){
+					wechatcore.reloadpage();
+				});
+			}else{
+				wechatcore.msg(data.msg);
+			}
+		}, function(){
+			clicked = false;
+			wechatcore.close(k);
+			wechatcore.msg(votetxt+'失败，请稍后重试');
+		});
+	},function(){
+		clicked = false;
+	});
+});
+$(".votetype2-btn").on('click',function(){
+	var remainnum = parseInt($(".timeremain .remainnums span").text());
+	if(remainnum <= 0) {
+		return wechatcore.msg('您已无可'+votetxt+'数');
+	}
+	if(selvoteids.length==0){
+		return wechatcore.msg('请选择'+votetxt+'项目');
+	}
+	if(selvoteids.length > remainnum){
+		return wechatcore.msg('最多选'+remainnum+'项');
+	}
+	if(remainnum >= minselect && selvoteids.length < minselect){
+		return wechatcore.msg('最少选'+minselect+'项');
+	}
+	if(clicked) return;
+	clicked = true;
+	wechatcore.ajaxSubmit('{:gowechat("vote/ajaxvoteids")}',{rotateid:rotateid,voteids:selvoteids,votetxt:votetxt},'正在处理请求..').then(function(json){
+		if(json.code==0){
+			wechatcore.msg(votetxt+'成功');
+			setTimeout(function(){
+				clicked = false;
+				wechatcore.reloadpage();
+			},1e3);
+		}else if(json.code==-2){
+			wechatcore.showtopmsg(data.msg,1e3,function(){
+				clicked = false;
+				wechatcore.reloadpage();
+			});
+		}else{
+			clicked = false;
+			wechatcore.msg(json.msg);
+		}
+	}, function(){
+		clicked = false;
+		wechatcore.msg(votetxt+'失败，请稍后重试');
+	});
+});
+var groupclicked = false;
+$(".votegroups li").click(function(){
+	var groupid = $(this).attr('data-groupid')||'';
+	if(groupid!=''){
+		$(this).addClass('active').siblings().removeClass('active');
+		if(groupclicked){
+			return false;
+		}
+		groupclicked = true;
+		wechatcore.ajaxSubmit('{:gowechat("vote/dzajaxgroupvote")}',{groupid:groupid,votetxt:votetxt},'正在加载中..').then(function(data){
+			if(data.code==0){
+				$(".vote-item").html(data.msg);
+				if(votetype == '2'){
+					$(".vote-itemlists input:checkbox").each(function(){
+						var vid = $(this).val()||'', ischecked = $(this).prop("checked"), isdisabled = $(this).prop("disabled");
+						if(!ischecked && !isdisabled && selvoteids.indexOf(vid) !== -1){
+							$(this).prop("checked", true);
+						}
+					});
+				}
+			}else{
+				wechatcore.msg(data.msg);
+			}
+			groupclicked = false;
+		}, function(){
+			groupclicked = false;
+			wechatcore.msg('请求失败，请稍后重试');
+		});
+	}
+});
+if($(".votegroups li").length > 0){
+	$(".votegroups li").eq(0).trigger('click');
+}
+//点赞
+$(".vote-item").on('click','.list-mes-item .btn-popvote',function(){
+	var $this = $(this),voteid = $(this).attr('data-voteid'),votename = $this.parent().prev().text();
+	$(".votepopbox .controlbox .votename").text(votename);
+	$(".votepopbox").removeClass('hidden').attr('data-voteid',voteid);
+});
+$(".votepopbox .close").click(function(){
+	$(".votepopbox .zannum").val('1');
+	$('.votepopbox').addClass('hidden');
+});
+$(".votepopbox .dec").click(function(){
+	var zannum = parseInt($('.votepopbox .zannum').val());
+	if(isNaN(zannum)){
+		$('.votepopbox .zannum').val(0);
+		return false;
+	}
+	zannum -= 1;
+	if(zannum < 0){
+		zannum = 0;
+	}
+	$('.votepopbox .zannum').val(zannum);
+});
+$(".votepopbox .inc").click(function(){
+	var zannum = parseInt($('.votepopbox .zannum').val());
+	if(isNaN(zannum)){
+		$('.votepopbox .zannum').val(1);
+		return false;
+	}
+	zannum += 1;
+	if(zannum > 3){
+		zannum = 3;
+	}
+	$('.votepopbox .zannum').val(zannum);
+});
+$(".votepopbox input").blur(function(){
+	var zannum = parseInt($('.votepopbox .zannum').val());
+	if(isNaN(zannum)){
+		$('.votepopbox .zannum').val(1);
+		return false;
+	}
+	if(zannum > 3){
+		zannum = 3;
+	}
+	if(zannum < 0){
+		zannum = 0;
+	}
+	$('.votepopbox .zannum').val(zannum);
+});
+var clickzanconfirm = false;
+$(".votepopbox .btn-confirm").click(function(){
+	var voteid = $(".votepopbox").attr('data-voteid'),zannum = $(".votepopbox .zannum").val();
+	if(typeof(zannum)==='undefined' || zannum==''){
+		return wechatcore.msg('请输入'+votetxt+'数量');
+	}
+	zannum = parseInt(zannum);
+	if(zannum > 3 || zannum <= 0){
+		return wechatcore.msg(votetxt+'数量需大于等于1，小于等于3');
+	}
+	if(clickzanconfirm) return false;
+	clickzanconfirm = true;
+	wechatcore.ajaxSubmit('{:gowechat("vote/ajaxzan")}',{rotateid:rotateid,voteid:voteid,num:zannum,votetxt:votetxt},'正在提交..').then(function(data){
+		if(data.code==0){
+			
+			$(".votepopbox .close").trigger('click');
+			wechatcore.msg(votetxt+'成功');
+		}else{
+			wechatcore.msg(data.msg);
+		}
+		clickzanconfirm = false;
+		
+	}, function(){
+		clickzanconfirm = false;
+		wechatcore.msg('请求失败，请稍后重试');
+	});
+});
+$(".numcontrolbox .numdec").click(function(){
+	var $this = $(this),numshuzi = $this.next().text() || '1';
+	numshuzi = parseInt(numshuzi);
+	numshuzi--;
+	if(numshuzi <= 0){
+		numshuzi = 1;
+	}
+	$this.next().text(numshuzi);
+});
+$(".numcontrolbox .numinc").click(function(){
+	var $this = $(this),numshuzi = $this.prev().text() || '1';
+	numshuzi = parseInt(numshuzi);
+	numshuzi++;
+	if(numshuzi > 5){
+		numshuzi = 5;
+	}
+	$this.prev().text(numshuzi);
+});
+});
+function moreselect(obj){
+	require(['wechatcore'],function(wechatcore){
+		var selid = $(obj).val()||'', selected = $(obj).prop('checked'), sindex = selvoteids.indexOf(selid);
+		if(selected){
+			var remainnum = parseInt($(".timeremain .remainnums span").text());
+			if(selvoteids.length >= remainnum){
+				$(obj).prop('checked',false);
+				return wechatcore.msg(remainnum == maxselect ? '最多可选' + remainnum + '项' : '仅剩'+remainnum+'项可选');
+			}
+			if (sindex === -1) {
+				selvoteids.push(selid);
+			}
+		}else{
+			if (sindex !== -1) {
+				selvoteids.splice(sindex, 1);
+			}
+		}
+	});
+}
+</script>
+{if $hdinfo['id']=='yangyangyang'}
+{include file="vote/fastvote" /}
+{/if}
+{include file="vote/footer" /}

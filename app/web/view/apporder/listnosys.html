@@ -1,0 +1,140 @@
+{include file='$Wpath/common/header'}
+<div class="alert alert-danger" role="alert">
+    <i class="mdi mdi-bell-ring"></i> 活动前台订单即为使用用户类支付模板，活动用户在霸屏等微信端产生的订单，此类收入因为支付到了活动主办方对应的商户，跟平台没有直接关联，无需提现
+</div>
+<table id="listtable" class="zam-btable"></table>
+<script>
+require(['webcore','webtable','jconfirmBox','zamnotice'],function(webcore,webtable,jconfirmBox,zamnotice){
+var initConfig = {
+	tableId:'#listtable',
+	url:"{:goweb('apporder/listnosys')}",
+	columnoperate:{
+        btns:{
+            refund:{title:"退款",icon:"mdi-gavel",'except':{'only':'1'}},
+        },
+	    func:{
+    	    refund:function(value, row, index){
+            	jconfirmBox.confirm('温馨提示','您确定要退款么？',function(){
+            			webcore.ajaxSubmit("{:goweb('apporder/refundnosys')}",{orderid:row.id},'处理中..').then(function(json){
+            				if(json.code==0){
+            				    webtable.refresh();
+            				    zamnotice.showTips('success','退款发起成功，请稍后查看退款结果');
+            			    }else{
+            			        zamnotice.showTips('error',json.msg);
+            			    }
+            			}, function(json){
+            				zamnotice.showTips('error','网络差。操作失败');
+            			});
+            	});
+    	    },
+	    }
+	},
+	columns:[{
+			checkbox: true,
+		}, 
+		{
+			field: 'id',
+			title: 'ID',
+			align: 'center',
+            width:'6%',
+			visible: false
+		}, {
+            field: 'hdtitle',
+            title: '活动',
+            align:'center',
+            width:'10%',
+            formatter: function (value, row, index) {
+                if(row.huodong_id=='0') return '-';
+                var html = "<div><span>"+(value==null?"已删除":value)+"</span></div><div class='m-t-5'><span>id:"+row.huodong_id+"</span></div>";
+                return html;
+            },
+        }, {
+            field: 'userinfo',
+            title: '用户',
+            align:'center',
+            width:'10%',
+            formatter: function (value, row, index) {
+                var html = '<div class="zam-flex-column-center"><img class="avatarImg m-b-10" src="'+(value.wxheadimg?value.wxheadimg:value.avatar)+'" /><span>'+(value.wxname?value.wxname:value.nickname)+'</span></div>';
+                return html;
+            },
+        }, {
+            field: 'statusname',
+            title: '状态',
+            align:'center',
+            formatter: function (value, row, index) {
+                var html = value;
+                if(row.paytype=='1' && row.status=='4'){
+                	html += "<div>退款单号:"+row.refund_id+"</div>";
+                }
+                return html;
+            },
+             width:'10%',
+        },  {
+            field: 'paytypename',
+            title: '支付方式',
+            align: 'center',
+        }, {
+            field: 'tradeid',
+            title: '订单号',
+            align:'center',
+        }, {
+            field: 'payfee',
+            title: '支付金额(元)',
+            align:'center',
+            formatter: function (value, row, index) {
+                var html = value;
+                if(row.fromtype=='baping' && (row.fromstype=='2' || row.fromstype=='4')){
+                    html += "<div><span class='text-danger m-t-5 m-r-5'>艺人分成:</span>"+row.splitfee/100+"元</div>";
+                }
+                if(row.fromtype=='baping' && row.fromstype=='3'){
+                    html += "<div><span class='text-danger m-t-5 m-r-5'>手续费:</span>"+row.poundage/100+"元</div>";
+                }
+                return html;
+            },
+        },  {
+			field: 'fromtypename',
+			title: '来源',
+			align: 'center',
+		},  {
+			field: 'payinfo',
+			title: '订单详情',
+			align: 'center',
+			formatter: function (value, row, index) {
+                var html = '<div>'+value.project+'</div>';
+                if(row.fromtype=='hdpayjoin'){
+                    html += '<div>'+value.day+'天</div>'
+                }
+                return html;
+            },
+		},  {
+            field: 'create_time',
+            title: '下单时间',
+            align: 'center',
+        }
+	],
+	searchParamas:[{'type':'1','id':'keyword'},{'type':'2','id':'atttype'}],
+	toolbar:{
+	    del:function(ajaxurl){
+	        var getSelects = webtable.getSelections();
+            if(!getSelects.length){
+                return zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+            jconfirmBox.confirm('温馨提示','您确定要删除选中的数据么？',function(){
+                webcore.ajaxSubmit(ajaxurl,{attid:getSelects},'处理中..').then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','删除成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+	    },
+	},
+};
+webtable.init(initConfig);
+});
+</script>
+{include file='$Wpath/common/footer'}

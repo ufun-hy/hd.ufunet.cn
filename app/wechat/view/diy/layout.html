@@ -1,0 +1,55 @@
+{php}$timestamp = '1.686';{/php}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title></title>
+    <link rel="shortcut icon" href="{:globalico()}" />
+	{if isset($clienttype) && $clienttype=='1'}
+        <script src="https://res.wx.qq.com/open/js/jweixin-1.6.0.js" type="text/javascript"></script>
+    	<script type="text/javascript">wx.config({:$jssdk});</script>
+    {elseif isset($clienttype) && $clienttype=='2'}
+        <script src="__STATIC__/js/wechatjs/douyin.open.js"></script>
+    {/if}
+    <script src="__STATIC__/js/amfe-flexible/amfe-flexible.js"></script>
+    <script src="__STATIC__/js/vue/vue.min.js"></script>
+    <!-- <script src="__STATIC__/js/vue/vue-router/vue-router.js"></script> -->
+    <link rel="stylesheet" href="__STATIC__/js/vant/vant.rem.css" />
+    <script src="__STATIC__/js/vant/vant.min.js"></script>
+    <script src="__STATIC__/js/axios/axios.min.js"></script>
+    <script src="__STATIC__/js/howler/howler.min.js?t={:$timestamp}"></script>
+    <link rel="stylesheet" href="__STATIC__/css/animate.min.css" />
+    <script src="__STATIC__/js/videojs/TcPlayer-4.9.1/libs/hls.min.js"></script>
+    <script src="__STATIC__/js/videojs/TcPlayer-4.9.1/libs/TXLivePlayer.min.js"></script>
+    <script src="__STATIC__/js/videojs/TcPlayer-4.9.1/tcplayer.min.js"></script>
+    <link rel="stylesheet" href="__STATIC__/js/videojs/TcPlayer-4.9.1/tcplayer.min.css" />
+    <link rel="stylesheet" href="__STATIC__/css/diy/mobile/mobile.css?t={$timestamp}" />
+    <link rel="stylesheet" href="__STATIC__/css/diy/mobile/iconfont.css" />
+    {block name="header"}{/block}
+</head>
+<body class="wechatbody">
+    <div id="app">
+        <div class="app-loadding-box d-flex flex-j-c-c flex-a-i-c" ref="apploading">
+            <div class="app-loading d-flex flex-j-c-s-b flex-a-i-f-e">
+                <div class="app-loading-line"></div>
+                <div class="app-loading-line"></div>
+                <div class="app-loading-line"></div>
+            </div>
+        </div>
+        {if $hdinfo['ispub'] != '1'}
+            <div class="nopub-tip" ref="nopubtip">活动尚未发布，当前仅供预览</div>
+        {/if}
+        {block name="app"}{/block}
+    </div>
+</body>
+{block name="footer"}{/block}
+{:globalcss()}
+{if !empty($hdinfo['diycss'])}
+<style type="text/css">{$hdinfo['diycss']}</style>
+{/if}
+{if isset($appconfig['style']) && isset($appconfig['style']['diycss']) && !empty($appconfig['style']['diycss'])}
+<style type="text/css">{$appconfig['style']['diycss']}</style>
+{/if}
+{:globalbaiducalc()}
+</html>

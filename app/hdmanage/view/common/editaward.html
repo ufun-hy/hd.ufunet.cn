@@ -1,0 +1,452 @@
+{php}
+$cjconfig = \app\common\service\web\moduleconfigService::getmoduleconfig($gametype);
+$isroundcj = $cjconfig['isroundcj']??'2';
+{/php}
+<style type="text/css">
+.ztree li span.button.roots_docu::before{content: ""}
+.ztree li a:hover {
+  text-decoration: none;
+}
+.editgroupperson b{font-size: 12px;padding:2px 5px;}
+</style>
+<div class="form-horizontal confirmbox-pop">
+<form class="confirm-formbox" method="post">
+    <div class="text-center">
+        <div class="btn-group pop-btns" style="margin-bottom:10px;">
+          <a href="javascript:void(0)" class="btn btn-default btn-primary"><span>基础设置</span></a>
+          <a href="javascript:void(0)" class="btn btn-default"><span>用户组设置</span></a>
+        </div>
+    </div>
+    <div class="carditem">
+    	<div class="form-group">
+		    <label class="col-lg-3 control-label">* 类型</label>
+		    <div class="col-lg-8">
+		      <label class="lyear-radio radio-inline radio-primary" onclick="showMoneyBox(this)">
+		       <input type="radio" name="prizetype" value="1" {if $config['prizetype']=='1'}checked{/if}><span>实物</span>
+		      </label>
+		      <label class="lyear-radio radio-inline radio-primary" onclick="showMoneyBox(this)">
+		       <input type="radio" name="prizetype" value="2" {if $config['prizetype']=='2'}checked{/if}><span>红包</span>
+		      </label>
+		    </div>
+		</div>
+        <div class="form-group showMoneyBox{if $config['prizetype']=='1'} hidden{/if}">
+            <label class="col-lg-3 control-label">* 单个红包金额</label>
+            <div class="col-lg-6">
+                <input type="text" class="form-control numberincdec" name="prizemoney" 
+                data-bts-min="{$sendhbmin}" data-bts-replacement-val="{$sendhbmin}"
+                data-bts-max="null"
+                data-bts-decimals="2"
+                data-bts-step="1"
+                data-bts-force-step-divisibility="xstwo"
+                data-bts-postfix="元"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['prizemoney']}">
+                <span class="help-block m-0">注:最小可以是{$sendhbmin}元，<span class="text-danger">必须保证您的红包账户余额充足，账户余额不足会导致中奖用户无法收到微信红包</span>，<a href="{:gomyhome('account/index')}" target="__blank">点击充值</a></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 奖项名</label>
+            <div class="col-lg-6">
+                <input class="form-control" type="text"  name="awardname" value="{$config['awardname']}" maxlength="20" placeholder="20字内">
+                <span class="help-block">如:一等奖，二等奖</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 奖品名字</label>
+            <div class="col-lg-6">
+                <input class="form-control" type="text"  name="prizename" value="{$config['prizename']}" maxlength="40" placeholder="40字内">
+            </div>
+        </div>
+        <div class="form-group">
+			  <label class="col-lg-3 control-label">* 奖品图</label>
+			  <div class="col-lg-8">
+			    {:tpl_image_one('prizeimg', $config['prizeimg'])}
+			    <span class="help-block">规格:500px*500px</span>
+			  </div>
+		</div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 奖品个数</label>
+            <div class="col-lg-6">
+                <input type="text" class="form-control numberincdec prizenum" name="prizenum" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="null"
+                data-bts-step="1"
+                data-bts-postfix="个"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['prizenum']}">
+                <div class="help-block m-0">至少为1个</div>
+            </div>
+        </div>
+        <div class="form-group{if $isroundcj=='1'} hidden{/if}">
+            <label class="col-lg-3 control-label">* 单次抽出个数</label>
+            <div class="col-lg-6">
+                <input type="text" class="form-control numberincdec" name="onceout" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="null"
+                data-bts-step="1"
+                data-bts-postfix="个"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['onceout']}">
+                <span class="help-block">一次性抽出中奖用户数量，最少是1个</span>
+            </div>
+        </div>
+        <div class="form-group hidden">
+            <label class="col-lg-3 control-label">* 准许重复中奖</label>
+            <div class="col-lg-8">
+                {:tpl_switch('canrepeat',$config['canrepeat'])}
+                <span class="help-block">注:开启后当前奖品同一个用户可中多次</span>
+            </div>
+        </div>
+        {if $gametype=='lottery'}
+            {include file="$Wpath/common/lotteryshape" title='奖品' /}
+        {/if}
+        {if $gametype == 'lottery' && isset($config['bindmodule']) && !empty($config['bindmodule']) && $isroundcj=='2'}
+        {include file="common/lotterybindmodule" /}
+        {/if}
+    </div>
+    <div class="carditem hidden" style="height: 360px">
+        {if $gametype=='liuyancj'}
+        	<div class="form-group">
+                <label class="col-lg-3  control-label">奖品可抽取用户条件</label>
+                <div class="col-lg-8">
+                    <label class="lyear-radio radio-inline radio-primary">
+                        <input type="radio" name="grouptype" {if $config["grouptype"]=="1"}checked{/if} value="1" onclick="showGroupBox(this)"><span>全部发送了弹幕的用户</span>
+                    </label>
+                    <label class="lyear-radio radio-inline radio-primary">
+                        <input type="radio" name="grouptype" {if $config["grouptype"]=="2"}checked{/if} value="2" onclick="showGroupBox(this)"><span>指定时间内发送了弹幕的用户</span>
+                    </label>
+                    <label class="lyear-radio radio-inline radio-primary">
+                        <input type="radio" name="grouptype" {if $config["grouptype"]=="3"}checked{/if} value="3" onclick="showGroupBox(this)"><span>发送了弹幕含指定文字内容的用户</span>
+                    </label>
+                    <label class="lyear-radio radio-inline radio-primary">
+                        <input type="radio" name="grouptype" {if $config["grouptype"]=="4"}checked{/if} value="4" onclick="showGroupBox(this)"><span>指定用户组用户</span>
+                    </label>
+                </div>
+            </div>
+            <div class="grouptypeboxs{if $config['grouptype']=='1'} hidden{/if}">
+            <div class="form-group rangetypeBox{if $config['grouptype']!='2'} hidden{/if}">
+                <label class="col-lg-3  control-label">时间范围</label>
+                <div class="col-lg-6">
+                    {:tpl_daterangetime([
+                        'name'=>'startendtime',
+                        'autoval'=>'1',
+                        'needsfm'=>'1',
+                        'needsdd'=>'1',
+                        'val'=>[
+                            'start'=>$config['starttime']?:time(),
+                            'end'=>$config['endtime']?:time()+24*3600
+                        ]
+                    ])}
+                </div>
+            </div>
+            <div class="form-group wordtypeBox{if $config['grouptype']!='3'} hidden{/if}">
+                <label class="col-lg-3  control-label">消息内容</label>
+                <div class="col-lg-6">
+                    <div class="input-group">
+                            <div class="input-group-addon">必须发送含有</div>
+                            <input type="text" class="form-control" value="{$config['stabletxt']}" name="stabletxt">
+                            <div class="input-group-addon">的内容</div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group grouptypeBox{if $config['grouptype']!='4'} hidden{/if}">
+                <label class="col-lg-3  control-label">用户组选择</label>
+                <div class="col-lg-6">
+                    <select name="groupid" class="form-control grouptypef">
+                        <option value='0' {if empty($config['groupid'])}selected{/if}>请选择用户组</option>
+                        {volist name="groups" id="group"}
+                         <option value="{$group['id']}"  {if $config['groupid']==$group['id']}selected{/if}>{$group['groupname']}</option>
+                        {/volist}
+                    </select>
+                </div>
+            </div>
+            </div>
+        {else}
+            <div class="form-group">
+                <label class="col-lg-3 control-label">* 可中本奖品的用户组</label>
+                <div class="col-lg-9 m-t-10">
+                    <ul id="groupsTree" class="ztree"></ul>
+                </div>
+            </div>
+        {/if}
+        <div class="form-group{if request()->opencjnd=='2'} hidden{/if}">
+            <label class="col-lg-3 control-label">* 特别用户</label>
+            <div class="col-lg-9">
+            	<table class="table table-bordered" style="margin-bottom:0px;">
+					<thead>
+					  <tr>
+						<th style="width:50%;text-align:center;">用户</th>
+						<th style="width:50%;text-align:center;">操作</th>
+					  </tr>
+					</thead>
+					<tbody class="nduser-lists">
+						{volist name="config.nduser" id="prow"}
+							<tr>
+								<td class="text-center">
+									<img class="userimg" src="{:tomedia($prow['avatar']);}">
+									<p>{$prow['nickname']}</p>
+									<input type="hidden" name="nduser[]" value="{$prow['userid']}">
+								</td>
+								<td class="text-center">
+								  <a href="javascript:;"  class="btn btn-danger btn-sm btn-del"><i class="mdi mdi-close"></i></a>
+								</td>
+							</tr>
+						{/volist}
+					</tbody>
+					<tfoot style="border: 1px solid #efefef;">
+					  <tr>
+						<td colspan="2">
+						  <a  class="btn btn-primary btn-xs adduser" href="javascript:;"> <i class="mdi mdi-plus"></i>&nbsp;<span>添加用户</span></a>
+						</td>
+					  </tr>
+					</tfoot>
+				</table>
+				<span class="zam-help-block">注:每个用户仅可指定一个奖项</span>
+            </div>
+        </div>
+    </div>
+</form>
+</div>
+<script type="text/template" id="nduser-tpl">
+<tr>
+	<td class="text-center">
+		<img class="userimg" src="<% d.avatar %>">
+		<p><% d.nickname %></p>
+		<input type="hidden" name="nduser[]" value="<% d.id %>">
+	</td>
+	<td class="text-center">
+	  <a href="javascript:;"  class="btn btn-danger btn-sm btn-del"><i class="mdi mdi-close"></i></a>
+	</td>
+</tr>
+</script>     
+<script>
+require(['webcore','jconfirmBox','zamnotice','layerBox',"bootstrap-touchspin","bootstrap-daterangepicker",'jztree',"select2-zhcn"],function(webcore,jconfirmBox,zamnotice,layerBox){
+    tpl_switch();
+    $(".confirmbox-pop .pop-btns a.btn").click(function(){
+        $(this).addClass('btn-primary').siblings().removeClass("btn-primary");
+        $(".confirmbox-pop .carditem").addClass('hidden').eq($(this).index()).removeClass('hidden');
+    });
+    $(".confirmbox-pop .numberincdec").TouchSpin();
+	{if $gametype=='liuyancj'}
+        $('.js-datetimepicker').each(function() {
+            var $input = $(this),$obj = {
+                    singleDatePicker: $input.data('issingle')=='1'?true:false,
+                    timePicker: $input.data('needsfm')=='1'?true:false,
+                    showDropdowns: $input.data('needsdd')=='1'?true:false,
+                    timePicker24Hour:true,
+                    timePickerSeconds:true,
+                    autoUpdateInput:$input.data('autoval')=='1'?true:false,
+                    locale: {
+                        format: $input.attr('data-format'),
+                    }
+                };
+                if($input.data('start')) $obj.startDate = $input.data('start');
+                if($input.data('end')) $obj.endDate = $input.data('end');
+                if($input.data('mintime')) $obj.minDate = $input.data('mintime');
+                if($input.data('maxtime')) $obj.maxDate = $input.data('maxtime');
+                $input.daterangepicker($obj,function(start, end, label){
+                    var funcstr = $input.data('func');
+                    var func = window[funcstr];
+                    func && func(start,end);
+                });
+        });
+    {else /}
+    {// 其他抽奖}
+        var setonegroupnum = "{$setonegroupnum}",setting = {
+          view: {
+              showIcon:false,
+              selectedMulti: false,
+          },
+          check: {
+              enable: true,
+          },
+          data: {
+            simpleData: {
+              enable: false,
+              idKey: "id",
+            },
+          },
+          edit: {
+              enable:false
+          },
+          callback: {
+            beforeClick: function(treeId, treeNode, clickFlag){
+                return setonegroupnum == '1' ? true : false;
+            },
+            beforeCheck: function(treeId, treeNode){
+                var treeObj = $.fn.zTree.getZTreeObj("groupsTree"),nodes = treeObj.getCheckedNodes(),fnode = treeNode.getParentNode();
+                if(fnode == null){
+                    treeObj.checkAllNodes(false);
+                }else{
+                    var ffnode = fnode.getParentNode();
+                    if(ffnode === null){
+                        $.each(nodes,function(i,v){
+                            if(v.id != fnode.id && v.level == 0){
+                                treeObj.checkNode(v,false,true);
+                            }
+                        })
+                    }else{
+                        //var nodes = treeObj.getCheckedNodes();
+                        $.each(nodes,function(i,v){
+                            if(v.id != ffnode.id && v.level == 0){
+                                treeObj.checkNode(v,false,true);
+                            }
+                        })
+                    }
+                }
+                return true;
+            },
+            onCheck:function(e, treeId, treeNode){
+                if(setonegroupnum == '2') return true;
+                $(".editgroupperson").remove();
+                var treeObj = $.fn.zTree.getZTreeObj("groupsTree"),nodes = treeObj.getCheckedNodes();
+                $.each(nodes, function(i,v){
+                    if(v.level == '0' || (v.level == '1' && v.isParent)){
+                        return true;
+                    }
+                    var btnobj = $('<span id="btn'+v.id+'" class="editgroupperson cursor"><b class="label label-primary m-r-5">随机人数</b><i class="mdi mdi-pencil"></i></span>');
+                    $("#"+v.tId+"_a").attr('data-outnum',0).append(btnobj);
+                    btnobj.click(function(){
+                        var $this = $(this);
+                        var aoutnum = $("#"+v.tId+"_a").attr('data-outnum')||0;
+                        var confirmobj = jconfirmBox.confirm('修改分组抽出人数',webcore.tpl($("#editnum-tpl"),{outnum:aoutnum}),function(e){
+                            var outnum = e.$content.find(".outnum").val();
+                            if(outnum=='') return zamnotice.showTips('error','请设置抽出人数');
+                            outnum = parseInt(outnum);
+                            if(outnum < 0){
+                                return zamnotice.showTips('error','单个分组抽取人数至少是0');
+                            }
+                            if(outnum > $(".prizenum").val()){
+                                return zamnotice.showTips('error','单个分组抽取人数不可大于奖品个数');
+                            }
+                            $this.parent().attr('data-outnum',outnum);
+                            $this.find('b').text(outnum==0 ? '随机人数' : outnum+"人");
+                            confirmobj.close();
+                        },false,false,true,[{'hidden':false,'txt':'确定修改'},{'hidden':false,'txt':'取消'}],function(){
+                            $(".selnumpopbox .numberincdec").TouchSpin();
+                        });
+                    });
+                });
+            },
+          }
+        };
+        var zNodes = {:json_encode($groups)};
+        var grouptypes = {:json_encode($config['grouptype'])};
+        var groupouts = {if isset($config['groupouts'])}{:json_encode($config['groupouts'])}{else /}[]{/if};
+        $(document).ready(function(){
+           var zTree = $.fn.zTree.init($("#groupsTree"), setting, zNodes);
+           zTree.expandAll(true);
+           var ffatherid = null;
+           $.each(grouptypes,function(i,v){
+                if(i==0){
+                    var node = zTree.getNodeByParam("id", v);//父节点
+                    if(node != null) {
+                        ffatherid = node;
+                    }
+                }else{
+                    if(ffatherid != null){
+                        var node = zTree.getNodeByParam("id", v,ffatherid);//子节点
+                    }else{
+                        var node = null;
+                    }
+                }
+                if(node != null) {
+                    zTree.checkNode(node, true);
+                    if(setonegroupnum == '1' && ((node.level == '1' && !node.isParent) || node.level == '2') && groupouts.length >0){
+                        $.each(groupouts,function(j,b){
+                            if(b.groupval == v){
+                                var btnobj = $('<span id="btn'+node.id+'" class="editgroupperson cursor"><b class="label label-primary m-r-5">'+(b.outnum == '0' ? '随机人数' : b.outnum + "人")+'</b><i class="mdi mdi-pencil"></i></span>');
+                                $("#"+node.tId+"_a").attr('data-outnum',b.outnum).append(btnobj);
+                                btnobj.click(function(){
+                                    var $this = $(this);
+                                    var confirmobj = jconfirmBox.confirm('修改分组抽出人数',webcore.tpl($("#editnum-tpl"),{outnum:($this.parent().attr('data-outnum')||0)}),function(e){
+                                        var outnum = e.$content.find(".outnum").val();
+                                        if(outnum=='') return zamnotice.showTips('error','请设置抽出人数');
+                                        outnum = parseInt(outnum);
+                                        if(outnum < 0){
+                                            return zamnotice.showTips('error','单个分组抽取人数至少是0');
+                                        }
+                                        if(outnum > $(".prizenum").val()){
+                                            return zamnotice.showTips('error','单个分组抽取人数不可大于奖品个数');
+                                        }
+                                        $this.parent().attr('data-outnum',outnum);
+                                        $this.find('b').text(outnum==0 ? '随机人数' : outnum+"人");
+                                        confirmobj.close();
+                                    },false,false,true,[{'hidden':false,'txt':'确定修改'},{'hidden':false,'txt':'取消'}],function(){
+                                        $(".selnumpopbox .numberincdec").TouchSpin();
+                                    });
+                                });
+                            }
+                        });
+                    }
+                } 
+           });
+        });
+    {/if}
+    {// 公用部分}
+	$(".adduser").click(function(){
+		var confirmObj = jconfirmBox.ajaxconfirm("内定用户","{:gohdmanage('common/searchuser',['hdid'=>$hdid])}",{ishtml:'1'},'html','col-lg-8 col-lg-offset-2',function(e){
+			var selectuser = e.find("input:checked");
+			if(selectuser.length>0){
+				var html = '',userids = [],nduserobj = $(".nduser-lists input");
+				nduserobj.each(function(){
+					userids.push($(this).val());
+				});
+				selectuser.each(function(){
+					var $this = $(this),$thisp = $this.parent().parent(),userid = $this.attr('data-id');
+					if($.inArray(userid,userids) > -1) return true; 
+					html += webcore.tpl($("#nduser-tpl"),{id:userid,avatar:$thisp.next().attr('src'),nickname:$thisp.next().next().text()});
+				});
+				$(".nduser-lists").append(html);
+				confirmObj.close();
+			}else{
+				zamnotice.showTips('error','请选择需内定的用户');
+			}
+		});
+	});
+	$(".nduser-lists").on('click','.btn-del',function(){
+		var $this = $(this);
+		jconfirmBox.confirm('温馨提示','您确定要删除么？',function(){
+			$this.parent().parent().remove();
+			zamnotice.showTips('success','删除成功');
+		});
+	});
+});
+function showMoneyBox(obj){
+	if($(obj).find('input').val()=='1'){
+		$(".showMoneyBox").addClass('hidden');
+	}else{
+		$(".showMoneyBox").removeClass('hidden');
+	}
+}
+function showGroupBox(obj){
+    var type = $(obj).val();
+    if(type=='1'){
+        $(".grouptypeboxs").addClass('hidden');
+    }else{
+        $(".grouptypeboxs").removeClass('hidden');
+        $(".grouptypeboxs .form-group").addClass('hidden');
+        if(type=='2') $(".grouptypeboxs .rangetypeBox").removeClass('hidden');
+        if(type=='3') $(".grouptypeboxs .wordtypeBox").removeClass('hidden');
+        if(type=='4') $(".grouptypeboxs .grouptypeBox").removeClass('hidden');
+    }
+}
+</script>
+<script id='editnum-tpl' type="text/template">
+<div class="form-horizontal selnumpopbox">
+  <div class="form-group">
+    <label class="col-lg-3 control-label">* 抽取</label>
+    <div class="col-lg-4">
+       <input type="text" class="form-control numberincdec outnum" name="outnum" 
+        data-bts-min="0" data-bts-replacement-val="0"
+        data-bts-max="null"
+        data-bts-init-val=""
+        data-bts-step="1"
+        data-bts-postfix="人"
+        data-bts-postfix-extra-class="touchspin-postfix"
+        value="<% d.outnum %>" >
+       <span class="help-block">注意:0为随机人数</span>
+    </div>
+  </div>
+</div>
+</script>

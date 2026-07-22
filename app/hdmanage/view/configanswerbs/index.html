@@ -1,0 +1,107 @@
+{include file='$Wpath/common/header'}
+<form id="formBox" class="zam-formvalidation form-horizontal" method="post">
+    <div class="config-titlebox">
+        <span class="config-titlename">微信设置</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#wechatconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+    </div>
+    <div id="wechatconfigbox" class="collapse in">
+        {include file="$Wpath/common/gameconfigwechatcommon" /}
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 准许重复中奖</label>
+            <div class="col-lg-3">
+                {:tpl_switch('canrepeat',$config['canrepeat'])}
+                <span class="help-block">开启后用户可以多轮游戏中奖</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 自定义logo图</label>
+            <div class="col-lg-8">
+                {:tpl_switch('applogotype',$config['applogotype'],'openapplogo')}
+                <span class="help-block">默认使用风格内logo图</span>
+            </div>
+        </div>
+        <div class="form-group applogobox{if $config['applogotype']=='2'} hidden{/if}">
+            <label class="col-lg-2 control-label">* logo图</label>
+            <div class="col-lg-8">
+                {:tpl_image_one('applogoimg',$config['applogoimg'])}
+                <span class="help-block">规格:200*183px</span>
+            </div>
+        </div>
+        <script type="text/javascript">
+        function openapplogo(obj,status,url){
+            if(status=='1'){
+                obj.prev().val('2');
+                obj.attr('data-status','2');
+                $(".applogobox").addClass('hidden');
+            }else{
+                obj.prev().val('1');
+                obj.attr('data-status','1');
+                $(".applogobox").removeClass('hidden');
+            }
+            obj.prev().prev().prop("checked",status=='1'?false:true);
+        }
+        </script>
+    </div>
+    <div class="config-titlebox">
+        <span class="config-titlename">大屏设置</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#screenconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+    </div>
+    <div id="screenconfigbox" class="collapse in">
+        {include file="$Wpath/common/configscreencommon" /}
+        {include file="$Wpath/common/gameconfigscreenmusic" /}
+        {include file="$Wpath/common/configstyle" /}
+        {include file="$Wpath/common/configwelcometop" /}
+    </div>
+    
+    <div class="config-titlebox">
+        <span class="config-titlename">红包发送设置</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#srconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+     </div>
+     <div id="srconfigbox" class="collapse in">
+        {include file="$Wpath/common/sendredpackinfo" /}
+     </div>
+    {include file='$Wpath/common/ts'}
+    {include file='$Wpath/common/configsavepanel'}
+</form>
+<script>
+require(['webcore','jconfirmBox','zamnotice','layerBox','zvalidator'],function(webcore,jconfirmBox,zamnotice,layerBox){
+    $('#formBox').formValidation({
+        framework: 'bootstrap',
+        excluded: [':disabled'],
+        message: '您填写的内容无效',
+        fields: {
+            apptitle:{
+                message: '请输入网页标题',
+                validators: {
+                    notEmpty: {
+                        message: '请输入网页标题'
+                    },
+                }
+            },
+        }
+    }).on('success.form.fv', function(e) {
+        e.preventDefault();
+        var $form = $(e.target);
+        var postData = webcore.serializeObject($form);
+        var bload = $form.find(".zam-fixedbottom button").lyearloading({opacity: 0.2,spinnerSize: 'nm'});
+        $form.formValidation('disableSubmitButtons', true);
+        webcore.ajaxSubmit("{:gohdmanage('config'.$gametype.'/index',['hdid'=>$hdid])}",postData).then(function(json){
+            bload.hide();
+            if(json.code==0){
+                $form.formValidation('disableSubmitButtons', false);
+                zamnotice.showTips('success','操作成功',2e3,function(){
+                    window.location.reload();
+                });
+            }else{
+                zamnotice.showTips('error',json.msg);
+                $form.formValidation('disableSubmitButtons', false);
+            }
+        }, function(json){
+            bload.hide();
+            zamnotice.showTips('error','网络差。操作失败');
+            $form.formValidation('disableSubmitButtons', false);
+        });
+    });
+});
+</script>
+{include file='$Wpath/common/footer'}

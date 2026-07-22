@@ -1,0 +1,287 @@
+<style type="text/css">
+.cateBox .catespan{
+    display: flex;
+    align-items: center;
+    border: 1px solid #dfe6ec;
+    margin: 0 5px 5px 0;
+    border-radius:5px;
+    padding:10px;
+}
+.cateBox .catespan label{margin-top: 0!important}
+.cateBox .catespan .personnum{position:absolute;right:60px;}
+.cateBox .catespan input{margin:0;margin-right:5px;}
+.nditem-lists tr td{text-align: center}
+</style>
+<div class="form-horizontal confirmbox-pop">
+<form class="confirm-formbox" method="post">
+    
+        <div class="form-group phototypes">
+            <label class="col-lg-3 control-label">* 图片来源</label>
+            <div class="col-lg-8">
+              <label class="lyear-radio radio-inline radio-primary">
+               <input type="radio" name="phototype" value="1" {if $config['phototype']=='1'}checked{else /} {if isset($config['luckernum']) && $config['luckernum'] >0}disabled{/if}{/if}><span>本地图片</span>
+              </label>
+              <label class="lyear-radio radio-inline radio-primary">
+               <input type="radio" name="phototype" value="2" {if $config['phototype']=='2'}checked{else /} {if isset($config['luckernum']) && $config['luckernum'] >0}disabled{/if}{/if}><span>上墙图片</span>
+              </label>
+              <label class="lyear-radio radio-inline radio-primary">
+               <input type="radio" name="phototype" value="3" {if $config['phototype']=='3'}checked{else /} {if isset($config['luckernum']) && $config['luckernum'] >0}disabled{/if}{/if}><span>霸屏图片</span>
+              </label>
+              <label class="lyear-radio radio-inline radio-primary">
+               <input type="radio" name="phototype" value="4" {if $config['phototype']=='4'}checked{else /} {if isset($config['luckernum']) && $config['luckernum'] >0}disabled{/if}{/if}><span>全部用户头像</span>
+              </label>
+              <label class="lyear-radio radio-inline radio-primary">
+               <input type="radio" name="phototype" value="5" {if $config['phototype']=='5'}checked{else /} {if isset($config['luckernum']) && $config['luckernum'] >0}disabled{/if}{/if}><span>签到用户头像</span>
+              </label>
+              <div class="help-block">
+                <div>本地图片需要您先本地上传，霸屏只会调用图片消息图片，并不会调用用户在霸屏消息中上传的图片</div>
+                {if isset($config['luckernum']) && $config['luckernum'] >0}<div><span class="text-danger">本奖品已经产生数据无法修改图片来源，如需修改请先清空本奖品中奖记录</span></div>{/if}
+              </div>
+            </div>
+        </div>
+        <div class="localphotobox{if $config['phototype']!='1'} hidden{/if}">
+            <div class="form-group grouptypes">
+                <label class="col-lg-3 control-label">* 本地图片分组</label>
+                <div class="col-lg-8">
+                  <label class="lyear-radio radio-inline radio-primary">
+                   <input type="radio" name="grouptype" value="1" {if $config['grouptype']=='1'}checked{/if}><span>全部本地图片</span>
+                  </label>
+                  <label class="lyear-radio radio-inline radio-primary">
+                   <input type="radio" name="grouptype" value="2" {if $config['grouptype']=='2'}checked{/if}><span>本地图片分组</span>
+                  </label>
+                  <div class="help-block">如果您选择了本地图片分组必须保证分组内图片数量大于奖品数量</div>
+                  {if isset($config['luckernum']) && $config['luckernum'] >0}<div><span class="text-danger">本奖品已经产生数据请务必不需要切换分组</span></div>{/if}
+                </div>
+            </div>
+            <div class="cateBox{if $config['grouptype']=='1'} hidden{/if}">
+                <div class="form-group">
+                    <label class="col-lg-3 control-label text-right">* 选择图片分组<br>(<span class="text-danger" style="font-size: 12px;">可选多个分组</span>)</label>
+                    
+                    <div class="col-lg-8">
+                        {if !empty($groups)}
+                            {foreach $groups as $group}
+                                <span class="catespan">
+                                    <label class="lyear-checkbox checkbox-inline checkbox-primary">
+                                        <input type="checkbox" name="groupids[]" value="{$group['id']}" {if !empty($config['groupids']) && in_array($group['id'],$config['groupids'])}checked{/if}><span>{$group['groupname']}</span>
+                                    </label>
+                                    <span class="personnum pull-right text-danger">{$group['num']} 张图片</span>
+                                </span>
+                            {/foreach}
+                        {else /}
+                        <div class="form-control-static">暂未添加分组，<a href="{:gohdmanage('configphotocj/groups',['hdid'=>$hdid])}">点我添加分组</a></div>
+                        {/if}
+                        <div class="help-block">
+                            <span class="text-error">选择了分组，本奖品的数据只能从所选的分组内的图片里抽出，请一定保证所选分组总人数大于等于本奖品数量</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-3 control-label">* 大屏照片滚动数据来源</label>
+                    <div class="col-lg-8">
+                      <label class="lyear-radio radio-inline radio-primary">
+                       <input type="radio" name="flydata" value="1" {if !isset($config['flydata']) || $config['flydata']=='1'}checked{/if}><span>分组内本地图片</span>
+                      </label>
+                      <label class="lyear-radio radio-inline radio-primary">
+                       <input type="radio" name="flydata" value="2" {if isset($config['flydata']) && $config['flydata']=='2'}checked{/if}><span>全部本地图片</span>
+                      </label>
+                      <div class="help-block">默认使用分组内照片，如果分组内照片数量较少，建议选择全部本地图片</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 奖项名</label>
+            <div class="col-lg-6">
+                <input class="form-control" type="text"  name="awardname" value="{$config['awardname']}" maxlength="20" placeholder="20字内">
+                <span class="help-block">如:一等奖，二等奖</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 奖品名字</label>
+            <div class="col-lg-6">
+                <input class="form-control" type="text"  name="prizename" value="{$config['prizename']}" maxlength="40" placeholder="40字内">
+            </div>
+        </div>
+        <div class="form-group">
+			  <label class="col-lg-3 control-label">* 奖品图</label>
+			  <div class="col-lg-8">
+			    {:tpl_image_one('prizeimg', $config['prizeimg'])}
+			    <span class="help-block">规格:500px*500px</span>
+			  </div>
+		</div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 奖品个数</label>
+            <div class="col-lg-4">
+                <input type="text" class="form-control numberincdec prizenum" name="prizenum" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="null"
+                data-bts-step="1"
+                value="{$config['prizenum']}">
+                <div class="help-block m-0">至少为1个</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 单次抽出个数</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec" name="onceout" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="null"
+                data-bts-step="1"
+                value="{$config['onceout']}">
+                <span class="help-block">一次性抽出中奖图片数量</span>
+            </div>
+        </div>
+        <div class="form-group{if request()->opencjnd=='2'} hidden{/if}">
+            <label class="col-lg-3 control-label">* 特殊图片</label>
+            <div class="col-lg-9">
+                <table class="table table-bordered">
+                    <thead>
+                      <tr>
+                        <th style="text-align:center;">图片</th>
+                        <th style="text-align:center;">图片名/发送用户</th>
+                        <th style="width:12%;text-align:center;">操作</th>
+                      </tr>
+                    </thead>
+                    <tbody class="nditem-lists">
+                        {volist name="config.ndids" id="ndval"}
+                        <tr class="type{if $config['phototype']=='1'}local{elseif $config['phototype']=='2' /}msg{elseif $config['phototype']=='3' /}baping{elseif $config['phototype']=='4' /}user{else /}sign{/if}">
+                            <input type="hidden" name="ndids[]" value="{$ndval['id']}" />
+                            <td>
+                                <img src="{:tomedia($ndval['filepath'])}" style="max-height:100px;">
+                            </td>
+                            <td>
+                                <div>
+                                {if $config['phototype']=='1'}
+                                    <p>{$ndval['photoname']}</p>
+                                {else /}
+                                    {if $config['phototype'] < 4}<img src="{:tomedia($ndval['avatar'])}" width="60px" height="60px">{/if}
+                                    <p>{$ndval['nickname']}</p>
+                                {/if}
+                                </div>
+                            </td>
+                            <td>
+                                <a class="btn btn-danger btn-xs delnd" href="javascript:;">删除</a>
+                            </td>
+                        </tr>
+                        {/volist}
+                    </tbody>
+                    <tfoot style="border: 1px solid #efefef;">
+                      <tr>
+                        <td colspan="8">
+                          <a  class="btn btn-primary btn-sm addnditem" href="javascript:;"> <i class="mdi mdi-plus"></i>&nbsp;<span>新增特殊图片</span></a>
+                        </td>
+                      </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+        <div class="form-group hidden">
+            <label class="col-lg-3 control-label">* 准许重复中奖</label>
+            <div class="col-lg-8">
+                {:tpl_switch('canrepeat',$config['canrepeat'])}
+                <span class="help-block">注:开启后当前奖品同一张图片可中多次</span>
+            </div>
+        </div>
+</form>
+</div>  
+<script>
+var haslucker = {if isset($config['luckernum']) && $config['luckernum'] >0}"1"{else/}"2"{/if};
+require(['webcore','jconfirmBox','zamnotice','layerBox',"bootstrap-touchspin","bootstrap-daterangepicker",'jztree'],function(webcore,jconfirmBox,zamnotice,layerBox){
+    tpl_switch();
+    $(".phototypes label").click(function(){
+        if(haslucker=='1') return false;
+        var phototype = $(this).find('input').val();
+        if(phototype=='1'){
+            $(".localphotobox").removeClass('hidden');
+             $(".nditem-lists .typemsg,.nditem-lists .typebaping,.nditem-lists .typeuser,.nditem-lists .typesign").remove();
+        }else{
+            if(phototype=='2'){
+                $(".nditem-lists .typelocal,.nditem-lists .typebaping,.nditem-lists .typeuser,.nditem-lists .typesign").remove();
+            }else if(phototype=='3'){
+                $(".nditem-lists .typelocal,.nditem-lists .typemsg,.nditem-lists .typeuser,.nditem-lists .typesign").remove();
+            }else if(phototype=='3'){
+                $(".nditem-lists .typelocal,.nditem-lists .typemsg,.nditem-lists .typebaping,.nditem-lists .typesign").remove();
+            }else{
+                $(".nditem-lists .typelocal,.nditem-lists .typemsg,.nditem-lists .typebaping,.nditem-lists .typeuser").remove();
+            }
+            $(".localphotobox").addClass('hidden');
+        }
+    });
+    $(".grouptypes label").click(function(){
+        var grouptype = $(this).find('input').val();
+        if(grouptype=='1'){
+            $(".cateBox").addClass('hidden');
+        }else{
+            $(".cateBox").removeClass('hidden');
+        }
+    });
+    $(".confirmbox-pop .numberincdec").TouchSpin();
+    $(".addnditem").click(function(){
+        var phototype = $(".phototypes input[type='radio']:checked").val(),confirmObj = jconfirmBox.ajaxconfirm("新增特殊图片","{:gohdmanage('configphotocj/editnditem',['hdid'=>$hdid])}",{awardid:"{$config['id']??''}",phototype:phototype},'html','col-lg-8 col-lg-offset-2',function(e){
+            var selectuser = e.find("input:checked");
+            if(selectuser){
+                var html = '';
+                selectuser.each(function(){
+                    var trs = $(this).parent().parent().parent();
+                    var nuser = {
+                        phototype:phototype,
+                        id:$(this).val(),
+                        filepath:trs.find('.fileimg').attr('src'),
+                        photoname:trs.find('p').text(),
+                        nickname:trs.find('p').text(),
+                        avatar:trs.find('.sendavatar').attr('src'),
+                    };
+                    html += webcore.tpl($("#nditem-tpl"),nuser);
+                });
+                if(html==''){
+                    zamnotice.showTips('error','请选择');
+                }else{
+                    $(".nditem-lists").append(html);
+                    confirmObj.close();
+                }
+            }else{
+                zamnotice.showTips('error','请选择用户');
+            }
+            
+        });
+    });
+    $(".nditem-lists").on('click','.delnd',function(){
+        $(this).parent().parent().remove();
+    });
+});
+</script>
+<script id='editnum-tpl' type="text/template">
+<div class="form-horizontal">
+  <div class="form-group">
+    <label class="col-lg-3 control-label">* 抽取</label>
+    <div class="col-lg-4">
+        <div class="input-group">
+            <input type="number" class="form-control outnum" name="outnum" value="<%# if(d.outnum){ %><% d.outnum %><%# }else{ %>0<%# } %>" onkeyup="this.value=this.value.replace(/\D/g,'')">
+            <div class="input-group-addon">人</div>
+       </div>
+       <span class="help-block">注意:0为随机人数</span>
+    </div>
+  </div>
+</div>
+</script>
+<script id='nditem-tpl' type="text/template">
+    <tr class="type<%# if(d.phototype=='1'){ %>local<%# }else if(d.phototype=='2'){ %>msg<%# }else if(d.phototype=='3'){ %>baping<%# }else if(d.phototype=='4'){ %>user<%# }else{ %>sign<%# } %>">
+        <input type="hidden" name="ndids[]" value="<% d.id %>" />
+        <td>
+            <img src="<% d.filepath %>" style="max-height:100px;">
+        </td>
+        <td>
+            <div>
+            <%# if(d.phototype=='1'){ %>
+                <p><% d.photoname %></p>
+            <%# }else{ %>
+                <%# if(d.phototype < 4){ %><img src="<% d.avatar %>"> <%# } %>
+                <p><% d.nickname %></p>
+            <%# } %>
+            </div>
+        </td>
+        <td>
+            <a class="btn btn-danger btn-xs delnd" href="javascript:;">删除</a>
+        </td>
+    </tr>
+</script>         

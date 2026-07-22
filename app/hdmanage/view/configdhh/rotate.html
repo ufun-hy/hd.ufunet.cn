@@ -1,0 +1,190 @@
+{include file='$Wpath/common/header'}
+<div class="alert alert-danger">
+    温馨提醒:键盘空格键用于开启或者暂停订货，键盘方向键左键用于切换上一轮，键盘方向键右键用于切换下一轮，键盘enter键可以放大或缩写右下角的订单统计信息；修改轮次信息或者商品后请务必刷新大屏幕与微信端
+</div>
+{include file='$Wpath/common/tabletoolbar'}
+<table id="listtable" class="zam-btable"></table>
+<script>    
+require(['webcore','webtable','jconfirmBox','zamnotice'],function(webcore,webtable,jconfirmBox,zamnotice){
+var initConfig = {
+    tableId:'#listtable',
+    url:"{:gohdmanage('configdhh/rotate',['hdid'=>$hdid])}",
+    columnoperate:{
+        btns:{
+            edit:true,
+            del:true,
+            reset:true,
+            data:{title:"订货记录"},
+            shenhe:{title:"复制",icon:"mdi-content-copy",class:"success"},
+            refund:{title:"参与方式",icon:"mdi-barcode",class:"success"},
+        },
+        func:{
+            edit:function(value, row, index){
+                var confirmObj = jconfirmBox.ajaxconfirm("编辑轮次","{:gohdmanage('configdhh/editrotate',['hdid'=>$hdid])}",{rotateid:row.id},'html','col-lg-10 col-lg-offset-1',function(e){
+                    var postData = webcore.serializeObject(e.find('form'));
+                    postData.rotateid = row.id;
+                    webcore.ajaxSubmit("{:gohdmanage('configdhh/saverotate',['hdid'=>$hdid])}",postData).then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','保存成功');
+                            confirmObj.close();
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                             return false;
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                         return false;
+                    });
+                });
+            },
+            del:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','删除将删除当前轮次商品以及下单记录并且无法恢复，您确定要删除么？',function(){
+                        webcore.ajaxSubmit("{:gohdmanage('configdhh/delrotate',['hdid'=>$hdid])}",{rotateid:row.id}).then(function(json){
+                            if(json.code==0){
+                                webtable.refresh();
+                                zamnotice.showTips('success','删除成功');
+                            }else{
+                                zamnotice.showTips('error',json.msg);
+                            }
+                        }, function(json){
+                            zamnotice.showTips('error','网络差。操作失败');
+                        });
+                });
+            },
+            data:function(value, row, index){
+                window.location.href = "{:gohdmanage('datadhh/index',['hdid'=>$hdid])}&rotateid="+row.id;
+            },
+            reset:function(value, row, index){
+                jconfirmBox.confirm('温馨提示',"<div class='m-b-5'><span class='text-danger'>如果活动正在进行中，请不要进行此操作</span></div><div>重置本轮将清空本轮下单记录，您确定要强制重置本轮么？</div>",function(){
+                    webcore.ajaxSubmit("{:gohdmanage('configdhh/resetrotate',['hdid'=>$hdid])}",{rotateid:row.id},'正在重置轮次数据并重新生成中....').then(function(json){
+                        webtable.refresh();
+                        zamnotice.showTips('success','操作成功');
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                    });
+                });
+            },
+            refund:function(value, row, index){
+                  var confirmobj = jconfirmBox.ajaxconfirm("参与方式","{:gohdmanage('configdhh/jointype',['hdid'=>$hdid])}",{rotateid:row.id},'html','col-lg-10 col-lg-offset-1',function(e){
+                      confirmobj.close();
+                  },false,'2');
+            },
+            shenhe:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','您确定要复制当前轮次生成新的一轮么？',function(){
+                    webcore.ajaxSubmit("{:gohdmanage('configdhh/copyrotate',['hdid'=>$hdid])}",{rotateid:row.id}).then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','复制成功');
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                    });
+                });
+            },
+        }
+    },
+    columns:[{
+            checkbox: true,
+            width:'5',
+        }, 
+        {
+            field: 'id',
+            title: 'Id',
+            align: 'center',
+            visible: false,
+            width:'5',
+        },{
+            field: 'title',
+            title: '轮次',
+            align: 'center',
+            formatter:function(value,row,index){
+                var html = "<div class='m-b-5'>"+value+"</div>";
+                if(row.isdefault=='1'){
+                    html += '<div class="label label-primary">默认轮次</div>';
+                }
+                return html;
+            },
+            width:'15',
+        },{
+            field: 'priceunit',
+            title: '商品价格单位',
+            align: 'center',
+            width:'10',
+        },{
+            field: 'goodsnum',
+            title: '商品',
+            align: 'center',
+            width:'8',
+            formatter:function(value,row,index){
+                return '<div class="m-b-5">' + value + '种</div><a href="javascript:;" class="btn btn-primary btn-sm btn-detail-row" data-id="'+row.id+'"">商品一览</a>';
+            }
+        },
+        {
+            field: 'create_time',
+            title: '创建时间',
+            align: 'center',
+            width:'11',
+        }
+        
+    ],
+    searchParamas:[],
+    toolbar:{
+        add:function(){
+            var confirmObj = jconfirmBox.ajaxconfirm("新增轮次","{:gohdmanage('configdhh/editrotate',['hdid'=>$hdid])}",{},'html','col-lg-10 col-lg-offset-1',function(e){
+                var postData = webcore.serializeObject(e.find('form'));
+                webcore.ajaxSubmit("{:gohdmanage('configdhh/saverotate',['hdid'=>$hdid])}",postData,'正在创建轮次...').then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','创建成功');
+                        confirmObj.close();
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                         return false;
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差。操作失败');
+                     return false;
+                });
+            });
+        },
+        del:function(){
+            var getSelects = webtable.getSelections();
+            if(!getSelects.length){
+                return zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+            jconfirmBox.confirm('温馨提示','删除将删除所选轮次下的商品以及下单记录并且无法恢复，您确定要删除么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('configdhh/delrotate',['hdid'=>$hdid])}",{rotateid:getSelects}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','删除成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+        },
+        reset:function(){
+            jconfirmBox.confirm('温馨提示','清空轮次将清空所有轮次的商品以及下单记录数据，您确定要清空么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('configdhh/resetallrotate',['hdid'=>$hdid])}",{}).then(function(json){
+                    webtable.refresh();
+                    zamnotice.showTips('success','操作成功');
+                }, function(json){
+                    zamnotice.showTips('error','网络差。操作失败');
+                });
+            });
+        }
+    },
+};
+webtable.init(initConfig);
+$("#listtable").on('click','.btn-detail-row',function() {
+    var rotateid = $(this).attr('data-id');
+    var confirmobj = jconfirmBox.ajaxconfirm("本轮商品下单一览","{:gohdmanage('configdhh/rotategoodsdetail',['hdid'=>$hdid])}",{rotateid:rotateid},'html','col-lg-10 col-lg-offset-1',function(e){},false,'2');
+});
+});
+</script>
+{include file='$Wpath/common/footer'}

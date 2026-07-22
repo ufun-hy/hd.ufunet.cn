@@ -1,0 +1,135 @@
+<style>
+.songtime-artlistbox span{margin-bottom:10px;margin-right: 10px;}
+.songtime-artlistbox span{
+    color: #333;
+    background: #e6f7ff;
+    border: 1px solid #91d5ff;
+}
+</style>
+<div class="form-horizontal confirmbox-pop" style="min-height: 500px;">
+    <form class="confirm-formbox" method="post">
+    <!-- <div class="form-group">
+        <label class="col-lg-3 control-label text-right">* 排序序号</label>
+        <div class="col-lg-6">
+          <input type="text" class="form-control"  name="displayorder" value="{$config['displayorder']??0}">
+          <div class="help-block">注意:排序按降序排序，序号越大越排在前面</div>
+        </div>
+    </div> -->
+    <div class="form-group">
+        <label class="col-lg-2 control-label text-right">* 名称</label>
+        <div class="col-lg-9">
+          <input type="text" class="form-control"  name="timename" value="{$config['timename']}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 点歌时间</label>
+        <div class="col-lg-9">
+            <div class="input-group">
+                <div class="input-group-btn not-allow"><a class="btn btn-default">从</a></div>
+                <input type="text" name="timestart" class="form-control songtimeinput" placeholder="点击选择小时和分钟" value="{$config['timestart']}" readonly>
+                <div class="input-group-btn not-allow"><a class="btn btn-default">开始，到</a></div>
+                <select class="form-control" name="timetype">
+                    <option value="1" {if $config['timetype'] == '1'}selected{/if}>当天</option>
+                    <option value="2" {if $config['timetype'] == '2'}selected{/if}>第二天</option>
+                </select>
+                <div class="input-group-btn not-allow"><a class="btn btn-default">的</a></div>
+                <input type="text" name="timeend" class="form-control songtimeinput" placeholder="点击选择小时和分钟" value="{$config['timeend']}" readonly>
+                <div class="input-group-btn not-allow"><a class="btn btn-default">结束</a></div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group songtime-artlistbox">
+        <label class="col-lg-2 control-label">* 歌手艺人</label>
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">已选艺人</div>
+                <div class="card-body">
+                    <div class="songtime-selartlist">
+                    {foreach $selarts as $sart}
+                        <span class="btn btn-default btn-sm" data-artid="{$sart['id']}">
+                            {$sart['artistname']}
+                            <input type="hidden" name="artids[]" value="{$sart['id']}">
+                        </span>
+                    {/foreach}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">可选艺人</div>
+                <div class="card-body">
+                    <div class="songtime-artlist">
+                    {foreach $arts as $art}
+                    <span class="btn btn-default btn-sm{if is_array($config['artids']) && in_array($art['id'],$config['artids'])} disabled{/if}" data-id="{$art['id']}">{$art['artistname']}</span>
+                    {/foreach}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </form>
+    </div>
+    <script>
+    require(['webcore','jconfirmBox','zamnotice','layerBox','bootstrap-datetimepicker'],function(webcore,jconfirmBox,zamnotice,layerBox){
+        $(".songtimeinput").datetimepicker({
+            format: 'HH:mm',
+            useCurrent: true,
+            collapse: true,
+            tooltips: {
+                today: 'Go to today',
+                clear: 'Clear selection',
+                close: 'Close the picker',
+                selectMonth: 'Select Month',
+                prevMonth: 'Previous Month',
+                nextMonth: 'Next Month',
+                selectYear: 'Select Year',
+                prevYear: 'Previous Year',
+                nextYear: 'Next Year',
+                selectDecade: 'Select Decade',
+                prevDecade: 'Previous Decade',
+                nextDecade: 'Next Decade',
+                prevCentury: 'Previous Century',
+                nextCentury: 'Next Century',
+                pickHour: 'Pick Hour',
+                incrementHour: 'Increment Hour',
+                decrementHour: 'Decrement Hour',
+                pickMinute: 'Pick Minute',
+                incrementMinute: 'Increment Minute',
+                decrementMinute: 'Decrement Minute',
+                pickSecond: 'Pick Second',
+                incrementSecond: 'Increment Second',
+                decrementSecond: 'Decrement Second',
+                togglePeriod: 'Toggle Period',
+                selectTime: 'Select Time'
+            },
+            showTodayButton: false,
+            showClear: false,
+            showClose: false,
+            ignoreReadonly: true,
+        }).on('dp.change', function(e) {
+            var time = e.date.format('YYYY-MM-DD HH:mm:ss');
+            //console.log(time)
+        });
+        
+        $(".songtime-artlist span").click(function(){
+            var $this = $(this),artid = $this.attr('data-id'),artname = $this.text();
+            if($this.hasClass('disabled')) {
+                return false;
+            }
+            $this.addClass('disabled');
+            $(".songtime-selartlist").append(`<span class="btn btn-default btn-sm" data-artid="${artid}">
+                ${artname}<input type="hidden" name="artids[]" value="${artid}">
+            </span>`);
+        });
+        //删除选择的项目
+        $(".songtime-selartlist").on('click','span',function(){
+            var $this = $(this),artid = $this.attr('data-artid');
+            $(".songtime-artlist span").filter(function(o, i) {
+                return $(i).attr("data-id") == artid;
+            }).removeClass('disabled');
+            $this.remove();
+        });
+    });
+    </script>
+    

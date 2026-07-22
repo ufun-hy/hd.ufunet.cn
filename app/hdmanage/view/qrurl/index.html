@@ -1,0 +1,450 @@
+{include file='$Wpath/common/header'}
+{include file='$Wpath/common/tabletoolbar'}
+<style>
+.qritem-lists tr td{text-align:center!important;}
+.qrmoduleBox{width:50px;height:50px;text-align:center;margin:0 auto;margin-bottom:5px;}
+.qrmoduleBox img{width:100%;height:100%;}
+.waitqrimgbox div{color: gray}
+.wechatqr{width:100px;height:100px;}
+.qrtowxminibox{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.qrtowxminibox div{
+  margin-right: 10px;
+}
+</style>
+<script type="text/javascript">
+function loadqr(obj){
+    var modulefield = $(obj).attr('data-modulefield'),appid = $(obj).attr('data-appid') || '';
+    require(['webcore'],function(webcore){
+        webcore.ajaxSubmit("{:gohdmanage('qrurl/makeqr',['hdid'=>$hdid])}",{qrtype:"{$qrtype}",modulefield:modulefield,appid:appid}).then(function(json){
+            if(json.code==0){
+                var qrtype = json.msg.qrtype,errmsg = json.msg.errmsg;
+                if(qrtype < 4){
+                  $(obj).removeAttr('onload');
+                  if(errmsg == '') {
+                    $(obj).attr('src',json.msg.qrcode).removeClass('hidden');
+                  }
+                  $(obj).parent().parent().append(webcore.tpl($('#qrbtns-tpl'),json.msg));
+                  $(obj).prev().remove();
+                }else{
+                  var wxminiimg = new Image();
+                  wxminiimg.onload = wxminiimg.onerror = function(){
+                      $(obj).removeAttr('onload');
+                      if(errmsg == '') {
+                        $(obj).attr('src',json.msg.qrcode).removeClass('hidden');
+                      }
+                      $(obj).parent().parent().append(webcore.tpl($('#qrbtns-tpl'),json.msg));
+                      $(obj).prev().remove();
+                  };
+                  wxminiimg.src = json.msg.qrcode;
+                }
+            }else{
+              $(obj).prev().remove();
+            }
+        })
+    });
+}
+</script>
+<div class="card{if !$canchangeqrtype} hidden{/if}">
+  <div class="card-header"><b>大屏二维码类型</b></div>
+  <div class="card-body" style="padding: 10px 24px;">
+    <form id="formBox" class="zam-formvalidation form-horizontal m-b-5" method="post">
+      <div class="form-group qrtypebox">
+          <label class="col-lg-2 control-label">* 类型选择</label>
+          <div class="col-lg-8">
+            <label class="lyear-radio radio-inline radio-primary">
+                <input type="radio" name="qrtype" value="1" {if $qrtype=='1'}checked{/if}><span>H5二维码</span>
+            </label>
+            {if $openwxmini=='1'}
+              <label class="lyear-radio radio-inline radio-primary">
+                  <input type="radio" name="qrtype" value="4" {if $qrtype=='4'}checked{/if}><span>小程序二维码</span>
+              </label>
+            {/if}
+            {if dzqrtype()}
+              <label class="lyear-radio radio-inline radio-primary">
+                  <input type="radio" name="qrtype" value="2" {if $qrtype=='2'}checked{/if}><span>系统带参二维码</span>
+              </label>
+              <label class="lyear-radio radio-inline radio-primary">
+                  <input type="radio" name="qrtype" value="3" {if $qrtype=='3'}checked{/if}><span>自有认证服务号带参二维码</span>
+              </label>
+            {/if}
+            <span class="help-block">
+                {if dzqrtype()}
+                  <div>注意:<span class="text-default">自有认证服务号带参二维码微信用户扫码后可直接关注公众号并自动回复参与活动链接，限认证服务号可用</span></div>
+                {/if}
+            </span>
+          </div>
+      </div>
+      <div class="form-group zam-qrlogobox{if $qrtype == '4'} hidden{/if}">
+          <label class="col-lg-2 control-label">* 二维码logo(png格式)</label>
+          <div class="col-lg-5">
+              <div class="input-group">
+                    <input type="text" class="form-control file-value" name="qrlogo" value="{$qrlogo}" placeholder="图片地址">
+                    <div class="input-group-btn">
+                      <button class="btn btn-default" type="button" onclick="tpl_image_one(this,changeqrlogo)">选择图片</button>
+                    </div>
+                </div>
+                <div class="input-group image-one-detail">
+                      <img src="{if !empty($qrlogo)}{:tomedia($qrlogo)}{/if}" style="max-width:150px;max-height:300px" onerror="javascript:this.src='/static/images/sys/nopic.jpg';this.title='暂无图片'" title="暂无图片">
+                      <i class="mdi mdi-close" onclick="javascript:$(this).parent().prev().find('input').val('');$(this).prev().attr('src','')" title="删除图片"></i>
+                </div>
+              <span class="help-block">只能设置png格式的logo图，修改或删除logo需要点击切换二维码类型按钮保存后才有效，固定尺寸:100 * 100px，大小控制在100kb内</span>
+          </div>
+      </div>
+      <script type="text/javascript">
+          function changeqrlogo(imgurl,imgpath,obj){
+            var $this = $(obj);
+            require(['webcore','zamnotice'],function(webcore,zamnotice){
+                webcore.ajaxSubmit("{:gohdmanage('qrurl/changeqrlogo',['hdid'=>$hdid])}",{qrlogo:imgpath},'正在处理logo图片..').then(function(json){
+                    if(json.code==0){
+                        $this.parent().prev().val(json.msg.imgpath);
+                        $this.parent().parent().next().find("img").attr("src",json.msg.imgurl);
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差。操作失败.');
+                });
+            })
+          }
+      </script>
+      <div class="form-group zam-wechataccountBox{if $qrtype != '3'} hidden{/if}">
+          <label class="col-lg-2 control-label">* 公众号选择</label>
+          <div class="col-lg-8">
+            <div class="zam-wechataccountList clearfix">
+                {if !empty($mywxaccount)}
+                  {foreach $mywxaccount as $one}
+                  {if $one['level']=='4'}
+                  <div class="zam-wechataccountItem{if $qrtypewechatid==$one['id']} active{/if}" data-uniacid="{$one['id']}">
+                    <img src="{:tomedia($one['qrcode'])}" />
+                    <p>{$one['accountname']}</p>
+                    {if $one['status']=='2'}
+                      <div class="unbind-txt">已取消授权</div>
+                    {/if}
+                    <div class="wechat-has-select">
+                      <i class="mdi mdi-check"></i>
+                    </div>
+                  </div>
+                  {/if}
+                  {/foreach}
+                  <input type="hidden" name="qrtypewechatid" value="{$qrtypewechatid}" />
+                {else/}
+                  <div class="form-control-static">
+                    <span class="mdi mdi-information" style="font-size:18px;margin-right:10px;"></span><span>您暂无可用公众号，</span>
+                    <a href="{:gomyhome('wxaccount/index')}" draggable="false">立即绑定 &gt;</a>
+                    <input type="hidden" name="qrtypewechatid" value="0" />
+                  </div>
+                {/if}
+            </div>
+            <span class="help-block">注意:仅展示扫码授权接入的认证服务号，已解绑的认证服务号无法选择</span>
+          </div>
+      </div>
+      <div class="form-group wxprogamebox{if $qrtype != '4'} hidden{/if}">
+        <label class="col-md-2 control-label text-right">* 强制微信端小程序访问</label>
+        <div class="col-md-8">
+          {:tpl_switch("inminiprogram",$inminiprogram)}
+          <span class="zam-help-block">开启后微信端只能通过小程序访问，扫h5二维码进入活动后会提示请通过小程序进入活动</span>
+        </div>
+      </div>
+      {if dzqrtype() && dzqrreplymsgtype() && $canchangereplytype}
+      <div class="form-group qrtypereplytypebox{if $qrtype != '2'} hidden{/if}">
+          <label class="col-lg-2 control-label">* 扫码回复消息链接类型</label>
+          <div class="col-lg-8">
+              <label class="lyear-radio radio-inline radio-primary">
+                <input type="radio" name="qrtypereplytype" value="1" {if $qrtypereplytype == '1'}checked{/if}><span>H5链接</span>
+              </label>
+              <label class="lyear-radio radio-inline radio-primary">
+                <input type="radio" name="qrtypereplytype" value="2" {if $qrtypereplytype == '2'}checked{/if}><span>小程序链接</span>
+              </label>
+              <div class="help-block">
+                  <div>H5链接即为微信用户点击回复的内容自动跳转到H5微信端</div>
+                  <div>小程序链接即为微信用户点击回复的内容自动跳转到小程序微信端</div>
+                  <div class="text-danger">小程序仅文字回复可跳转到小程序，图文消息暂不支持直接跳转小程序</div>
+              </div>
+          </div>
+      </div>
+      {/if}
+      <div class="form-group">
+        <label class="col-lg-2 control-label"></label>
+        <div class="col-lg-8">
+          <button class="btn btn-primary zam-btn" type="submit">切换二维码类型</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+<div class="card">
+  <div class="card-header"><b>二维码列表</b></div>
+  <div class="card-body">
+    <table class="table" id="listtable">
+        <thead>
+          <tr>
+            <th style="width:20%;text-align:center;">功能</th>
+            <th style="width:30%;text-align:center;">大屏地址</th>
+            <th style="width:50%;text-align:center;">微信二维码</th>
+          </tr>
+        </thead>
+        <tbody class="qritem-lists">
+          {volist name="modules" id="module"}
+             <tr>
+                <td>
+                  {if !empty($module['moduleimg'])}
+                    <div class="qrmoduleBox">
+                      <img src="{$module['moduleimg']}" />
+                    </div>
+                  {/if}
+                  <div class="qrmoduleName">{$module['modulename']}</div>
+                </td>
+                <td>
+                  {if $module['screenurl']!=''}
+                    <a class="btn btn-primary btn-xs m-b-5" href="{$module['screenurl']}" target="__blank"><i class="mdi mdi-laptop"></i> {if $module['modulefield']==='wechatlive'}打开pc直播{else /}打开大屏{/if}</a>
+                    <a class="btn btn-success btn-xs zam-clip m-b-5" href="javascript:;" data-href="{$module['screenurl']}"><i class="mdi mdi-content-copy"></i> {if $module['modulefield']==='wechatlive'}复制pc直播地址{else /}复制大屏地址{/if}</a>
+                    {if $module['modulefield']=='msg' && !empty($dmsoftinfo)}
+                      <a class="btn btn-warning btn-xs zam-clip m-b-5" href="javascript:;" data-href="{$dmsoftinfo['apiurl']}"><i class="mdi mdi-content-copy"></i> 复制消息对接地址</a>
+                      <a class="btn btn-warning btn-xs zam-clip m-b-5" href="javascript:;" data-href="{$dmsoftinfo['sqcode']}"><i class="mdi mdi-content-copy"></i> 复制授权码</a>
+                    {/if}
+                  {else}
+                    无需大屏展示
+                  {/if}
+                </td>
+                <td>
+                    {if $module['hasqr'] =='1'}
+                      <div class="qrimgbox">
+                        <div class="waitqrimgbox">
+                          <i class="mdi mdi-48px mdi-spin mdi-loading"></i>
+                          <div>二维码生成中...</div>
+                        </div>  
+                        <img class="wechatqr hidden" src="/{:SYSIMGURL}loading.png" onload="loadqr(this)" data-modulename="{$module['modulename']}" data-modulefield="{$module['modulefield']}" data-appid="{if $qrtype == '4'}{$wxminiappid}{else /}{$appid}{/if}" />
+                      </div>
+                    {else}
+                      无需微信参与
+                    {/if}
+                </td>
+              </tr>
+          {/volist}
+        </tbody>
+    </table>
+  </div>
+</div>
+<script>   
+require(['webcore','zamnotice','clipboard','jconfirmBox','zvalidator'],function(webcore,zamnotice,Clipboard,jconfirmBox){
+    $('#formBox').formValidation({
+        framework: 'bootstrap',
+        excluded: [':disabled'],
+        message: '您填写的内容无效',
+        fields: {}
+    }).on('success.form.fv', function(e) {
+      e.preventDefault();
+      var $form = $(e.target);
+      var postData = webcore.serializeObject($form);
+      $form.formValidation('disableSubmitButtons', true);
+      webcore.ajaxSubmit("{:gohdmanage('qrurl/changeqrtype',['hdid'=>$hdid])}",postData,'正在切换二维码类型，请稍后...').then(function(json){
+        if(json.code==0){
+            $form.formValidation('disableSubmitButtons', false);
+            zamnotice.showTips('success','切换成功',2e3,function(){
+              window.location.reload();
+            });
+          }else{
+              zamnotice.showTips('error',json.msg);
+              $form.formValidation('disableSubmitButtons', false);
+          }
+      }, function(json){
+        zamnotice.showTips('error','网络差，操作失败');
+        $form.formValidation('disableSubmitButtons', false);
+      });
+    });
+    $(".qrtypebox input").click(function(){
+        var qrtype = $(this).val();
+        if(qrtype!='3'){
+            $(".zam-wechataccountBox,.wxprogamebox,.zam-qrlogobox,.qrtypereplytypebox").addClass('hidden');
+            if(qrtype=='4'){
+              $(".wxprogamebox").removeClass('hidden');
+            }else{
+              if(qrtype=='2'){
+                $(".qrtypereplytypebox").removeClass('hidden');
+              }
+              $(".zam-qrlogobox").removeClass('hidden');
+            }
+        }else{
+            $(".zam-wechataccountBox,.zam-qrlogobox").removeClass('hidden');
+            $(".wxprogamebox,.qrtypereplytypebox").addClass('hidden');
+        }
+    });
+    $(".zam-wechataccountList .zam-wechataccountItem").on('click',function(e){
+      $(this).siblings().removeClass('active');
+      if($(this).hasClass('active')){
+        $(this).removeClass("active");
+        $(".zam-wechataccountList input").val($(this).attr("0"));
+      }else{
+        $(this).addClass("active");
+        $(".zam-wechataccountList input").val($(this).attr("data-uniacid"));
+      }
+    });
+    var clipboard = new Clipboard('.zam-clip', {
+        text: function(e) {
+            return $(e).data('url') || $(e).data('href')
+        }
+    });
+    clipboard.on('success',function(e) {
+       zamnotice.showTips('success','复制成功',2e3);
+    });
+    $("#listtable").on('click','.btn-download',function(){
+        var $this = $(this),ishighlight = $this.hasClass('ishighlight');
+        if(ishighlight){
+          var mname = $this.parent().prev().find('img').attr('data-modulename')+'高清二维码.png';
+          var modulefield = $this.parent().prev().find('img').attr('data-modulefield') || '';
+          if(modulefield){
+            webcore.ajaxSubmit("{:gohdmanage('qrurl/makehighqr',['hdid'=>$hdid])}",{modulefield:modulefield},'正在生产高清二维码，请稍后...').then(function(json){
+                if(json.code==0){
+                  var imgUrl = json.msg||'';
+                  if(!imgUrl){
+                    return false;
+                  }
+                  if (window.navigator.msSaveOrOpenBlob) {
+                    var bstr = atob(imgUrl.split(',')[1]);
+                    var n = bstr.length;
+                    var u8arr = new Uint8Array(n);
+                    while (n--) {
+                      u8arr[n] = bstr.charCodeAt(n);
+                    }
+                    var blob = new Blob([u8arr]);
+                    window.navigator.msSaveOrOpenBlob(blob, mname);
+                  } else {
+                    var el = document.createElement('a');
+                    el.href = imgUrl;
+                    el.setAttribute('download', mname);
+                    el.setAttribute('target', '__blank');
+                    el.click();
+                  }
+                }else{
+                  zamnotice.showTips('error',json.msg||'高清二维码生成出现异常');
+                }
+            }, function(json){
+              zamnotice.showTips('error','高清二维码生成出现异常');
+            });
+          }
+        }else{
+          var imgUrl = $this.parent().prev().find('img').attr('src') || '';
+          var mname = $this.parent().prev().find('img').attr('data-modulename')+'二维码.png';
+          if(!imgUrl){
+            return false;
+          }
+          if (window.navigator.msSaveOrOpenBlob) {
+            var bstr = atob(imgUrl.split(',')[1]);
+            var n = bstr.length;
+            var u8arr = new Uint8Array(n);
+            while (n--) {
+              u8arr[n] = bstr.charCodeAt(n);
+            }
+            var blob = new Blob([u8arr]);
+            window.navigator.msSaveOrOpenBlob(blob, mname);
+          } else {
+            var el = document.createElement('a');
+            el.href = imgUrl;
+            el.setAttribute('download', mname);
+            el.setAttribute('target', '__blank');
+            el.click();
+          }
+        }
+    });
+    $("#listtable").on('click','.btn-editmessage',function(){
+        var sceneid = $(this).attr('data-sceneid');
+        var confirmObj = jconfirmBox.ajaxconfirm("编辑回复消息内容","{:gohdmanage('qrurl/editmessage',['hdid'=>$hdid])}",{ishtml:'1',sceneid:sceneid},'html','col-lg-8 col-lg-offset-2',function(e){
+            var postData = webcore.serializeObject(e.find('form'));
+            if(postData.title=='') {
+              zamnotice.showTips('error','请设置回复消息标题');
+              return false;
+            }
+            postData.sceneid = sceneid;
+            webcore.ajaxSubmit("{:gohdmanage('qrurl/editmessage',['hdid'=>$hdid])}",postData).then(function(json){
+                if(json.code==0){
+                    zamnotice.showTips('success','保存成功');
+                    confirmObj.close();
+                }else{
+                    zamnotice.showTips('error',json.msg);
+                    return false;
+                }
+            }, function(json){
+                zamnotice.showTips('error','网络差，操作失败');
+                return false;
+            });
+        });
+    });
+    $("#listtable").on('click','.qrtowxminibox .switch-qrtowxmini',function(e){
+        e.preventDefault();
+        var $this = $(this);
+        var sceneid = $this.attr('data-sceneid');
+        var inputObj = $this.find('input');
+        var status = inputObj.prop('checked');
+        var btn = $this.parent().parent().find('.btn-editmessage');
+        webcore.ajaxSubmit("{:gohdmanage('qrurl/switchqrtowxmini',['hdid'=>$hdid])}",{
+          sceneid: sceneid,
+          type:  (status ? '2' : '1'),
+        },'正在执行操作，请稍后..').then(function(json){
+            if(json.code==0){
+                zamnotice.showTips('success','操作成功');
+                inputObj.prop('checked', !status);
+                if(status){
+                  btn.removeClass('hidden');
+                }else{
+                  btn.addClass('hidden');
+                }
+            }else{
+                zamnotice.showTips('error',json.msg);
+            }
+        }, function(json){
+            zamnotice.showTips('error','网络差,操作失败');
+        });
+    });
+});
+</script>
+<script id='qrbtns-tpl' type="text/template">
+  <%# if(d.errmsg == ''){ %>
+    <div class="qrbtnsbox m-t-10">
+        <%# if(d.qrtype == '1'){ %>
+            <a class="btn btn-primary btn-xs zam-clip" href="javascript:;" data-href="<% d.qrurl %>" >
+              <i class="mdi mdi-content-copy"></i> 复制微信地址
+            </a>
+        <%# }else if(d.qrtype == '2' || d.qrtype == '3'){ %>
+            <a class="btn btn-primary btn-xs btn-editmessage<%# if(d.qrtype == '2' && d.qrtowxmini == '1'){ %> hidden<%# } %>" href="javascript:;" data-sceneid="<% d.sceneid %>" >
+                <i class="mdi mdi-pencil"></i> 编辑回复消息内容
+            </a>
+        <%# }else{ %>
+            <a class="btn btn-primary btn-xs zam-clip" href="javascript:;" data-href="<% d.path %>" >
+              <i class="mdi mdi-content-copy"></i> 小程序路径
+            </a>
+            <a class="btn btn-primary btn-xs zam-clip" href="javascript:;" data-href="<% d.appid %>" >
+              <i class="mdi mdi-content-copy"></i> 小程序AppID
+            </a>
+        <%# } %>
+        <a class="btn btn-success btn-xs btn-download" href="javascript:void(0)">
+            <i class="mdi mdi-download"></i> 下载二维码
+        </a>
+        <%# if(d.qrtype == '1'){ %>
+        <a class="btn btn-success btn-xs btn-download ishighlight" href="javascript:void(0)">
+            <i class="mdi mdi-download"></i> 下载高清二维码
+        </a>
+        <%# } %>
+    </div>
+    <%# if(d.tiptxt != ''){ %>
+      <div class="text-danger m-t-10"><% d.tiptxt %></div>
+    <%# } %>
+    {if dznormalrequest('paramqrtowxmini')}
+    <%# if(d.qrtype == '2'){ %>
+      <div class="qrtowxminibox m-t-10">
+        <div>扫码进入微信小程序:</div>
+        <label class="lyear-switch switch-primary normal-swith switch-solid switch-qrtowxmini"  data-sceneid="<% d.sceneid %>">
+          <input type="checkbox" <%# if(d.qrtowxmini == '1'){ %>checked<%# } %>>
+          <span></span>
+        </label>
+      </div>
+    <%# } %>
+    {/if}
+  <%# }else{ %>
+      <div class="text-danger m-t-10"><% d.errmsg %></div>
+  <%# } %> 
+</script>
+{include file='$Wpath/common/footer'}

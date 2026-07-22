@@ -1,0 +1,3551 @@
+{include file='common/header' /}
+<style>
+.headerTitle{opacity:0;}
+.livemark-mainbox{
+    top: 90px;
+    bottom: 40px;
+    z-index: 3;
+}
+.livemark-list{
+    position: relative;
+    width: min(1280px, 86vw);
+    height: min(680px, 78vh);
+    margin: 40px auto 0;
+    border-radius: 10px;
+    background: rgba(0,0,0,.7);
+    overflow: visible;
+}
+.livemark-title{
+    position: absolute;
+    top: -60px;
+    left: 0;
+    height: 56px;
+    line-height: 56px;
+    color: #fff;
+    font-size: 36px;
+    font-weight: 400;
+    text-align: center;
+    width: 100%;
+}
+.livemark-titleBox{
+    position: absolute;
+    top: -42px;
+    right: 0;
+    z-index: 6;
+    display: flex;
+    align-items: center;
+}
+/*开启与关闭*/
+.startstopbtn{height:25px;margin-right:20px;margin-top:-2px;}
+.startstopbtn .endstatus {
+    display: block;
+    background: url(/{:SIMGURL}vote/ebtn.png) no-repeat;
+    width: 90px;
+    height: 35px;
+    background-size: 90px auto;
+}
+.startstopbtn .startstatus {
+    background: url(/{:SIMGURL}vote/sbtn.png) no-repeat;
+    width: 90px;
+    height: 35px;
+    display: block;
+    background-size: 90px auto;
+}
+.livemark-userone .startstopbtn{
+    position: absolute;
+    top: 19px;
+    right: 13px;
+}
+.livemark-userone .pubscore-btn {
+    position: absolute;
+    top: 19px;
+    right: 140px;
+    width: 98px;
+    height: 28px;
+    border: 1px solid hsla(0,0%,100%,.36);
+    border-radius: 14px;
+    opacity: .6;
+    cursor: pointer;
+    text-align: center;
+    line-height: 28px;
+    color: #fff;
+    font-size: 14px;
+}
+.livemark-topbtn{
+    width: 118px;
+    height: 30px;
+    line-height: 30px;
+    border-radius: 15px;
+    border:1px solid #fff;
+    text-align: center;
+    color: #fff;
+    opacity: .8;
+    font-size: 16px;
+    z-index: 2;
+    cursor:pointer;
+}
+.livemark-topbtn:hover{
+    color: #00c0ef;
+    border: 1px solid #00c0ef;
+}
+.livemark-scrollbox > div{
+    overflow-x:hidden; 
+    overflow-y:auto;
+}
+.livemark-scrollbox{
+    position: relative;
+    width: 100%;
+    height: calc(100% - 52px);
+    box-sizing: border-box;
+    background: rgba(255,255,255,.04);
+}
+.livemark-scrollbox > div::-webkit-scrollbar {
+    width: 7px;
+    height: 7px;
+    border-radius: 10px;
+    background: hsla(0,0%,100%,.1);
+}
+.livemark-scrollbox > div::-webkit-scrollbar-thumb{
+    box-shadow: inset 0 0 6px hsla(0,0%,100%,.3);
+    border-radius: 10px;
+}
+/*底部按钮组*/
+.livemark-btns>div{
+    width: 102px;
+    height: 32px;
+    line-height: 32px;
+    text-align: center;
+    font-size: 16px;
+    color: #fff;
+    opacity: .6;
+    border-radius: 16px;
+    border: 1px solid #fff;
+    cursor: pointer;
+    margin: 0 10px;
+}
+.livemark-btns>div:hover{
+    color: #00c0ef;
+    border: 1px solid #00c0ef;
+}
+.livemark-btns>div.active{
+    color: #00c0ef;
+    border: 1px solid #00c0ef;
+}
+/*默认用户排序*/
+.livemark-users{
+    width: min(1092px, calc(100% - 72px));
+    height: 100%;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    justify-content: flex-start;
+    gap: 16px 36px;
+}
+.livemark-users .livemark-user-item{
+    display: block;
+    width: 340px;
+    height: 140px;
+    margin: 0;
+    cursor:pointer;
+}
+.livemark-users .livemark-user-item.hidden{
+    display: none
+}
+.livemark-users .livemark-user-itembox{
+    position: relative;
+    width: 340px;
+    height: 140px;
+    background-image: url("/{:SIMGURL}livemark/userbg.png");
+    background-repeat:no-repeat;
+}
+.livemark-users .livemark-user-avatar{
+    position: relative;
+    width: 96px;
+    height: 96px;
+    margin: 0 27px 0 23px;
+    background: url("/{:SIMGURL}livemark/avatarbg.png") no-repeat 50%;
+}
+.livemark-users .livemark-user-avatar img{
+    position: absolute;
+    left: 10px;
+    top: 9px;
+    right: 0;
+    bottom: 0;
+    width: 77px;
+    height: 77px;
+    border-radius: 50%;
+    -o-object-fit: cover;
+    object-fit: cover;
+    -o-object-position: center;
+    object-position: center;
+}
+.livemark-users .livemark-user-info{
+    width: 175px;
+    height: 68px;
+    color: #fff;
+    font-size: 20px;
+}
+.livemark-users .livemark-user-info .livemark-user-name{
+    width: 100%;
+    height: 24px;
+    line-height: 1;
+}
+.livemark-users .livemark-user-noscore{
+    position: absolute;
+    right: 0px;
+    bottom: 0px;
+    width: 74px;
+    height: 66px;
+    background: url("/{:SIMGURL}livemark/noscore.png") no-repeat 50%;
+}
+.livemark-btns{
+    position: absolute;
+    bottom: 14px;
+    left: 0;
+    width: 100%;
+    height: 32px;
+    z-index: 2;
+}
+/*点赞排名*/
+.livemark-dianzans{
+    width: min(1092px, calc(100% - 72px));
+    height: 100%;
+    padding-left: 0;
+    margin: 0 auto;
+}
+.livemark-dz-item{
+    display: inline-block;
+    margin-right: 32px;
+    margin-bottom: 6px;
+    cursor:pointer;
+}
+.livemark-dianzans .livemark-dz-item:nth-child(2n){
+    margin-right: 0;
+}
+.livemark-dz-itembox{
+    width: 540px;
+    height: 92px;
+}
+.livemark-dz-avatarbox{
+    width: 102px;
+    height: 92px;
+    position: relative;
+    top: -3px;
+}
+.livemark-dz-avatarbg{
+    position: absolute;
+    top: 0;
+    left: 5px;
+    width: 90px;
+    height: 90px;
+}
+.livemark-dz-avatar{
+    position: absolute;
+    top: 10px;
+    left: 15px;
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    -o-object-fit: cover;
+    object-fit: cover;
+    -o-object-position: center;
+    object-position: center;
+    z-index: 2;
+}
+.livemark-dz-pm{
+    position: absolute;
+    z-index: 5;
+    bottom: -3px;
+    width: 100%;
+}
+.livemark-dz-pm img{
+   width: 100px;
+    height: 28px;
+}
+.livemark-dz-num{
+    margin: 0 auto;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 2px solid #00eaff;
+    background: #1c51ff;
+    text-align: center;
+    line-height: 30px;
+    color: #fff;
+    font-size: 20px;
+}
+.livemark-dz-info{
+    margin-top: 10px;
+    width: 400px;
+    height: 100%;
+}
+.livemark-dz-name{
+    width: 400px;
+    font-size: 16px;
+    color: #fff;
+    height: 20px;
+    line-height: 1;
+    margin-bottom: 8px;
+}
+.livemark-dz-scorebox{
+    position: relative;
+    width: 400px;
+    height: 36px;
+    background: hsla(0,0%,100%,.2);
+    border-radius: 18px;
+    overflow: hidden;
+}
+.livemark-dz-bar{
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 36px;
+    border-radius: 18px;
+}
+.livemark-dz-score{
+    position: absolute;
+    top: 4px;
+    right: 13px;
+    font-size: 20px;
+    color: #fff;
+}
+.livemark-dz-icon{
+    width: 28px;
+    height: 28px;
+    -webkit-flex-shrink: 0;
+    -ms-flex-negative: 0;
+    flex-shrink: 0;
+    margin-left: 9px;
+    margin-top: 38px;
+}
+/*评分排名*/
+.livemark-phbs{
+    width: min(1092px, calc(100% - 72px));
+    height: 100%;
+    margin: 0 auto;
+    overflow: hidden;
+}
+.livemark-phb-top{
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 18px;
+    height: 194px;
+    margin-bottom: 14px;
+}
+.livemark-phb-item{
+    cursor: pointer;
+    min-width: 0;
+}
+.livemark-phb-item:empty{
+    display: none;
+}
+.livemark-phb-item.rank1,
+.livemark-phb-item.rank2,
+.livemark-phb-item.rank3{
+    width: 320px;
+    margin: 0;
+    min-width: 0;
+}
+.livemark-phb-item.rank1{
+    order: 2;
+    width: 410px;
+}
+.livemark-phb-item.rank2{
+    order: 1;
+}
+.livemark-phb-item.rank3{
+    order: 3;
+}
+.livemark-phb-others{
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px 14px;
+    width: 1098px;
+    margin: 0 auto;
+}
+.livemark-phb-other-item{
+    width: auto;
+    margin: 0;
+    cursor: pointer;
+    min-width: 0;
+}
+.livemark-phb-itembox,
+.livemark-phb-other-itembox{
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-height: 56px;
+    padding: 7px 16px;
+    border: 1px solid rgba(111,220,255,.18);
+    border-radius: 18px;
+    background:
+        linear-gradient(90deg, rgba(28,220,255,.1), transparent 42%),
+        linear-gradient(180deg, rgba(20,31,50,.96), rgba(8,14,27,.94));
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 12px 30px rgba(0,0,0,.3);
+    box-sizing: border-box;
+    overflow: hidden;
+    transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+.livemark-phb-itembox.is-top3{
+    display: block;
+    height: 172px;
+    padding: 18px 20px 16px;
+    border-color: rgba(234,173,29,.32);
+    background:
+        radial-gradient(circle at 50% -20%, rgba(255,224,128,.45), transparent 52%),
+        linear-gradient(150deg, rgba(40,52,78,.98), rgba(12,20,36,.96));
+}
+.livemark-phb-itembox.is-rank-1{
+    height: 194px;
+    border-color: rgba(255,217,92,.72);
+    background:
+        radial-gradient(circle at 50% -18%, rgba(255,221,96,.68), transparent 54%),
+        linear-gradient(150deg, rgba(56,45,22,.98), rgba(15,23,38,.96));
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.16), 0 20px 45px rgba(234,173,29,.22);
+}
+.livemark-phb-itembox.is-rank-2{
+    border-color: rgba(205,225,245,.48);
+}
+.livemark-phb-itembox.is-rank-3{
+    border-color: rgba(234,160,104,.48);
+}
+.livemark-phb-itembox:before,
+.livemark-phb-other-itembox:before{
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(120deg, rgba(255,255,255,.16), transparent 28%, transparent 70%, rgba(255,255,255,.05));
+    pointer-events: none;
+}
+.livemark-phb-item:hover .livemark-phb-itembox,
+.livemark-phb-other-item:hover .livemark-phb-other-itembox{
+    transform: translateY(-2px);
+    border-color: rgba(111,220,255,.46);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.1), 0 18px 38px rgba(0,0,0,.36);
+}
+.livemark-phb-avatarbox,
+.livemark-phb-other-avatarbox{
+    position: relative;
+    width: 42px;
+    height: 42px;
+    margin-right: 12px;
+    flex-shrink: 0;
+}
+.livemark-phb-itembox.is-top3 .livemark-phb-avatarbox{
+    width: 74px;
+    height: 74px;
+    margin: 0 auto 8px;
+}
+.livemark-phb-avatarbg{
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+.livemark-phb-avatarbox .user-img,
+.livemark-phb-other-avatarbox .user-img{
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    -o-object-fit: cover;
+    object-fit: cover;
+    -o-object-position: center;
+    object-position: center;
+}
+.livemark-phb-itembox.is-top3 .livemark-phb-avatarbox .user-img{
+    width: 58px;
+    height: 58px;
+}
+.livemark-phb-badge{
+    width: 38px;
+    height: 38px;
+    margin-right: 12px;
+    border-radius: 13px;
+    background: rgba(255,255,255,.08);
+    border: 1px solid rgba(255,255,255,.12);
+    color: #d8dee9;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 38px;
+    text-align: center;
+    flex-shrink: 0;
+}
+.livemark-phb-itembox.is-top3 .livemark-phb-badge{
+    position: absolute;
+    top: 14px;
+    left: 16px;
+    width: 54px;
+    height: 34px;
+    margin: 0;
+    border-radius: 17px;
+    font-size: 20px;
+    line-height: 34px;
+    z-index: 2;
+}
+.livemark-phb-badge-1{
+    color: #10161f;
+    background: linear-gradient(135deg, #f7d978, #d89f16);
+    border-color: rgba(247,217,120,.9);
+}
+.livemark-phb-badge-2{
+    color: #132033;
+    background: linear-gradient(135deg, #d6dee8, #93a3b5);
+    border-color: rgba(214,222,232,.85);
+}
+.livemark-phb-badge-3{
+    color: #1f1510;
+    background: linear-gradient(135deg, #ebb58d, #b96a3d);
+    border-color: rgba(235,181,141,.82);
+}
+.livemark-phb-meta{
+    flex: 1;
+    min-width: 0;
+    padding-right: 10px;
+}
+.livemark-phb-itembox.is-top3 .livemark-phb-meta{
+    padding-right: 0;
+}
+.livemark-phb-name,
+.livemark-phb-other-name{
+    width: 100%;
+    height: auto;
+    margin-bottom: 0;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.15;
+    text-align: left;
+}
+.livemark-phb-name{
+    font-size: 22px;
+    text-align: center;
+}
+.livemark-phb-other-name{
+    font-size: 18px;
+}
+.livemark-phb-status{
+    margin-top: 6px;
+    color: rgba(255,255,255,.56);
+    font-size: 13px;
+    letter-spacing: .08em;
+    text-align: center;
+}
+.livemark-phb-score,
+.livemark-phb-other-score{
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: center;
+    min-width: 150px;
+    color: #fff;
+    line-height: 1;
+    text-align: right;
+    flex-shrink: 0;
+}
+.livemark-phb-score{
+    margin-top: 10px;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    text-align: center;
+}
+.livemark-phb-scoreLabel{
+    color: rgba(255,255,255,.62);
+    font-size: 14px;
+    margin-bottom: 4px;
+    margin-right: 8px;
+    letter-spacing: .02em;
+}
+.livemark-phb-scoreValue{
+    color: #eaad1d;
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: .01em;
+    text-shadow: 0 0 18px rgba(234,173,29,.36);
+}
+.livemark-phb-itembox.is-rank-1 .livemark-phb-scoreValue{
+    font-size: 38px;
+}
+.livemark-phb-other-score .livemark-phb-scoreValue{
+    font-size: 28px;
+}
+.livemark-phb-scoreValue.is-empty{
+    color: rgba(255,255,255,.68);
+    font-size: 18px;
+    font-weight: 500;
+}
+/*评分排名 - 简洁列表版*/
+.livemark-phbs{
+    width: 1098px;
+    height: 470px;
+    margin: 62px auto 0;
+    overflow: hidden;
+}
+.livemark-phb-top,
+.livemark-phb-others{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 1092px;
+    height: auto;
+    margin: 0 auto;
+}
+.livemark-phb-top{
+    margin-bottom: 10px;
+}
+.livemark-phb-item:empty{
+    display: none;
+}
+.livemark-phb-item.rank1,
+.livemark-phb-item.rank2,
+.livemark-phb-item.rank3,
+.livemark-phb-other-item{
+    order: initial;
+    width: 100%;
+    margin: 0;
+    cursor: pointer;
+}
+.livemark-phb-itembox,
+.livemark-phb-other-itembox,
+.livemark-phb-itembox.is-top3,
+.livemark-phb-itembox.is-rank-1,
+.livemark-phb-itembox.is-rank-2,
+.livemark-phb-itembox.is-rank-3{
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 58px;
+    min-height: 58px;
+    padding: 7px 20px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,.14);
+    border-radius: 12px;
+    background: rgba(10,18,32,.82);
+    box-shadow: none;
+    box-sizing: border-box;
+}
+.livemark-phb-itembox:before,
+.livemark-phb-other-itembox:before{
+    display: none;
+}
+.livemark-phb-item:hover .livemark-phb-itembox,
+.livemark-phb-other-item:hover .livemark-phb-other-itembox{
+    transform: none;
+    border-color: rgba(234,173,29,.38);
+    background: rgba(18,27,43,.9);
+    box-shadow: none;
+}
+.livemark-phb-badge,
+.livemark-phb-itembox.is-top3 .livemark-phb-badge{
+    position: static;
+    width: 42px;
+    height: 42px;
+    margin: 0 18px 0 0;
+    border-radius: 8px;
+    background: rgba(255,255,255,.1);
+    border: 1px solid rgba(255,255,255,.16);
+    color: #fff;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 40px;
+    text-align: center;
+    flex-shrink: 0;
+}
+.livemark-phb-badge-1{
+    color: #151515;
+    background: #eaad1d;
+    border-color: #eaad1d;
+}
+.livemark-phb-badge-2{
+    color: #151515;
+    background: #c9d1dc;
+    border-color: #c9d1dc;
+}
+.livemark-phb-badge-3{
+    color: #151515;
+    background: #c9895f;
+    border-color: #c9895f;
+}
+.livemark-phb-avatarbox,
+.livemark-phb-other-avatarbox,
+.livemark-phb-itembox.is-top3 .livemark-phb-avatarbox{
+    position: relative;
+    width: 44px;
+    height: 44px;
+    margin: 0 16px 0 0;
+    flex-shrink: 0;
+}
+.livemark-phb-avatarbox .user-img,
+.livemark-phb-other-avatarbox .user-img,
+.livemark-phb-itembox.is-top3 .livemark-phb-avatarbox .user-img{
+    width: 36px;
+    height: 36px;
+}
+.livemark-phb-meta,
+.livemark-phb-itembox.is-top3 .livemark-phb-meta{
+    flex: 1;
+    min-width: 0;
+    padding-right: 20px;
+}
+.livemark-phb-name,
+.livemark-phb-other-name{
+    color: #fff;
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1.2;
+    text-align: left;
+}
+.livemark-phb-status{
+    display: none;
+}
+.livemark-phb-score,
+.livemark-phb-other-score{
+    display: flex;
+    align-items: baseline;
+    justify-content: flex-end;
+    min-width: 180px;
+    margin: 0;
+    text-align: right;
+    flex-shrink: 0;
+}
+.livemark-phb-scoreLabel{
+    margin: 0 10px 0 0;
+    color: rgba(255,255,255,.58);
+    font-size: 14px;
+}
+.livemark-phb-scoreValue,
+.livemark-phb-other-score .livemark-phb-scoreValue,
+.livemark-phb-itembox.is-rank-1 .livemark-phb-scoreValue{
+    color: #eaad1d;
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1;
+    text-shadow: none;
+}
+.livemark-phb-scoreValue.is-empty{
+    color: rgba(255,255,255,.55);
+    font-size: 16px;
+    font-weight: 500;
+}
+.livemark-userone{
+    position: relative;
+    width: 1178px;
+    height: 600px;
+    margin: 0 auto;
+    border-radius: 10px;
+    background: rgba(0,0,0,.6);
+}
+.returnall{
+    position: absolute;
+    top: 19px;
+    right: 250px;
+    left: auto;
+    z-index: 22;
+    width: 98px;
+    height: 28px;
+    border: 1px solid hsla(0,0%,100%,.36);
+    border-radius: 14px;
+    opacity: .6;
+    cursor: pointer;
+    text-align: center;
+    line-height: 26px;
+    color: #fff;
+    font-size: 14px;
+}
+.livemark-prevone,.livemark-nextone{
+    position: absolute;
+    top: 190px;
+    width: 33px;
+    height: 40px;
+    background-size: 100%;
+    cursor: pointer;
+}
+.livemark-prevone{
+    left:70px;
+    background: url("/{:SIMGURL}livemark/prev.png") no-repeat 50%;
+}
+.livemark-nextone{
+    left:550px;
+    background: url("/{:SIMGURL}livemark/next.png") no-repeat 50%;
+}
+.livemark-leftbox{
+    width: 565px;
+    height: 519px;
+    margin: 66px 23px 15px 46px;
+}
+.livemark-userone-info{
+    position: relative;
+    width: 183px;
+    height: 183px;
+    background: url("/{:SIMGURL}livemark/useronebg.png") no-repeat 50%;
+    background-size: 100%;
+    margin-bottom: 6px;
+}
+.livemark-userone-info img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    margin: auto;
+    width: 120px;
+    height: 120px;
+    -o-object-fit: cover;
+    object-fit: cover;
+    -o-object-position: center;
+    object-position: center;
+    border-radius: 50%;
+}
+.livemark-userone-info div {
+    position: absolute;
+    bottom: 10px;
+    padding: 0 40px;
+    width: 102px;
+    height: 50px;
+    background: url("/{:SIMGURL}livemark/useronenamebg.png") no-repeat 50%;
+    background-size: 100%;
+    text-align: center;
+    line-height: 60px;
+    font-size: 22px;
+    color: #fff;
+}
+.livemark-userone-des{
+    width: 490px;
+    height: 95px;
+    color: #fff;
+    font-size: 14px;
+    line-height: 1.8;
+    margin-bottom: 14px;
+}
+.livemark-user-rank{
+    color: #ffbe10;
+    font-weight: 700;
+    font-size: 18px;
+    line-height: 1;
+    margin-bottom: 18px;
+}
+.livemark-user-zanbox{
+    line-height: 1;
+    color: red;
+    font-size: 18px;
+    margin-bottom: 50px;
+    position: relative;
+}
+.livemark-user-zanbox img{
+    width: 20px;
+    height: 21px;
+    margin-left: 9px;
+}
+.livemark-zan-title{
+    font-size: 16px;
+    color: #fff;
+    line-height: 1;
+    margin-bottom: 11px;
+}
+.livemark-zanbox{
+    width: 541px;
+    height: 89px;
+    background: rgba(0,0,0,.3);
+    border-radius: 2px;
+    padding: 0 12px;
+    overflow: hidden;
+}
+.livemark-zanbox .zanone{
+    margin-right: 20px;
+    width: 52px;
+    height: 52px;
+    padding:3px;
+    border-radius: 50%;
+    border: 1px solid #5abbff;
+}
+.livemark-zanbox .zanone img{
+    width:52px;
+    height:52px;
+    border-radius:26px;
+}
+/*右侧*/
+.livemark-rightbox{
+    width: 480px;
+    height: 518px;
+    margin-top: 66px;
+    background: rgba(0,0,0,.3);
+    border-radius: 2px;
+    padding-left: 17px;
+    position: relative;
+}
+.livemark-user-pj{
+    position: absolute;
+    top: 36px;
+    right: 32px;
+    width: 116px;
+    height: 28px;
+    line-height: 28px;
+    border-radius: 14px;
+    border: 1px solid #fff;
+    color: #fff;
+    font-size: 14px;
+    opacity: .6;
+    text-align: center;
+    cursor: pointer;
+}
+.livemark-user-totalscore{
+    height: 42px;
+    width: 100%;
+    margin-left: 3px;
+    margin-top: 18px;
+    margin-bottom: 10px;
+}
+.livemark-user-score{
+    position: relative;
+    font-size: 18px;
+    line-height: 1;
+    color: #eaad1d;
+}
+.livemark-user-score .pwbox{
+    display: inline-block;
+    position: absolute;
+    right: -10px;
+    top: -10px;
+    color:#fff;
+    display:{if isset($pcconfig['showpwnum']) && $pcconfig['showpwnum']=='2'}none{else /}block{/if};
+}
+.livemark-user-score .pwbox .hadpwnum span{display:inline-block;margin:0 5px;color:#eaad1d;}
+.livemark-user-score .pwbox .pwnums span{display:inline-block;margin:0 5px;color:red;}
+.livemark-user-score .scorenum{font-size: 24px;}
+.livemark-user-totalscore .scoretips{
+    color: #fff;
+    line-height: 1;
+    font-size: 14px;
+    height: 14px;
+}
+.livemark-user-totalscore .scoretips span{
+    display: inline-block;
+    margin-left: 3px;
+}
+.livemark-user-totalscore .scoretips .maxscore{
+    color: green;
+}
+.livemark-user-totalscore .scoretips .minscore{
+    color: red;
+}
+.livemark-user-scroll-list{
+    width: 466px;
+    height: 436px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    font-size: 18px;
+    color: #fff;
+    line-height: 1;
+    position: relative;
+}
+.livemark-user-pingwei .pingweione{
+    width: 421px;
+    margin-bottom: 8px;
+    border: 1px solid hsla(0,0%,100%,.2);
+    border-radius: 4px;
+    {if $hdinfo['id']!='-1'}
+        min-height: 96px;
+        padding: 10px 15px;
+        padding-bottom: 0;
+    {else /}
+        padding:0px 15px;
+        height:76px;
+    {/if}
+}
+.pingweione .pingwei-info{
+    width: 100%;
+    height: 68px;
+}
+.pingwei-info .pingwei-avatar{
+    -webkit-flex-shrink: 0;
+    -ms-flex-negative: 0;
+    flex-shrink: 0;
+    width: 60px;
+    height: 60px;
+    padding: 4px;
+    background: url("/{:SIMGURL}livemark/pingweibg.png") no-repeat 50%;
+    background-size: 100%;
+}
+.pingwei-info .pingwei-avatar img{
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+}
+.pingwei-info .pingwei-name{
+    width: 250px;
+    margin: 0 20px;
+    height: 22px;
+    text-align: left;
+}
+.pingwei-info .pingwei-score{
+    height: 22px;
+    -webkit-flex-shrink: 0;
+    -ms-flex-negative: 0;
+    flex-shrink: 0;
+    color: #eaad1d;
+}
+.pingweione .pingwei-des{
+    width: 410px;
+    line-height: 1.5;
+    color: #fff;
+    font-size: 14px;
+    margin: 8px auto;
+    word-break: break-all;
+}
+.livemark-user-single .singleone{
+    width: 416px;
+    height: 62px;
+    border: 1px solid hsla(0,0%,100%,.2);
+    border-radius: 4px;
+    margin-bottom: 8px;
+    padding: 17px;
+    font-size: 18px;
+    color: #fff;
+}
+.singleone-info .singleone-info-totalscore{color: #eaad1d;}
+.singleone-bar{
+    width: 100%;
+    height: 32px;
+    background: hsla(0,0%,100%,.2);
+    position: relative;
+    top: 0;
+    left: 0;
+    border-radius: 4px;
+    line-height: 32px;
+}
+.singleone-bar-per{
+    border-radius: 4px;
+    background: #005aff;
+    height: 32px;
+}
+.singleone-bar-score{
+    position: absolute;
+    top: 8px;
+    left: 11px;
+    line-height: 1;
+}
+.livemark-user-nodata{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+}
+.hidden{
+    display: none;
+}
+.openpubpw{
+    width: 600px;
+    height: 68px;
+    background:none;
+    background-color:transparent;
+    position: absolute;
+    top: 530px;
+    left:228px;
+    color: #fff;
+    font-weight: 550;
+    z-index: 3;
+}
+.openpubpw.opacity0{opacity: 0;}
+.showpub1{
+    position: absolute;
+    top: 0;
+    left: 30px;
+    width: 150px;
+    height: 34px;
+    line-height: 34px;
+    font-size: 20px;
+}
+.showpub2{
+    position: absolute;
+    top: 0;
+    left: 245px;
+    width: 195px;
+    height: 34px;
+    line-height: 34px;
+    font-size: 20px;
+}
+.showpub3{
+    position: absolute;
+    top: 0;
+    left: 455px;
+    width: 145px;
+    height: 34px;
+    line-height: 34px;
+    font-size: 22px;
+}
+.score_pw{
+    position: absolute;
+    top: 34px;
+    left: 30px;
+    width: 120px;
+    text-align: center;
+    font-size: 20px;
+}
+.score_pw .pw_score{
+    width: 100%;
+    border: 1px solid #fff;
+    height: 28px;
+    line-height: 28px;
+}
+.score_pw .pw_num{
+    margin-top: 5px;
+    width: 100%;
+    font-size:18px;
+    color: #eaad1d;
+    display:{if isset($pcconfig['showpwnum']) && $pcconfig['showpwnum']=='2'}none{else /}block{/if};
+}
+.pwweightbox{
+    position: absolute;
+    top: 34px;
+    left: 160px;
+    width: 80px;
+    height: 34px;
+    line-height: 34px;
+    font-size: 18px;
+}
+.score_pub{
+    position: absolute;
+    top: 34px;
+    left: 245px;
+    width: 120px;
+    line-height: 28px;
+    text-align: center;
+    font-size: 20px;
+}
+.score_pub .pw_score{
+    width: 100%;
+    border: 1px solid #fff;
+    height: 28px;
+}
+.score_pub .pw_num{
+    margin-top: 5px;
+    width: 100%;
+    font-size:18px;
+    color: #eaad1d;
+    display:{if isset($pcconfig['showpwnum']) && $pcconfig['showpwnum']=='2'}none{else /}block{/if};
+}
+.pubweightbox{
+    position: absolute;
+    top: 34px;
+    left: 370px;
+    width: 80px;
+    height: 34px;
+    line-height: 34px;
+    font-size: 18px;
+}
+.score_last{
+    position: absolute;
+    top: 34px;
+    left: 455px;
+    border: 1px solid #fff;
+    width: 120px;
+    height: 28px;
+    line-height: 28px;
+    text-align: center;
+    font-size: 21px;
+}
+.pwbox{
+    display: inline-block;
+    position: absolute;
+    right: 20px;
+    top: 0;
+}
+/*bosheng*/
+.decscorebox,.lastscorebox{
+    color: #fff;
+}
+.decscorebox .decscorebox-icon,.lastscorebox .lastscorebox-icon{
+    display: inline-block;
+    margin: 0 20px;
+}
+.decscorebox .decscorebox-info,.lastscorebox .lastscorebox-info{
+    width: 120px;
+}
+.decscorebox .decscorebox-info .decscorebox-info-title,.lastscorebox .lastscorebox-info .lastscorebox-info-title{
+    margin-bottom: 8px;
+}
+.decscorebox .decscorebox-info .decscorebox-info-score,.lastscorebox .lastscorebox-info .lastscorebox-info-score{
+    display: inline-block;
+    border: 1px solid #fff;
+    width: 100%;
+    text-align: center;
+    padding: 5px 0;
+}
+.livemark-user-pingwei .pingweione.ispwmin .pingwei-score{
+    background-color: red;
+    color: #fff;
+    padding: 3px;
+    border-radius: 2px;
+}
+.livemark-user-pingwei .pingweione.ispwmax .pingwei-score{
+    background-color: green;
+    color: #fff;
+    padding: 3px;
+    border-radius: 2px;
+}
+.livemark-phb-head{
+    display:none;
+}
+.livemark-phb-medal,
+.livemark-phb-tag{
+    display:none;
+}
+.livemark-phb-badge-number{
+    display:inline;
+}
+.livemark-mainbox{
+    font-family:"PingFang SC","Microsoft YaHei",sans-serif;
+}
+.livemark-mainbox:before{
+    content:"";
+    position:absolute;
+    inset:0;
+    z-index:0;
+    pointer-events:none;
+    display:none;
+    background:none;
+}
+.livemark-mainbox .livemark-title,
+.livemark-mainbox .livemark-titleBox,
+.livemark-mainbox .emptybox,
+.livemark-mainbox .livemark-list,
+.livemark-mainbox .livemark-userone,
+.livemark-mainbox .livemark-waitshow,
+.livemark-mainbox .livemark-waitshow2{
+    z-index:1;
+}
+.livemark-title{
+    position:absolute;
+    top:-74px;
+    left:0;
+    z-index:6;
+    width:100%;
+    height:52px;
+    line-height:52px;
+    color:#fff;
+    font-size:44px;
+    font-weight:700;
+    letter-spacing:1px;
+    text-shadow:0 2px 12px rgba(120,0,0,.12);
+}
+.livemark-titleBox{
+    position:absolute;
+    top:-74px;
+    right:0;
+    z-index:7;
+    display:flex;
+    align-items:center;
+    gap:16px;
+}
+.startstopbtn{
+    height:40px;
+    margin:0;
+}
+.startstopbtn .startstatus,
+.startstopbtn .endstatus{
+    position:relative;
+    display:block;
+    width:116px;
+    height:40px;
+    border-radius:999px;
+    background:none;
+    background-size:0 0;
+    box-shadow:0 10px 24px rgba(90,0,0,.10), inset 0 1px 0 rgba(255,255,255,.18);
+    overflow:hidden;
+}
+.startstopbtn .startstatus{
+    background:linear-gradient(135deg, #42d76b, #35c759);
+}
+.startstopbtn .endstatus{
+    background:linear-gradient(135deg, rgba(255,255,255,.16), rgba(255,255,255,.08));
+    border:1px solid rgba(255,255,255,.42);
+}
+.startstopbtn .startstatus:before,
+.startstopbtn .endstatus:before{
+    content:"";
+    position:absolute;
+    top:4px;
+    width:32px;
+    height:32px;
+    border-radius:50%;
+    background:#fff;
+    box-shadow:0 4px 12px rgba(0,0,0,.18);
+    z-index:1;
+}
+.startstopbtn .startstatus:before{
+    right:4px;
+}
+.startstopbtn .endstatus:before{
+    left:4px;
+}
+.startstopbtn .startstatus:after,
+.startstopbtn .endstatus:after{
+    position:absolute;
+    top:0;
+    height:100%;
+    display:flex;
+    align-items:center;
+    color:#fff;
+    font-size:17px;
+    font-weight:700;
+    z-index:2;
+}
+.startstopbtn .startstatus:after{
+    content:"开始";
+    left:18px;
+}
+.startstopbtn .endstatus:after{
+    content:"结束";
+    right:18px;
+}
+.livemark-topbtn,
+.returnall,
+.livemark-user-pj,
+.livemark-userone .pubscore-btn{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-width:132px;
+    height:40px;
+    padding:0 24px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,.65);
+    background:rgba(255,255,255,.12);
+    color:#fff;
+    font-size:17px;
+    font-weight:600;
+    line-height:1;
+    opacity:1;
+    box-shadow:0 10px 24px rgba(90,0,0,.10), inset 0 1px 0 rgba(255,255,255,.22);
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+    box-sizing:border-box;
+}
+.livemark-topbtn:hover,
+.returnall:hover,
+.livemark-user-pj:hover,
+.livemark-userone .pubscore-btn:hover{
+    color:#fff;
+    border-color:rgba(255,255,255,.82);
+    background:rgba(255,255,255,.18);
+}
+.livemark-list,
+.livemark-userone{
+    position:relative;
+    width:min(1560px, calc(100vw - 180px));
+    height:min(700px, calc(100vh - 210px));
+    margin:42px auto 0;
+    border-radius:22px;
+    background:none;
+    border:1px solid rgba(255,255,255,.28);
+    box-shadow:0 18px 45px rgba(90,0,0,.10), inset 0 1px 0 rgba(255,255,255,.20);
+    backdrop-filter:none;
+    -webkit-backdrop-filter:none;
+    box-sizing:border-box;
+    overflow:visible;
+}
+.livemark-list:before,
+.livemark-userone:before{
+    content:"";
+    position:absolute;
+    inset:0;
+    border-radius:inherit;
+    pointer-events:none;
+    display:none;
+    background:none;
+}
+.livemark-btns{
+    bottom:22px;
+    height:40px;
+    gap:16px;
+}
+.livemark-btns>div{
+    width:auto;
+    min-width:116px;
+    height:40px;
+    line-height:38px;
+    padding:0 24px;
+    font-size:16px;
+    color:rgba(255,255,255,.92);
+    opacity:1;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,.45);
+    background:rgba(255,255,255,.08);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.18);
+    margin:0;
+    box-sizing:border-box;
+}
+.livemark-btns>div:hover,
+.livemark-btns>div.active{
+    color:#fff;
+    border-color:rgba(255,255,255,.72);
+    background:rgba(255,255,255,.16);
+}
+
+/* 列表 / 排行 共用舞台 */
+.livemark-list .livemark-scrollbox{
+    height:100%;
+    padding:34px 36px 84px;
+    box-sizing:border-box;
+    background:transparent;
+}
+.livemark-list .livemark-scrollbox > div{
+    width:100%;
+    height:100%;
+    overflow-x:hidden;
+    overflow-y:auto;
+    -ms-overflow-style:none;
+    scrollbar-width:none;
+}
+.livemark-list .livemark-scrollbox > div::-webkit-scrollbar{
+    display:none;
+}
+
+/* 卡片列表视图 */
+.livemark-list .livemark-users{
+    width:100%;
+    min-height:100%;
+    margin:0;
+    padding:0;
+    display:grid;
+    grid-template-columns:repeat(3, minmax(0, 1fr));
+    gap:24px 24px;
+    align-content:start;
+    box-sizing:border-box;
+}
+.livemark-list .livemark-users .livemark-user-item{
+    width:auto;
+    height:176px;
+    margin:0;
+}
+.livemark-list .livemark-users .livemark-user-itembox{
+    width:100%;
+    height:100%;
+    padding:0 28px;
+    display:flex;
+    align-items:center;
+    border-radius:20px;
+    background:rgba(255,255,255,.10);
+    border:1px solid rgba(255,255,255,.26);
+    box-shadow:0 12px 28px rgba(90,0,0,.12), inset 0 1px 0 rgba(255,255,255,.24);
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+    background-image:none;
+    overflow:hidden;
+    box-sizing:border-box;
+}
+.livemark-list .livemark-users .livemark-user-avatar{
+    width:92px;
+    height:92px;
+    margin:0 24px 0 0;
+    padding:5px;
+    border-radius:50%;
+    background:rgba(255,255,255,.86);
+    box-shadow:0 6px 16px rgba(0,0,0,.18);
+    box-sizing:border-box;
+}
+.livemark-list .livemark-users .livemark-user-avatar img{
+    position:static;
+    width:82px;
+    height:82px;
+    border-radius:50%;
+}
+.livemark-list .livemark-users .livemark-user-info{
+    width:auto;
+    height:auto;
+    flex:1;
+    min-width:0;
+    color:rgba(255,255,255,.92);
+}
+.livemark-list .livemark-users .livemark-user-info .livemark-user-name{
+    height:auto;
+    margin-bottom:18px;
+    font-size:22px;
+    font-weight:700;
+    line-height:1.3;
+}
+.livemark-list .livemark-users .livemark-user-score{
+    color:#fff1c4;
+    font-size:18px;
+}
+.livemark-list .livemark-users .livemark-user-score span:last-child{
+    color:#ffd34d;
+    font-size:34px;
+    font-weight:800;
+    margin-left:8px;
+    line-height:1;
+}
+.livemark-list .livemark-users .livemark-user-noscore{
+    right:-10px;
+    bottom:-10px;
+    width:96px;
+    height:96px;
+    background:none;
+    overflow:hidden;
+}
+.livemark-list .livemark-users .livemark-user-noscore:before{
+    content:"待评分";
+    position:absolute;
+    right:-34px;
+    bottom:16px;
+    width:132px;
+    height:28px;
+    line-height:28px;
+    text-align:center;
+    color:#fff;
+    font-size:14px;
+    letter-spacing:1px;
+    background:rgba(255,255,255,.22);
+    transform:rotate(-45deg);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.18);
+}
+
+/* 人气排行视图 */
+.livemark-list .livemark-dianzans{
+    width:100%;
+    margin:0;
+    padding:0;
+    display:flex;
+    flex-wrap:wrap;
+    gap:22px 24px;
+    align-content:flex-start;
+}
+.livemark-list .livemark-dz-item{
+    width:calc(50% - 12px);
+    margin:0;
+}
+.livemark-list .livemark-dianzans .livemark-dz-item:nth-child(2n){
+    margin-right:0;
+}
+.livemark-list .livemark-dz-itembox{
+    width:100%;
+    height:112px;
+    padding:0 22px;
+    align-items:center;
+    border-radius:18px;
+    border:1px solid rgba(255,255,255,.24);
+    background:rgba(255,255,255,.10);
+    box-shadow:0 12px 28px rgba(90,0,0,.12), inset 0 1px 0 rgba(255,255,255,.24);
+    box-sizing:border-box;
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+}
+.livemark-list .livemark-dz-avatarbox{
+    width:92px;
+    height:92px;
+    top:0;
+}
+.livemark-list .livemark-dz-avatarbg{
+    display:none;
+}
+.livemark-list .livemark-dz-avatar{
+    top:10px;
+    left:10px;
+    width:72px;
+    height:72px;
+    padding:4px;
+    border-radius:50%;
+    background:rgba(255,255,255,.86);
+    border:2px solid rgba(255,255,255,.8);
+    box-shadow:0 6px 16px rgba(0,0,0,.22);
+    box-sizing:border-box;
+}
+.livemark-list .livemark-dz-pm{
+    bottom:0;
+}
+.livemark-list .livemark-dz-num{
+    width:34px;
+    height:34px;
+    border:1px solid rgba(255,255,255,.42);
+    background:rgba(255,255,255,.16);
+    line-height:34px;
+    color:#fff;
+    font-size:18px;
+}
+.livemark-list .livemark-dz-info{
+    width:auto;
+    flex:1;
+    min-width:0;
+    margin-top:0;
+}
+.livemark-list .livemark-dz-name{
+    width:100%;
+    margin-bottom:12px;
+    font-size:20px;
+    font-weight:700;
+    color:rgba(255,255,255,.92);
+}
+.livemark-list .livemark-dz-scorebox{
+    width:100%;
+    height:36px;
+    border-radius:999px;
+    background:rgba(255,255,255,.12);
+    border:1px solid rgba(255,255,255,.16);
+}
+.livemark-list .livemark-dz-bar{
+    border-radius:999px;
+    background:linear-gradient(90deg, rgba(255,211,77,.96), rgba(255,102,102,.86));
+}
+.livemark-list .livemark-dz-score{
+    top:7px;
+    right:16px;
+    color:#fff;
+    font-size:18px;
+    font-weight:700;
+}
+.livemark-list .livemark-dz-icon{
+    width:24px;
+    height:24px;
+    margin:0 0 0 12px;
+}
+
+/* 得分排行视图 */
+.livemark-list .livemark-phbs{
+    width:100%;
+    height:100%;
+    margin:0;
+    padding:0;
+    overflow-x:hidden;
+    overflow-y:auto;
+    border-radius:22px;
+    background:rgba(255,255,255,.07);
+    border:1px solid rgba(255,255,255,.18);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.22);
+    box-sizing:border-box;
+    -ms-overflow-style:none;
+    scrollbar-width:none;
+}
+.livemark-list .livemark-phbs::-webkit-scrollbar{
+    display:none;
+}
+.livemark-list .livemark-phb-head{
+    display:grid;
+    position:sticky;
+    top:0;
+    z-index:4;
+    grid-template-columns:170px minmax(0, 1fr) 210px;
+    width:100%;
+    height:74px;
+    margin:0;
+    border-radius:22px 22px 0 0;
+    background:rgba(255,255,255,.14);
+    color:#fff;
+    font-size:24px;
+    font-weight:700;
+    border-bottom:1px solid rgba(255,255,255,.18);
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+}
+.livemark-list .livemark-phb-head span{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+.livemark-list .livemark-phb-top,
+.livemark-list .livemark-phb-others{
+    display:block;
+    width:100%;
+    margin:0;
+}
+.livemark-list .livemark-phb-item.rank1,
+.livemark-list .livemark-phb-item.rank2,
+.livemark-list .livemark-phb-item.rank3,
+.livemark-list .livemark-phb-other-item{
+    width:100%;
+    margin:0;
+}
+.livemark-list .livemark-phb-itembox,
+.livemark-list .livemark-phb-other-itembox,
+.livemark-list .livemark-phb-itembox.is-top3,
+.livemark-list .livemark-phb-itembox.is-rank-1,
+.livemark-list .livemark-phb-itembox.is-rank-2,
+.livemark-list .livemark-phb-itembox.is-rank-3{
+    position:relative;
+    display:grid;
+    grid-template-columns:170px minmax(0, 1fr) 210px;
+    align-items:center;
+    width:100%;
+    min-height:92px;
+    height:auto;
+    padding:0 22px 0 0;
+    border:none;
+    border-bottom:1px solid rgba(255,255,255,.16);
+    border-left:3px solid transparent;
+    border-radius:0;
+    background:rgba(255,255,255,.08);
+    box-shadow:none;
+    overflow:hidden;
+    box-sizing:border-box;
+}
+.livemark-list .livemark-phb-itembox:before,
+.livemark-list .livemark-phb-other-itembox:before{
+    display:none;
+}
+.livemark-list .livemark-phb-item:hover .livemark-phb-itembox,
+.livemark-list .livemark-phb-other-item:hover .livemark-phb-other-itembox{
+    transform:none;
+    border-color:rgba(255,255,255,.30);
+    background:rgba(255,255,255,.16);
+    box-shadow:none;
+}
+.livemark-list .livemark-phb-itembox.is-rank-1{
+    border-left-color:#ffd34d;
+    background:linear-gradient(90deg, rgba(255,211,77,.14), rgba(255,255,255,.08) 28%);
+}
+.livemark-list .livemark-phb-itembox.is-rank-2{
+    border-left-color:#bfe8ff;
+    background:linear-gradient(90deg, rgba(191,232,255,.12), rgba(255,255,255,.08) 28%);
+}
+.livemark-list .livemark-phb-itembox.is-rank-3{
+    border-left-color:#ffb15c;
+    background:linear-gradient(90deg, rgba(255,177,92,.12), rgba(255,255,255,.08) 28%);
+}
+.livemark-list .livemark-phb-badge,
+.livemark-list .livemark-phb-itembox.is-top3 .livemark-phb-badge{
+    position:static;
+    width:88px;
+    height:88px;
+    margin:0 auto;
+    padding:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border:none;
+    border-radius:0;
+    background:none;
+    font-size:0;
+    text-align:center;
+}
+.livemark-list .livemark-phb-badge-number{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:44px;
+    height:44px;
+    border-radius:50%;
+    background:rgba(255,255,255,.16);
+    border:1px solid rgba(255,255,255,.24);
+    color:#fff;
+    font-size:20px;
+    font-weight:700;
+}
+.livemark-list .livemark-phb-itembox.is-top3 .livemark-phb-badge-number{
+    display:none;
+}
+.livemark-list .livemark-phb-medal{
+    display:block;
+    width:60px;
+    height:60px;
+    margin:0 auto;
+}
+.livemark-list .livemark-phb-itembox.is-rank-1 .livemark-phb-medal{
+    filter:drop-shadow(0 0 8px rgba(255,211,77,.16));
+}
+.livemark-list .livemark-phb-itembox.is-rank-2 .livemark-phb-medal{
+    filter:drop-shadow(0 0 8px rgba(191,232,255,.14));
+}
+.livemark-list .livemark-phb-itembox.is-rank-3 .livemark-phb-medal{
+    filter:drop-shadow(0 0 8px rgba(255,177,92,.14));
+}
+.livemark-list .livemark-phb-player{
+    display:flex;
+    align-items:center;
+    min-width:0;
+}
+.livemark-list .livemark-phb-avatarbg,
+.livemark-list .livemark-phb-tag,
+.livemark-list .livemark-phb-status{
+    display:none;
+}
+.livemark-list .livemark-phb-avatarbox,
+.livemark-list .livemark-phb-other-avatarbox,
+.livemark-list .livemark-phb-itembox.is-top3 .livemark-phb-avatarbox{
+    position:relative;
+    width:68px;
+    height:68px;
+    margin:0 18px 0 0;
+    flex-shrink:0;
+}
+.livemark-list .livemark-phb-avatarbox .user-img,
+.livemark-list .livemark-phb-other-avatarbox .user-img,
+.livemark-list .livemark-phb-itembox.is-top3 .livemark-phb-avatarbox .user-img{
+    position:static;
+    width:68px;
+    height:68px;
+    padding:4px;
+    border-radius:50%;
+    background:rgba(255,255,255,.86);
+    border:2px solid rgba(255,255,255,.8);
+    box-shadow:0 6px 16px rgba(0,0,0,.18);
+    object-fit:cover;
+    box-sizing:border-box;
+}
+.livemark-list .livemark-phb-meta,
+.livemark-list .livemark-phb-itembox.is-top3 .livemark-phb-meta{
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    min-width:0;
+    min-height:68px;
+    padding-right:20px;
+}
+.livemark-list .livemark-phb-name,
+.livemark-list .livemark-phb-other-name{
+    color:rgba(255,255,255,.92);
+    font-size:20px;
+    font-weight:700;
+    line-height:1.25;
+    text-align:left;
+}
+.livemark-list .livemark-phb-score,
+.livemark-list .livemark-phb-other-score{
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    min-width:0;
+    padding-right:0;
+    text-align:right;
+}
+.livemark-list .livemark-phb-scoreLabel{
+    display:none;
+}
+.livemark-list .livemark-phb-scoreValue,
+.livemark-list .livemark-phb-other-score .livemark-phb-scoreValue,
+.livemark-list .livemark-phb-itembox.is-rank-1 .livemark-phb-scoreValue{
+    color:#fff;
+    font-size:26px;
+    font-weight:800;
+    line-height:1;
+    text-shadow:none;
+    white-space:nowrap;
+}
+.livemark-list .livemark-phb-itembox.is-rank-1 .livemark-phb-scoreValue{
+    color:#ffd65a;
+}
+.livemark-list .livemark-phb-itembox.is-rank-2 .livemark-phb-scoreValue{
+    color:#bfe8ff;
+}
+.livemark-list .livemark-phb-itembox.is-rank-3 .livemark-phb-scoreValue{
+    color:#ffb15c;
+}
+.livemark-list .livemark-phb-scoreValue.is-empty{
+    color:#bfd2e8;
+    font-size:18px;
+    font-weight:600;
+}
+
+/* 单人详情视图 */
+.livemark-userone{
+    display:grid!important;
+    grid-template-rows:160px minmax(0, 1fr);
+    gap:16px;
+    align-items:stretch;
+    width:min(1360px, 86vw);
+    height:min(760px, calc(100vh - 190px));
+    min-height:0;
+    margin:70px auto 0;
+    padding:0;
+    border:0;
+    border-radius:0;
+    background:none;
+    box-shadow:none;
+    backdrop-filter:none;
+    -webkit-backdrop-filter:none;
+    overflow:visible;
+}
+.livemark-userone.display-none{
+    display:none!important;
+}
+.livemark-userone:before{
+    display:none;
+}
+.livemark-userone .hidden,
+.livemark-userone .display-none{
+    display:none !important;
+}
+.livemark-userone .startstopbtn{
+    position:absolute;
+    top:-56px;
+    right:172px;
+    z-index:7;
+}
+.livemark-userone .returnall{
+    position:absolute;
+    top:-56px;
+    right:0;
+    z-index:7;
+    left:auto;
+}
+.livemark-userone .pubscore-btn{
+    position:absolute;
+    top:-56px;
+    right:336px;
+    z-index:7;
+    width:auto;
+}
+.livemark-prevone,
+.livemark-nextone{
+    top:50%;
+    width:54px;
+    height:54px;
+    margin-top:-27px;
+    border-radius:50%;
+    border:1px solid rgba(255,220,145,.34);
+    background:rgba(255,255,255,.08)!important;
+    background-size:18px auto;
+    box-shadow:0 10px 24px rgba(90,0,0,.12), inset 0 1px 0 rgba(255,255,255,.20);
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+}
+.livemark-prevone:before,
+.livemark-nextone:before{
+    content:"";
+    position:absolute;
+    top:50%;
+    left:50%;
+    width:16px;
+    height:16px;
+    border-left:3px solid rgba(255,222,145,.94);
+    border-bottom:3px solid rgba(255,222,145,.94);
+    filter:drop-shadow(0 1px 2px rgba(120,0,0,.28));
+    box-sizing:border-box;
+}
+.livemark-prevone:before{
+    transform:translate(-38%, -50%) rotate(45deg);
+}
+.livemark-nextone:before{
+    transform:translate(-62%, -50%) rotate(-135deg);
+}
+.livemark-prevone{
+    left:-90px;
+}
+.livemark-nextone{
+    left:auto;
+    right:-90px;
+}
+.livemark-user-summary{
+    display:flex;
+    align-items:center;
+    height:160px;
+    min-height:0;
+    min-width:0;
+    width:100%;
+    padding:14px 28px;
+    border-radius:22px;
+    background:none;
+    border:1px solid rgba(255,255,255,.24);
+    box-shadow:0 12px 26px rgba(90,0,0,.08), inset 0 1px 0 rgba(255,255,255,.14);
+    box-sizing:border-box;
+}
+.livemark-user-summary-main{
+    display:grid;
+    grid-template-columns:330px minmax(0, 1fr);
+    gap:24px;
+    align-items:stretch;
+    width:100%;
+    height:100%;
+    min-width:0;
+}
+.livemark-leftbox{
+    display:grid;
+    grid-template-columns:84px minmax(0, 1fr);
+    grid-template-rows:auto auto;
+    align-content:center;
+    align-items:center;
+    justify-content:stretch;
+    width:auto;
+    height:100%;
+    margin:0;
+    padding:0 24px 0 0;
+    border-radius:0;
+    background:none;
+    border:none;
+    border-right:1px solid rgba(255,255,255,.18);
+    box-shadow:none;
+    box-sizing:border-box;
+    column-gap:18px;
+    row-gap:8px;
+    min-width:0;
+    overflow:visible;
+}
+.livemark-userone-info{
+    display:contents;
+    width:auto;
+    min-height:0;
+    margin:0;
+    margin-left:0;
+    padding:0;
+    left:auto;
+    border-radius:0;
+    background:none;
+    border:none;
+    background-image:none;
+    box-sizing:border-box;
+    overflow:visible;
+}
+.livemark-userone-info img{
+    position:static;
+    grid-column:1;
+    grid-row:1 / span 2;
+    width:84px;
+    height:84px;
+    padding:5px;
+    display:block;
+    object-fit:cover;
+    border-radius:50%;
+    background:rgba(255,255,255,.86);
+    border:2px solid rgba(255,255,255,.80);
+    box-shadow:0 6px 16px rgba(0,0,0,.18);
+    box-sizing:border-box;
+    flex-shrink:0;
+}
+.livemark-userone-info div{
+    position:static;
+    grid-column:2;
+    grid-row:1;
+    align-self:end;
+    width:100%;
+    max-width:100%;
+    min-width:0;
+    flex:1;
+    height:auto;
+    margin-top:0;
+    margin-left:0;
+    padding:0;
+    background:none;
+    box-sizing:border-box;
+    line-height:1.2;
+    font-size:26px;
+    font-weight:700;
+    text-align:left;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+.livemark-userone-des{
+    display:block !important;
+    grid-column:2;
+    grid-row:2;
+    align-self:start;
+    width:100%;
+    max-width:100%;
+    min-width:0;
+    max-height:66px;
+    box-sizing:border-box;
+    color:rgba(255,255,255,.72);
+    font-size:15px;
+    font-weight:500;
+    line-height:1.45;
+    text-align:left;
+    overflow:hidden;
+    word-break:break-word;
+    overflow-wrap:anywhere;
+    display:-webkit-box !important;
+    -webkit-line-clamp:3;
+    -webkit-box-orient:vertical;
+}
+.livemark-user-rank{
+    display:none;
+}
+.livemark-user-zanbox{
+    display:none;
+}
+.livemark-zan-title{
+    display:none;
+}
+.livemark-zanbox{
+    display:none;
+}
+.livemark-zanbox .zanone{
+    display:none;
+}
+.livemark-zanbox .zanone img{
+    display:none;
+}
+.livemark-zanmain{
+    display:none;
+}
+.livemark-rightbox{
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    gap:0;
+    width:auto;
+    height:100%;
+    margin:0;
+    padding:0;
+    background:none;
+    border-radius:0;
+    border:none;
+    box-shadow:none;
+    position:relative;
+    box-sizing:border-box;
+    min-width:0;
+    overflow:visible;
+}
+.livemark-user-pj{
+    top:20px;
+    right:20px;
+    width:auto;
+    min-width:142px;
+}
+.livemark-user-totalscore{
+    width:100%;
+    height:100%;
+    min-height:0;
+    margin:0;
+    padding-right:0;
+    box-sizing:border-box;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    overflow:visible;
+}
+.livemark-user-score{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:6px 12px;
+    position:relative;
+    width:100%;
+    height:auto;
+    flex:0 0 auto;
+    min-height:0;
+    padding:0;
+    border-radius:0;
+    border:none;
+    background:none;
+    font-size:22px;
+    line-height:1;
+    color:#ffd34d;
+    box-sizing:border-box;
+}
+.livemark-user-score-main{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-width:320px;
+    min-height:58px;
+    padding:0 20px;
+    border-radius:20px;
+    border:none;
+    background:none;
+    box-sizing:border-box;
+}
+.livemark-user-score .scoretype{
+    display:inline-flex;
+    align-items:center;
+    margin-right:12px;
+    color:rgba(255,255,255,.92);
+    font-size:24px;
+    font-weight:700;
+    line-height:1;
+}
+.livemark-user-score .scorenum{
+    font-size:42px;
+    font-weight:800;
+    line-height:1;
+}
+.livemark-user-score .pwbox{
+    display:none !important;
+}
+.livemark-user-score .pwbox .hadpwnum span,
+.livemark-user-score .pwbox .pwnums span{
+    color:#ffd34d;
+}
+.livemark-user-score-meta{
+    display:flex !important;
+    align-items:center;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:6px 12px;
+    width:100%;
+    min-height:0;
+    margin-top:0;
+    color:rgba(255,255,255,.82);
+    font-size:13px;
+    line-height:1.2;
+}
+.livemark-user-totalscore .scoretips{
+    display:none;
+    align-items:center;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:6px 10px;
+    width:100%;
+    padding:2px 0;
+    margin-top:0;
+    color:rgba(255,255,255,.82);
+    font-size:12px;
+    line-height:1.2;
+    height:auto;
+    min-height:0;
+    overflow:visible;
+}
+.livemark-user-totalscore .scoretips:not(:empty){
+    display:flex !important;
+}
+.livemark-user-totalscore .scoretips .scoretip-item{
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+    min-width:0;
+    min-height:26px;
+    padding:2px 9px;
+    border-radius:10px;
+    border:1px solid rgba(255,255,255,.14);
+    background:rgba(255,255,255,.08);
+    box-sizing:border-box;
+    margin-left:0;
+    white-space:nowrap;
+}
+.livemark-user-totalscore .scoretips .scoretip-label{
+    flex-shrink:0;
+    margin-left:0;
+    color:rgba(255,255,255,.72);
+    font-weight:700;
+}
+.livemark-user-totalscore .scoretips .scoretip-value{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-width:44px;
+    padding:2px 6px;
+    margin-left:0;
+    border-radius:999px;
+    background:rgba(255,255,255,.12);
+    font-weight:800;
+}
+.livemark-user-totalscore.ispubpwscore{
+    padding-right:0;
+}
+.livemark-user-totalscore .scoretips .maxscore{
+    color:#ffe2a5;
+}
+.livemark-user-totalscore .scoretips .minscore{
+    color:#bfd2e8;
+}
+.livemark-user-totalscore .scoretips .decscore{
+    color:#ffd34d;
+}
+.livemark-user-score-meta .decscorebox,
+.livemark-user-score-meta .lastscorebox{
+    display:none;
+    align-items:center;
+    gap:6px;
+    margin-left:0;
+    min-height:30px;
+}
+.livemark-user-score-meta .decscorebox-icon,
+.livemark-user-score-meta .lastscorebox-icon{
+    margin:0;
+    color:rgba(255,255,255,.72);
+    font-size:16px;
+    line-height:1;
+}
+.livemark-user-score-meta .decscorebox-info,
+.livemark-user-score-meta .lastscorebox-info{
+    width:auto;
+    min-width:86px;
+    gap:4px;
+}
+.livemark-user-score-meta .decscorebox-info-title,
+.livemark-user-score-meta .lastscorebox-info-title{
+    margin-bottom:0;
+    color:rgba(255,255,255,.72);
+    font-size:12px;
+    font-weight:700;
+    line-height:1;
+}
+.decscorebox .decscorebox-info .decscorebox-info-score,
+.lastscorebox .lastscorebox-info .lastscorebox-info-score{
+    border:1px solid rgba(255,255,255,.24);
+    border-radius:10px;
+    background:none;
+    min-width:64px;
+    padding:4px 8px;
+    box-sizing:border-box;
+    color:#ffd34d;
+    font-size:14px;
+    font-weight:800;
+    line-height:1;
+}
+.livemark-user-score-meta .decscorebox:not(.hidden),
+.livemark-user-score-meta .lastscorebox:not(.hidden){
+    display:none;
+}
+.livemark-user-totalscore.ispubpwscore .livemark-user-score.hidden{
+    display:none !important;
+}
+.livemark-user-detailpanel{
+    position:relative;
+    height:100%;
+    max-height:none;
+    min-height:0;
+    width:100%;
+    padding:0;
+    border-radius:0;
+    background:none;
+    border:none;
+    box-shadow:none;
+    box-sizing:border-box;
+    overflow:hidden;
+}
+.livemark-user-scroll-list{
+    width:100%;
+    height:100%;
+    min-height:0;
+    max-height:inherit;
+    left:auto;
+    margin-left:0;
+    padding-right:8px;
+    box-sizing:border-box;
+    overflow-x:hidden;
+    overflow-y:auto;
+    position:relative;
+}
+.livemark-user-detailpanel:has(.livemark-user-nodata:not(.display-none)){
+    min-height:120px;
+}
+.livemark-user-detailpanel:has(.livemark-user-nodata:not(.display-none)) .livemark-user-scroll-list{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding-right:0;
+}
+.livemark-user-pingwei:empty + .livemark-user-single.display-none + .livemark-user-nodata,
+.livemark-user-pingwei.display-none + .livemark-user-single:empty + .livemark-user-nodata{
+    display:flex !important;
+}
+.livemark-user-pingwei{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(180px, 200px));
+    gap:16px;
+    align-content:start;
+    justify-content:center;
+    width:100%;
+    min-width:0;
+}
+.livemark-user-pingwei .pingweione,
+.livemark-user-single .singleone{
+    width:100%;
+    margin-bottom:0;
+    border:1px solid rgba(255,255,255,.18);
+    border-radius:16px;
+    background:none;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
+    box-sizing:border-box;
+}
+.livemark-user-pingwei .pingweione{
+    position:relative;
+    height:200px;
+    min-height:200px;
+    margin-bottom:0;
+    padding:10px 10px!important;
+    border-radius:18px;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    justify-content:space-between!important;
+    background:none;
+    cursor:pointer;
+}
+.pingweione .pingwei-info{
+    display:flex!important;
+    flex-direction:column;
+    gap:8px;
+    width:100%;
+    min-height:0;
+    height:100%;
+    padding-top:12px;
+    align-items:center!important;
+    justify-content:flex-start!important;
+    box-sizing:border-box;
+}
+.pingwei-info .pingwei-avatar{
+    width:66px;
+    height:66px;
+    padding:0;
+    background:none;
+    flex-shrink:0;
+}
+.pingwei-info .pingwei-avatar img{
+    width:66px;
+    height:66px;
+    padding:4px;
+    background:rgba(255,255,255,.86);
+    border:2px solid rgba(255,255,255,.8);
+    box-shadow:0 6px 16px rgba(0,0,0,.18);
+    box-sizing:border-box;
+}
+.pingwei-info .pingwei-name{
+    width:100%;
+    color:rgba(255,255,255,.92);
+    font-size:17px;
+    font-weight:700;
+    line-height:1.35;
+    margin:0;
+    text-align:center;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+.pingwei-info .pingwei-score{
+    align-self:center;
+    margin-top:auto;
+    width:142px;
+    height:46px;
+    min-width:142px;
+    min-height:46px;
+    padding:0;
+    border-radius:14px;
+    background:rgba(255,255,255,.92);
+    border:1px solid rgba(255,255,255,.80);
+    color:#f02b24;
+    font-size:17px;
+    font-weight:800;
+    line-height:1.15;
+    text-align:center;
+    box-shadow:none;
+    box-sizing:border-box;
+    display:flex!important;
+    align-items:center;
+    justify-content:center;
+}
+.livemark-user-pingwei .pingweione.ispwmin .pingwei-score{
+    background:linear-gradient(180deg, rgba(232,239,248,.96), rgba(202,216,232,.92));
+    border-color:rgba(188,205,224,.96);
+    color:#5f748e;
+    width:142px;
+    height:46px;
+    min-width:142px;
+    min-height:46px;
+    padding:0;
+    border-radius:14px;
+    border-width:1px;
+    border-style:solid;
+    line-height:1.15;
+    box-sizing:border-box;
+}
+.livemark-user-pingwei .pingweione.ispwmax .pingwei-score{
+    background:linear-gradient(180deg, rgba(255,239,188,.98), rgba(255,210,92,.92));
+    border-color:rgba(255,214,90,.96);
+    color:#ba3b00;
+    width:142px;
+    height:46px;
+    min-width:142px;
+    min-height:46px;
+    padding:0;
+    border-radius:14px;
+    border-width:1px;
+    border-style:solid;
+    line-height:1.15;
+    box-sizing:border-box;
+}
+.pingweione .pingwei-des{
+    display:none;
+}
+.livemark-user-single{
+    width:100%;
+}
+.livemark-user-single .singleone{
+    margin-bottom:14px;
+    padding:18px 20px;
+}
+.livemark-user-single.is-judge-detail{
+    height:100%;
+}
+.livemark-judge-detail{
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+    width:100%;
+    min-height:100%;
+    color:#fff;
+}
+.livemark-judge-detail-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:18px;
+    padding:14px 16px;
+    border-radius:16px;
+    border:1px solid rgba(255,255,255,.18);
+    background:rgba(255,255,255,.08);
+    box-sizing:border-box;
+}
+.livemark-judge-detail-label{
+    margin-right:10px;
+    color:rgba(255,255,255,.68);
+    font-size:14px;
+    font-weight:700;
+}
+.livemark-judge-detail-name{
+    color:#fff;
+    font-size:22px;
+    font-weight:800;
+}
+.livemark-judge-detail-actions{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    flex-shrink:0;
+}
+.livemark-judge-detail-score{
+    padding:8px 12px;
+    border-radius:999px;
+    background:rgba(255,255,255,.92);
+    color:#f02b24;
+    font-size:16px;
+    font-weight:800;
+}
+.livemark-judge-detail-back{
+    height:36px;
+    padding:0 16px;
+    border:1px solid rgba(255,255,255,.24);
+    border-radius:999px;
+    background:rgba(255,255,255,.12);
+    color:#fff;
+    font-size:15px;
+    font-weight:700;
+    cursor:pointer;
+}
+.livemark-judge-detail-body{
+    display:grid;
+    grid-template-columns:minmax(0, 1.05fr) minmax(280px, .95fr);
+    gap:16px;
+    min-height:0;
+}
+.livemark-judge-detail-left,
+.livemark-judge-detail-right{
+    min-width:0;
+    padding:16px;
+    border-radius:18px;
+    border:1px solid rgba(255,255,255,.16);
+    background:rgba(255,255,255,.07);
+    box-sizing:border-box;
+}
+.livemark-judge-detail-title{
+    margin-bottom:12px;
+    color:rgba(255,255,255,.76);
+    font-size:16px;
+    font-weight:800;
+}
+.livemark-judge-score-item{
+    margin-bottom:14px;
+    padding:14px 16px;
+    border-radius:15px;
+    border:1px solid rgba(255,255,255,.14);
+    background:rgba(255,255,255,.07);
+}
+.livemark-judge-score-name{
+    margin-bottom:10px;
+    font-size:17px;
+    font-weight:800;
+}
+.livemark-judge-score-bar{
+    position:relative;
+    height:34px;
+    overflow:hidden;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,.14);
+    background:rgba(255,255,255,.12);
+}
+.livemark-judge-score-bar-per{
+    position:absolute;
+    left:0;
+    top:0;
+    height:100%;
+    border-radius:999px;
+    background:linear-gradient(90deg, rgba(255,211,77,.96), rgba(255,102,102,.84));
+}
+.livemark-judge-score-value{
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#fff;
+    font-size:15px;
+    font-weight:800;
+}
+.livemark-judge-comment-one{
+    margin-bottom:12px;
+    padding:13px 14px;
+    border-radius:14px;
+    border:1px solid rgba(255,255,255,.14);
+    background:rgba(255,255,255,.07);
+}
+.livemark-judge-comment-name{
+    margin-bottom:7px;
+    color:#ffd34d;
+    font-size:16px;
+    font-weight:800;
+}
+.livemark-judge-comment-text{
+    color:rgba(255,255,255,.88);
+    font-size:15px;
+    line-height:1.55;
+    word-break:break-word;
+}
+.livemark-judge-score-empty,
+.livemark-judge-comment-empty{
+    padding:22px 14px;
+    color:rgba(255,255,255,.68);
+    font-size:16px;
+    text-align:center;
+}
+.livemark-user-detailpanel .livemark-user-pj{
+    position:absolute;
+    top:-52px;
+    right:20px;
+    z-index:3;
+}
+.livemark-user-detailpanel .livemark-user-nodata{
+    font-size:18px;
+    color:rgba(255,255,255,.78);
+    text-align:center;
+    padding:0 24px;
+}
+.livemark-user-single .singleone{
+    height:auto;
+    padding:16px 18px;
+    color:#fff;
+}
+.singleone-info .singleone-info-totalscore{
+    color:#ffd34d;
+}
+.singleone-bar{
+    height:34px;
+    border-radius:999px;
+    background:rgba(255,255,255,.12);
+    border:1px solid rgba(255,255,255,.14);
+}
+.singleone-bar-per{
+    border-radius:999px;
+    background:linear-gradient(90deg, rgba(255,211,77,.96), rgba(255,102,102,.84));
+}
+.singleone-bar-score{
+    top:9px;
+    color:#fff;
+}
+.livemark-user-nodata{
+    position:absolute;
+    inset:0;
+    color:rgba(255,255,255,.86);
+}
+
+/* 等待态 / 特殊态 */
+.openpubpw,
+.dzhuoba,
+.dzshule{
+    border-radius:18px;
+    background:none;
+    border:1px solid rgba(255,255,255,.22);
+    box-shadow:none;
+    backdrop-filter:none;
+    -webkit-backdrop-filter:none;
+}
+.livemark-mainbox .livemark-waitshow,
+.livemark-mainbox .livemark-waitshow2{
+    position:absolute;
+    top:50%;
+    left:50%;
+    width:min(1320px, calc(100vw - 220px));
+    min-height:420px;
+    margin:0;
+    padding:36px;
+    transform:translate(-50%, -50%);
+    z-index:8;
+    border-radius:22px;
+    background:rgba(255,255,255,.10);
+    border:1px solid rgba(255,255,255,.28);
+    box-shadow:0 18px 45px rgba(90,0,0,.16), inset 0 1px 0 rgba(255,255,255,.30);
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+    box-sizing:border-box;
+    color:#fff;
+}
+.livemark-mainbox .livemark-waitshow:before,
+.livemark-mainbox .livemark-waitshow2:before{
+    content:"";
+    position:absolute;
+    inset:0;
+    border-radius:inherit;
+    pointer-events:none;
+    background:linear-gradient(135deg, rgba(255,255,255,.12), rgba(255,255,255,.03) 32%, rgba(255,255,255,.02) 100%);
+}
+.livemark-mainbox .livemark-waitshow .title,
+.livemark-mainbox .livemark-waitshow2 .livemark-markname,
+.livemark-mainbox .openmarkbox .livemark-markcompany{
+    color:#fff;
+    text-shadow:none;
+}
+.livemark-mainbox .livemark-waitshow .publish-btn,
+.livemark-mainbox .livemark-waitshow2 .public-box .publish-btn{
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,.58);
+    background:rgba(255,255,255,.14);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.20);
+}
+.livemark-theme-blue_theme{
+    --lm-primary:#4DB8FF;
+    --lm-primary-light:#6ED6FF;
+    --lm-primary-deep:#2F8CFF;
+    --lm-neon:#63F3FF;
+    --lm-gold:#FFC857;
+    --lm-bg:#071426;
+    --lm-bg-deep:#050D1A;
+    --lm-panel-bg:rgba(15,35,68,.58);
+    --lm-panel-bg-strong:rgba(8,26,51,.82);
+    --lm-border:rgba(120,190,255,.18);
+    --lm-border-active:rgba(110,214,255,.65);
+    --lm-text-main:#fff;
+    --lm-text-sub:rgba(255,255,255,.72);
+    --lm-text-muted:rgba(255,255,255,.45);
+    --lm-score:#4DB8FF;
+    --lm-success:#3DFFB5;
+    --lm-danger:#FF7A59;
+    position:relative;
+    overflow:hidden;
+}
+.livemark-theme-blue_theme:before{
+    display:block;
+    background:radial-gradient(circle at top, #123A6B 0%, var(--lm-bg) 55%);
+}
+.livemark-theme-blue_theme .livemark-title,
+.livemark-theme-blue_theme .livemark-phb-name,
+.livemark-theme-blue_theme .livemark-phb-other-name,
+.livemark-theme-blue_theme .livemark-user-name,
+.livemark-theme-blue_theme .livemark-userone-info div,
+.livemark-theme-blue_theme .pingwei-name,
+.livemark-theme-blue_theme .singleone-info span{
+    color:var(--lm-text-main);
+}
+.livemark-theme-blue_theme .livemark-list,
+.livemark-theme-blue_theme .livemark-userone,
+.livemark-theme-blue_theme .livemark-rightbox,
+.livemark-theme-blue_theme .livemark-zanbox,
+.livemark-theme-blue_theme .livemark-user-pingwei .pingweione,
+.livemark-theme-blue_theme .livemark-user-single .singleone,
+.livemark-theme-blue_theme .livemark-phb-itembox,
+.livemark-theme-blue_theme .livemark-phb-other-itembox{
+    background:var(--lm-panel-bg);
+    border-color:var(--lm-border);
+    box-shadow:0 12px 40px rgba(0,0,0,.35);
+    backdrop-filter:blur(20px);
+    -webkit-backdrop-filter:blur(20px);
+}
+.livemark-theme-blue_theme .livemark-scrollbox{
+    background:rgba(5,13,26,.42);
+}
+.livemark-theme-blue_theme .livemark-users .livemark-user-itembox{
+    background-image:none;
+    border:1px solid var(--lm-border);
+    border-radius:14px;
+    background:var(--lm-panel-bg);
+    box-shadow:0 12px 40px rgba(0,0,0,.28);
+    box-sizing:border-box;
+}
+.livemark-theme-blue_theme .livemark-users .livemark-user-item:hover .livemark-user-itembox,
+.livemark-theme-blue_theme .livemark-phb-item:hover .livemark-phb-itembox,
+.livemark-theme-blue_theme .livemark-phb-other-item:hover .livemark-phb-other-itembox{
+    transform:translateY(-2px);
+    border-color:var(--lm-border-active);
+    box-shadow:0 0 0 1px rgba(77,184,255,.2), 0 0 20px rgba(77,184,255,.15), 0 12px 40px rgba(0,0,0,.35);
+}
+.livemark-theme-blue_theme .livemark-topbtn,
+.livemark-theme-blue_theme .returnall,
+.livemark-theme-blue_theme .livemark-user-pj,
+.livemark-theme-blue_theme .livemark-userone .pubscore-btn,
+.livemark-theme-blue_theme .livemark-btns>div{
+    color:var(--lm-text-sub);
+    border-color:rgba(255,255,255,.12);
+    background:rgba(255,255,255,.06);
+}
+.livemark-theme-blue_theme .livemark-topbtn:hover,
+.livemark-theme-blue_theme .returnall:hover,
+.livemark-theme-blue_theme .livemark-user-pj:hover,
+.livemark-theme-blue_theme .livemark-btns>div:hover,
+.livemark-theme-blue_theme .livemark-btns>div.active{
+    color:var(--lm-primary-light);
+    border-color:var(--lm-border-active);
+    box-shadow:0 0 12px rgba(77,184,255,.35), 0 0 24px rgba(77,184,255,.18);
+}
+.livemark-theme-blue_theme .startstopbtn .startstatus{
+    background:linear-gradient(180deg, var(--lm-primary), var(--lm-primary-deep));
+    box-shadow:0 0 12px rgba(77,184,255,.4);
+}
+.livemark-theme-blue_theme .livemark-user-score,
+.livemark-theme-blue_theme .livemark-user-score .scorenum,
+.livemark-theme-blue_theme .livemark-phb-scoreValue,
+.livemark-theme-blue_theme .livemark-phb-other-score .livemark-phb-scoreValue,
+.livemark-theme-blue_theme .singleone-info .singleone-info-totalscore,
+.livemark-theme-blue_theme .pingwei-info .pingwei-score,
+.livemark-theme-blue_theme .livemark-user-score .pwbox .hadpwnum span{
+    color:var(--lm-score);
+    text-shadow:0 0 8px rgba(77,184,255,.65), 0 0 18px rgba(77,184,255,.35);
+}
+.livemark-theme-blue_theme .livemark-phb-badge-1,
+.livemark-theme-blue_theme .livemark-user-rank{
+    color:var(--lm-gold);
+}
+.livemark-theme-blue_theme .livemark-phb-badge-1{
+    background:rgba(255,200,87,.16);
+    border-color:rgba(255,200,87,.62);
+}
+.livemark-theme-blue_theme .livemark-phb-badge-2{
+    color:#D9E4FF;
+    background:rgba(217,228,255,.12);
+    border-color:rgba(217,228,255,.42);
+}
+.livemark-theme-blue_theme .livemark-phb-badge-3{
+    color:#C98B5F;
+    background:rgba(201,139,95,.14);
+    border-color:rgba(201,139,95,.42);
+}
+.livemark-theme-blue_theme .livemark-phb-badge,
+.livemark-theme-blue_theme .livemark-phb-itembox.is-top3 .livemark-phb-badge{
+    color:var(--lm-primary);
+    background:rgba(77,184,255,.1);
+    border-color:rgba(77,184,255,.28);
+}
+.livemark-theme-blue_theme .livemark-phb-scoreLabel,
+.livemark-theme-blue_theme .livemark-phb-status,
+.livemark-theme-blue_theme .livemark-userone-des,
+.livemark-theme-blue_theme .pingweione .pingwei-des,
+.livemark-theme-blue_theme .livemark-zan-title,
+.livemark-theme-blue_theme .scoretips{
+    color:var(--lm-text-sub);
+}
+.livemark-theme-blue_theme .singleone-bar,
+.livemark-theme-blue_theme .livemark-dz-scorebox{
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(120,190,255,.18);
+}
+.livemark-theme-blue_theme .singleone-bar-per,
+.livemark-theme-blue_theme .livemark-dz-bar{
+    background:linear-gradient(90deg, var(--lm-primary), var(--lm-neon));
+}
+.livemark-theme-blue_theme .livemark-dz-num{
+    color:var(--lm-bg-deep);
+    border-color:var(--lm-neon);
+    background:linear-gradient(180deg, var(--lm-primary), var(--lm-primary-deep));
+}
+.livemark-theme-blue_theme .livemark-dz-name,
+.livemark-theme-blue_theme .livemark-dz-score,
+.livemark-theme-blue_theme .livemark-user-zanbox,
+.livemark-theme-blue_theme .livemark-zanbox .zanone{
+    color:var(--lm-primary-light);
+    border-color:rgba(110,214,255,.65);
+}
+.livemark-theme-blue_theme .livemark-mainbox .livemark-waitshow,
+.livemark-theme-blue_theme .livemark-mainbox .livemark-waitshow2,
+.livemark-theme-blue_theme .livemark-waitshow,
+.livemark-theme-blue_theme .livemark-waitshow2,
+.livemark-theme-blue_theme .openpubpw,
+.livemark-theme-blue_theme .dzhuoba,
+.livemark-theme-blue_theme .dzshule{
+    color:var(--lm-text-main);
+    background:var(--lm-panel-bg-strong);
+    border-color:var(--lm-border-active);
+    box-shadow:0 12px 40px rgba(0,0,0,.35), 0 0 24px rgba(77,184,255,.18);
+}
+.livemark-theme-blue_theme .livemark-mainbox .livemark-waitshow .publish-btn,
+.livemark-theme-blue_theme .livemark-mainbox .livemark-waitshow2 .public-box .publish-btn,
+.livemark-theme-blue_theme .livemark-waitshow .publish-btn,
+.livemark-theme-blue_theme .livemark-waitshow2 .public-box .publish-btn{
+    color:#fff;
+    border-color:rgba(77,184,255,.42);
+    background:linear-gradient(180deg, var(--lm-primary), var(--lm-primary-deep));
+    box-shadow:0 0 12px rgba(77,184,255,.4);
+}
+</style>
+{php}$livemarkTheme = (request()->get('theme') == 'blue' || request()->get('livemark_theme') == 'blue') ? 'blue_theme' : 'default';{/php}
+	<section class="livemark-mainbox livemark-theme-{$livemarkTheme} normal-box zam-app-flex-ajCenter2">
+    <div class="livemark-title limitbox"></div>
+    <div class="emptybox zam-app-flex-ajCenter display-none">
+        <img src="/{:SIMGURL}common/empty.png">
+        <p style="padding:20px;">暂无可用轮次，请到后台添加</p>
+    </div>
+    <div class="livemark-list display-none">
+        <div class="livemark-titleBox zam-app-flex">
+            <div class="startstopbtn"><div class="startstatus" data-state="1"></div></div>
+            <div class="livemark-topbtn" data-view="list">查看排名</div>
+        </div>
+        <div class="livemark-scrollbox">
+            <div class="livemark-users"></div>
+            <div class="livemark-dianzans display-none"></div>
+            <div class="livemark-phbs display-none">
+                <div class="livemark-phb-head">
+                    <span>排名</span>
+                    <span>选手</span>
+                    <span>得分</span>
+                </div>
+                <div class="livemark-phb-top">
+                    <div class="livemark-phb-item rank1"></div>
+                    <div class="livemark-phb-item rank2"></div>
+                    <div class="livemark-phb-item rank3"></div>
+                </div>
+                <div class="livemark-phb-others"></div>
+            </div>
+        </div>
+        <div class="livemark-btns zam-app-flex-ajCenter2">
+            <div class="btn-mark active">评分</div> 
+            <div class="btn-dianzan">人气</div>
+        </div>
+    </div>
+    <div class="livemark-userone zam-app-flex display-none">
+        {if request()->host(true) == 'hotbav3.hotba88.com' && $hdinfo['id'] != '787'}
+        <div class="pubscore-btn" data-pfuserid='0' data-hadclick='2'>得分统计中</div>
+        {/if}
+        <div class="startstopbtn"><div class="startstatus" data-state="1"></div></div>
+        <div class="returnall">查看全部</div> 
+        <div class="livemark-prevone"></div> 
+        <div class="livemark-nextone"></div> 
+        <div class="livemark-user-summary">
+            <div class="livemark-user-summary-main">
+                <div class="livemark-leftbox">
+                    <div class="livemark-userone-info">
+                        <img class="user-img" src="/{:SIMGURL}livemark/default.png"> 
+                        <div class="limitbox">xxx</div>
+                    </div> 
+                    <div class="livemark-userone-des">xxx</div> 
+                    <div class="livemark-zanmain zam-app-flex zam-app-alignCenter zam-app-directionColumn">
+                        <span class="livemark-user-rank">人气排行第 <span>1</span> 名</span> 
+                        <span class="livemark-user-zanbox zam-app-flex zam-app-flex-alignflexend">
+                            <span>收获<span>10</span>个赞</span> 
+                            <img src="/{:SIMGURL}livemark/good.png">
+                        </span> 
+                        <span class="livemark-zan-title">TA们觉得很赞</span> 
+                        <div class="livemark-zanbox zam-app-flex zam-app-alignCenter"></div>
+                    </div>
+                </div>
+                <div class="livemark-rightbox">
+                    <div class="livemark-user-totalscore zam-app-flex zam-app-directionColumn zam-app-justifyspacebetween">
+                        <div class="livemark-user-score zam-app-flex zam-app-flex-alignflexend hidden">
+                            <div class="livemark-user-score-main">
+                                <span class="scoretype">总分：</span> 
+                                <span class="scorenum"></span>
+                            </div>
+                            <div class="livemark-user-score-meta">
+                                <span class="pwbox">
+                                    <span class="hadpwnum">已评分<span>0</span>人</span>
+                                    <span>/</span>
+                                    <span class="pwnums">总评委<span>0</span>人</span>
+                                </span>
+                                {if ($pcconfig['showdecscore']??'1') == '1'}
+                                    <div class="decscorebox zam-app-flex zam-app-alignCenter hidden">
+                                        <span class="decscorebox-icon">-</span>
+                                        <div class="decscorebox-info zam-app-flex zam-app-directionColumn zam-app-alignCenter">
+                                            <span class="decscorebox-info-title">扣分</span>
+                                            <span class="decscorebox-info-score">0</span>
+                                        </div>
+                                    </div>
+                                    <div class="lastscorebox zam-app-flex zam-app-alignCenter hidden">
+                                        <span class="lastscorebox-icon">=</span>
+                                        <div class="lastscorebox-info zam-app-flex zam-app-directionColumn zam-app-alignCenter">
+                                            <span class="lastscorebox-info-title">最终得分</span>
+                                            <span class="lastscorebox-info-score">0</span>
+                                        </div>
+                                    </div>
+                                {/if}
+                            </div>
+                        </div>
+                        {if $hdinfo['id'] != 'huobapf' && !(request()->host(true) == 'hd.shulehudong.com' && $hdinfo['id'] == '1698')}
+                        <div class="openpubpw hidden">
+                            <div class="showpub1">专家评委得分：</div>
+                            <div class="showpub2">大众评委得分：</div>
+                            <div class="showpub3">最终得分：</div>
+                            <div class="score_pw">
+                                <div class="pw_score">90.56</div>
+                                <div class="pw_num">已提交：<span>0</span>人</div>
+                            </div>
+                            <div class="pwweightbox">X<span class="pw_weight">60</span>%&nbsp;+</div>
+                            <div class="score_pub">
+                                <div class="pw_score">90.56</div>
+                                <div class="pw_num">已提交：<span>0</span>人</div>
+                            </div>
+                            <div class="pubweightbox">X<span class="pub_weight">40</span>%&nbsp;=</div>
+                            <div class="score_last">90.56</div>
+                        </div>
+                        {/if}
+                        <div class="scoretips"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="livemark-user-detailpanel">
+            <div class="livemark-user-pj">查看单项平均分</div>
+            <div class="livemark-user-scroll-list"> 
+                <div class="livemark-user-pingwei"></div> 
+                <div class="livemark-user-single display-none"></div>
+                <div class="livemark-user-nodata zam-app-flex-ajCenter2 display-none">暂无评分记录</div>
+            </div>
+        </div>
+    </div>
+    {//huobapf}
+    {if $hdinfo['id']=='huobapf'}
+    <style type="text/css">
+        .livemark-waitshow{
+            position: absolute;
+            width: 1178px;
+            height: 600px;
+            margin: 0 auto;
+            border-radius: 10px;
+            background: rgba(0,0,0,.6);
+            color:#fff;
+        }
+        .livemark-waitshow.hidden{
+            display: none;
+        }
+        .livemark-waitshow .title{
+            font-size: 60px;
+            margin:10px auto;
+            letter-spacing: 6px;
+            color: #09ebe3;
+        }
+        .livemark-waitshow .zy-pw,.livemark-waitshow .pub1-pw,.livemark-waitshow .pub2-pw{
+            height: 40px;
+            line-height: 40px;
+            font-size: 20px;
+            margin:10px auto;
+        }
+        .livemark-waitshow .zy-pw span,.livemark-waitshow .pub1-pw .num,.livemark-waitshow .pub2-pw .num{
+            display: inline-block;
+            margin:0 5px;
+            font-size: 24px;
+            color: #09ebe3;
+        }
+        .livemark-waitshow .publish-btn {
+            background-color: #1a73e8;
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin-top: 30px;
+            border-radius: 5px;
+            letter-spacing: 6px;
+            cursor: pointer;
+        }
+        .livemark-waitshow .publish-btn.hidden{display: none}
+    </style>
+    <div class="livemark-waitshow zam-app-flex-ajCenter hidden">
+        <div class="title">统分中···</div>
+        <div class="zy-pw">已有<span>0</span>位专业评委提交评分</div>
+        <div class="pub1-pw">已有<span class="num">0</span>位<span class="name">媒体评委</span>提交评分</div>
+        <div class="pub2-pw">已有<span class="num">0</span>位<span class="name">大众评委</span>提交评分</div>
+        <div class="publish-btn hidden" data-pfuserid='0' data-hadclick='2'>统分结束，即将亮分</div>
+    </div>
+    {/if}
+    {if request()->host(true) == 'hd.shulehudong.com' && $hdinfo['id'] == '1698'}
+    <style type="text/css">
+        .livemark-title{display: none}
+        .livemark-waitshow2{
+            position: absolute;
+            top:50px;
+            width: 1178px;
+            height: 540px;
+            margin: 0 auto;
+            border-radius: 10px;
+            padding: 20px;
+            box-sizing: border-box;
+            color:#fff;
+        }
+        .livemark-waitshow2.hidden{
+            display: none;
+        }
+        .livemark-waitshow2 .livemark-markname{
+            text-align: center;
+            font-size: 42px;
+            font-weight: 600;
+            color: #fff;
+            letter-spacing: 1px;
+            margin-bottom:60px;
+        }
+        .livemark-waitshow2 .titlebg{
+            width: 100%;
+            text-align: center;
+            margin:12px auto;
+        }
+        .livemark-waitshow2 .titlebg img{
+            height: 50px;
+            margin:0 auto;
+        }
+        .livemark-waitshow2 .pw-lists{
+            color: #fff;
+            margin: 0 auto;
+            margin-top: 20px;
+        }
+        .livemark-waitshow2 .pw-lists .pw-one{
+            margin-right:10px;
+            margin-bottom:10px;
+        }
+        .livemark-waitshow2 .pw-lists .pw-scorebox{
+            width: 100px;
+            height: 62.5px;
+            background-size: contain;
+            background-position: center bottom;
+            background-image: url(/{:SIMGURL}livemark/shule/noscore.png);
+            background-repeat: no-repeat;
+        }
+        .livemark-waitshow2 .pw-lists .pw-scorebox .pw-score{
+            display: none
+        }
+        .livemark-waitshow2 .pw-lists .pw-scorebox.hadscore{
+            background-image: url(/{:SIMGURL}livemark/shule/scorebg.png?t=1);
+        }
+        .livemark-waitshow2 .pw-lists .pw-scorebox.hadscore .pw-score{
+            display: block;
+            text-align: center;
+            font-size:24px;
+            margin-left: 5px;
+            margin-top: 11px;
+        }
+        .livemark-waitshow2 .pw-lists .pw-one .pw-num{
+            text-align: center;
+            font-size:18px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+        .livemark-waitshow2 .public-box{
+            margin: 0 auto;
+            width:100%;
+            text-align: center;
+        }
+        .livemark-waitshow2 .public-box .publish-btn{
+            background-color: #1a73e8;
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin-top: 30px;
+            border-radius: 5px;
+            letter-spacing: 6px;
+            cursor: pointer;
+            width: 120px;
+            font-size: 20px;
+            font-weight: 600;
+            
+        }
+        .openmarkbox{
+
+        }
+        .openmarkbox .livemark-markcompany{
+            margin: 30px auto;
+            margin-bottom: 40px;
+            font-size: 42px;
+            font-weight: 600;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+        .openmarkbox .livemark-companyscore .scoreitembox .scoreitem{
+            width: 300px;
+            height: 189px;
+            background-size: contain;
+            background-position: center bottom;
+            background-image: url(/{:SIMGURL}livemark/shule/endscorebg.png?t=1);
+            background-repeat: no-repeat;
+            
+        }
+        .openmarkbox .livemark-companyscore .scoreitembox .scoreitem div{
+            font-size: 58px;
+            font-weight: 600;
+            margin-top: 56px;
+            margin-left: 36px;
+        }
+        .openmarkbox .livemark-companyscore .scoreitembox .scorename{
+            font-size:32px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            margin-top: 10px;
+            margin-left: 34px;
+        }
+    </style>
+    <div class="livemark-waitshow2 hidden">
+        <div class="waitmarkbox">
+            <div class="livemark-markname"><span></span></div>
+            <div class="titlebg"><img src="/{:SIMGURL}livemark/shule/title.png"/></div>
+            <div class="pw-lists zam-app-flex zam-app-flex-wrap zam-app-justifyspacebetween"></div>
+            <div class="public-box hidden">
+                <div class="publish-btn" data-pfuserid='0' data-hadclick='2'>公布分数</div>
+            </div>
+        </div>
+        <div class="openmarkbox hidden">
+            <div class="livemark-markcompany"><span>株洲米波网络科技有限公司</span></div>
+            <div class="livemark-companyscore zam-app-flex-ajCenter2">
+                <div class="scoreitembox zam-app-flex-ajCenter">
+                    <div class="scoreitem zam-app-flex-ajCenter">
+                        <div>80.00</div>
+                    </div>
+                    <div class="scorename">得分</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {/if}
+</section>
+{//huobapf}
+{if $hdinfo['id']=='huobapf'}
+<style type="text/css">
+.openpubpw{height:78px!important;width:570px!important}
+.showpub1,.showpub2,.showpub3,.showpub4{width:100px}
+.showpub2{left:180px!important}
+.showpub3{left:320px!important}
+.showpub4{left:460px!important}
+.showpub4 {
+    position: absolute;
+    top: 0;
+    left: 670px;
+    width: 145px;
+    height: 34px;
+    line-height: 34px;
+    font-size: 22px;
+}
+.score_pw{width:80px!important;border: 1px solid #fff;line-height: 28px;}
+.pwweightbox{left:120px!important}
+.score_pub{width:80px!important;left:178px!important;border: 1px solid #fff;}
+.pubweightbox{left:270px!important}
+.score_pub2 {
+    position: absolute;
+    top: 34px;
+    left: 320px;
+    border: 1px solid #fff;
+    width: 80px;
+    height: 28px;
+    line-height: 28px;
+    text-align: center;
+    font-size: 21px;
+}
+.pubweightbox2{
+    position: absolute;
+    top: 34px;
+    left: 410px;
+    width: 70px;
+    height: 34px;
+    line-height: 34px;
+    font-size: 21px;
+}
+.score_last{width:80px!important;left: 460px;font-size:24px!important;color:yellow}
+.openpubpw div{font-size:14px;}
+</style>
+<div class="openpubpw dzhuoba hidden">
+<div class="showpub1">专家评委得分</div>
+<div class="showpub2">媒体评委得分</div>
+<div class="showpub3">大众评委得分</div>
+<div class="showpub4">最终得分</div>
+<div class="score_pw">0</div>
+<div class="pwweightbox">X<span class="pw_weight">95</span>%&nbsp;+</div>
+<div class="score_pub">0</div>
+<div class="pubweightbox">X<span class="pub_weight">3</span>%&nbsp;+</div>
+<div class="score_pub2">0</div>
+<div class="pubweightbox2">X<span class="pub_weight2">2</span>%&nbsp;=</div>
+<div class="score_last">0</div>
+</div>
+{elseif request()->host(true) == 'hd.shulehudong.com' && $hdinfo['id'] == '1698'}
+<div class="openpubpw dzshule hidden">
+<div class="showpub1">专家评委得分：</div>
+<div class="showpub2">大众评委得分：</div>
+<div class="showpub3">最终得分：</div>
+<div class="score_pw">90.56</div>
+<div class="pwweightbox">X<span class="pw_weight">60</span>%&nbsp;+</div>
+<div class="score_pub">90.56</div>
+<div class="pubweightbox">X<span class="pub_weight">40</span>%&nbsp;=</div>
+<div class="score_last">90.56</div>
+</div>
+{/if}
+<style>
+.livemark-userone .openpubpw:not(.dzhuoba):not(.dzshule){
+    position:static!important;
+    top:auto!important;
+    left:auto!important;
+    width:100%;
+    height:100%;
+    min-height:0;
+    margin:0;
+    padding:0;
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 96px minmax(0,1fr) 96px minmax(0,1fr);
+    grid-template-rows:auto auto auto;
+    gap:10px 16px;
+    align-items:center;
+    align-content:center;
+    justify-content:stretch;
+    border-radius:0;
+    background:none;
+    border:none;
+    box-shadow:none;
+    backdrop-filter:none;
+    -webkit-backdrop-filter:none;
+    box-sizing:border-box;
+}
+.livemark-userone .openpubpw:not(.dzhuoba):not(.dzshule) .showpub1,
+.livemark-userone .openpubpw:not(.dzhuoba):not(.dzshule) .showpub2,
+.livemark-userone .openpubpw:not(.dzhuoba):not(.dzshule) .showpub3,
+.livemark-userone .openpubpw:not(.dzhuoba):not(.dzshule) .score_pw,
+.livemark-userone .openpubpw:not(.dzhuoba):not(.dzshule) .score_pub,
+.livemark-userone .openpubpw:not(.dzhuoba):not(.dzshule) .pwweightbox,
+.livemark-userone .openpubpw:not(.dzhuoba):not(.dzshule) .pubweightbox,
+.livemark-userone .openpubpw:not(.dzhuoba):not(.dzshule) .score_last{
+    position:static;
+    top:auto;
+    left:auto;
+    width:auto;
+    height:auto;
+}
+.livemark-userone .openpubpw:not(.dzhuoba):not(.dzshule) .showpub1{
+    grid-column:1;
+}
+.livemark-userone .openpubpw:not(.dzhuoba):not(.dzshule) .showpub2{
+    grid-column:3;
+}
+.livemark-userone .openpubpw:not(.dzhuoba):not(.dzshule) .showpub3{
+    grid-column:5;
+}
+.livemark-userone .openpubpw:not(.dzhuoba):not(.dzshule) .showpub1,
+.livemark-userone .openpubpw:not(.dzhuoba):not(.dzshule) .showpub2,
+.livemark-userone .openpubpw:not(.dzhuoba):not(.dzshule) .showpub3{
+    line-height:1.3;
+    font-size:19px;
+    font-weight:700;
+    color:rgba(255,255,255,.92);
+}
+.livemark-userone .openpubpw:not(.dzhuoba):not(.dzshule) .score_pw{
+    grid-column:1;
+}
+.livemark-userone .openpubpw:not(.dzhuoba):not(.dzshule) .pwweightbox{
+    grid-column:2;
+}
+.livemark-userone .openpubpw:not(.dzhuoba):not(.dzshule) .score_pub{
+    grid-column:3;
+}
+.livemark-userone .openpubpw:not(.dzhuoba):not(.dzshule) .pubweightbox{
+    grid-column:4;
+}
+.livemark-userone .openpubpw:not(.dzhuoba):not(.dzshule) .score_last{
+    grid-column:5;
+}
+.livemark-userone .openpubpw:not(.dzhuoba):not(.dzshule) .score_pw,
+.livemark-userone .openpubpw:not(.dzhuoba):not(.dzshule) .score_pub{
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    gap:8px;
+    font-size:18px;
+}
+.livemark-userone .openpubpw:not(.dzhuoba):not(.dzshule) .score_pw .pw_score,
+.livemark-userone .openpubpw:not(.dzhuoba):not(.dzshule) .score_pub .pw_score,
+.livemark-userone .openpubpw:not(.dzhuoba):not(.dzshule) .score_last{
+    min-height:0;
+    padding:0;
+    display:flex;
+    align-items:center;
+    justify-content:flex-start;
+    border-radius:0;
+    border:none;
+    background:none;
+    box-sizing:border-box;
+}
+.livemark-userone .openpubpw:not(.dzhuoba):not(.dzshule) .score_pw .pw_score,
+.livemark-userone .openpubpw:not(.dzhuoba):not(.dzshule) .score_pub .pw_score{
+    color:#ffd34d;
+    font-size:46px;
+    font-weight:800;
+    line-height:1;
+}
+.livemark-userone .openpubpw:not(.dzhuoba):not(.dzshule) .score_last{
+    color:#ffd34d;
+    font-size:46px;
+    font-weight:800;
+    line-height:1;
+}
+.livemark-userone .openpubpw:not(.dzhuoba):not(.dzshule) .score_pw .pw_num,
+.livemark-userone .openpubpw:not(.dzhuoba):not(.dzshule) .score_pub .pw_num{
+    {if isset($pcconfig['showpwnum']) && $pcconfig['showpwnum']=='2'}
+    display:none;
+    {else /}
+    display:block;
+    color:rgba(255,255,255,.74);
+    font-size:13px;
+    font-weight:700;
+    line-height:1.1;
+    white-space:nowrap;
+    {/if}
+}
+.livemark-userone .openpubpw:not(.dzhuoba):not(.dzshule) .pwweightbox,
+.livemark-userone .openpubpw:not(.dzhuoba):not(.dzshule) .pubweightbox{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:rgba(255,255,255,.88);
+    font-size:20px;
+    line-height:1.2;
+}
+</style>
+<script id="normaluserItem" type="html/javascript">
+<div class="livemark-user-item{{ if userstatus=='2' && screenshow=='2' }} hidden{{ /if }}" data-pfuserid="{{ id }}">
+    <div class="livemark-user-itembox zam-app-flex zam-app-alignCenter">
+        <div class="livemark-user-avatar">
+            <img src="{{ userimg }}">
+        </div>
+        <div class="livemark-user-info zam-app-flex zam-app-directionColumn zam-app-justifyspacebetween">
+            <div class="livemark-user-name limitbox"><span>{{ username }}</span></div> 
+            <div class="livemark-user-score zam-app-flex zam-app-flex-alignflexend">
+                <span>
+                {{ if scoretype=='1' }}总分{{ else }}平均分{{ /if }}：
+                </span> 
+                <span>
+                {{ if score===false }}
+                    无
+                {{ else }}
+                    {{ score }}
+                {{ /if }}
+                </span>
+            </div>
+        </div> 
+        <div class="livemark-user-noscore{{ if score===false }}{{ else }} display-none{{ /if }}"></div>
+    </div>
+</div>
+</script>
+<script id="scorephbtopItem" type="html/javascript">
+<div class="livemark-phb-itembox is-top3 is-rank-{{ keyindex }}">
+    <div class="livemark-phb-badge livemark-phb-badge-{{ keyindex }}">
+        <span class="livemark-phb-badge-number">{{ keyindex }}</span>
+        {{ if keyindex==1 }}
+            <img src="/static/images/screen/livemark/rank_1_medal.svg" class="livemark-phb-medal">
+        {{ else if keyindex==2 }}
+            <img src="/static/images/screen/livemark/rank_2_medal.svg" class="livemark-phb-medal">
+        {{ else }}
+            <img src="/static/images/screen/livemark/rank_3_medal.svg" class="livemark-phb-medal">
+        {{ /if }}
+    </div>
+    <div class="livemark-phb-player">
+        <div class="livemark-phb-avatarbox">
+            <img src="/{:SIMGURL}livemark/dzavatarbg.png" class="livemark-phb-avatarbg">
+            <img src="{{ userimg }}" class="user-img">
+        </div>
+        <div class="livemark-phb-meta">
+            <div class="livemark-phb-name limitbox">{{ username }}</div>
+            <div class="livemark-phb-status"><span class="livemark-phb-tag">选手</span><span class="livemark-phb-statusText">RANK {{ keyindex }}</span></div>
+        </div>
+    </div>
+    <div class="livemark-phb-score">
+        {{ if score===false }}
+            <span class="livemark-phb-scoreValue is-empty">待评分</span>
+        {{ else }}
+            <span class="livemark-phb-scoreLabel">{{ if scoretype=='1'}}总分{{ else }}平均分{{ /if }}</span>
+            <span class="livemark-phb-scoreValue">{{ score }}</span>
+        {{ /if }}
+    </div>
+</div>
+</script>
+<script id="scorephbotherItem" type="html/javascript">
+<div class="livemark-phb-other-item" data-pfuserid="{{ id }}">
+    <div class="livemark-phb-other-itembox is-rank-{{ keyindex }}">
+        <div class="livemark-phb-badge"><span class="livemark-phb-badge-number">{{ keyindex }}</span></div>
+        <div class="livemark-phb-player">
+            <div class="livemark-phb-other-avatarbox">
+                <img src="/{:SIMGURL}livemark/dzavatarbg.png" class="livemark-phb-avatarbg">
+                <img src="{{ userimg }}" class="user-img">
+            </div>
+            <div class="livemark-phb-meta">
+                <div class="livemark-phb-other-name limitbox">{{ username }}</div>
+                <div class="livemark-phb-status"><span class="livemark-phb-tag">选手</span><span class="livemark-phb-statusText">RANK {{ keyindex }}</span></div>
+            </div>
+        </div>
+        <div class="livemark-phb-other-score">
+        {{ if score===false }}
+            <span class="livemark-phb-scoreValue is-empty">待评分</span>
+        {{ else }}
+            <span class="livemark-phb-scoreLabel">{{ if scoretype=='1'}}总分{{ else }}平均分{{ /if }}</span>
+            <span class="livemark-phb-scoreValue">{{ score }}</span>
+        {{ /if }}
+        </div>
+    </div>
+</div>
+</script>
+<script id="zanphbItem" type="html/javascript">
+<div class="livemark-dz-item" data-pfuserid="{{ id }}">
+    <div class="livemark-dz-itembox zam-app-flex">
+        <div class="livemark-dz-avatarbox">
+            <img src="/{:SIMGURL}livemark/dzavatarbg.png" class="livemark-dz-avatarbg"> 
+            <img src="{{ userimg }}" class="livemark-dz-avatar"> 
+            <div class="livemark-dz-pm">
+                {{ if keyindex <= 3 }}
+                    <img  src="/{:SIMGURL}livemark/{{ if keyindex==1 }}first{{ else if keyindex==2 }}second{{ else }}third{{ /if }}.png">
+                {{ else }}
+                    <div class="livemark-dz-num">{{ keyindex }}</div>
+                {{ /if }}
+            </div>
+        </div> 
+        <div class="livemark-dz-info">
+            <div class="livemark-dz-name limitbox">{{ username }}</div> 
+            <div class="livemark-dz-scorebox">
+                <div class="livemark-dz-bar" style="background-color: rgb(255, 0, 0); width:{{ zanpercent }}%;"></div> 
+                <div class="livemark-dz-score">{{ zan }}</div>
+            </div>
+        </div> 
+        <img src="/{:SIMGURL}livemark/good.png" class="livemark-dz-icon">
+    </div>
+</div>
+</script>
+<script id="pfzanItem" type="html/javascript">
+<div class="zanone zam-app-flex-ajCenter2"><img  src="{{ avatar }}"></div>
+</script>
+<script id="pwpfItem" type="html/javascript">
+<div class="pingweione zam-app-flex-ajCenter pwone-{{ id }}" data-prid="{{ id }}">
+    <div class="pingwei-info zam-app-flex zam-app-alignCenter zam-app-justifyspacebetween">
+        <div class="pingwei-avatar">
+            <img src="{{ pwimg }}">
+        </div> 
+        <div class="pingwei-name limitbox">{{ pwname }}</div>
+        {{ if showpws == '1'}}
+            <div class="pingwei-score zam-app-flex-ajCenter{{ if hadpf == '1'}} pingwei-hadpf{{ /if }}">
+                <span class="pingwei-score-value">{{ if hadpf == '1'}}{{ if showscore == '1'}}{{ totalscore }}{{ else }}已评分{{ /if }}{{ else }}评分中{{ /if }}</span>
+            </div>
+        {{ else }}
+            <div class="pingwei-score zam-app-flex-ajCenter">
+                <span class="pingwei-score-value">评分: {{ totalscore }}分</span>
+            </div>
+        {{ /if }}
+    </div>
+    {{ if pfword != ''}}
+        <div class="pingwei-des">{{ pfword }}</div>
+    {{ /if }}
+</div>
+</script>
+<script id="pfitemone" type="html/javascript">
+<div class="singleone zam-app-flex zam-app-directionColumn zam-app-justifyspacebetween">
+    <div class="singleone-info zam-app-flex zam-app-alignCenter zam-app-justifyspacebetween">
+        <span>{{ dfname }}</span>
+    </div> 
+    <div class="singleone-bar">
+        <div class="singleone-bar-per" style="width:{{ percent}}%;"></div>
+        <div class="singleone-bar-score">{{ score }} / {{ dfmax }}分</div>
+    </div>
+</div>
+</script>
+<script>
+require(['screenlivemark'],function (screenlivemark) {
+    screenlivemark.init();
+});
+</script>
+{include file='common/footer' /}

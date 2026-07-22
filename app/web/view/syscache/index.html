@@ -1,0 +1,64 @@
+{include file='$Wpath/common/header'}
+<div class="alert alert-danger" role="alert">
+    <i class="mdi mdi-bell-ring"></i> 缓存是系统性能提升的重要部分，一般情况下不可随意清理缓存，系统内部也仅在更新版本时检测到数据库结构发生变化才会去清理数据表缓存以及数据缓存<span class="label label-primary m-l-10">相当于点击了下面的第三个按钮</span><br>
+    如果某用户登录后台时未勾选7天内自动登录，清理系统所有缓存(点第4个按钮)会导致当前已登录的用户立即掉线，需要重新登录
+</div>
+<div class="card">
+	<div class="card-header">系统缓存管理</div>
+	<div class="card-body">
+		<a class="btn btn-success m-r-10 m-b-10 resetdatabase">清理系统数据表缓存</a>
+		<a class="btn btn-purple m-r-10 m-b-10 resetdata">清理系统数据缓存</a>
+		<a class="btn btn-warning m-r-10 m-b-10 resetdataAll">清理系统数据表以及系统数据缓存</a>
+		<a class="btn btn-danger m-r-10 m-b-10 resetAll">清理系统所有缓存</a>
+	</div>
+	<div class="card-footer">以上按钮排序以危险等级高低划分，从左至右危险程度逐步提升</div>
+</div>
+<script type="text/javascript">
+require(['webcore','jconfirmBox','zamnotice'],function(webcore,jconfirmBox,zamnotice){
+	$(".resetdatabase").on('click',function(){
+        jconfirmBox.confirm('温馨提示','清理数据表缓存将会使得所有数据表对应的redis缓存全部被删除，确定要这样操作么？',function(){
+            webcore.ajaxSubmit("{:goweb('syscache/index')}",{type:'1'}).then(function(json){
+                 if(json.code==0){
+                    zamnotice.showTips('success','操作成功');
+                 }else{
+                    zamnotice.showTips('error',json.msg);
+                 }
+            })
+        });
+    });
+    $(".resetdata").on('click',function(){
+        jconfirmBox.confirm('温馨提示','清理系统数据缓存将会使得所有数据对应的redis缓存全部被删除，可能会导致正在进行的活动出现异常，确定要这样操作么？',function(){
+            webcore.ajaxSubmit("{:goweb('syscache/index')}",{type:'2'}).then(function(json){
+                 if(json.code==0){
+                    zamnotice.showTips('success','操作成功');
+                 }else{
+                    zamnotice.showTips('error',json.msg);
+                 }
+            })
+        });
+    });
+    $(".resetdataAll").on('click',function(){
+        jconfirmBox.confirm('温馨提示','清理系统数据表以及系统数据缓存将会使得所有数据表对应的redis缓存以及系统数据缓存全部被删除，可能会导致正在进行的活动出现异常，确定要这样操作么？',function(){
+            webcore.ajaxSubmit("{:goweb('syscache/index')}",{type:'3'}).then(function(json){
+                 if(json.code==0){
+                    zamnotice.showTips('success','操作成功');
+                 }else{
+                    zamnotice.showTips('error',json.msg);
+                 }
+            })
+        });
+    });
+    $(".resetAll").on('click',function(){
+        jconfirmBox.confirm('温馨提示','清理系统所有缓存将会使得系统所有的redis缓存会删除，可能会导致正在进行的活动出现异常，确定要这样操作么？',function(){
+            webcore.ajaxSubmit("{:goweb('syscache/index')}",{type:'4'}).then(function(json){
+                 if(json.code==0){
+                    zamnotice.showTips('success','操作成功');
+                 }else{
+                    zamnotice.showTips('error',json.msg);
+                 }
+            })
+        });
+    });
+});
+</script>
+{include file='$Wpath/common/footer'}

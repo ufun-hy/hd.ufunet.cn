@@ -1,0 +1,386 @@
+<div class="config-titlebox">
+    <span class="config-titlename">风格设置</span>
+    <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#styleconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+</div>
+<div id="styleconfigbox" class="collapse in">
+	<div class="form-group">
+		<label class="col-lg-2  control-label">* 风格类型</label>
+		<div class="col-lg-10">	
+			<div class="zam-stylewrapper zam-flex zam-alignItems">
+			{foreach $styles as $skey=>$style}
+				<div data-val="{$style['val']}" class="zam-styleitem{if (!isset($config['styleconfig']['flytype']) && $skey == 0) || (isset($config['styleconfig']['flytype']) && $config['styleconfig']['flytype'] == $style['val'])} hadchecked{/if}">
+					<div class="zam-styleimg">
+						<img src="{:tomedia($style['img'])}" onerror="javascript:this.src='/static/images/sys/nopic.jpg';this.title='暂无图片'">
+					</div>
+					<div class="zam-stylename">{$style['name']}</div>
+					<div class="zam-selected"><i class="mdi mdi-check"></i></div>
+					{if !request()->realhdid}
+					<input type="hidden" name="styleimg{$style['val']}" value="{$style['img']}">
+					{/if}
+				</div>
+			{/foreach}
+			</div>
+			<input type="hidden" name="styleconfig[flytype]" value="{$config['styleconfig']['flytype']??1}">
+			{if !request()->realhdid}
+			<div class="help-block">点击图片即可上传预览图，图片尺寸：180*101px</div>
+			{/if}
+		</div>
+	</div>
+	<script>
+	$(".zam-stylewrapper .zam-styleitem").click(function(){
+		var flytype = $(this).attr('data-val');
+		$(this).addClass('hadchecked').siblings().removeClass('hadchecked');
+		$(this).parent().next().val(flytype);
+		if(flytype == '1'){
+			$(".flystylebox").addClass('hidden');
+		}else{
+			$(".flystylebox").removeClass('hidden');
+			if(flytype == '2'){
+				$(".flystylebox .one").removeClass('hidden').siblings().addClass('hidden');
+			}else if(flytype == '3'){
+				$(".flystylebox .grid").removeClass('hidden').siblings().addClass('hidden');
+			}else{
+				$(".flystylebox .sphere").removeClass('hidden').siblings().addClass('hidden');
+			}
+		}
+	});
+	{if !request()->realhdid}
+	$(".zam-stylewrapper .zam-styleitem img").click(function(e){
+		//e.stopPropagation();
+		tpl_image_one(this,function($imgsrc,srcpath,obj){
+			$(obj).attr('src',$imgsrc);
+			$(obj).parent().parent().find('input').val(srcpath);
+		});
+	});
+	{/if}
+	</script>
+	<div class="flystylebox{if !isset($config['styleconfig']['flytype']) || $config['styleconfig']['flytype'] == '1'} hidden{/if}">
+		<div class="one{if isset($config['styleconfig']['flytype']) && $config['styleconfig']['flytype'] != '2'} hidden{/if}">
+			<div class="form-group">
+				<label class="col-lg-2 control-label">* 文字大小</label>
+				<div class="col-lg-4">
+					<input type="text" class="form-control numberincdec" name="styleconfig[flyonesize]" 
+						data-bts-min="1" data-bts-replacement-val="1"
+						data-bts-max="300"
+						data-bts-step="1"
+						data-bts-postfix="px"
+						data-bts-postfix-extra-class="touchspin-postfix"
+						value="{$config['styleconfig']['flyonesize']??50}">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-lg-2 control-label">* 飞出速度</label>
+				<div class="col-lg-4">
+					<input type="text" class="form-control numberincdec" name="styleconfig[flyonespeed]" value="{$config['styleconfig']['flyonespeed']??100}"
+					data-bts-min="20" data-bts-replacement-val="20"
+					data-bts-max="160"
+					data-bts-step="1"
+					data-bts-postfix="速度"
+					data-bts-postfix-extra-class="touchspin-postfix"
+					>
+				</div>
+			</div>
+		</div>
+		<div class="grid{if isset($config['styleconfig']['flytype']) && $config['styleconfig']['flytype'] != '3'} hidden{/if}">
+			<div class="form-group">
+				<label class="col-lg-2 control-label">* 文字大小</label>
+				<div class="col-lg-4">
+					<input type="text" class="form-control numberincdec" name="styleconfig[flygridsize]" 
+						data-bts-min="1" data-bts-replacement-val="1"
+						data-bts-max="300"
+						data-bts-step="1"
+						data-bts-postfix="px"
+						data-bts-postfix-extra-class="touchspin-postfix"
+						value="{$config['styleconfig']['flygridsize']??50}">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-lg-2 control-label">* 飞出速度</label>
+				<div class="col-lg-4">
+					<input type="text" class="form-control numberincdec" name="styleconfig[flygridspeed]" value="{$config['styleconfig']['flygridspeed']??100}"
+					data-bts-min="20" data-bts-replacement-val="20"
+					data-bts-max="160"
+					data-bts-step="1"
+					data-bts-postfix="速度"
+					data-bts-postfix-extra-class="touchspin-postfix"
+					>
+				</div>
+			</div>
+		</div>
+		<div class="sphere{if isset($config['styleconfig']['flytype']) && $config['styleconfig']['flytype'] != '4'} hidden{/if}">
+			<div class="form-group">
+				<label class="col-lg-2 control-label">* 球半径</label>
+				<div class="col-lg-4">
+					<input type="text" class="form-control numberincdec" name="styleconfig[flysphereballw]" 
+						data-bts-min="500" data-bts-replacement-val="1"
+						data-bts-max="3000"
+						data-bts-step="1"
+						data-bts-postfix="px"
+						data-bts-postfix-extra-class="touchspin-postfix"
+						value="{$config['styleconfig']['flysphereballw']??800}">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-lg-2 control-label">* 球面数据量</label>
+				<div class="col-lg-4">
+					<input type="text" class="form-control numberincdec" name="styleconfig[flyspherecell]" 
+						data-bts-min="100" data-bts-replacement-val="1"
+						data-bts-max="600"
+						data-bts-step="1"
+						data-bts-postfix="个"
+						data-bts-postfix-extra-class="touchspin-postfix"
+						value="{$config['styleconfig']['flyspherecell']??200}">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-lg-2 control-label">* 文字大小</label>
+				<div class="col-lg-4">
+					<input type="text" class="form-control numberincdec" name="styleconfig[flyspheresize]" 
+						data-bts-min="1" data-bts-replacement-val="1"
+						data-bts-max="300"
+						data-bts-step="1"
+						data-bts-postfix="px"
+						data-bts-postfix-extra-class="touchspin-postfix"
+						value="{$config['styleconfig']['flyspheresize']??50}">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-lg-2 control-label">* 旋转方式</label>
+				<div class="col-lg-6">
+					<label class="lyear-radio radio-inline radio-primary">
+						<input type="radio" name="styleconfig[flyspheretype]" value="1" {if !isset($config['styleconfig']['flyspheretype']) || $config['styleconfig']['flyspheretype']=='1'}checked{/if}><span>左右旋转</span>
+					</label>
+					<label class="lyear-radio radio-inline radio-primary">
+						<input type="radio" name="styleconfig[flyspheretype]" value="2" {if isset($config['styleconfig']['flyspheretype']) && $config['styleconfig']['flyspheretype']=='2'}checked{/if}><span>上下旋转</span>
+					</label>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-lg-2 control-label">* 旋转速度</label>
+				<div class="col-lg-4">
+					<input type="text" class="form-control numberincdec" name="styleconfig[flyspherespeed]" value="{$config['styleconfig']['flyspherespeed']??100}"
+					data-bts-min="20" data-bts-replacement-val="20"
+					data-bts-max="160"
+					data-bts-step="1"
+					data-bts-postfix="速度"
+					data-bts-postfix-extra-class="touchspin-postfix"
+					>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-lg-2 control-label">主色调</label>
+		<div class="col-lg-8">
+			{:tpl_color('styleconfig[color]',$config['styleconfig']['color']??'#feca00')}
+			<span class="help-block">奖品名，奖项名，中奖列表等文字均会生效</span>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-lg-2 control-label">* 奖项以及奖品名称大小</label>
+		<div class="col-lg-10">
+			<div class="input-group">
+                <div class="input-group-btn not-allow"><a class="btn btn-default">奖项名称大小</a></div>
+                <div class="touchspin">
+					<input type="text" class="form-control numberincdec" name="styleconfig[awardsize]" 
+					data-bts-min="0" data-bts-replacement-val="30"
+					data-bts-max="200"
+					data-bts-step="1"
+					data-bts-postfix="px"
+					data-bts-postfix-extra-class="touchspin-postfix"
+					value="{$config['styleconfig']['awardsize']??30}">
+                </div>
+                <div class="input-group-btn not-allow"><a class="btn btn-default">奖品名称大小</a></div>
+				<div class="touchspin">
+					<input type="text" class="form-control numberincdec" name="styleconfig[prizesize]" 
+					data-bts-min="0" data-bts-replacement-val="25"
+					data-bts-max="200"
+					data-bts-step="1"
+					data-bts-postfix="px"
+					data-bts-postfix-extra-class="touchspin-postfix"
+					value="{$config['styleconfig']['prizesize']??25}">
+                </div>
+            </div>
+		</div>
+ 	</div>
+	<div class="form-group">
+		<label class="col-lg-2 control-label">* 随机滚动以及中奖列表文字大小</label>
+		<div class="col-lg-10">
+			<div class="input-group">
+                <div class="input-group-btn not-allow"><a class="btn btn-default">1-2个</a></div>
+                <div class="touchspin">
+					<input type="text" class="form-control numberincdec" name="styleconfig[rolltxt1]" 
+					data-bts-min="1" data-bts-replacement-val="1"
+					data-bts-max="300"
+					data-bts-step="1"
+					data-bts-postfix="px"
+					data-bts-postfix-extra-class="touchspin-postfix"
+					value="{$config['styleconfig']['rolltxt1']??50}">
+                </div>
+                <div class="input-group-btn not-allow"><a class="btn btn-default">3-4个</a></div>
+				<div class="touchspin">
+					<input type="text" class="form-control numberincdec" name="styleconfig[rolltxt2]" 
+					data-bts-min="1" data-bts-replacement-val="1"
+					data-bts-max="300"
+					data-bts-step="1"
+					data-bts-postfix="px"
+					data-bts-postfix-extra-class="touchspin-postfix"
+					value="{$config['styleconfig']['rolltxt2']??45}">
+                </div>
+				<div class="input-group-btn not-allow"><a class="btn btn-default">5-6个</a></div>
+				<div class="touchspin">
+					<input type="text" class="form-control numberincdec" name="styleconfig[rolltxt3]" 
+					data-bts-min="1" data-bts-replacement-val="1"
+					data-bts-max="300"
+					data-bts-step="1"
+					data-bts-postfix="px"
+					data-bts-postfix-extra-class="touchspin-postfix"
+					value="{$config['styleconfig']['rolltxt3']??35}">
+                </div>
+				<div class="input-group-btn not-allow"><a class="btn btn-default">7-8个</a></div>
+				<div class="touchspin">
+					<input type="text" class="form-control numberincdec" name="styleconfig[rolltxt4]" 
+					data-bts-min="1" data-bts-replacement-val="1"
+					data-bts-max="300"
+					data-bts-step="1"
+					data-bts-postfix="px"
+					data-bts-postfix-extra-class="touchspin-postfix"
+					value="{$config['styleconfig']['rolltxt4']??30}">
+                </div>
+				<div class="input-group-btn not-allow"><a class="btn btn-default">9个及以上</a></div>
+				<div class="touchspin">
+					<input type="text" class="form-control numberincdec" name="styleconfig[rolltxt5]" 
+					data-bts-min="1" data-bts-replacement-val="1"
+					data-bts-max="300"
+					data-bts-step="1"
+					data-bts-postfix="px"
+					data-bts-postfix-extra-class="touchspin-postfix"
+					value="{$config['styleconfig']['rolltxt5']??25}">
+                </div>
+            </div>
+			<span class="zam-help-block">注:最大可以是300，请结合文字长度设置此数值</span>
+		</div>
+ 	</div>
+	<div class="form-group">
+		<label class="col-lg-2 control-label">* 随机滚动以及中奖列表文字内外间距</label>
+		<div class="col-lg-6">
+			<div class="input-group">
+                <div class="input-group-btn not-allow"><a class="btn btn-default">外间距</a></div>
+                <div class="touchspin">
+					<input type="text" class="form-control numberincdec" name="styleconfig[margin]" 
+					data-bts-min="0" data-bts-replacement-val="0"
+					data-bts-max="100"
+					data-bts-step="1"
+					data-bts-postfix="px"
+					data-bts-postfix-extra-class="touchspin-postfix"
+					value="{$config['styleconfig']['margin']??0}">
+                </div>
+                <div class="input-group-btn not-allow"><a class="btn btn-default">内边距</a></div>
+				<div class="touchspin">
+					<input type="text" class="form-control numberincdec" name="styleconfig[padding]" 
+					data-bts-min="0" data-bts-replacement-val="0"
+					data-bts-max="100"
+					data-bts-step="1"
+					data-bts-postfix="px"
+					data-bts-postfix-extra-class="touchspin-postfix"
+					value="{$config['styleconfig']['padding']??7}">
+                </div>
+            </div>
+			
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-lg-2 control-label">* （滚动列表）最大滚动数据个数</label>
+		<div class="col-lg-6">
+			<input type="text" class="form-control numberincdec" name="styleconfig[maxrollnum]" 
+				data-bts-min="20" data-bts-replacement-val="20"
+				data-bts-max="500"
+				data-bts-step="1"
+				data-bts-postfix="个"
+				data-bts-postfix-extra-class="touchspin-postfix"
+				value="{$config['styleconfig']['maxrollnum']??20}">
+			<span class="zam-help-block">注:默认20个，最多可设置500个</span>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-lg-2 control-label">* （滚动列表）抽取9个及以上每行个数</label>
+		<div class="col-lg-6">
+			<input type="text" class="form-control numberincdec" name="styleconfig[over8linenum]" 
+				data-bts-min="1" data-bts-replacement-val="5"
+				data-bts-max="50"
+				data-bts-step="1"
+				data-bts-postfix="个"
+				data-bts-postfix-extra-class="touchspin-postfix"
+				value="{$config['styleconfig']['over8linenum']??5}">
+			<span class="zam-help-block">注:默认每行是5个，如果您设置的个数较多可能会导致数据发生换行</span>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-lg-2 control-label">* 中奖记录列表自动滚动速度</label>
+		<div class="col-lg-6">
+			<input type="text" class="form-control numberincdec" name="styleconfig[autoscrollspeed]" 
+				data-bts-min="1" data-bts-replacement-val="1"
+				data-bts-max="200"
+				data-bts-step="1"
+				data-bts-postfix="px"
+				data-bts-postfix-extra-class="touchspin-postfix"
+				value="{$config['styleconfig']['autoscrollspeed']??50}">
+			<span class="zam-help-block">注:此设置仅限开启了自动滚动有效，设置的越大滚动越快，最大可以设置200</span>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-lg-2 control-label">顶部奖品背景图</label>
+		<div class="col-lg-8">
+			{:tpl_image_one('styleconfig[topbg]',$config['styleconfig']['topbg'])}
+			<span class="help-block">规格:1034px * 76px</span>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-lg-2 control-label">奖品动态背景图</label>
+		<div class="col-lg-8">
+			{:tpl_image_one('styleconfig[prizebg]',$config['styleconfig']['prizebg'])}
+			<span class="help-block">规格:600px * 600px</span>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-lg-2 control-label">底部背景图</label>
+		<div class="col-lg-8">
+			{:tpl_image_one('styleconfig[bottombg]',$config['styleconfig']['bottombg'])}
+			<span class="help-block">规格:1056px * 116px</span>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-lg-2 control-label">抽奖按钮背景图</label>
+		<div class="col-lg-8">
+			{:tpl_image_one('styleconfig[btn]',$config['styleconfig']['btn']??'')}
+			<span class="help-block">规格:153px * 45px</span>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-lg-2 control-label">* 抽奖进行中显示停止按钮</label>
+		<div class="col-lg-8">
+			{:tpl_switch('styleconfig[showstopbtn]',$config['styleconfig']['showstopbtn']??'2')}
+			 <span class="help-block">默认不显示停止按钮，直接通过点击键盘空格键来停止抽奖，一般是空格键坏了等特殊原因才开启此项</span>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-lg-2 control-label">开始抽奖奖品变小背景视频（变小再散花效果）</label>
+		<div class="col-lg-8">
+			{:tpl_video('styleconfig[hidevideo]',$config['styleconfig']['hidevideo'])}
+			<span class="help-block">规格:1920px * 1080px</span>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-lg-2 control-label">结束抽奖背景视频（爆炸效果）</label>
+		<div class="col-lg-8">
+			{:tpl_video('styleconfig[baozhavideo]',$config['styleconfig']['baozhavideo'])}
+			<span class="help-block">规格:1920px * 1080px</span>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-lg-2 control-label">* 右侧中奖列表别名</label>
+		<div class="col-lg-8">
+		  <input type="text" class="form-control"  name="styleconfig[listname]"  value="{$config['styleconfig']['listname']??'中奖列表'}" maxlength="15" placeholder="15个字符以内">
+		</div>
+	</div>
+</div>

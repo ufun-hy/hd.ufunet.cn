@@ -1,0 +1,199 @@
+<style type="text/css">
+.fast-btn {
+    position: fixed;
+    top: 2rem;
+    left: 0;
+    width: 0.60rem;
+    font-size: 0.32rem;
+    -webkit-writing-mode: vertical-rl;
+    -ms-writing-mode: tb-rl;
+    writing-mode: vertical-rl;
+    text-indent: 2px;
+    color: #fff;
+    border-radius: 0 6px 6px 0;
+    background-color: rgba(0,0,0,.4);
+    cursor: pointer;
+    z-index: 3;
+    letter-spacing: 0.15rem;
+    color: #fff;
+    padding-top: 0.15rem;
+}
+.popup-in-modal {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 3;
+    display: none;
+}
+.fast-modal-wraper {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    background-color: rgba(0,0,0,.8);
+}
+.fast-modal-content {
+    position: absolute;
+    width: 6.4rem;
+    max-height: 6.67rem;
+    top: 50%;
+    left: 50%;
+    padding: .24rem;
+    border-radius: .1rem;
+    background: #fff;
+    -webkit-transform: translate(-50%,-50%);
+    transform: translate(-50%,-50%);
+}
+.fast-btnclose {
+    position: absolute;
+    width: .54rem;
+    height: .54rem;
+    right: -.27rem;
+    top: -.27rem;
+    background-size: 100%;
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFcAAABXCAMAAABGFileAAAAZlBMVEVHcEzn5+fg4ODk5OTh4eHj4+Ph4eHh4eHg4ODp6enk5OTg4OD////w8PDi4uLh4eHh4eHg4ODg4ODg4ODg4ODg4ODg4ODg4OBmZmbV1dXa2tqDg4N5eXmwsLB/f39xcXHFxcVra2sMBscFAAAAF3RSTlMAH/wXzUuJ6vYPHJUDCGCRvcLc2aewO1l+nbIAAAH/SURBVHjatZnrboMwDEZDmquglK6XD9jo1vd/yVVoWrS1gEvzHfVfpSMrcoxjq2XiuXYnc/BBB38wJ1efo3qVrXVGY0SPvxFtnN2ul1b2GDBFONpqlXXjPObxbvO0tSgDlgll8ZQ1lhoydBnl2tpDjq+lR7DHc+xFh2E9nsXb5YTdYQ27hXSODdbRxNmcNViLmcnl4g3reSsmo03aVeKJiKPBa5j4MBMavErzKCt2eJ3dvdYiB/YuFTxy4P8nxR552P+rYMhF/SfFPHLho0qUyEeZtIVGPnRBCRcp4E1ATsLmx+uQF6dGKo+8+GrpBnfD0OMR/TB0S7f5OK39bNtL9+iPS9t+TouPY30MmGJob3x099qP9saAKcI2HcOkN4mRtPNe2Pls6C9JfKe99PMZYSAUy7UwSkUNoViuhY7qDAjFci1wXqy8/fuvOGnf+8Uq7ABhxPJoAadOgDRicbTASRmIxV9iLYw6QCxuxVoclIdYLNdqrwKkYrkWCEpDRHcdtdcOIjQrXtb5svKBlb+s+8aqD6x6xqq/rO8F6fvG+h6z+gdWv0Pqz1j9JKv/JfXrrPcF6T3Eer+R3pus9zHpPc+cP/DnJRVhvkOYRxHmZ4x5H2k+SZqnkua/tHk1f77O3wckKsL+grBvIeyHCPsswv6Nti+U7zcT4v0max/7DaMoFZeb5NVRAAAAAElFTkSuQmCC);
+}
+.fast-modal-content .fast-header {
+    margin-top: 0.2rem;
+    margin-bottom: .28rem;
+    text-align: center;
+    font-size: .32rem;
+    color: #151516;
+    font-weight: 700;
+}
+.fast-modal-content .fast-list {
+    overflow-x: hidden;
+    overflow-y: scroll;
+    max-height: 5.63rem;
+    font-size: 0.34rem;
+}
+.fast-list .fast-groups{margin:5px auto 20px auto;}
+.fast-list .fast-groups ul {
+    height: auto;
+    overflow: hidden;
+}
+.fast-list .fast-groups ul li {
+    float: left;
+    font-size: 0.24rem;
+    text-align: center;
+    width:2rem;
+    height: 0.58rem;
+    padding:0 0.12rem;
+    box-sizing: border-box;
+    line-height: 0.58rem;
+    color: #919499;
+    border-radius: 5px;
+    cursor: pointer;
+    background: #f5f6f7;
+    margin:0 5px;
+    box-shadow: 0px 0px 5px rgb(157 179 208 / 40%);
+}
+.fast-list .fast-groups ul li.active {
+    color: #fff;
+    background: #00aeff;
+}
+.zam-input-select{width: 100%;height: 0.75rem;line-height:0.75rem;font-size:0.3rem;color:#555;text-align:center;}
+.q-select-box-item-collections__tick{font-size:16px;}
+.q-select-header-title__value{font-size: 16px;}
+
+</style>
+<div class="fast-btn zam-app-flex-ajCenter2">快速投票</div>
+<div class="popup-in-modal">
+    <div class="fast-modal-wraper"></div>
+    <div class="fast-modal-content">
+        <div class="fast-btnclose"></div>
+        <div class="fast-header">选择心仪的嘉宾</div>
+        <div class="fast-list">
+        	{if !empty($groups)}
+			<div class="fast-groups">
+				<ul class="zam-app-flex zam-app-justifyCenter">
+				{foreach $groups as $gkey=>$group}
+		        	<li class="limitbox fast-group{$group['id']}" data-groupid="{$group['id']}">{$group['groupname']}</li>
+		        {/foreach}
+		        </ul>
+			</div>
+			{/if}
+			<div class="zam-input-item select-Box">
+				<div class="zam-input-box">
+					<div class="zam-input-select">点击选择嘉宾</div>
+				</div>
+			</div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+var fastgroupclicked = false,qSelect1;
+require(['wechatcore','q-select'],function (wechatcore,QSelect) {
+$(".fast-btn").click(function(){
+    var activegroup = $(".votegroups li.active");
+    if(activegroup.length > 0){
+        $(".fast-list").find(".fast-group"+activegroup.attr('data-groupid')).addClass('active').siblings().removeClass('active');
+    }else{
+        $(".fast-list li").eq(0).addClass('active').siblings().removeClass('active');
+    }
+    $('.popup-in-modal').show();
+});
+$(".fast-btnclose").click(function(){
+    $('.popup-in-modal').hide();
+});
+$(".fast-list li").click(function(){
+    var groupid = $(this).attr('data-groupid');
+    $(this).addClass('active').siblings().removeClass('active');
+})
+$(".zam-input-select").click(function(){
+    var groupid = $(".fast-list li.active").attr('data-groupid')||'';
+    if(groupid==''){
+        return wechatcore.msg('请先选择分组');
+    }
+    wechatcore.ajaxSubmit('{:gowechat("vote/dzajaxgroupvote")}',{groupid:groupid,ishtml:'2'},'正在加载中..').then(function(data){
+        if(data.code==0){
+            if(qSelect1){
+                qSelect1.setData([data.msg], [0]);
+            }else{
+                qSelect1 = new QSelect({
+                    title:'请选择嘉宾',
+                    data: [data.msg],
+                    confirm(value,key) {
+                        if(key.length==0 || key.length > 1){
+                            wechatcore.msg('请选择一个嘉宾');
+                            return false;
+                        }
+                        var selectid = key[0];
+                        wechatcore.ask('温馨提醒','一旦确定无法修改，您确定选择'+(value||'')+'么?',['确定','取消'],function(k){
+                            var remainnum = parseInt($(".timeremain .remainnums span").text());
+                            if(remainnum<=0) return wechatcore.msg('您已无可投票数');
+                            wechatcore.ajaxSubmit('{:gowechat("vote/ajaxvote")}',{rotateid:rotateid,voteid:selectid},'正在处理..').then(function(data){
+                                 wechatcore.close(k);
+                                 if(data.code==0){
+                                    $(".timeremain .remainnums span").text(remainnum>0?remainnum-1:0);
+                                    if(votetype=='1') $('.item-'+selectid).text('已投此项').addClass('btn-disabled');
+                                    wechatcore.msg('操作成功');
+                                    $(".fast-btnclose").trigger('click');
+                                 }else if(data.code==-2){
+                                    wechatcore.showtopmsg(data.msg,1e3,function(){
+                                        wechatcore.reloadpage();
+                                    });
+                                 }else{
+                                    wechatcore.msg(data.msg);
+                                 }
+                            }, function(){
+                                  wechatcore.close(k);
+                                  wechatcore.msg('操作失败，请稍后重试');
+                            });
+                        });
+                    }
+                });
+            }
+            qSelect1.show();
+        }else{
+            wechatcore.msg(data.msg);
+        }
+        fastgroupclicked = false;
+    }, function(){
+        fastgroupclicked = false;
+        wechatcore.msg('请求失败，请稍后重试');
+    });
+});
+});
+</script>

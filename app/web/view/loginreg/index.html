@@ -1,0 +1,342 @@
+{include file='$Wpath/common/header'}
+<form id="formBox" class="zam-formvalidation form-horizontal" method="post">
+<div class="zam-titleBox">登录与注册通用设置</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 背景图</label>
+    <div class="col-lg-8">
+        {:tpl_image_one('common[bgimg]',$config['common']['bgimg'])}
+        <span class="help-block">尺寸控制在1920*1080px</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* logo</label>
+    <div class="col-lg-8">
+        {:tpl_image_one('common[logo]',$config['common']['logo'])}
+        <span class="help-block">210*36px</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 版权信息</label>
+    <div class="col-lg-8">
+      <input class="form-control" type="text"  name="common[copyright]" value="{$config['common']['copyright']}">
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 备案号</label>
+    <div class="col-lg-8">
+      <input class="form-control" type="text"  name="common[beianhao]" value="{$config['common']['beianhao']}">
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 公安备案地区代号</label>
+    <div class="col-lg-8">
+      <input class="form-control" type="text"  name="common[gnname]" value="{$config['common']['gnname']}">
+      <span class="help-block">一般是填写省份的代号 如:北京就填写京，湖南就填写湘</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 公安备案号</label>
+    <div class="col-lg-8">
+      <input class="form-control" type="text"  name="common[gnbeianhao]" value="{$config['common']['gnbeianhao']}">
+    </div>
+</div>
+<div class="zam-titleBox">账号登录设置</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 记录用户后台操作日志</label>
+    <div class="col-lg-8">
+        {:tpl_switch('login[saveuserbehavior]',$config['login']['saveuserbehavior']??'1')}
+        <span class="help-block">开启则记录登录用户在后台所有操作的日志，反之则仅记录管理员在后台管理内的操作日志</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 登录方式</label>
+    <div class="col-lg-8">
+      <label class="lyear-radio radio-inline radio-primary">
+       <input type="radio" name="login[type]" value="1" {if $config['login']['type']=='1'}checked{/if}><span>仅账号密码登录</span>
+      </label>
+      <label class="lyear-radio radio-inline radio-primary">
+       <input type="radio" name="login[type]" value="2" {if $config['login']['type']=='2'}checked{/if}><span>仅手机验证码登陆</span>
+      </label>
+      <label class="lyear-radio radio-inline radio-primary">
+       <input type="radio" name="login[type]" value="3" {if $config['login']['type']=='3'}checked{/if}><span>2个都要 <b class="label label-success">推荐</b></span>
+      </label>
+      <label class="lyear-radio radio-inline radio-primary">
+       <input type="radio" name="login[type]" value="4" {if $config['login']['type']=='4'}checked{/if}><span>关闭</span>
+      </label>
+      <span class="help-block"><span class="text-danger">注:在admin账户未绑定手机号或未配置好系统短信接口情况下，千万不要只开启手机验证码登录</span></span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 账号登录验证码</label>
+    <div class="col-lg-8">
+        {:tpl_switch('login[code]',$config['login']['code'],'opencodetype')}
+        <span class="help-block">开启后用户通过账号密码登录时需要填写验证码，建议开启</span>
+    </div>
+</div>
+<div class="form-group codetypebox{if $config['login']['code']=='2'} hidden{/if}">
+    <label class="col-lg-2 control-label">* 验证码类型</label>
+    <div class="col-lg-8">
+      <label class="lyear-radio radio-inline radio-primary">
+       <input type="radio" name="login[codetype]" value="1" {if !isset($config['login']['codetype']) || $config['login']['codetype']=='1'}checked{/if}><span>数字字母混合体 <b class="label label-success">推荐</b></span>
+      </label>
+      <label class="lyear-radio radio-inline radio-primary">
+       <input type="radio" name="login[codetype]" value="2" {if isset($config['login']['codetype']) && $config['login']['codetype']=='2'}checked{/if}><span>纯数字</span>
+      </label>
+      <label class="lyear-radio radio-inline radio-primary">
+       <input type="radio" name="login[codetype]" value="3" {if isset($config['login']['codetype']) && $config['login']['codetype']=='3'}checked{/if}><span>纯字母 <b class="label label-success">推荐</b></span>
+      </label>
+      <span class="help-block">注:数字验证码简单但安全性低，推荐选择字母或者混合体类型，此处设置的验证码类型对所有输入验证码的地方均生效</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 同一账户禁止多地同时登录</label>
+    <div class="col-lg-8">
+        {:tpl_switch('login[onlyone]',$config['login']['onlyone'])}
+        <span class="help-block">开启后同一个账户禁止多处同时登录，即为同一个账户只能一个地方登录，多个地方登录会把其他登录同一个账号的人挤掉线</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label"> 第三方登录</label>
+    <div class="col-lg-10">
+        <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th style="width:20%;text-align:center;">第三方图标</th>
+                <th style="width:20%;text-align:center;">第三方名称</th>
+                <th style="width:30%;text-align:center;">第三方登录链接</th>
+                <th style="width:10%;text-align:center;">状态</th>
+                <th style="width:20%;text-align:center;">操作</th>
+              </tr>
+            </thead>
+            <tbody class="thirdlogin-lists">
+            {volist name="config.login.thirdlogins" id="thirdlogin"}    
+            <tr>
+                <td class="text-center">
+                   {:tpl_image_one('login[thirdlogins][logo]',$thirdlogin['logo']??'')}
+                </td>
+                <td class="text-center">
+                    <input class="form-control" name="login[thirdlogins][name]" value="{$thirdlogin['name']??''}">
+                </td>
+                <td class="text-center">
+                   <input class="form-control" name="login[thirdlogins][url]" value="{$thirdlogin['url']??''}">
+                </td>
+                <td class="text-center">
+                   {:tpl_switch('login[thirdlogins][status]',$thirdlogin['status']??'1')}
+                </td>
+                <td class="text-center">
+                   <a class="btn btn-danger btn-xs btn-del"><i class="mdi mdi-close"></i></a>
+                   <a class="btn btn-primary btn-xs mousemove zam-sortable"><i class="mdi mdi-arrow-all"></i></a>
+                </td>
+            </tr>
+            {/volist}
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="5">
+                  <a class="btn btn-primary btn-xs addthirdlogin" href="javascript:;" > <i class="mdi mdi-plus"></i>新增第三方</a>
+                  <span class="help-block">注：最多可添加3个第三方登录，第三方登录并不是用于登录本系统仅仅是展示一下</span>
+                </td>
+              </tr>
+            </tfoot>
+        </table>
+    </div>
+    </div>
+<div class="zam-titleBox">微信扫码登录设置</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 状态</label>
+    <div class="col-lg-8">
+      {:tpl_switch('wxlogin[open]',$config['wxlogin']['open']??'2','wxlogincheck')}
+      <span class="help-block"><span class="text-danger">注:在admin超级管理员账号未绑定登录微信或微信开放平台未配置好的情况下，账号登录设置的登录方式千万不能选择关闭</span></span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 作为默认登录方式</label>
+    <div class="col-lg-8">
+      {:tpl_switch('wxlogin[isdefault]',$config['wxlogin']['isdefault']??'2')}
+      <span class="help-block">开启则后台登录页面默认使用微信扫码登录，否则默认使用账号登录</span>
+    </div>
+</div>
+
+<div class="zam-titleBox">账号注册设置<span class="text-danger">(为防止恶意注册，注册验证码无法关闭且跟随账号登录验证码类型设置)</span></div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 开启注册</label>
+    <div class="col-lg-8">
+        {:tpl_switch('reg[open]',$config['reg']['open'],'openreg')}
+        <span class="help-block">开启则在登录页面会显示无账号可去注册账号提示文字，注意：此开关对微信扫码登录注册也生效</span>
+    </div>
+</div>
+<div class="regbox{if !isset($config['reg']['open']) || $config['reg']['open'] == '2'} hidden{/if}">
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 注册审核</label>
+    <div class="col-lg-8">
+        {:tpl_switch('reg[shenhe]',$config['reg']['shenhe'])}
+        <span class="help-block">开启则注册的账户需要管理员审核方可登录</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 注册服务条款</label>
+    <div class="col-lg-8">
+        {:tpl_ueditor('reg[fwnotice]',$config['reg']['fwnotice'])}
+        <span class="help-block"><span class="text-danger">这个服务条款一定要好好的完善下内容，防止用户违法导致平台方受到牵连</span></span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 注册成功后自动创建活动</label>
+    <div class="col-lg-8">
+        {:tpl_switch('reg[autocreatehd]',$config['reg']['autocreatehd']??'2','openautocreatehd')}
+        <span class="help-block">开启则用户注册新账户后系统会自动给新账号创建一个测试活动</span>
+    </div>
+</div>
+<div class=" autocreatehdbox{if !isset($config['reg']['autocreatehd']) || $config['reg']['autocreatehd'] == '2'} hidden{/if}">
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 活动主题</label>
+        <div class="col-lg-8">
+            <input class="form-control" type="text"  name="reg[autohdtitle]" value="{$config['reg']['autohdtitle']??'新用户体验活动'}">
+            <span class="help-block">用于自动创建的测试活动的主题名称</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 活动默认人数</label>
+        <div class="col-lg-8">
+            <input type="text" class="form-control numberincdec" name="reg[autohdperson]" 
+            data-bts-min="1" data-bts-replacement-val="1"
+            data-bts-max="null"
+            data-bts-step="1"
+            data-bts-postfix="人"
+            data-bts-postfix-extra-class="touchspin-postfix"
+            value="{$config['reg']['autohdperson']??200}">
+            <div class="help-block">该人数用于自动创建的测试活动发布时的默认人数</div>
+        </div>
+    </div>
+</div>
+</div>
+{include file='$Wpath/common/savepanel'}
+</form>
+<script>
+require(['webcore','jconfirmBox','zamnotice','zvalidator','jquery.ui'],function(webcore,jconfirmBox,zamnotice){
+    $('.thirdlogin-lists').sortable({handle: ".mousemove"}).disableSelection();
+    $('#formBox').formValidation({
+		framework: 'bootstrap',
+		excluded: [':disabled'],
+		message: '您填写的内容无效',
+		fields: {}
+	}).on('success.form.fv', function(e) {
+		e.preventDefault();
+		var $form = $(e.target);
+		var postData = webcore.serializeObject($form);
+		var bload = $form.find(".zam-fixedbottom button").lyearloading({opacity: 0.2,spinnerSize: 'nm'});
+		$form.formValidation('disableSubmitButtons', true);
+		webcore.ajaxSubmit("{:goweb('loginreg/index')}",postData).then(function(json){
+			bload.hide();
+			if(json.code==0){
+			    $form.formValidation('disableSubmitButtons', false);
+			    zamnotice.showTips('success','操作成功',2e3,function(){
+			    	window.location.reload();
+			    });
+		    }else{
+		        zamnotice.showTips('error',json.msg);
+		        $form.formValidation('disableSubmitButtons', false);
+		    }
+		}, function(json){
+			bload.hide();
+			zamnotice.showTips('error','网络差。操作失败');
+			$form.formValidation('disableSubmitButtons', false);
+		});
+	});
+    $(".addthirdlogin").click(function(){
+        if($(".thirdlogin-lists tr").length > 2){
+            return zamnotice.showTips('error','最多添加3个第三方');
+        }
+        var bhtml = $(webcore.tpl($("#addthirdlogin"),{logo:'',name:'',url:'',status:'1'})).clone();
+        $(".thirdlogin-lists").append(bhtml);
+        tpl_switch();
+    });
+    $(".thirdlogin-lists").on('click','.btn-del',function(){
+        $(this).parent().parent().remove();
+    })
+});
+function wxlogincheck(obj,status,url){
+  require(["webcore","zamnotice"],function(webcore,zamnotice){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        obj.prev().prev().prop("checked",false);
+    }else{
+        webcore.ajaxSubmit("{:goweb('loginreg/openwxlogin')}",{}).then(function(json){
+            if(json.code==0){
+                obj.prev().val('1');
+                obj.attr('data-status','1');
+                obj.prev().prev().prop("checked",true);
+            }else{
+                obj.prev().val('2');
+                obj.attr('data-status','2');
+                obj.prev().prev().prop("checked",false);
+                zamnotice.showTips('error',json.msg,2e3);
+            }
+        }, function(json){
+            obj.prev().val('2');
+            obj.attr('data-status','2');
+            obj.prev().prev().prop("checked",false);
+            zamnotice.showTips('error','网络差，操作失败');
+        });
+    }
+  });  
+}
+function opencodetype(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".codetypebox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".codetypebox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openreg(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".regbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".regbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openautocreatehd(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".autocreatehdbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".autocreatehdbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+</script>
+<script id='addthirdlogin' type="text/template">
+    <tr>
+    <td class="text-center">
+        {:tpl_image_one('login[thirdlogins][logo]','')}
+     </td>
+     <td class="text-center">
+         <input class="form-control" name="login[thirdlogins][name]" value="">
+     </td>
+     <td class="text-center">
+        <input class="form-control" name="login[thirdlogins][url]" value="">
+     </td>
+     <td class="text-center">
+        {:tpl_switch('login[thirdlogins][status]','1')}
+     </td>
+     <td class="text-center">
+        <a class="btn btn-danger btn-xs btn-del"><i class="mdi mdi-close"></i></a>
+        <a class="btn btn-primary btn-xs mousemove zam-sortable"><i class="mdi mdi-arrow-all"></i></a>
+     </td>
+    </tr>
+</script>
+{include file='$Wpath/common/footer'}

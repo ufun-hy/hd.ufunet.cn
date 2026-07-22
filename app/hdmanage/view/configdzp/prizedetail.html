@@ -1,0 +1,27 @@
+<table class="we7-table table" style="margin-bottom:0px;">
+<thead>
+  <tr>
+	<th style="width:40%;text-align:center;">奖品</th>
+	<th style="width:30%;text-align:center;">计划发放数量</th>
+	<th style="width:30%;text-align:center;">剩余数量</th>
+  </tr>
+</thead>
+<tbody class="prize-lists">
+	 {volist name="prizes" id="prow"}
+	  <tr>
+		<td class="text-center">
+			<div class="prizeInfo">
+				<img src="{:tomedia($prow['prizeimg'])}" style="max-width: 60px;">
+				<p class="mt10">{$prow['prizename']}</p>
+				{if $prow['prizetype']=='2'}
+					<p>(<span class="text-danger">{$prow['prizemoney']}元</span>)</p>
+				{/if}
+			</div>
+		</td>
+		<td class="text-center">{$prow['prizenum']}个</td>
+		<td class="text-center">{$prow['remainnum']}个 {if $prow['prizetype']=='2'}(共剩余: <span class="text-danger">{$prow['remainmoney']}元</span>){/if}</td>
+	 </tr>
+	{/volist}
+</tbody>
+</table>
+

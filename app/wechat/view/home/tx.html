@@ -1,0 +1,116 @@
+{include file="common/header" /}
+<style>
+.list-wrapper{
+	width:100%;
+	height:100%;
+	background-color:#F5F5F5
+}
+.tx-box{margin-top:1rem!important;background-color:#fff}
+.mymoneynum{font-size:0.3rem;color:red;}
+.tx-btnbox{width:100%;text-align:center;}
+.btn-tx{width:60%;margin:0 auto;}
+.btn-tx.disabled{pointer-events: none;}
+.btn-txrecord{
+	display:inline-block;width:100%;text-align:center;height:1rem;line-height:1rem;font-size:0.3rem;color: #525252
+}
+.tx-tips{
+	color: #B1B1B1;
+    font-size: 0.28rem;
+    padding: .2rem .24rem .4rem;
+    line-height: 18px;
+    font-family: \5fae\8f6f\96c5\9ed1;
+    position: relative;
+	margin:0.2rem 0;
+}
+.tx-tip-title{margin-bottom:0.2rem;font-size:0.32rem;}
+.tx-tips p{margin: 0.2rem 0;}
+</style>
+<section class="g-flexview">
+	<header class="m-navbar navbar-fixed">
+		<a href="javascript:history.back(-1)" class="navbar-item">
+			<i class="back-ico"></i> 返回
+		</a>
+		<div class="navbar-center"></div>
+	</header>
+	<div class="g-scrollview tx-box">
+		<div class="m-cell">
+			<div class="cell-item">
+				<div class="cell-left">账户余额:<span class="mymoneynum">{$mymoney}</span>元</div>
+				<div class="cell-right"><a href="{:gowechat('home/myincome',['hdid'=>$hdinfo['hdid']])}">收入明细</a></div>
+			</div>
+			<div class="cell-item">
+                <div class="cell-right">
+                    <input type="text" class="cell-input txmoney"  onkeyup="checkInput(this)" placeholder="请输入提现金额" autocomplete="off">
+					<a href="javascript:;" class="btn btn-warning btn-txall">全部提现</a>
+                </div>
+            </div>
+		</div>
+		<div class="tx-btnbox">
+			<a href="javascript:;" class="btn-block btn-primary btn-tx">立即提现</a>
+			<a href="{:gowechat('home/txrecord',['hdid'=>$hdinfo['hdid']])}" class="btn-txrecord">提现记录</a>
+		</div>
+		<aside class="tx-tips">
+			<p class="tx-tip-title">提现说明</p>
+			<p>
+			    1 单次提现最小金额是{$wxtxconfig['txmin']}元，最大金额是{$wxtxconfig['txmax']}元
+			</p>
+			<p>
+			    2 提现需收取{$wxtxconfig['txfl']}%的手续费
+			</p>
+			<p>
+			    3 每日最多可提现1次
+			</p>
+			<p>
+			    4 提现间隔为{$wxtxconfig['txfrozenh']}个小时
+			</p>
+        </aside>
+	</div>
+</section>
+<script>
+function checkInput(obj) {
+    obj.value  = obj.value.replace(/[^\d.]/g,  "");
+    obj.value  = obj.value.replace(/^\./g,  "");
+    obj.value  = obj.value.replace(/(\..*)\./g,  '$1');
+    // 限制2位小数
+    // obj.value  = obj.value.replace(/^(-?\d+\.\d{0,2}).*$/,  '$1');
+}
+var clicktx = false;
+require(['wechatcore'],function (wechatcore) {
+	$(".btn-tx").on('click',function(){
+		var txmoney = $(".txmoney").val();
+		if(txmoney=='') return wechatcore.msg('请输入提现金额');
+		if(clicktx) return;
+		clicktx = true;
+		wechatcore.ajaxSubmit("{:gowechat('home/tx',['hdid'=>$hdinfo['hdid']])}",{txmoney:txmoney},'正在处理您的提现请求...').then(function(json){
+			if(json.code==0){
+				$(".txmoney").val('');
+				wechatcore.msg('提现成功');
+				setTimeout(function(){
+					window.location.reload();
+				},2e3);
+			}else if(json.code==-2){
+			    {/*抖音强制调到微信小程序授权后才可以提现*/}
+				wechatcore.ask('温馨提醒','您需要同意微信授权后才可以发起提现',['马上去授权','拒绝授权'],function(index){
+					wechatcore.close(index);
+					window.location.href = json.msg;
+				},function(index){
+					wechatcore.close(index);
+					wechatcore.msg('您已拒绝授权，无法发起提现');
+				});
+			}else{
+				clicktx = false;
+				wechatcore.msg(json.msg);	
+			}		
+		},function(){
+			clicktx = false;
+			wechatcore.msg('出现异常，提现失败');
+		});
+	});
+	$(".btn-txall").on('click',function(){
+		var mymoneynum = $(".mymoneynum").text();
+		if(mymoneynum == ''||mymoneynum <= 0 ) return wechatcore.msg('账户余额不足以提现');
+		$(".txmoney").val(mymoneynum);
+	});
+});
+</script>
+{include file="common/footer" /}

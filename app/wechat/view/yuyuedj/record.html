@@ -1,0 +1,70 @@
+{include file="common/header" /}
+<style>
+.yuyuedj-scroll-box{
+	padding-top: 0.92rem;
+}
+.record-list{width:100%;min-height: 100%;overflow:hidden;overflow-y: scroll;background: #fff}
+.record-list .record-item{
+	border-bottom:0.12rem solid #eee;
+}
+.record-user{
+	position:relative;height:0.78rem; line-height:0.78rem;padding-left:0.2rem;border-bottom: 1px solid #eee;
+}
+.record-avatar img{
+	width:0.4rem;height:0.4rem;border-radius:50%;
+}
+.record-nickname{margin-left:0.2rem;max-width:calc(100% - 4.5rem);overflow:hidden;white-space: nowrap;
+    word-break: break-all;
+    text-overflow: ellipsis;}
+.record-time{position:absolute;right:0.1rem;top:0;width:3.5rem;overflow: hidden;white-space: nowrap;
+    word-break: break-all;
+    text-overflow: ellipsis;}
+.record-prize{position:relative;padding:0.2rem;flex-wrap: wrap;}
+.record-prize div{width:50%;margin-bottom: 0.2rem}
+.zam-app-bodyBg{display: none}
+.list-norecords{padding:0.4rem 0;width:100%;height: 100%;}
+.list-norecords img.none-img{width:2rem;height:2rem}
+.list-norecords img.load-img{width:48px;height:48px}
+.list-norecords p{height:1rem;line-height:1rem;font-size:0.32rem;color:gray;text-align:center}
+</style>
+<header class="m-navbar navbar-fixed">
+<a href="{:gowechat('yuyuedj/index',['hdid'=>$hdinfo['hdid']])}" class="navbar-item">
+	<i class="back-ico"></i>返回
+</a>
+<div class="navbar-center"></div>
+</header>
+<section class="g-scrollview yuyuedj-scroll-box zam-app-flex-ajCenter">
+<ul class="record-list">
+	{if !empty($record)}
+		{foreach $record as $r}
+			<div class="record-item">
+				<div class="record-user zam-app-flex">
+					<div class="record-avatar zam-app-flex-ajCenter2">
+						<img src="{:tomedia($wxuser['avatar'])}">
+					</div>
+					<div class="record-nickname">{$wxuser['nickname']}</div>
+					<div class="record-time">预约时间：{$r['create_time']}</div>
+				</div>
+				<div class="record-prize zam-app-flex">
+					{if !empty($fields) && !empty($r['bddata'])}
+						{foreach $fields as $f}
+							<div>{$f['title']}:{$r['bddata'][$f['zd']]}</div>
+						{/foreach}
+					{/if}
+				</div>
+			</div>
+		{/foreach}
+	{else /}
+		<div class="list-norecords zam-app-flex-ajCenter">
+			<img class="none-img" src="/{:SIMGURL}common/isnone.png">
+			<p>暂无记录</p>
+		</div>
+	{/if}
+</ul>
+</section>
+<script>
+require(['wechatcore'],function (wechatcore) {
+})
+</script>
+{include file="yuyuedj/xieyi" /}
+{include file="common/footer" /}

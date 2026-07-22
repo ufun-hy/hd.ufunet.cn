@@ -1,0 +1,222 @@
+{include file='common/header' /}
+<style type="text/css">
+.hidden{display: none;}
+.qdbook-mainbox {
+    height: 670px;
+    top: 90px;
+    bottom: 40px;
+    box-sizing: border-box;
+}
+.qdbook-container{
+    position: relative;
+    width: auto;
+    height: 100%;
+}
+.qdbook-left{
+    position: relative;
+    height: 100%;
+}
+.qdbook-left img{
+    height: 100%;
+}
+.leftcorner{
+    position: absolute;
+    left: -60px;
+    top: -60px;
+    width: 246px;
+    z-index: 1;
+}
+.leftcorner img{
+    width: 100%;
+}
+.qdbook-right{
+    position: relative;
+    height: 100%;
+}
+.qdbook-right img{
+    height: 100%;
+}
+.rightcorner{
+    position: absolute;
+    right: -40px;
+    bottom: -40px;
+    width: 246px;
+    z-index: 1;
+}
+.rightcorner img{
+    width: 100%;
+}
+.qdbook-body{
+    width: 50px;
+    height: 100%;
+    padding: 80px 0;
+    box-sizing: border-box;
+    background-size: auto 100%;
+    background-repeat: repeat-x;
+    overflow: hidden;
+    transform: translate3d(0, 0, 0);
+    background-image: url({:tomedia($pcconfig['pcstyle']['box']['centerbg'])});
+}
+.qdbook-body ul{
+    position: relative;
+    height: 100%;
+    width: 100%;
+    will-change: transform;
+}
+.qdbook-body ul li{
+    position: absolute;
+    width: 125px;
+    height: 100%;
+    top: 0;
+}
+.qdbook-body ul li .avatarbox{
+    width: 70px;
+    height: 70px;
+    border: {$pcconfig['pcstyle']['box']['imgbordersize']??2}px solid {$pcconfig['pcstyle']['box']['imgbordercolor']??'#ffcf93'};
+    box-sizing: border-box;
+    border-radius: 5px;
+    background-size: cover;
+}
+.qdbook-body ul li .avatarbox img{width: 100%;height: 100%;}
+.qdbook-body ul li .contentbox{
+    margin-top: 18px;
+    height: calc(100% - 88px);
+}
+.qdbook-body ul li .contentbox .nickname {
+    writing-mode: vertical-lr;
+    text-orientation: mixed;
+    width: 40px;
+    font-weight: 700;
+    font-size: {$pcconfig['pcstyle']['box']['namesize']??30}px;
+    color: {$pcconfig['pcstyle']['box']['namecolor']??'#ffcf93'};
+    overflow: hidden;
+}
+.qdbook-body ul li .contentbox .message {
+    width: 30px;
+    overflow: hidden;
+    font-size: {$pcconfig['pcstyle']['box']['messagesize']??24}px;
+    color: {$pcconfig['pcstyle']['box']['messagecolor']??'#ffdec1'};
+}
+.qdbook-body ul li .contentbox .message div{
+    width: 100%;
+    writing-mode: vertical-lr;
+    text-orientation: mixed;
+    height: 10000px;
+    overflow: hidden;
+    overflow-y: auto;
+}
+.qdbook-body ul li .contentbox .message div.txtscroll{
+    animation: txtscroll 10s linear 2s infinite;
+}
+@keyframes txtscroll{
+    0%{
+        transform: translateY(0px);
+    }
+    100%{
+        transform: translateY(-100%);
+    }
+}
+.qdbook-body ul li .contentbox .message div span{
+    display: inline-block;
+}
+.qdbook-popbox{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.25);
+}
+.qdbook-popbox .popcontainer{
+    width: 600px;
+    height: 300px;
+    padding: 60px;
+    box-sizing: border-box;
+    background-image: url({:tomedia($pcconfig['pcstyle']['pop']['bgimg'])});
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    font-weight: bold;
+}
+.qdbook-popbox .popcontainer .popname{
+    max-width: 100%;
+    height: 40px;
+    line-height: 40px;
+    font-weight: bold;
+    overflow: hidden;
+    font-size: {$pcconfig['pcstyle']['pop']['namesize']??24}px;
+    color: {$pcconfig['pcstyle']['pop']['namecolor']??'#333'};
+}
+.qdbook-popbox .popcontainer .popcontent{
+    max-width: 100%;
+    height: 140px;
+    word-wrap: break-word;
+    overflow: hidden;
+    font-size: {$pcconfig['pcstyle']['pop']['messagesize']??24}px;
+    color: {$pcconfig['pcstyle']['pop']['messagecolor']??'#ffa200'};
+}
+.qdbook-popbox .popcontainer .oneWord {
+    display: inline-block;
+    opacity: 0;
+}
+.qdbook-popbox .popcontainer .popcontent .oneWord{
+    margin-right: 1px;
+}
+.qdbook-popbox .popcontainer .popcontent .oneWord:first-child{
+    margin-left: 40px;
+}
+{if isset($pcconfig['showjoinnum']) && $pcconfig['showjoinnum']=='2'}
+.header .joinPeople{opacity: 0;}
+{/if}
+</style>
+<div class="qdbook-mainbox normal-box">
+    <div class="qdbook-container zam-app-flex-ajCenter2">
+        <div class="qdbook-left">
+            <img src="{:tomedia($pcconfig['pcstyle']['box']['leftbg'])}"  {if empty($pcconfig['pcstyle']['box']['leftbg'])}style="opacity: 0;"{/if} />
+            <div class="leftcorner">
+                <img src="{:tomedia($pcconfig['pcstyle']['box']['leftcorner'])}" {if empty($pcconfig['pcstyle']['box']['leftcorner'])}style="opacity: 0;"{/if} />
+            </div>
+        </div>
+        <div class="qdbook-body zam-app-flex">
+            <ul class="scrollbox"></ul>
+        </div>
+        <div class="qdbook-right">
+            <img src="{:tomedia($pcconfig['pcstyle']['box']['rightbg'])}"  {if empty($pcconfig['pcstyle']['box']['rightbg'])}style="opacity: 0;"{/if} />
+            <div class="rightcorner">
+                <img src="{:tomedia($pcconfig['pcstyle']['box']['rightcorner'])}" {if empty($pcconfig['pcstyle']['box']['rightcorner'])}style="opacity: 0;"{/if} />
+            </div>
+        </div>
+    </div>
+</div>
+<div class="qdbook-popbox zam-app-flex-ajCenter2 hidden">
+    <div class="popcontainer">
+        <div class="popname"></div>
+        <div class="popcontent"></div>
+    </div>
+</div>
+<script type="text/html" id="bookitem-tpl">
+    <li class="zam-app-flex zam-app-alignCenter zam-app-directionColumn" style="left: {{ left }}px;">
+        <div class="avatarbox" style="background-image: url({{ avatar }});"></div>
+        <div class="contentbox zam-app-flex">
+            <div class="nickname">{{ nickname }}</div>
+            <div class="message">
+                <div>{{ #message | messageinit }}</div>
+            </div>
+        </div>
+    </li>
+</script>
+<script type="text/javascript">
+var qdbookconfig = {
+    rolltime:parseInt("{$pcconfig['pcstyle']['box']['rolltime']??2}") * 1e3,
+    txtrollspeed:10,
+    popstatus:"{$pcconfig['pcstyle']['pop']['status']??1}",
+    oldopenpop:"{$pcconfig['pcstyle']['pop']['oldopenpop']??2}",
+    ani:"{$pcconfig['pcstyle']['pop']['ani']??1}",
+    anitime:parseInt("{$pcconfig['pcstyle']['pop']['anitime']??300}"),
+    speed:parseInt("{$pcconfig['pcstyle']['pop']['speed']??500}"),
+    poptime:parseInt("{$pcconfig['pcstyle']['pop']['showtime']??5}") * 1e3,
+};
+require(['screenqdbook'],function(screenqdbook){
+    screenqdbook.init();
+})
+</script>
+{include file='common/footer' /}

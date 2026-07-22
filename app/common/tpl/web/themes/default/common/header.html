@@ -1,0 +1,57 @@
+{include file="$Wpath/common/header_base"}
+<div class="lyear-layout-web">
+  <div class="lyear-layout-container">
+    <!--左侧导航-->
+   {if !noleftMenu()}
+    <aside class="lyear-layout-sidebar{if empty($leftmenu['pmenu'])} no-son{/if}">
+      <div class="lyear-layout-mini-sidebar">
+        <div class="lyear-layout-sidebar-scroll"> 
+          {include file="$Wpath/common/leftnav" /}
+        </div>
+        {include file="$Wpath/common/sonnav" /}
+      </div>
+    </aside>
+    {/if}
+    <!--End 左侧导航-->
+    <!--头部信息-->
+    <header class="lyear-layout-header bg-default">
+      <nav class="navbar navbar-default">
+        <div class="topbar">
+          <div class="topbar-left">
+            <div id="logo" class="sidebar-header bg-default">
+                <a href="javascript:void(0)"><img src="{if !empty($siteinfo['sitelogo'])}{:tomedia($siteinfo['sitelogo'])}{else/}/static/images/logo-sidebar.png{/if}"></a>
+            </div>
+            {if !noleftMenu()}
+            <div class="lyear-aside-toggler">
+              <span class="lyear-toggler-bar"></span>
+              <span class="lyear-toggler-bar"></span>
+              <span class="lyear-toggler-bar"></span>
+            </div>
+            {/if}
+          </div>
+          <ul class="topbar-right">
+            {include file='$Wpath/common/header-home'}
+          </ul>
+        </div>
+      </nav>
+    </header>
+    <!--End 头部信息-->
+    <!--页面主要内容-->
+    <main class="lyear-layout-content{if noleftMenu()} no-left{else /}{if empty($leftmenu['pmenu'])} no-son{/if}{/if} oneuser-{$admin['user_name']??''}">
+      <div class="container-fluid">
+        <div class="row" style="padding-bottom: 50px;">
+          <div class="col-lg-12">
+              {if !noleftMenu()}
+              <div class="card page-card">
+                  <div class="card-header"><h4>{$leftmenu['lefttitle']}</h4></div>
+                  <div class="card-body">
+                    {if !empty($leftmenu['ssmenu']['menu'])}
+                    <div class="text-center">
+                      <div class="btn-group zam-inner-highconfig-btns" style="margin:5px 0 30px 0;">
+                          {volist name="leftmenu.ssmenu.menu" id="ssmenu"}
+                            <a href="{$ssmenu['permis_url']}" class="btn {if $ssmenu['active']=='1'} btn-primary{else}btn-default{/if} {$ssmenu['btnclass']??''}"><span>{$ssmenu['permis_name']}</span></a>
+                          {/volist}
+                      </div>
+                    </div>
+                    {/if}
+              {/if}

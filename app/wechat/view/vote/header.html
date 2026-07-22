@@ -1,0 +1,129 @@
+{include file="common/header" /}
+<style>
+body{background-color:{$appconfig['apppageconfig']['bgcolor']};overflow-y:auto}
+.vote-slides{width:100%;height:auto;overflow:hidden}
+.vote-slides img{width:100%; vertical-align:middle;}
+.voteBox{width: 100%; height:auto;padding-bottom:1.1rem;text-align: center;}
+.num_box{width:100%;height:100px;background-image:url("{:tomedia($appconfig['apppageconfig']['topbg'])}");background-repeat:no-repeat;background-size:cover;background-position:bottom;}
+.num_box .num_box_ul{overflow:hidden;padding:15px 0;width:100%;line-height:22px;}
+.num_box .num_box_ul li{float:left;width:33%;border-right:1px solid #dea91a}
+.num_box .num_box_ul li:last-child{border:none}
+.num_box .num_box_ul li span{display:block;width:100%;color:{$appconfig['apppageconfig']['maincolor']};text-align:center;font-size:18px}
+.num_box .num_box_ul li span.text{margin:0;padding:0;background-color:transparent;box-shadow:none;font-size:15px}
+.timeremain {margin:0 auto;margin-bottom:0.1rem;width:100%;text-align:center;}
+.timeremain strong{border:#CCC 1px solid;background:#FFF;color:#999;line-height:40px;font-size:14px;padding:5px 10px;margin:0 5px;border-radius:3px;box-shadow:1px 1px 1px rgba(0,0,0,0.1);}
+.timeremain .timeremain-title{line-height:35px;color:{$appconfig['apppageconfig']['maincolor']};font-size:16px;}
+.timeremain .remainnums{height:0.6rem;line-height:0.6rem;margin:0.2rem 0;font-size:0.32rem;color:{$appconfig['apppageconfig']['maincolor']}}
+.vote-searchBox{width:86%;margin:0.2rem auto;}
+.vote-searchBox input{height:0.6rem!important;}
+.vote-searchBox a{height:0.6rem;line-height:0.6rem;}
+/*选手列表*/
+.clearfix{clear:both}
+.vote-itemlists{
+    position: relative;
+    width: 100%;
+    height: auto;
+	padding:0 0.1rem;
+}
+.vote-item{
+    padding:0;
+}
+.vote-item .list-item{position:relative;padding:0.1rem;margin:0;}
+.vote-item .list-item .list-img{padding: 0;height: auto}
+.vote-item .list-item .list-img img{margin:0;height: auto}
+.vote-item .list-mes .list-title{height:auto!important;text-align:center!important;font-size:0.3rem}
+.list-mes-item a{height:0.6rem;line-height:0.6rem;margin:0.1rem auto;padding:0 0.3rem;}
+.list-number{
+	position:absolute;
+	top:0.1rem;
+	left:0.1rem;
+}
+.footerbg{width:100%;}
+.vote-phblists li {
+	width:100%;
+	padding:0 10px;
+    height: 55px;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+	border-bottom:1px solid #eccdcd;
+	color:{$appconfig['apppageconfig']['maincolor']};
+}
+.vote-phblists li section {
+    line-height: 55px;
+}
+.vote-phblists li section.number {
+    width: 15%;
+    border: 0;
+    font-style: normal;
+    font-size: 14px;
+    text-align: center;
+	color:#333
+}
+.vote-phblists li section.number img{
+    width: 30px;
+}
+.vote-phblists li section.avatar{
+	width:20%;
+}
+.vote-phblists li section.avatar img {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+}
+.vote-phblists li section.nickname {
+	width:45%;
+    padding: 0 10px;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.vote-phblists li section.score {
+    width:20%;
+    font-size:16px;
+    text-align:right;
+}
+/*排行榜*/
+.vote-rule .rule-title {
+    width: 30%;
+    display: block;
+    height: 40px;
+    line-height: 40px;
+    border-radius: 0 20px 20px 0;
+    color: #FFF;
+    background-color:{$appconfig['apppageconfig']['gzcolor']};
+    font-size: 15px;
+    text-align: center;
+	margin:0.3rem 0;
+}
+.rule-con{
+	margin: 0 auto;
+    width: 94%;
+    color: #fff;
+    font-size: 16px;
+	text-align:left;
+}
+/*footer*/
+.vote-ftab{
+    {if isset($appconfig['apppageconfig']['openwxmenu']) && $appconfig['apppageconfig']['openwxmenu']=='2'}
+        display:none;
+    {/if}
+}
+.vote-ftab .tabbar-item.tabbar-active{
+	color:{$appconfig['apppageconfig']['maincolor']}
+}
+</style>
+<div class="voteBox g-flexview">
+	<div class="vote-slides">
+			<div class="swiper-container vote-slide-wrapper">
+				<ul class="swiper-wrapper">
+					{volist name="rotate.topslides" id="ts"}
+					<li class="swiper-slide">
+						<img src="{:tomedia($ts)}">
+					</li>
+					{/volist}
+				</ul>
+				 <div class="swiper-pagination"></div>
+			</div>
+	</div>

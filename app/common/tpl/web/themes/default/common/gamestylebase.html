@@ -1,0 +1,82 @@
+<style>
+.zam-stylewrapper .zam-style-lockicon{position: absolute;width: 30px;display: inline-block;}
+.zam-stylewrapper .zam-style-lockicon i{font-size:20px;}
+</style>
+<div class="config-titlebox">
+    <span class="config-titlename">游戏风格设置<span class="text-danger" style="font-size:0.8em">(点击下面的风格可选取需要显示的风格)</span></span>
+</div>
+<div class="form-group">
+	<div class="form-group shapeTypes">
+		<label class="col-lg-2  control-label">* 可选风格</label>
+		<div class="col-lg-10">	
+			<div class="zam-stylewrapper zam-flex zam-alignItems">
+			{foreach $styles as $style}
+				<div class="zam-styleitem{if in_array($style['id'],$config['styleids'])} hadchecked{/if}">
+					<div class="zam-styleimg">
+						<img src="{:tomedia($style['styleimg'])}" onerror="javascript:this.src='/static/images/sys/nopic.jpg';this.title='暂无图片'">
+					</div>
+					<div class="zam-stylename">{$style['stylename']}</div>
+					<div class="zam-selected">
+						<i class="mdi mdi-check"></i>
+					</div>
+					<input 
+					type="checkbox" 
+					class="hidden" 
+					name="styleids" 
+					value="{$style['id']}" 
+					{if in_array($style['id'],$config['styleids'])}checked{/if}>
+				</div>
+			{/foreach}
+			</div>
+		</div>
+</div>
+<div class="form-group shapeTypes">
+	<label class="col-lg-2  control-label">* 默认显示风格</label>
+	<div class="col-lg-8 styleidbox">	
+		<select name="styleid" class="form-control">
+			{volist name="styles" id="sty"}
+			{if in_array($sty['id'],$config['styleids'])}
+			 <option value="{$sty['id']}" {if isset($config['styleid']) && $sty['id']==$config['styleid']}selected="selected"{/if}>{$sty['stylename']}</option>
+			{/if}
+			{/volist}
+		</select>
+	</div>
+</div>
+<script>
+$(".zam-stylewrapper .zam-styleitem").on('click',function(){
+	var $this = $(this);
+	require(["zamnotice"],function(zamnotice){
+		if(!$this.hasClass('hadchecked')){
+			$this.addClass('hadchecked');
+			$this.find('input').prop("checked","checked");
+		}else{
+			if($(".zam-stylewrapper .hadchecked").length<=1){
+				return zamnotice.showTips('error','大屏至少要选择一套风格');
+			}
+			$this.removeClass('hadchecked');
+			$this.find('input').prop("checked",false);
+		}
+		updatestyleid();
+	});
+});
+function updatestyleid(){
+	var hadsel = $(".zam-stylewrapper .hadchecked");
+	var html = '';
+	//获取选的默认风格
+	var styleid = $(".styleidbox").find("option:selected").val();
+	//所有已选风格
+	var hadsel = $(".zam-stylewrapper .hadchecked");
+	var styleids = [];
+	$.each(hadsel,function(i,v){
+		styleids.push($(this).find('input').val());
+		html += ' <option value="'+$(this).find('input').val()+'" data-shaketype="'+$(this).attr("data-shaketype")+'">'+$(this).find('.zam-stylename').text()+'</option>';
+	});
+	$(".styleidbox select").html(html);
+	if(hadsel.length<=0) return;
+	if($.inArray(styleid,styleids)){
+		$(".styleidbox select").find("option[value='"+styleid+"']").prop("selected","selected");
+	}else{
+		$(".styleidbox select").find("option").eq(0).prop("selected","selected");
+	}
+}
+</script>

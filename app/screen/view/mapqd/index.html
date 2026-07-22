@@ -1,0 +1,505 @@
+{include file='common/header' /}
+<link rel="stylesheet" href="/{:SIMGURL}mapqd/font/iconfont.css?t=11"/>
+<style>
+.joinPeople{
+{if isset($pcconfig['styleconfig']['joinopen']) && $pcconfig['styleconfig']['joinopen']=='2'}
+display: none;
+{/if}
+}
+.mapqdbox{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+.mapbox{
+    width: 100%;
+    height: 100%;
+    top: {$pcconfig['styleconfig']['top']??0}px;
+    left: {$pcconfig['styleconfig']['left']??0}px;
+    transform: scale({$pcconfig['styleconfig']['scale']??1});
+}
+.mapbox a,.mapbox .logo-text{display: none;}
+.mapbox .marker{
+    color: #fff;
+}
+.mapbox .marker .signamebox{
+    
+}
+.mapbox .marker .signamebox i{
+   font-size: 36px;
+}
+.mapbox .marker  .signamebox .signnum{
+    position: absolute;
+    top: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font-size: 12px;
+    font-weight: 600;
+    {if isset($pcconfig['styleconfig']['markernum']) && $pcconfig['styleconfig']['markernum']=='2'}
+    display: none;
+    {/if}
+}
+.mapbox .marker .areaname{
+    font-size: 14px;
+    top: 36px;
+    position: absolute;
+    color: #fff;
+    width: 100%;
+    word-break: break-all;
+    white-space: nowrap;
+    text-align: center;
+    max-width: 400px;
+    min-width: 200px;
+}
+.mapbox .marker .dot{
+    position: absolute;
+    bottom: -6px;
+    left:13px;
+    width: 10px;
+    height: 10px;
+    z-index: -1;
+    display: none;
+    {if isset($pcconfig['styleconfig']['markerdot']) && $pcconfig['styleconfig']['markerdot']=='2'}
+    visibility: hidden;
+    {/if}
+}
+.mapbox .marker .signamebox.active .dot{
+    display: block;
+}
+.mapbox .marker .dot:after {
+    content:' ';
+    position: absolute;
+    z-index:1;
+    width:10px;
+    height:10px;
+    background-color: #ff4200;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(0,0,0,.3) inset;
+    animation:ripple 1s linear 0s infinite normal
+}
+@keyframes ripple {
+    0% {
+        left:5px;
+        top:5px;
+        opacity:0.75;
+        width:0;
+        height:0;
+    }
+    100% {
+        left:-20px;
+        top:-20px;
+        opacity: 0;
+        width:50px;
+        height:50px;
+    }
+}
+/*弹窗*/
+.mapqd-popBox {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    z-index: 2;
+    pointer-events: none;
+}
+.mapqd-popBox .signtip{
+    width: 100%;
+    text-align: center;
+    font-weight: 600;
+    opacity: 0;
+    transform: rotateX(90deg);
+    color: {$pcconfig['styleconfig']['popcolor']??'#fff'};
+    font-size: {$pcconfig['styleconfig']['popsize']??'42'}px;
+}
+.mapqd-popBox .signtip img{
+    border-radius: 50%;
+    margin:0 10px;
+    width: calc({$pcconfig['styleconfig']['popsize']??'42'}px + 6px);
+    height: calc({$pcconfig['styleconfig']['popsize']??'42'}px + 6px);
+}
+.mapqd-popBox.maskopen .signtip{
+    animation:signtipopen 0.8s linear 0s 1 normal forwards;
+}
+@keyframes signtipopen{
+    from{opacity:0;transform:rotateX(90deg)}
+    to{opacity:1;transform:rotateX(0deg)}
+}
+.mapqd-popBox.maskclose .signtip{
+    animation: signtipclose 0.8s linear 0s 1 normal forwards;
+}
+@keyframes signtipclose{
+    from{opacity:1;transform:rotateX(0deg)}
+    to{opacity:0;transform:rotateX(90deg)}
+}
+.mapqd-maskbox{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+.mapqd-maskbox div{
+    width: 100%;
+    height: 0;
+    position: absolute;
+    left: 0px;
+    opacity: 1;
+    background: {$pcconfig['styleconfig']['popbgcolor']??'rgba(0, 0, 0, 0.5)'};
+}
+.mapqd-maskbox .masktop {
+    bottom: 50%;
+}
+.mapqd-maskbox .maskbottom {
+    top: 50%;
+}
+.mapqd-popBox.maskopen .mapqd-maskbox div{
+    animation:maskopen 0.8s linear 0s forwards
+}
+@keyframes maskopen{
+    from{
+        height: 0;
+        opacity: 0;
+    }to{
+        height:50%;
+        opacity: 1;
+    }
+}
+.mapqd-popBox.maskclose .mapqd-maskbox div{
+    animation:maskclose 0.8s linear 0s forwards
+}
+@keyframes maskclose{
+    from{
+        height: 50%;
+        opacity: 1;
+    }to{
+        height:0;
+        opacity: 0;
+    }
+}
+.signyanhuabox{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+}
+.signyanhuabox.hidden{display: none;}
+.signyanhuabox .yanhuaitem{
+    position: absolute;
+    top: 0;
+    width: 480px;
+    height: 270px;
+    background-image: url(/static/images/screen/mapqd/yanhua.gif);
+    background-size: cover;
+}
+.signyanhuabox .yanhuaitem.yanhua-left{left:0;}
+.signyanhuabox .yanhuaitem.yanhua-right{right:0;}
+{if isset($pcconfig['styleconfig']['closemapbox']) && $pcconfig['styleconfig']['closemapbox']=='1'}
+.mapbox canvas{opacity: 0}
+{/if}
+</style>
+<div class="mapqdbox"><div class="mapbox" id="mapbox"></div></div>
+<section class="mapqd-popBox zam-app-flex-ajCenter">
+    <div class="mapqd-maskbox">
+        <div class="masktop"></div>
+        <div class="maskbottom"></div>
+    </div>
+    <div class="signtip zam-app-flex-ajCenter2"></div>
+    <div class="signyanhuabox hidden">
+        <div class="yanhuaitem yanhua-left"></div>
+        <div class="yanhuaitem yanhua-right"></div>
+    </div>
+</section>
+<script type="text/javascript">
+var areadata = {
+    ischina : "{$area['ischina']??'1'}",
+    provincecode : "{$area['provincecode']??''}",
+    citycode : "{$area['citycode']??''}",
+    markers:{:json_encode($districts)},
+    popopen:{$pcconfig['styleconfig']['popopen']??'1'},
+    popseconds:parseInt("{$pcconfig['styleconfig']['popseconds']??6}"),
+    popyanhua:"{$pcconfig['styleconfig']['showyanhua']??1}",
+};
+var maxid = "{$maxid}",newsignqueues = [],map,district,polygons,markers = [],bounds = [],polygonobjs = {},geometries = [];
+require(['screencore','keyboard','template','layerBox','https://map.qq.com/api/gljs?v=1.exp&libraries=service&key={$mapkey}'],function(screencore,keyboardJS,template,layerBox){
+    var map = new TMap.Map(document.getElementById('mapbox'), {
+        zoom: 10,
+        baseMap:null,
+        pitch: 0,
+        rotation: 0,
+        mapStyleId: 'style1',
+        draggable:false,
+        scrollable:false,
+        doubleClickZoom:false,
+        showControl:false,
+    });
+    district = new TMap.service.District({
+        polygon: 2,
+    });
+    polygons = new TMap.MultiPolygon({
+      map: map,
+      geometries: [],
+      styles: {
+        'polygon': new TMap.PolygonStyle({
+            'color': "{$pcconfig['styleconfig']['bgcolor']??'#0000ff'}",
+            'showBorder':true,
+            'borderWidth':2,
+            'borderColor': "{$pcconfig['styleconfig']['bordercolor']??'#9b9bff'}",
+        }),
+        'highlight': new TMap.PolygonStyle({
+          'color': "{$pcconfig['styleconfig']['highlightcolor']??'#ff9800'}",
+          'borderColor': "{$pcconfig['styleconfig']['bordercolor']??'#9b9bff'}",
+        }),
+      },
+    });
+    var i = 0,citycode = (areadata.ischina=='1'?'':(areadata.ischina=='2'?areadata.provincecode:areadata.citycode));
+    var layindex = layerBox.showLoading('地图加载中...');
+    if(areadata.ischina=='3' && areadata.provincecode=='460000'){
+        district.getChildren({id:areadata.provincecode}).then(function(result){
+            if (result && result.result) {
+                var cityList = result.result[0];
+                if(cityList.length > 0){
+                    $.each(cityList,function(k,v){
+                        if(v.id==citycode){
+                            polygons.updateGeometries(drawPolygon(
+                                v.id,
+                                v.polygon,
+                            ));
+                            return false;
+                        }
+                    });
+                }
+            }
+            initdata();
+        })
+    }else{
+        initdata();
+    }
+    $(".mapbox > div").find('div').eq(1).hide();
+    function initdata(){
+        var highlightareas = {};
+        $.each(areadata.markers,function(i,v){
+            highlightareas[v.areacode] = v.signnum > 0 ? true : false;
+        });
+        district.getChildren({id:citycode}).then(function(result){
+            if (!result && !result.result) return;
+            var allcitys = result.result[0];
+            allcitys.forEach(function(item, index){
+                if(item.id != "-1" && item.polygon){
+                    geometries.push.apply(geometries,drawPolygon(
+                        item.id,
+                        item.polygon,
+                        highlightareas[item.id]||false,
+                    ));
+                    polygonobjs[item.id] = item.polygon;
+                }
+                i++;
+                if(i==allcitys.length){
+                    if(bounds.length > 0){
+                        bounds = bounds.reduce((a, b) => {
+                            return fitBounds([
+                              a.getNorthEast(),
+                              a.getSouthWest(),
+                              b.getNorthEast(),
+                              b.getSouthWest(),
+                            ]);
+                        });
+                        setTimeout(function(){
+                            map.fitBounds(bounds);
+                        },5e2);
+                    }
+                    setTimeout(function(){
+                        if(geometries.length > 0){
+                            polygons.updateGeometries(geometries);
+                            setTimeout(function(){
+                                geometries = [];
+                            },2e3);
+                        }
+                        setTimeout(function(){
+                            $.each(areadata.markers,function(i,item){
+                                new Donut({
+                                    map,
+                                    position: new TMap.LatLng(item.arealat, item.arealng),
+                                    content:template('marker-tpl',{id:item.id,areatitle:item.areatitle,signnum:item.signnum,pointercolor:item.pointercolor,titlesize:item.titlesize,titlecolor:item.titlecolor,numcolor:item.numcolor})
+                                });
+                            });
+                            loaddata();
+                            layerBox.close(layindex);
+                            setInterval(function(){
+                                loaddata();
+                            },3e3);
+                            setInterval(function(){
+                                popshow();
+                            },2e3);
+                        },1e3);
+                    },1e3);
+                }
+            });
+        });
+    }
+    function loaddata(){
+        screencore.ajaxSubmit('/screen/mapqd/loaddata',{maxid:maxid}).then(function(json){
+            if(json.code==0){
+                var newsigns = json.msg.newsign;
+                if(newsigns.length > 0){
+                    maxid = newsigns[0].id;
+                    newsignqueues = newsignqueues.concat(newsigns);
+                }
+                var districts = json.msg.districts;
+                if(districts.length > 0){
+                    $.each(districts,function(i,item){
+                        var itembox = $(".box"+item.id);
+                        if(itembox.length > 0){
+                            itembox.find('.signnum').text(item.signnum);
+                            itembox.parent().find('.areaname').text(item.areatitle);
+                            var signpath = polygonobjs[item.areacode] || '';
+                            if(signpath!=''){
+                                var polygonone = polygons.getGeometryById(item.areacode+'0');
+                                if(polygonone!=null){
+                                    if(item.signnum=='0' && polygonone.styleId=='highlight'){
+                                        polygons.updateGeometries(drawPolygon(
+                                            item.areacode,
+                                            signpath,
+                                            false,
+                                            '2'
+                                        ));
+                                    }
+                                    if(item.signnum > 0  && polygonone.styleId=='polygon'){
+                                        polygons.updateGeometries(drawPolygon(
+                                            item.areacode,
+                                            signpath,
+                                            true,
+                                            '2'
+                                        ));
+                                    }
+                                }
+                            }
+                            
+                        }
+                    });
+                }
+                $(".joinPeople").html('<span>'+json.msg.totalnum+'</span>人签到');
+            }else{
+                layerBox.showMsg(json.msg);
+            }
+        });
+    }
+    var ispop = false;
+    function popshow(){
+        if(!ispop && newsignqueues.length > 0){
+            ispop = true;
+            var signone  = newsignqueues.shift();
+            $(".box"+signone.district_id).addClass('active');
+            /*
+            var signpath = polygonobjs[signone.areacode] || '';
+            if(signpath!=''){
+                var polygonone = polygons.getGeometryById(signone.areacode+'0');
+                if(polygonone!=null && polygonone.styleId != "highlight"){
+                    polygons.updateGeometries(drawPolygon(
+                        signone.areacode,
+                        signpath,
+                        true,
+                        '2'
+                    ));
+                }
+            }
+            */
+            setTimeout(function(){
+                if(areadata.popopen=='2'){
+                    ispop = false;
+                    $(".box"+signone.district_id).removeClass('active');
+                }else{
+                    var html = template('signuser-tpl',signone);
+                    $(".signtip").html(html);
+                    $(".mapqd-popBox").removeClass('maskclose').addClass('maskopen');
+                    if(areadata.popyanhua=='1') $(".signyanhuabox").removeClass('hidden');
+                    setTimeout(function(){
+                        $(".mapqd-popBox").removeClass('maskopen').addClass('maskclose');
+                        if(areadata.popyanhua=='1') $(".signyanhuabox").addClass('hidden');
+                        ispop = false;
+                        $(".box"+signone.district_id).removeClass('active');
+                    },areadata.popseconds * 1e3);
+                }
+            },1e3);
+        }
+    }
+    function Donut(options) {
+        TMap.DOMOverlay.call(this, options);
+    }
+    Donut.prototype = new TMap.DOMOverlay();
+    Donut.prototype.onInit = function(options) {
+        this.position = options.position;
+        this.content = options.content;
+    };
+    Donut.prototype.onDestroy = function() {
+        
+    };
+    Donut.prototype.createDOM = function() {
+        let div = document.createElement("div");
+        div.innerHTML = this.content;
+        div.setAttribute('class', 'marker zam-app-flex-ajCenter');
+        div.style.cssText = 'position:absolute;top:0px;left:0px;';
+        return div;
+    };
+    Donut.prototype.updateDOM = function() {
+        if (!this.map) {
+            return;
+        }
+        let pixel = this.map.projectToContainer(this.position);
+        let left = pixel.getX() - this.dom.clientWidth / 2 + 'px';
+        let top = pixel.getY() - this.dom.clientHeight / 2 + 'px';
+        this.dom.style.transform = `translate(${left}, ${top})`;
+    };
+    $(window).on('resize',function(){
+        setTimeout(function(){
+             map.fitBounds(bounds);
+        },1e3);
+    });
+    function drawPolygon(placeId, polygonArray,ishighlight,pushbounds) {
+        pushbounds = pushbounds || '1';
+        return polygonArray.map((polygon, index) => {
+            if(pushbounds=='1') bounds.push(fitBounds(polygon));
+            return {
+              id: `${placeId}` + index,
+              paths: polygon,
+              styleId: ishighlight ? 'highlight':'polygon',
+            };
+        });
+    }
+    function fitBounds(latLngList) {
+      if (latLngList.length === 0) {
+        return null;
+      }
+      var boundsN = latLngList[0].getLat();
+      var boundsS = boundsN;
+      var boundsW = latLngList[0].getLng();
+      var boundsE = boundsW;
+      latLngList.forEach((point) => {
+        point.getLat() > boundsN && (boundsN = point.getLat());
+        point.getLat() < boundsS && (boundsS = point.getLat());
+        point.getLng() > boundsE && (boundsE = point.getLng());
+        point.getLng() < boundsW && (boundsW = point.getLng());
+      });
+      return new TMap.LatLngBounds(
+        new TMap.LatLng(boundsS, boundsW),
+        new TMap.LatLng(boundsN, boundsE)
+      );
+    }
+});    
+</script>
+<script id="marker-tpl" type="html/javascript">
+<div class="signamebox zam-app-flex-ajCenter2 box{{ id }}">
+    <i class="mapicon mapicon-three" style="color:{{ pointercolor }}"></i><span class="signnum" style="color:{{ numcolor }}">{{ signnum }}</span>
+    <div class="dot"></div>
+</div>
+<div class="areaname limitbox" style="color:{{ titlecolor }};font-size:{{ titlesize }}px">{{ areatitle }}</div>
+</script>
+<script id="signuser-tpl" type="html/javascript">
+{:$poptxt}
+</script>
+{include file='common/footer' /}

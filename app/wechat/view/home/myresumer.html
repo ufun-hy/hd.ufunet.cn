@@ -1,0 +1,114 @@
+{include file="common/header" /}
+<style>
+.zam-app-myincome-box .zam-app-myincome-navbar .navbar-item i{
+	margin-right:0.1rem;
+}
+.zam-app-myincome-box .zam-app-myincome-scroll {
+    position: fixed;
+    top: 0.9rem;
+	left:0;
+    bottom:0;
+	width: 100%;
+    overflow: hidden;
+    overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
+	background-color:#fff;
+	color:#333;
+}
+.myincomeone{
+	padding: 20px 15px;
+    position: relative;
+    min-height: 45px;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+.msgHead{
+	position: absolute;
+    top: 50%;
+    left: 15px;
+    transform: translateY(-50%);
+    -webkit-transform: translateY(-50%)
+}
+.msgHead img {
+    display: block;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+}
+.msgList {
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    padding-left: 55px;
+    padding-right: 50px;
+    overflow: hidden;
+    width: 100%;
+    position: relative;
+}
+.msgList span {
+    display: block;
+    margin: 3px 0;
+}
+.msgList i {
+    font-style: normal;
+    font-size: 14px;
+}
+.msgList span.content {
+    font-size: 13px;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+	color:#3296fa
+}
+.myincomeone .right {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    -webkit-transform: translateY(-50%);
+    height: 40px;
+}
+.myincomeone .right p {
+    margin: 2px 0 4px 0;
+    text-align: right;
+    width: auto;
+}
+.myincomeone .right p span {
+    display: inline-block;
+    height: 18px;
+	line-height: 18px;
+    text-align: center;
+    font-size: 0.26rem;
+}
+.myincomeone .right p span.money{
+	color: red;
+}
+.zam-app-myincome-scroll .norecords{margin-top:1rem;font-size:0.3rem;text-align:center;}
+</style>
+<section class="g-flexview zam-app-myincome-box">
+	<header class="m-navbar navbar-fixed zam-app-myincome-navbar">
+		<a href="javascript:history.back(-1)" class="navbar-item">
+			<i class="back-ico"></i>返回
+		</a>
+		<div class="navbar-center"></div>
+	</header>
+	<div class="zam-app-myincome-scroll">
+		<div class="norecords">暂无记录</div>
+    </div>
+    <div class="zam-app-myincome-scroll">
+        {foreach $list as $okey=>$one}
+            <div class="myincomeone" >
+                <div class="msgHead"><img src="{:tomedia($wxuser['avatar'])}" alt=""></div>
+                <div class="msgList">
+                    <span><i>{$wxuser['nickname']}</i></span>
+                    <span class="content">{$one['fromtype']}</span>
+                </div>
+                <div class="right">
+                    <p class="lastmsgtime">{$one['create_time']}</p>
+                    <p><span class="money">{$one['payfee']}元</span>{if $one['status']=='4'}<span class="isrefund" style="color:red">(订单已退款)</span>{/if}</p>
+                </div>
+            </div>
+        {/foreach}
+        {if empty($list)}<div class="norecords">暂无记录</div>{/if}
+    </div>
+</section>
+{include file="common/footer" /}

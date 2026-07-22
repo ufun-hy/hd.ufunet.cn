@@ -1,0 +1,196 @@
+{include file='$Wpath/common/header'}
+<div class="form-inline zam-inline-searchbar">
+    <div class="form-group">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">类型</span>
+          <select id="type" class="form-control js_select2">
+            {foreach $cardtypes as $key=>$type } 
+            <option value="{$key}" {if $key=="0"}selected{/if}>{$type}</option>
+            {/foreach}
+          </select>
+        </div>
+    </div>
+    <div class="form-group">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">券号</span>
+        <input type="text" class="form-control" value="" id="keyword" name="cardno" placeholder="请输入券号">
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">状态</span>
+          <select id="status" class="form-control js_select2">
+            {foreach $statustypes as $k=>$v } 
+            <option value="{$k}" {if $k=="0"}selected{/if}>{$v}</option>
+            {/foreach}
+          </select>
+        </div>
+    </div>
+    <a class="btn btn-primary btn-sm btn-search" href="javascript:void(0)"><i class="mdi mdi-magnify"></i> 搜索</a>
+    <a class="btn btn-warning btn-sm btn-export" href="javascript:void(0)"><i class="mdi mdi-export"></i> 导出</a>
+</div>
+{include file='$Wpath/common/tabletoolbar'}
+<table id="listtable" class="zam-btable"></table>
+<script>
+require(['webcore','webtable','jconfirmBox','zamnotice'],function(webcore,webtable,jconfirmBox,zamnotice){
+var initConfig = {
+    tableId:'#listtable',
+    url:"{:gohdmanage('configbaping/cardno',['hdid'=>$hdid])}",
+    columnoperate:{
+        btns:{
+            del:true,
+        },
+        func:{
+            del:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','删除将无法恢复，您确定要删除么？',function(){
+                        webcore.ajaxSubmit("{:gohdmanage('configbaping/delcardid',['hdid'=>$hdid])}",{cardid:row.id}).then(function(json){
+                            if(json.code==0){
+                                webtable.refresh();
+                                zamnotice.showTips('success','删除成功');
+                            }else{
+                                zamnotice.showTips('error',json.msg);
+                            }
+                        }, function(json){
+                            zamnotice.showTips('error','网络差。操作失败');
+                        });
+                });
+            },
+        }
+    },
+    columns:[{
+            checkbox: true,
+        }, 
+        {
+            field: 'id',
+            title: 'id',
+            align: 'center',
+            visible: false
+        },{
+            field: 'typehtml',
+            title: '功能',
+            align: 'center',
+        },{
+            field: 'statushtml',
+            title: '状态',
+            align: 'center',
+        },{
+            field: 'userinfo',
+            title: '使用者',
+            align: 'center',
+            formatter: function (value, row, index) {
+                if(!value || !row.recordid){
+                    return '-';
+                }
+                return `
+                <div class='zam-flex-column-center'>
+                    <img src="${value.avatar}" class="avatarImg" />
+                    <div class="m-t-10">${value.nickname||'已删除'}</div>
+                </div>
+                `;
+            },
+            width:'25'
+        },{
+            field: 'cardno',
+            title: '券号',
+            align: 'center',
+            width:'25'
+        },  {
+            field: 'create_time',
+            title: '创建时间',
+            align: 'center',
+            width:'15'
+        }
+    ],
+    searchParamas:[{'type':'2','id':'type'},{'type':'1','id':'keyword'},{'type':'2','id':'status'}],
+    toolbar:{
+        add:function(){
+            var confirmObj = jconfirmBox.ajaxconfirm("批量新增券号","{:gohdmanage('configbaping/addcardid',['hdid'=>$hdid])}",{ishtml:'1'},'html','col-lg-8 col-lg-offset-2',function(e){
+                var postData = webcore.serializeObject(e.find('form'));
+                postData.ishtml = '2';
+                webcore.ajaxSubmit("{:gohdmanage('configbaping/addcardid',['hdid'=>$hdid])}",postData,'正在努力生成券号中....').then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','批量新增成功');
+                        confirmObj.close();
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                         return false;
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差。操作失败');
+                     return false;
+                });
+            });
+        },
+        del:function(){
+            var getSelects = webtable.getSelections();
+            if(!getSelects.length){
+                return zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+            jconfirmBox.confirm('温馨提示','删除券号将无法恢复，您确定要删除选中的券号么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('configbaping/delcardid',['hdid'=>$hdid])}",{cardid:getSelects}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','删除成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+        },
+        reset:function(){
+            jconfirmBox.confirm('温馨提示','清空将删除所有的券号<span class="text-danger">(不论券号是否已使用)</span>并且无法恢复，您确定要清空么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('configbaping/resetcardid',['hdid'=>$hdid])}",{}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','清空成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+        },
+        shenhe:function(){
+            var rotateid = $("#rotateid").find("option:selected").val();
+            var confirmobj = jconfirmBox.ajaxconfirm("重复券号检查结果","{:gohdmanage('configbaping/checkcardno',['hdid'=>$hdid])}",{},'html','col-lg-8 col-lg-offset-2',function(e){},false,'2');
+        },
+    },
+};
+webtable.init(initConfig);
+$('.zam-inline-searchbar select').change(function(e) {
+    webtable.refresh();
+});
+$('.btn-export').on('click',function(){
+    var type = $("#type").find('option:selected').val()||'',status = $("#status").find('option:selected').val()||'';
+    webcore.ajaxSubmit("{:gohdmanage('configbaping/exportcardno',['hdid'=>$hdid])}",{type:type,status:status}).then(function(json){
+        if(json.code!=0){
+            zamnotice.showTips('error',json.msg);
+        }else{
+            window.location.href = "{:gohdmanage('configbaping/exportcardno',['hdid'=>$hdid])}&type="+type+"&status="+status;
+        }
+    }, function(json){
+        zamnotice.showTips('error','网络差,操作失败');
+    });
+});
+$("body").on('click','.btn-samedetail',function() {
+    var confirmobj = jconfirmBox.ajaxconfirm("重复券号明细","{:gohdmanage('configbaping/repeatcardno',['hdid'=>$hdid])}",{},'html','col-md-10 col-md-offset-1',function(e){},false,'2');
+});
+$("body").on('click','.btn-delsame',function(){
+    var $this = $(this),dataid = $this.attr('data-id')||'';
+    jconfirmBox.confirm('温馨提示','删除所选券号将无法恢复，您确定要删除么？',function(){
+        webcore.ajaxSubmit("{:gohdmanage('configbaping/delcardid',['hdid'=>$hdid])}",{cardid:dataid}).then(function(json){
+            $this.parent().parent().remove();
+            webtable.refresh();
+            zamnotice.showTips('success','删除成功');
+        }, function(json){
+            zamnotice.showTips('error','网络差。操作失败');
+        });
+    });
+});
+});
+</script>
+{include file='$Wpath/common/footer'}

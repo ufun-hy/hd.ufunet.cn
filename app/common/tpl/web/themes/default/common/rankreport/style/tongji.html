@@ -1,0 +1,218 @@
+<div class="config-titlebox">
+    <span class="config-titlename">认购人数</span>
+    <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#tongjiperson" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+</div>
+<div id="tongjiperson" class="collapse in">
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 显示</label>
+        <div class="col-lg-6">
+            {:tpl_switch('tongjiconfig[person][open]',$config['tongjiconfig']['person']['open'],'opentongjiperson')}
+            <span class="zam-help-block">关闭则不显示认购人数</span>
+        </div>
+    </div>
+    <div class="tongjipersonbox{if $config['tongjiconfig']['person']['open'] =='2'} hidden{/if}">
+        <div class="form-group">
+            <label class="col-lg-2 control-label text-right">* 文字</label>
+            <div class="col-lg-8">
+                <div class="input-group">
+                    <div class="input-group-btn not-allow"><a class="btn btn-default">认购人数</a></div>
+                    <input class="form-control" type="text"  name="tongjiconfig[person][pretxt]" value="{$config['tongjiconfig']['person']['pretxt']??'认购人数:'}">
+                    <div class="input-group-btn not-allow"><a class="btn btn-default">单位</a></div>
+                    <input class="form-control" type="text"  name="tongjiconfig[person][endtxt]" value="{$config['tongjiconfig']['person']['endtxt']??'人'}">
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label text-right">* 位置</label>
+            <div class="col-lg-8">
+                <div class="input-group">
+                    <div class="input-group-btn not-allow"><a class="btn btn-default">距屏幕顶部距离</a></div>
+                    <div class="touchspin">
+                    <input type="text" class="form-control numberincdec" name="tongjiconfig[person][top]" 
+                    data-bts-min="0" data-bts-replacement-val="0"
+                    data-bts-max="null"
+                    data-bts-step="1"
+                    data-bts-postfix="px"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                    value="{$config['tongjiconfig']['person']['top']}">
+                    </div>
+                    <div class="input-group-btn not-allow"><a class="btn btn-default">距屏幕左侧距离</a></div>
+                    <div class="touchspin">
+                    <input type="text" class="form-control numberincdec" name="tongjiconfig[person][left]" 
+                    data-bts-min="0" data-bts-replacement-val="0"
+                    data-bts-max="null"
+                    data-bts-step="1"
+                    data-bts-postfix="px"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                    value="{$config['tongjiconfig']['person']['left']}">
+                    </div>
+                </div>
+                <span class="help-block">注:位置可在大屏幕自行拖动</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label text-right">* 基础样式</label>
+            <div class="col-lg-6">
+                <div class="input-group">
+                    <div class="input-group-btn not-allow"><a class="btn btn-default">文字大小</a></div>
+                    <div class="touchspin">
+                    <input type="text" class="form-control numberincdec" name="tongjiconfig[person][size]" 
+                    data-bts-min="12" data-bts-replacement-val="12"
+                    data-bts-max="60"
+                    data-bts-step="1"
+                    data-bts-postfix="px"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                    value="{$config['tongjiconfig']['person']['size']}">
+                    </div>
+                    <div class="input-group-btn not-allow"><a class="btn btn-default">文字色</a></div>
+                    {:tpl_color('tongjiconfig[person][color]',$config['tongjiconfig']['person']['color'])}
+                </div>
+                <span class="help-block">请根据实际情况设置此值</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label text-right">* 数值样式</label>
+            <div class="col-lg-8">
+                <div class="input-group">
+                    <div class="input-group-btn not-allow"><a class="btn btn-default">文字大小</a></div>
+                    <div class="touchspin">
+                    <input type="text" class="form-control numberincdec" name="tongjiconfig[person][numsize]" 
+                    data-bts-min="12" data-bts-replacement-val="12"
+                    data-bts-max="60"
+                    data-bts-step="1"
+                    data-bts-postfix="px"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                    value="{$config['tongjiconfig']['person']['numsize']}">
+                    </div>
+                    <div class="input-group-btn not-allow"><a class="btn btn-default">文字色</a></div>
+                    {:tpl_color('tongjiconfig[person][numcolor]',$config['tongjiconfig']['person']['numcolor'])}
+                    <div class="input-group-btn not-allow"><a class="btn btn-default">背景色</a></div>
+                    {:tpl_color('tongjiconfig[person][numbgcolor]',$config['tongjiconfig']['person']['numbgcolor'])}
+                </div>
+                <span class="help-block">请根据实际情况设置此值</span>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="config-titlebox">
+    <span class="config-titlename">认购金额</span>
+    <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#tongjimoney" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+</div>
+<div id="tongjimoney" class="collapse in">
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 显示</label>
+        <div class="col-lg-6">
+            {:tpl_switch('tongjiconfig[money][open]',$config['tongjiconfig']['money']['open'],'opentongjimoney')}
+            <span class="zam-help-block">关闭则不显示认购金额</span>
+        </div>
+    </div>
+    <div class="tongjimoneybox{if $config['tongjiconfig']['money']['open'] =='2'} hidden{/if}">
+        <div class="form-group">
+            <label class="col-lg-2 control-label text-right">* 文字</label>
+            <div class="col-lg-8">
+                <div class="input-group">
+                    <div class="input-group-btn not-allow"><a class="btn btn-default">认购金额</a></div>
+                    <input class="form-control" type="text"  name="tongjiconfig[money][pretxt]" value="{$config['tongjiconfig']['money']['pretxt']??'认购金额:'}">
+                    <div class="input-group-btn not-allow"><a class="btn btn-default">单位</a></div>
+                    <input class="form-control" type="text"  name="tongjiconfig[money][endtxt]" value="{$config['tongjiconfig']['money']['endtxt']??'万'}">
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label text-right">* 位置</label>
+            <div class="col-lg-8">
+                <div class="input-group">
+                    <div class="input-group-btn not-allow"><a class="btn btn-default">距屏幕顶部距离</a></div>
+                    <div class="touchspin">
+                    <input type="text" class="form-control numberincdec" name="tongjiconfig[money][top]" 
+                    data-bts-min="0" data-bts-replacement-val="0"
+                    data-bts-max="null"
+                    data-bts-step="1"
+                    data-bts-postfix="px"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                    value="{$config['tongjiconfig']['money']['top']}">
+                    </div>
+                    <div class="input-group-btn not-allow"><a class="btn btn-default">距屏幕左侧距离</a></div>
+                    <div class="touchspin">
+                    <input type="text" class="form-control numberincdec" name="tongjiconfig[money][left]" 
+                    data-bts-min="0" data-bts-replacement-val="0"
+                    data-bts-max="null"
+                    data-bts-step="1"
+                    data-bts-postfix="px"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                    value="{$config['tongjiconfig']['money']['left']}">
+                    </div>
+                </div>
+                <span class="help-block">注:位置可在大屏幕自行拖动</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label text-right">* 基础样式</label>
+            <div class="col-lg-6">
+                <div class="input-group">
+                    <div class="input-group-btn not-allow"><a class="btn btn-default">文字大小</a></div>
+                    <div class="touchspin">
+                    <input type="text" class="form-control numberincdec" name="tongjiconfig[money][size]" 
+                    data-bts-min="12" data-bts-replacement-val="12"
+                    data-bts-max="60"
+                    data-bts-step="1"
+                    data-bts-postfix="px"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                    value="{$config['tongjiconfig']['money']['size']}">
+                    </div>
+                    <div class="input-group-btn not-allow"><a class="btn btn-default">文字色</a></div>
+                    {:tpl_color('tongjiconfig[money][color]',$config['tongjiconfig']['money']['color'])}
+                </div>
+                <span class="help-block">请根据实际情况设置此值</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label text-right">* 数值样式</label>
+            <div class="col-lg-8">
+                <div class="input-group">
+                    <div class="input-group-btn not-allow"><a class="btn btn-default">文字大小</a></div>
+                    <div class="touchspin">
+                    <input type="text" class="form-control numberincdec" name="tongjiconfig[money][numsize]" 
+                    data-bts-min="12" data-bts-replacement-val="12"
+                    data-bts-max="60"
+                    data-bts-step="1"
+                    data-bts-postfix="px"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                    value="{$config['tongjiconfig']['money']['numsize']}">
+                    </div>
+                    <div class="input-group-btn not-allow"><a class="btn btn-default">文字色</a></div>
+                    {:tpl_color('tongjiconfig[money][numcolor]',$config['tongjiconfig']['money']['numcolor'])}
+                    <div class="input-group-btn not-allow"><a class="btn btn-default">背景色</a></div>
+                    {:tpl_color('tongjiconfig[money][numbgcolor]',$config['tongjiconfig']['money']['numbgcolor'])}
+                </div>
+                <span class="help-block">请根据实际情况设置此值</span>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function opentongjiperson(obj,status){
+        if(status=='1'){
+            obj.prev().val('2');
+            obj.attr('data-status','2');
+            $(".tongjipersonbox").addClass('hidden');
+        }else{
+            obj.prev().val('1');
+            obj.attr('data-status','1');
+            $(".tongjipersonbox").removeClass('hidden');
+        }
+        obj.prev().prev().prop("checked",status=='1'?false:true);
+    }
+    function opentongjimoney(obj,status){
+        if(status=='1'){
+            obj.prev().val('2');
+            obj.attr('data-status','2');
+            $(".tongjimoneybox").addClass('hidden');
+        }else{
+            obj.prev().val('1');
+            obj.attr('data-status','1');
+            $(".tongjimoneybox").removeClass('hidden');
+        }
+        obj.prev().prev().prop("checked",status=='1'?false:true);
+    }
+</script>

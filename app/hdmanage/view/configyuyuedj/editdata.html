@@ -1,0 +1,23 @@
+<style type="text/css">
+.confirmbox-pop label{text-align: center!important;}
+</style>
+<div class="form-horizontal confirmbox-pop">
+  <form class="confirm-formbox" method="post">
+    {volist name="config" id="bditem"}
+      <div class="form-group">
+        <label class="col-lg-4 control-label">* {$bditem['title']}</label>
+        <div class="col-lg-8">
+          <input class="form-control" type="text"  name="{$bditem['zd']}" value="{$bditem['val']}">
+          {if $bditem['isbind']=='1'}<div class="help-block"><span class="text-danger">附加数据项</span></div>{/if}
+        </div>
+      </div>
+    {/volist}
+    <div class="form-group">
+        <label class="col-lg-4 control-label">自定义用户组id<br/><span class="text-danger m-r-5" style="font-size: 10px">(选填项)</span></label>
+        <div class="col-lg-8">
+          <input class="form-control" type="text"  name="selfgroupid" value="{$selfgroupid}" placeholder="此项为选填项">
+          <div class="help-block">填写前请到<span class="text-danger"><a class="m-l-5 m-r-5" href="{:gohdmanage('datausergroup/index',['hdid'=>$hdid])}" target="__blank">自定义分组</a></span>内添加分组并且把对应的分组id复制过来，如需多个分组请以英文逗号,隔开，格式为:分组id1,分组id2</div>
+        </div>
+     </div>
+</form>
+</div>

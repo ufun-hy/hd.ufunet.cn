@@ -1,0 +1,126 @@
+{include file="common/header" /}
+<style>
+.zam-app-menubox{
+    display: none;
+}
+.phbbtn{
+	position: fixed;
+    left: .1rem;
+    top: .5rem;
+    z-index:1;
+    padding: 0 .24rem;
+    min-width: 1.58rem;
+    height: .6rem;
+    background: rgba(0,0,0,.3);
+    color: #fff;
+    border-radius: .5rem;
+}
+.phbbtn i{margin-right:0.08rem}
+
+.markrefresh{
+	position: fixed;
+    right: .3rem;
+    top: .5rem;
+    z-index:1;
+    padding: 0 .24rem;
+    min-width: 1.58rem;
+    height: .6rem;
+    background: rgba(0,0,0,.3);
+    color: #fff;
+    border-radius: .5rem;
+}
+.markrefresh i{margin-right:0.08rem}
+.livemark-hadpf-box{
+	width: 100%;
+    height: calc(100% - 0.9rem);
+    padding: 1.2rem 0 0.76rem 0;
+    color: #fff;
+}
+.livemark-hadpf-one{
+    padding: 0.2rem 0.36rem;
+}
+.livemark-hadpf-info{
+    min-height: 1rem;
+}
+.livemark-hadpf-one .livemark-hadpf-info .livemark-hadpf-info-name{
+    font-size: 0.34rem;
+    font-weight: 600;
+}
+.livemark-hadpf-one .livemark-hadpf-info .livemark-hadpf-info-score{
+    font-size: 0.34rem;
+    font-weight: 600;
+}
+.livemark-hadpf-one .livemark-hadpf-info .livemark-hadpf-info-score .scorenum{
+    font-size: 0.64rem;
+    font-weight: 600;
+}
+.livemark-hadpf-des{
+    margin-top: 0.12rem;
+}
+
+.livemark-hadpf-pws{padding: 0 0.36rem;margin-top: 0.32rem;}
+.livemark-hadpf-pws .livemark-hadpf-one{
+    position: relative;
+    padding: 2vw;
+    margin-bottom: .3rem;
+    width: 29vw;
+    border-radius: .05rem;
+    overflow: hidden;
+    border: 0.02rem solid {$rotate['maincolor']};
+}
+.livemark-hadpf-pws .livemark-hadpf-one img{
+    width: 25vw;
+    height: 25vw;
+    -o-object-fit: cover;
+    object-fit: cover;
+    -o-object-position: center;
+    object-position: center;
+    border-radius: .05rem;
+}
+.livemark-hadpf-pws .livemark-hadpf-one div{
+	width:100%;
+	margin: 0.1rem 0;
+    text-align: center;
+}
+.livemark-hadpf-pws .livemark-hadpf-one .pw-name{
+	white-space: nowrap;
+    word-break: break-all;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    margin-top: 0.2rem;
+}
+.livemark-hadpf-pws .livemark-hadpf-one .pw-score{
+	font-weight: bold;
+    font-size: 0.28rem;
+}
+</style>
+<section class="g-flexview" style="width:100%;min-width:100%;max-width:100%;">
+	<a href="javascript:;" data-href="{:gowechat(!$pwclient ? 'livemark/index' : 'livemarkpw/index',['hdid' => $hdinfo['hdid']])}" data-module="livemark" class="phbbtn zam-app-flex-ajCenter2"><i class="mxc-untitled109"></i><span>返回</span></a>
+	<a href="javascript:window.location.reload();" class="markrefresh zam-app-flex-ajCenter2 hidden"><i class="mxc-refresh"></i><span>刷新页面</span></a>
+	<div class="g-scrollview livemark-hadpf-box">
+		<div class="livemark-hadpf-one">
+            <div class="livemark-hadpf-info zam-app-flex zam-app-justifyspacebetween">
+                <div class="livemark-hadpf-info-name zam-app-flex-ajCenter2">{$pfuser['username']}</div>
+                <div class="livemark-hadpf-info-score zam-app-flex-ajCenter2"><span>得分：</span><span class="scorenum">{$pfuser['score']}分</span></div>
+            </div>
+            {if !empty($pfuser['userdes'])}
+            <div class="livemark-hadpf-des">
+                {$pfuser['userdes']}
+            </div>
+            {/if}
+        </div>
+        {if !empty($pfuser['pws'])}
+        <div class="livemark-hadpf-pws zam-app-flex zam-app-flex-wrap zam-app-justifyspacebetween">
+            {foreach $pfuser['pws'] as $k=>$p } 
+            <div class="livemark-hadpf-one zam-app-flex-ajCenter">
+                <img src="{$p['pwimg']}"> 
+                <div class="pw-name">{:$p['pwname']}</div>
+                <div class="pw-score">{$p['totalscore']??'暂未打分'}</div>
+            </div>
+            {/foreach}
+        </div>
+        {/if}
+	</div>
+</section>
+{include file="livemark/footer" /}
+{include file="common/footer" /}

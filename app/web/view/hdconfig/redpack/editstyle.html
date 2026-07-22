@@ -1,0 +1,200 @@
+{include file='$Wpath/common/header'}
+<style type="text/css">
+  .catenameitem{margin-bottom: 20px}
+  .card-hdmodule{border:1px solid #dfe6ec}
+  .card-hdmodule:hover{
+    box-shadow: 1px 3px 10px rgba(37,46,64,.2);
+  }
+  .card-hdmodule .card-body{padding: 15px 10px;}
+  .hdmodule-name{width: 50%}
+  .card-hdmodule .hdmodule-price{
+    width: 50%;
+  }
+  .hdmodule-price input {
+    border-radius: 0px!important;
+    height: 28px;
+    padding: 0;
+    text-align: center;
+  }
+  .hdmodule-price .input-group-addon {
+    height: 28px;
+    padding: 0 5px;
+  }
+</style>
+<div class="confirmbox-pop">
+<div class="text-center">
+      <div class="btn-group pop-btns" style="margin-bottom:10px;">
+        <a href="javascript:void(0)" class="btn btn-default btn-primary"><span>基础设置</span></a>
+        <a href="javascript:void(0)" class="btn btn-default"><span>风格设置</span></a>
+        <a href="javascript:void(0)" class="btn btn-default"><span>自定义css</span></a>
+      </div>
+</div>
+<form id="formBox" class="zam-formvalidation form-horizontal" method="post">
+  <div class="carditem">
+    {include file='$Wpath/common/gamestyle/basic'}
+  </div>
+  <div class="carditem hidden">
+    <div class="form-group">
+      <label class="col-lg-2 control-label">* 顶部袋子</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('tredout', $config['tredout'])}
+        <span class="help-block">{$desconfig['tredout']}</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label">* 顶部袋子边沿</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('tredin', $config['tredin'])}
+        <span class="help-block">{$desconfig['tredin']}</span>
+      </div>
+    </div>
+     <div class="form-group">
+      <label class="col-lg-2 control-label">* 开始GO按钮</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('goimg', $config['goimg'])}
+        <span class="help-block">{$desconfig['goimg']}</span>
+      </div>
+    </div>
+     <div class="form-group">
+      <label class="col-lg-2 control-label">* 底部钱</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('bmoney', $config['bmoney'])}
+        <span class="help-block">{$desconfig['bmoney']}</span>
+      </div>
+    </div>
+     <div class="form-group">
+      <label class="col-lg-2 control-label">* 底部手机</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('bphone', $config['bphone'])}
+        <span class="help-block">{$desconfig['bphone']}</span>
+      </div>
+    </div>
+     <div class="form-group">
+      <label class="col-lg-2 control-label">* 红包掉落图【含微信】</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('dropredpack', $config['dropredpack'])}
+        <span class="help-block">{$desconfig['dropredpack']}</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label">* 左侧人数背景</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('leftjoinbg', $config['leftjoinbg'])}
+        <span class="help-block">{$desconfig['leftjoinbg']}</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label">* 右侧中奖名单右侧红包图片</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('rightrecordimg', $config['rightrecordimg'])}
+        <span class="help-block">{$desconfig['rightrecordimg']}</span>
+      </div>
+    </div>
+     <div class="form-group">
+      <label class="col-lg-2 control-label">* 右侧底部排名按钮</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('bottompm', $config['bottompm'])}
+        <span class="help-block">{$desconfig['bottompm']}</span>
+      </div>
+    </div>
+     <div class="form-group">
+      <label class="col-lg-2 control-label">* 排行榜背景</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('phbbg', $config['phbbg']);}
+        <span class="help-block">{$desconfig['phbbg']}</span>
+      </div>
+    </div>
+     <div class="form-group">
+      <label class="col-lg-2 control-label">* 排行版顶部文字图</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('phbtopimg', $config['phbtopimg'])}
+        <span class="help-block">{$desconfig['phbtopimg']}</span>
+      </div>
+    </div>
+    
+     <div class="form-group">
+      <label class="col-lg-2 control-label">* 大屏红包弹窗背景</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('popbg', $config['popbg'])}
+        <span class="help-block">{$desconfig['popbg']}</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label">* 微信端提示图</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('apptipimg', $config['apptipimg'])}
+        <span class="help-block">{$desconfig['apptipimg']}</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label">* 微信端倒计时背景图</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('apptimebg', $config['apptimebg']??'/static/images/wechat/redpack/stopwatch.png')}
+        <span class="help-block">{$desconfig['apptimebg']}</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label">* 微信端待开红包图</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('appwaitopenimg', $config['appwaitopenimg']??'/static/images/wechat/redpack/waitopen.png')}
+        <span class="help-block">{$desconfig['appwaitopenimg']}</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label">* 微信端拆红包按钮图</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('appwaitopenbtn', $config['appwaitopenbtn']??'/static/images/wechat/redpack/openbtn.png')}
+        <span class="help-block">{$desconfig['appwaitopenbtn']}</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label">* 微信端拆开红包图</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('appopenedimg', $config['appopenedimg']??'/static/images/wechat/redpack/opened.png')}
+        <span class="help-block">{$desconfig['appwaitopenimg']}</span>
+      </div>
+    </div>
+  </div>
+  <div class="carditem hidden">
+    {include file='$Wpath/common/gamestyle/diycss'}
+  </div>
+  {include file='$Wpath/common/cancelsavepanel'}
+</form>
+</div>
+<script type="text/javascript">
+require(['webcore','jconfirmBox','zamnotice','zvalidator'],function(webcore,jconfirmBox,zamnotice){
+  $(".confirmbox-pop .pop-btns a.btn").click(function(){
+      $(this).addClass('btn-primary').siblings().removeClass("btn-primary");
+      $(".confirmbox-pop .carditem").addClass('hidden').eq($(this).index()).removeClass('hidden');
+  });
+  $('#formBox').formValidation({
+      framework: 'bootstrap',
+      excluded: [':disabled'],
+      message: '您填写的内容无效',
+      fields: {}
+  }).on('success.form.fv', function(e) {
+    e.preventDefault();
+    var $form = $(e.target);
+    var postData = webcore.serializeObject($form);
+    var bload = $form.find(".zam-fixedbottom button").lyearloading({opacity: 0.2,spinnerSize: 'nm'});
+    $form.formValidation('disableSubmitButtons', true);
+    webcore.ajaxSubmit("{:goweb('hdconfig/edit'.$gametype.'style')}",postData).then(function(json){
+      bload.hide();
+      if(json.code==0){
+          $form.formValidation('disableSubmitButtons', false);
+          zamnotice.showTips('success','操作成功',1e3,function(){
+            window.location.href = "{:goweb('hdconfig/'.$gametype.'style')}";
+          });
+        }else{
+            zamnotice.showTips('error',json.msg);
+            $form.formValidation('disableSubmitButtons', false);
+        }
+    }, function(json){
+      bload.hide();
+      zamnotice.showTips('error','网络差。操作失败');
+      $form.formValidation('disableSubmitButtons', false);
+    });
+  });
+});
+</script>
+{include file='$Wpath/common/footer'}

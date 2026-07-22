@@ -1,0 +1,589 @@
+{include file='common/header' /}
+<style>
+.hidden{display:none}
+.mosaicqd-mainbox{
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+.mosaicqd-content{
+    position: relative;
+    width: {$pcconfig['pcstyle']['width']??1200}px;
+    height: {$pcconfig['pcstyle']['height']??660}px;
+}
+.mosaicqd-content .mosaicqd-avatarwall{
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    mask-size: contain;
+    -webkit-mask-size: contain;
+    mask-repeat: no-repeat;
+    -webkit-mask-repeat: no-repeat;
+    {if isset($pcconfig['pcstyle']['innerbgopacity']) && $pcconfig['pcstyle']['innerbgopacity'] <= 0}
+    mask-image: url("{:tomedia($pcconfig['pcstyle']['innerbg'])}");
+    -webkit-mask-image:url("{:tomedia($pcconfig['pcstyle']['innerbg'])}");
+    {/if}
+}
+.mosaicqd-content .mosaicqd-avatarwall .avatar-item{
+    position: absolute;
+    box-sizing: border-box;
+    transform-origin: left center;
+    will-change: transform;
+}
+.mosaicqd-content .mosaicqd-avatarwall .avatar-item img{
+    width: 100%;
+    height: 100%;
+}
+.mosaicqd-content .mosaicqd-avatarbg{
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    background-color: {$pcconfig['pcstyle']['innercolor']??'#5297ff'};
+    opacity: {$pcconfig['pcstyle']['innercoloropacity']??'0.4'};
+}
+.mosaicqd-content .mosaicqd-bgimg{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    background-repeat: no-repeat;
+    pointer-events: none;
+    background-size: 100% 100%;
+    background-image: url("{:tomedia($pcconfig['pcstyle']['innerbg'])}");
+    opacity: {$pcconfig['pcstyle']['innerbgopacity']??'0.3'};
+}
+.mosaicqd-content .mosaicqd-popbox{
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+}
+.mosaicqd-content .mosaicqd-popbox .mosaicqd-popitem{
+    width: 232px;
+    min-height: 300px;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    opacity: 0;
+    transform-origin: left center;
+    will-change: transform;
+    background-image: url("{:tomedia($pcconfig['pcstyle']['pop']['boxbg'])}");
+    margin: 0 {$pcconfig['pcstyle']['pop']['itemmargin']??40}px;
+}
+.mosaicqd-content .mosaicqd-popbox .mosaicqd-popitem .avatarbox {
+    position: relative;
+    width: 100%;
+    height: 200px;
+}
+.mosaicqd-content .mosaicqd-popbox .mosaicqd-popitem .avatarbox:before {
+	content: " ";
+	width: 100%;
+	height: 100%;
+	display: inline-block;
+	position: absolute;
+	top: 0;
+	left: 0;
+	animation: foreverrotate linear infinite;
+	animation-duration: 2s;
+	background-size: 100% 100%;
+    background-image: url("{:tomedia($pcconfig['pcstyle']['pop']['lightbg'])}");
+    {if $pcconfig['pcstyle']['pop']['needlightbg'] == '2' || empty($pcconfig['pcstyle']['pop']['lightbg'])}
+        display:none;
+    {/if}
+}
+.mosaicqd-popitem .avatarbox span{
+    display: inline-block;
+    position: absolute;
+    width: 160px;
+    height: 27px;
+    background-position: -160px center;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    animation: lineani 1.2s linear 0s infinite;
+    background-image: url({:tomedia($pcconfig['pcstyle']['pop']['userfangbg'])});
+    {if $pcconfig['pcstyle']['pop']['avatarshape'] == '1' || $pcconfig['pcstyle']['pop']['needfanguserbg']=='2' || empty($pcconfig['pcstyle']['pop']['userfangbg'])}
+        display:none;
+    {/if}
+}
+.mosaicqd-popitem .avatarbox span:nth-of-type(1) {
+    top: 5px;
+    left: 36px;
+}
+.mosaicqd-popitem .avatarbox span:nth-of-type(2) {
+    top: 87px;
+    left: 116px;
+    transform: rotate(90deg);
+    animation-delay: 0.3s;
+}
+.mosaicqd-popitem .avatarbox span:nth-of-type(3) {
+    top: 168px;
+    left: 36px;
+    transform: rotate(180deg);
+    animation-delay: 0.6s;
+}
+.mosaicqd-popitem .avatarbox span:nth-of-type(4) {
+    top: 86px;
+    left: -44px;
+    transform: rotate(270deg);
+    animation-delay: 0.9s;
+}
+@keyframes lineani {
+    0% {
+        background-position-x: -160px
+    }50%, 100%{
+        background-position-x: 160px
+    }
+}
+.mosaicqd-content .mosaicqd-popbox .mosaicqd-popitem .avatarbox .avatar{
+    position: relative;
+    width: 120px;
+    height: 120px;
+}
+.mosaicqd-content .mosaicqd-popbox .mosaicqd-popitem .avatarbox .avatar:before {
+	content: " ";
+	width: calc(100% + 20px);
+	height: calc(100% + 20px);
+	display: inline-block;
+	position: absolute;
+	top: -10px;
+	left: -10px;
+	animation: foreverrotate linear 2s infinite;
+	background-size: 100% 100%;
+    background-image: url("{:tomedia($pcconfig['pcstyle']['pop']['userbg'])}");
+    {if $pcconfig['pcstyle']['pop']['avatarshape'] == '2' || $pcconfig['pcstyle']['pop']['needuserbg'] == '2' || empty($pcconfig['pcstyle']['pop']['userbg'])}
+        display:none
+    {/if}
+}
+@keyframes foreverrotate {
+	0% {
+		transform: rotate(0)
+	}
+	100% {
+		transform: rotate(-1turn)
+	}
+}
+.mosaicqd-content .mosaicqd-popbox .mosaicqd-popitem .avatarbox .avatar img {
+    width: 100%;
+    height: 100%;
+    {if $pcconfig['pcstyle']['pop']['avatarshape'] == '1'}
+        border-radius: 50%;
+    {else /}
+        border-radius: 2px;
+    {/if}
+}
+.mosaicqd-content .mosaicqd-popbox .mosaicqd-popitem .infobox {
+    width: 100%;
+    padding: 0 16px;
+    box-sizing: border-box;
+    font-weight: 600;
+    margin-bottom: 20px;
+    {if ($pcconfig['pcstyle']['pop']['avatarshape'] == '1' && ( $pcconfig['pcstyle']['pop']['needlightbg'] == '2' || empty($pcconfig['pcstyle']['pop']['lightbg']) )) || ($pcconfig['pcstyle']['pop']['avatarshape'] == '2' && (( $pcconfig['pcstyle']['pop']['needlightbg'] == '2' || empty($pcconfig['pcstyle']['pop']['lightbg']) ) && ( $pcconfig['pcstyle']['pop']['needfanguserbg'] == '2' || empty($pcconfig['pcstyle']['pop']['userfangbg']) )))}
+        margin-top: -26px;
+    {/if}
+    font-size: {$pcconfig['pcstyle']['pop']['wordsize']??24}px;
+    color: {$pcconfig['pcstyle']['pop']['wordcolor']??'#fff'};
+    text-shadow: 0 0 12px {$pcconfig['pcstyle']['pop']['wordshadowcolor']??'#ee970b'};
+}
+.mosaicqd-content .mosaicqd-popbox .mosaicqd-popitem .infobox span{
+    display: inline-block;
+    width: 100%;
+    text-align: center;
+}
+{if isset($pcconfig['showjoinnum']) && $pcconfig['showjoinnum']=='2'}
+.header .joinPeople{opacity: 0;}
+{/if}
+</style>
+<script id="popitem-tpl" type="html/javascript">
+    <div class="mosaicqd-popitem zam-app-flex-ajCenter">
+        <div class="avatarbox zam-app-flex-ajCenter2">
+            <div class="avatar">
+                <img src="{{ avatar }}">
+            </div>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <div class="infobox">
+            {{ each showitems as item }}
+                <span class="limitbox">{{ item }}</span>
+            {{ /each}}
+        </div>
+    </div>
+</script>
+<div class="mosaicqd-mainbox zam-app-flex-ajCenter2">
+    <div class="mosaicqd-content">
+        <div class="mosaicqd-avatarwall"></div>
+        <div class="mosaicqd-avatarbg"></div>
+        <div class="mosaicqd-bgimg"></div>
+        <div class="mosaicqd-popbox zam-app-flex-ajCenter2 hidden"></div>
+    </div>
+</div>
+<script>
+var popconfig = {:json_encode($pcconfig['pcstyle'])};
+require(['screencore','template','anime','layerBox','jquerytrans'],function(screencore,template,anime,layerBox){
+    var screenmosaicqd = {
+        boxw:1260,
+        boxh:660,
+        onew:30,
+        oneh:30,
+        onebs:2,
+        onebc:'#5297ff',
+        rows:42,
+        cols:32,
+        needstagger:'1',
+        staggerseconds:0,
+        maxitemnum:1,
+        itemmargin:40,
+        oldopenpop:'1',
+        oldpopseconds:0,
+        oldpopreplace:'1',
+        oldpopstagger:'1',
+        itemshowseconds:1,
+        maxid:'0',
+        allusers:[],
+        popusers:[],
+        defaultimg:'',
+        repeat:'1',
+        israndom:'2',
+        init:function(config){
+            var self = this;
+            self.boxw = config.width;
+            self.boxh = config.height;
+            self.onew = config.avatarbox.onew;
+            self.oneh = config.avatarbox.oneh;
+            self.onebs = config.avatarbox.bordersize||2;
+            self.onebc = config.avatarbox.bordercolor||"#5297ff";
+            
+            self.needstagger = config.pop.needstagger||'2';
+            self.staggerseconds = config.pop.staggerseconds||0;
+            self.maxitemnum = config.pop.itemnum||'2';
+            self.itemshowseconds = config.pop.itemtime||1;
+            self.itemmargin = config.pop.itemmargin||40;
+            self.oldopenpop = config.pop.oldopenpop||'1';
+            self.oldpopseconds = config.pop.oldpopseconds||0;
+            self.oldpopreplace = config.pop.oldpopreplace||'1';
+            self.oldpopstagger = config.pop.oldpopstagger||'1';
+            self.defaultimg = config.defaultimg||'/static/screen/bigcj/default.jpg';
+            self.repeat = config.repeat || '1',
+            self.israndom = config.israndom||"2";
+            self.initdata(function(){
+                self.initwall();
+                self.lastnewpoptime = new Date();
+                self.lastnewstaggertime = new Date();
+                setTimeout(function(){
+                    self.ajaxNewsign();
+                    self.popone();
+                },2e3);
+            });
+        },
+        initdata:function(func){
+            var self = this;
+			screencore.ajaxSubmit('/screen/mosaicqd/ajaxsign',{}).then(function(json){
+				if(json.code==0){
+					self.allusers = json.msg.list;
+                    $(".joinPeople").html('<span>' + json.msg.total + '</span>人签到');
+					if(json.msg.total > 0 ) {
+                        self.maxid = self.allusers[0].id;
+                    }
+					func && func();
+				}else{
+					layerBox.showMsg(json.msg);
+				}
+			});
+        },
+        initwall:function(){
+            var self = this,leftOffset = 0, topOffset = 0, rows = (self.boxw / self.onew), cols = (self.boxh / self.oneh);
+            if(!self.isInteger(rows)){
+                rows = Math.floor(rows);
+                if(rows < 1){
+                    rows = 1;
+                }
+                leftOffset = (self.boxw - self.onew * rows) / 2;
+            }
+            if(!self.isInteger(cols)){
+                cols = Math.floor(cols);
+                if(cols < 1){
+                    cols = 1;
+                }
+                topOffset = (self.boxh - self.oneh * cols) / 2;
+            }
+            self.rows = rows;
+            self.cols = cols;
+            var randomDatas = [];
+            if(self.israndom == '1'){
+                randomDatas = self.usertoRandpos();
+            }
+            for(var i=0;i < self.rows * self.cols;i++){
+                var left = leftOffset + (i % self.rows) * self.onew,top = topOffset + Math.floor(i / self.rows) * self.oneh;
+                var userimg = self.defaultimg, iswait = '1';
+                if(self.israndom == '2'){
+                    if(self.allusers[i]){
+                        userimg = self.allusers[i].avatar;
+                        iswait = '2';
+                    }else{
+                        if(self.repeat == '1' && self.allusers.length > 0){
+                            userimg = self.allusers[Math.floor(Math.random() * self.allusers.length)].avatar;
+                        }
+                    }
+                }else{
+                    if(randomDatas[i]){
+                        userimg = randomDatas[i].avatar;
+                        iswait = '2';
+                    }else{
+                        if(self.repeat == '1' && self.allusers.length > 0){
+                            userimg = self.allusers[Math.floor(Math.random() * self.allusers.length)].avatar;
+                        }
+                    }
+                }
+                var obj = $('<div class="avatar-item'+(iswait == '1' ? ' iswait' : '')+'"><img src="' + userimg + '"></div>');
+                $(".mosaicqd-avatarwall").append(obj);
+                obj.css({
+                    width: self.onew,
+                    height: self.oneh,
+                    border: `${self.onebs}px solid ${self.onebc}`,
+                    opacity: 0,
+                    x: left,
+                    y: top,
+                    "border-top-width":(top == 0 ? self.onebs : 0) + "px",
+                    "border-right-width":(left == (self.boxw - self.onew) ? self.onebs : "0") + "px",
+                }).transition({opacity: 1,delay: i});
+            }
+        },
+        usertoRandpos:function() {
+            var self = this,len = (self.rows * self.cols) - self.allusers.length,temp = [];
+            if(len <= 0){
+                return screencore.arrayrandom(self.allusers, self.rows * self.cols);
+            }
+            self.allusers.forEach(function(value) {
+                temp.push(value);
+            });
+            let arr = new Array(len);
+            arr.fill('');
+            while (temp.length > 0) {
+                var rindex = Math.floor(Math.random() * arr.length);
+                arr.splice(rindex, 0, temp.pop());
+            }
+            return arr;
+        },
+        ajaxNewsign:function(){
+            var self = this;
+			screencore.ajaxSubmit("/screen/mosaicqd/ajaxsign",{maxid:self.maxid}).then(function(data){
+                if(data.code != 0){
+                    return layerBox.showMsg(data.msg);
+                }
+                var ajaxsigns = data.msg.list;
+                if(ajaxsigns.length > 0){
+                    self.maxid = ajaxsigns[0].id;
+                    ajaxsigns = ajaxsigns.reverse();
+                    $.each(ajaxsigns,function(i,v){
+                        self.popusers.push(v);
+                        self.allusers.push(v);
+                    });
+                }
+                if(data.msg.total === 0){
+                    self.popusers = [];
+                    self.allusers = [];
+                    $('.mosaicqd-avatarwall .avatar-item').addClass('iswait');
+                    $('.mosaicqd-avatarwall .avatar-item img').attr('src',self.defaultimg);
+                    $(".mosaicqd-popbox").empty().addClass('hidden');
+                }
+                $(".joinPeople").html('<span>' + data.msg.total + '</span>人签到');
+                setTimeout(function(){
+                    self.ajaxNewsign();
+                },2e3);
+			},function(){
+				layerBox.showMsg('加载出错');
+			});
+        },
+        hasrepeat:false,
+        ispoping:false,
+        isoldpop:'2',
+        lastnewpoptime:0,
+        popone:function(){
+            var self = this, startIndex = 0, stopIndex = 0, html = '', popitems = false;
+            if(self.ispoping || $('.mosaicqd-avatarwall .avatar-item').length == 0){
+                setTimeout(function(){
+                    self.popone();
+                },1e3);
+                return false;
+            }
+            if(self.allusers.length == 0 && self.popusers.length == 0){
+                setTimeout(function(){
+                    self.popone();
+                },1e3);
+                return false;
+            }
+            if(self.popusers.length > 0){
+                popitems = self.popusers.splice(0, self.maxitemnum);
+                self.isoldpop = '2';
+            }
+            if(!popitems && self.oldopenpop == '1' && self.allusers.length > 0){
+                var oldpopseconds = parseInt(self.oldpopseconds);
+                if(oldpopseconds === 0 || (oldpopseconds > 0 && self.lastnewpoptime > 0 && ((new Date() -  self.lastnewpoptime)/1000) > oldpopseconds)){
+                    popitems = screencore.arrayrandom(self.allusers, self.maxitemnum);
+                    self.isoldpop = '1';
+                }
+            }
+            if(!popitems){
+                setTimeout(function(){
+                    self.popone();
+                },1e3);
+                return false;
+            }
+            self.ispoping = true;
+            if(self.repeat == '1' && !self.hasrepeat && $('.mosaicqd-avatarwall .avatar-item.iswait').length > 0 && $('.mosaicqd-avatarwall .avatar-item.iswait').length == (self.rows * self.cols)){
+                self.hasrepeat = true;
+                $('.mosaicqd-avatarwall .avatar-item img').each(function(){
+                    $(this).attr('src', self.allusers[Math.floor(Math.random() * self.allusers.length)].avatar);
+                });
+            }
+            $.each(popitems,function(i,v){
+                html += template("popitem-tpl",v);
+            });
+            $(".mosaicqd-popbox").html(html).removeClass('hidden');
+            var items = $(".mosaicqd-popbox .mosaicqd-popitem");
+            items.each(function(i,v){
+                var item = $(this);
+                anime({
+                    targets: item[0],
+                    opacity: [0, 1],
+                    rotateY: [90, 0],
+                    delay: i * 1e3,
+                    duration: 1e3,
+                    easing: 'linear',
+                    complete:function(anim){
+                        startIndex++;
+                        if(startIndex == items.length){
+                            items.each(function(j,v){
+                                var item = $(this);
+                                if($('.mosaicqd-avatarwall .avatar-item.iswait').length > 0){
+                                    var pindex = Math.floor(Math.random() * $('.mosaicqd-avatarwall .avatar-item.iswait').length), posobj = $('.mosaicqd-avatarwall .avatar-item.iswait').eq(pindex);
+                                }else{
+                                    var pindex = Math.floor(Math.random() * $('.mosaicqd-avatarwall .avatar-item').length), posobj = $('.mosaicqd-avatarwall .avatar-item').eq(pindex);
+                                }
+                                anime({
+                                    targets: item[0],
+                                    translateY: (posobj.position().top + posobj.outerHeight() / 2) - (item.position().top + item.height() / 2),
+                                    translateX: posobj.position().left - self.itemmargin - item.position().left,
+                                    scale: posobj.outerWidth() / item.width(),
+                                    duration: 1e3,
+                                    easing: 'linear',
+                                    delay: self.itemshowseconds * (j + 1) * 1e3,
+                                    complete: function(anim){
+                                        item.css({opacity:0});
+                                        if(self.isoldpop == '2'){
+                                            posobj.find('img').attr('src',item.find('img').attr('src'));
+                                            if(posobj.hasClass('iswait')) posobj.removeClass('iswait');
+                                        }else{
+                                            if(self.oldpopreplace == '1'){
+                                                posobj.find('img').attr('src',item.find('img').attr('src'));
+                                            }
+                                        }
+                                        self.StaggerAnimation(pindex,function(){
+                                            stopIndex++;
+                                            if(stopIndex >= items.length){
+                                                self.lastnewpoptime = new Date();
+                                                self.ispoping = false;
+                                                $(".mosaicqd-popbox").empty().addClass('hidden');
+                                                setTimeout(function(){
+                                                    self.popone();
+                                                },1e3);
+                                            }
+                                        });
+                                    }
+                                });
+                            });
+                        }
+                    }
+                });
+            });
+        },
+        lastnewstaggertime:0,
+        StaggerAnimation:function(index,func){
+            var self = this,grid = [self.rows, self.cols];
+            if(self.needstagger == '1'){
+                if(self.isoldpop == '2'){
+                    var staggerseconds = parseInt(self.staggerseconds);
+                    if(staggerseconds === 0 || (staggerseconds > 0 && self.lastnewstaggertime > 0 && ((new Date() -  self.lastnewstaggertime)/1000) > staggerseconds)){
+                        anime({
+                            targets: '.mosaicqd-avatarwall .avatar-item',
+                            keyframes: [
+                                {
+                                    translateX: anime.stagger('-1px', {grid: grid, from: index, axis: 'x'}),
+                                    translateY: anime.stagger('-1px', {grid: grid, from: index, axis: 'y'}),
+                                    scale: anime.stagger([1,0.1], {grid: grid, from: index}),
+                                    opacity: anime.stagger([1, 0.1], {grid: grid, from: index}),
+                                    duration: 5e2
+                                },{
+                                    translateX: 0,
+                                    translateY: 0,
+                                    scale: 1,
+                                    opacity: 1,
+                                    duration: 5e2,
+                                }
+                            ],
+                            delay: anime.stagger(20, {grid: grid, from: index}),
+                            complete: function(){
+                                self.lastnewstaggertime = new Date();
+                                func && func()
+                            },
+                        });
+                    }else{
+                        func && func();
+                    }
+                }else{
+                    if(self.oldpopstagger == '1'){
+                        var staggerseconds = parseInt(self.staggerseconds);
+                        if(staggerseconds === 0 || (staggerseconds > 0 && self.lastnewstaggertime > 0 && ((new Date() -  self.lastnewstaggertime)/1000) > staggerseconds)){
+                            anime({
+                                targets: '.mosaicqd-avatarwall .avatar-item',
+                                keyframes: [
+                                    {
+                                        translateX: anime.stagger('-1px', {grid: grid, from: index, axis: 'x'}),
+                                        translateY: anime.stagger('-1px', {grid: grid, from: index, axis: 'y'}),
+                                        scale: anime.stagger([1,0.1], {grid: grid, from: index}),
+                                        opacity: anime.stagger([1, 0.1], {grid: grid, from: index}),
+                                        duration: 5e2
+                                    },{
+                                        translateX: 0,
+                                        translateY: 0,
+                                        scale: 1,
+                                        opacity: 1,
+                                        duration: 5e2,
+                                    }
+                                ],
+                                delay: anime.stagger(20, {grid: grid, from: index}),
+                                complete: function(){
+                                    self.lastnewstaggertime = new Date();
+                                    func && func()
+                                },
+                            });
+                        }else{
+                            func && func();
+                        }
+                    }else{
+                        func && func();
+                    }
+                }
+            }else{
+                func && func();
+            }
+        },
+        isInteger:function(num) {
+            return Math.floor(num) === num;
+        },
+    };
+    screenmosaicqd.init(popconfig);
+});
+</script>
+{include file='common/footer' /}

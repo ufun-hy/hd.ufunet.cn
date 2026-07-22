@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns='http://www.w3.org/1999/xhtml' class='view'>
+<head>
+  <style type='text/css'>
+    .view {
+      padding: 0;
+      word-wrap: break-word;
+      cursor: text;
+      height: 90%;
+    }
+    body {
+      margin: 8px;
+      font-family: sans-serif;
+      font-size: 16px;
+    }
+    p {
+      margin: 5px 0;
+    }
+  </style>
+<link rel='stylesheet' type='text/css' href='/static/js/ueditor/themes/iframe.css' />
+</head>
+<body class='view'></body>
+<script type='text/javascript' id='_initialScript'>
+  const uid = location.search.match(/uid=(\d+)/)[1];
+  setTimeout(function () {
+    editor = window.parent.UE.instants['ueditorInstant' + uid];
+    editor._setup(document);
+  }, 0);
+  var _tmpScript = document.getElementById('_initialScript');
+  _tmpScript.parentNode.removeChild(_tmpScript);
+</script>
+</html>

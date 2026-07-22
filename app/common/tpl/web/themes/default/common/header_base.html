@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<title>{$siteinfo['sitetitle']}</title>
+<meta charset="utf-8">
+{if !isset($siteinfo['responsetype']) || (isset($siteinfo['responsetype']) && $siteinfo['responsetype']=='1') || in_array(request()->path(),['/web/login/index','/web/register/index','/web/findpass/index'])}
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=0" />
+{/if}
+<meta name="keywords" content="{$siteinfo['sitetitle']}">
+<meta name="description" content="{$siteinfo['sitetitle']}">
+<meta name="author" content="zam">
+<link rel="shortcut icon" href="{if !empty($siteinfo['siteicon'])}{:tomedia($siteinfo['siteicon'])}{else /}__STATIC__/favicon.ico{/if}" />
+<link href="__STATIC__/css/bootstrap.min.css" rel="stylesheet">
+<link href="__STATIC__/css/materialdesignicons.min.css" rel="stylesheet">
+<link href="__STATIC__/css/style2.min.css?t=3.2.5" rel="stylesheet">
+<link href="__STATIC__/css/style.css?t=3.2.1" rel="stylesheet">
+{if !isset($siteinfo['responsetype']) || (isset($siteinfo['responsetype']) && $siteinfo['responsetype']=='1')}
+<link href="__STATIC__/css/responselayout.css" rel="stylesheet">
+{/if}
+<link href="__STATIC__/css/zam-icon.css?v=zam12" rel="stylesheet">
+<link href="__STATIC__/css/mxc-icon.css?v=zam18" rel="stylesheet">
+<script type="text/javascript" src="__STATIC__/js/jquery.2.1.4.js"></script>
+<script type="text/javascript" src="__STATIC__/js/jquery.extend.js"></script>
+<script type="text/javascript" src="__STATIC__/js/bootstrap.min.js"></script>
+<script type="text/javascript"  src="__STATIC__/js/require.js"></script>
+<script>
+var requireConfig = {
+baseUrl:"__STATIC__/js/",
+urlArgs:'t=2.5.691',//+Math.random(),
+waitSeconds:0,
+paths: {
+    'css': "css.min",
+    'async': "async",
+    'jquery.ui': 'jquery.ui',
+	'webcore':'webcore',
+	'webtable':'webtable',
+	'webtree':'webtree',
+	'sitesocket':'sitesocket',
+	'keyboard':'keyboard/keyboard.min',
+	'layer':'layer/layer',
+	'layerBox':'layer/layerBox',
+	'laytpl':'laytpl/laytpl',
+	'laydate':'laydate/laydate',
+	'bscroll':'wechatjs/bscroll/bscroll',
+	'confirm': 'confirm/jquery-confirm.min', 
+	'jconfirmBox': 'confirm/jconfirmBox', 
+	'jcode':'jcode/jquery.qrcode', 
+	'zamnotice': 'zamnotice/zamnotice',
+	'clipboard' : 'clipboard.min', 
+	'jbox':'jbox/jBox',
+	'jboxnotice':'jbox/plugins/Notice/jBox.Notice.min',
+	'webupload':'webupload/webuploader.min',
+	'directoss':['https://gosspublic.alicdn.com/aliyun-oss-sdk-6.16.0.min','directupload/aliyun'],
+	'directqiniu':['https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/qiniu-js/2.5.5/qiniu.min','directupload/qiniu'],
+	'directcos':'directupload/cos',
+	'pickcity':'area/pickcity',
+	'zvalidator':'validator/validator',	
+	'onoffswitch':'onoffswitch/on-off-switch',
+	'onoffswitchauto':'onoffswitch/on-off-switch-onload',
+	'zswitch':'zswitch/zswitch',
+	'template':'template/template',
+	'treegrid': 'treegrid/jquery.treegrid.min',
+	'jztree': 'jquery-ztree/jquery.ztree.all.min',
+	'bootstrap-select':'bootstrap-select/bootstrap-select',	
+	'bootstrap-table':'bootstrap-table/bootstrap-table',
+	'bootstrap-table-export':'bootstrap-table/bootstrap-table-export.min',
+	'tableExport':'bootstrap-table/tableExport.min',
+	'bootstrap-table-pagejump':'bootstrap-table/bootstrap-table-pagejump',
+	'bootstrap-edittable':'bootstrap-edittable/bootstrap-edittable.min',
+	'bootstrap-table-edit':'bootstrap-table/bootstrap-table-edit',
+	'bootstrap-table-treegrid':'bootstrap-table/bootstrap-table-treegrid.min',
+	'bootstrap-daterangepicker':'bootstrap-daterangepicker/daterangepicker.min',
+	'bootstrap-datetimepicker':'bootstrap-datetimepicker/bootstrap-datetimepicker.min',
+	'moment':'moment/moment.min',
+	'moment-zhcn':'moment/locale/zh-cn',
+	'niceselect':'nice-select/jquery.nice-select',
+	'jform':'jquery.form',
+	'swiper':['https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/Swiper/4.3.3/js/swiper.min','swiper/swiper.min'],
+	'echarts':'echarts.min',
+	'perfect-scrollbar ':"perfect-scrollbar",
+	'colorpicker':"bootstrap-colorpicker/bootstrap-colorpicker.min",
+	'colorpicker2':"spectrum/spectrum",
+	'fontpicker':"fontIconPicker/jquery.fonticonpicker.min",
+	'bootstrap-maxlength':"bootstrap-maxlength/bootstrap-maxlength.min",
+	'bootstrap-touchspin':"bootstrap-touchspin/jquery.bootstrap-touchspin.min",
+	"select2":"select2/select2.min",
+	"select2-zhcn":"select2/lang/zhcn",
+	'ueditor': 'ueditor/ueditor.all.min',
+	'toolbar':'jtoolbar/jquery.toolbar.min',
+	'AMapLoader':'https://webapi.amap.com/loader',
+	'citypicker':"citypicker/js/city-picker",
+	'citypickerdata':"citypicker/js/city-picker.data",
+	'tablesorter':"tablesorter/tablesorter.min",
+	'nosleep': ['https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/nosleep/0.12.0/NoSleep.min','noSleep/NoSleep'],
+	'slider-min':"slider-min"
+},
+shim:{
+	'jquery.ui': {
+		exports: "$",
+	},
+	'AMapLoader':{
+		exports:"AMapLoader"
+	},
+	'webcore':{
+		exports: 'webcore',
+	},
+	'sitesocket':{
+		exports:'sitesocket',
+	},
+	'webtable':{
+		exports:'webtable',
+	},
+	'webtree':{
+		exports:'webtree',
+	},
+	'layer':{
+		exports: 'layer',
+		deps: ['css!../js/layer/theme/default/layer.css']
+	},
+	'citypicker':{
+		exports: 'citypicker',
+		deps: ['jquery','citypickerdata','css!../js/citypicker/css/city-picker.css']
+	},
+	'toolbar':{
+		exports: 'toolbar',
+		deps: ['jquery','css!../js/jtoolbar/jquery.toolbar.min.css']
+	},
+	'layerBox':{
+		exports: 'layerBox',
+		deps: ['layer']
+	},
+	'laytpl':{
+		exports: 'laytpl',
+	},
+	'laydate':{
+		exports: 'laydate',
+		deps: ['css!../js/laydate/theme/default/laydate.css']
+	},
+	
+	'confirm':{
+		deps: ['css!../js/confirm/jquery-confirm.min.css']
+	},
+	'jconfirmBox':{
+		exports: 'jconfirmBox',
+		deps: ['confirm']
+	},
+	'jcode':{
+		deps: ['jquery']
+	},
+	'jform':{
+		deps: ['jquery']
+	},
+	'niceselect':{
+		deps:['jquery']
+	},
+	'zamnotice':{
+		deps: ['css!../js/zamnotice/zamnotice.css']
+	},
+	'jbox':{
+		deps: ['css!../js/jbox/jBox.css',]
+	},
+	'jboxnotice':{
+		deps: ['jbox','css!../js/jbox/plugins/Notice/jBox.Notice.css']
+	},
+	'zvalidator':{
+		deps: ['css!../js/validator/validator.css']
+	},
+	'bootstrap-select':{
+		deps: ['bootstrap','css!../js/bootstrap-select/bootstrap-select.css']
+	},
+	'select2-zhcn':{
+		deps: ['select2','css!../js/select2/select2.min.css']
+	},
+	'bootstrap-table':{
+		deps: ['bootstrap','css!../js/bootstrap-table/bootstrap-table.css']
+	},
+	'bootstrap-table-export':{
+		deps: ['bootstrap-table-pagejump', 'bootstrap-table']
+	},
+	'bootstrap-table-pagejump':{
+		deps: ['bootstrap-table']
+	},
+	'bootstrap-table-edit': {
+        deps: ['bootstrap-edittable', 'bootstrap-table']
+    },
+    "bootstrap-edittable": {
+        deps: ["css!../js/bootstrap-edittable/bootstrap-edittable.min.css"]
+    },
+    'treegrid':{
+        deps:["css!../js/treegrid/jquery.treegrid.min.css"],
+    },
+    'jztree':{
+        deps:["css!../js/jquery-ztree/jquery.ztree.css"],
+    },
+    'bootstrap-table-treegrid': {
+        deps: ['bootstrap-table','treegrid']
+    },
+    'bootstrap-daterangepicker':{
+    	deps:['moment-zhcn','moment','css!../js/bootstrap-daterangepicker/daterangepicker.min.css',]
+    },
+	'bootstrap-datetimepicker':{
+    	deps:['css!../js/bootstrap-datetimepicker/bootstrap-datetimepicker.min.css']
+    },
+	'onoffswitchauto':{
+		deps: ['onoffswitch','css!../js/onoffswitch/on-off-switch.css']
+	},
+	'zswitch':{
+		exports:'zswitch',
+		deps: ['css!../js/zswitch/zswitch.css']
+	},
+	'pickcity':{
+		deps: ['css!../js/area/pickcity.css']
+	},
+	'template':{
+		exports: 'template',
+	},
+	'swiper':{
+		deps: ['css!../js/swiper/swiper.min.css'],
+		exports:'Swiper',
+	},
+	
+	'perfect-scrollbar':{
+	    exports:'PerfectScrollbar'
+	},
+	'fontpicker':{
+		deps:['css!../js/fontIconPicker/css/jquery.fonticonpicker.min.css','css!../js/fontIconPicker/themes/bootstrap-theme/jquery.fonticonpicker.bootstrap.min.css'],
+	},
+	'colorpicker':{
+		deps:["css!../js/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css"]
+	},
+	'colorpicker2':{
+		deps:["css!../js/spectrum/spectrum.css"]
+	},
+	'bootstrap-touchspin':{
+		deps:["css!../js/bootstrap-touchspin/jquery.bootstrap-touchspin.min.css"]
+	},
+	'ueditor': {
+		deps: ['../../static/js/ueditor/third-party/zeroclipboard/ZeroClipboard.min.js', '../../static/js/ueditor/ueditor.config.js'],
+		exports: 'UE',
+		init:function(ZeroClipboard){
+			window.ZeroClipboard = ZeroClipboard;
+		}
+	},
+	
+},
+};
+if (!jQuery.fn.modal) {
+    requireConfig['paths']['bootstrap'] = '../lib/bootstrap.min';
+} else {
+    define('bootstrap', [], function() {
+        if (typeof jQuery.fn.modal == 'undefined') {
+            var $ = require(['bootstrap.min']);return jQuery;
+        }
+        return jQuery;
+    });
+}
+require.config(requireConfig);
+define("jquery", [], function () {
+    return jQuery;
+});
+var XCV3Config = {
+  wsAddress:"{if isset($wssaddress)}{$wssaddress}{/if}",
+  staticurl:"__STATIC__/",
+  amconfig:{:json_encode(amconfig())},
+};
+</script>
+<style>
+.laytip .layui-layer-content{padding: 2px 6px!important;border-radius: 4px!important;}
+.laytip i.layui-layer-TipsT {
+    bottom: -12px!important;
+}
+.laytip  i.layui-layer-TipsB, .laytip  i.layui-layer-TipsT{
+	border-top-style: dashed!important;
+    border-top-color: #000!important;
+	border-top-width: 8px!important;
+	border-right-style: solid!important;
+	border-right-color: transparent!important;
+}
+/* style2 新增 end*/
+@-webkit-keyframes spinner-border {
+  to {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+@keyframes spinner-border {
+  to {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+.spinner-border {
+    display: inline-block;
+    vertical-align: text-bottom;
+    border: 0.125em solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    -webkit-animation: spinner-border .75s linear infinite;
+    animation: spinner-border .75s linear infinite;
+}
+.daterangepicker td.active, .daterangepicker td.active:hover{background-color: #66bdf9!important}
+</style>
+</head>
+<body class="webbody{if noleftMenu()} lyear-layout-sidebar-close{/if}">

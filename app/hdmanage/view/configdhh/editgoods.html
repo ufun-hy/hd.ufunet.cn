@@ -1,0 +1,361 @@
+<style>
+ .confirmbox-pop .form-group {
+    margin-bottom: 8px;
+ }
+</style>
+<div class="form-horizontal confirmbox-pop">
+<form>
+  <input type="hidden" class="form-control"  name="id" value="{$config['goodsid']??''}" >
+ <div class="form-group">
+    <label class="col-lg-3 control-label">* 商品名称</label>
+    <div class="col-lg-8">
+      <input type="text" class="form-control"  name="goodsname" value="{$config['goodsname']}" placeholder="20字内" maxlength="20">
+    </div>
+ </div>
+ <div class="form-group">
+    <label class="col-lg-3 control-label">* 商品介绍</label>
+    <div class="col-lg-8">
+         <textarea class="form-control" name="goodsdes" rows="4">{$config['goodsdes']}</textarea>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label text-right">商品图</label>
+    <div class="col-lg-8">
+      {:tpl_image_one('goodsimg',$config['goodsimg'])}
+      <span class="help-block">规格:200*200px</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 每单起订量</label>
+    <div class="col-lg-8">
+        <input type="text" class="form-control numberincdec" name="inputmin" 
+            data-bts-min="1" data-bts-replacement-val="1"
+            data-bts-max="null"
+            data-bts-step="1"
+            value="{$config['inputmin']}">
+    </div>
+</div>
+<div class="form-group">
+  <label class="col-lg-3 control-label">* 每单最大订货量</label>
+  <div class="col-lg-8">
+      <input type="text" class="form-control numberincdec" name="inputmax" 
+          data-bts-min="0" data-bts-replacement-val="0"
+          data-bts-max="null"
+          data-bts-step="1"
+          value="{$config['inputmax']??0}">
+      <span class="help-block">即为用户订购此商品时可输入的最大订货数量，设置为0即为不限制单次订货最大数量</span>
+  </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 最小增量</label>
+    <div class="col-lg-8">
+        <input type="text" class="form-control numberincdec" name="inputadd" 
+            data-bts-min="1" data-bts-replacement-val="1"
+            data-bts-max="null"
+            data-bts-step="1"
+            value="{$config['inputadd']}">
+    </div>
+</div>
+<div class="form-group">
+  <label class="col-lg-3 control-label">* 商品每人订货总量</label>
+  <div class="col-lg-8">
+      <input type="text" class="form-control numberincdec" name="maxnum" 
+          data-bts-min="0" data-bts-replacement-val="0"
+          data-bts-max="null"
+          data-bts-step="1"
+          value="{$config['maxnum']??0}">
+      <span class="help-block">即为每个用户订购此商品的总订货量，设置为0即为不限制订货最大数量</span>
+  </div>
+</div>
+<div class="form-group laonanhaibox hidden">
+  <label class="col-lg-3 control-label">* 订货数量倍数</label>
+  <div class="col-lg-8">
+      <input type="text" class="form-control numberincdec" name="multiplenum" 
+          data-bts-min="1" data-bts-replacement-val="1"
+          data-bts-max="null"
+          data-bts-step="1"
+          value="{$config['multiplenum']??1}">
+      <span class="help-block">在未设置赠送量的情况下右侧实时订单内每个订单订货量 = 订单订货数量 * 商品订货倍数</span>
+  </div>
+</div>
+<div class="form-group laonanhaibox hidden">
+  <label class="col-lg-3 control-label">* 订货赠送</label>
+  <div class="col-lg-8">
+      {:tpl_switch('isgiftquantity',$config['isgiftquantity']??'2','opengiftquantityrules')}
+  </div>
+</div>
+<div class="giftquantityrulebox{if $config['isgiftquantity']=='2'} hidden{/if}">
+  <div class="form-group">
+    <label class="col-lg-3 control-label">* 赠送阶梯规则</label>
+    <div class="col-lg-9">
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th style="width:30%;text-align: center;">满多少</th>
+              <th style="width:30%;text-align: center;">送多少</th>
+              <th style="width:40%;text-align: center;">操作</th>
+            </tr>
+          </thead>
+          <tbody class="grule-lists">
+            {foreach $config['giftquantityrules'] as $grule}
+            <tr>
+              <td class="text-center">
+                  <input type="text" class="form-control numberincdec" name="giftquantityrules[num][]" 
+                    data-bts-min="1" data-bts-replacement-val="1"
+                    data-bts-max="null"
+                    data-bts-step="1"
+                    value="{$grule['num']}">
+              </td>
+              <td class="text-center">
+                    <input type="text" class="form-control numberincdec" name="giftquantityrules[send][]" 
+                    data-bts-min="1" data-bts-replacement-val="1"
+                    data-bts-max="null"
+                    data-bts-step="1"
+                    value="{$grule['send']}">
+              </td>
+              <td class="text-center">
+                <a class="btn btn-xs btn-primary zam-sortable btn-moveitem" href="javascript:void(0)">
+                  <i class="mdi mdi-arrow-all"></i>
+                </a>
+                <a class="btn btn-xs btn-danger" href="javascript:;" onclick="javascript:$(this).parent().parent().remove()">
+                  <i class="mdi mdi-close"></i>
+                </a>
+              </td>
+            </tr>
+            {/foreach}
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="3">
+                <div class="m-b-10"><a class="btn btn-primary btn-xs btn-grule" href="javascript:;"><i class="mdi mdi-plus"></i> 新增规则</a></div>
+                <div class="text-left">注意：满多少是根据每个订单总订货数量来算的，并且向下取整，比如满10送5，如果订单的订货总数量是11，那么赠送量为5，如果订单的订货总数量是20，那么赠送量为10</div>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+    </div>
+  </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 商品单价</label>
+    <div class="col-lg-8">
+        <input type="text" class="form-control numberincdec" name="goodsprice" 
+        data-bts-min="0.01" data-bts-replacement-val="0.01"
+        data-bts-max="null"
+        data-bts-decimals="2"
+        data-bts-step="1"
+        data-bts-force-step-divisibility="xstwo"
+        data-bts-postfix-extra-class="touchspin-postfix"
+        value="{$config['goodsprice']}">
+    </div>
+</div>
+<div class="form-group goodsweightbox hidden">
+    <label class="col-lg-3 control-label">* 商品重量</label>
+    <div class="col-lg-3">
+        <input type="text" class="form-control" name="goodsweight" value="{$config['goodsweight']??'1.0000'}">
+        <span class="help-block">最多可保留4位小数，只能填写数字</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 商品单位</label>
+    <div class="col-lg-8">
+        <input type="text" class="form-control"  name="goodsunit" value="{$config['goodsunit']}" placeholder="">
+        <span class="help-block m-b-0">例如：个，件，箱，台等</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 价格阶梯递减</label>
+    <div class="col-lg-8">
+        {:tpl_switch('isladder',$config['isladder']??'2','openladderrules')}
+        <span class="help-block m-t-0">开启后需要设置递减规则</span>
+    </div>
+</div>
+<div class="ladderrulebox{if $config['isladder']=='2'} hidden{/if}">
+  <div class="form-group">
+      <label class="col-lg-3 control-label">* 递减规则</label>
+      <div class="col-lg-9">
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th style="width:30%;text-align: center;">满多少</th>
+                <th style="width:30%;text-align: center;">单价</th>
+                <th style="width:40%;text-align: center;">操作</th>
+              </tr>
+            </thead>
+            <tbody class="rule-lists">
+              {foreach $config['ladderrules'] as $rule}
+              <tr>
+                <td class="text-center">
+                    <input type="text" class="form-control numberincdec" name="ladderrules[num][]" 
+                      data-bts-min="1" data-bts-replacement-val="1"
+                      data-bts-max="null"
+                      data-bts-step="1"
+                      value="{$rule['num']}">
+                </td>
+                <td class="text-center">
+                      <input type="text" class="form-control numberincdec" name="ladderrules[price][]" 
+                      data-bts-min="0.01" data-bts-replacement-val="0.01"
+                      data-bts-max="null"
+                      data-bts-decimals="2"
+                      data-bts-step="1"
+                      data-bts-force-step-divisibility="xstwo"
+                      data-bts-postfix-extra-class="touchspin-postfix"
+                      value="{$rule['price']}">
+                </td>
+                <td class="text-center">
+                  <a class="btn btn-xs btn-primary zam-sortable btn-moveitem" href="javascript:void(0)">
+                    <i class="mdi mdi-arrow-all"></i>
+                  </a>
+                  <a class="btn btn-xs btn-danger" href="javascript:;" onclick="javascript:$(this).parent().parent().remove()">
+                    <i class="mdi mdi-close"></i>
+                  </a>
+                </td>
+              </tr>
+              {/foreach}
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="3">
+                  <div class="m-b-10"><a class="btn btn-primary btn-xs btn-rule" href="javascript:;"><i class="mdi mdi-plus"></i> 新增规则</a></div>
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+      </div>
+  </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 弹窗目标值</label>
+    <div class="col-lg-8">
+        <input type="text" class="form-control numberincdec" name="dabiaonum" 
+            data-bts-min="1" data-bts-replacement-val="1"
+            data-bts-max="null"
+            data-bts-step="1"
+            value="{$config['dabiaonum']??1000}">
+        <div class="help-block">注：本轮基础设置需开启达标弹窗并当前商户的总订单量或者总金额达标才会出现弹窗</div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 达标弹窗话术</label>
+    <div class="col-lg-8">
+        <input type="text" class="form-control"  name="dabiaotxt" value="{$config['dabiaotxt']??'恭喜【商品名】完成订购目标'}" placeholder="请尽量简单明了" maxlength="100">
+        <span class="help-block m-b-0">【商品名】代表当前商品的名称，【商品图】代表当前商品图片，【商品量】代表当前商品达标时真实总量或总额</span>
+    </div>
+</div>
+{if $hascate == '1'}
+<div class="form-group">
+  <label class="col-lg-3 control-label">* 所属分类</label>
+  <div class="col-lg-9">
+      {foreach $cates as $c}
+        <label class="lyear-checkbox checkbox-inline checkbox-primary">
+          <input name="cateids" value="{$c['id']}" type="checkbox" {if in_array($c['id'],$activecateids)} checked{/if}>
+          <span>{$c['catename']}</span>
+        </label>
+      {/foreach}
+      <div class="help-block">每个商品都可选多个分类</div>
+  </div>
+</div>
+{/if}
+</form>
+</div>
+<script>
+require(['webcore',"bootstrap-touchspin","jquery.ui"],function(webcore){
+    tpl_switch();
+    $('.rule-lists').sortable({handle: ".btn-moveitem"}).disableSelection();
+    $(".rule-lists").disableSelection();
+    $('.grule-lists').sortable({handle: ".btn-moveitem"}).disableSelection();
+    $(".grule-lists").disableSelection();
+    $(".confirmbox-pop .numberincdec").TouchSpin();
+    $(".btn-rule").click(function(){
+      $(".rule-lists").append(webcore.tpl($("#rule-tpl"),{}));
+      setTimeout(function(){
+            $(".confirmbox-pop .ladderrulebox .numberincdec").TouchSpin();
+      },1e2);
+    });
+    $(".btn-grule").click(function(){
+      $(".grule-lists").append(webcore.tpl($("#grule-tpl"),{}));
+      setTimeout(function(){
+            $(".confirmbox-pop .giftquantityrulebox .numberincdec").TouchSpin();
+      },1e2);
+    });
+});
+function openladderrules(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".ladderrulebox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".ladderrulebox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function opengiftquantityrules(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".giftquantityrulebox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".giftquantityrulebox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+</script>
+<script id='rule-tpl' type="text/template">
+<tr>
+  <td class="text-center">
+      <input type="text" class="form-control numberincdec" name="ladderrules[num][]" 
+        data-bts-min="1" data-bts-replacement-val="1"
+        data-bts-max="null"
+        data-bts-step="1"
+        value="1">
+  </td>
+  <td class="text-center">
+    <input type="text" class="form-control numberincdec" name="ladderrules[price][]" 
+    data-bts-min="0.01" data-bts-replacement-val="0.01"
+    data-bts-max="null"
+    data-bts-decimals="2"
+    data-bts-step="1"
+    data-bts-force-step-divisibility="xstwo"
+    data-bts-postfix-extra-class="touchspin-postfix"
+    value="1">
+  </td>
+  <td class="text-center">
+    <a class="btn btn-xs btn-primary zam-sortable btn-moveitem" href="javascript:void(0)">
+      <i class="mdi mdi-arrow-all"></i>
+    </a>
+    <a class="btn btn-xs btn-danger" href="javascript:;" onclick="javascript:$(this).parent().parent().remove()">
+      <i class="mdi mdi-close"></i>
+    </a>
+  </td>
+</tr>
+</script>
+<script id="grule-tpl" type="text/template">
+  <tr>
+    <td class="text-center">
+        <input type="text" class="form-control numberincdec" name="giftquantityrules[num][]" 
+          data-bts-min="1" data-bts-replacement-val="1"
+          data-bts-max="null"
+          data-bts-step="1"
+          value="1">
+    </td>
+    <td class="text-center">
+        <input type="text" class="form-control numberincdec" name="giftquantityrules[send][]" 
+          data-bts-min="1" data-bts-replacement-val="1"
+          data-bts-max="null"
+          data-bts-step="1"
+          value="1">
+    </td>
+    <td class="text-center">
+      <a class="btn btn-xs btn-primary zam-sortable btn-moveitem" href="javascript:void(0)">
+        <i class="mdi mdi-arrow-all"></i>
+      </a>
+      <a class="btn btn-xs btn-danger" href="javascript:;" onclick="javascript:$(this).parent().parent().remove()">
+        <i class="mdi mdi-close"></i>
+      </a>
+    </td>
+  </tr>
+</script>

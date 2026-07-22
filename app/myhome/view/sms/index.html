@@ -1,0 +1,178 @@
+{include file='$Wpath/common/header'}
+<style type="text/css">
+	.useraccount-item .card{border-radius: 6px;}
+	.useraccount-item .topitem{height:48px;line-height: 48px;font-size:1.2em;}
+	.useraccount-item .bottomitem{padding-left: 48px}
+	.useraccount-item .bottomitem div.moneybox {
+	    height: 60px;
+	    font-size: 32px;
+	    font-weight:600;
+	}
+	.useraccount-item .bottomitem .moneybox span{
+		display: inline-block;
+		margin-left:5px;
+	    font-size: 16px;
+	    font-weight:0;
+	}
+	.useraccount-item .bottomitem .moneymx{
+		padding-left:5px;
+	}
+	.useraccount-item .btn-control{position: absolute;right:38px;bottom:50px;}
+	
+	.confirmbox-pop{
+		    font: 400 13.3333px Arial!important;
+	}
+	.confirmbox-pop .onlytxt{
+		font-size:14px;
+	}
+	.confirmbox-pop .only-one{
+		height:38px;
+		line-height: 38px;
+	}
+</style>
+<section class="row useraccount-box">
+	<div class="col-sm-6 col-lg-6 useraccount-item">
+        <div class="card bg-primary">
+          <div class="card-body">
+			<div class="topitem text-white m-t-10">
+				<span class="img-avatar img-avatar-48 bg-translucent"><i class="mdi mdi-message fa-1-5x"></i></span>
+				<span class="m-l-5">短信账户</span>
+				&nbsp;&nbsp;|&nbsp;&nbsp;
+				<span class="account-des">该账户为活动提供短信服务</span>
+			</div>
+			<div class="bottomitem text-white m-t-10">
+				<div class="moneybox">{$smsremain}<span>&nbsp;条</span></div>
+				<div class="moneymx hidden"><a class="text-white cursor" href="{:gomyhome('account/income')}">明细</a></div>
+			</div>
+			<div class="btn-control btn-czsms"> 
+				<a href="javascript:void(0)" class="btn btn-warning">立即充值</a> 
+			</div>
+          </div>
+        </div>
+    </div>
+    
+</section>
+<section class="txrecords">
+	<div class="config-titlebox">
+        <span class="config-titlename">下发记录</span>
+    </div>
+	<div class="form-inline zam-inline-searchbar">
+		<div class="form-group" style="max-width: 220px;">
+			<div class="input-group input-group-sm">
+			  <span class="input-group-addon">活动</span>
+				<select id="hdid" class="form-control js_select2">
+				  <option value="0">全部活动</option>
+				  {foreach $hdtitles as $hkey=>$hdtitle } 
+				  <option value="{$hdtitle['id']}">(id:{$hdtitle['id']}){$hdtitle['hdtitle']}</option>
+				  {/foreach}
+				</select>
+			</div>
+		</div>
+	    <div class="form-group">
+	      <div class="input-group input-group-sm">
+	        <span class="input-group-addon">下发类型</span>
+	          <select id="sendtype" class="form-control js_select2">
+	            {foreach $smstypes as $skey=>$stype} 
+	                <option value="{$skey}">{$stype}</option>
+	            {/foreach}
+	          </select>
+	        </div>
+	    </div>
+		<div class="form-group">
+			<div class="input-group input-group-sm">
+			  <span class="input-group-addon">用户昵称或openid</span>
+			  <input type="text" class="form-control" value="" id="nickname" placeholder="请输入用户昵称或openid">
+			</div>
+		</div>
+	    <a class="btn btn-primary btn-sm btn-search" href="javascript:void(0)"><i class="mdi mdi-magnify"></i> 搜索</a>
+	</div>
+	<table id="listtable" class="zam-btable"></table>
+</section>
+<script>
+require(['webcore','webtable','jconfirmBox','zamnotice'],function(webcore,webtable,jconfirmBox,zamnotice){
+	$(".btn-czsms").click(function(){
+		var confirmobj = jconfirmBox.ajaxconfirm("选择充值短信包","{:gomyhome('sms/checkbao')}",{},'html','col-md-6 col-md-offset-3',function(e){
+				var selalibox = e.find('.sel');
+				if(selalibox.length==0) {
+					zamnotice.showTips('error','请选择你需要的短信包');
+					return false;
+				}else{
+					confirmobj.close();
+					var confirmobj2 = jconfirmBox.ajaxconfirm("扫码支付充值短信","{:gomyhome('sms/gopay')}",{smsid:selalibox.attr('data-id'),smsnum:selalibox.attr('data-smsnum'),smsprice:selalibox.attr('data-smsprice'),paytype:$(".paytype").val()},'html','col-md-6 col-md-offset-3',function(e){
+							var payBox = e.find(".payInfoBox");
+							if(payBox.length>0){
+								var orderid = payBox.attr('data-id');
+								webcore.ajaxSubmit("{:gomyhome('sms/queryorder')}",{orderid:orderid}).then(function(json){
+									if(json.code!=0){
+										zamnotice.showNotice('提示',json.msg,2e3,false,'info','info');
+									}else{
+										confirmobj2.close();
+										zamnotice.showTips('success','支付成功',500,function(){
+											window.location.reload();
+										});
+									}
+								});
+							}else{
+								confirmobj2.close();
+							}
+					},false,'1',[{'hidden':false,'txt':'已完成支付'},{'hidden':false,'txt':'取消'}]);
+				}
+		});
+	});
+	var initConfig = {
+	    tableId:'#listtable',
+	    url:"{:gomyhome('sms/index')}",
+	    columnoperate:false,
+	    columns:[{
+	            checkbox: true,
+	        }, 
+	        {
+	            field: 'id',
+	            title: 'id',
+	            align: 'center',
+	            visible: false
+	        },{
+	            field: 'hdtitle',
+	            title: '活动',
+	            align: 'center',
+	            formatter:function(value,row,index){
+	                var html = "<div><span>"+(value==null?"已删除":value)+"</span></div><div class='m-t-5'><span>id:"+row.huodong_id+"</span></div>";
+                	return html;
+	            }
+	        }, {
+	            field: 'statushtml',
+	            title: '状态',
+	            align: 'center',
+	        },{
+	            field: 'mobile',
+	            title: '手机号',
+	            align: 'center',
+	        },{
+	            field: 'smscontent',
+	            title: '短信内容',
+	            align: 'center',
+	        },{
+	            field: 'binduser',
+	            title: '用户',
+	            align: 'center',
+	            formatter: function (value, row, index) {
+	                var html = "<div><div>"+value.nickname+"</div></div><div class='m-t-5'><span>openid:"+value.openid+"</span></div>";
+	                return html;
+	            },
+	        },{
+	            field: 'create_time',
+	            title: '下发时间',
+	            align: 'center',
+	        }
+	    ],
+	    searchParamas:[{'type':'2','id':'hdid'},{'type':'2','id':'sendtype'},{'type':'1','id':'nickname'}],
+	    toolbar:{
+	    },
+	};
+	webtable.init(initConfig);
+	$('.zam-inline-searchbar select').change(function(e) {
+		webtable.refresh();
+	});
+});
+</script>
+{include file='$Wpath/common/footer'}

@@ -1,0 +1,37 @@
+{include file='$Wpath/common/header'}
+<div class="alert alert-danger">
+    队列长度是根据活动发放红包情况变化的
+</div>
+<div class="alert alert-primary">
+    <div class="waitbox m-t-10">
+        <span class="m-r-10">待发放队列长度:</span><span class="label label-success queuelen m-l-5 m-r-5">{$data['total']}</span>个
+    </div>
+    <div class="waitbox m-t-10">
+        <span class="m-r-10">商转零接口待核实队列长度:</span><span class="label label-danger checkqueuelen m-l-5 m-r-5">{$data['count']}</span>个
+    </div>
+    <a href="javascript:void(0)" class="btn btn-primary btn-sm m-t-15 refreshwait"><i class="mdi mdi-refresh"></i> 刷新</a>
+</div>
+<div class="help-block text-danger">
+    待发放队列或商家转账到零钱待核实长度大于0时不推荐进行红包补发操作
+</div>
+<script>
+require(['webcore','jconfirmBox','zamnotice'],function(webcore,jconfirmBox,zamnotice){
+  var isrefresh = false;
+  $(".refreshwait").click(function(){
+      if(isrefresh) return false;
+      webcore.ajaxSubmit("/web/hbqueue/refreshwait",{},'加载中...').then(function(json){
+          if(json.code==0){
+              $(".queuelen").text(json.msg.total);
+              $(".checkqueuelen").text(json.msg.count);
+          }else{
+              layerBox.showMsg(json.msg);
+          }
+          isrefresh = false;
+      },function(){
+          isrefresh = false;
+          layerBox.showMsg('出现异常');
+      });
+  });
+});
+</script>
+{include file='$Wpath/common/footer'}

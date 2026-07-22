@@ -1,0 +1,171 @@
+{include file='$Wpath/common/header'}
+{if $hasbuy=='2'}
+<div class="alert alert-danger">您还未购买当前功能，购买后可正常使用</div>
+{/if}
+<div class="alert alert-danger">因为创建新活动会使用默认模板的数据作为新活动的默认页面，所以必须设置一个默认模板</div>
+{include file='$Wpath/common/tabletoolbar'}
+<table id="listtable" class="zam-btable"></table>
+<script>
+require(['webcore','webtable','jconfirmBox','zamnotice'],function(webcore,webtable,jconfirmBox,zamnotice){
+var initConfig = {
+    tableId:'#listtable',
+    url:"{:goweb('hdconfig/microsite')}",
+    columnoperate:{
+        btns:{
+            edit:true,
+            del:true,
+        },
+        func:{
+            del:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','您确定要删除么？',function(){
+                    webcore.ajaxSubmit("{:goweb('hdconfig/delmicrositetpl')}",{tplid:row.id},'处理中..').then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','删除成功');
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                    });
+                });
+            },
+            edit:function(value, row, index){
+                var confirmObj = jconfirmBox.ajaxconfirm("编辑模板","{:goweb('hdconfig/editmicrositetpl')}",{ishtml:'1',tplid:row.id},'html','col-lg-8 col-lg-offset-2',function(e){
+                    var postData = webcore.serializeObject(e.find('form'));
+                    postData.tplid = row.id;
+                    postData.ishtml = '2';
+                    webcore.ajaxSubmit("{:goweb('hdconfig/editmicrositetpl')}",postData,'正在提交....').then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','保存成功');
+                            confirmObj.close();
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                            return false;
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                        return false;
+                    });
+                });
+            }
+        }
+    },
+    columns:[{
+            checkbox: true,
+        }, 
+        {
+            field: 'id',
+            title: 'id',
+            align: 'center',
+            width:'6%',
+            visible: false
+        }, {
+            field: 'displayorder',
+            title: '排序序号',
+            align:'center',
+            width:'10%',
+        },{
+            field: 'isdefault',
+            title: '默认模板',
+            align: 'center',
+            formatter: function(value, row, index){
+                var html = '',checked = value == '1' ? "checked='checked'" : "";
+                html += '<label class="lyear-switch switch-primary switch-solid" style="height:38px"><input type="checkbox" '+checked+'><span class="default-span" data-tplid="'+row.id+'"></span></label>';
+                return html;
+            },
+        }, {
+            field: 'statushtml',
+            title: '状态',
+            align:'center',
+            width:'10%',
+        }, {
+            field: 'tplname',
+            title: '模板名',
+            align:'center',
+            width:'20%',
+            formatter: function (value, row, index) {
+                var html = `<div>${value}${!row.diydata ? '<span class="text-danger" style="font-size:12px">(未设置模板组件)</span>': ''}</div>`;
+                if(row.isdefault == '1'){
+                    html + `<div>默认模板</div>`;
+                }
+                html += `<a href="{:goweb('hdconfig/editmicrositetpl',['ishtml'=>'4'])}&tplid=${row.id}" target="__blank" class="btn btn-primary btn-xs mt10"><i class="mdi mdi-pencil"></i> 编辑模板页面</a>`
+                return html;
+            },
+        }, {
+            field: 'tplimg',
+            title: '预览图',
+            align:'center',
+            width:'20%',
+            formatter: function (value, row, index) {
+                return '<img width="100px" src="'+value+'" onclick="prevshowattachs(this,1);" style="cursor:pointer">';
+            },
+        },  {
+            field: 'create_time',
+            title: '创建时间',
+            align: 'center',
+            width:'15%',
+        }
+    ],
+    searchParamas:[],
+    toolbar:{
+        add:function(){
+            var confirmObj = jconfirmBox.ajaxconfirm("新增模板","{:goweb('hdconfig/addmicrositetpl')}",{ishtml:'1'},'html','col-lg-8 col-lg-offset-2',function(e){
+                var postData = webcore.serializeObject(e.find('form'));
+                postData.ishtml = '2';
+                webcore.ajaxSubmit("{:goweb('hdconfig/addmicrositetpl')}",postData,'正在提交....').then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','新增成功');
+                        confirmObj.close();
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                         return false;
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差。操作失败');
+                     return false;
+                });
+            });
+        },
+        del:function(ajaxurl){
+            var getSelects = webtable.getSelections();
+            if(getSelects.length>0){
+                jconfirmBox.confirm('温馨提示','您确定要删除选中的数据么？',function(){
+                    webcore.ajaxSubmit("{:goweb('hdconfig/delmicrositetpl')}",{tplid:getSelects},'处理中..').then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','删除成功');
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差,操作失败');
+                    });
+                });
+            }else{
+                zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+        },
+    },
+};
+webtable.init(initConfig);
+$("#listtable").on('click','.default-span',function(){
+    var $this = $(this).prev(),tplid = $(this).attr('data-tplid'),checked = $this.prop("checked");
+    webcore.ajaxSubmit("{:goweb('hdconfig/editmicrositetpl')}",{ishtml:'3',tplid:tplid,checked:(checked ? '2' : '1')}).then(function(json){
+        if(json.code!=0){
+            $this.prop('checked',checked);
+            zamnotice.showTips('error',json.msg);
+        }else{
+            webtable.refresh();
+            zamnotice.showTips('success','操作成功');
+        }
+    }, function(json){
+        zamnotice.showTips('error','网络差,操作失败');
+        $this.prop('checked',checked);
+    });
+});
+});
+</script>
+{include file='$Wpath/common/footer'}

@@ -1,0 +1,29 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="/static/js/jquery.2.1.4.js"></script>
+    <script src="https://res.wx.qq.com/connect/zh_CN/htmledition/js/wxLogin.js"></script>
+</head>
+<body>
+    <style type="text/css">
+        //#login_container{width: 300px;height: 300px;border: 1px solid red}
+    </style>
+<div id="login_container"></div>
+<script>
+    $(function(){
+        var obj = new WxLogin({
+         //self_redirect:true,
+         id:"login_container", 
+         appid: "wx9fff37717ff27bd4", 
+         scope: "snsapi_login", 
+         redirect_uri: "{:urlencode($callbackurl)}",
+         state:"{:time()}",
+         });
+    });
+</script>
+</body>
+</html>

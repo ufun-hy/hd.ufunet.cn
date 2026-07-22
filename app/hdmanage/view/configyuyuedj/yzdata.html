@@ -1,0 +1,207 @@
+{include file='$Wpath/common/header'}
+{if !empty($yzbds)}
+<div class="form-inline zam-inline-searchbar">
+    <div class="form-group">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">验证数据</span>
+        <input type="text" class="form-control" value="" id="keyword" name="username" placeholder="请输入验证数据">
+      </div>
+    </div>
+    <a class="btn btn-primary btn-sm btn-search" href="javascript:void(0)"><i class="mdi mdi-magnify"></i> 搜索</a>
+    <a class="btn btn-warning btn-sm btn-export hidden" href="javascript:void(0)"><i class="mdi mdi-export"></i> 导出</a>
+</div>
+{include file='$Wpath/common/tabletoolbar'}
+<table id="listtable" class="zam-btable"></table>
+<script>
+require(['webcore','webtable','jconfirmBox','zamnotice','layerBox'],function(webcore,webtable,jconfirmBox,zamnotice,layerBox){
+var initConfig = {
+    tableId:'#listtable',
+    url:"{:gohdmanage('configyuyuedj/list',['hdid'=>$hdid])}",
+    columnoperate:{
+        btns:{
+            edit:{title:"编辑",'except':{'only':'2'}},
+            del:true,
+        },
+        func:{
+            edit:function(value, row, index){
+                var confirmObj = jconfirmBox.ajaxconfirm("编辑验证数据","{:gohdmanage('configyuyuedj/savedata',['hdid'=>$hdid])}",{ishtml:'1','yzid':row.id},'html','col-lg-6 col-lg-offset-3',function(e){
+                    var postData = webcore.serializeObject(e.find('form'));
+                    postData.yzid = row.id;
+                    webcore.ajaxSubmit("{:gohdmanage('configyuyuedj/savedata',['hdid'=>$hdid])}",postData).then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','新增成功');
+                            confirmObj.close();
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                             return false;
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                         return false;
+                    });
+                });
+            },
+            del:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','您确定要删除么？',function(){
+                        webcore.ajaxSubmit("{:gohdmanage('configyuyuedj/deldata',['hdid'=>$hdid])}",{yzid:row.id}).then(function(json){
+                            if(json.code==0){
+                                webtable.refresh();
+                                zamnotice.showTips('success','删除成功');
+                            }else{
+                                zamnotice.showTips('error',json.msg);
+                            }
+                        }, function(json){
+                            zamnotice.showTips('error','网络差。操作失败');
+                        });
+                });
+            },
+        }
+    },
+    columns:[{
+            checkbox: true,
+        }, 
+        {
+            field: 'id',
+            title: 'id',
+            align: 'center',
+            visible: false
+        },{
+            field: 'statushtml',
+            title: '状态',
+            align: 'center',
+        },
+        {volist name="yzbds" id="item"}
+        {
+            field: "{$item['zd']}",
+            title: "{$item['title']}",
+            align: 'center',
+            formatter: function(value, row, index){
+                return row.data["{$item['zd']}"];
+            }
+        },  
+        {/volist}
+        {
+            field: 'selfgroupid',
+            title: '自定义分组id',
+            align: 'center',
+        },
+        {
+            field: 'nickname',
+            title: '验证用户',
+            align: 'center',
+            formatter:function(value,row,index){
+                if(row.user_id=='0') return '-';
+                var html = "<div class='zam-flex-column-center'><img src='"+row.avatar+"' class=\"avatarImg m-b-5\" /><span class=\"label label-"+(row.openid==null?'danger':'primary')+"\">"+(value==null?"已删除":value)+"</span></div><div class='m-t-5'></div>";
+                return html;
+            }
+        },  {
+            field: 'create_time',
+            title: '验证时间',
+            align: 'center',
+            formatter: function(value, row, index){
+                if(row.user_id=='0'){
+                    return '-';
+                }
+                return webcore.timeTostring(value,1);
+            }
+        }
+    ],
+    searchParamas:[{'type':'1','id':'keyword'}],
+    toolbar:{
+        add:function(){
+            var confirmObj = jconfirmBox.ajaxconfirm("新增验证数据","{:gohdmanage('configyuyuedj/savedata',['hdid'=>$hdid])}",{ishtml:'1'},'html','col-lg-6 col-lg-offset-3',function(e){
+                var postData = webcore.serializeObject(e.find('form'));
+                webcore.ajaxSubmit("{:gohdmanage('configyuyuedj/savedata',['hdid'=>$hdid])}",postData).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','新增成功');
+                        confirmObj.close();
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                         return false;
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差。操作失败');
+                     return false;
+                });
+            });
+        },
+        del:function(){
+            var getSelects = webtable.getSelections();
+            if(getSelects.length>0){
+                jconfirmBox.confirm('温馨提示','您确定要删除选中的验证数据么？',function(){
+                    webcore.ajaxSubmit("{:gohdmanage('configyuyuedj/deldata',['hdid'=>$hdid])}",{yzid:getSelects}).then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','删除成功');
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差,操作失败');
+                    });
+                });
+            }else{
+                zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+        },
+        import:function(){
+            webcore.importxls({title:'导入验证信息',url:"{:gohdmanage('configyuyuedj/importyzdata',['hdid'=>$hdid])}",moban:"{:tomedia(SYSIMGURL.'excel/name.xls')}",uptxt:"点击上传验证信息",xlstxt:"注:表单内开启验证的项目与开启附加项的项目之和必须与导入的xls文件列数相等"},function(){
+                        webtable.refresh();
+            });
+        },
+        shenhe:function(){
+            var getSelects = webtable.getSelections();
+            if(getSelects.length>0){
+            jconfirmBox.confirm('温馨提示','重置验证数据将导致使用过的验证的数据改成待验证，您确定要这样操作么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('configyuyuedj/shenhedata',['hdid'=>$hdid])}",{yzid:getSelects}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','重置成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+            }else{
+                zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+        },
+        reset:function(){
+            jconfirmBox.confirm('温馨提示','清空验证数据将导致所有验证数据被删除，您确定要这样操作么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('configyuyuedj/resetdata',['hdid'=>$hdid])}",{}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','重置成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+        },
+        export:function(){
+               webcore.ajaxSubmit("{:gohdmanage('configyuyuedj/exportyzdata',['hdid'=>$hdid])}",{}).then(function(json){
+                    if(json.code!=0){
+                        zamnotice.showTips('error',json.msg);
+                    }else{
+                        window.location.href = "{:gohdmanage('configyuyuedj/exportyzdata',['hdid'=>$hdid])}";
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+        }
+        
+    },
+};
+webtable.init(initConfig);
+});
+</script>
+{else /}
+<div class="alert alert-danger text-center">预约表单未开启验证项</div>
+{/if}
+{include file='$Wpath/common/footer'}

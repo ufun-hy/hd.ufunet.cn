@@ -1,0 +1,352 @@
+{include file='common/header' /}
+<style>
+.liuyancj-mainbox{
+	top:90px;
+	bottom:40px;
+}
+.liuyan-welcomeBox{
+	width:100%;
+	height:100%;
+}
+.liuyancj-center {
+	position: relative;
+    width: 1200px;
+    height: 603px;
+	text-align:center;
+	background-image: url("{:tomedia($pcconfig['leftbg'])}");
+    background-size: 100% 100%;
+}
+.liuyan-joinnum{
+	position:absolute;
+	top:50px;
+	left:0;
+	width:100%;
+	height: 38px;
+    line-height: 38px;
+	text-align:center;
+    font-size: 20px;
+    color: #fff;
+}
+.liuyan-joinnum span{display:inline-block;line-height:38px;color:#fff;margin-left:10px;}
+.liuyan-messageBox{
+   position: relative;
+    top: 100px;
+    left: 100px;
+    width: 1000px;
+    height: 410px;
+    padding: 0 10px;
+    overflow: hidden;
+	box-sizing: border-box; 
+    -webkit-box-sizing: border-box; 
+}
+.liuyan-messagelist{
+	position: relative;
+	will-change: transform;
+}
+.liuyan-messagelist li{
+	height: 90px;
+    margin-top: 10px;
+    border-radius: 10px;
+	background-color:#fff;
+	padding:0 10px;
+	box-sizing: border-box; 
+    -webkit-box-sizing: border-box; 
+    -moz-box-sizing: border-box; 
+}
+/* 停止的弹窗box */
+.liuyan-popBox{
+   position: absolute;
+    top: 0;
+	left: 50%;
+    transform: translateX(-50%);
+    width: 1100px;
+    height: 100%;
+}
+.liuyan-popList{
+	position: relative;
+	height: 100%;
+}
+.liuyan-popList li{
+	width: 100%;
+	height: 90px;
+    border-radius: 10px;
+	background-color:#fff;
+	padding: 0 20px;
+	box-sizing: border-box; 
+    -webkit-box-sizing: border-box; 
+	zoom:1.5
+}
+
+.liuyan-message-avatar img{
+	width:56px;
+	height:56px;
+	border-radius:50%;
+	border: 1px solid rgb(243, 148, 5);
+}
+.liuyan-message-info{
+	flex:1;
+	padding-left:15px;
+	text-align:left;
+	font-size:20px;
+	color:#333;
+}
+.liuyan-message-username{
+	height:36px;
+	line-height:36px;
+	font-weight:800;
+}
+.liuyan-message-content{
+	max-height:54px;
+	line-height:27px;
+	overflow:hidden;
+}
+.faceImg{
+	width:25px;height:25px;
+}
+.liuyan-setting{
+	position: relative;
+    left: 0;
+    top: 110px;
+    width: 80%;
+    height: 70px;
+    margin: 0 auto;
+	color:#fff;
+}
+.liuyan-startbtn{
+	width:160px;
+    height:53.6px;
+    background-image: url("{:tomedia($pcconfig['startbtn'])}");
+    background-size: 100% 100%;
+	line-height:48px;
+	font-size:22px;
+	cursor: pointer;
+}
+.liuyan-selnum{
+	width: 134px;
+    height:38px;
+    border-radius:38px;
+    background: #FFF;
+    text-align: center;
+    line-height: 38px;
+    position: relative;
+    color: #d63645;
+	cursor:pointer;
+}
+.liuyan-selnum input{
+	width: 100%;
+    height: 100%;
+    text-align: center;
+    color: #d63645;
+    background: 0 0;
+    border: none;
+    outline: 0;
+    font-size:16px;
+}
+.liuyan-selprize{
+	width: 140px;
+    height:38px;
+    border-radius:38px;
+    background: #FFF;
+    text-align: center;
+    line-height: 38px;
+    position: relative;
+    color: #d63645;
+}
+.liuyan-selprize span.selaward{display:inline-block;width: 120px;padding-right: 20px;cursor:pointer;}
+.liuyan-selprize span.selarrow{display: inline-block;
+    position: absolute;
+    right:2px;
+    top: 0;
+	font-size:18px;
+    transform: rotate(-90deg);
+	-webkit-transform: rotate(-90deg);
+	-mos-transform: rotate(-90deg);
+}
+
+.liuyan-awardlist{
+    width: 100px;
+    overflow: hidden;
+    position: absolute;
+    bottom:40px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+.liuyan-awardlist li{
+	height:30px;
+    line-height:30px;
+    background: rgba(0,0,0,.7);
+    cursor: pointer;
+    color: #FFF;
+}
+.liuyan-awardlist li.active{
+    color: red;
+}
+.liuyan-awardlist li:hover{
+    color: red;
+}
+/*中奖弹窗*/
+.liuyan-output{
+	width: 100%;
+    height: 100%;
+    position: fixed;
+    overflow: hidden;
+    left:0;
+    top:0;
+	background-color:rgba(0,0,0,0.5);
+}
+.liuyan-output .liuyan-output-main{
+	position: relative;
+    width: 1200px;
+    height: 761px;
+    background-image: url("{:tomedia($pcconfig['laybg'])}");
+    background-size: 100% 100%;
+}
+.liuyan-output .liuyan-output-main ul{
+	position: relative;
+    top: 160px;
+    left: 36px;
+    width: 1122px;
+    height: 583px;
+	padding-bottom:8px;
+	box-sizing: border-box; 
+    -webkit-box-sizing: border-box; 
+    -moz-box-sizing: border-box; 
+	overflow:hidden;
+	overflow-y:auto;
+}
+.liuyan-output-main li{
+	min-height: 160px;
+	width:62%;
+    border-radius: 10px;
+	background-color:#fff;
+	padding: 0 20px;
+	box-sizing: border-box; 
+    -webkit-box-sizing: border-box; 
+    -moz-box-sizing: border-box; 
+}
+.liuyan-output-main .liuyan-output-avatar img{
+	width:90px;
+	height:90px;
+	border-radius:50%;
+	border: 1px solid rgb(243, 148, 5);
+}
+.liuyan-output-info{
+	flex: 1;
+	padding-left:20px;
+	text-align:left;
+	font-size:24px;
+	color:#333;
+}
+.liuyan-output-username{
+	height:60px;
+	line-height:60px;
+	overflow:hidden;
+	font-weight:800;
+}
+.liuyan-output-username span{
+	display:inline-block;
+	margin-right:5px;
+}
+.liuyan-output-content{
+	min-height:100px;
+	line-height:27px;
+	padding-bottom: 10px;
+	overflow:hidden;
+}
+.faceImg{
+	width:25px;height:25px;
+}
+.liuyan-output-close{
+	position: absolute;
+    top: 70px;
+    right: -70px;
+    font-size: 50px;
+    color: #fff;
+    cursor: pointer;
+}
+</style>
+<section class="normal-box liuyancj-mainbox">
+  <div class="emptybox zam-app-flex-ajCenter display-none">
+	<img src="/{:SIMGURL}common/empty.png">
+	<p style="padding:20px;">请到后台添加奖品</p>
+  </div>
+  <section class="liuyan-welcomeBox zam-app-flex-ajCenter display-none">
+	<section class="liuyancj-center">
+	    <div class="liuyan-joinnum{if $pcconfig['showjoin']=='2'} display-none{/if}">奖池总人数:<span>0</span></div>
+		<div class="liuyan-messageBox">
+			<ul class="liuyan-messagelist"></ul>
+		</div>
+		<div class="liuyan-popBox display-none">
+			<ul class="liuyan-popList zam-app-flex-ajCenter"></ul>
+		</div>
+		<div class="liuyan-setting zam-app-flex zam-app-alignCenter zam-app-justifyspacearound">
+			<div class="liuyan-selprize">
+				<span class="selaward limitbox" data-prizeid="0" data-nums="0" data-onceout="0">xxx</span>
+				<span class="selarrow mxc-roundrightfill"></span>
+				<ul class="liuyan-awardlist display-none"></ul>
+			</div>
+			<div class="liuyan-startbtn">开始抽奖</div>
+			<div class="liuyan-selnum">
+				<input value="0" type="text" onkeyup="value=value.replace(/[^\d]/g,'')">
+			</div>
+		</div>
+	</section>
+  </section>
+</section>
+<!--中奖弹窗-->
+<section class="liuyan-output zam-app-flex-ajCenter2 display-none">
+	<section class="liuyan-output-main">
+		<ul class="zam-app-flex-ajCenter2"></ul>
+		<span class="liuyan-output-close mxc-unie631"></span>
+	</section>
+</section>
+<script id="msg-tpl" type="html/javascript">
+<li class="zam-app-flex">
+	<div class="liuyan-message-avatar zam-app-flex-ajCenter2">
+		<img src="{{ avatar }}">
+	</div>
+	<div class="liuyan-message-info">
+		<div class="liuyan-message-username">{{# nickname }}</div>
+		<div class="liuyan-message-content">{{# content }}</div>
+	</div>
+</li>
+</script>
+<script id="roll-tpl" type="html/javascript">
+<li class="card zam-app-flex {{ if needreplace }}card-needreplace{{ /if }}">
+	<div class="card-avatar zam-app-flex-ajCenter2"><img src="{{ avatar }}"></div>
+	<div class="card-content zam-app-flex zam-app-alignCenter">{{# content }}</div>
+</li>
+</script>
+<script id="layuser-tpl" type="html/javascript">
+<li class="zam-app-flex">
+	<div class="liuyan-output-avatar zam-app-flex-ajCenter2">
+		<img src="{{ avatar }}">
+	</div>
+	<div class="liuyan-output-info">
+		<div class="liuyan-output-username">{{# nickname }}</div>
+		<div class="liuyan-output-content">{{# content }}</div>
+	</div>
+</li>
+</script>
+<script id="rightlucker-tpl" type="html/javascript">
+<li class="zam-app-flex">
+	<div class="liuyan-lucker-avatar zam-app-flex-ajCenter2">
+		<img src="{{ avatar }}">
+	</div>
+	<div class="liuyan-lucker-info">
+		<div class="liuyan-lucker-username">{{# nickname }}</div>
+		<div class="liuyan-lucker-content">{{# content }}</div>
+	</div>
+	<div class="right-luckerdel" data-id="{{ luckerid }}"><i class="zam-icon-error2"></i></div>
+</li>
+</script>
+<script>
+var defaultimg = "{:tomedia($pcconfig['defaultimg'])}";
+var lotteryshow = {};
+var luckerids = [],rotatesecond = parseInt("{if empty($pcconfig['rotatesecond'])}20{else}{$pcconfig['rotatesecond']}{/if}");
+require(['screenliuyancj2'],function (screenliuyancj2) {
+	screenliuyancj2.init();
+});
+</script>
+{include file='common/footer' /}
+

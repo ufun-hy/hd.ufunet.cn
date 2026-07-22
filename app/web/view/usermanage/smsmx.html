@@ -1,0 +1,85 @@
+<div class="form-horizontal confirmbox-pop">
+  <div class="text-center">
+        <div class="btn-group pop-btns" style="margin-bottom:10px;">
+          <a href="javascript:void(0)" class="btn btn-default" data-issend="1" data-userid="{$userid}"><span>发放明细</span></a>
+          <a href="javascript:void(0)" class="btn btn-default" data-issend="2" data-userid="{$userid}"><span>充值明细</span></a>
+        </div>
+  </div>
+  <div class="carditem"></div>
+</div>
+<script type="text/javascript">
+require(['webcore','jconfirmBox','zamnotice','layerBox'],function(webcore,jconfirmBox,zamnotice,layerBox){
+  $(".confirmbox-pop .pop-btns a.btn").click(function(){
+      var issend = $(this).data('issend'),userid = $(this).data('userid');
+      $(this).addClass('btn-primary').siblings().removeClass("btn-primary");
+      webcore.ajaxSubmit("{:goweb('usermanage/smsmx')}",{userid:userid,issend:issend},'数据获取中...').then(function(json){
+            if(json.code==0){
+                $(".confirmbox-pop .carditem").html(webcore.tpl((issend=='1'?$("#send-tpl"):$("#cz-tpl")),json.msg));
+            }else{
+                zamnotice.showTips('error',json.msg);
+            }
+      }, function(json){
+            zamnotice.showTips('error','网络差,加载失败');
+      });
+  });
+  $(".confirmbox-pop .pop-btns a.btn").eq(0).trigger('click');
+
+});
+</script>
+<script id='send-tpl' type="text/template">
+<div class="alert alert-info" role="alert">
+    总发放:<span class="text-info totalsendmoney m-l-5 m-r-5 fa-2x"><% d.allnums %></span>条
+</div>
+<table class="table">
+<thead>
+  <tr>
+  <th style="width:40%;text-align:center;">活动</th>
+  <th style="width:60%;text-align:center;">发放明细</th>
+  </tr>
+</thead>
+<tbody class="rotate-lists">
+<%# $.each(d.list,function(k,v){ %>
+  <tr>
+    <td class="text-center">
+      <span class="text-info"><% v.hdtitle %><span class="text-danger m-l-5">(id:<% v.id %>)</span></span>
+    </td>
+    <td class="text-center">
+      <div>发放: <span class="text-danger m-r-5"><% v.sendnums %></span>条</div>
+    </td>
+  </tr>
+<%# }) %>
+</tbody>
+</table>
+</script>
+<script id='cz-tpl' type="text/template">
+<div class="alert alert-info" role="alert">
+    总充值:<span class="text-info totalczsms m-l-5 m-r-5 fa-2x"><% d.allsms %></span>条
+</div>
+<table class="table">
+<thead>
+  <tr>
+  <th style="width:20%;text-align:center;">支付方式</th>
+  <th style="width:40%;text-align:center;">充值数量</th>
+  <th style="width:40%;text-align:center;">充值时间</th>
+  </tr>
+</thead>
+<tbody class="rotate-lists">
+<%# $.each(d.list,function(k,v){ %>
+  <tr>
+    <td class="text-center">
+      <div><span class="text-<%# if(v.isforce=='1'){ %>info<%# }else{ %>success<%# } %>"><%# if(v.isforce=='1'){ %>手动支付<%# }else{ %>正常支付<%# } %></span></div>
+      <%# if(v.isforce=='1' && v.addnums < 0){ %>
+          <div><span class="label label-warning">减去余量</span></div>
+      <%# } %>
+    </td>
+    <td class="text-center">
+      <div><span class="text-danger m-r-5"><% v.addnums %></span>条</div>
+    </td>
+    <td class="text-center">
+      <% v.create_time %>
+    </td>
+  </tr>
+<%# }) %>
+</tbody>
+</table>
+</script>

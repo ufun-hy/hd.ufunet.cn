@@ -1,0 +1,45 @@
+<div class="form-horizontal confirmbox-pop">
+  <form class="confirm-formbox" method="post" style="height:400px">
+	<div class="form-group">
+      <label class="col-lg-3 control-label">* 活动截止时间</label>
+      <div class="col-lg-7">
+         {:tpl_daterangetime([
+            'name'=>'startendtime',
+            'autoval'=>'1',
+            'needsfm'=>'1',
+            'needsdd'=>'1',
+            'val'=>[
+              'start'=>$config['starttime']?:time(),
+              'end'=>$config['endtime']?:time()+24*3600
+            ]
+         ])}
+      </div>
+  </div>
+  </form>
+</div>
+<script type="text/javascript">
+require(["bootstrap-daterangepicker"],function(){
+  $('.js-datetimepicker').each(function() {
+        var $input = $(this),$obj = {
+                singleDatePicker: $input.data('issingle')=='1'?true:false,
+                timePicker: $input.data('needsfm')=='1'?true:false,
+                showDropdowns: $input.data('needsdd')=='1'?true:false,
+                timePicker24Hour:true,
+                timePickerSeconds:true,
+                autoUpdateInput:$input.data('autoval')=='1'?true:false,
+                locale: {
+                    format: $input.attr('data-format'),
+                }
+            };
+            if($input.data('start')) $obj.startDate = $input.data('start');
+            if($input.data('end')) $obj.endDate = $input.data('end');
+            if($input.data('mintime')) $obj.minDate = $input.data('mintime');
+            if($input.data('maxtime')) $obj.maxDate = $input.data('maxtime');
+            $input.daterangepicker($obj,function(start, end, label){
+                var funcstr = $input.data('func');
+                var func = window[funcstr];
+                func && func(start,end);
+            });
+    });
+});
+</script>

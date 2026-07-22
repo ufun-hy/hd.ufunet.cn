@@ -1,0 +1,835 @@
+<style>
+.prize-lists tr td,.failprize-lists tr td,.question-lists tr td,.puzzle-lists tr td{text-align:center!important}
+.prize-lists tr td .prizeimg,.failprize-lists tr td .prizeimg{width:69px;height:69px;}
+.confirmbox-pop .zam-titleBox{font-weight: 600;padding:5px 0;}
+.puzzle-lists tr td img{max-height:100px}
+</style>
+<div class="form-horizontal confirmbox-pop">
+<form class="confirm-formbox" method="post">
+    <div class="text-center">
+        <div class="btn-group pop-btns" style="margin-bottom:10px;">
+          <a href="javascript:void(0)" class="btn btn-default btn-primary"><span>基础设置</span></a>
+          {if in_array($gametype,['answerbs','puzzle'])}
+          <a href="javascript:void(0)" class="btn btn-default"><span>{if $gametype=='answerbs'}题目{else /}关卡{/if}设置</span></a>
+          {/if}
+          <a href="javascript:void(0)" class="btn btn-default"><span>高级设置</span></a>
+          <a href="javascript:void(0)" class="btn btn-default"><span>排行榜</span></a>
+        </div>
+    </div>
+    <div class="carditem">
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 轮次名</label>
+            <div class="col-lg-8">
+                <input class="form-control title" type="text"  name="title" value="{$rotate['title']}">
+            </div>
+        </div>
+        {if $gametype=='answerbs'}
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 答题时间</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec answertime" name="answertime" 
+                data-bts-min="5" data-bts-replacement-val="5"
+                data-bts-max="999"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['answertime']}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 自动换题</label>
+            <div class="col-lg-8">
+                {:tpl_switch('isauto',$rotate['isauto'],'isautoquestion')}
+                <span class="zam-help-block">注:关闭后需要手动切换至下一题</span>
+            </div>
+        </div>
+        <div class="form-group autoquestionbox{if $rotate['isauto']=='2'} hidden{/if}">
+            <label class="col-lg-3 control-label">* 自动换题间隔时间</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec autotime" name="autotime" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="999"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['autotime']}">
+                <span class="zam-help-block">注:必须大于0，小于等于999秒</span>
+            </div>
+        </div>
+        {elseif $gametype=='jjb' /}
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 接到金币加分</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec coininc" name="coininc" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="999"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['coininc']}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 接到炸弹减分</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec boomdec" name="boomdec" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="999"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['boomdec']}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 游戏时间</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec gametime" name="gametime" 
+                data-bts-min="5" data-bts-replacement-val="5"
+                data-bts-max="999"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['gametime']}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 预估用户最大分数</label>
+            <div class="col-lg-6">
+                <input type="text" class="form-control numberincdec" name="maxcount" 
+                data-bts-min="5" data-bts-replacement-val="5"
+                data-bts-max="10000"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['maxcount']}">
+                <span class="help-block">请根据接金币得分数，接炸弹减去分数以及游戏时间等因素合理的设置此值，注:此值并不会限定死用户最大得分数</span>
+            </div>
+        </div>
+        {elseif $gametype=='cutfruit' /}
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 切苹果得分数</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec" name="applecut" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="999"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['applecut']}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 切香蕉得分数</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec" name="bananacut" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="999"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['bananacut']}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 切草莓得分数</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec" name="basahacut" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="999"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['basahacut']}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 切桃子得分数</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec" name="peachcut" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="999"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['peachcut']}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 切西瓜得分数</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec" name="sandiacut" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="999"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['sandiacut']}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 切炸弹减分数</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec" name="boomcut" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="999"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['boomcut']}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 游戏时间</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec gametime" name="gametime" 
+                data-bts-min="5" data-bts-replacement-val="5"
+                data-bts-max="999"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['gametime']}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 预估用户最大分数</label>
+            <div class="col-lg-6">
+                <input type="text" class="form-control numberincdec" name="maxcount" 
+                data-bts-min="5" data-bts-replacement-val="5"
+                data-bts-max="10000"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['maxcount']}">
+                <span class="help-block">请根据接金币得分数，接炸弹减去分数以及游戏时间等因素合理的设置此值，注:此值并不会限定死用户最大得分数</span>
+            </div>
+        </div>
+        {elseif $gametype=='tug' /}
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 游戏时间</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec gametime" name="gametime" 
+                data-bts-min="5" data-bts-replacement-val="5"
+                data-bts-max="999"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['gametime']}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 红队名称</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control" name="redname" value="{$rotate['redname']}" maxlength="20">
+            </div>
+        </div>
+        <div class="form-group">
+              <label class="col-lg-3 control-label">* 红队队标</label>
+              <div class="col-lg-8">
+                {:tpl_image_one('redlogo', $rotate['redlogo'])}
+                <span class="help-block">222*278px</span>
+              </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 蓝队名称</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control" name="bluename" value="{$rotate['bluename']}" maxlength="20">
+            </div>
+        </div>
+        <div class="form-group">
+              <label class="col-lg-3 control-label">* 蓝队队标</label>
+              <div class="col-lg-8">
+                {:tpl_image_one('bluelogo', $rotate['bluelogo'])}
+                <span class="help-block">222*278px</span>
+              </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 每个队伍可加入人数</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec" name="maxjoin" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="null"
+                data-bts-step="1"
+                value="{$rotate['maxjoin']}">
+                <span class="help-block">0为不限制队伍加入人数</span>
+            </div>
+        </div>
+        {elseif $gametype=='mouse' /}
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 打地鼠加分</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec tigerinc" name="tigerinc" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="999"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['tigerinc']}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 打其他减分</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec foxdec" name="foxdec" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="999"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['foxdec']}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 游戏时间</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec gametime" name="gametime" 
+                data-bts-min="5" data-bts-replacement-val="5"
+                data-bts-max="999"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['gametime']}">
+            </div>
+        </div>
+        <div class="form-group hidden">
+            <label class="col-lg-3 control-label">* 预估用户最大分数</label>
+            <div class="col-lg-6">
+                <input type="text" class="form-control numberincdec" name="maxcount" 
+                data-bts-min="5" data-bts-replacement-val="5"
+                data-bts-max="10000"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['maxcount']}">
+                <span class="help-block">请根据接金币得分数，接炸弹减去分数以及游戏时间等因素合理的设置此值，注:此值并不会限定死用户最大得分数</span>
+            </div>
+        </div>
+        {elseif $gametype=='jumprace' /}
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 跳中加分</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec jumpinc" name="jumpinc" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="999"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['jumpinc']}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 跳中正中间加分</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec jump2inc" name="jump2inc" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="999"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['jump2inc']}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 未跳中减分</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec faildec" name="faildec" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="999"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['faildec']}">
+                <span class="zam-help-block">注:设置0即为不减分</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 游戏时间</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec gametime" name="gametime" 
+                data-bts-min="5" data-bts-replacement-val="5"
+                data-bts-max="999"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['gametime']}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 预估用户最大分数</label>
+            <div class="col-lg-6">
+                <input type="text" class="form-control numberincdec" name="maxcount" 
+                data-bts-min="5" data-bts-replacement-val="5"
+                data-bts-max="10000"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['maxcount']}">
+                <span class="help-block">请根据跳中得分数，未跳中减去分数以及游戏时间等因素合理的设置此值，注:此值并不会限定死用户最大得分数</span>
+            </div>
+        </div>
+        {elseif $gametype=='clickrace' /}
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 吃箱子加分</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec coininc" name="coininc" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="999"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['coininc']}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 未避开障碍物减分</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec boomdec" name="boomdec" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="999"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['boomdec']}">
+                <span class="zam-help-block">注:设置0即为不减分</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 游戏时间</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec gametime" name="gametime" 
+                data-bts-min="5" data-bts-replacement-val="5"
+                data-bts-max="999"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['gametime']}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 预估用户最大分数</label>
+            <div class="col-lg-6">
+                <input type="text" class="form-control numberincdec" name="maxcount" 
+                data-bts-min="5" data-bts-replacement-val="5"
+                data-bts-max="10000"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['maxcount']}">
+                <span class="help-block">请根据吃箱子得分数，未躲避障碍物减去分数以及游戏时间等因素合理的设置此值，注:此值并不会限定死用户最大得分数</span>
+            </div>
+        </div>
+        {elseif $gametype=='puzzle' /}
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 游戏时间</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec gametime" name="gametime" 
+                data-bts-min="5" data-bts-replacement-val="5"
+                data-bts-max="999"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['gametime']}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 预估用户最大分数</label>
+            <div class="col-lg-6">
+                <input type="text" class="form-control numberincdec" name="maxcount" 
+                data-bts-min="5" data-bts-replacement-val="5"
+                data-bts-max="10000"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['maxcount']}">
+                <span class="help-block">请根据每关的分数以及游戏时间等因素合理的设置此值，注:此值并不会限定死用户最大得分数</span>
+            </div>
+        </div>
+        {else}
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 游戏时间</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec gametime" name="gametime" 
+                data-bts-min="5" data-bts-replacement-val="5"
+                data-bts-max="999"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['gametime']}">
+            </div>
+        </div>
+        {/if}
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 开始后准许加入</label>
+            <div class="col-lg-8">
+                {:tpl_switch('startedjoin',$rotate['startedjoin'])}
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 倒计时</label>
+            <div class="col-lg-8">
+                {:tpl_switch('opendjs',$rotate['opendjs'],'opendjs')}
+            </div>
+        </div>
+        <div class="form-group djsbox{if $rotate['opendjs']=='2'} hidden{/if}">
+            <label class="col-lg-3 control-label">* 倒计时时间</label>
+            <div class="col-lg-4">
+                <input type="text" class="form-control numberincdec djstime" name="djstime" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="20"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['djstime']}">
+                <span class="zam-help-block">注:必须大于0，小于等于20秒</span>
+            </div>
+        </div>
+    </div>
+    {if in_array($gametype,['answerbs','puzzle'])}
+        <div class="carditem hidden">
+        <div class="form-group">
+        <div class="col-lg-12">
+            <table class="table" style="margin-bottom:0px;">
+                <thead>
+                  <tr>
+                    <th style="width:20%;text-align:center;">类型</th>
+                    <th style="width:30%;text-align:center;">{if $gametype=='answerbs'}题目{else /}闯关图片{/if}</th>
+                    <th style="width:30%;text-align:center;">{if $gametype=='answerbs'}答案{else /}闯关分数{/if}</th>
+                    <th style="width:20%;text-align:center;">操作</th>
+                  </tr>
+                </thead>
+                {if $gametype=='answerbs'}
+                <tbody class="question-lists">
+                    {volist name="rotate.questions" id="question"}
+                        <tr>
+                            <td>
+                               <p><span class="label label-{if strexists($question['yesanswer'],',')}danger{else}primary{/if}">{if strexists($question['yesanswer'],',')}多选{else}单选{/if}题</span></p>
+                            </td>
+                            <td>
+                               <p>{$question['questitle']}</p>
+                            </td>
+                            <td>
+                                <p class="cursor" lay-tips="A: {$question['answera']}<br>B: {$question['answerb']}{if !empty($question['answerc'])}<br>C: {$question['answerc']}{/if}{if !empty($question['answerd'])}<br>D: {$question['answerd']}{/if}">
+                                {if strexists($question['yesanswer'],'A')}A: {$question['answera']}{/if}
+                                {if strexists($question['yesanswer'],'B')}<br>B: {$question['answerb']}{/if}
+                                {if strexists($question['yesanswer'],'C')}<br>C: {$question['answerc']}{/if}
+                                {if strexists($question['yesanswer'],'D')}<br>D: {$question['answerd']}{/if}
+                               </p>
+                            </td>
+                            <td>
+                              <a href="javascript:;" class="btn btn-danger btn-sm btn-del">
+                                  <i class="mdi mdi-close"></i>
+                              </a>
+                            </td>
+                        </tr>
+                    {/volist}
+                </tbody>
+                <tfoot style="border: 1px solid #efefef;">
+                  <tr>
+                    <td colspan="4">
+                      <a  class="btn btn-primary btn-xs addquestion" href="javascript:;"> <i class="mdi mdi-plus"></i>&nbsp;<span>添加题目</span></a>
+                    </td>
+                  </tr>
+                </tfoot>
+                {else /}
+                    <tbody class="puzzle-lists">
+                        {volist name="rotate.roundimages" id="roundimg"}
+                            <tr>
+                                <td>
+                                <p>
+                                    <span>{if $roundimg['prows']=='2'}4{elseif $roundimg['prows']=='3' /}9{else /}16{/if}宫格</span>
+                                    <input type="hidden" name="roundimages[prows][]" value="{$roundimg['prows']}">
+                                </p>
+                                </td>
+                                <td>
+                                    <img src="{:tomedia($roundimg['pimg'])}">
+                                    <input type="hidden" name="roundimages[pimg][]" value="{$roundimg['pimg']??''}">
+                                </td>
+                                <td>
+                                    <span>{$roundimg['pscore']}分</span>
+                                    <input type="hidden" name="roundimages[pscore][]" value="{$roundimg['pscore']}">
+                                </td>
+                                <td>
+                                    <a href="javascript:;" class="btn btn-danger btn-xs btn-del">
+                                        <i class="mdi mdi-close"></i>
+                                    </a>
+                                    <a href="javascript:;"  class="btn btn-info btn-xs sortmove" title="拖动排序"><i class="mdi mdi-arrow-all"></i></a>
+                                </td>
+                            </tr>
+                        {/volist}
+                    </tbody>
+                    <tfoot style="border: 1px solid #efefef;">
+                        <tr>
+                            <td colspan="4">
+                                <a class="btn btn-primary btn-xs addpuzzle" href="javascript:;"> <i class="mdi mdi-plus"></i>&nbsp;<span>添加关卡</span></a>
+                            </td>
+                        </tr>
+                    </tfoot>
+                {/if}
+            </table>
+            {if $gametype=='answerbs'}<span class="zam-help-block">注:导入时注意，答案如果是多个，请以英文逗号隔开，如:A,B</span>{/if}
+        </div>
+        </div>
+    </div>
+    {/if}
+    <div class="carditem hidden">
+        {if $gametype=='tug'}
+        <div class="form-group">
+              <label class="col-lg-3 control-label">* 广告图</label>
+              <div class="col-lg-8">
+                {:tpl_image_one('topadv', $rotate['topadv'])}
+                <span class="help-block">800*200px</span>
+              </div>
+        </div>
+        {/if}
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 游戏自动开始</label>
+            <div class="col-lg-8">
+                {:tpl_switch('autorun',$rotate['autorun'],'openautorun')}
+            </div>
+        </div>
+        <div class="form-group autorunbox{if $rotate['autorun']=='2'} hidden{/if}">
+            <label class="col-lg-3 control-label">* 基础人数</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec autorunnum" name="autorunnum" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="10000"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['autorunnum']}">
+                <span class="zam-help-block">注:必须大于0</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 付费参与游戏</label>
+            <div class="col-lg-8">
+                {:tpl_switch('needpayjoin',$rotate['needpayjoin'],'openpayjoin')}
+            </div>
+        </div>
+        <div class="form-group joinfeebox{if $rotate['needpayjoin']=='2'} hidden{/if}">
+            <label class="col-lg-3 control-label">* 费用</label>
+            <div class="col-lg-3">
+               <input type="text" class="form-control numberincdec" name="payfee" 
+                data-bts-min="0.01" data-bts-replacement-val="0.01"
+                data-bts-max="null"
+                data-bts-decimals="2"
+                data-bts-step="1"
+                data-bts-force-step-divisibility="xstwo"
+                value="{$rotate['payfee']}">
+                <span class="zam-help-block">注:必须大于0，可保留2位小数</span>
+            </div>
+        </div>
+    </div>
+    <div class="carditem hidden">
+        <div class="form-group{if $gametype=='tug'} hidden{/if}">
+            <label class="col-lg-3 control-label">* 游戏结束排行榜人数</label>
+            <div class="col-lg-6">
+                <input type="text" class="form-control numberincdec endphb" name="endphb" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="20"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['endphb']}">
+                <span class="zam-help-block">注:游戏结束时大屏排名人数，必须大于0，小于等于10</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* {if $gametype=='tug'}每个队伍排名人数{else /}游戏总排名人数{/if}</label>
+            <div class="col-lg-6">
+                <input type="text" class="form-control numberincdec gamephb" name="gamephb" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="10000"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['gamephb']}">
+                <span class="help-block">注:按成绩降序排名</span>
+            </div>
+        </div>
+        <div class="form-group{if $gametype=='tug'} hidden{/if}">
+            <label class="col-lg-3 control-label">* 微信端是否显示排名</label>
+            <div class="col-lg-8">
+                {:tpl_switch('appshowphbbtn',$rotate['appshowphbbtn'])}
+                <span class="help-block">注:开启后用户在微信端点击排名按钮可以查看所有人的排名与成绩</span>
+            </div>
+        </div>
+    </div>
+</form>
+</div>
+<script id='newquestion-tpl' type="text/template">
+    <tr>
+        <td>
+           <p>
+            <span class="label label-<%# if(d.yesanswer&&d.yesanswer.indexOf(',')>-1){ %>danger<%# }else{ %>primary<%# } %>">
+            <%# if(d.yesanswer&&d.yesanswer.indexOf(',')>-1){ %>多选<%# }else{ %>单选<%# } %>题
+           </span>
+           </p>
+           <%# if(!d.id){ %>
+                <input type="hidden" name="yesanswer[]" value="<% d.yesanswer %>">
+           <%# } %>
+        </td>
+        <td>
+            <p><% d.questitle %></p>
+            <%# if(!d.id){ %>
+                <input type="hidden" name="questitle[]" value="<% d.questitle %>">
+            <%# } %>
+        </td>
+        <td>
+           <p class="cursor" lay-tips="A: <% d.answera %><br>B: <% d.answerb %><%# if(d.answerc){ %><br>C: <% d.answerc %><%# } %><%# if(d.answerc){ %><br>D: <% d.answerd %><%# } %>">
+            <%# if(d.yesanswer.indexOf('A')>-1){ %>A: <% d.answera %><br><%# } %>
+            <%# if(d.yesanswer.indexOf('B')>-1){ %>B: <% d.answerb %><br><%# } %>
+            <%# if(d.yesanswer.indexOf('C')>-1){ %>C: <% d.answerc %><br><%# } %>
+            <%# if(d.yesanswer.indexOf('D')>-1){ %>D: <% d.answerd %><br><%# } %>
+           </p>
+            <input type="hidden" name="answera[]" value="<% d.answera %>">
+            <input type="hidden" name="answerb[]" value="<% d.answerb %>">
+            <input type="hidden" name="answerc[]" value="<% d.answerc %>">
+            <input type="hidden" name="answerd[]" value="<% d.answerd %>">
+        </td>
+        <td>
+          <a href="javascript:;" class="btn btn-danger btn-sm btn-del">
+              <i class="mdi mdi-close"></i>
+          </a>
+        </td>
+    </tr>
+</script>
+<script id='newpuzzle-tpl' type="text/template">
+    <tr>
+        <td>
+        <p>
+            <span><%# if(d.prows == '2'){ %>4<%# }else if(d.prows == '3'){ %>9<%# }else{ %>16<%# } %>宫格</span>
+            <input type="hidden" name="roundimages[prows][]" value="<% d.prows %>">
+        </p>
+        </td>
+        <td>
+            <img src="<% d.pimgprev %>">
+            <input type="hidden" name="roundimages[pimg][]" value="<% d.pimg %>">
+        </td>
+        <td>
+            <span><% d.pscore %>分</span>
+            <input type="hidden" name="roundimages[pscore][]" value="<% d.pscore %>">
+        </td>
+        <td>
+            <a href="javascript:;" class="btn btn-danger btn-xs btn-del">
+                <i class="mdi mdi-close"></i>
+            </a>
+            <a href="javascript:;"  class="btn btn-info btn-xs sortmove" title="拖动排序"><i class="mdi mdi-arrow-all"></i></a>
+        </td>
+    </tr>
+</script>            
+<script>    
+require(['webcore','jconfirmBox','zamnotice','layerBox',"bootstrap-touchspin","jquery.ui"],function(webcore,jconfirmBox,zamnotice,layerBox){
+    $('.puzzle-lists').sortable({handle: ".sortmove"}).disableSelection();
+    $(".confirmbox-pop .pop-btns a.btn").click(function(){
+        $(this).addClass('btn-primary').siblings().removeClass("btn-primary");
+        $(".confirmbox-pop .carditem").addClass('hidden').eq($(this).index()).removeClass('hidden');
+    });
+    tpl_switch();
+    $(".confirmbox-pop .numberincdec").TouchSpin().on("change", function(){
+        var $this = $(this),funcstr = $this.data('func');
+        var func = window[funcstr];
+        func && func();
+    });
+    $(".addquestion").on('click',function(){
+        var confirmObj = jconfirmBox.ajaxconfirm("新增题目","{:goweb('hdconfig/answerbsrotate')}",{ishtml:'3'},'html','col-lg-8 col-lg-offset-2',function(e){
+            var questitle = e.find(".questitle").val(),answera = e.find(".answera").val(),answerb = e.find(".answerb").val(),answerc = e.find(".answerc").val(),answerd = e.find(".answerd").val();
+            if(questitle==''){
+                layerBox.showMsg('请设置题目');
+                return false;
+            }
+            if(answera==''||answerb==''){
+                layerBox.showMsg('请A与B选项必须设置');
+                return false;
+            }
+            var yesarr = ['A','B'];
+            if(answerc!=''){
+                yesarr.push('C');
+            }
+            if(answerd!=''){
+                yesarr.push('D');
+            }
+            if(answerc==''&&answerd!=''){
+                layerBox.showMsg('选项C未填写内容');
+                return false;
+            }
+            var yesanswer = [];
+            var checkanswer = true;
+            e.find("input:checkbox").each(function(i){
+                if(this.checked){
+                    var oneanswer = $(this).val();
+                    if($.inArray(oneanswer,yesarr)==-1){
+                        checkanswer = false;
+                        return false;
+                    }
+                    yesanswer.push(oneanswer);
+                }
+            });
+            if(!checkanswer) {
+                layerBox.showMsg('作为正确答案的选项必须填写选择内容');
+                return false;
+            }
+            if(yesanswer.length==0){
+                layerBox.showMsg('请勾选题目正确答案');
+                return false;
+            }else{
+                yesanswer = yesanswer.join(',');
+            }
+            var questionArr = {
+                questitle:questitle,
+                answera:answera,
+                answerb:answerb,
+                answerc:answerc,
+                answerd:answerd,
+                yesanswer:yesanswer
+            };
+            if(questionArr.answerc=='') questionArr.answerc = " ";
+            if(questionArr.answerd=='') questionArr.answerd = " ";
+            $(".question-lists").append(webcore.tpl($("#newquestion-tpl"),questionArr));
+            confirmObj.close();
+        });
+    });
+    $(".question-lists").on('click','.btn-del',function(){
+        var $this = $(this);
+        jconfirmBox.confirm('温馨提示','删除将无法恢复，您确定要删除么？',function(){
+            $this.parent().parent().remove();
+        });
+    });
+    $(".addpuzzle").on('click',function(){
+        var confirmObjadd = jconfirmBox.ajaxconfirm("新增关卡","{:goweb('hdconfig/puzzlerotate')}",{ishtml:'3'},'html','col-lg-10 col-lg-offset-1',function(e){
+            var prows = e.find(".prows").find('input:radio:checked').val() || 2,pimg = e.find(".pimg input").val() || '',pimgprev = e.find(".pimg img").attr('src') || '',pscore = e.find(".pscore").val() || '';
+            if(pimg==''){
+                layerBox.showMsg('关卡拼图必须设置');
+                return false;
+            }
+            $(".puzzle-lists").append(webcore.tpl($("#newpuzzle-tpl"),{
+                prows:prows,
+                pimg:pimg,
+                pimgprev:pimgprev,
+                pscore:pscore,
+            }));
+            confirmObjadd.close();
+        });
+    });
+    $(".puzzle-lists").on('click','.btn-del',function(){
+        var $this = $(this);
+        jconfirmBox.confirm('温馨提示','删除将无法恢复，您确定要删除么？',function(){
+            $this.parent().parent().remove();
+        });
+    });
+});
+function opendjs(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".djsbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".djsbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function isautoquestion(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".autoquestionbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".autoquestionbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+
+function openautorun(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".autorunbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".autorunbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openpayjoin(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".joinfeebox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".joinfeebox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+</script>

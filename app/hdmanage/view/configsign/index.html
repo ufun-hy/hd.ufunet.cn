@@ -1,0 +1,1822 @@
+{include file='$Wpath/common/header'}
+<style type="text/css">
+.bdItemlist li{margin-bottom:10px;border: 1px solid rgba(0,0,0,0.2);border-radius: 5px;padding: 5px;}
+.bdItemlist li .form-group{
+    margin: 0 4px 0 0;
+    padding:5px;
+}
+.bdItemlist li .form-group.bdnameInput{
+    padding: 5px 0;
+}
+.bdItemlist li .checkbox{margin-top:9px!important;}
+.selectItemlist li:first-child{margin-top:1px;}
+.selectItemlist .bdselectLi input{width:230px!important}
+.form-bd-special{
+    display: inline-flex!important;
+    align-items: center;
+}
+.form-bd-special .lyear-checkbox{
+    padding-right: 1px!important;
+}
+.ui-tooltip{position: absolute!important}
+.input-group-addon{font-size: 12px!important}
+</style>
+<form id="formBox" class="zam-formvalidation form-horizontal signconfigboxs" method="post">
+    <div class="text-center">
+        <div class="btn-group zam-inner-highconfig-btns" style="margin:-5px 0 20px 0;">
+            <a href="javascript:void(0)" class="btn btn-default"><span>微信与大屏设置</span></a>
+            <a href="javascript:void(0)" class="btn btn-default"><span>签到表单设置</span></a>
+            <a href="javascript:void(0)" class="btn btn-default"><span>预约报名设置</span></a>
+        </div>
+    </div>
+    <div class="highconfig-item hidden">
+        <div class="config-titlebox">
+            <span class="config-titlename">微信设置</span>
+            <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#wechatconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+        </div>
+        <div id="wechatconfigbox" class="collapse in">
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 网页标题</label>
+                <div class="col-lg-8">
+                    <input class="form-control" type="text"  name="apptitle" value="{$config['apptitle']}">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 签到成功页背景图片</label>
+                <div class="col-lg-8">
+                    {:tpl_image_one('appbgimg',$config['appbgimg'])}
+                    <span class="help-block">规格:640*1240px</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 签到截止时间</label>
+                <div class="col-lg-8">
+                    {:tpl_switch('appsignlimit[open]',$config['appsignlimit']['open']??'2','opensigntimelimit')}
+                    <span class="zam-help-block p-t-0">开启后需要设置签到截止日期时间，一般是用于防止用户钻抽奖空子来提升自己的中奖概率</span>
+                </div>
+            </div>
+            <div class="signtimelimitbox{if !isset($config['appsignlimit']['open']) || $config['appsignlimit']['open']=='2'} hidden{/if}">
+                <div class="form-group">
+                    <label class="col-lg-2 control-label">* 签到截止日期</label>
+                    <div class="col-lg-7 signlimitinput">
+                      {:tpl_daterangetime([
+                          'name'=>'appsignlimit[endtime]',
+                          'issingle'=>'1',
+                          'autoval'=>'2',
+                          'needsfm'=>'1',
+                          'needsdd'=>'1',
+                          'val'=>(isset($config['appsignlimit']['endtime']) && !empty($config['appsignlimit']['endtime'])) ? $config['appsignlimit']['endtime']:'',
+                          'func'=>'signlimitchange'
+                      ])}
+                      <div class="zam-help-block">注:用户签到的时候已超过签到截止时间将无法签到</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-2 control-label">* 签到超时提示文字</label>
+                    <div class="col-lg-6">
+                        <input type="text" class="form-control" name="appsignlimit[endtxt]" value="{$config['appsignlimit']['endtxt']??''}" />
+                        <span class="zam-help-block">注:不填写此项则使用系统内置的提示文字</span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">签到成功转跳地址<br/><span class="text-danger" style="font-size: 12px;">(不填写则转跳到活动微信端首页)</span></label>
+                <div class="col-lg-8">
+                    <input class="form-control" type="text"  name="successurl" placeholder="此项可以不设置，如需设置请填写一个完整的url地址" value="{$config['successurl']}">
+                    <span class="help-block">默认跳转首页，可以设置跳转到其他地方，必须填写一个完整的url地址</span>
+                </div>
+            </div>
+        </div>
+        <div class="config-titlebox">
+            <span class="config-titlename">大屏设置</span>
+            <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#screenconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+        </div>
+        <div id="screenconfigbox" class="collapse in">
+            {include file="$Wpath/common/configscreencommon"}
+            {include file="$Wpath/common/configscreenmusic"}
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 隐藏签到人数</label>
+                <div class="col-lg-8">
+                    {:tpl_switch('hidesignnum',$config['hidesignnum'])}
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 显示方式</label>
+                <div class="col-lg-8">
+                    <label class="lyear-radio radio-inline radio-primary">
+                        <input type="radio" name="itemshowtype" {if $config["itemshowtype"]=="1"}checked{/if} value="1"><span>放大再缩小</span>
+                    </label>
+                    <label class="lyear-radio radio-inline radio-primary">
+                        <input type="radio" name="itemshowtype" {if $config["itemshowtype"]=="2"}checked{/if} value="2"><span>旋转并且放大缩小</span>
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 签到顺序序号</label>
+                <div class="col-lg-8">
+                    {:tpl_switch('showsignsx',$config['showsignsx'])}
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 遮罩层</label>
+                <div class="col-lg-8">
+                    {:tpl_switch('appstyleconfig[listcover]',$config['appstyleconfig']['listcover']??1)}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="highconfig-item hidden">
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 开启头像上传与表单</label>
+            <div class="col-lg-8">
+                {:tpl_switch('appopenbd',$config['appopenbd'],'openupbd')}
+            </div>
+        </div>
+        <div class="upbdbox{if $config['appopenbd']=='2'} hidden{/if}">
+            <div class="form-group">
+                <label class="col-lg-2 control-label">表单页面背景图</label>
+                <div class="col-lg-8">
+                    {:tpl_image_one('appbdbgimg',$config['appbdbgimg']??'')}
+                    <span class="help-block">规格:640*1240px，此背景仅在输入表单信息页面有效</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">*距离手机顶部距离</label>
+                <div class="col-lg-6">
+                    <input type="text" class="form-control numberincdec" name="appbdbgmargintop" 
+                    data-bts-min="null" data-bts-replacement-val="0"
+                    data-bts-max="null"
+                    data-bts-step="1"
+                    data-bts-postfix="px"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                    value="{$config['appbdbgmargintop']}">
+                    <span class="zam-help-block">注:默认是0，表单框在页面居中显示，如果背景图部分元素被表单框遮挡可改大此设置</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 开启上传头像</label>
+                <div class="col-lg-8">
+                    {:tpl_switch('appuploadimg',$config['appuploadimg'],'openuploadimg')}
+                    <span class="zam-help-block p-t-0">开启后微信用户需要在微信端上传头像或图片</span>
+                </div>
+            </div>
+            <div class="form-group uploadavatarimg{if $config['appuploadimg']=='2'} hidden{/if}">
+                <label class="col-lg-2 control-label">* 上传头像文件来源</label>
+                <div class="col-lg-8">
+                    <label class="lyear-radio radio-inline radio-primary">
+                        <input type="radio" name="appuploadtype" {if !isset($config["appuploadtype"]) || $config["appuploadtype"]=="1"}checked{/if} value="1"><span>拍照或者本地相册</span>
+                    </label>
+                    <label class="lyear-radio radio-inline radio-primary">
+                        <input type="radio" name="appuploadtype" {if isset($config["appuploadtype"]) && $config["appuploadtype"]=="2"}checked{/if} value="2"><span>拍照</span>
+                    </label>
+                    <label class="lyear-radio radio-inline radio-primary">
+                        <input type="radio" name="appuploadtype" {if isset($config["appuploadtype"]) && $config["appuploadtype"]=="3"}checked{/if} value="3"><span>本地相册</span>
+                    </label>
+                </div>
+            </div>
+            <div class="form-group uploadavatarimg{if $config['appuploadimg']=='2'} hidden{/if}">
+                <label class="col-lg-2 control-label">* 上传头像提示文字</label>
+                <div class="col-lg-8">
+                    <input class="form-control" name="appuploadtxt" value="{if isset($config['appuploadtxt'])}{$config['appuploadtxt']}{else /}点击上传头像{/if}" />
+                    <span class="zam-help-block">控制在10个汉字内，尽量简单明了，默认显示点击上传头像</span>
+                </div>
+            </div>
+            <div class="form-group uploadavatarimg{if $config['appuploadimg']=='2'} hidden{/if}">
+                <label class="col-lg-2 control-label">* 头像开启截取</label>
+                <div class="col-lg-8">
+                    {:tpl_switch('appcropperupload',$config['appcropperupload']??'1','opencroppertypebox')}
+                    <span class="zam-help-block p-t-0">关闭则不截取头像直接上传图片</span>
+                </div>
+            </div>
+            {if dzsigncroppertype()}
+            <div class="form-group uploadavatarimg croppertypebox{if $config['appuploadimg']=='2' || $config['appcropperupload']=='2'} hidden{/if}">
+                <label class="col-lg-2 control-label">* 头像截取形状</label>
+                <div class="col-lg-8">
+                    <label class="lyear-radio radio-inline radio-primary">
+                       <input type="radio" name="appcroppertype" value="1" {if !isset($config['appcroppertype']) || $config['appcroppertype']=='1'}checked{/if}><span>正方形</span>
+                    </label>
+                    <label class="lyear-radio radio-inline radio-primary">
+                       <input type="radio" name="appcroppertype" value="2" {if isset($config['appcroppertype']) && $config['appcroppertype']=='2'}checked{/if}><span>长方形</span>
+                    </label>
+                    <span class="zam-help-block">长方形分辨率是350 * 530px</span>
+                </div>
+            </div>
+            {/if}
+            {if $managerhdrights['edit']=='1'}
+                <div class="form-group uploadavatarimg{if $config['appuploadimg']=='2'} hidden{/if}">
+                    <label class="col-lg-2 control-label">* 上传头像人脸识别</label>
+                    <div class="col-lg-8">
+                        {:tpl_switch('appfaceverify',$config['appfaceverify']??'2')}
+                        <span class="zam-help-block p-t-0">开启后微信端上传头像将进行人脸检测，如果不含人脸会上传失败</span>
+                        <span class="help-block"><span class="text-danger">此项仅限管理员可更见</span></span>
+                    </div>
+                </div>
+                {if dzfacecomic()}
+                <div class="form-group uploadavatarimg{if $config['appuploadimg']=='2'} hidden{/if}">
+                    <label class="col-lg-2 control-label">* 上传头像动漫化</label>
+                    <div class="col-lg-8">
+                        {:tpl_switch('appfacecomic',$config['appfacecomic']??'2')}
+                        <span class="zam-help-block p-t-0">开启后微信端上传头像将进行人脸检测并动漫化，如果不含人脸会动漫化失败</span>
+                        <span class="help-block"><span class="text-danger">此项仅限管理员可更见</span></span>
+                    </div>
+                </div>
+                {/if}
+            {/if}
+            <div class="form-group uploadavatarimg{if $config['appuploadimg']=='2'} hidden{/if}">
+                <label class="col-lg-2 control-label">* 大屏显示上传头像</label>
+                <div class="col-lg-8">
+                    {:tpl_switch('upimgavatar',$config['upimgavatar'])}
+                    <span class="zam-help-block p-t-0">开启后大屏幕将显示微信端上传的头像</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label text-right">* 表单框顶部标题</label>
+                <div class="col-lg-8">
+                    <div class="input-group">
+                        <div class="input-group-btn not-allow"><a class="btn btn-default">文字</a></div>
+                        <input type="text" class="form-control" name="appstyleconfig[title][txt]" value="{$config['appstyleconfig']['title']['txt']??'填写信息'}" placeholder="请输入表单框顶部标题..">
+                        <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
+                        <div class="touchspin">
+                        <input type="text" class="form-control numberincdec" name="appstyleconfig[title][size]" 
+                        data-bts-min="12" data-bts-replacement-val="12"
+                        data-bts-max="52"
+                        data-bts-step="1"
+                        data-bts-postfix="px"
+                        data-bts-postfix-extra-class="touchspin-postfix"
+                        value="{$config['appstyleconfig']['title']['size']??20}">
+                        </div>
+                        <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+                        {:tpl_color('appstyleconfig[title][color]',$config['appstyleconfig']['title']['color']??'#fff')}
+                        <div class="input-group-btn not-allow"><a class="btn btn-default">下间距</a></div>
+                        <div class="touchspin">
+                        <input type="text" class="form-control numberincdec" name="appstyleconfig[title][margin]" 
+                        data-bts-min="12" data-bts-replacement-val="12"
+                        data-bts-max="52"
+                        data-bts-step="1"
+                        data-bts-postfix="px"
+                        data-bts-postfix-extra-class="touchspin-postfix"
+                        value="{$config['appstyleconfig']['title']['margin']??20}">
+                        </div>
+                    </div>
+                    <span class="help-block">不填写标题文字就不会显示标题内容</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">表单框顶部logo</label>
+                <div class="col-lg-8">
+                    {:tpl_image_one('appbdlogo',$config['appbdlogo'])}
+                    <span class="help-block">规格:500*190px</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">表单框背景色</label>
+                <div class="col-lg-8">
+                    {:tpl_color('appbdbgcolor',$config['appbdbgcolor'])}
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label text-right">* 提交按钮</label>
+                <div class="col-lg-8 col-xs-12">
+                    <div class="input-group">
+                        <div class="input-group-btn not-allow"><a class="btn btn-default">文字</a></div>
+                        <input type="text" class="form-control" name="appbdbtntxt" value="{$config['appbdbtntxt']}">
+                        <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+                        {:tpl_color('appbdbtnfontcolor',$config['appbdbtnfontcolor'])}
+                        <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
+                        <div class="touchspin">
+                        <input type="text" class="form-control numberincdec" name="appbdbtnfontsize" 
+                        data-bts-min="0" data-bts-replacement-val="0"
+                        data-bts-max="100"
+                        data-bts-step="1"
+                        data-bts-postfix="px"
+                        data-bts-postfix-extra-class="touchspin-postfix"
+                        value="{$config['appbdbtnfontsize']}">
+                        </div>
+                        <div class="input-group-btn not-allow"><a class="btn btn-default">背景色</a></div>
+                        {:tpl_color('appbdbtnbgcolor',$config['appbdbtnbgcolor'])}
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">提交按钮图片(可选设置)</label>
+                <div class="col-lg-8">
+                    {:tpl_image_one('appbdbtnimg',$config['appbdbtnimg']??'')}
+                    <span class="help-block">推荐尺寸:130*37px，不上传此图则使用上面的提交按钮</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 强制验证</label>
+                <div class="col-lg-8">
+                    {:tpl_switch('forceyz',$config['forceyz'])}
+                    <span class="zam-help-block p-t-0">注意:此项生效必须表单有开启了验证的表单项，关闭强制验证代表微信用户输入的信息与验证数据无关联则直接签到成功，适用于部分来宾信息无法提前预知，但已知来宾必须验证的场景</span>
+                </div>
+            </div>
+            <div class="alert alert-danger" role="alert">
+                签到产生数据后，表单信息不可更改。{if $signnums>0}(本活动已产生签到数据)，如需更改表单信息 <a href="javascript:;" class="btn btn-danger btn-sm m-l-5 resetsigndata">点我清空签到数据</a>{/if}<br><br>
+                表单验证(最多可开启3项): 您添加表单项并开启了验证后，您需要手动添加或导入用户验证信息<a href="javascript:;" class="btn btn-danger btn-sm m-l-5 resetyzdata">点我清空验证用户数据</a><br><br>
+                值唯一: 您添加表单项并开启了必填后才可以开启值唯一；值唯一即为此项所有的微信用户输入的此项内容不可重复<br><br>
+                附加项(最多可开启20项): 您添加的表单项中某一项或多项开启了验证后才可以开启其他表单项为附加项 (附加项必须与验证相结合，用户签到时不需要填写开启了附加项的表单项目，此类项目需要后台导入数据)<br><br>
+                大屏显示项(最多可开启3项): 开启了大屏显示的项目将在大屏显示，并且开启后大屏将不再显示用户的微信昵称
+            </div>
+            <div class="form-group bdListsBox" style="margin-bottom: 0">
+                <label class="col-lg-2 control-label">* 签到表单设置</label>
+                <div class="col-lg-10">
+                    <ul class="bdItemlist">
+                    {volist name="config.appbddata" id="bditem"}
+                    <li class="form-inline">
+                      <div class="mustDom">
+                        <input type="hidden" name="bdzd[]" value="{$bditem['zd']}" />
+                        <input type="hidden" name="bdtype[]" value="{$bditem['type']}"  />
+                        <div class="form-group bdnameInput">
+                            <input type="text"  class="form-control" name="bdtitle[]" value="{$bditem['title']}"  />
+                        </div>
+                        <div class="form-group form-control form-bd-special form-bdmust">
+                            <label class="lyear-checkbox checkbox-primary">
+                                <input type="hidden" name="bdmust[]"  value="{$bditem['bdmust']??'1'}"  />
+                                <input type="checkbox" {if !isset($bditem['bdmust']) || $bditem['bdmust']=='1'}checked{/if} onchange="changemust(this)" {if $signnums > 0}disabled{/if} />
+                                <span>必填</span>
+                            </label>
+                        </div>
+                        <div class="form-group form-control form-bd-special form-bdonly">
+                            <label class="lyear-checkbox checkbox-primary">
+                                <input type="hidden" name="bdonly[]"  value="{$bditem['bdonly']??'2'}"  />
+                                <input type="checkbox" {if isset($bditem['bdonly']) && $bditem['bdonly']=='1'}checked{/if} onchange="changeonly(this)"  />
+                                <span>值唯一</span>
+                            </label>
+                        </div>
+                        <div class="form-group form-control form-bd-special form-bdyz">
+                            <label class="lyear-checkbox checkbox-primary">
+                                <input type="hidden" name="bdyz[]"  value="{$bditem['bdyz']}"  />
+                                <input type="checkbox" {if $bditem['bdyz']=='1'}checked{/if} onchange="changeyz(this)" {if $signnums > 0}disabled{/if} />
+                                <span>验证</span>
+                            </label>
+                        </div>
+                        <div class="form-group form-control form-bd-special form-bdyzbind">
+                            <label class="lyear-checkbox checkbox-primary">
+                                <input type="hidden" name="yzbind[]"  value="{$bditem['yzbind']}"  />
+                                <input type="checkbox" {if $bditem['yzbind']=='1'}checked{/if} onchange="yzbind(this)" {if $signnums > 0}disabled{/if} />
+                                <span>附加项</span>
+                            </label>
+                        </div>
+                        <div class="form-group form-control form-bd-special form-bdscreenshow">
+                            <label class="lyear-checkbox checkbox-primary">
+                                <input type="hidden" name="screenshow[]"  value="{$bditem['screenshow']}"  />
+                                <input type="checkbox" {if $bditem['screenshow']=='1'}checked{/if} onchange="changescreenshow(this)" />
+                                <span>大屏显示</span>
+                            </label>
+                        </div>
+                        {if $bditem['type']=='select'}
+                        <div class="form-group form-control form-bd-special form-bdscreenshow">
+                            <label class="lyear-checkbox checkbox-primary">
+                                <input type="hidden" name="supportsearch[]"  value="{$bditem['supportsearch']??'2'}"  />
+                                <input type="checkbox" {if isset($bditem['supportsearch']) && $bditem['supportsearch']=='1'}checked{/if} onchange="changesupportsearch(this)" />
+                                <span>支持搜索</span>
+                            </label>
+                        </div>
+                        {else /}
+                        <input type="hidden" name="supportsearch[]"  value="2"  />
+                        {/if}
+                        {if $bditem['type']=='number'}
+                            <div class="form-group form-control form-bd-special">
+                                <label class="lyear-checkbox checkbox-primary">
+                                    <input type="hidden" name="isfloat[]"  value="{$bditem['isfloat']??'2'}"  />
+                                    <input type="checkbox" {if isset($bditem['isfloat']) && $bditem['isfloat']=='1'}checked{/if} onchange="changefloat(this)" />
+                                    <span>小数</span>
+                                </label>
+                            </div>
+                            <div class="form-bd-special" style="display: inline-block;">
+                                <div class="input-group input-group-sm">                             
+                                    <div class="input-group-btn not-allow hidden"><a class="btn btn-default">最小</a></div>
+                                    <div class="input-group-addon">最小</div>
+                                    <div class="touchspin" style="width: 80px">
+                                        <input type="text" class="form-control numberincdec" name="bdmin[]" 
+                                        data-bts-min="0" data-bts-replacement-val="0"
+                                        data-bts-max="null"
+                                        data-bts-step="1"
+                                        value="{$bditem['bdmin']??'0'}">
+                                    </div>
+                                    <div class="input-group-btn not-allow hidden"><a class="btn btn-default">最大</a></div>
+                                    <div class="input-group-addon">最大</div>
+                                    <div class="touchspin" style="width: 80px">
+                                        <input type="text" class="form-control numberincdec" name="bdmax[]" 
+                                        data-bts-min="0" data-bts-replacement-val="0"
+                                        data-bts-max="null"
+                                        data-bts-step="1"
+                                        value="{$bditem['bdmax']??'0'}">
+                                    </div>
+                                </div>
+                            </div>
+                            <input type="hidden" name="isqdbook[]"  value="{$bditem['isqdbook']??2}"  />
+                        {elseif in_array($bditem['type'],['normal','textarea'])}
+                            {if $bditem['type']=='textarea'}
+                                <div class="form-group form-control form-bd-special form-bdqdbook{if $openqdbook=='2'} hidden{/if}">
+                                    <label class="lyear-checkbox checkbox-primary">
+                                        <input type="hidden" name="isqdbook[]"  value="{$bditem['isqdbook']??'2'}"  />
+                                        <input type="checkbox" {if isset($bditem['isqdbook']) && $bditem['isqdbook']=='1'}checked{/if} onchange="changeqdbook(this)" />
+                                        <span>签到簿留言</span>
+                                    </label>
+                                </div>
+                            {else /}
+                                <input type="hidden" name="isqdbook[]"  value="{$bditem['isqdbook']??2}"  />
+                            {/if}
+                            <div class="form-group form-control form-bd-special" style="height: auto;border: 0">
+                                <select class="form-control" name="isfloat[]">
+                                    <option value="2" {if !isset($bditem['isfloat']) || $bditem['isfloat']=='2'}selected{/if}>不限制</option>
+                                    <option value="3" {if isset($bditem['isfloat']) && $bditem['isfloat']=='3'}selected{/if}>汉字</option>
+                                    <option value="4" {if isset($bditem['isfloat']) && $bditem['isfloat']=='4'}selected{/if}>字母</option>
+                                    <option value="5" {if isset($bditem['isfloat']) && $bditem['isfloat']=='5'}selected{/if}>数字</option>
+                                    <option value="6" {if isset($bditem['isfloat']) && $bditem['isfloat']=='6'}selected{/if}>汉字字母组合</option>
+                                    <option value="7" {if isset($bditem['isfloat']) && $bditem['isfloat']=='7'}selected{/if}>汉字数字组合</option>
+                                    <option value="8" {if isset($bditem['isfloat']) && $bditem['isfloat']=='8'}selected{/if}>字母数字组合</option>
+                                    <option value="9" {if isset($bditem['isfloat']) && $bditem['isfloat']=='9'}selected{/if}>汉字或字母</option>
+                                    <option value="10" {if isset($bditem['isfloat']) && $bditem['isfloat']=='10'}selected{/if}>汉字或数字</option>
+                                    <option value="11" {if isset($bditem['isfloat']) && $bditem['isfloat']=='11'}selected{/if}>字母或数字</option>
+                                </select>
+                            </div>
+                            <div class="form-bd-special" style="display: inline-block;">
+                                <div class="input-group input-group-sm">                             
+                                    <div class="input-group-addon">最短</div>
+                                    <div class="touchspin" style="width: 140px">
+                                        <input type="text" class="form-control numberincdec" name="bdmin[]" 
+                                        data-bts-min="0" data-bts-replacement-val="0"
+                                        data-bts-max="null"
+                                        data-bts-step="1"
+                                        data-bts-postfix="个字符"
+                                        data-bts-postfix-extra-class="touchspin-postfix"
+                                        value="{$bditem['bdmin']??'0'}">
+                                    </div>
+                                    <div class="input-group-addon">最长</div>
+                                    <div class="touchspin" style="width: 140px">
+                                        <input type="text" class="form-control numberincdec" name="bdmax[]" 
+                                        data-bts-min="0" data-bts-replacement-val="0"
+                                        data-bts-max="null"
+                                        data-bts-step="1"
+                                        data-bts-postfix="个字符"
+                                        data-bts-postfix-extra-class="touchspin-postfix"
+                                        value="{$bditem['bdmax']??'0'}">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        {elseif $bditem['type']=='file' }
+                            <div class="form-group form-control form-bd-special" style="height: auto;border: 0">
+                                <select class="form-control" name="isfloat[]">
+                                    <option value="1" {if !isset($bditem['isfloat']) || $bditem['isfloat']=='1'}selected{/if}>图片文件</option>
+                                    <option value="2" {if isset($bditem['isfloat']) && $bditem['isfloat']=='2'}selected{/if}>视频文件</option>
+                                </select>
+                            </div>
+                            <input type="hidden" name="bdmin[]"  value="{$bditem['bdmin']??0}"  />
+                            <input type="hidden" name="bdmax[]"  value="{$bditem['bdmax']??0}"  />
+                            <input type="hidden" name="isqdbook[]"  value="{$bditem['isqdbook']??2}"  />
+                        {else /}
+                            <input type="hidden" name="isfloat[]"  value="2"  />
+                            <input type="hidden" name="bdmin[]"  value="{$bditem['bdmin']??0}"  />
+                            <input type="hidden" name="bdmax[]"  value="{$bditem['bdmax']??0}"  />
+                            {if $bditem['type']=='select'}
+                                <div class="form-group form-control form-bd-special form-bdqdbook{if $openqdbook=='2'} hidden{/if}">
+                                    <label class="lyear-checkbox checkbox-primary">
+                                        <input type="hidden" name="isqdbook[]"  value="{$bditem['isqdbook']??'2'}"  />
+                                        <input type="checkbox" {if isset($bditem['isqdbook']) && $bditem['isqdbook']=='1'}checked{/if} onchange="changeqdbook(this)" />
+                                        <span>签到簿留言</span>
+                                    </label>
+                                </div>
+                            {else/}
+                                <input type="hidden" name="isqdbook[]"  value="{$bditem['isqdbook']??2}"  />
+                            {/if}
+                        {/if}
+                        {if $bditem['zd']=='mobile'}
+                        <div class="form-group form-control form-bd-special" style="height: auto;border: 0;{if $managerhdrights['edit'] != '1' || !dznormalrequest('wxminiphone')}display:none!important{/if}">
+                            <select class="form-control" name="mobiletype">
+                                <option value="1" {if !isset($bditem['mobiletype']) || $bditem['mobiletype']=='1'}selected{/if}>手动输入</option>
+                                <option value="2" {if isset($bditem['mobiletype']) && $bditem['mobiletype']=='2'}selected{/if}>微信小程序获取</option>
+                            </select>
+                        </div>
+                        <div class="form-group form-control form-bd-special form-bdmobilecode">
+                            <label class="lyear-checkbox checkbox-primary">
+                                <input type="hidden" name="opencode"  value="{$bditem['opencode']}"  />
+                                <input type="checkbox" {if $bditem['opencode']=='1'}checked{/if} onchange="changemobilecode(this)" />
+                                <span>短信验证</span>
+                            </label>
+                        </div>
+                        <div class="form-group form-control  form-bd-special form-bdhide4">
+                            <label class="lyear-checkbox checkbox-primary">
+                            <input type="hidden" name="hidefournum" value="{$bditem['hidefournum']}" />
+                            <input type="checkbox" {if $bditem['hidefournum']=='1'}checked{/if} onchange="hidemobile(this)" /><span>隐藏中间4位</span>
+                            </label>
+                        </div>
+                        {/if}
+                        <div class="form-group bdnameInput">
+                            <input type="text"  class="form-control" name="defaulttip[]" value="{$bditem['defaulttip']??'请'.(in_array($bditem['type'],['select','date'])?'选择':($bditem['type']=="file" ? "上传" : "输入")).$bditem['title']}" placeholder="输入提示语" onblur="blurinput(this,'1')" />
+                        </div>
+                        <div class="form-group bdnameInput">
+                            <input type="text"  class="form-control" name="errortip[]" value="{$bditem['errortip']??$bditem['title'].(in_array($bditem['type'],['select','date'])?'选择':( $bditem['type']=="file" ? "上传" : "输入" )).'错误'}" placeholder="错误提示语" onblur="blurinput(this,'2')" />
+                        </div>
+                        <div class="form-group">
+                            <a href="javascript:;" class="btn btn-danger btn-sm delbditem" {if $signnums > 0}data-disabled="1" disabled{/if} title="删除"><i class="mdi mdi-close"></i></a>
+                            {if $bditem['type']=='select'}
+                            <a href="javascript:;" class="btn btn-primary btn-sm addselectitem" data-zd="{$bditem['zd']}" title="新增选项"><i class="mdi mdi-plus"></i></a>
+                            {/if}
+                            <a href="javascript:;"  class="btn btn-info btn-sm mousemove zam-sortable" title="拖动排序"><i class="mdi mdi-arrow-all"></i></a>
+                        </div>
+                      </div>
+                      {if $bditem['type']=='select'}
+                      <div class="bindDom">
+                         <div class="form-group selectLists">
+                            <ul class="selectItemlist">
+                                {volist name="bditem.items" id="sitem"}
+                                    <li class="bdselectLi">
+                                        <div class="form-group">
+                                            选项
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="text"  class="form-control" name="{$bditem['zd']}[]" value="{$sitem}" />
+                                        </div>
+                                        <div class="form-group">
+                                            <a href="javascript:;" class="btn btn-danger btn-sm delselectitem" {if $signnums > 0}data-disabled="1" disabled{/if}><i class="mdi mdi-close"></i></a>
+                                            <a href="javascript:;"  class="btn btn-info btn-sm mousemoveselect zam-sortable" title="拖动排序"><i class="mdi mdi-arrow-all"></i></a>
+                                        </div>
+                                    </li>
+                                {/volist}
+                            </ul>
+                         </div>
+                      </div>
+                      {/if}
+                    </li>
+                    {/volist}
+                    </ul>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label"></label>
+                <div class="col-lg-8">
+                    <a class="btn btn-primary btn-sm btn-additem" {if $signnums > 0}data-disabled="1" disabled{/if}><i class="mdi mdi-plus"></i>新增表单项</a>
+                    <span class="help-block">注:产生签到数据后不可新增或者删除表单项，但是可以修改已添加的表单项目名称以及顺序</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 用户签到协议</label>
+                <div class="col-lg-8">
+                    {:tpl_switch('appbdxieyi[open]',$config['appbdxieyi']['open']??'2','appbdxieyi')}
+                    <span class="zam-help-block p-t-0">注意:开启则微信用户填写表单后必须勾选协议才可以提交签到信息</span>
+                </div>
+            </div>
+            <div class="xieyibox{if !isset($config['appbdxieyi']['open']) || $config['appbdxieyi']['open']=='2'} hidden{/if}">
+                <div class="form-group">
+                    <label class="col-lg-2 control-label">* 协议名称</label>
+                    <div class="col-lg-8">
+                        <input class="form-control" type="text"  name="appbdxieyi[name]" placeholder="务必简单明了" value="{$config['appbdxieyi']['name']??'签到用户协议'}">
+                    <span class="help-block">务必简单明了</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-2 control-label">* 协议内容链接</label>
+                    <div class="col-lg-8">
+                        <input class="form-control" type="text"  name="appbdxieyi[url]" placeholder="请填写一个完整的url链接" value="{$config['appbdxieyi']['url']}">
+                    <span class="help-block">ps:可以到<a class="m-l-5 m-r-5" href="{:gohdmanage('configh5/index',['hdid'=>$hdid])}" target="__blank">H5文章</a>里编辑一篇文章(编辑好协议内容)然后将该文章链接复制到此处</span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">签到成功提示</label>
+                <div class="col-lg-8">
+                    <input class="form-control" type="text"  name="successtxt" value="{$config['successtxt']}">
+                    <span class="help-block">默认为签到成功</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">验证失败提示</label>
+                <div class="col-lg-8">
+                    <input class="form-control" type="text"  name="yzfailtxt" value="{$config['yzfailtxt']??'验证失败'}">
+                    <span class="help-block">默认为验证失败，仅开启了表单验证项才有效</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">验证失败转跳链接<br/><span class="text-danger" style="font-size: 12px;">(不填写则不转跳)</span></label>
+                <div class="col-lg-8">
+                    <input class="form-control" type="text"  name="yzfailurl" value="{$config['yzfailurl']??''}">
+                    <span class="help-block">验证失败后将自动跳转到当前设置的链接</span>
+                </div>
+            </div>
+            <div class="form-group signonlysearch{if !dzsignonlysearch()} hidden{/if}">
+                <label class="col-lg-2 control-label">* 信息查询模式</label>
+                <div class="col-lg-8">
+                    {:tpl_switch('onlysearch',$config['onlysearch']??'2','openonlysearch')}
+                    <span class="zam-help-block p-t-0">
+                        <div class="text-danger">注意事项:</div>
+                        <div>1 开启后不可自定义签到成功跳转地址也即为签到后必须跳转到微信首页才有效</div>
+                        <div>2 开启后预约报名内不可开启签到报名</div>
+                        <div>3 开启后签到表单项目内至少有一项勾选验证</div>
+                        <div>4 开启后签到验证数据被使用后不会变跟验证状态</div>
+                    </span>
+                </div>
+            </div>
+            <div class="config-titlebox">
+                <span class="config-titlename">表单样式设置</span>
+                <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#inputconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+            </div>
+            <div id="inputconfigbox" class="collapse in">
+                <div class="form-group">
+                    <label class="col-lg-2 control-label text-right">* 表单项基础</label>
+                    <div class="col-lg-8">
+                        <div class="input-group">
+                            <div class="input-group-btn not-allow"><a class="btn btn-default">高度</a></div>
+                            <div class="touchspin">
+                            <input type="text" class="form-control numberincdec" name="appstyleconfig[input][height]" 
+                            data-bts-min="10" data-bts-replacement-val="10"
+                            data-bts-max="100"
+                            data-bts-step="1"
+                            data-bts-postfix="px"
+                            data-bts-postfix-extra-class="touchspin-postfix"
+                            value="{$config['appstyleconfig']['input']['height']}">
+                            </div>
+                            <div class="input-group-btn not-allow"><a class="btn btn-default">宽度</a></div>
+                            <div class="touchspin">
+                            <input type="text" class="form-control numberincdec" name="appstyleconfig[input][width]" 
+                            data-bts-min="40" data-bts-replacement-val="40"
+                            data-bts-max="100"
+                            data-bts-step="1"
+                            data-bts-postfix="%"
+                            data-bts-postfix-extra-class="touchspin-postfix"
+                            value="{$config['appstyleconfig']['input']['width']}">
+                            </div>
+                            <div class="input-group-btn not-allow"><a class="btn btn-default">背景色</a></div>
+                            {:tpl_color('appstyleconfig[input][bgcolor]',$config['appstyleconfig']['input']['bgcolor'])}
+                            <div class="input-group-btn not-allow"><a class="btn btn-default">文字色</a></div>
+                            {:tpl_color('appstyleconfig[input][color]',$config['appstyleconfig']['input']['color'])}
+                            <div class="input-group-btn not-allow"><a class="btn btn-default">文字大小</a></div>
+                            <div class="touchspin">
+                            <input type="text" class="form-control numberincdec" name="appstyleconfig[input][size]" 
+                            data-bts-min="12" data-bts-replacement-val="12"
+                            data-bts-max="60"
+                            data-bts-step="1"
+                            data-bts-postfix="px"
+                            data-bts-postfix-extra-class="touchspin-postfix"
+                            value="{$config['appstyleconfig']['input']['size']}">
+                            </div>
+                        </div>
+                        <span class="help-block">高度默认32px，宽度最大是100%，请根据实际情况设置此值</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-2 control-label text-right">* 表单项内边距</label>
+                    <div class="col-lg-6">
+                        <div class="input-group">
+                            <div class="input-group-btn not-allow"><a class="btn btn-default">左右内边距</a></div>
+                            <div class="touchspin">
+                            <input type="text" class="form-control numberincdec" name="appstyleconfig[input][padleft]" 
+                            data-bts-min="1" data-bts-replacement-val="1"
+                            data-bts-max="20"
+                            data-bts-step="1"
+                            data-bts-postfix="px"
+                            data-bts-postfix-extra-class="touchspin-postfix"
+                            value="{$config['appstyleconfig']['input']['padleft']}">
+                            </div>
+                            <div class="input-group-btn not-allow"><a class="btn btn-default">上下内边距</a></div>
+                            <div class="touchspin">
+                            <input type="text" class="form-control numberincdec" name="appstyleconfig[input][padtop]" 
+                            data-bts-min="1" data-bts-replacement-val="1"
+                            data-bts-max="20"
+                            data-bts-step="1"
+                            data-bts-postfix="px"
+                            data-bts-postfix-extra-class="touchspin-postfix"
+                            value="{$config['appstyleconfig']['input']['padtop']}">
+                            </div>
+                        </div>
+                        <span class="help-block">请根据实际情况设置</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-2 control-label text-right">* 表单项边界圆角</label>
+                    <div class="col-lg-8">
+                        <div class="input-group">
+                            <div class="input-group-btn not-allow"><a class="btn btn-default">边界宽度</a></div>
+                            <div class="touchspin">
+                            <input type="text" class="form-control numberincdec" name="appstyleconfig[input][bordersize]" 
+                            data-bts-min="0" data-bts-replacement-val="0"
+                            data-bts-max="10"
+                            data-bts-step="1"
+                            data-bts-postfix="px"
+                            data-bts-postfix-extra-class="touchspin-postfix"
+                            value="{$config['appstyleconfig']['input']['bordersize']}">
+                            </div>
+                            <div class="input-group-btn not-allow"><a class="btn btn-default">边界色</a></div>
+                            {:tpl_color('appstyleconfig[input][bordercolor]',$config['appstyleconfig']['input']['bordercolor'])}
+                            <div class="input-group-btn not-allow"><a class="btn btn-default">表单项圆角大小</a></div>
+                            <div class="touchspin">
+                            <input type="text" class="form-control numberincdec" name="appstyleconfig[input][borderraduis]" 
+                            data-bts-min="1" data-bts-replacement-val="1"
+                            data-bts-max="20"
+                            data-bts-step="1"
+                            data-bts-postfix="px"
+                            data-bts-postfix-extra-class="touchspin-postfix"
+                            value="{$config['appstyleconfig']['input']['borderraduis']}">
+                            </div>
+                        </div>
+                        <span class="help-block">请根据实际情况设置</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="highconfig-item hidden">
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 是否开启签到报名</label>
+            <div class="col-lg-8">
+                {:tpl_switch('appverify',$config['appverify']??'2','openversify')}
+                <span class="zam-help-block p-t-0">开启后用户提交签到信息将作为报名信息，后台人工审核或管理员扫码核销用户报名信息后才可签到成功<a class="btn btn-primary btn-xs m-l-10" href="{:gohdmanage('datasign/wait',['hdid'=>$hdid])}">点击查看报名数据</a></span>
+            </div>
+        </div>
+        <div class="verrifybox{if $config['appverify']=='2'} hidden{/if}">
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 报名最大人数</label>
+                <div class="col-lg-4">
+                    <input type="text" class="form-control numberincdec" name="maxbmnum" value="{$config['maxbmnum']??'0'}"
+                    data-bts-min="0" data-bts-replacement-val="0"
+                    data-bts-max="null"
+                    data-bts-step="1"
+                    data-bts-postfix="人"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                    >
+                    <span class="zam-help-block">注:必须是整数，0为不限制报名总人数</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 报名截止时间</label>
+                <div class="col-lg-8">
+                    {:tpl_switch('openappbmtime',$config['openappbmtime']??'2','openbmbox')}
+                    <span class="zam-help-block p-t-0">开启后需要设置报名截止日期时间</span>
+                </div>
+            </div>
+            <div class="bmtimebox{if !isset($config['openappbmtime']) || $config['openappbmtime']=='2'} hidden{/if}">
+                <div class="form-group">
+                    <label class="col-lg-2 control-label">* 报名截止日期</label>
+                    <div class="col-lg-7">
+                      {:tpl_daterangetime([
+                          'name'=>'bmendtime',
+                          'issingle'=>'1',
+                          'autoval'=>'2',
+                          'needsfm'=>'1',
+                          'needsdd'=>'1',
+                          'val'=>(isset($config['bmendtime']) && !empty($config['bmendtime'])) ? $config['bmendtime']:'',
+                          'func'=>'limitchange'
+                      ])}
+                      <div class="zam-help-block">注:用户报名的时候已超过报名截止时间将无法报名</div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 人数已满或报名已截止转跳链接</label>
+                <div class="col-lg-6">
+                    <input type="text" class="form-control" name="bmoverurl" value="{$config['bmoverurl']??''}" />
+                    <span class="zam-help-block">注:此项仅报名人数已满或者报名时间超过截止日期会自动跳转该链接</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 待审核提示文字</label>
+                <div class="col-lg-8">
+                    <input class="form-control" name="signwaittxt" value="{$config['signwaittxt']??'抱歉，您的签到信息正在审核中'}" />
+                    <span class="zam-help-block">还未审核通过的签到用户进入活动会提示此文字提示</span>
+                </div>
+            </div>
+            <div class="hxscanbox">
+                <div class="form-group">
+                    <label class="col-lg-2 control-label">* 开启扫码核销</label>
+                    <div class="col-lg-8">
+                        {:tpl_switch('appwaitscan',$config['appwaitscan']??'2','openwaitscan')}
+                        <span class="zam-help-block p-t-0">开启后报名成功后或扫签到二维码均会自动跳到二维码核销页面</span>
+                    </div>
+                </div>
+                <div class="waitscanbox{if !isset($config['appwaitscan']) || $config['appwaitscan']=='2'} hidden{/if}">
+                    <div class="config-titlebox">
+                        <span class="config-titlename">微信报名/预约成功页设置</span>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-2 control-label">* 预约报名成功页网页标题</label>
+                        <div class="col-lg-8">
+                            <input class="form-control" name="waitscanconfig[apptitle]" value="{$config['waitscanconfig']['apptitle']??'预约报名成功'}" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-2 control-label">*距离手机顶部距离</label>
+                        <div class="col-lg-4">
+                            <input type="text" class="form-control numberincdec" name="waitscanconfig[margintop]" 
+                            data-bts-min="0" data-bts-replacement-val="0"
+                            data-bts-max="null"
+                            data-bts-step="1"
+                            data-bts-postfix="px"
+                            data-bts-postfix-extra-class="touchspin-postfix"
+                            value="{$config['waitscanconfig']['margintop']??0}">
+                            <span class="zam-help-block">注:默认是0代表表单框在页面居中显示，一般是为了解决背景图有一部分元素被表单框遮挡</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-2 control-label text-right">* 二维码下文字1</label>
+                        <div class="col-lg-10">
+                            <div class="input-group">
+                                <div class="input-group-btn not-allow"><a class="btn btn-default">文字</a></div>
+                                <input type="text" class="form-control" name="waitscanconfig[success1][txt]" value="{$config['waitscanconfig']['success1']['txt']??'恭喜您预约成功'}">
+                                <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
+                                <div class="touchspin">
+                                <input type="text" class="form-control numberincdec" name="waitscanconfig[success1][size]" 
+                                data-bts-min="12" data-bts-replacement-val="12"
+                                data-bts-max="52"
+                                data-bts-step="1"
+                                data-bts-postfix="px"
+                                data-bts-postfix-extra-class="touchspin-postfix"
+                                value="{$config['waitscanconfig']['success1']['size']??28}">
+                                </div>
+                                <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+                                {:tpl_color('waitscanconfig[success1][color]',$config['waitscanconfig']['success1']['color']??'#fff')}
+                                <div class="input-group-btn not-allow"><a class="btn btn-default">下间距</a></div>
+                                <div class="touchspin">
+                                <input type="text" class="form-control numberincdec" name="waitscanconfig[success1][margin]" 
+                                data-bts-min="12" data-bts-replacement-val="12"
+                                data-bts-max="52"
+                                data-bts-step="1"
+                                data-bts-postfix="px"
+                                data-bts-postfix-extra-class="touchspin-postfix"
+                                value="{$config['waitscanconfig']['success1']['margin']??20}">
+                                </div>
+                            </div>
+                            <span class="help-block">不填写文字就不会显示</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-2 control-label">* 二维码下文字2</label>
+                        <div class="col-lg-10">
+                            <div class="input-group">
+                                <div class="input-group-btn not-allow"><a class="btn btn-default">文字</a></div>
+                                <input type="text" class="form-control" name="waitscanconfig[success2][txt]" value="{$config['waitscanconfig']['success2']['txt']??'凭此二维码赴宴可参与抽奖'}">
+                                <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
+                                <div class="touchspin">
+                                <input type="text" class="form-control numberincdec" name="waitscanconfig[success2][size]" 
+                                data-bts-min="12" data-bts-replacement-val="12"
+                                data-bts-max="52"
+                                data-bts-step="1"
+                                data-bts-postfix="px"
+                                data-bts-postfix-extra-class="touchspin-postfix"
+                                value="{$config['waitscanconfig']['success2']['size']??16}">
+                                </div>
+                                <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+                                {:tpl_color('waitscanconfig[success2][color]',$config['waitscanconfig']['success2']['color']??'#fff')}
+                                <div class="input-group-btn not-allow"><a class="btn btn-default">下间距</a></div>
+                                <div class="touchspin">
+                                <input type="text" class="form-control numberincdec" name="waitscanconfig[success2][margin]" 
+                                data-bts-min="12" data-bts-replacement-val="12"
+                                data-bts-max="52"
+                                data-bts-step="1"
+                                data-bts-postfix="px"
+                                data-bts-postfix-extra-class="touchspin-postfix"
+                                value="{$config['waitscanconfig']['success2']['margin']??20}">
+                                </div>
+                            </div>
+                            <span class="help-block">不填写文字就不会显示</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-2 control-label">* 二维码下文字3</label>
+                        <div class="col-lg-10">
+                            <div class="input-group">
+                                <div class="input-group-btn not-allow"><a class="btn btn-default">文字</a></div>
+                                <input type="text" class="form-control" name="waitscanconfig[success3][txt]" value="{$config['waitscanconfig']['success3']['txt']??'请截图保存此码，或重新扫描活动邀请码可再次弹出此页面'}">
+                                <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
+                                <div class="touchspin">
+                                <input type="text" class="form-control numberincdec" name="waitscanconfig[success3][size]" 
+                                data-bts-min="12" data-bts-replacement-val="12"
+                                data-bts-max="52"
+                                data-bts-step="1"
+                                data-bts-postfix="px"
+                                data-bts-postfix-extra-class="touchspin-postfix"
+                                value="{$config['waitscanconfig']['success3']['size']??12}">
+                                </div>
+                                <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+                                {:tpl_color('waitscanconfig[success3][color]',$config['waitscanconfig']['success3']['color']??'#fff')}
+                                <div class="input-group-btn not-allow"><a class="btn btn-default">下间距</a></div>
+                                <div class="touchspin">
+                                <input type="text" class="form-control numberincdec" name="waitscanconfig[success3][margin]" 
+                                data-bts-min="12" data-bts-replacement-val="12"
+                                data-bts-max="52"
+                                data-bts-step="1"
+                                data-bts-postfix="px"
+                                data-bts-postfix-extra-class="touchspin-postfix"
+                                value="{$config['waitscanconfig']['success3']['margin']??20}">
+                                </div>
+                            </div>
+                            <span class="help-block">不填写文字就不会显示</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-2 control-label">* 二维码下文字4</label>
+                        <div class="col-lg-10">
+                            <div class="input-group">
+                                <div class="input-group-btn not-allow"><a class="btn btn-default">文字</a></div>
+                                <input type="text" class="form-control" name="waitscanconfig[success4][txt]" value="{$config['waitscanconfig']['success4']['txt']??''}">
+                                <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
+                                <div class="touchspin">
+                                <input type="text" class="form-control numberincdec" name="waitscanconfig[success4][size]" 
+                                data-bts-min="12" data-bts-replacement-val="12"
+                                data-bts-max="52"
+                                data-bts-step="1"
+                                data-bts-postfix="px"
+                                data-bts-postfix-extra-class="touchspin-postfix"
+                                value="{$config['waitscanconfig']['success4']['size']??12}">
+                                </div>
+                                <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+                                {:tpl_color('waitscanconfig[success4][color]',$config['waitscanconfig']['success4']['color']??'#fff')}
+                                <div class="input-group-btn not-allow"><a class="btn btn-default">下间距</a></div>
+                                <div class="touchspin">
+                                <input type="text" class="form-control numberincdec" name="waitscanconfig[success4][margin]" 
+                                data-bts-min="12" data-bts-replacement-val="12"
+                                data-bts-max="52"
+                                data-bts-step="1"
+                                data-bts-postfix="px"
+                                data-bts-postfix-extra-class="touchspin-postfix"
+                                value="{$config['waitscanconfig']['success4']['margin']??20}">
+                                </div>
+                            </div>
+                            <span class="help-block">不填写文字就不会显示</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-2 control-label">* 核销成功提示文字</label>
+                        <div class="col-lg-10">
+                            <div class="input-group">
+                                <div class="input-group-btn not-allow"><a class="btn btn-default">文字</a></div>
+                                <input type="text" class="form-control" name="waitscanconfig[hxtip][txt]" value="{$config['waitscanconfig']['hxtip']['txt']??'已核销'}">
+                                <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
+                                <div class="touchspin">
+                                <input type="text" class="form-control numberincdec" name="waitscanconfig[hxtip][size]" 
+                                data-bts-min="12" data-bts-replacement-val="12"
+                                data-bts-max="52"
+                                data-bts-step="1"
+                                data-bts-postfix="px"
+                                data-bts-postfix-extra-class="touchspin-postfix"
+                                value="{$config['waitscanconfig']['hxtip']['size']??32}">
+                                </div>
+                                <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+                                {:tpl_color('waitscanconfig[hxtip][color]',$config['waitscanconfig']['hxtip']['color']??'#fff')}
+                                <div class="input-group-btn not-allow"><a class="btn btn-default">下间距</a></div>
+                                <div class="touchspin">
+                                <input type="text" class="form-control numberincdec" name="waitscanconfig[hxtip][margin]" 
+                                data-bts-min="12" data-bts-replacement-val="12"
+                                data-bts-max="52"
+                                data-bts-step="1"
+                                data-bts-postfix="px"
+                                data-bts-postfix-extra-class="touchspin-postfix"
+                                value="{$config['waitscanconfig']['hxtip']['margin']??20}">
+                                </div>
+                            </div>
+                            <span class="help-block">此文字会核销成功后显示在二维码下面，不填写文字就不会显示</span>
+                        </div>
+                    </div>
+                    <div class="form-group qrbottomtxt-command">
+                        <label class="col-lg-2 control-label"><span class="text-danger">* 注意事项</span></label>
+                        <div class="col-lg-10">
+                            <div class="form-control-static">
+                                <div>1 二维码下面的文字如果较长可使用<pre style="display:inline;background:none;border:0;">&lt;br&gt;</pre>换行</div>
+                                {if isset($config['appopenbd']) && $config['appopenbd'] == '1' && isset($config['appbddata']) && !empty($config['appbddata'])}
+                                {php}$bindex = 2;{/php}
+                                {foreach $config['appbddata'] as $bkey=>$bd}
+                                <div class="m-t-10">
+                                    {$bindex} 调用报名数据的{$bd['title']}可使用变量<pre style="margin: 0;display: inline;border: none;">[{$bd['zd']}] <a class="btn btn-primary btn-xs zam-clip" data-text="[{$bd['zd']}]" style="margin-left: 10px;">点我复制</a></pre><br>
+                                </div>
+                                {php}$bindex++;{/php}
+                                {/foreach}
+                                {/if}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="config-titlebox">
+                        <span class="config-titlename">微信扫码核销页设置(<span class="text-danger" style="font-size: 12px">仅限活动管理员才有核销权限</span>)</span>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-2 control-label">* 核销页标题</label>
+                        <div class="col-lg-8">
+                            <input class="form-control" name="waitscanconfig[hxapptitle]" value="{$config['waitscanconfig']['hxapptitle']??'核销用户'}" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-2 control-label">* 核销页顶部标题</label>
+                        <div class="col-lg-8">
+                            <input class="form-control" name="waitscanconfig[hxtoptitle]" value="{$config['waitscanconfig']['hxtoptitle']??'核验用户预约信息'}" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-2 control-label">* 确定按钮文字</label>
+                        <div class="col-lg-8">
+                            <input class="form-control" name="waitscanconfig[hxconfirm]" value="{$config['waitscanconfig']['hxconfirm']??'同意'}" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-2 control-label">* 取消按钮文字</label>
+                        <div class="col-lg-8">
+                            <input class="form-control" name="waitscanconfig[hxcancel]" value="{$config['waitscanconfig']['hxcancel']??'拒绝'}" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-2 control-label">* 核销成功后提示语</label>
+                        <div class="col-lg-8">
+                            <input class="form-control" name="waitscanconfig[hxsuccess]" value="{$config['waitscanconfig']['hxsuccess']??'已核销'}" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {include file='$Wpath/common/configsavepanel'}
+</form>
+<script id='bditem-tpl' type="text/template">
+    <li class="form-inline">
+      <div class="mustDom">
+        <input type="hidden" name="bdzd[]"  />
+        <input type="hidden" name="bdtype[]"  />
+        <div class="form-group bdnameInput">
+            <input type="text"  class="form-control" name="bdtitle[]" value="<% d.itemname %>" />
+        </div>
+        <div class="form-group form-control form-bd-special form-bdmust">
+            <label class="lyear-checkbox checkbox-primary">
+                <input type="hidden" name="bdmust[]"  value="1"  />
+                <input type="checkbox" checked onchange="changemust(this)"  />
+                <span>必填</span>
+            </label>
+        </div>
+        <div class="form-group form-control form-bd-special form-bdonly">
+            <label class="lyear-checkbox checkbox-primary">
+                <input type="hidden" name="bdonly[]"  value="2"  />
+                <input type="checkbox" onchange="changeonly(this)" />
+                <span>值唯一</span>
+            </label>
+        </div>
+        <div class="form-group form-control form-bd-special form-bdyz">
+            <label class="lyear-checkbox checkbox-primary">
+                <input type="hidden" name="bdyz[]"  value="2"  />
+                <input type="checkbox" onchange="changeyz(this)" />
+                <span>验证</span>
+            </label>
+        </div>
+        <div class="form-group form-control form-bd-special form-bdyzbind">
+            <label class="lyear-checkbox checkbox-primary">
+                <input type="hidden" name="yzbind[]" value="2"  />
+                <input type="checkbox" onchange="yzbind(this)" />
+                <span>附加项</span>
+            </label>
+        </div>
+        <div class="form-group form-control form-bd-special form-bdscreenshow">
+            <label class="lyear-checkbox checkbox-primary">
+                <input type="hidden" name="screenshow[]" value="2" />
+                <input type="checkbox" onchange="changescreenshow(this)" />
+                <span>大屏显示</span>
+            </label>
+        </div>
+        <%# if(d.type=='select'){ %>
+        <div class="form-group form-control form-bd-special form-bdscreenshow">
+            <label class="lyear-checkbox checkbox-primary">
+                <input type="hidden" name="supportsearch[]"  value="2"  />
+                <input type="checkbox" onchange="changesupportsearch(this)" />
+                <span>支持搜索</span>
+            </label>
+        </div>
+        <%# }else{ %>
+        <input type="hidden" name="supportsearch[]"  value="2"  />
+        <%# } %>
+        <%# if(d.type=='number'){ %>
+            <div class="form-group form-control form-bd-special">
+                <label class="lyear-checkbox checkbox-primary">
+                    <input type="hidden" name="isfloat[]"  value="2"  />
+                    <input type="checkbox"  onchange="changefloat(this)" />
+                    <span>小数</span>
+                </label>
+            </div>
+            <div class="form-bd-special" style="display: inline-block;">
+                <div class="input-group input-group-sm">                             
+                    <div class="input-group-btn not-allow hidden"><a class="btn btn-default">最小</a></div>
+                    <div class="input-group-addon">最小</div>
+                    <div class="touchspin" style="width: 80px">
+                        <input type="text" class="form-control numberincdec" name="bdmin[]" 
+                        data-bts-min="0" data-bts-replacement-val="0"
+                        data-bts-max="null"
+                        data-bts-step="1"
+                        value="0">
+                    </div>
+                    <div class="input-group-btn not-allow hidden"><a class="btn btn-default">最大</a></div>
+                    <div class="input-group-addon">最大</div>
+                    <div class="touchspin" style="width: 80px">
+                        <input type="text" class="form-control numberincdec" name="bdmax[]" 
+                        data-bts-min="0" data-bts-replacement-val="0"
+                        data-bts-max="null"
+                        data-bts-step="1"
+                        value="0">
+                    </div>
+                </div>
+            </div>
+            <input type="hidden" name="isqdbook[]"  value="2"  />
+        <%# }else if(d.type=='normal' || d.type == 'textarea'){ %>
+            <%# if(d.type=='textarea'){ %>
+                <div class="form-group form-control form-bd-special form-bdqdbook{if $openqdbook=='2'} hidden{/if}">
+                    <label class="lyear-checkbox checkbox-primary">
+                        <input type="hidden" name="isqdbook[]"  value="2"  />
+                        <input type="checkbox" onchange="changeqdbook(this)" />
+                        <span>签到簿留言</span>
+                    </label>
+                </div>
+            <%# }else{ %>
+                <input type="hidden" name="isqdbook[]"  value="2"  />
+            <%# } %>
+            <div class="form-group form-control form-bd-special" style="height: auto;border: 0">
+                <select class="form-control" name="isfloat[]">
+                    <option value="2" selected>不限制</option>
+                    <option value="3">汉字</option>
+                    <option value="4">字母</option>
+                    <option value="5">数字</option>
+                    <option value="6">汉字字母组合</option>
+                    <option value="7">汉字数字组合</option>
+                    <option value="8">字母数字组合</option>
+                    <option value="9">汉字或字母</option>
+                    <option value="10">汉字或数字</option>
+                    <option value="11">字母或数字</option>
+                </select>
+            </div>
+            <div class="form-bd-special" style="display: inline-block;">
+                <div class="input-group input-group-sm">                             
+                    <div class="input-group-addon">最短</div>
+                    <div class="touchspin" style="width: 140px">
+                        <input type="text" class="form-control numberincdec" name="bdmin[]" 
+                        data-bts-min="0" data-bts-replacement-val="0"
+                        data-bts-max="null"
+                        data-bts-step="1"
+                        data-bts-postfix="个字符"
+                        data-bts-postfix-extra-class="touchspin-postfix"
+                        value="0">
+                    </div>
+                    <div class="input-group-addon">最长</div>
+                    <div class="touchspin" style="width: 140px">
+                        <input type="text" class="form-control numberincdec" name="bdmax[]" 
+                        data-bts-min="0" data-bts-replacement-val="0"
+                        data-bts-max="null"
+                        data-bts-step="1"
+                        data-bts-postfix="个字符"
+                        data-bts-postfix-extra-class="touchspin-postfix"
+                        value="0">
+                    </div>
+                </div>
+            </div>
+            
+        <%# }else if(d.type=='file'){ %>
+            <div class="form-group form-control form-bd-special" style="height: auto;border: 0">
+                <select class="form-control" name="isfloat[]">
+                    <option value="1" selected>图片文件</option>
+                    <option value="2">视频文件</option>
+                </select>
+            </div>
+            <input type="hidden" name="bdmin[]"  value="0"  />
+            <input type="hidden" name="bdmax[]"  value="0"  />
+            <input type="hidden" name="isqdbook[]"  value="2"  />
+        <%# }else{ %>
+            <input type="hidden" name="isfloat[]"  value="2"  />
+            <input type="hidden" name="bdmin[]"  value="0"  />
+            <input type="hidden" name="bdmax[]"  value="0"  />
+            <%# if(d.type=='select'){ %>
+                <div class="form-group form-control form-bd-special form-bdqdbook{if $openqdbook=='2'} hidden{/if}">
+                    <label class="lyear-checkbox checkbox-primary">
+                        <input type="hidden" name="isqdbook[]"  value="2"  />
+                        <input type="checkbox" onchange="changeqdbook(this)" />
+                        <span>签到簿留言</span>
+                    </label>
+                </div>
+            <%# }else{ %>
+                <input type="hidden" name="isqdbook[]"  value="2"  />
+            <%# } %>
+        <%# } %>
+        <div class="form-group bdnameInput">
+            <input type="text"  class="form-control" name="defaulttip[]" value="请<%# if(d.type=='select' || d.type=='date' || d.type=='sex' || d.type=='area'){ %>选择<%# }else if(d.type=='file'){ %>上传<%# }else{ %>输入<%# } %><% d.itemname %>" placeholder="输入提示语" onblur="blurinput(this,'1')" />
+        </div>
+        <div class="form-group bdnameInput">
+            <input type="text"  class="form-control" name="errortip[]" value="<% d.itemname %><%# if(d.type=='select' || d.type=='date' || d.type=='sex' || d.type=='area'){ %>选择<%# }else if(d.type=='file'){ %>上传<%# }else{ %>输入<%# } %>错误" placeholder="错误提示语" onblur="blurinput(this,'2')" />
+        </div>
+        <div class="form-group">
+            <a href="javascript:;" class="btn btn-danger btn-sm delbditem"  title="删除"><i class="mdi mdi-close"></i></a>
+            <%# if(d.type=='select'){ %>
+                <a href="javascript:;" class="btn btn-primary btn-sm addselectitem" title="新增选项"><i class="mdi mdi-plus"></i></a>
+            <%# } %>
+            <a href="javascript:;"  class="btn btn-info btn-sm mousemove zam-sortable" title="拖动排序"><i class="mdi mdi-arrow-all"></i></a>
+        </div>
+      </div>
+      <%# if(d.type=='select'){ %>
+          <div class="bindDom">
+             <div class="form-group selectLists">
+                <ul class="selectItemlist"></ul>
+             </div>
+          </div>
+      <%# } %>
+    </li>
+</script>
+<script id='selectitem-tpl' type="text/template">
+    <li class="bdselectLi">
+        <div class="form-group">
+            选项
+        </div>
+        <div class="form-group">
+            <input type="text"  class="form-control" />
+        </div>
+        <div class="form-group">
+            <a href="javascript:;" class="btn btn-danger btn-sm delselectitem"><i class="mdi mdi-close"></i></a>
+            <a href="javascript:;"  class="btn btn-info btn-sm mousemoveselect zam-sortable" title="拖动排序"><i class="mdi mdi-arrow-all"></i></a>
+        </div>
+    </li>
+</script>
+<script id='oneitem-tpl' type="text/template">
+    <div class="form-horizontal confirmbox-pop">
+        <div class="form-group bdaddTypes">
+          <label class="col-lg-2 control-label">* 类型</label>
+          <div class="col-lg-10">
+            <div class="form-control-static">
+                <a href="javascript:;" class="btn btn-default m-r-5" data-type="realname">姓名</a>
+                <a href="javascript:;" class="btn btn-default m-r-5" data-type="mobile">手机号</a>
+                <a href="javascript:;" class="btn btn-default m-r-5" data-type="sex">性别</a>
+                <a href="javascript:;" class="btn btn-default m-r-5" data-type="normal">单行文本</a>
+                <a href="javascript:;" class="btn btn-default m-r-5" data-type="textarea">多行文本</a>
+                <a href="javascript:;" class="btn btn-default m-r-5" data-type="select">下拉框</a>
+                <a href="javascript:;" class="btn btn-default m-r-5" data-type="email">邮箱</a>
+                <a href="javascript:;" class="btn btn-default m-r-5" data-type="number">整数</a>
+                <a href="javascript:;" class="btn btn-default m-r-5" data-type="date">日期</a>
+                <a href="javascript:;" class="btn btn-default m-r-5" data-type="area">地区</a>
+                <a href="javascript:;" class="btn btn-default m-r-5" data-type="file">图片或视频文件</a>
+            </div>
+            <div class="help-block">注:姓名，手机号，性别只能添加一次</div>
+          </div>
+        </div>
+        <div class="form-group m-b-5">
+          <label class="col-lg-2 control-label">* 名称</label>
+          <div class="col-lg-7">
+            <input type="text" class="form-control itemname" value="">
+            <div class="help-block">注:尽量控制在5个字以内</div>
+          </div>
+        </div>
+    </div>
+</script>
+<script>
+require(['webcore','jconfirmBox','zamnotice','layerBox','clipboard',"jquery.ui",'zvalidator',"bootstrap-touchspin"],function(webcore,jconfirmBox,zamnotice,layerBox,Clipboard){
+    var clipboard = new Clipboard('.zam-clip', {
+      text: function(e) {
+        return $(e).data('text') ||'';
+      }
+    });
+    clipboard.on('success',function(e) {
+      zamnotice.showTips('success','复制成功',2e3);
+      return;
+    });
+    $(".signconfigboxs .zam-inner-highconfig-btns a.btn").click(function(){
+        localStorage.setItem("signconfigindex{$hdid}",$(this).index());
+        $(this).addClass('btn-primary').siblings().removeClass("btn-primary");
+        $(".signconfigboxs .highconfig-item").addClass('hidden').eq($(this).index()).removeClass('hidden');
+    });
+    var storageindex = localStorage.getItem("signconfigindex{$hdid}");
+    if (storageindex != null && storageindex != 'null') {
+        $(".signconfigboxs .zam-inner-highconfig-btns a.btn").eq(storageindex).trigger('click');
+    }else{
+        $(".signconfigboxs .zam-inner-highconfig-btns a.btn").eq(0).trigger('click');
+    }
+    $('.bdItemlist').sortable({handle: ".mousemove"}).disableSelection();
+    $('.bdItemlist .selectItemlist').sortable({handle: ".mousemoveselect"}).disableSelection();
+    $(".bdItemlist").disableSelection();
+    $('#formBox').formValidation({
+            framework: 'bootstrap',
+            excluded: [':disabled'],
+            message: '您填写的内容无效',
+            fields: {
+                apptitle:{
+                    message: '请输入网页标题',
+                    validators: {
+                        notEmpty: {
+                            message: '请输入网页标题'
+                        },
+                    }
+                },
+            }
+    }).on('success.form.fv', function(e) {
+        e.preventDefault();
+        var $form = $(e.target);
+        var postData = webcore.serializeObject($form);
+        var bload = $form.find(".zam-fixedbottom button").lyearloading({opacity: 0.2,spinnerSize: 'nm'});
+        $form.formValidation('disableSubmitButtons', true);
+        webcore.ajaxSubmit("{:gohdmanage('configsign/index',['hdid'=>$hdid])}",postData).then(function(json){
+            bload.hide();
+            if(json.code==0){
+                $form.formValidation('disableSubmitButtons', false);
+                zamnotice.showTips('success','操作成功',2e3,function(){
+                    window.location.reload();
+                });
+            }else{
+                zamnotice.showTips('error',json.msg);
+                $form.formValidation('disableSubmitButtons', false);
+            }
+        }, function(json){
+            bload.hide();
+            zamnotice.showTips('error','网络差。操作失败');
+            $form.formValidation('disableSubmitButtons', false);
+        });
+    });
+    $(".btn-additem").click(function(){
+        var isdisabled = $(this).attr('data-disabled');
+        if(isdisabled=='1'){
+            return false;
+        }
+        var confirmobj = jconfirmBox.confirm('添加表单项目',webcore.tpl($("#oneitem-tpl"),{}),function(e){
+                var $this = e.$content,itemtype = $this.find('a.btn-primary').attr('data-type'),itemname = $this.find('.itemname').val();
+                if(typeof itemtype==='undefined' || itemtype==''){
+                    return zamnotice.showTips('error','项目类型必须选择');
+                }
+                if(typeof itemname==='undefined' || itemname==''){
+                    return zamnotice.showTips('error','项目名称必须填写');
+                }
+
+                var newDom = $(webcore.tpl($("#bditem-tpl"),{itemname:itemname,type:itemtype,random:webcore.random(5,1,1)})).clone();
+                 if(itemtype!='select'){
+                     if($.inArray(itemtype,['realname','mobile','sex'])!=-1){
+                        if(checkRM(itemtype)){
+                            return zamnotice.showTips('error',(itemtype=='realname'?'姓名':(itemtype=='mobile'?'手机号':'性别'))+'已经存在');
+                        }
+                        newDom.find('input').eq(0).val(itemtype);
+                        if(itemtype == 'mobile'){
+                            newDom.find('.mustDom').children("div:eq(-3)").before(`
+                            <div class="form-group form-control form-bd-special" style="height: auto;border: 0;{if $managerhdrights['edit'] != '1' || !dznormalrequest('wxminiphone')}display:none!important{/if}">
+                                <select class="form-control" name="mobiletype">
+                                    <option value="1" selected>手动输入</option>
+                                    <option value="2">微信小程序获取</option>
+                                </select>
+                            </div>
+                            <div class="form-group form-control  form-bd-special form-bdmobilecode">
+                                <label class="lyear-checkbox checkbox-primary">
+                                    <input type="hidden" name="opencode" value="2" />
+                                    <input type="checkbox" class="opencode" onchange="changemobilecode(this)" />
+                                    <span>短信验证</span>
+                                </label>
+                            </div>
+                            <div class="form-group form-control form-bd-special form-bdhide4">
+                                <label class="lyear-checkbox checkbox-primary">
+                                    <input type="hidden" name="hidefournum" value="2" />
+                                    <input type="checkbox" onchange="hidemobile(this)" />
+                                    <span>隐藏中间4位</span>
+                                </label>
+                            </div>`);
+                        }
+                     }else{
+                        newDom.find('input').eq(0).val(webcore.random(10,1,1));
+                     }
+                 }else{
+                    var zdName = 'select'+webcore.random(10,1,1);
+                    newDom.find('input').eq(0).val(zdName);
+                    newDom.find(".addselectitem").attr('data-zd',zdName);
+                 }
+                 newDom.find("a").tooltip();
+                 newDom.find('input').eq(1).val(itemtype);
+                 newDom.appendTo($(".bdItemlist"));
+                 if(itemtype=='select'){
+                    $('.bdItemlist .selectItemlist').sortable({handle: ".mousemoveselect"}).disableSelection();
+                 }
+                $(".bdItemlist .numberincdec").TouchSpin().on("change", function(){
+                    var $this = $(this),funcstr = $this.data('func');
+                    var func = window[funcstr];
+                    func && func();
+                });
+                confirmobj.close();
+        },false,'col-lg-12 col-lg-offset-0',true,[{'hidden':false,'txt':'确定新增'},{'hidden':false,'txt':'取消'}],function(){
+            var $this = confirmobj.$content;
+            $this.find(".bdaddTypes a").on('click',function(){
+                 $(this).addClass('btn-primary').siblings().removeClass('btn-primary');
+                 $this.find('input').val($(this).text());
+            });
+        });
+    });
+    $(".bdItemlist").on('click','.delbditem',function(){
+        if(!$(this).data("disabled")) $(this).parent().parent().parent().remove();
+    });
+    $(".bdItemlist").on('click','.delselectitem',function(){
+        if(!$(this).data("disabled")) $(this).parent().parent().remove();
+    });
+    $(".bdItemlist").on('click','.addselectitem',function(){
+            var selecDom = $(webcore.tpl($("#selectitem-tpl"),{})).clone();
+            selecDom.find('input').eq(0).attr("name",$(this).attr('data-zd')+'[]');
+            selecDom.appendTo($(this).parent().parent().next().find(".selectItemlist"));
+    });
+    $(".resetsigndata").on('click',function(){
+        jconfirmBox.confirm('温馨提示','清空将删除本次活动用户所有的签到数据，并且无法恢复，您确定要清空么？',function(){
+            webcore.ajaxSubmit("{:gohdmanage('datasign/reset',['hdid'=>$hdid])}",{}).then(function(json){
+                if(json.code==0){
+                    zamnotice.showTips('success','清空成功');
+                    setTimeout(function(){
+                        window.location.reload();
+                    },5e2);
+                }else{
+                    zamnotice.showTips('error',json.msg);
+                }
+            }, function(json){
+                zamnotice.showTips('error','网络差。操作失败.');
+            });
+        });
+    });
+    $(".resetyzdata").on('click',function(){
+    jconfirmBox.confirm('温馨提示','清空将删除活动所有的验证签到数据，并且无法恢复，您确定要清空么？',function(){
+        webcore.ajaxSubmit("{:gohdmanage('configsign/resetdata',['hdid'=>$hdid])}",{}).then(function(json){
+            if(json.code==0){
+                zamnotice.showTips('success','已清空所有验证数据');
+            }else{
+                zamnotice.showTips('error',json.msg);
+            }
+        }, function(json){
+            zamnotice.showTips('error','网络差。操作失败.');
+        });
+    });
+});
+});
+/*开关控件 关闭上传头像与表单*/
+function openupbd(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".upbdbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".upbdbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+/*开关控件 关闭上传头像*/
+function changeupimg(obj){
+    var prevval = $(obj).prev().val();
+    if(prevval=='1'){
+        $('.upimgBox').removeClass('hidden');
+    }else{
+        $('.upimgBox').addClass('hidden');
+    }
+}
+function openuploadimg(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".uploadavatarimg").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".uploadavatarimg").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+
+function changemobilecode(obj){
+var check = $(obj).prop('checked'),fnode = $(obj).parent().parent().parent();
+require(["webcore","zamnotice"],function(webcore,zamnotice){
+    if(check){
+        webcore.ajaxSubmit("{:gohdmanage('configsign/checksms',['hdid'=>$hdid])}",{}).then(function(json){
+            if(json.code==0){
+                $(obj).prop('checked',true);
+                $(obj).prev().val('1');
+                if(check){
+                    var mustnode = fnode.find(".form-bdmust input[type='checkbox']");
+                    mustnode.prop('checked',true);
+                    mustnode.prev().val("1");
+                }
+            }else{
+                $(obj).prop('checked',false);
+                $(obj).prev().val('2');
+                zamnotice.showTips('error',json.msg,2e3);
+            }
+        }, function(json){
+            $(obj).prop('checked',false);
+            $(obj).prev().val('2');
+            zamnotice.showTips('error','网络差，操作失败');
+        });
+    }else{
+        $(obj).prev().val('2');
+    }
+});
+}
+function hidemobile(obj){
+    var check = $(obj).prop('checked'),fnode = $(obj).parent().parent().parent();
+    $(obj).prev().val(check?"1":"2");
+    if(check){
+        var mustnode = fnode.find(".form-bdmust input[type='checkbox']");
+        mustnode.prop('checked',true);
+        mustnode.prev().val("1");
+    }
+}
+function changeyz(obj){
+    require(["webcore","zamnotice"],function(webcore,zamnotice){
+        if($(".form-bdyz input[type='checkbox']:checked").length > 3){
+            $(obj).prop('checked',false);
+            return zamnotice.showTips('error','验证项最多仅可开启3项');
+        }
+        if($(obj).parent().parent().next().find('input').eq(0).val()=='1'){
+            $(obj).prop('checked',false);
+            return zamnotice.showTips('error','已经开启了附加项的表单项目无法开启验证');
+        }
+        var check = $(obj).prop('checked'),fnode = $(obj).parent().parent().parent();
+        if(fnode.find('input').eq(1).val()=='file'){
+            $(obj).prop('checked',false);
+            return zamnotice.showTips('error','图片或视频文件表单项无法开启验证'); 
+        }
+        $(obj).prev().val(check?"1":"2");
+        if(check){
+            var mustnode = fnode.find(".form-bdmust input[type='checkbox']");
+            mustnode.prop('checked',true);
+            mustnode.prev().val("1");
+        }
+    });
+}
+
+function yzbind(obj){
+    require(["webcore","zamnotice"],function(webcore,zamnotice){
+        if($(obj).parent().parent().prev().find('input').eq(0).val()=='1'){
+            $(obj).prop('checked',false);
+            return zamnotice.showTips('error','已经开启了验证的表单项目无法开启附加项');
+        }
+        if($(".form-bdyzbind input[type='checkbox']:checked").length > 20){
+            $(obj).prop('checked',false);
+            return zamnotice.showTips('error','最多仅可20项开启附加项');
+        }
+        var check = $(obj).prop('checked'),fnode = $(obj).parent().parent().parent();
+        if(fnode.find('input').eq(1).val()=='file'){
+            $(obj).prop('checked',false);
+            return zamnotice.showTips('error','图片或视频文件表单项无法开启附加项'); 
+        }
+        $(obj).prev().val(check?"1":"2");
+        //取消附加项则取消必填
+        if(check){
+            var mustnode = fnode.find(".form-bdmust input[type='checkbox']");
+            mustnode.prop('checked',false);
+            mustnode.prev().val("2");
+            var bdonly = fnode.find(".form-bdonly input[type='checkbox']");
+            bdonly.prop('checked',false);
+            bdonly.prev().val("2");
+        }else{
+            //取消附加项
+            var dpshow = fnode.find(".form-bdscreenshow input[type='checkbox']").prop('checked');
+            var mobilecode = fnode.find(".form-bdmobilecode input[type='checkbox']").prop('checked');
+            var hidefour = fnode.find(".form-bdhide4 input[type='checkbox']").prop('checked');
+            if(dpshow || mobilecode || hidefour){
+                var mustnode = fnode.find(".form-bdmust input[type='checkbox']");
+                mustnode.prop('checked',true);
+                mustnode.prev().val("1");
+            }
+        }
+    });
+}
+function changemust(obj){
+    var check = $(obj).prop('checked'),fnode = $(obj).parent().parent().parent();
+    require(["webcore","zamnotice"],function(webcore,zamnotice){
+        var isyzbind = fnode.find(".form-bdyzbind input[type='checkbox']").prop('checked');
+        if(!isyzbind){
+            var yz = fnode.find(".form-bdyz input[type='checkbox']").prop('checked');
+            if(yz && !check){
+                $(obj).prop('checked',true);
+                $(obj).prev().val("1");
+                return zamnotice.showTips('error','开启验证的表单必须必填');
+            }
+            var dpshow = fnode.find(".form-bdscreenshow input[type='checkbox']").prop('checked');
+            if(dpshow && !check){
+                $(obj).prop('checked',true);
+                $(obj).prev().val("1");
+                return zamnotice.showTips('error','开启大屏显示的表单必须必填');
+            }
+            var mobilecode = fnode.find(".form-bdmobilecode input[type='checkbox']").prop('checked');
+            if(mobilecode && !check){
+                $(obj).prop('checked',true);
+                $(obj).prev().val("1");
+                return zamnotice.showTips('error','开启短信验证的表单必须必填');
+            }
+            var hidefour = fnode.find(".form-bdhide4 input[type='checkbox']").prop('checked');
+            if(hidefour && !check){
+                $(obj).prop('checked',true);
+                $(obj).prev().val("1");
+                return zamnotice.showTips('error','开启隐藏中间4位的表单必须必填');
+            }
+            $(obj).prev().val(check?"1":"2");
+            if($(".form-bdmust input[type='checkbox']:checked").length <= 0){
+                $(obj).prop('checked',true);
+                $(obj).prev().val("1");
+                return zamnotice.showTips('error','至少保留一项必填');
+            }
+            if(!check){
+                var bdonly = fnode.find(".form-bdonly input[type='checkbox']");
+                bdonly.prop('checked',false);
+                bdonly.prev().val("2");
+            }
+        }else{
+            if(check){
+                $(obj).prop('checked',false);
+                $(obj).prev().val("2");
+                return zamnotice.showTips('error','已开启附加项表单无法开启必填');
+            }else{
+                var bdonly = fnode.find(".form-bdonly input[type='checkbox']");
+                bdonly.prop('checked',false);
+                bdonly.prev().val("2");
+            }
+        }
+    })
+}
+function changeonly(obj){
+    var check = $(obj).prop('checked'),fnode = $(obj).parent().parent().parent();
+    require(["webcore","zamnotice"],function(webcore,zamnotice){
+        if(fnode.find('input').eq(1).val()=='file'){
+            $(obj).prop('checked',false);
+            return zamnotice.showTips('error','图片或视频文件表单项无法开启唯一'); 
+        }
+        var isyzbind = fnode.find(".form-bdyzbind input[type='checkbox']").prop('checked');
+        var ismust = fnode.find(".form-bdmust input[type='checkbox']").prop('checked');
+        if(!isyzbind){
+            if(!ismust){
+                $(obj).prop('checked',false);
+                $(obj).prev().val("2");
+                return zamnotice.showTips('error','开启必填的表单才可开启值唯一');
+            }
+            $(obj).prop('checked',check?true:false);
+            $(obj).prev().val(check?"1":"2");
+        }else{
+            if(check){
+                $(obj).prop('checked',false);
+                $(obj).prev().val("2");
+                return zamnotice.showTips('error','已开启附加项表单无法开启值唯一');
+            }
+        }
+    })
+}
+function changescreenshow(obj){
+    require(["webcore","zamnotice"],function(webcore,zamnotice){
+        if($(".form-bdscreenshow input[type='checkbox']:checked").length > 3){
+            $(obj).prop('checked',false);
+            return zamnotice.showTips('error','大屏显示项目最多仅可开启3项');
+        }
+
+        var check = $(obj).prop('checked'),fnode = $(obj).parent().parent().parent();
+        if(fnode.find('input').eq(1).val()=='file'){
+            $(obj).prop('checked',false);
+            return zamnotice.showTips('error','图片或视频文件表单项无法开启大屏显示'); 
+        }
+        $(obj).prev().val(check?"1":"2");
+        if(check){
+            var isyzbind = fnode.find(".form-bdyzbind input[type='checkbox']").prop('checked');
+            if(isyzbind) return false;
+            var mustnode = fnode.find(".form-bdmust input[type='checkbox']");
+            mustnode.prop('checked',true);
+            mustnode.prev().val("1");
+        }
+    });
+}
+function changeqdbook(obj){
+    require(["webcore","zamnotice"],function(webcore,zamnotice){
+        var check = $(obj).prop('checked');
+        if(check){
+            var qdbooknode = $(".form-bdqdbook input[type='checkbox']");
+            if(qdbooknode.length > 0){
+                qdbooknode.prev().val("2");
+                qdbooknode.each(function(){
+                    if(this!=obj){
+                        $(this).prop('checked',false);
+                    }
+                });
+            }
+        }
+        setTimeout(function(){
+            $(obj).prev().val(check?"1":"2");
+        },1e2);
+    });
+}
+function checkRM(type){
+    var checked  = false;
+    var bdItemTypes = $(".bdItemlist").find("input[name='bdtype[]']");
+    if(bdItemTypes.length>0){
+        $.each(bdItemTypes,function(k,v){
+            if($(v).val()==type){
+                checked =true;
+                return;
+            }
+        });
+    }
+    return checked;
+}
+function appbdxieyi(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".xieyibox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".xieyibox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openversify(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".verrifybox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".verrifybox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openwaitscan(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".waitscanbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".waitscanbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function opencroppertypebox(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".croppertypebox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".croppertypebox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function changefloat(obj){
+    var check = $(obj).prop('checked');
+    $(obj).prev().val(check?"1":"2");
+}
+function changesupportsearch(obj){
+    var check = $(obj).prop('checked');
+    $(obj).prev().val(check?"1":"2");
+}
+function blurinput(obj,type){
+    var inputval = $(obj).val(),nametitle = $(obj).parent().parent().find('.bdnameInput input').eq(0).val(),inputtype = $(obj).parent().parent().find('input').eq(1).val(),puttxt = (inputtype=='select'||inputtype=='date' || inputtype=='sex' || inputtype=='area')?'选择':(inputtype=='file'?'上传':'输入');
+    if(type=='1'){
+        if(typeof inputval === 'undefined' || inputval=='') $(obj).val('请'+puttxt+nametitle);
+    }else{
+        if(typeof inputval === 'undefined' || inputval=='') $(obj).val(nametitle+puttxt+'错误');
+    }
+}
+function openbmbox(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".bmtimebox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".bmtimebox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function limitchange(start,end){
+  var endtime = start.format('YYYY-MM-DD HH:mm:ss');
+  $(".bmtimebox input").val(endtime);
+}
+function opensigntimelimit(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".signtimelimitbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".signtimelimitbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function signlimitchange(start,end){
+  var endtime = start.format('YYYY-MM-DD HH:mm:ss');
+  $(".signtimelimitbox .signlimitinput input").val(endtime);
+}
+function openonlysearch(obj,status,url){
+    require(["webcore","zamnotice"],function(webcore,zamnotice){
+        if(status=='1'){
+            obj.prev().val('2');
+            obj.attr('data-status','2');
+            obj.prev().prev().prop("checked",status=='1'?false:true);
+        }else{
+            var yzitems = $(".bdItemlist input[name='bdyz[]']");
+            var hasyz = false;
+            if(yzitems.length){
+                yzitems.each(function(){
+                    var value = $(this).val()||'2';
+                    if(value == '1'){
+                        hasyz = true;
+                    }
+                });
+            }
+            if(!hasyz){
+                return zamnotice.showTips('error','开启信息查询模式必须存在开启验证项的表单项目');
+            }
+            obj.prev().val('1');
+            obj.attr('data-status','1');
+            obj.prev().prev().prop("checked",status=='1'?false:true);
+        }
+    });
+}
+
+</script>
+{include file='$Wpath/common/footer'}

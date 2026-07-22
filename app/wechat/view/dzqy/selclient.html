@@ -1,0 +1,65 @@
+{include file="common/header" /}
+<style>
+.zam-app-dzqy-main{position:fixed;top:0;left:0;width:100%;height:100%;overflow: hidden;color:#333;}
+.hytitle{width:100%;height:1rem;line-height:1rem;margin:1rem auto;margin-bottom:0.4rem;text-align:center;color:#fff;font-size:0.4rem;}
+.hy-devices{width:80%;margin:0 auto;}
+.hy-devices a{
+	width: 2.4rem;
+    margin: 0.1rem;
+}
+</style>
+<div class="zam-app-dzqy-main">
+	<p class="hytitle">{$rotate['hytitle']}</p>
+	<section class="hy-devices zam-app-flex zam-app-justifyCenter zam-app-flex-wrap">
+		{volist name="rotate.clients" id="device"}
+			<a href="javascript:;" class="btn btn-primary limitbox" data-deviceid="{$device['id']}">{$device['apptitle']}</a>
+		{/volist}
+	</section>
+</div>
+<script>
+require(['wechatcore','appsocket'],function (wechatcore,appsocket) {
+var wsConfig = {};
+wsConfig.onmessage = function(data){
+	if(data.type=='connected'){
+		appsocket.isclose = false;
+		wechatcore.ajaxSubmit("/wechat/dzqy/binduid",{clientid:data.clientid}).then(function(data){
+			if(data.code!=0){
+				wechatcore.msg(data.msg);
+			}else{
+			}
+		}, function(){
+			wechatcore.msg('网络太差链接socket服务失败，请稍后重试');
+		});
+	}else if(data.type=='delshowvote' || data.type=='rollvoterotate' || data.type=='resetallvote'){
+		wechatcore.reloadpage();
+	}else if(data.type=='goto'){
+		wechatcore.goto(data);
+	}else if(data.type=='addblack'){
+		if(data.userid==XCV3Config.userid){
+			wechatcore.closewxwindow();
+		}
+	}else if(data.type=='luckeruserids'){
+		wechatcore.layerAsklucker(data);
+	}else if(data.type=='clientnextround'){
+		window.location.href = data.url;
+	}
+};
+appsocket.init(wsConfig);
+$(".hy-devices a").click(function(){
+	var $this = $(this),selnum = $this.index(),seldeviceid = $this.attr("data-deviceid");
+	wechatcore.ajaxSubmit("{:gowechat('dzqy/seloneclient',['hdid'=>$hdinfo['hdid']])}",{rotateid:"{$rotate['id']}",selnum:selnum},'操作中..').then(function(json){
+		if(json.code==0){
+			setTimeout(function(){
+				window.location.href = "{:gowechat('dzqy/index',['hdid'=>$hdinfo['hdid'],'rotateid'=>$rotate['id']])}&deviceid="+seldeviceid;
+			},3e2);
+		}else{
+			wechatcore.msg(json.msg);
+		}
+	}, function(){
+		wechatcore.msg('网络太差，操作失败');
+	})
+});
+});
+</script>
+{include file="common/footermenu" /}
+{include file="common/footer" /}

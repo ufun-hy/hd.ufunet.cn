@@ -1,0 +1,247 @@
+{include file='$Wpath/common/header'}
+<form id="formBox" class="zam-formvalidation form-horizontal" method="post">
+	<div class="alert alert-danger" role="alert">
+		全屏弹幕必须开启上墙功能用户才可以发送弹幕内容
+    </div>
+    <div class="config-titlebox">
+        <span class="config-titlename">大屏设置</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#screenconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+    </div>
+    <div id="screenconfigbox" class="collapse in">
+    	<div class="form-group">
+			<label class="col-lg-3 control-label text-right">* 开屏播放</label>
+			<div class="col-lg-4">
+				{:tpl_switch('opendm',$config['opendm'])}
+			</div>
+		  </div>
+		  <div class="form-group">
+			<label class="col-lg-3 control-label text-right">* 弹幕位置</label>
+			<div class="col-lg-8">
+              <label class="lyear-radio radio-inline radio-primary">
+               <input type="radio" name="dmpos" value="1" {if $config['dmpos']=='1'}checked{/if}><span>全屏</span>
+              </label>
+              <label class="lyear-radio radio-inline radio-primary">
+               <input type="radio" name="dmpos" value="2" {if $config['dmpos']=='2'}checked{/if}><span>顶部半屏</span>
+              </label>
+              <label class="lyear-radio radio-inline radio-primary">
+               <input type="radio" name="dmpos" value="3" {if $config['dmpos']=='3'}checked{/if}><span>中间半屏</span>
+              </label>
+              <label class="lyear-radio radio-inline radio-primary">
+               <input type="radio" name="dmpos" value="4" {if $config['dmpos']=='4'}checked{/if}><span>底部半屏</span>
+              </label>
+            </div>
+		  </div>
+		  <div class="form-group">
+			<label class="col-lg-3 control-label text-right">* 滚动方式</label>
+			<div class="col-lg-8">
+              <label class="lyear-radio radio-inline radio-primary">
+               <input type="radio" name="dmrolltype" value="1" {if $config['dmrolltype']=='1'}checked{/if}><span>从右往左运动</span>
+              </label>
+              <label class="lyear-radio radio-inline radio-primary">
+               <input type="radio" name="dmrolltype" value="2" {if $config['dmrolltype']=='2'}checked{/if}><span>从左往右运动</span>
+              </label>
+            </div>
+		  </div>
+          <div class="form-group">
+			<label class="col-lg-3 control-label text-right">* 速度快慢</label>
+			<div class="col-lg-8">
+              <label class="lyear-radio radio-inline radio-primary">
+               <input type="radio" name="dmspeed" value="1" {if $config['dmspeed']=='1'}checked{/if}><span>慢</span>
+              </label>
+              <label class="lyear-radio radio-inline radio-primary">
+               <input type="radio" name="dmspeed" value="2" {if $config['dmspeed']=='2'}checked{/if}><span>一般</span>
+              </label>
+              <label class="lyear-radio radio-inline radio-primary">
+               <input type="radio" name="dmspeed" value="3" {if $config['dmspeed']=='3'}checked{/if}><span>快</span>
+              </label>
+            </div>
+		  </div>
+		  <div class="form-group">
+			<label class="col-lg-3 control-label text-right">* 是否循环播放</label>
+			<div class="col-lg-5">
+				{:tpl_switch('isloop',$config['isloop'])}
+			</div>
+		  </div>
+			<div class="form-group">
+				<label class="col-lg-3 control-label text-right">* 是否加载历史消息</label>
+				<div class="col-lg-5">
+					{:tpl_switch('loadhistory',$config['loadhistory'],'nohistory')}
+				</div>
+			</div>
+			<div class="form-group loadhistory{if $config['loadhistory']=='2'} hidden{/if}">
+				<label class="col-lg-3 control-label text-right">* 加载历史消息条数</label>
+				<div class="col-lg-2">
+					<div class="input-group">
+						<input type="text" class="form-control" name="historynum" value="{$config['historynum']}">
+						<div class="input-group-addon">条</div>
+					</div>
+					<span class="zam-help-block">注:必须是个大于等于0的整数，0为加载所有消息</span>
+				</div>
+			</div>
+		  <div class="form-group">
+			<label class="col-lg-3 control-label text-right">* 类型</label>
+			<div class="col-lg-5">
+				<label class="lyear-radio radio-inline radio-primary">
+	               <input type="radio" name="dmtype" value="1" {if $config['dmtype']=='1'}checked{/if}><span>普通</span>
+	              </label>
+	            <label class="lyear-radio radio-inline radio-primary">
+	               <input type="radio" name="dmtype" value="2" {if $config['dmtype']=='2'}checked{/if}><span>气泡状</span>
+	            </label>
+			</div>
+		  </div>
+		  <div class="form-group">
+			<label class="col-lg-3 control-label text-right">* 背景</label>
+			<div class="col-lg-5">
+				{:tpl_switch('needbg',$config['needbg'],'nodmbg')}
+			</div>
+		  </div>
+		  <div class="dmbgbox{if $config['needbg']=='2'} hidden{/if}">
+		  <div class="form-group">
+			<label class="col-lg-3 control-label text-right">* 背景色类型</label>
+			<div class="col-lg-5">
+			  <label class="lyear-radio radio-inline radio-primary">
+               <input type="radio" name="bgcolortype" value="1" {if $config['bgcolortype']=='1'}checked{/if} onclick="changebgcolor(this);"><span>固定色</span>
+              </label>
+              <label class="lyear-radio radio-inline radio-primary">
+               <input type="radio" name="bgcolortype" value="2" {if $config['bgcolortype']=='2'}checked{/if} onclick="changebgcolor(this);"><span>随机色</span>
+              </label>
+			</div>
+		  </div>
+		  <div class="form-group bgcolortype {if $config['bgcolortype']=='2'}hidden{/if}">
+			<label class="col-lg-3 control-label text-right">* 背景色</label>
+			<div class="col-lg-5">
+				{:tpl_color('bgcolor',$config['bgcolor'])}
+                <span class="help-block">默认黑色 rgba(0,0,0,0.5)</span>
+			</div>
+		  </div>
+		  </div>
+		  <div class="form-group">
+			<label class="col-lg-3 control-label text-right">* 用户头像</label>
+			<div class="col-lg-5">
+				{:tpl_switch('needavatar',$config['needavatar'])}
+			</div>
+		  </div>
+		  <div class="form-group">
+			<label class="col-lg-3 control-label text-right">* 用户昵称</label>
+			<div class="col-lg-5">
+				{:tpl_switch('neednickname',$config['neednickname'])}
+			</div>
+		  </div>
+		  <div class="form-group">
+			<label class="col-lg-3 control-label text-right">* 文字颜色</label>
+			<div class="col-lg-5">
+				<label class="lyear-radio radio-inline radio-primary">
+	               <input type="radio" name="fontcolortype" value="1" {if $config['fontcolortype']=='1'}checked{/if} onclick="changefontcolor(this);"><span>固定色</span>
+	              </label>
+	            <label class="lyear-radio radio-inline radio-primary">
+	               <input type="radio" name="fontcolortype" value="2" {if $config['fontcolortype']=='2'}checked{/if} onclick="changefontcolor(this);"><span>随机色</span>
+	            </label>
+	            <span class="help-block">如果背景色选择了随机色最好颜色文字选择固定为白色</span>
+			</div>
+		  </div>
+		  <div class="form-group fontcolortype{if $config['fontcolortype']=='2'} hidden{/if}">
+			<label class="col-lg-3 control-label text-right">* 颜色</label>
+			<div class="col-lg-5">
+				{:tpl_color('fontcolor',$config['fontcolor'])}
+                <span class="help-block">默认白色</span>
+			</div>
+		  </div>
+		  <div class="form-group">
+			<label class="col-lg-3 control-label text-right">* 文字大小</label>
+			<div class="col-lg-2">
+				<div class="input-group">
+					<input type="text" class="form-control" name="fontsize" value="{$config['fontsize']}">
+					<div class="input-group-addon">像素</div>
+				</div>
+				<span class="zam-help-block">注:必须是个大于10,小于60的数字</span>
+			</div>
+		  </div>
+		  <div class="form-group">
+			<label class="col-lg-3 control-label text-right">* 鼠标悬停</label>
+			<div class="col-lg-5">
+				{:tpl_switch('hoverstop',$config['hoverstop'])}
+			</div>
+		  </div>
+		  <div class="form-group">
+			<label class="col-lg-3 control-label text-right">* 鼠标点击删除</label>
+			<div class="col-lg-5">
+				{:tpl_switch('clickdel',$config['clickdel'])}
+			</div>
+		  </div>
+    </div>
+    {include file='$Wpath/common/savepanel'}
+</form>
+<script>
+require(['webcore','jconfirmBox','zamnotice','layerBox','zvalidator'],function(webcore,jconfirmBox,zamnotice,layerBox){
+    $('#formBox').formValidation({
+        framework: 'bootstrap',
+        excluded: [':disabled'],
+        message: '您填写的内容无效',
+        fields: {}
+    }).on('success.form.fv', function(e) {
+        e.preventDefault();
+        var $form = $(e.target);
+        var postData = webcore.serializeObject($form);
+        var bload = $form.find(".zam-fixedbottom button").lyearloading({opacity: 0.2,spinnerSize: 'nm'});
+        $form.formValidation('disableSubmitButtons', true);
+        webcore.ajaxSubmit("{:goweb('hdconfig/fulldm')}",postData).then(function(json){
+            bload.hide();
+            if(json.code==0){
+                $form.formValidation('disableSubmitButtons', false);
+                zamnotice.showTips('success','保存成功',2e3,function(){
+                    window.location.reload();
+                });
+            }else{
+                zamnotice.showTips('error',json.msg);
+                $form.formValidation('disableSubmitButtons', false);
+            }
+        }, function(json){
+            bload.hide();
+            zamnotice.showTips('error','网络差。操作失败');
+            $form.formValidation('disableSubmitButtons', false);
+        });
+    });
+});
+/*开关控件 关闭上传头像与表单*/
+function nohistory(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".loadhistory").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".loadhistory").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function nodmbg(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".dmbgbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".dmbgbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function changebgcolor(obj){
+	var type = $(obj).val();
+	if(type=='1'){
+		$(".bgcolortype").removeClass('hidden');
+	}else{
+		$(".bgcolortype").addClass('hidden');
+	}
+}
+function changefontcolor(obj){
+	var type = $(obj).val();
+	if(type=='1'){
+		$(".fontcolortype").removeClass('hidden');
+	}else{
+		$(".fontcolortype").addClass('hidden');
+	}
+}
+</script>
+{include file='$Wpath/common/footer'}

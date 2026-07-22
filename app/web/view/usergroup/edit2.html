@@ -1,0 +1,228 @@
+<style>
+.modulelist{
+    float:left;
+    padding:10px;
+}
+.modulelist .groupmodule-item{
+    padding:8px;
+    margin-bottom:10px;
+    margin-right: 10px;
+    float:left;
+    color:#fff;
+    background-color: rgba(0,0,0,0.4);
+}
+.btn-addmodule{
+    float:left;
+    padding:10px;
+}
+</style>
+<div class="form-horizontal confirmbox-pop">
+  <form class="confirm-formbox" method="post">
+  <div class="text-center">
+        <div class="btn-group pop-btns" style="margin-bottom:10px;">
+          <a href="javascript:void(0)" class="btn btn-default btn-primary"><span>基础设置</span></a>
+          <a href="javascript:void(0)" class="btn btn-default"><span>活动限制</span></a>
+          <a href="javascript:void(0)" class="btn btn-default"><span>充值红包</span></a>
+          <a href="javascript:void(0)" class="btn btn-default"><span>收入提现</span></a>
+          <a href="javascript:void(0)" class="btn btn-default"><span>可用模块</span></a>
+          <a href="javascript:void(0)" class="btn btn-default"><span>套餐设置</span></a>
+          <a href="javascript:void(0)" class="btn btn-default"><span>短信设置</span></a>
+        </div>
+  </div>
+  <div class="carditem">
+    <div class="form-group">
+      <label class="col-lg-3 control-label">* 用户组名称</label>
+      <div class="col-lg-7">
+        <input class="form-control" type="text"  name="groupname" placeholder="请务必填写一个您觉得唯一的名称" value="{$config['groupname']}">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-3 control-label">用户组介绍</label>
+      <div class="col-lg-7">
+        <textarea class="form-control" name="groupdes" rows="3">{$config['groupdes']}</textarea>
+      </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-3 control-label">* 默认组</label>
+        <div class="col-lg-8">
+            {:tpl_switch('isdefault',$config['isdefault'])}
+            <span class="zam-help-block">默认用户组即为新注册用户的默认用户组，一定是有且仅有一个默认用户组</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-3 control-label">* 免费发布活动</label>
+        <div class="col-lg-8">
+            {:tpl_switch('isfree',$config['isfree'])}
+            <span class="zam-help-block">免费发布活动即为用户组下的用户可以免费发布活动，新增活动功能，但是必须先给用户设置一个免费截止日期</span>
+        </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-3 control-label">享受折扣率</label>
+      <div class="col-lg-7">
+            <div class="input-group">
+                <input type="text" class="form-control" name="paydiscount" value="{$config['paydiscount']}">
+                <div class="input-group-addon">%</div>
+            </div>
+            <span class="zam-help-block">0即为不享受折扣，1折填写10，依次类推，不可设置为100</span>
+      </div>
+    </div>
+  </div>
+  <div class="carditem hidden">
+      <div class="form-group">
+        <label class="col-lg-3 control-label">最大创建活动数量</label>
+        <div class="col-lg-7">
+              <div class="input-group">
+                  <input type="text" class="form-control" name="maxhd" value="{$config['maxhd']}">
+                  <div class="input-group-addon">个活动</div>
+              </div>
+              <span class="zam-help-block">0即为不限制</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-3 control-label">活动最大人数</label>
+        <div class="col-lg-7">
+              <div class="input-group">
+                  <input type="text" class="form-control" name="maxhdperson" value="{$config['maxhdperson']}">
+                  <div class="input-group-addon">人</div>
+              </div>
+              <span class="zam-help-block">0即为不限制</span>
+        </div>
+      </div>
+  </div>
+  <div class="carditem hidden">
+      <div class="form-group">
+        <label class="col-lg-3 control-label">单次充值最小金额</label>
+        <div class="col-lg-7">
+              <div class="input-group">
+                  <input type="text" class="form-control" name="czhbmin" value="{$config['czhbmin']}">
+                  <div class="input-group-addon">元</div>
+              </div>
+              <span class="zam-help-block">0即为不限制，必须是整数</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-3 control-label">单次充值最大金额</label>
+        <div class="col-lg-7">
+              <div class="input-group">
+                  <input type="text" class="form-control" name="czhbmax" value="{$config['czhbmax']}">
+                  <div class="input-group-addon">元</div>
+              </div>
+              <span class="zam-help-block">0即为不限制，必须是整数</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-3 control-label">单次费率</label>
+        <div class="col-lg-7">
+              <div class="input-group">
+                  <input type="text" class="form-control" name="czhbfl" value="{$config['czhbfl']}">
+                  <div class="input-group-addon">%</div>
+              </div>
+              <span class="zam-help-block">0即为无手续费，必须是整数</span>
+        </div>
+      </div>
+  </div>
+  <div class="carditem hidden">
+      <div class="form-group">
+        <label class="col-lg-3 control-label">单次提现最小金额</label>
+        <div class="col-lg-7">
+              <div class="input-group">
+                  <input type="text" class="form-control" name="txmin" value="{$config['txmin']}">
+                  <div class="input-group-addon">元</div>
+              </div>
+              <span class="zam-help-block">0即为不限制，必须是整数</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-3 control-label">单次充值最大金额</label>
+        <div class="col-lg-7">
+              <div class="input-group">
+                  <input type="text" class="form-control" name="txmax" value="{$config['txmax']}">
+                  <div class="input-group-addon">元</div>
+              </div>
+              <span class="zam-help-block">0即为不限制，必须是整数</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-3 control-label">单次费率</label>
+        <div class="col-lg-7">
+              <div class="input-group">
+                  <input type="text" class="form-control" name="txfl" value="{$config['txfl']}">
+                  <div class="input-group-addon">%</div>
+              </div>
+              <span class="zam-help-block">0即为无手续费，必须是整数</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-3 control-label">提现冷却时间</label>
+        <div class="col-lg-7">
+              <div class="input-group">
+                  <input type="text" class="form-control" name="txjg" value="{$config['txjg']}">
+                  <div class="input-group-addon">小时</div>
+              </div>
+              <span class="zam-help-block">提现冷却时间即为用户发起提现，管理员审核打款后，冷却设置的小时后才可以发起下一次提现，0为无限制，必须是整数</span>
+        </div>
+      </div>
+  </div>
+  <div class="carditem hidden">
+      <div class="form-group">
+        <label class="col-lg-3 control-label">可用模块</label>
+        <div class="col-lg-7">
+            <div class="modulelist clearfix">
+               {volist name="config.modules" id="module"}
+               <div class="groupmodule-item cursor"><input type="hidden" name="modules[]" value="{$module['id']}">{$module['modulename']} <i class="mdi mdi-close"></i></div>
+               {/volist}
+            </div>
+            <div class="btn-addmodule cursor" data-groupid="{if isset($config['id'])}{$config['id']}{else}''{/if}">
+                <a class="btn btn-primary btn-sm"><i class="mdi mdi-plus"></i> 新增模块</a>
+            </div>
+        </div>
+      </div>
+  </div>
+  <div class="carditem hidden">
+      <div class="form-group">
+        <label class="col-lg-3 control-label">套餐列表</label>
+        <div class="col-lg-7">
+            <span class="zam-help-block">必须选择至少一个功能</span>
+        </div>
+      </div>
+  </div>
+  <div class="carditem hidden">
+      <div class="form-group">
+        <label class="col-lg-3 control-label">短信快捷通道</label>
+        <div class="col-lg-7">
+            <span class="zam-help-block">必须添加至少一个通道</span>
+        </div>
+      </div>
+  </div>
+</form>
+</div>
+<script type="text/javascript">
+require(['webcore','jconfirmBox','zamnotice','layerBox',"bootstrap-touchspin"],function(webcore,jconfirmBox,zamnotice,layerBox){
+  tpl_switch();
+  $(".confirmbox-pop .pop-btns a.btn").click(function(){
+      $(this).addClass('btn-primary').siblings().removeClass("btn-primary");
+      $(".confirmbox-pop .carditem").addClass('hidden').eq($(this).index()).removeClass('hidden');
+  });
+  $('.btn-addmodule').click(function() {
+     var $this = $(this),moduleitems = $(".modulelist input"),moduleids = [];
+     moduleitems.each(function(){
+          moduleids.push($(this).val());
+     });
+     var confirmObj = jconfirmBox.ajaxconfirm("新增模块","{:goweb('usergroup/edit')}",{ismodule:'1',groupid:$this.attr('data-groupid'),moduleids:moduleids},'html','col-lg-6 col-lg-offset-3',function(e){
+          var selmodule = e.find('.addgroupmodulelist .active');
+          if(selmodule.length==0){
+              zamnotice.showTips('error','请选择模块');
+              return false;
+          }else{
+              selmodule.each(function(){
+                  $(".modulelist").append('<div class="groupmodule-item cursor"><input type="hidden" name="modules[]" value="'+$(this).attr('data-id')+'">'+$(this).attr('data-modulename')+' <i class="mdi mdi-close"></i></div>');
+              });
+              confirmObj.close();
+          }
+      });
+  });
+  $(".modulelist").on('click','i',function(){
+      $(this).parent().remove();
+  });
+});
+</script>

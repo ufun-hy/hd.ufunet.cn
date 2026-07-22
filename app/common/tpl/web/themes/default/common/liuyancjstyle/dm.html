@@ -1,0 +1,100 @@
+<div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 背景色</label>
+    <div class="col-lg-5">
+        {:tpl_switch('dmstyle[needbg]',$config['dmstyle']['needbg'],'nodmbg')}
+    </div>
+  </div>
+  <div class="dmbgbox{if $config['dmstyle']['needbg']=='2'} hidden{/if}">
+  <div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 背景色类型</label>
+    <div class="col-lg-5">
+      <label class="lyear-radio radio-inline radio-primary">
+       <input type="radio" name="dmstyle[bgcolortype]" value="1" {if $config['dmstyle']['bgcolortype']=='1'}checked{/if} onclick="changebgcolor(this);"><span>固定色</span>
+      </label>
+      <label class="lyear-radio radio-inline radio-primary">
+       <input type="radio" name="dmstyle[bgcolortype]" value="2" {if $config['dmstyle']['bgcolortype']=='2'}checked{/if} onclick="changebgcolor(this);"><span>随机色</span>
+      </label>
+    </div>
+  </div>
+  <div class="form-group bgcolortype {if $config['dmstyle']['bgcolortype']=='2'}hidden{/if}">
+    <label class="col-lg-2 control-label text-right">* 背景色</label>
+    <div class="col-lg-5">
+        {:tpl_color('dmstyle[bgcolor]',$config['dmstyle']['bgcolor'])}
+        <span class="help-block">默认黑色 rgba(0,0,0,0.5)</span>
+    </div>
+  </div>
+  </div>
+  <div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 用户头像</label>
+    <div class="col-lg-5">
+        {:tpl_switch('dmstyle[needavatar]',$config['dmstyle']['needavatar'])}
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 用户昵称</label>
+    <div class="col-lg-5">
+        {:tpl_switch('dmstyle[neednickname]',$config['dmstyle']['neednickname'])}
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 文字颜色</label>
+    <div class="col-lg-5">
+        <label class="lyear-radio radio-inline radio-primary">
+           <input type="radio" name="dmstyle[fontcolortype]" value="1" {if $config['dmstyle']['fontcolortype']=='1'}checked{/if} onclick="changefontcolor(this);"><span>固定色</span>
+          </label>
+        <label class="lyear-radio radio-inline radio-primary">
+           <input type="radio" name="dmstyle[fontcolortype]" value="2" {if $config['dmstyle']['fontcolortype']=='2'}checked{/if} onclick="changefontcolor(this);"><span>随机色</span>
+        </label>
+        <span class="help-block">如果背景色选择了随机色最好颜色文字选择固定为白色</span>
+    </div>
+  </div>
+  <div class="form-group fontcolortype{if $config['dmstyle']['fontcolortype']=='2'} hidden{/if}">
+    <label class="col-lg-2 control-label text-right">* 颜色</label>
+    <div class="col-lg-5">
+        {:tpl_color('dmstyle[fontcolor]',$config['dmstyle']['fontcolor'])}
+        <span class="help-block">默认白色</span>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 文字大小</label>
+    <div class="col-lg-2">
+        <input type="text" class="form-control numberincdec" name="dmstyle[fontsize]" value="{$config['dmstyle']['fontsize']}"
+        data-bts-min="10" data-bts-replacement-val="10"
+        data-bts-max="60"
+        data-bts-step="1"
+        data-bts-postfix="px"
+        data-bts-postfix-extra-class="touchspin-postfix"
+        >
+        <span class="zam-help-block">注:必须是个大于10,小于60的数字</span>
+    </div>
+  </div>
+<script>
+function nodmbg(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".dmbgbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".dmbgbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function changebgcolor(obj){
+	var type = $(obj).val();
+	if(type=='1'){
+		$(".bgcolortype").removeClass('hidden');
+	}else{
+		$(".bgcolortype").addClass('hidden');
+	}
+}
+function changefontcolor(obj){
+	var type = $(obj).val();
+	if(type=='1'){
+		$(".fontcolortype").removeClass('hidden');
+	}else{
+		$(".fontcolortype").addClass('hidden');
+	}
+}
+</script>

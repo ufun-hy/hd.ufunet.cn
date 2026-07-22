@@ -1,0 +1,361 @@
+{include file='$Wpath/common/header'}
+<div class="row">
+<div class="col-lg-12">
+<div class="card zam-createactivitybox">
+   <div class="card-top">
+      <div class="zam-createactivitybox-title">
+		<button type="button" class="btn btn-default btn-xs" disabled="">创建活动指引</button>
+	  </div>
+	  <div class="zam-level-timeline">
+		<ul class="text-center clearfix" style="width: 800px;">
+			<li class="step1">创建活动
+				<div class="step-outside zam-flex zam-alignItems">
+					<div>1</div>
+				</div>
+			</li>
+			<li class="step2">测试活动
+				<div class="step-outside zam-flex zam-alignItems">
+					<div>2</div>
+				</div>
+			</li>
+			<li class="step3">正式发布
+				<div class="step-outside zam-flex zam-alignItems">
+					<div>3</div>
+				</div>
+			</li>
+		</ul>
+	  </div>
+   </div>
+   <div class="card-body">
+        <form id="formBox" class="zam-formvalidation form-horizontal" method="post" >
+		  <div class="zam-titleBox">活动信息</div>
+          <div class="form-group">
+            <label class="col-lg-2 control-label">* 活动主题</label>
+            <div class="col-lg-8">
+              <input class="form-control" type="text"  name="title" placeholder="请输入活动主题..">
+            </div>
+          </div>
+		  <div class="form-group">
+			<label class="col-lg-2 control-label">* 活动类型</label>
+			<div class="col-lg-8">
+			   <select name="catetype" class='form-control'>
+					 <option  value="">请选择</option>
+					 <option  value="1">商超活动</option>
+					 <option  value="2">校园活动</option>
+			   </select>
+			</div>
+		  </div>
+		  <div class="form-group">
+			<label class="col-lg-2 control-label">* 大屏图片</label>
+			<div class="col-lg-8">
+			  {:tpl_image_one('pcimg','')}
+			</div>
+		  </div>
+		  <div class="form-group">
+			<label class="col-lg-2 control-label">* 微信图片</label>
+			<div class="col-lg-8">
+			  {:tpl_image_one('wechatimg','')}
+			</div>
+		  </div>
+		  <div class="form-group">
+			<label class="col-lg-2 control-label">* 大屏背景多个图片</label>
+			<div class="col-lg-8">
+			  {:tpl_image_multi('pcbgimg','')}
+			</div>
+		  </div>
+		  <div class="form-group">
+			<label class="col-lg-2 control-label">* 大屏背景多个图片2</label>
+			<div class="col-lg-8">
+			  {:tpl_image_multi('pcbgimg2','')}
+			</div>
+		  </div>
+		  <div class="form-group">
+			<label class="col-lg-2 control-label">* 大屏背景音效</label>
+			<div class="col-lg-8">
+			  {:tpl_audio('pcbgmusic','')}
+			</div>
+		  </div>
+		  <div class="form-group">
+			<label class="col-lg-2 control-label">* 大屏背景视频</label>
+			<div class="col-lg-8">
+			  {:tpl_video('pcbgvideo','')}
+			</div>
+		  </div>
+		  <div class="form-group">
+			<label class="col-lg-2 control-label">* 图标1</label>
+			<div class="col-lg-2">
+			 	{:tpl_icon('icon1','mdi mdi-close')}
+			</div>
+		  </div>
+		  <div class="form-group">
+			<label class="col-lg-2 control-label">* 图标2</label>
+			<div class="col-lg-2">
+			  {:tpl_icon('icon2','mdi mdi-plus')}
+			</div>
+		  </div>
+		  <div class="form-group">
+			<label class="col-lg-2 control-label">* 背景色</label>
+			<div class="col-lg-2">
+			  {:tpl_color('bgcolor','#000000')}
+			</div>
+		  </div>
+		  <div class="form-group">
+			<label class="col-lg-2 control-label">* 活动时间</label>
+			<div class="col-lg-2">
+                {:tpl_daterangetime('starttime','2019-01-02 22:02:02')}   
+			</div>
+		  </div>
+		  <div class="form-group">
+			<label class="col-lg-2 control-label">* 活动时间范围</label>
+			<div class="col-lg-4">
+                {:tpl_daterangetime('starttime2',['start'=>'2018-02-04 20:22:02','end'=>'2019-01-02 22:02:02'])}  
+			</div>
+		  </div>
+		  <div class="form-group">
+			<label class="col-lg-2 control-label">* 人数</label>
+			<div class="col-lg-4">
+                <input type="text" name="personsval" class="form-control numberincdec" value="55"
+                data-bts-min="0"
+                data-bts-max="10"
+                data-bts-init-val=""
+                data-bts-step="1"
+              />  
+			</div>
+		  </div>
+		  <div class="form-group">
+            <label class="col-lg-2 control-label">* 需要控制最大输入文字</label>
+            <div class="col-lg-8">
+              <input class="form-control inputneedmax" type="text"  name="title" maxlength="25" placeholder="请输入活动主题..">
+            </div>
+          </div>
+		  <div class="form-group procitydist-unnormal">
+            <label class="col-lg-2 control-label">* 活动地点</label>
+            <div class="col-lg-4">
+                <a href="javascript:void(0)" class="pick-area pick-activityarea" ></a>
+				<input type="text" class="form-control hidden"  name="hdarea">
+            </div>
+          </div>
+		  <div class="form-group inputnumberBox">
+			<label class="col-lg-2 control-label">* 活动人数</label>
+			<div class="col-lg-4">
+				<div class="input-group">
+						<div class="input-group-addon btn-decrement"><i class="fa fa-minus"></i></div>
+						<input type="number"  class="form-control" name="persons"  placeholder="预计活动人数" />
+						<div class="input-group-addon btn-increment"><i class="fa fa-plus"></i></div>
+				</div>
+			</div>
+		  </div>
+		  
+		  <div class="form-group">
+			<label class="col-lg-2 control-label">大屏密码(可不填写)</label>
+			<div class="col-lg-8">
+			  <input type="text" class="form-control" name="screenpassword" maxlength="10" placeholder="大屏密码" onkeyup="value=value.replace(/[^\a-\z\A-\Z0-9]/g,'')" onpaste="value=value.replace(/[^\a-\z\A-\Z0-9]/g,'')" oncontextmenu = "value=value.replace(/[^\a-\z\A-\Z0-9]/g,'')">
+			  <div class="zam-help-block">只能是数字或者英文字母，控制在10个字符内</div>
+			</div>
+		  </div>
+		  <div class="zam-titleBox">参与方式</div>
+		  <div class="form-group zam-jointypeBox">
+			<label class="col-lg-2 control-label">* 活动模式</label>
+			<div class="col-lg-8 clearfix">
+					<section class="zam-jointype has-selected" data-hdmode="1">
+						<span class="zam-righttriangle"></span>
+						<i class="mdi mdi-check zam-typeselected"></i>
+						<h4>系统模式</h4>
+						<p>现场用户使用微信扫描活动参与二维码后以H5页面的形式参与活动，如用户关闭页面则需重新扫码进入.<span class="text-danger">(适合未申请公众号的用户使用)</span></p>
+					</section>
+				
+					<section class="zam-jointype" data-hdmode="2">
+						<span class="zam-righttriangle"></span>
+						<i class="mdi mdi-check zam-typeselected"></i>
+						<h4>公众号模式</h4>
+						<p>现场用户使用微信扫描公众号二维码后以发送关键词或是点击菜单的形式进行参与活动<span class="text-danger">(适合已申请公众号的用户使用)</span></p>
+					</section>
+				
+					<input type="hidden" name="hdmode" value="1" />
+			</div>
+		  </div>
+		  <div class="zam-jointype-wechataccount">
+			  <div class="form-group zam-wechataccountBox hidden">
+				<label class="col-lg-2 control-label"><span class="laytip-span" style="width:30px;" lay-tips="点击选取右侧的一个公众号，如未显示公众号请点击立即绑定"><i class="fa fa-question-circle"></i></span> * 公众号选择 </label>
+				<div class="col-lg-8">
+					<div class="zam-wechataccountList clearfix">
+						{if !empty($menu)}
+							
+							<div class="zam-wechataccountItem active" data-uniacid="1">
+								<img src="" />
+								<p>222</p>
+								<div class="wechat-has-select">
+										<i class="wi wi-right-sign"></i>
+								</div>
+							</div>
+							
+							<input type="hidden" name="wechatuniacid" value="1" />
+						{else/}
+							<div class="no-wechat-tip zam-flex zam-alignItems zam-justifyContent"><span class="wi wi-info-sign" style="font-size:18px;margin-right:10px;"></span><span>您暂未绑定公众号，</span><a href="" draggable="false">立即绑定&gt;</a></div>
+							<input type="hidden" name="wechatuniacid" value="" />
+						{/if}
+					</div>
+					
+				</div>
+			  </div>
+			  <div class="form-group hidden">
+				<label class="col-lg-2 control-label">* 触发关键词</label>
+				<div class="col-lg-8">
+				  <input type="text" class="form-control"  name="wechatkeyword" placeholder="微信公众号发送此关键词参与活动" >
+				</div>
+			  </div>
+		  </div>
+		  <div class="zam-titleBox">附加信息</div>
+		  <div class="form-group">
+			<label class="col-lg-2 control-label">备注(非必填)</label>
+			<div class="col-lg-8">
+			  <input type="text" class="form-control"  name="liuyan" placeholder="活动备注信息" >
+			  <span class="help-block">此项为选填</span>
+			</div>
+		  </div>
+		  <div class="form-group zam-createactivitybtnbox">
+			<label class="col-lg-2 control-label"></label>
+			<div class="col-lg-8 text-center">
+			  <a href="/myhd" class="btn btn-default">取消</a> 
+			  <button class="btn btn-primary zam-btn" data-style="expand-right" type="submit">确定创建</button>
+			</div>
+		  </div>
+		</form>        
+   </div>             
+</div>
+</div>
+</div>
+<script>
+require(['webcore','jconfirmBox','zamnotice','zvalidator','pickcity'],function(webcore,jconfirmBox,zamnotice){
+    $('#formBox').formValidation({
+			framework: 'bootstrap',
+			excluded: [':disabled'],
+			message: '您填写的内容无效',
+			fields: {
+				title: {
+					message: '您填写的活动标题内容无效',
+					validators: {
+						notEmpty: {
+							message: '活动标题必须填写'
+						},
+					}
+				},
+				catetype: {
+					validators: {
+						notEmpty: {
+							message: '请选择活动类型'
+						},	
+					}
+				},
+				hdarea:{
+					validators: {
+						callback:{
+							callback:function(value){
+								if(value!=''){
+									var n = (value.split('/')).length-1;
+									if(n==2){
+										return true;
+									}else{
+										if(n==1){
+											return {
+												valid: false,
+												message: '请选择活动所在县'
+											}
+										}else{
+											return {
+												valid: false,
+												message: '请选择活动所在市'
+											}
+										}
+									}
+								}else{
+									return {
+											valid: false,
+											message: '请选择活动所在地区'
+									}
+								}
+							}
+						}
+					}
+				},
+				persons:{
+					validators: {
+						notEmpty: {
+							message: '请设置活动人数'
+						},
+						greaterThan: {
+							value:10,
+							inclusive:true,
+							message: '活动人数必须大于等于10'
+						},
+						lessThan: {
+							value:10000,
+							inclusive: true,
+							message: '活动人数最多等于10000'
+						},
+						integer:{
+							message:"活动人数必须为整数"
+						}
+					}
+				},
+			}
+	}).on('success.form.fv', function(e) {
+		e.preventDefault();
+		var $form = $(e.target);
+		var createValidation = $form.data('formValidation');
+		var hdtype = createValidation.getFieldElements('hdtype').val();
+		if(hdtype==''){
+			zamnotice.showTips('error','请先选择参与方式');
+			$form.formValidation('disableSubmitButtons', false);
+			return;
+		}else{
+			if(hdtype=='2'){
+				var wechatuniacid = createValidation.getFieldElements('wechatuniacid').val();//公众号
+				var wechatkeyword = createValidation.getFieldElements('wechatkeyword').val();
+				if(wechatuniacid==''){
+					zamnotice.showTips('error','请先选择公众号');
+					$form.formValidation('disableSubmitButtons', false);
+					return;
+				}
+				if(wechatkeyword==''){
+					zamnotice.showTips('error','请先填写公众号触发关键词');
+					$form.formValidation('disableSubmitButtons', false);
+					return;
+				}
+			}
+		}
+		var postData = webcore.serializeObject($form);
+		$form.formValidation('disableSubmitButtons', true);
+		webcore.ajaxSubmit("{:APP_WEB}/rolemanage/de11l",postData,'数据提交中..').then(function(json){
+			if(json.code==0){
+			    //$form.formValidation('disableSubmitButtons', false);
+			    zamnotice.showTips('success','创建成功');
+		    }else{
+		        zamnotice.showTips('error',json.msg);
+		        $form.formValidation('disableSubmitButtons', false);
+		    }
+		}, function(json){
+			zamnotice.showTips('error','网络差。操作失败');
+			$form.formValidation('disableSubmitButtons', false);
+		});
+	});
+	//初始化城市选择器
+	$(".pick-activityarea").pickArea({
+		"width":"400px",
+		"hoverColor":"#4886ff",
+		"maxWidth":"100",
+		"getVal":function(){
+			var pickcityDom = $("."+$(".pick-area-dom").val());
+			pickcityDom.next().val($(".pick-area-hidden").val());
+			$('#formBox').data('formValidation').revalidateField('hdarea');
+		},
+		"pickcity":function(){
+			zamnotice.showTips('error','请先选择省');
+		},
+		"pickdist":function(){
+			zamnotice.showTips('error','请先选择省和市');
+		},
+	});
+});
+</script>
+{include file='$Wpath/common/footer'}

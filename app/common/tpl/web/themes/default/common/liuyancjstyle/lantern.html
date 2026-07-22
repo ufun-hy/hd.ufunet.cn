@@ -1,0 +1,106 @@
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 灯笼类型</label>
+    <div class="col-lg-9">
+        <table class="table table-bordered" style="margin-bottom: 0;">
+            <thead>
+                <tr>
+                    <th style="width:60%;text-align:center;">图片</th>
+                    <th style="width:40%;text-align:center;">操作</th>
+                </tr>
+            </thead>
+            <tbody class="lantern-lists">
+                {foreach $config['lanternstyle']['lanterns'] as $d}
+                <tr>
+                    <td>
+                        {:tpl_image_one('lanternstyle[lanterns]',$d)}
+                        <div class="mt10">注：标准尺寸150 * 190px，推荐使用png图片</div>
+                    </td>
+                    <td class="text-center">
+                        <a class="btn btn-xs btn-primary zam-sortable sortmove" data-tooltip="laytip" title="拖动排序" href="javascript:void(0)"> <i class="mdi mdi-arrow-all"></i> </a>
+                        <a class="btn btn-danger btn-xs btn-del"><i class="mdi mdi-close"></i></a>
+                    </td>
+                </tr>
+                {/foreach}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="2">
+                        <a class="btn btn-primary btn-xs addlantern" href="javascript:;"> <i class="mdi mdi-plus"></i>新增灯笼</a>
+                        <div class="m-t-10">系统会随机选择一种灯笼放飞孔明灯</div>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 灯笼上用户名样式</label>
+    <div class="col-lg-8">
+        <div class="input-group">
+            <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
+            <div class="touchspin">
+            <input type="text" class="form-control numberincdec" name="lanternstyle[namesize]" 
+            data-bts-min="12" data-bts-replacement-val="12"
+            data-bts-max="80"
+            data-bts-step="1"
+            data-bts-postfix="px"
+            data-bts-postfix-extra-class="touchspin-postfix"
+            value="{$config['lanternstyle']['namesize']??16}">
+            </div>
+            <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+            {:tpl_color('lanternstyle[namecolor]',$config['lanternstyle']['namecolor']??'#ffff99')}
+        </div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 灯笼横轴图</label>
+    <div class="col-lg-8">
+        {:tpl_image_one('lanternstyle[top]',$config['lanternstyle']['top'])}
+        <span class="help-block">规格:140*8px</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 灯笼中间文字背景图</label>
+    <div class="col-lg-8">
+        {:tpl_image_one('lanternstyle[center]',$config['lanternstyle']['center'])}
+        <span class="help-block">规格:144*53px</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 灯笼中间文字样式</label>
+    <div class="col-lg-8">
+        <div class="input-group">
+            <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
+            <div class="touchspin">
+            <input type="text" class="form-control numberincdec" name="lanternstyle[msgsize]" 
+            data-bts-min="12" data-bts-replacement-val="12"
+            data-bts-max="80"
+            data-bts-step="1"
+            data-bts-postfix="px"
+            data-bts-postfix-extra-class="touchspin-postfix"
+            value="{$config['lanternstyle']['msgsize']??24}">
+            </div>
+            <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+            {:tpl_color('lanternstyle[msgcolor]',$config['lanternstyle']['msgcolor']??'#ffff99')}
+        </div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 灯笼底部丝带图</label>
+    <div class="col-lg-8">
+        {:tpl_image_one('lanternstyle[bottom]',$config['lanternstyle']['bottom'])}
+        <span class="help-block">规格:144*156px</span>
+    </div>
+</div>
+<script>
+    require(['webcore','zamnotice','jconfirmBox','jquery.ui'],function(webcore,zamnotice,jconfirmBox){
+        $('.lantern-lists').on('click','.btn-del',function(){
+            var $this = $(this);
+            jconfirmBox.confirm('温馨提示','您确定要删除么？',function(){
+                $this.parent().parent().remove();
+                zamnotice.showTips('success','删除成功');
+            });
+        });
+        $('.lantern-lists').sortable({handle: ".sortmove"}).disableSelection();
+    })
+</script>

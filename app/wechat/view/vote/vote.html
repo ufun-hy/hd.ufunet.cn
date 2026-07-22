@@ -1,0 +1,97 @@
+{include file="common/header" /}
+<style type="text/css">
+body{overflow-y: auto;}
+.zam-app-bodyBg{min-height: 100%;height: auto;overflow:hidden;overflow-y: auto;background-position: 100% 100%;}
+.vote-box{position: relative;height: 100%;color: #fff;}
+.vote-scroll-box{padding: 0.68rem 0;}
+.vote-title{height: 1rem;line-height: 1rem;font-size: 0.48rem;font-weight:600;text-align: center;letter-spacing: 3px}
+.vote-box .vote-lists {
+    position: relative;
+    width: 90%;
+    overflow: hidden;
+    margin-top: 0.82rem;
+}
+.vote-box .vote-lists .vote-list-one{margin-bottom:0.52rem}
+.vote-list-one .onetitle{width: 60%}
+.vote-list-one .onetitle div{font-size: 0.32rem}
+.vote-list-one .onescore{width: 20%}
+.vote-list-one .onescore{font-size: 0.24rem;}
+.vote-list-one .onescore .score{margin-left:0.1rem;font-size: 0.42rem;font-weight:bold;color:#34d3fd }
+.vote-list-one .onebtns{width: 20%;justify-content: flex-end;-webkit-justify-content:flex-end;}
+.vote-list-one .onebtns span{
+	width: 0.48rem;
+	height: 0.48rem;
+	background-color: #274e82;
+	border-radius: 50%;
+	cursor: pointer;
+}
+.vote-list-one .onebtns span i{font-size: 0.32rem;font-weight: bold;color: #fff;}
+.vote-list-one .onebtns span.vote-jia{margin-right: 0.24rem}
+</style>
+<div class="vote-box zam-app-flex-ajCenter">
+<section class="g-scrollview vote-scroll-box zam-app-flex-ajCenter">
+	<div class="vote-title limitbox">{$rotate['title']??'第二十一届国际潮团联谊年会团长暨秘书长会议'}</div>
+	<div class="vote-lists">
+		{foreach $rotate['items'] as $ikey=>$ival}
+			<div class="vote-list-one zam-app-flex" data-voteid="{$ival['id']}">
+				<div class="onetitle">
+					{php}$votenames = explode('/',$ival['votename']){/php}
+					<div class="hz limitbox">{$votenames[0]??''}</div>
+					<div class="en limitbox">{$votenames[1]??''}</div>
+				</div>
+				<div class="onescore zam-app-flex-ajCenter2"><span>得票数:</span><span class="score">{$ival['votenums']??'0'}</span></div>
+				<div class="onebtns zam-app-flex-ajCenter2">
+					<span class="zam-app-flex-ajCenter2 vote-jia"><i class="mxc-add1"></i></span>
+					<span class="zam-app-flex-ajCenter2 vote-jian"><i class="mxc-move"></i></span>
+				</div>
+			</div>
+		{/foreach}
+	</div>
+</section>
+</div>
+<script type="text/javascript">
+require(['wechatcore','marqueen'],function (wechatcore,marqueen) {
+	var clicked = false;
+	$(".vote-jia").on('click',function(){
+		if (clicked) return;
+		clicked = true;
+		var $this = $(this),voteid = $this.parent().parent().attr("data-voteid"),scorenum = $this.parent().prev().find('.score');
+		wechatcore.ajaxSubmit("{:gowechat('vote/dzvoteadd')}",{rotateid:"{$rotate['id']}",voteid:voteid},'正在处理加票请求...').then(function(data){
+			if(data.code==0){
+				scorenum.text(data.msg);
+				wechatcore.msg('投票成功');
+			}else{
+				wechatcore.msg(data.msg);
+			}
+			clicked = false;
+		}, function(){
+			clicked = false;
+			wechatcore.msg('网络太差，请稍后重试');
+		});
+	});
+	$(".vote-jian").on('click',function(){
+		var $this = $(this),voteid = $this.parent().parent().attr("data-voteid"),scorenum = $this.parent().prev().find('.score'),votename = $this.parent().parent().find('.hz').text();
+		if(clicked) return;
+		clicked = true;
+		wechatcore.ask('温馨提醒','确定给'+votename+'减去一票么?',['确定','取消'],function(k){
+			wechatcore.ajaxSubmit('{:gowechat("vote/dzvotejian")}',{rotateid:"{$rotate['id']}",voteid:voteid},'正在处理减票请求..').then(function(data){
+				clicked = false;
+				wechatcore.close(k);
+				if(data.code==0){
+				 	scorenum.text(data.msg);
+					wechatcore.msg('操作成功');
+				}else{
+					wechatcore.msg(data.msg);
+				}
+			}, function(){
+			  	clicked = false;
+			  	wechatcore.close(k);
+			  	wechatcore.msg('投票失败，请稍后重试');
+			});
+		},function(){
+			clicked = false;
+		});
+	});
+})
+</script>
+{include file="common/footer" /}

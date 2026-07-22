@@ -1,0 +1,367 @@
+{include file='$Wpath/common/header'}
+<style type="text/css">
+table thead tr th{text-align:center;font-size: 13px;font-weight: 400}
+.ditshowitems .card .card-header{padding: 10px 20px;}
+.ditshowitems .card .card-body{padding: 14px;}
+.card-totalitems span{margin-bottom:10px;margin-right: 10px;}
+.normalitems span{
+    color: #333;
+    background: #e6f7ff;
+    border: 1px solid #91d5ff;
+}
+.bditems span{
+    color: #333;
+    background: #f9ebd6;
+    border: 1px solid #fdb538;
+}
+</style>
+<form id="formBox" class="zam-formvalidation form-horizontal" method="post">
+    <div class="config-titlebox">
+        <span class="config-titlename">微信设置</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#wechatconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+    </div>
+    <div id="wechatconfigbox" class="collapse in">
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 网页标题</label>
+            <div class="col-lg-8">
+                <input class="form-control" type="text"  name="apptitle" value="{$config['apptitle']}">
+            </div>
+        </div>
+        <div class="form-group{if isset($showbgbox) && $showbgbox=='2'} hidden{/if}">
+            <label class="col-lg-2 control-label">* 背景图片</label>
+            <div class="col-lg-8">
+                {:tpl_image_one('appbgimg',$config['appbgimg'])}
+                <span class="help-block">规格:640*1240px</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 打开背景音效</label>
+            <div class="col-lg-3">
+                {:tpl_switch('appbgmusicoff',$config['appbgmusicoff'],'appbgmusic')}
+                <span class="help-block">关闭则不播放背景音效</span>
+            </div>
+        </div>
+        <div class="form-group appmusicbox{if !isset($config['appbgmusicoff']) || $config['appbgmusicoff']=='2'} hidden{/if}">
+            <label class="col-lg-2 control-label">* 背景音效内容</label>
+            <div class="col-lg-8">
+                {:tpl_audio('appbgmusic',$config['appbgmusic'])}
+                <span class="help-block">尽量音乐文件尽量控制在200kb内的</span>
+            </div>
+        </div>
+        <div class="form-group ditshowitems">
+            <label class="col-lg-2 control-label">自定义显示项</label>
+            <div class="col-lg-7" style="padding-right: 5px;">
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th style="width:20%">项目</th>
+                        <th style="width:20%">大小</th>
+                        <th style="width:10%">颜色</th>
+                        <th style="width:20%">距离前一个元素距离</th>
+                        <th style="width:18%">左右偏距</th>
+                        <th style="width:12%">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody class="showitem-lists">
+                    {volist name="config.showitems" id="showitem"}    
+                    <tr>
+                        <td class="text-center">
+                            <input type="hidden" name="showzd[]" value="{$showitem['showzd']}">
+                            <input class="form-control" type="text" name="showcontent[]" value="{$showitem['showcontent']}"{if in_array($showitem['showzd'],$noteditzd)} readonly{/if}>
+                        </td>
+                        <td class="text-center">
+                        <div class="input-group">
+                                <input type="text" class="form-control" name="showsize[]" value="{$showitem['showsize']}">
+                                <div class="input-group-addon">px</div>
+                        </div>
+                        </td>
+                        <td class="text-center">
+                            <div class="zam-flex-center">
+                            {:tpl_color('showcolor[]',$showitem['showcolor'])}
+                            </div>
+                        </td>
+                        <td class="text-center">
+                        <div class="input-group">
+                                <input type="text" class="form-control" name="showtop[]" value="{$showitem['showtop']}">
+                                <div class="input-group-addon">px</div>
+                        </div>
+                        </td>
+                        <td class="text-center">
+                        <div class="input-group">
+                                <input type="text" class="form-control" name="showleft[]" value="{$showitem['showleft']??'0'}">
+                                <div class="input-group-addon">px</div>
+                        </div>
+                        </td>
+                        <td class="text-center">
+                            <a class="btn btn-xs btn-primary zam-sortable btn-moveitem" href="javascript:void(0)"> <i class="mdi mdi-arrow-all"></i> </a>
+                            <a class="btn btn-xs btn-danger btn-delshowitem" href="javascript:void(0)"> <i class="mdi mdi-close"></i> </a>
+                        </td>
+                    </tr>
+                    {/volist}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="6">
+                                
+                                <div class="zam-flex zam-alignItems">
+                                    <div style="padding: 0;margin-right: 15px;">签到表单项显示表单名称</div>
+                                    <div>
+                                        {:tpl_switch('appshowbditemfield',$config['appshowbditemfield']??'1')}
+                                    </div>
+                                </div>
+                                <div style="font-size: 10px;color:gray">此项设置在自定义显示项内添加了表单项目才有意义</div>
+                                <div class="m-t-10">注：左右偏距是以手机屏幕中心对称线为参考，设置0即为保持居中，设置正数即为向中心线右侧偏离，设置负数即为向中心线左侧偏离</div>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            <div class="col-lg-3"  style="padding: 0 5px;">
+                <div class="card card-totalitems">
+                    <div class="card-header">常用项</div>
+                    <div class="card-body normalitems">
+                        {volist name="normalitems" id="nitem"}
+                            {if (empty($signconfig) || $signconfig['openstatus']=='2') && ($nitem['zd']=='signrank' || $nitem['zd']=='signtime')}
+                            {else /}
+                            <span class="btn btn-default btn-sm{if $nitem['zd']!='diytxt' && in_array($nitem['zd'],array_column($config['showitems'],'showzd'))} disabled{/if}" data-zd="{$nitem['zd']}">{$nitem['title']}</span>
+                            {/if}
+                        {/volist}
+                    </div>
+                    {if !empty($signconfig) && $signconfig['openstatus']=='1' && $signconfig['appopenbd']=='1' && !empty($signconfig['appbddata'])}
+                    <div class="card-header">上传头像与表单项</div>
+                    <div class="card-body bditems">
+                        {if $signconfig['appuploadimg']=='1'}
+                            <span class="btn btn-default btn-sm{if in_array('uploadimg',array_column($config['showitems'],'showzd'))} disabled{/if}" data-zd="uploadimg">上传头像</span>
+                        {/if}
+                        {volist name="signconfig.appbddata" id="bd"}
+                            <span class="btn btn-default btn-sm{if in_array($bd['zd'],array_column($config['showitems'],'showzd'))} disabled{/if}" data-zd="{$bd['zd']}">{$bd['title']}</span>
+                        {/volist}
+                    </div>
+                    {/if}
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label"> 自定义按钮项</label>
+            <div class="col-lg-8 yautooverflow">
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th style="width:20%">名称</th>
+                        <th style="width:10%">颜色</th>
+                        <th style="width:40%">链接</th>
+                        <th style="width:20%">距离前一个元素距离</th>
+                        <th style="width:10%">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody class="button-lists">
+                    {volist name="config.buttons" id="button"}    
+                    <tr>
+                        <td class="text-center">
+                            <input type="hidden" name="buttonid[]" value="{if isset($button['buttonid'])}{$button['buttonid']}{else /}{$button['id']}{/if}">
+                            <input class="form-control" type="text" name="bname[]" value="{if isset($button['bname'])}{$button['bname']}{else /}{$button['name']}{/if}">
+                        </td>
+                        <td class="text-center">
+                            <div class="zam-flex-center">
+                            {:tpl_color('bcolor[]',isset($button['bcolor'])?$button['bcolor']:$button['color'])}
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <input class="form-control" type="text" name="burl[]" value="{if isset($button['burl'])}{$button['burl']}{else /}{$button['url']}{/if}">
+                        </td>
+                        <td class="text-center">
+                        <div class="input-group">
+                                <input type="text" class="form-control" name="bmartop[]" value="{if isset($button['bmartop'])}{$button['bmartop']}{else /}18{/if}">
+                                <div class="input-group-addon">px</div>
+                        </div>
+                        </td>
+                        <td class="text-center">
+                            <a class="btn btn-xs btn-danger btn-del-button" href="javascript:void(0)" onclick="javascript:$(this).parents('tr').remove();"> <i class="mdi mdi-close"></i> </a>
+                        </td>
+                    </tr>
+                    {/volist}
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        <td colspan="4">
+                        <a class="btn btn-primary btn-xs addbutton" href="javascript:;"> <i class="mdi mdi-plus"></i>新增按钮</a>
+                        </td>
+                    </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 模块列表显示类型</label>
+            <div class="col-lg-8">
+            <label class="lyear-radio radio-inline radio-primary">
+            <input type="radio" name="openmoduletype" value="1" {if $config['openmoduletype']=='1'}checked{/if}><span>底部滑动栏目</span>
+            </label>
+            <label class="lyear-radio radio-inline radio-primary">
+            <input type="radio" name="openmoduletype" value="2" {if $config['openmoduletype']=='2'}checked{/if}><span>顶部互动按钮</span>
+            </label>
+            <label class="lyear-radio radio-inline radio-primary">
+            <input type="radio" name="openmoduletype" value="3" {if $config['openmoduletype']=='3'}checked{/if}><span>隐藏</span>
+            </label>
+            <div class="help-block">注:此项可以控制首页功能菜单展示方式</div>
+            </div>
+        </div>
+    </div>
+    <div class="config-titlebox">
+        <span class="config-titlename">大屏设置</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#screenconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+    </div>
+    <div id="screenconfigbox" class="collapse in">
+        {include file="$Wpath/common/configscreencommon" /}
+        {include file="$Wpath/common/configscreenmusic" /}
+        {include file="$Wpath/common/configscreenlay" /}
+    </div>
+    {include file='$Wpath/common/configsavepanel'}
+</form>
+<script>
+var noteditzds = {:json_encode($noteditzd)};
+require(['webcore','jconfirmBox','zamnotice','layerBox','zvalidator','jquery.ui'],function(webcore,jconfirmBox,zamnotice,layerBox){
+    $('.showitem-lists').sortable({handle: ".btn-moveitem"}).disableSelection();
+    $('#formBox').formValidation({
+        framework: 'bootstrap',
+        excluded: [':disabled'],
+        message: '您填写的内容无效',
+        fields:{}
+    }).on('success.form.fv', function(e) {
+        e.preventDefault();
+        var $form = $(e.target);
+        var postData = webcore.serializeObject($form);
+        var bload = $form.find(".zam-fixedbottom button").lyearloading({opacity: 0.2,spinnerSize: 'nm'});
+        $form.formValidation('disableSubmitButtons', true);
+        webcore.ajaxSubmit("{:gohdmanage('configshouye/index',['hdid'=>$hdid])}",postData).then(function(json){
+            bload.hide();
+            if(json.code==0){
+                $form.formValidation('disableSubmitButtons', false);
+                zamnotice.showTips('success','操作成功',2e3,function(){
+                    window.location.reload();
+                });
+            }else{
+                zamnotice.showTips('error',json.msg);
+                $form.formValidation('disableSubmitButtons', false);
+            }
+        }, function(json){
+            bload.hide();
+            zamnotice.showTips('error','网络差。操作失败');
+            $form.formValidation('disableSubmitButtons', false);
+        });
+    });
+    $(".card-totalitems span").click(function(){
+        var $this = $(this),zd = $this.attr('data-zd'),zdname = $this.text();
+        if($this.hasClass('disabled')) return false;
+        var zdinfo = {
+            zd:zd,
+            content:zdname,
+            size:16,
+            top:20,
+            readonly:true,
+        };
+        if($.inArray(zd,noteditzds)==-1){
+            zdinfo.readonly = false;
+        }
+        if(zd=='avatar' || zd=='uploadimg'){
+            zdinfo.size = 100;
+            zdinfo.top = 100;
+        }
+        if(zd=='nickname'){
+            zdinfo.size = 20;
+            zdinfo.top = 30;
+        }
+        var whtml = $(webcore.tpl($("#addshowitem"),zdinfo)).clone();
+        $(".showitem-lists").append(whtml);
+        if(zd!='diytxt') $this.addClass('disabled');
+        tpl_colorpicker();
+    });
+    //删除选择的项目
+    $(".showitem-lists").on('click','.btn-delshowitem',function(){
+        var pnode = $(this).parents('tr'),zd = pnode.find('input').eq(0).val();
+        $(".card-totalitems span").filter(function(o, i) {
+            return $(i).attr("data-zd")==zd;
+        }).removeClass('disabled');
+        pnode.remove();
+    });
+    $(".addbutton").click(function(){
+        var bhtml = $(webcore.tpl($("#addbutton"),{name:'',url:'',bmartop:'18'})).clone();
+        bhtml.find('input').eq(0).val(webcore.random(6,1,1));
+        $(".button-lists").append(bhtml);
+        tpl_colorpicker();
+    });
+});
+function appbgmusic(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".appmusicbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".appmusicbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+</script>
+<script id='addshowitem' type="text/template">
+<tr>
+    <td class="text-center">
+        <input type="hidden" name="showzd[]" value="<% d.zd %>">
+        <input class="form-control" type="text" name="showcontent[]" value="<% d.content %>" <%# if(d.readonly){ %>readonly<%# } %>>
+    </td>
+    <td class="text-center">
+       <div class="input-group">
+            <input type="text" class="form-control" name="showsize[]" value="<% d.size %>">
+            <div class="input-group-addon">px</div>
+       </div>
+    </td>
+    <td class="text-center">
+        <div class="zam-flex-center">
+        {:tpl_color('showcolor[]','#ffffff')}
+        </div>
+    </td>
+    <td class="text-center">
+       <div class="input-group">
+            <input type="text" class="form-control" name="showtop[]" value="<% d.top %>">
+            <div class="input-group-addon">px</div>
+       </div>
+    </td>
+    <td class="text-center">
+       <div class="input-group">
+            <input type="text" class="form-control" name="showleft[]" value="0">
+            <div class="input-group-addon">px</div>
+       </div>
+    </td>
+    <td class="text-center">
+        <a class="btn btn-xs btn-primary zam-sortable btn-moveitem" href="javascript:void(0)"> <i class="mdi mdi-arrow-all"></i></a>
+        <a class="btn btn-xs btn-danger btn-delshowitem" href="javascript:void(0)"> <i class="mdi mdi-close"></i></a>
+    </td>
+</tr>
+</script>
+<script id='addbutton' type="text/template">
+<tr>
+<td class="text-center">
+    <input type="hidden" name="buttonid[]" value="" />
+    <input class="form-control" type="text" name="bname[]" value="<% d.name %>" placeholder="必须填写按钮名">
+</td>
+<td class="text-center">
+    <div class="zam-flex-center">
+    {:tpl_color('bcolor[]','#239bf0')}
+    </div>
+</td>
+<td class="text-center">
+    <input class="form-control" type="text" name="burl[]" value="<% d.url %>" placeholder="必须填写完整的地址">
+</td>
+<td class="text-center">
+   <div class="input-group">
+        <input type="text" class="form-control" name="bmartop[]" value="<% d.bmartop %>">
+        <div class="input-group-addon">px</div>
+   </div>
+</td>
+<td class="text-center">
+    <a class="btn btn-xs btn-danger btn-del-button" href="javascript:void(0)" onclick="javascript:$(this).parents('tr').remove();"> <i class="mdi mdi-close"></i> </a>
+</td>
+</tr>
+</script>
+{include file='$Wpath/common/footer'}

@@ -1,0 +1,281 @@
+{include file='$Wpath/common/header'}
+<form id="formBox" class="zam-formvalidation form-horizontal" method="post">
+<div class="form-group smstypes">
+    <label class="col-lg-2 control-label">* 短信发放平台</label>
+    <div class="col-lg-8">
+        <label class="lyear-radio radio-inline radio-primary">
+            <input type="radio" name="type" value="1" {if $config['type']=='1'}checked{/if}><span>阿里云短信</span>
+        </label>
+        <label class="lyear-radio radio-inline radio-primary">
+            <input type="radio" name="type" value="2" {if $config['type']=='2'}checked{/if}><span>腾讯云短信</span>
+        </label>
+        <label class="lyear-radio radio-inline radio-primary">
+            <input type="radio" name="type" value="3" {if $config['type']=='3'}checked{/if}><span>七牛云短信</span>
+        </label>
+        <div class="help-block">默认使用阿里云短信</div>
+    </div>
+</div>
+<div>
+<div class="smstype1{if $config['type']!='1'} hidden{/if}">
+    <div class="form-group">
+      <label class="col-lg-2 control-label">* Access Key ID</label>
+      <div class="col-lg-8">
+        <input class="form-control" type="text"  name="ali[appkey]" value="{$config['ali']['appkey']}" onkeyup="return trimSpace(this)">
+        <div class="help-block">Access Key ID是阿里云API的Accesskey</div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label">* Access Key Secret</label>
+      <div class="col-lg-8">
+        <input class="form-control" type="text"  name="ali[appsecret]" value="{$config['ali']['appsecret']}" onkeyup="return trimSpace(this)">
+        <div class="help-block">Access Key Secret是阿里云API的AccessSecret</div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label">* 短信签名</label>
+      <div class="col-lg-8">
+        <input class="form-control" type="text"  name="ali[signname]" value="{$config['ali']['signname']}" onkeyup="return trimSpace(this)">
+        <div class="help-block">一般是需要企业信息才能申请到短信签名</div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label">* 注册账号模板id</label>
+      <div class="col-lg-8">
+        <input class="form-control" type="text"  name="ali[registertplid]" value="{$config['ali']['registertplid']}" onkeyup="return trimSpace(this)">
+        <div class="help-block">一般用于注册账号填写手机时验证码，此模板用于告知用户注册账号时的短信验证码。在“阿里云短信”添加的短信模板内容:尊敬的用户，您的注册账号手机验证码为：${code}，请勿泄漏于他人！</div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label">* 登录账号模板id</label>
+      <div class="col-lg-8">
+        <input class="form-control" type="text"  name="ali[logintplid]" value="{$config['ali']['logintplid']}" onkeyup="return trimSpace(this)">
+        <div class="help-block">此模板一般用于用户通过手机号登录平台时，发送手机验证码。在“阿里云短信”添加的短信模板内容:尊敬的用户，您的手机号登录验证码为：${code}，请勿泄漏于他人！</div>
+      </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 绑定或修改手机模板id</label>
+        <div class="col-lg-8">
+            <input class="form-control" type="text"  name="ali[changbindtplid]" value="{$config['ali']['changbindtplid']}" onkeyup="return trimSpace(this)">
+            <span class="help-block">一般用于用户在个人中心修改绑定的手机号，此模板用于用户绑定或者修改手机号，发送手机验证码。在“阿里云短信”添加的短信模板内容:尊敬的用户，您绑定手机验证码为：${code}，请勿泄漏于他人！</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 找回密码模板id</label>
+        <div class="col-lg-8">
+            <input class="form-control" type="text"  name="ali[findwordtplid]" value="{$config['ali']['findwordtplid']}" onkeyup="return trimSpace(this)">
+            <span class="help-block">一般用于用户忘记密码，希望通过手机号来找回密码，此模板用于用户找回密码时，发送手机验证码。在“阿里云短信”添加的短信模板内容:尊敬的用户，您找回登录密码手机验证码为：${code}，请勿泄漏于他人！</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 充值红包账号模板id</label>
+        <div class="col-lg-8">
+            <input class="form-control" type="text"  name="ali[czredpacktplid]" value="{$config['ali']['czredpacktplid']??''}" onkeyup="return trimSpace(this)">
+            <span class="help-block">一般用于后台充值红包账户时对绑定了手机号的用户进行短信验证，发送手机验证码。在“阿里云短信”添加的短信模板内容:尊敬的用户，您本次充值红包账号短信验证码为：${code}，请勿泄漏于他人！</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 发起收入提现模板id</label>
+        <div class="col-lg-8">
+            <input class="form-control" type="text"  name="ali[txapplytplid]" value="{$config['ali']['txapplytplid']??''}" onkeyup="return trimSpace(this)">
+            <span class="help-block">一般用于后台发起收入提现时对绑定了手机号的用户进行短信验证，发送手机验证码。在“阿里云短信”添加的短信模板内容:尊敬的用户，您本次收入提现短信验证码为：${code}，请勿泄漏于他人！</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 微信端签到短信验证模板id</label>
+        <div class="col-lg-8">
+            <input class="form-control" type="text"  name="ali[signtplid]" value="{$config['ali']['signtplid']}" onkeyup="return trimSpace(this)">
+            <span class="help-block">一般用于活动微信端开启了短信验证手机号, 此模板用于向签到用户发送签到手机验证码。在“阿里云短信”添加的短信模板内容:尊敬的用户，您的签到手机验证码为：${code}，请勿泄漏于他人！</span>
+        </div>
+    </div>
+</div>
+<div class="smstype2{if $config['type']!='2'} hidden{/if}">
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* SecretID</label>
+        <div class="col-lg-8">
+            <input class="form-control" type="text"  name="tencent[appkey]" value="{$config['tencent']['appkey']??''}" onkeyup="return trimSpace(this)">
+            <div class="help-block">腾讯云右上角->访问管理->访问秘钥->API密钥管理内的SecretID</div>
+        </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label">* SecretKEY</label>
+      <div class="col-lg-8">
+            <input class="form-control" type="text"  name="tencent[appsecret]" value="{$config['tencent']['appsecret']??''}" onkeyup="return trimSpace(this)">
+            <div class="help-block">腾讯云右上角->访问管理->访问秘钥->API密钥管理内的SecretKEY</div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label">* 短信应用SDK AppID</label>
+      <div class="col-lg-8">
+            <input class="form-control" type="text"  name="tencent[appid]" value="{$config['tencent']['appid']??''}" onkeyup="return trimSpace(this)">
+            <div class="help-block">在腾讯云短信->应用管理->应用列表内复制过来</div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label">* 短信签名</label>
+      <div class="col-lg-8">
+        <input class="form-control" type="text"  name="tencent[signname]" value="{$config['tencent']['signname']??''}" onkeyup="return trimSpace(this)">
+        <div class="help-block">一般是需要企业信息才能申请到短信签名</div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label">* 注册账号模板id</label>
+      <div class="col-lg-8">
+        <input class="form-control" type="text"  name="tencent[registertplid]" value="{$config['tencent']['registertplid']??''}" onkeyup="return trimSpace(this)">
+        <div class="help-block">一般用于注册账号填写手机时验证码，此模板用于告知用户注册账号时的短信验证码。请在“腾讯云国内短信->正文模板管理内创建模板 ”短信模板内容:尊敬的用户，您的注册账号手机验证码为：{1}，请勿泄漏于他人！</div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label">* 登录账户模板id</label>
+      <div class="col-lg-8">
+        <input class="form-control" type="text"  name="tencent[logintplid]" value="{$config['tencent']['logintplid']??''}" onkeyup="return trimSpace(this)">
+        <div class="help-block">此模板一般用于用户通过手机号登录平台时，发送手机验证码。请在“腾讯云国内短信->正文模板管理内创建模板 ”短信模板内容:尊敬的用户，您的手机号登录验证码为：{1}，请勿泄漏于他人！</div>
+      </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 绑定或修改手机模板id</label>
+        <div class="col-lg-8">
+            <input class="form-control" type="text"  name="tencent[changbindtplid]" value="{$config['tencent']['changbindtplid']??''}" onkeyup="return trimSpace(this)">
+            <span class="help-block">一般用于用户在个人中心修改绑定的手机号，此模板用于用户绑定或者修改手机号，发送手机验证码。请在“腾讯云国内短信->正文模板管理内创建模板 ”短信模板内容:尊敬的用户，您绑定手机验证码为：{1}，请勿泄漏于他人！</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 找回密码模板id</label>
+        <div class="col-lg-8">
+            <input class="form-control" type="text"  name="tencent[findwordtplid]" value="{$config['tencent']['findwordtplid']??''}" onkeyup="return trimSpace(this)">
+            <span class="help-block">一般用于用户忘记密码，希望通过手机号来找回密码，此模板用于用户找回密码时，发送手机验证码。请在“腾讯云国内短信->正文模板管理内创建模板 ”短信模板内容:尊敬的用户，您找回登录密码手机验证码为：{1}，请勿泄漏于他人！</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 充值红包账号模板id</label>
+        <div class="col-lg-8">
+            <input class="form-control" type="text"  name="tencent[czredpacktplid]" value="{$config['tencent']['czredpacktplid']??''}" onkeyup="return trimSpace(this)">
+            <span class="help-block">一般用于后台充值红包账户时对绑定了手机号的用户进行短信验证，发送手机验证码。请在“腾讯云国内短信->正文模板管理内创建模板”添加的短信模板内容:尊敬的用户，您本次充值红包账号短信验证码为：{1}，请勿泄漏于他人！</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 发起收入提现模板id</label>
+        <div class="col-lg-8">
+            <input class="form-control" type="text"  name="tencent[txapplytplid]" value="{$config['tencent']['txapplytplid']??''}" onkeyup="return trimSpace(this)">
+            <span class="help-block">一般用于后台发起收入提现时对绑定了手机号的用户进行短信验证，发送手机验证码。请在“腾讯云国内短信->正文模板管理内创建模板”添加的短信模板内容:尊敬的用户，您本次收入提现短信验证码为：{1}，请勿泄漏于他人！</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 微信端签到短信验证模板id</label>
+        <div class="col-lg-8">
+            <input class="form-control" type="text"  name="tencent[signtplid]" value="{$config['tencent']['signtplid']??''}" onkeyup="return trimSpace(this)">
+            <span class="help-block">一般用于活动微信端开启了短信验证手机号,此模板用于向签到用户发送签到手机验证码。请在“腾讯云国内短信->正文模板管理内创建模板”短信模板内容:尊敬的用户，您的签到手机验证码为：{1}，请勿泄漏于他人！</span>
+        </div>
+    </div>
+</div>
+<div class="smstype3{if $config['type']!='3'} hidden{/if}">
+    <div class="form-group">
+      <label class="col-lg-2 control-label">* Accesskey</label>
+      <div class="col-lg-8">
+        <input class="form-control" type="text"  name="qiniu[appkey]" value="{$config['qiniu']['appkey']??''}" onkeyup="return trimSpace(this)">
+        <div class="help-block">七牛后台右上角进入密钥管理复制AK</div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label">* Secretkey</label>
+      <div class="col-lg-8">
+        <input class="form-control" type="text"  name="qiniu[appsecret]" value="{$config['qiniu']['appsecret']??''}" onkeyup="return trimSpace(this)">
+        <div class="help-block">七牛后台右上角进入密钥管理复制SK</div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label">* 短信签名</label>
+      <div class="col-lg-8">
+        <input class="form-control" type="text"  name="qiniu[signname]" value="{$config['qiniu']['signname']??''}" onkeyup="return trimSpace(this)">
+        <div class="help-block">七牛后台->云短信->签名->创建</div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label">* 注册账号模板id</label>
+      <div class="col-lg-8">
+        <input class="form-control" type="text"  name="qiniu[registertplid]" value="{$config['qiniu']['registertplid']??''}" onkeyup="return trimSpace(this)">
+        <div class="help-block">一般用于注册账号填写手机时验证码，此模板用于告知用户注册账号时的短信验证码。请在“七牛后台->云短信->模板->新建”添加的短信模板内容:尊敬的用户，您的注册账号手机验证码为：${code}，请勿泄漏于他人！</div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label">* 登录账户模板id</label>
+      <div class="col-lg-8">
+        <input class="form-control" type="text"  name="qiniu[logintplid]" value="{$config['qiniu']['logintplid']??''}" onkeyup="return trimSpace(this)">
+        <div class="help-block">此模板一般用于用户通过手机号登录平台时，发送手机验证码。请在“七牛后台->云短信->模板->新建”添加的短信模板内容:尊敬的用户，您的手机号登录验证码为：${code}，请勿泄漏于他人！</div>
+      </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 绑定或修改手机模板id</label>
+        <div class="col-lg-8">
+            <input class="form-control" type="text"  name="qiniu[changbindtplid]" value="{$config['qiniu']['changbindtplid']??''}" onkeyup="return trimSpace(this)">
+            <span class="help-block">一般用于用户在个人中心修改绑定的手机号，此模板用于用户绑定或者修改手机号，发送手机验证码。请在“七牛后台->云短信->模板->新建”添加的短信模板内容:尊敬的用户，您绑定手机验证码为：${code}，请勿泄漏于他人！</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 找回密码模板id</label>
+        <div class="col-lg-8">
+            <input class="form-control" type="text"  name="qiniu[findwordtplid]" value="{$config['qiniu']['findwordtplid']??''}" onkeyup="return trimSpace(this)">
+            <span class="help-block">一般用于用户忘记密码，希望通过手机号来找回密码，此模板用于用户找回密码时，发送手机验证码。请在“七牛后台->云短信->模板->新建”添加的短信模板内容:尊敬的用户，您找回登录密码手机验证码为：${code}，请勿泄漏于他人！</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 充值红包账号模板id</label>
+        <div class="col-lg-8">
+            <input class="form-control" type="text"  name="qiniu[czredpacktplid]" value="{$config['qiniu']['czredpacktplid']??''}" onkeyup="return trimSpace(this)">
+            <span class="help-block">一般用于后台充值红包账户时对绑定了手机号的用户进行短信验证，发送手机验证码。请在“七牛后台->云短信->模板->新建”添加的短信模板内容:尊敬的用户，您本次充值红包账号短信验证码为：${code}，请勿泄漏于他人！</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 发起收入提现模板id</label>
+        <div class="col-lg-8">
+            <input class="form-control" type="text"  name="qiniu[txapplytplid]" value="{$config['qiniu']['txapplytplid']??''}" onkeyup="return trimSpace(this)">
+            <span class="help-block">一般用于后台发起收入提现时对绑定了手机号的用户进行短信验证，发送手机验证码。请在“七牛后台->云短信->模板->新建”添加的短信模板内容:尊敬的用户，您本次收入提现短信验证码为：${code}，请勿泄漏于他人！</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 微信端签到短信验证模板id</label>
+        <div class="col-lg-8">
+            <input class="form-control" type="text"  name="qiniu[signtplid]" value="{$config['qiniu']['signtplid']??''}" onkeyup="return trimSpace(this)">
+            <span class="help-block">一般用于活动微信端开启了短信验证手机号, 此模板用于向签到用户发送签到手机验证码。请在“七牛后台->云短信->模板->新建”添加的短信模板内容:尊敬的用户，您的签到手机验证码为：${code}，请勿泄漏于他人！</span>
+        </div>
+    </div>
+</div>
+</div>
+{include file='$Wpath/common/savepanel'}
+</form>
+<script>
+require(['webcore','jconfirmBox','zamnotice','zvalidator'],function(webcore,jconfirmBox,zamnotice){
+    $(".smstypes label").click(function(){
+        var smstype = $(this).find('input').val();
+        $(".smstype"+smstype).removeClass('hidden').siblings().addClass('hidden');
+    });
+    $('#formBox').formValidation({
+		framework: 'bootstrap',
+		excluded: [':disabled'],
+		message: '您填写的内容无效',
+		fields: {}
+	}).on('success.form.fv', function(e) {
+		e.preventDefault();
+		var $form = $(e.target);
+		var postData = webcore.serializeObject($form);
+		var bload = $form.find(".zam-fixedbottom button").lyearloading({opacity: 0.2,spinnerSize: 'nm'});
+		$form.formValidation('disableSubmitButtons', true);
+		webcore.ajaxSubmit("{:goweb('smsmanage/index')}",postData).then(function(json){
+			bload.hide();
+			if(json.code==0){
+			    $form.formValidation('disableSubmitButtons', false);
+			    zamnotice.showTips('success','操作成功',2e3,function(){
+			    	window.location.reload();
+			    });
+		    }else{
+		        zamnotice.showTips('error',json.msg);
+		        $form.formValidation('disableSubmitButtons', false);
+		    }
+		}, function(json){
+			bload.hide();
+			zamnotice.showTips('error','网络差。操作失败');
+			$form.formValidation('disableSubmitButtons', false);
+		});
+	});
+});
+</script>
+{include file='$Wpath/common/footer'}

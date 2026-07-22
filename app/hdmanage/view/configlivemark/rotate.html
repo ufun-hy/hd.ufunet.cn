@@ -1,0 +1,235 @@
+{include file='$Wpath/common/header'}
+<div class="alert alert-danger">
+注意事项：<br>
+1 键盘方向键右键用于切换到下一轮，方向键左键用于切换上一轮<br>
+2 键盘空格键用于开启/关闭评分通道<br>
+3 键盘方向键向上键用于切换上一个选手，方向键向下键用于切换下一个选手<br> 
+</div>
+{include file='$Wpath/common/tabletoolbar'}
+<table id="listtable" class="zam-btable"></table>
+<script>    
+require(['webcore','webtable','jconfirmBox','zamnotice','clipboard','layerBox','jcode'],function(webcore,webtable,jconfirmBox,zamnotice,Clipboard,layerBox){
+var initConfig = {
+    tableId:'#listtable',
+    url:"{:gohdmanage('configlivemark/rotate',['hdid'=>$hdid])}",
+    columnoperate:{
+        btns:{
+            edit:true,
+            del:true,
+            data:true,
+            reset:{title:"重置",icon:"mdi-gavel"},
+            refund:{title:"评委二维码",icon:"mdi-qrcode",class:"primary"}
+        },
+        func:{
+            edit:function(value, row, index){
+                var confirmObj = jconfirmBox.ajaxconfirm("编辑轮次","{:gohdmanage('configlivemark/editrotate',['hdid'=>$hdid])}",{rotateid:row.id},'html','col-lg-10 col-lg-offset-1',function(e){
+                    var postData = webcore.serializeObject(e.find('form'));
+                    postData.rotateid = row.id;
+                    webcore.ajaxSubmit("{:gohdmanage('configlivemark/saverotate',['hdid'=>$hdid])}",postData).then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','保存成功');
+                            confirmObj.close();
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                             return false;
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                         return false;
+                    });
+                });
+            },
+            del:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','删除将删除当前轮次参评用户以及评委、评分数据无法恢复，您确定要删除么？',function(){
+                        webcore.ajaxSubmit("{:gohdmanage('configlivemark/delrotate',['hdid'=>$hdid])}",{rotateid:row.id}).then(function(json){
+                            if(json.code==0){
+                                webtable.refresh();
+                                zamnotice.showTips('success','删除成功');
+                            }else{
+                                zamnotice.showTips('error',json.msg);
+                            }
+                        }, function(json){
+                            zamnotice.showTips('error','网络差。操作失败');
+                        });
+                });
+            },
+            reset:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','重置轮次将清空轮次内所有得评分与点赞数据并且无法恢复，您确定要重置当前轮次么？',function(){
+                        webcore.ajaxSubmit("{:gohdmanage('configlivemark/resetrotate',['hdid'=>$hdid])}",{rotateid:row.id}).then(function(json){
+                            webtable.refresh();
+                            zamnotice.showTips('success','重置成功');
+                        }, function(json){
+                            zamnotice.showTips('error','网络差。操作失败');
+                        });
+                });
+            },
+            refund:function(value, row, index){
+                var confirmobj = jconfirmBox.ajaxconfirm("评委入口","{:gohdmanage('configlivemark/pwqrcode',['hdid'=>$hdid])}",{rotateid:row.id},'html','col-lg-8 col-lg-offset-2',function(e){
+                    confirmobj.close();
+                },false,'2');
+            },
+            data:function(value, row, index){
+                window.location.href = "{:gohdmanage('datalivemark/index',['hdid'=>$hdid])}&rotateid="+row.id;
+            },
+        }
+    },
+    columns:[{
+            checkbox: true,
+        }, 
+        {
+            field: 'id',
+            title: 'Id',
+            align: 'center',
+            visible: false
+        }
+        ,{
+            field: 'title',
+            title: '轮次',
+            align: 'center',
+        }, {
+                field: 'status',
+                title: '状态',
+                align: 'center',
+                width:'15%',
+                formatter: function(value, row, index){
+                    var html = row.pfnum >0?'<span class="text-danger">有评分数据</span>':'<span class="text-success">无评分数据</span>';
+                    html += row.isshow=='1'?'<span class="text-primary">(展示中)</span>':'';
+                    return html;
+                }
+        }, {
+            field: 'scoretype',
+            title: '计分模式',
+            align: 'center',
+            formatter: function(value, row, index){
+                var html = value=='1'?'总分':'平均分';
+                html += row.pfmode=='1'?'':'<span class="text-danger" style="font-size:10px">(去掉一个最高和最低)</span>'
+                return html;
+            }
+        },{
+            field: 'usernum',
+            title: '参评选手(人)',
+            align: 'center',
+        }
+        ,{
+            field: 'pftype',
+            title: '打分项目',
+            align: 'center',
+            formatter: function(value, row, index){
+                return value=='1'?'单项':'多项 - '+ row.pfitem.length + '项';
+            }
+        }
+        ,{
+            field: 'create_time',
+            title: '创建时间',
+            align: 'center',
+        }
+    ],
+    searchParamas:[],
+    toolbar:{
+        add:function(){
+            var confirmObj = jconfirmBox.ajaxconfirm("新增轮次","{:gohdmanage('configlivemark/editrotate',['hdid'=>$hdid])}",{},'html','col-lg-10 col-lg-offset-1',function(e){
+	            var postData = webcore.serializeObject(e.find('form'));
+	            webcore.ajaxSubmit("{:gohdmanage('configlivemark/saverotate',['hdid'=>$hdid])}",postData,'正在创建轮次...').then(function(json){
+	                if(json.code==0){
+	                    webtable.refresh();
+	                    zamnotice.showTips('success','创建成功');
+	                    confirmObj.close();
+	                }else{
+	                    zamnotice.showTips('error',json.msg);
+	                     return false;
+	                }
+	            }, function(json){
+	                zamnotice.showTips('error','网络差。操作失败');
+	                 return false;
+	            });
+	        });
+        },
+        del:function(){
+            var getSelects = webtable.getSelections();
+            if(getSelects.length>0){
+                jconfirmBox.confirm('温馨提示','删除将删除所选轮次下的的参评选手以及评分数据并且无法恢复，您确定要删除么？',function(){
+                    webcore.ajaxSubmit("{:gohdmanage('configlivemark/delrotate',['hdid'=>$hdid])}",{rotateid:getSelects}).then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','删除成功');
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差,操作失败');
+                    });
+                });
+            }else{
+                zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+        },
+        reset:function(){
+            jconfirmBox.confirm('温馨提示','清空将删除所有轮次相关数据并且无法恢复，您确定要清空么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('configlivemark/resetallrotate',['hdid'=>$hdid])}",{}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','清空成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+        },
+        {/*
+         当成重置
+        */}
+        shenhe:function(){
+            var getSelects = webtable.getSelections();
+            if(getSelects.length>0){
+                jconfirmBox.confirm('温馨提示','重置将删除所选轮次下评分和点赞数据，并且无法恢复，您确定要重置么？',function(){
+                    webcore.ajaxSubmit("{:gohdmanage('configlivemark/resetrotate',['hdid'=>$hdid])}",{rotateid:getSelects}).then(function(json){
+                        webtable.refresh();
+                        zamnotice.showTips('success','重置成功');
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                    });
+                });
+            }else{
+                zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+            
+        },
+    },
+};
+webtable.init(initConfig);
+var clickedshow = false;
+$(".zam-Table").on('click','.clickdownmainimg',function() {
+    var rotateid = $(this).attr('data-rotateid');
+    webcore.ajaxSubmit("{:gohdmanage('configlivemark/showrotateimg',['hdid'=>$hdid])}",{rotateid:rotateid},'稍等，正在查询..').then(function(json){
+        clickedshow = false;
+        if(json.code==0){
+            prevshowattachs(json.msg,1);
+        }else{
+            zamnotice.showTips('error',json.msg);
+        }
+    }, function(json){
+        clickedshow = false;
+        zamnotice.showTips('error','网络异常');
+    });
+});
+var clipboard = new Clipboard('.zam-clip', {
+    text: function(e) {
+      return $(e).data('url') || $(e).data('href')
+    }
+});
+clipboard.on('success',function(e) {
+ zamnotice.showTips('success','复制成功',2e3);
+ return;
+});
+$(".zam-Table").on('click','.clickshowclients',function() {
+    var rotateid = $(this).attr('data-rotateid');
+    var confirmobj = jconfirmBox.ajaxconfirm("本轮签约客户端一览","{:gohdmanage('configlivemark/showallclients',['hdid'=>$hdid])}",{rotateid:rotateid},'html','col-lg-10 col-lg-offset-1',function(e){
+            
+    },false,'2');
+});
+});
+</script>
+{include file='$Wpath/common/footer'}

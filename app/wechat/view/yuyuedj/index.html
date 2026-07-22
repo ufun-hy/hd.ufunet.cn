@@ -1,0 +1,122 @@
+{include file="common/header" /}
+<style>
+input{font:inherit;font-family: 微软雅黑,"Microsoft YaHei";}
+input::-webkit-input-placeholder,textarea::-webkit-input-placeholder{ color:#666!important}
+.zam-input-select{width: 100%;height: 0.75rem;line-height:0.75rem;font-size:0.3rem;color:#555;text-align:left}
+/**wechat-sign style**/
+body{overflow-y:auto}
+.zam-app-sign{height:100%;}
+.zam-app-signbox{
+	margin:0 auto;
+	border-radius: 4px;
+    text-align: center;
+    margin-top:{$appconfig['appbdbgmargintop']??0}px;
+}
+.remainbox{
+	margin-top: 0rem;
+	margin-bottom: 0.32rem;
+	width: 100%;
+	font-size: 0.52rem;
+}
+.remainbox .item{
+	color: #ee554f;
+	font-weight: bold;
+}
+.remainbox .nums div{
+	background-color: #ee554f;
+	color: #fff;
+	width: 0.62rem;
+	height: 0.62rem;
+	line-height: 0.62rem;
+	margin: 0 0.05rem;
+	border-radius: 0.08rem;
+	font-size: 0.72rem;
+}
+.yuyuebody{
+	background: rgba(0,0,0,0.32);
+	padding: 0.2rem;
+	border-radius: 0.24rem;
+	color: gold;
+	font-size: 0.3rem
+}
+
+.yuyuebody li{
+	height: 0.82rem;
+	line-height: 0.82rem;
+}
+.yuyuebody .title{
+	width: 0.8rem;
+}
+.yuyuebody .item{
+	width: 2.6rem;
+}
+.yuyuebody .yuyueitem{margin-bottom: 0.2rem;}
+.yuyuebody .yuyueitem .item{
+	background: #fff;
+	color: #333;
+	border-radius: 0.1rem;
+	font-weight: 600;
+	font-size: 0.42rem;
+}
+.btn-yuyue{
+	width: 100%;
+	margin-top: 0.32rem;
+}
+.btn-yuyue a{
+	padding: 0.3rem 1.2rem;
+	border-radius: 0.1rem;
+	background: #ee554f;
+	color: gold;
+	font-size: 0.42rem;
+	letter-spacing: 2px;
+}
+.btn-myrecord{
+	width: 100%;
+	margin-top: 0.32rem;
+}
+.btn-myrecord a{
+	padding: 0.3rem 1.2rem;
+	border-radius: 0.1rem;
+	background: rgba(0,0,0,0.32);
+	color: gold;
+	font-size: 0.42rem;
+	letter-spacing: 2px;
+}
+
+</style>
+<section class="zam-app-sign g-flexview zam-app-justifyCenter">
+<div class="zam-app-signbox zam-app-flex-ajCenter">
+	{if $showremain}
+	<div class="remainbox zam-app-flex zam-app-justifyCenter">
+		<span class="item">剩余额度:</span>
+		<div class="nums zam-app-flex">
+			{foreach $remainnum as $r}
+			<div>{$r}</div>
+			{/foreach}
+		</div>
+		<span class="item">{$appconfig['tongjiconfig']['unit']}</span>
+	</div>
+	{/if}
+	<div class="yuyuebody">
+		<ul class="yuyuetop zam-app-flex"><li class="title"></li><li class="item">预约金额(万元)</li><li class="item">预约人数</li></ul>
+		<ul class="yuyueitem zam-app-flex">
+			<li class="title">累计</li>
+			<li class="item" style="margin-right: 0.2rem">{$total['money']}</li>
+			<li class="item">{$total['total']}</li>
+		</ul>
+		<ul class="yuyueitem zam-app-flex">
+			<li class="title">今日</li>
+			<li class="item" style="margin-right: 0.2rem">{$today['money']}</li>
+			<li class="item">{$today['total']}</li>
+		</ul>
+	</div>
+	<div class="btn-yuyue zam-app-flex zam-app-justifyCenter"><a href="{:gowechat('yuyuedj/yuyue',['hdid'=>$hdinfo['hdid']])}">即刻预约</a></div>
+	<div class="btn-myrecord zam-app-flex zam-app-justifyCenter"><a href="{:gowechat('yuyuedj/record',['hdid'=>$hdinfo['hdid']])}">预约记录</a></div>
+</div>
+</section>
+<script>
+require(['wechatcore'],function (wechatcore) {
+})
+</script>
+{include file="yuyuedj/xieyi" /}
+{include file="common/footer" /}

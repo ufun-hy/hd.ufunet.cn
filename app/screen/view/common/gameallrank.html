@@ -1,0 +1,176 @@
+<style>
+/**排名样式**/
+.rankAllBox{
+	position: absolute;
+	top:0;
+	left:0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0,0,0,.9);
+	color:#fff;
+	z-index: 9;
+	animation-duration: 0.3s;
+}
+.rankAllBox.hidden{display: none}
+.rankAllBox-main{
+	position:relative;
+	width:1150px;
+	border-radius:5px;
+	height:600px;
+	border: 1px solid rgba(255,255,255,.4);
+    -webkit-box-shadow: inset 0 0 5px rgba(255,255,255,.4), 0 0 5px rgba(0,0,0,.4);
+    -moz-box-shadow: inset 0 0 5px rgba(255,255,255,.4), 0 0 5px rgba(0,0,0,.4);
+    box-shadow: inset 0 0 5px rgba(255,255,255,.4), 0 0 5px rgba(0,0,0,.4);
+    background: -webkit-linear-gradient(235deg, rgba(255,255,255,.1) 60%, rgba(255,255,255,0) 60%);
+    background: -moz-linear-gradient(235deg, rgba(255,255,255,.1) 60%, rgba(255,255,255,0) 60%);
+    background: -o-linear-gradient(235deg, rgba(255,255,255,.1) 60%, rgba(255,255,255,0) 60%);
+}
+.rankalllist-top{
+	position:absolute;
+	top:-86px;
+	width:100%;
+	height:70px;
+	font-size:32px;
+	line-height:70px;
+	text-align:center;
+}
+.rankalllist-title{
+	width:100%;
+	height:60px;
+	font-size:26px;
+}
+
+.rankalllist-close{
+	position: absolute;
+    top: -50px;
+    right: -80px;
+	cursor:pointer;
+}
+.rankalllist-close i{
+	font-size:32px;
+	color:#fff;
+}
+.rankalllist{
+	width:100%;
+	height:540px;
+	overflow-x:hidden;
+	overflow-y:auto;
+	
+}
+
+.rankalllist .rankalllist-item {
+	width:100%;
+	height:53px;
+    border-top: 1px solid rgba(255,255,255,.4);
+}
+.rankalllist .rankalllist-item div{
+	height:100%;
+}
+.rankalllist .rankalllist-item .rankalllist-pm .pmbox{
+	position: relative;
+	width: 100%;
+	height: 53px;
+}
+.rankalllist .rankalllist-item .rankalllist-pm .pmbox span{
+	position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 30px;
+    height: 30px;
+    transform: translate(-50%,-50%);
+    
+}
+.rankalllist .rankalllist-item .rankalllist-pm .pmbox .rankalllist-tag {
+    width:30px;
+}
+.rankalllist .rankalllist-item .rankalllist-pm span {
+    display: inline-block;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.rankalllist .rankalllist-item .rankalllist-user{
+	padding: 0 10px;
+	box-sizing: border-box;
+}
+.rankalllist .rankalllist-item .rankalllist-user img{
+    width: 40px;
+    height:40px;
+    border-radius: 100%;
+    margin-right: 30px;
+}
+.rankalllist .rankalllist-item .rankalllist-user p{
+    width: calc(100% - 70px);
+	font-size:20px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.rankalllist .rankalllist-item .rankalllist-score span {
+	display:inline-block;
+    color: yellow;
+	font-size:24px;
+	font-style:normal;
+}
+.rankalllist .rankalllist-item .rankalllist-jp span {
+	display:inline-block;
+	width: 100%;
+	padding: 0 3px;
+    color: yellow;
+	font-size:18px;
+	box-sizing: border-box;
+	text-align: center;
+}
+.rankAllBox-btns{
+	width: 100%;
+    text-align: center;
+    position: absolute;
+    bottom: -80px;
+    left: 0;
+}
+.rankAllBox-btns .rankAllBox-btn{
+    display: inline-block;
+    border: 1px solid #fff;
+    padding: 10px 20px;
+    border-radius: 5px;
+	cursor:pointer;
+}
+.rankAllBox-btns .rankAllBox-btn:hover{
+	background-color:#fff;
+	color:#333;
+}
+</style>
+<script id="rankall-tpl" type="html/javascript">
+<li class="rankalllist-item zam-app-flex">
+	<div class="rankalllist-pm zam-app-flex-ajCenter2" style="width:15%">
+		  {{ if key < 4 }}
+		  <div class="pmbox zam-app-flex-ajCenter2">
+			<img src="/{:WIMGURL}cutfruit/images/rank/{{ key }}.png" class="rankalllist-tag">
+			<span>{{ key }}</span>
+		  </div>
+		  {{ else }}
+			<span>{{ key }}</span>
+		  {{ /if }}
+	</div>
+	<div class="rankalllist-user zam-app-flex zam-app-alignCenter" style="width:55%">
+		<img  src="{{ avatar }}">
+		<p>{{ nickname }}</p>
+	</div>
+	<div class="rankalllist-score zam-app-flex-ajCenter2" style="width:30%">
+		<span>{{ score }}</span>
+	</div>
+</li>
+</script>
+<div  class="rankAllBox zam-app-flex-ajCenter hidden"> 
+   <section class="rankAllBox-main">
+		<div class="rankalllist-close"><i class="zam-icon-error"></i></div>
+		<div class="rankalllist-top">总排名</div>
+		<section class="rankalllist-title zam-app-flex">
+			<div class="rankalllist-num zam-app-flex-ajCenter2" style="width:15%">排名</div>
+			<div class="rankalllist-name zam-app-flex-ajCenter2" style="width:55%">用户</div>
+			<div class="rankalllist-cj zam-app-flex-ajCenter2" style="width:30%">最好成绩</div>
+		</section>
+		<ul class="rankalllist"></ul>
+	</section>
+</div>

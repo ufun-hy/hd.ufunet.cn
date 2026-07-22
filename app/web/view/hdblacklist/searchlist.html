@@ -1,0 +1,121 @@
+<div class="form-inline zam-inline-searchbar">
+    <div class="form-group">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">用户昵称</span>
+        <input type="text" class="form-control usernickname" value="" id="keyword" placeholder="请输入用户昵称" style="width: 200px">
+      </div>
+    </div>
+    <a class="btn btn-primary btn-sm btn-search" href="javascript:void(0)" onclick="plansearch(this)" ><i class="mdi mdi-magnify"></i> 搜索</a>
+</div>
+<table class="table" style="margin-bottom:0px;">
+<thead>
+  <tr>
+	<th style="width:50%;text-align:center;">用户</th>
+	<th style="width:20%;text-align:center;">参与活动数</th>
+	<th style="width:30%;text-align:center;">操作</th>
+  </tr>
+</thead>
+<tbody class="searchuser-lists"></tbody>
+</table>
+<div class="searchuser-pager" style="padding:10px;text-align: center;"></div>
+<script id="oneuser-tpl" type="text/template">
+	<tr>
+		<td class="text-center">
+			<div class="nduserinfo" data-openid="<% d.openid %>">
+				<img style="width:30px;height:30px;border-radius:50%;" src="<% d.avatar %>" />
+				<p><% d.nickname %></p>
+				<p>openid:<% d.openid %></p>
+			</div>
+		</td>
+		<td class="text-center">
+		  <% d.num %>个
+		</td>
+		<td class="text-center">
+			<%# if(d.isin=='2'){ %>
+			<a class="btn btn-danger btn-xs" href="javascript:void(0)" onclick="joinblack(this,'1')">加入黑名单</a>
+			<%# }else{ %>
+			<a class="btn btn-primary btn-xs" href="javascript:void(0)" onclick="joinblack(this,'2')">移出黑名单</a>
+			<%# } %>
+		</td>
+	</tr>
+</script>
+<script>
+function ajaxlist(page,obj){ 
+	require(["zamnotice","layerBox","jconfirmBox","webcore"],function(zamnotice,layerBox,jconfirmBox,webcore){
+		webcore.ajaxSubmit("{:goweb('hdblacklist/add')}",{ishtml:'1',ajaxtype:'2',page:page,keyword:$('.usernickname').val()},'正在加载..').then(function(json){
+			if(json.code==0){
+				var html = '';
+				$.each(json.msg.rows,function(i,v){
+					html += webcore.tpl($("#oneuser-tpl"),v);
+				});
+				$(".searchuser-lists").html(html);
+				$(".searchuser-pager").html(json.msg.pager);
+			}else{
+				zamnotice.showTips('error','网络差。操作失败');
+			}
+		}, function(json){
+			zamnotice.showTips('error','网络差。操作失败');
+		});
+	});
+}
+function initbaolist(){
+	require(["zamnotice","layerBox","jconfirmBox","webcore"],function(zamnotice,layerBox,jconfirmBox,webcore){
+		webcore.ajaxSubmit("{:goweb('hdblacklist/add')}",{ishtml:'1',ajaxtype:'2',keyword:$('.usernickname').val()},'正在加载..').then(function(json){
+			var html = '';
+			if(json.code==0){
+				$.each(json.msg.rows,function(i,v){
+					html += webcore.tpl($("#oneuser-tpl"),v);
+				});
+				$(".searchuser-lists").html(html);
+				$(".searchuser-pager").html(json.msg.pager);
+			}else{
+				zamnotice.showTips('error','网络差。操作失败');
+			}
+		}, function(json){
+			zamnotice.showTips('error','网络差。操作失败');
+		});
+	});
+}
+function plansearch(obj){ 
+	require(["zamnotice","layerBox","jconfirmBox","webcore"],function(zamnotice,layerBox,jconfirmBox,webcore){
+		webcore.ajaxSubmit("{:goweb('hdblacklist/add')}",{ishtml:'1',ajaxtype:'2',keyword:$('.usernickname').val()},'正在加载..').then(function(json){
+			var html = '';
+			if(json.code==0){
+				$.each(json.msg.rows,function(i,v){
+					html += webcore.tpl($("#oneuser-tpl"),v);
+				});
+				$(".searchuser-lists").html(html);
+				$(".searchuser-pager").html(json.msg.pager);
+			}else{
+				zamnotice.showTips('error','网络差。操作失败');
+			}
+		}, function(json){
+			zamnotice.showTips('error','网络差。操作失败');
+		});
+	});
+}
+function joinblack(obj,type){
+	var postobj = {ishtml:'2',type:type};
+	postobj.openid = $(obj).parent().parent().find('td').eq(0).find('div').attr('data-openid');
+	require(["zamnotice","layerBox","jconfirmBox","webcore","webtable"],function(zamnotice,layerBox,jconfirmBox,webcore,webtable){
+		webcore.ajaxSubmit("{:goweb('hdblacklist/add')}",postobj,'正在执行操作..').then(function(json){
+			if(json.code==0){
+				if(type=='1'){
+					$(obj).attr('onclick',"joinblack(this,'2')").text('移出黑名单');
+					$(obj).removeClass('btn-danger').addClass('btn-primary');
+				}else{
+					$(obj).attr('onclick',"joinblack(this,'1')").text('加入黑名单');
+					$(obj).addClass('btn-danger').removeClass('btn-primary');
+				}
+				webtable.refresh();
+				zamnotice.showTips('success','操作成功');
+			}else{
+				zamnotice.showTips('error',json.msg);
+			}
+		}, function(json){
+			zamnotice.showTips('error','网络差。操作失败');
+		});
+	});
+}
+initbaolist();
+</script>

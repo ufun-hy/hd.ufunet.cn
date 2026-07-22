@@ -1,0 +1,179 @@
+{include file="common/header" /}
+<style>
+/**shake控制器 style**/
+.zam-app-shake-main{position:fixed;top:0;left:0;width:100%;height:100%;overflow: hidden;color:#333;}
+/*提示层*/
+.zam-app-shaketip{
+	font-size:0.32rem;font-weight:500;margin-bottom:0.5rem;color:#fff
+}
+.zam-app-shake-wait,.zam-app-shake-over{width:2.5rem;height:2.5rem;margin-bottom:0.5rem}
+.zam-app-shake-wait img,.zam-app-shake-over img{width:100%;height:100%;}
+.zam-app-shake-ing{
+	position:relative;
+    width: 5.76rem;
+	height: 6rem;
+	margin-bottom:0.5rem;
+}
+.zam-app-shake-ing .zam-app-shake-img{
+	position:absolute;
+	top:0;
+	left:0;
+	width:100%;
+	height:100%;
+	background-image: url("{:tomedia($appconfig['style']['shakeconfig']['appcenter'])}");
+    background-size: cover;
+    z-index: -1;
+}
+.zam-app-shake-ing span{
+	background-image: url("{:tomedia($appconfig['style']['shakeconfig']['approle'])}");
+    background-size: cover;
+    background-repeat: no-repeat;
+    width: 5rem;
+    height: 5.2rem;
+    display: inline-block;
+}
+/*点一点*/
+.zam-app-click-ing img{
+	width:4rem;
+	height:4rem;
+}
+.zam-app-rotate-ing img{
+	width:4rem;
+	height:4rem;
+}
+/*进度条*/
+.progress-box{padding:0 26px;width:80%;}
+.progress-bg{ position:relative; height:28px; line-height:28px; background:rgba(0,0,0,0.7); border-radius:40px; text-align:center; font-size:1.5em; color:#fff; box-shadow:inset 0 1px 4px rgba(0,0,0,.7), 0 1px 2px rgba(255,255,255,.5); padding:0 3px;}
+.progress-bar{ position:relative; top:3px; left:0px; width:0%; height:22px; background: -moz-linear-gradient(left , #fff56f , #ffc62a); background: -webkit-linear-gradient(left , #fff56f , #ffc62a); background: -o-linear-gradient(left , #fff56f , #ffc62a); border-radius:40px; box-shadow:inset 0 2px 5px rgba(255,255,255,.7), 0 1px 3px rgba(0,0,0,.7);}
+.progress-bar:after{content: ""; position: absolute; top: 0; left: 0; bottom: 0; right: 0; background-image: -webkit-gradient(linear, 0 0, 100% 100%, color-stop(.25, rgba(255, 255, 255, .2)), color-stop(.25, transparent), color-stop(.5, transparent), color-stop(.5, rgba(255, 255, 255, .2)), color-stop(.75, rgba(255, 255, 255, .2)), color-stop(.75, transparent), to(transparent) ); background-image: -moz-linear-gradient( -45deg, rgba(255, 255, 255, .2) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .2) 50%, rgba(255, 255, 255, .2) 75%, transparent 75%, transparent ); z-index: 1; -webkit-background-size: 50px 50px; -moz-background-size: 50px 50px; background-size: 50px 50px; -webkit-animation: move 2s linear infinite; -moz-animation: move 2s linear infinite; border-radius:40px; overflow: hidden; }
+.progress-bg span{position:absolute;top:0;left:0;width:100%;z-index:2; text-shadow:1px 1px rgba(0,0,0,.5);font-size:18px;text-align:center}
+/*游戏时间*/
+.zam-app-gametime{
+	position:fixed;
+	left:0;
+	top:0.4rem;
+	background-color:rgba(0,0,0,0.4);
+	color:#fff;
+	padding:0.3rem;
+	font-size:0.5rem;
+}
+.zam-app-gametime i{
+	margin-right:0.3rem;
+}
+/*游戏结束弹窗*/
+.zam-app-shake-over{
+	position:fixed;
+	top:0;
+	left:0;
+	width:100%;
+	height:100%;
+	overflow: hidden;
+	color:blue;
+	background-color:rgba(0,0,0,0.6);
+	z-index:1;
+}
+.phb-btn{
+	width:3.6rem;
+	height:1.25rem;
+	background-image: url("{:tomedia($appconfig['style']['apppm'])}");
+    background-size: cover;   
+	background-repeat:no-repeat;
+	
+}
+.shake-banglist{
+	height:5.8rem;
+	overflow-x:hidden;
+	overflow-y:auto;
+}
+.shake-bangtitle{position:relative;font-size:0.32rem!important;text-align:center!important;}
+.shake-bangtitle i{position:absolute;right:0.3rem;font-size: 0.5rem;color:gray}
+.shake-banglist li {
+	height:1rem;
+    border-top: 1px solid #f0f0f0;
+}
+.shake-banglist li div{
+	height:100%;
+}
+.shake-banglist .banglist-tag {
+    width:0.6rem;
+}
+.shake-banglist .rolwnum {
+    display: inline-block;
+    width: 0.5rem;
+    text-align: center;
+    font-size: 0.32rem;
+	color:#666
+}
+.shake-banglist .banglist-avatar {
+    width: 0.7rem;
+    height: 0.7rem;
+    border-radius: 100%;
+}
+.shake-banglist .banglist-nickname {
+    width: 100%;
+	color:#666;
+	font-size:0.3rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.shake-banglist .banglist-number em {
+    color: #0084ff;
+	font-size: 0.4rem;
+}
+</style>
+{if !empty($appconfig['style']['diycss'])}<style>{$appconfig['style']['diycss']}</style>{/if}
+<audio id="djsaudio" src="/{:WIMGURL}shake/count.mp3"></audio>
+<audio id="shakeaudio" src="/{:WIMGURL}shake/shake.mp3"></audio>
+<div class="zam-app-shake-main zam-app-flex-ajCenter">
+	<div class="zam-app-shake-ing zam-app-flex-ajCenter hidden">
+		<div class="zam-app-shake-img"></div>
+		<span class="zam-app-shakehand"></span>
+	</div>
+	<div class="zam-app-click-ing zam-app-flex-ajCenter hidden">
+		<img class="zam-app-clickimg" src="">
+		<img class="zam-app-clickedimg hidden" src="">
+	</div>
+	<div class="zam-app-rotate-ing zam-app-flex-ajCenter hidden">
+		<img id="rotate" src="{:tomedia($appconfig['style']['rotateimg'])}" />
+	</div>
+	<div class="zam-app-shaketip"></div>
+	<div class="progress-box">
+	  <div class="progress-bg">
+		<div class="progress-bar"></div>
+		<span class="hidden"><em class="hadshakenums">0</em>/<em class="totalshakenums">0</em></span>
+	  </div>
+	</div>
+</div>
+<div class="zam-app-shake-over zam-app-flex-ajCenter hidden">
+	<div class="zam-app-shaketip"></div>
+	<a href="javascript:;" class="phb-btn zam-app-flex-ajCenter hidden"></a>
+</div>
+<div class="zam-app-gametime">
+	<i class="mxc-unie6b2"></i><span>0</span>
+</div>
+<script>
+var roleimg = "{:tomedia($appconfig['style']['shakeconfig']['approle'])}",rolerunimg = "{:tomedia($appconfig['style']['shakeconfig']['approlerun'])}";
+require(['wechatcore','appcar'],function (wechatcore,appcar) {
+	wechatcore.gameInit(appcar);
+	$(".phb-btn").on('click',function(){
+		var $this = $(this);
+		wechatcore.ajaxSubmit("{:gowechat('common/getphbdata')}",{gametype:XCV3Config.gametype,rotateid:$this.attr('data-rotateid'),gamephb:$this.attr('data-gamephb'),teamid:$this.attr('data-teamid')},'正在获取排行榜数据').then(function(data){
+			 if(data.code==0){
+				 if(data.msg.list.length>0){
+					 $("body").append(wechatcore.tpl($("#phb-tpl"),{list:data.msg.list,myrank:data.msg.myrank}));
+				 }else{
+					wechatcore.msg('暂无数据');
+				 }
+			 }else{
+				wechatcore.msg(data.msg);
+			 }
+		}, function(){
+			  wechatcore.msg('网络太差，请稍后重试');
+		});
+	});
+})
+</script>
+{include file="common/gamecommon" /}
+{include file="common/footermenu" /}
+{include file="common/footer" /}

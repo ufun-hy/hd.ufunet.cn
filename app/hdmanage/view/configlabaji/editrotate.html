@@ -1,0 +1,72 @@
+<style>
+.confirmbox-pop .zam-titleBox{font-weight: 600;padding:5px 0;}
+.nddatabox{line-height: 30px;margin-right: 10px;}
+</style>
+<div class="form-horizontal confirmbox-pop rotate-pop">
+<form class="confirm-formbox" method="post">
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 轮次名</label>
+    <div class="col-lg-8">
+        <input class="form-control" type="text"  name="title" value="{$rotate['title']}">
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 内定</label>
+    <div class="col-lg-8">
+        {:tpl_switch('isnd',$rotate['isnd']??'2','openndbox')}
+        <span class="help-block m-t-0">开启后需要选择内定的名单</span>
+    </div>
+</div>
+<div class="form-group ndbox{if $rotate['isnd']=='2'} hidden{/if}">
+    <label class="col-lg-3 control-label">* 内定名单</label>
+	<div class="col-lg-6">
+		<input type="hidden"  name="ndid" value="{$rotate['ndid']}">
+        <span class="nddatabox">{if !empty($rotate['nddata'])}{$rotate['nddata']['companyname']??''} - {$rotate['nddata']['username']??''}{/if}</span>
+        <a href="javascript:void(0)" class="btn btn-sm btn-{if empty($rotate['nddata'])}primary{else}danger{/if} btn-binddata">{if empty($rotate['nddata'])}点击选择名单{else}点击更换名单{/if}</a>
+	</div>
+</div>
+</form>
+</div> 
+<script id='onegoods-tpl' type="text/template">
+</script>        
+<script>    
+require(['webcore','jconfirmBox','zamnotice','layerBox'],function(webcore,jconfirmBox,zamnotice,layerBox){
+	tpl_switch();
+    //查询名单记录
+    $(".btn-binddata").click(function(){
+        var confirmobj = jconfirmBox.ajaxconfirm("内定名单","{:gohdmanage('configlabaji/bindndid',['hdid'=>$hdid])}",{},'html','col-lg-6 col-lg-offset-3',function(e){
+        	var selectuser = e.find("input:checked");
+			if(selectuser.length > 0 ){
+				if(selectuser.length != 1){
+					zamnotice.showTips('error','只能选择一个名单');
+					return false;
+				}
+				var ndid = selectuser.attr('data-id')||'';
+				if(ndid==''){
+					zamnotice.showTips('error','请选择需内定的名单');
+					return false;
+				}
+				var ndbox = $('.ndbox'),companyname = selectuser.parent().parent().next().text(),username = selectuser.parent().parent().next().next().text();
+				ndbox.find("input").val(ndid);
+				ndbox.find('.nddatabox').text(companyname + '-' + username);
+				ndbox.find('.btn').removeClass('btn-primary').addClass('btn-danger').text('点击更换名单');
+				confirmobj.close();
+			}else{
+				zamnotice.showTips('error','请选择需内定的名单');
+			}
+        });
+    });
+});
+function openndbox(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $('.ndbox').addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $('.ndbox').removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+</script>

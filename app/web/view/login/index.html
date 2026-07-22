@@ -1,0 +1,839 @@
+{include file="$Wpath/common/header_base" /}
+<style>
+  button.disabled {
+    pointer-events: none;
+  }
+  .lyear-wrapper-bg {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-image: url({:tomedia($config['common']['bgimg'])});
+  }
+  .lyear-wrapper {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden auto;
+  }
+  .lyear-login{
+    margin-top: 20px;
+  }
+  .login-center {
+    position: relative;
+    background: #fff;
+    width: 410px;
+    padding: {if $config['wxlogin']['open']=='1' && $config['login']['type']!='4'}72{else /}30{/if}px 30px 30px 30px;
+    border-radius: 3px;
+  }
+
+  @media screen and (max-width:768px) {
+    .login-center {
+      background: #fff;
+      width: 410px;
+      padding: {if $config['wxlogin']['open']=='1' && $config['login']['type']!='4'}72{else /}30{/if}px 30px 30px 30px;
+      border-radius: 3px;
+    }
+  }
+
+  @media screen and (max-width:480px) {
+    .login-center {
+      background: #fff;
+      width: 310px;
+      padding: {if $config['wxlogin']['open']=='1' && $config['login']['type']!='4'}72{else /}25{/if}px 25px 25px 25px;
+      border-radius: 3px;
+    }
+  }
+
+  .login-header {
+    margin-bottom:15px;
+  }
+
+  .login-header img {
+    max-width: 260px;
+  }
+
+  .login-center .has-feedback.feedback-left .form-control {
+    padding-left: 38px;
+    padding-right: 12px;
+  }
+
+  .login-center .has-feedback.feedback-right .form-control {
+    padding-right: 30px;
+  }
+
+  .login-center .has-feedback.feedback-left .form-control-feedback {
+    left: 0;
+    right: auto;
+    width: 38px;
+    height: 38px;
+    line-height: 38px;
+    z-index: 4;
+    color: #dcdcdc;
+  }
+
+  .login-center .has-success .form-control-feedback {
+    display: block !important;
+  }
+
+  .login-center .has-feedback.feedback-right .form-control-feedback-right {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 30px;
+    height: 38px;
+    line-height: 38px;
+    z-index: 4;
+    color: #dcdcdc;
+    text-align: center;
+  }
+
+  .imgverify {
+    width: 100px;
+    cursor: pointer;
+  }
+
+  .imgverify img {
+    width: 100px;
+    height: 38px;
+  }
+
+  .login-nav {
+    margin-bottom: 20px
+  }
+
+  .login-nav.only-type {
+    text-align: center
+  }
+
+  .login-nav li {
+    width: 50% !important;
+    float: left;
+    border: 0 !important;
+    text-align: center;
+  }
+
+  .login-nav.only-type li {
+    display: inline-block;
+    width: auto
+  }
+
+  .login-nav li:hover {
+    border: 0 !important;
+  }
+
+  .login-nav li a {
+    display: inline-block;
+    border-width: 3px !important;
+    border-radius: 0 !important;
+  }
+
+  .nav-tabs.nav-justified>li>a {
+    border-bottom-color: transparent;
+  }
+
+  .btn-sendcode.disabled {
+    pointer-events: none;
+    cursor: not-allowed;
+  }
+
+  .yzm-box {
+    position: relative;
+    margin: 10px;
+  }
+
+  .yzm-box * {
+    box-sizing: border-box;
+  }
+
+  .yzm-box input {
+    width: 220px;
+    height: 42px;
+    line-height: 42px;
+    padding-left: 42px;
+  }
+
+  .yzm-box span {
+    position: absolute;
+    left: 0;
+    right: auto;
+    width: 42px;
+    height: 42px;
+    line-height: 42px;
+    z-index: 4;
+    color: #dcdcdc;
+  }
+
+  .yzm-box a {
+    width: 157.5px
+  }
+
+  .yzm-box a img {
+    width: 157.5px;
+    height: 42px;
+  }
+
+  .layui-layer-btn0.disabled {
+    pointer-events: none;
+  }
+
+  .login-typetag {
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: start;
+    -webkit-justify-content: flex-start;
+    -ms-flex-pack: start;
+    justify-content: flex-start;
+  }
+
+  .login-typetag img {
+    position: relative;
+    top: 0px;
+    width: 72px;
+    height: 72px;
+    cursor: pointer;
+  }
+
+  .btn-login-tips {
+    position: absolute;
+    right: 72px;
+    top: 22px;
+    width: 106px;
+    height: 28px;
+    background: url(/static/images/sys/login/icon/typebg.png) no-repeat 0 0;
+    -webkit-background-size: 100% 100%;
+    background-size: 100% 100%;
+    line-height: 28px;
+    font-size: 14px;
+    font-weight: 400;
+    font-family: "PingFang SC";
+    color: #1472FF;
+    text-align: center;
+  }
+
+  .btn-login-tips span {
+    font-weight: 500;
+    letter-spacing: 1px;
+  }
+
+  .wx-login-title {
+    width: 100%;
+    text-align: center;
+    font-size: 20px;
+    font-weight: 600;
+    margin: 10px 0;
+  }
+
+  .qrbox .qrbg {
+    position: relative;
+    background-image: url(/static/images/sys/login/icon/scan.png);
+    background-size: cover;
+    background-repeat: no-repeat;
+    width: 200px;
+    height: 200px;
+    padding: 10px;
+    box-sizing: border-box;
+    margin: 10px 0;
+  }
+
+  .qrbox .qrbg img {
+    width: 100%;
+    height: 100%;
+  }
+
+  .qrbox .qrbg .loading {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 0.32);
+    border-radius: 8px;
+  }
+
+  .qrbox .qrbg .loading img {
+    width: 50px;
+    height: 50px;
+    margin-bottom: 10px;
+    animation: foreverrotate 2s linear infinite;
+  }
+
+  @keyframes foreverrotate {
+    0% {
+      transform: rotate(0)
+    }
+
+    to {
+      transform: rotate(-1turn)
+    }
+  }
+
+  .qrbox .qrbg .loading div {
+    color: #fff;
+    word-break: break-all;
+    text-align: center;
+  }
+
+  .qrbox .qrbg .cover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.92);
+    color: #333;
+  }
+
+  .qrbox .qrbg .cover div {
+    margin-bottom: 20px;
+    font-size: 12px;
+  }
+
+  .qrbox p {
+    width: 100%;
+    text-align: center;
+    margin: 20px 0;
+    font-weight: 600;
+  }
+
+  .wx-login-mobiletip {
+    width: 80%;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.12);
+    border-radius: 4px;
+    margin: 20px auto;
+    padding: 10px 0;
+    color: red;
+  }
+  /* 第三方登录 */
+  .third-login-line{
+    display: block;
+    width: 100%;
+    height: 20px;
+    line-height: 20px;
+    -ms-flex-positive: 0;
+    flex-grow: 0;
+    -ms-flex-negative: 0;
+    flex-shrink: 0;
+    margin: 20px 0;
+    position: relative;
+    text-align: center;
+  }
+  .third-login-line::before{
+    content: "";
+    border-top: 1px dashed #e3e6eb;
+    position: absolute;
+    left: 48px;
+    right: 48px;
+    top: 50%;
+  }
+  .third-login-line span{
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 20px;
+    color: rgba(0, 0, 0, .6);
+    background-color: #fff;
+    padding-left: 19px;
+    padding-right: 19px;
+    position: relative;
+  }
+  .third-login-list ul{
+    display: flex;
+    justify-content: space-around;
+  }
+  .third-login-list ul li{
+    flex: 1;
+  }
+  .third-login-list ul li a{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .third-login-list ul li a{
+    color: #333;
+  }
+  .third-login-list ul li a:hover{
+    color: #1472FF;
+  }
+  .third-login-list ul li a img{
+    width: 40px;
+    height: 40px;
+    margin-bottom: 10px;
+  }
+</style>
+<div class="lyear-wrapper-bg"></div>
+<div class="lyear-wrapper">
+  <div class="lyear-login">
+    <div class="login-center">
+      {if $config['wxlogin']['open']=='1' && $config['login']['type']!='4'}
+      <div class="login-typetag"
+        data-type="{if $config['wxlogin']['open']=='1' && $config['wxlogin']['isdefault']=='1'}2{else /}1{/if}"><img
+          src="/static/images/sys/login/icon/{if $config['wxlogin']['open']=='1' && $config['wxlogin']['isdefault']=='1'}account{else /}wx{/if}.png">
+      </div>
+      <div class="btn-login-tips"><span>{if $config['wxlogin']['open']=='1' &&
+          $config['wxlogin']['isdefault']=='1'}账号{else /}扫码{/if}登录</span></div>
+      {/if}
+      <div class="login-header text-center">
+        <img src="{:tomedia($config['common']['logo'])}">
+      </div>
+      <div
+        class="accountlogin{if ($config['wxlogin']['open']=='1' && $config['wxlogin']['isdefault']=='1') || $config['login']['type']=='4'} hidden{/if}">
+        <ul class="nav nav-tabs nav-justified login-nav{if $config['login']['type']<3} only-type{/if}">
+          {if $config['login']['type']=='1'}
+          <li class="nav-item namelogin active">
+            <a data-toggle="tab" href="#username-login">账号登录</a>
+          </li>
+          {elseif $config['login']['type']=='2' /}
+          <li class="nav-item phonelogin active">
+            <a data-toggle="tab" href="#phone-login">手机号登录</a>
+          </li>
+          {else /}
+          <li class="nav-item namelogin pull-left active">
+            <a data-toggle="tab" href="#username-login">账号登录</a>
+          </li>
+          <li class="nav-item phonelogin pull-right">
+            <a data-toggle="tab" href="#phone-login">手机号登录</a>
+          </li>
+          {/if}
+        </ul>
+        <div class="login-box tab-content">
+          {if $config['login']['type']=='1'}
+          <div class="tab-pane fade active in" id="username-login">
+            <div class="form-group has-feedback feedback-left">
+              <input type="text" placeholder="请输入用户名或手机号" class="form-control username" name="username" />
+              <span class="mdi mdi-account form-control-feedback" aria-hidden="true"></span>
+            </div>
+            <div class="form-group has-feedback feedback-left feedback-right">
+              <input type="password" placeholder="请输入密码" class="form-control password" name="password" />
+              <span class="mdi mdi-lock form-control-feedback" aria-hidden="true"></span>
+              <span class="mdi mdi-eye-off form-control-feedback-right password-showtext cursor"></span>
+            </div>
+            <div
+              class="form-group has-feedback feedback-left{if isset($config['login']['code']) && $config['login']['code']=='2'} hidden{/if}">
+              <div class="input-group zam-flex">
+                <input name="captcha" type="text" class="form-control captcha" style="flex: 1;" placeholder="请输入验证码" maxlength=4>
+                <span class="mdi mdi-verified form-control-feedback" aria-hidden="true"></span>
+                <div class="input-group-btn imgverify"><img id="captchaimg"
+                    src="{:gocommon('verify/login')}" title="点击图片更换验证码" onerror=""></div>
+              </div>
+            </div>
+          </div>
+          {elseif $config['login']['type']=='2' /}
+          <div class="tab-pane fade active in" id="phone-login">
+            <div class="form-group has-feedback feedback-left">
+              <input type="text" placeholder="请输入您的手机号" class="form-control mobile" name="mobile" />
+              <span class="mdi mdi-cellphone form-control-feedback" aria-hidden="true"></span>
+            </div>
+            <div class="form-group has-feedback feedback-left">
+              <div class="input-group">
+                <input name="mobilecode" type="text" class="form-control mobilecode" placeholder="请输入验证码" maxlength=4>
+                <span class="mdi mdi-verified form-control-feedback" aria-hidden="true"></span>
+                <span href="javascript:void(0)" class="input-group-addon btn btn-primary btn-sendcode">短信验证码</span>
+              </div>
+            </div>
+          </div>
+          {else /}
+          <div class="tab-pane fade active in" id="username-login">
+            <div class="form-group has-feedback feedback-left">
+              <input type="text" placeholder="请输入用户名或手机号" class="form-control username" name="username" />
+              <span class="mdi mdi-account form-control-feedback" aria-hidden="true"></span>
+            </div>
+            <div class="form-group has-feedback feedback-left feedback-right">
+              <input type="password" placeholder="请输入密码" class="form-control password" name="password" />
+              <span class="mdi mdi-lock form-control-feedback" aria-hidden="true"></span>
+              <span class="mdi mdi-eye-off form-control-feedback-right password-showtext cursor"></span>
+            </div>
+            <div
+              class="form-group has-feedback feedback-left{if isset($config['login']['code']) && $config['login']['code']=='2'} hidden{/if}">
+              <div class="input-group zam-flex">
+                <input name="captcha" type="text" class="form-control captcha" style="flex: 1;" placeholder="请输入验证码" maxlength=4>
+                <span class="mdi mdi-verified form-control-feedback" aria-hidden="true"></span>
+                <div href="javascript:;" class="input-group-btn imgverify"><img id="captchaimg"
+                    src="{:gocommon('verify/login',['t'=>time()])}" title="点击图片更换验证码" onerror=""></div>
+              </div>
+            </div>
+          </div>
+          <div class="tab-pane fade" id="phone-login">
+            <div class="form-group phonelogin has-feedback feedback-left">
+              <input type="text" placeholder="请输入您的手机号" class="form-control mobile" name="mobile" />
+              <span class="mdi mdi-cellphone form-control-feedback" aria-hidden="true"></span>
+            </div>
+            <div class="form-group phonelogin has-feedback feedback-left">
+              <div class="input-group">
+                <input name="mobilecode" type="text" class="form-control mobilecode" placeholder="请输入验证码" maxlength=4>
+                <span class="mdi mdi-verified form-control-feedback" aria-hidden="true"></span>
+                <span href="javascript:void(0)" class="input-group-addon btn btn-primary btn-sendcode">发送验证码</span>
+              </div>
+            </div>
+          </div>
+          {/if}
+          <div class="form-group">
+            <label class="lyear-checkbox checkbox-primary m-t-10">
+              <input type="checkbox" name="auto_remember" class="auto_remember"><span>7天内自动登录</span>
+            </label>
+          </div>
+          <div class="form-group">
+            <button class="btn btn-block btn-primary" type="button">立即登录</button>
+          </div>
+          <div class="form-group m-b-0">
+            <div style="height:30px;line-height: 30px;">
+              <div class="pull-left cursor"><a href="{:APP_WEB_FINDPASS}">忘记密码</a></div>
+              {if $config['reg']['open']=='1'}
+              <div class="pull-right ">没有账号？<a href="{:APP_WEB_REGISTER}">立即注册</a></div>
+              {/if}
+            </div>
+          </div>
+          {if isset($config['login']['thirdlogins']) && !empty($config['login']['thirdlogins'])}
+            <div class="form-group m-b-0 mt10 third-login-box">
+              <div class="third-login-line"><span>第三方登录</span></div>
+              <div class="third-login-list">
+                <ul>
+                  {foreach $config['login']['thirdlogins'] as $third}
+                  {if $third['status']=='1'}
+                  <li>
+                      <a href="{$third['url']}" target="_blank">
+                        <img src="{:tomedia($third['logo'])}"/>
+                        <span>{$third['name']}</span>
+                      </a>
+                  </li>
+                  {/if}
+                  {/foreach}
+                </ul>
+              </div>
+            </div>
+          {/if}
+        </div>
+      </div>
+      <div
+        class="wxlogin{if $config['wxlogin']['open']=='2' || ($config['wxlogin']['open']=='1' && $config['wxlogin']['isdefault']=='2' && $config['login']['type']!='4')} hidden{/if}">
+        <div class="wx-login-title">微信扫码登录</div>
+        <div class="qrbox zam-flex-column-center">
+          <div class="qrbg">
+            <img class="qrimg hidden" src="" />
+            <div class="loading zam-flex-column-center hidden">
+              <img src="/static/images/sys/loading.png" />
+              <div>二维码生成中...</div>
+            </div>
+            <div class="cover zam-flex-column-center hidden">
+              <div>二维码已失效，点击刷新</div>
+              <a href="javascript:;" class="btn btn-primary btn-sm btn-refreshqr">刷新</a>
+            </div>
+          </div>
+          <p>请使用微信扫一扫登录</p>
+        </div>
+        <div class="wxlogin-mobilebox hidden">
+          <div class="wx-login-mobiletip">首次微信登录请绑定手机号</div>
+          <div class="form-group phonelogin has-feedback feedback-left">
+            <input type="text" placeholder="请输入您的手机号" class="form-control fmobile" name="fmobile" />
+            <span class="mdi mdi-cellphone form-control-feedback" aria-hidden="true"></span>
+          </div>
+          <div class="form-group phonelogin has-feedback feedback-left">
+            <div class="input-group">
+              <input name="fmobilecode" type="text" class="form-control fmobilecode" placeholder="请输入验证码" maxlength=4>
+              <span class="mdi mdi-verified form-control-feedback" aria-hidden="true"></span>
+              <span href="javascript:void(0)" class="input-group-addon btn btn-primary btn-fsendcode">发送验证码</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <button class="btn btn-block btn-primary btn-confirmbind" type="button">确定</button>
+          </div>
+        </div>
+        {if $config['reg']['open']=='1'}
+        <div style="text-align:right">没有账号？<a href="{:APP_WEB_REGISTER}">立即注册</a></div>
+        {/if}
+        {if isset($config['login']['thirdlogins']) && !empty($config['login']['thirdlogins'])}
+            <div class="mt10 third-login-box">
+              <div class="third-login-line"><span>第三方登录</span></div>
+              <div class="third-login-list">
+                <ul>
+                  {foreach $config['login']['thirdlogins'] as $third}
+                  {if $third['status']=='1'}
+                  <li>
+                      <a href="{$third['url']}" target="_blank">
+                        <img src="{:tomedia($third['logo'])}"/>
+                        <span>{$third['name']}</span>
+                      </a>
+                  </li>
+                  {/if}
+                  {/foreach}
+                </ul>
+              </div>
+            </div>
+          {/if}
+      </div>
+    </div>
+  </div>
+  {include file="login/common" /}
+</div>
+</div>
+
+<script>
+  require(['webcore', "sitesocket", 'keyboard', 'zamnotice', 'layerBox'], function (webcore, sitesocket, keyboardJS, zamnotice, layerBox) {
+    {// 连接socket}
+    var wsConfig = {};
+    wsConfig.onmessage = function (data) {
+      if (data.type == 'connected') {
+        sitesocket.isclose = false;
+        webcore.ajaxSubmit("{:goweb('login/binduid')}", { clientid: data.clientid || '0' }).then(function (data) {
+          if (data.code != 0) {
+            webcore.showMsg(data.msg);
+          }
+        }, function () {
+          webcore.showMsg('网络太差，请稍后重试.');
+        });
+      } else if (data.type == 'wxloginsuccess') {
+        zamnotice.showTips('success', '登录成功', 1e3, function () {
+          window.location.reload();
+        });
+      } else if (data.type == 'wxloginfirstmobile') {
+        $(".wxlogin .qrbox").addClass('hidden');
+        $(".wxlogin .wxlogin-mobilebox").removeClass('hidden');
+      }
+    };
+    sitesocket.init(wsConfig);
+    var refreshtimer;
+    $(".btn-refreshqr").click(function () {
+      var $this = $(this);
+      $this.parent().addClass('hidden');
+      $(".loading").removeClass('hidden');
+      webcore.ajaxSubmit("{:goweb('login/makewxloginqr')}", {type:'1'}).then(function (json) {
+        if (json.code == 0) {
+          $(".loading").addClass('hidden');
+          $(".qrbox .qrimg").removeClass('hidden').attr('src', json.msg);
+          clearInterval(refreshtimer);
+          refreshtimer = webcore.countdown(120, false, function () {
+            $(".qrbox .cover").removeClass('hidden');
+            $(".qrbox").removeClass('hidden');
+            $(".wxlogin-mobilebox").addClass('hidden');
+          });
+        } else {
+          $(".qrbox .qrimg").addClass('hidden');
+          $(".loading img").addClass('hidden');
+          $(".loading div").html('<div style="color:red">出现异常：' + json.msg + '</div><div><a class="btn btn-primary btn-xs m-t-10">刷新</a></div>');
+        }
+      }, function () {
+        $(".loading img").addClass('hidden');
+        $(".loading div").text('生成二维码出现异常');
+      });
+    });
+    $(".loading div").on('click', '.btn', function () {
+      $(this).parent().parent().html('二维码生成中...');
+      $(".loading img").removeClass('hidden');
+      $(".btn-refreshqr").trigger('click');
+    });
+    if (!$('.wxlogin').is(':hidden')) $(".btn-refreshqr").trigger('click');
+    $(".login-typetag").click(function () {
+      var type = $(this).attr('data-type');
+      if (type == '1') {
+        $(".accountlogin").addClass('hidden');
+        $(".wxlogin").removeClass('hidden');
+        $(this).attr('data-type', '2');
+        $(this).find('img').attr('src', '/static/images/sys/login/icon/account.png');
+        $('.btn-login-tips span').text('账号登录');
+        $(".btn-refreshqr").trigger('click');
+      } else {
+        $(".accountlogin").removeClass('hidden');
+        $(".wxlogin").addClass('hidden');
+        $(this).attr('data-type', '1');
+        $(this).find('img').attr('src', '/static/images/sys/login/icon/wx.png');
+        $('.btn-login-tips span').text('扫码登录');
+      }
+    });
+    $(".password-showtext").click(function () {
+      var $this = $(this), passworddom = $this.parent().find('input');
+      if ($this.hasClass('mdi-eye-off')) {
+        $this.removeClass('mdi-eye-off').addClass('mdi-eye');
+        passworddom.attr("type", 'text');
+      } else {
+        $this.removeClass('mdi-eye').addClass('mdi-eye-off');
+        passworddom.attr("type", 'password');
+      }
+    });
+    $(".login-box button").on('click', function () {
+      if ($(".login-nav .active").hasClass('namelogin')) {
+        var username = $(".username").val(), password = $(".password").val(), captcha = $(".captcha").val();
+        if (username == '' || password == '') {
+          if (username == '') {
+            return zamnotice.showTips('error', '请输入用户名');
+          } else {
+            return zamnotice.showTips('error', '请输入密码');
+          }
+          return false;
+        }
+        if ($(".captcha").is(':visible') > 0 && captcha == '') {
+          return zamnotice.showTips('error', '请输入验证码');
+        }
+        var postdata = { type: '1', username: username, password: password, captcha: captcha, auto_remember: $(".auto_remember").is(":checked") };
+      } else {
+        var mobile = $(".mobile").val(), mobilecode = $(".mobilecode").val();
+        if (mobile == '' || mobilecode == '') {
+          return zamnotice.showTips('error', '请输入手机号与登录验证码');
+        }
+        var postdata = { type: '2', mobile: mobile, mobilecode: mobilecode, auto_remember: $(".auto_remember").is(":checked") };
+      }
+      var $this = $(this);
+      if ($this.hasClass('disabled')) return;
+      $this.addClass("disabled");
+      webcore.ajaxSubmit("{:goweb('login/index')}", postdata, '登录中...').then(function (json) {
+        if (json.code == 0) {
+          zamnotice.showTips('success', json.msg, 1e3, function () {
+            window.location.href = json.url;
+          });
+        } else {
+          zamnotice.showTips('error', json.msg);
+          $this.removeClass("disabled");
+          $("#captchaimg").trigger('click');
+        }
+      }, function () {
+        $this.removeClass("disabled");
+        zamnotice.showTips('error', '登录异常');
+        $("#captchaimg").trigger('click');
+      });
+    });
+    keyboardJS.bind('enter', function (e) {
+      $(".login-box button").trigger('click');
+    });
+    keyboardJS.bind('space', function (e) {
+      $(".login-box button").trigger('click');
+    });
+    $("#captchaimg").on('click', function () {
+      var src = $(this).attr("src"), key = 't=', reg = new RegExp(key + '\\d+'), timestamp = +new Date();
+      if (src.indexOf(key) > -1) {
+        $(this).attr("src", src.replace(reg, key + timestamp));
+      } else {
+        $(this).attr("src", $(this).attr("src") + "?t=" + timestamp);
+      }
+    });
+
+    $(".btn-sendcode").click(function () {
+      var $this = $(this), mobile = $(".mobile").val(), phonereg = /^[1][3,4,5,6,7,8,9][0-9]{9}$/;
+      if (mobile == '' || !phonereg.test(mobile)) {
+        return zamnotice.showTips('error', '请输入正确的手机号码');
+      }
+      var yzmlayer = layerBox.sendcodeLayer('请输入验证码', webcore.tpl($("#yzm-tpl"), {}), ['发送短信验证码'], function (index, layerno) {
+        var yzm = layerno.find(".captcha").val();
+        if (yzm == '') {
+          return zamnotice.showTips('error', '请先输入验证码');
+        }
+        layerno.find('.layui-layer-btn0').addClass('disabled');
+        webcore.ajaxSubmit("{:goweb('login/sendcode')}", { mobile: mobile, yzm: yzm }).then(function (json) {
+          if (json.code == 0) {
+            $this.text('60 s').addClass('disabled');
+            webcore.countdown(60, function (t) {
+              $this.text(t + ' s');
+            }, function () {
+              $this.removeClass("disabled");
+              $this.text('短信验证码').removeClass('disabled');
+            });
+            layerBox.close(index);
+            zamnotice.showTips('success', '验证码下发成功，请稍后查收');
+          } else {
+            setTimeout(function () {
+              layerno.find('.layui-layer-btn0').removeClass('disabled');
+            }, 1e3);
+            zamnotice.showTips('error', json.msg);
+            layerno.find('.imgverify img').trigger('click');
+          }
+        }, function () {
+          setTimeout(function () {
+            layerno.find('.layui-layer-btn0').removeClass('disabled');
+          }, 1e3);
+          zamnotice.showTips('error', '下发验证码出现异常');
+        });
+      });
+    });
+    $(".btn-fsendcode").click(function () {
+      var $this = $(this), fmobile = $(".fmobile").val(), phonereg = /^[1][3,4,5,6,7,8,9][0-9]{9}$/;
+      if (fmobile == '' || !phonereg.test(fmobile)) {
+        return zamnotice.showTips('error', '请输入正确的手机号码');
+      }
+      var yzmlayer = layerBox.sendcodeLayer('请输入验证码', webcore.tpl($("#yzm-tpl"), {}), ['发送短信验证码'], function (index, layerno) {
+        var yzm = layerno.find(".captcha").val();
+        if (yzm == '') {
+          return zamnotice.showTips('error', '请先输入验证码');
+        }
+        layerno.find('.layui-layer-btn0').addClass('disabled');
+        webcore.ajaxSubmit("{:goweb('login/fsendcode')}", { mobile: fmobile, yzm: yzm }).then(function (json) {
+          if (json.code == 0) {
+            $this.text('60 s').addClass('disabled');
+            webcore.countdown(60, function (t) {
+              $this.text(t + ' s');
+            }, function () {
+              $this.removeClass("disabled");
+              $this.text('短信验证码').removeClass('disabled');
+            });
+            layerBox.close(index);
+            zamnotice.showTips('success', '验证码下发成功，请稍后查收');
+          } else {
+            setTimeout(function () {
+              layerno.find('.layui-layer-btn0').removeClass('disabled');
+            }, 1e3);
+            zamnotice.showTips('error', json.msg);
+            layerno.find('.imgverify img').trigger('click');
+          }
+        }, function () {
+          setTimeout(function () {
+            layerno.find('.layui-layer-btn0').removeClass('disabled');
+          }, 1e3);
+          zamnotice.showTips('error', '下发验证码出现异常');
+        });
+      });
+    });
+    $(".btn-confirmbind").click(function () {
+      var $this = $(this), fmobile = $(".fmobile").val(), phonereg = /^[1][3,4,5,6,7,8,9][0-9]{9}$/, fyzm = $(".fmobilecode").val();
+      if (fmobile == '' || !phonereg.test(fmobile)) {
+        return zamnotice.showTips('error', '请输入正确的手机号码');
+      }
+      if (fyzm == '' || fyzm.length != 4) {
+        return zamnotice.showTips('error', '请输入正确的手机验证码');
+      }
+      if ($this.hasClass('disabled')) return;
+      $this.addClass('disabled');
+      webcore.ajaxSubmit("{:goweb('login/flogin')}", { mobile: fmobile, yzm: fyzm }).then(function (json) {
+        if (json.code == 0) {
+          zamnotice.showTips('success', '登录成功', 1e3, function () {
+            window.location.reload();
+          });
+        } else if (json.code == 1) {
+          $this.removeClass('disabled');
+          zamnotice.showTips('info', json.msg, 4e3, function () {
+            $(".wxlogin .qrbox").removeClass('hidden');
+            $(".wxlogin .wxlogin-mobilebox").addClass('hidden');
+          });
+        } else {
+          $this.removeClass('disabled');
+          zamnotice.showTips('error', json.msg, 2e3, function () {
+            $(".wxlogin .qrbox").removeClass('hidden');
+            $(".wxlogin .wxlogin-mobilebox").addClass('hidden');
+          });
+        }
+
+      }, function () {
+        zamnotice.showTips('error', '登录出现异常，请刷新重试');
+      });
+    });
+    if($(".third-login-box").length && !$(".third-login-box li").length){
+      $(".third-login-box").addClass('hidden')
+    }
+  });
+</script>
+<script id='yzm-tpl' type="text/template">
+<div class="yzm-box zam-flex">
+  <input name="captcha" type="text" class="form-control captcha" placeholder="请输入验证码" maxlength="4">
+  <span class="mdi mdi-verified form-control-feedback" aria-hidden="true"></span>
+  <a href="javascript:;" class="input-group-btn imgverify"><img src="/common/verify/phonelogin" title="点击图片更换验证码" onerror=""></a>
+</div>
+</script>
+{include file="$Wpath/common/footer_base" /}

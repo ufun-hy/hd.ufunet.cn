@@ -1,0 +1,1589 @@
+{include file='$Wpath/common/header'}
+<style type="text/css">.select2{min-width: 200px!important;}</style>
+<form id="formBox" class="zam-formvalidation form-horizontal" method="post">
+<div class="zam-titleBox">活动系统公众号</div>
+<div class="alert alert-danger" role="alert">
+	<i class="mdi mdi-alert-outline"></i> 禁止在无关紧要的情况下更换系统公众号APPID以及APPSECRET信息，如果对活动产生影响，后果自负
+</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 公众号名称</label>
+    <div class="col-lg-8">
+      <input class="form-control" type="text"  name="accountname" value="{$config['accountname']}">
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* APPID</label>
+    <div class="col-lg-8">
+      <input class="form-control" type="text"  name="app_id" value="{$config['app_id']}" onkeyup="return trimSpace(this)">
+      <span class="help-block">系统公众号的appid</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* APPSECRET</label>
+    <div class="col-lg-8">
+      <input class="form-control" type="text"  name="secret" value="{$config['secret']}" onkeyup="return trimSpace(this)">
+      <span class="help-block">系统公众号的appsecret</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 公众号类型授权类型</label>
+    <div class="col-lg-8">
+      <label class="lyear-radio radio-inline radio-primary">
+        <input type="radio" name="accesstype" value="1" {if $config['accesstype']=='1'}checked{/if}><span>普通网页授权</span>
+      </label>
+      <label class="lyear-radio radio-inline radio-primary">
+        <input type="radio" name="accesstype" value="2" {if $config['accesstype']=='2'}checked{/if}><span>开放平台代授权</span>
+      </label>
+      <span class="help-block">注:开放平台代授权必须先把系统公众号通过扫码接入到平台，通常是认证服务号只有一个并且需要同时在多个其他第三方平台使用这个服务号的用户选择此项(开放平台待授权不需要设置网页授权域名以及jssdk域名)</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 公众号二维码</label>
+    <div class="col-lg-8">
+      {:tpl_image_one('accountqrimg',$config['accountqrimg'])}
+      <span class="help-block">规格:100*100px</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 授权获取用户信息生命周期</label>
+    <div class="col-lg-7">
+        <input type="text" class="form-control numberincdec" name="maxlifetime" value="{$config['maxlifetime']??7*24}"
+        data-bts-min="1" data-bts-replacement-val="1"
+        data-bts-max="null"
+        data-bts-step="1"
+        data-bts-postfix="小时"
+        data-bts-postfix-extra-class="touchspin-postfix"
+        >
+        <span class="zam-help-block">注:生命周期即为同一个授权公众号下的同一个用户授权登录后有效期，同一个用户一旦在某个活动授权登录后下次再次发起授权登录需要的最短小时数，此处设置仅仅是为了解决同一个用户访问不同的活动需要每次都去授权登录的问题，默认是7天</span>
+    </div>
+</div>
+<div class="zam-titleBox">活动别名</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 付费版活动别名</label>
+    <div class="col-lg-8">
+      <input class="form-control" type="text"  name="hdnames[mode1]" value="{$config['hdnames']['mode1']??'商业付费版'}" maxlength="10">
+      <span class="help-block">默认是商业付费版，主要显示在我的活动内的每个活动的左上角</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 付费版未发布别名</label>
+    <div class="col-lg-8">
+      <input class="form-control" type="text"  name="hdnames[mode1nopub]" value="{$config['hdnames']['mode1nopub']??'测试活动'}" maxlength="10">
+      <span class="help-block">默认是测试活动，主要显示在我的活动内的每个活动的左上角</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 付费版已发布别名</label>
+    <div class="col-lg-8">
+      <input class="form-control" type="text"  name="hdnames[mode1ispub]" value="{$config['hdnames']['mode1ispub']??'正式活动'}" maxlength="10">
+      <span class="help-block">默认是正式活动，主要显示在我的活动内的每个活动的左上角</span>
+    </div>
+</div>
+<div class="hdnamesbox{if !dzhuodongfree()} hidden{/if}">
+  <div class="form-group">
+      <label class="col-lg-3 control-label">* 付费版活动介绍</label>
+      <div class="col-lg-8">
+        {:tpl_ueditor('hdnames[mode1des]',$config['hdnames']['mode1des']??'<p>活动可以选择自由选择需要的功能与人数，内部无广告</p>')}
+        <span class="help-block">主要显示在用户可以创建免费版活动时，创建付费活动菜单下显示的内容</span>
+      </div>
+  </div>
+  <div class="form-group">
+    <label class="col-lg-3 control-label">* 免费版活动别名</label>
+    <div class="col-lg-8">
+      <input class="form-control" type="text"  name="hdnames[mode2]" value="{$config['hdnames']['mode2']??'免费版'}" maxlength="10">
+      <span class="help-block">默认是免费版，主要显示在我的活动内的每个活动的左上角</span>
+    </div>
+  </div>
+  <div class="form-group">
+      <label class="col-lg-3 control-label">* 免费版活动介绍</label>
+      <div class="col-lg-8">
+        {:tpl_ueditor('hdnames[mode2des]',$config['hdnames']['mode2des']??'<p>无需支付费用即可进行【maxperson】人内的活动，<span style="color: rgb(255, 0, 0);">内部有广告</span></p>')}
+        <span class="help-block">创建免费版活动时免费活动版菜单下显示的内容，通过内容的【maxperson】可调用对应用户组下的免费最大人数</span>
+      </div>
+  </div>
+</div>
+<div class="fastcreatebox{if !dznormalrequest('fastcreate')} hidden{/if}">
+  <div class="zam-titleBox">快速创建活动设置</div>
+  <div class="form-group">
+    <label class="col-lg-3 control-label">* 默认活动主题名称</label>
+    <div class="col-lg-8">
+      <input class="form-control" type="text"  name="fastcreate[hdtitle]" value="{$config['fastcreate']['hdtitle']??'快速创建的活动'}" onkeyup="return trimSpace(this)">
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-lg-3 control-label">* 默认活动人数</label>
+    <div class="col-lg-8">
+      <input type="text" class="form-control numberincdec" name="fastcreate[person]" value="{$config['fastcreate']['person']??200}"
+          data-bts-min="0" data-bts-replacement-val="0"
+          data-bts-max="null"
+          data-bts-step="1"
+          data-bts-postfix="人"
+          data-bts-postfix-extra-class="touchspin-postfix"
+      >
+      <span class="help-block">
+      <div><span class="text-danger">注意：前期使用推荐此处设置成0人，这样能保证不会忘记设置真实的活动人数</span></div>
+      </span>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-lg-3 control-label">* 默认活动天数</label>
+    <div class="col-lg-8">
+      <input type="text" class="form-control numberincdec" name="fastcreate[daynum]" value="{$config['fastcreate']['daynum']??1}"
+          data-bts-min="1" data-bts-replacement-val="1"
+          data-bts-max="null"
+          data-bts-step="1"
+          data-bts-postfix="天"
+          data-bts-postfix-extra-class="touchspin-postfix"
+      >
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-lg-3 control-label">* 新账号创建活动复制信息模板</label>
+    <div class="col-lg-8">
+      <textarea class="form-control copytxt-area" name="fastcreate[newusercopyinfo]" rows="6" placeholder="请输入复制信息模板内容">{$config['fastcreate']['newusercopyinfo']}</textarea>
+      <div class="zam-help-block">
+        <div>注意事项:</div>
+        <div class="m-t-10">1 可通过按键盘enter键换行</div>
+        <div class="m-t-10">2 调用后台登录地址使用变量<pre style="margin: 0;display: inline;border: none;">[loginurl] <a class="btn btn-primary btn-xs zam-clip" data-text="[loginurl]" style="margin-left: 10px;">点我复制</a></pre></div>
+        <div class="m-t-10">3 调用新用户账号使用变量<pre style="margin: 0;display: inline;border: none;">[user_name] <a class="btn btn-primary btn-xs zam-clip" data-text="[user_name]" style="margin-left: 10px;">点我复制</a></pre></div>
+        <div class="m-t-10">4 调用新用户手机号使用变量<pre style="margin: 0;display: inline;border: none;">[user_mobile] <a class="btn btn-primary btn-xs zam-clip" data-text="[user_mobile]" style="margin-left: 10px;">点我复制</a></pre></div>
+        <div class="m-t-10">5 调用新用户密码使用变量<pre style="margin: 0;display: inline;border: none;">[user_password] <a class="btn btn-primary btn-xs zam-clip" data-text="[user_password]" style="margin-left: 10px;">点我复制</a></pre></div>
+        <div class="m-t-10">6 调用大屏通用地址使用变量<pre style="margin: 0;display: inline;border: none;">[screenurl] <a class="btn btn-primary btn-xs zam-clip" data-text="[screenurl]" style="margin-left: 10px;">点我复制</a></pre></div>
+        <div class="m-t-10">7 调用新活动加密id使用变量<pre style="margin: 0;display: inline;border: none;">[hdid] <a class="btn btn-primary btn-xs zam-clip" data-text="[hdid]" style="margin-left: 10px;">点我复制</a></pre></div>
+        <div class="m-t-10">8 <span class="text-danger">如果你想固定使用某个功能的大屏地址可以添加模板内容:例如动感摇一摇：https://{:request()->host(true)}{:goscreen('dgshake')}/index?hdid=[hdid]</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-lg-3 control-label">* 现有账号创建活动复制信息模板</label>
+    <div class="col-lg-8">
+      <textarea class="form-control copytxt-area" name="fastcreate[oldusercopyinfo]" rows="6" placeholder="请输入复制信息模板内容">{$config['fastcreate']['oldusercopyinfo']??"大屏地址：[screenurl]"}</textarea>
+      <div class="zam-help-block">
+        <div>注意事项:</div>
+        <div class="m-t-10">1 可通过按键盘enter键换行</div>
+        <div class="m-t-10">2 调用后台登录地址使用变量<pre style="margin: 0;display: inline;border: none;">[loginurl] <a class="btn btn-primary btn-xs zam-clip" data-text="[loginurl]" style="margin-left: 10px;">点我复制</a></pre></div>
+        <div class="m-t-10">3 调用新用户账号使用变量<pre style="margin: 0;display: inline;border: none;">[user_name] <a class="btn btn-primary btn-xs zam-clip" data-text="[user_name]" style="margin-left: 10px;">点我复制</a></pre></div>
+        <div class="m-t-10">4 调用新用户手机号使用变量<pre style="margin: 0;display: inline;border: none;">[user_mobile] <a class="btn btn-primary btn-xs zam-clip" data-text="[user_mobile]" style="margin-left: 10px;">点我复制</a></pre></div>
+        <div class="m-t-10">5 调用大屏通用地址使用变量<pre style="margin: 0;display: inline;border: none;">[screenurl] <a class="btn btn-primary btn-xs zam-clip" data-text="[screenurl]" style="margin-left: 10px;">点我复制</a></pre></div>
+        <div class="m-t-10">6 调用新活动加密id使用变量<pre style="margin: 0;display: inline;border: none;">[hdid] <a class="btn btn-primary btn-xs zam-clip" data-text="[hdid]" style="margin-left: 10px;">点我复制</a></pre></div>
+        <div class="m-t-10">7 <span class="text-danger">特别注意现有用户无法调用用户密码变量</span></div>
+        <div class="m-t-10">8 <span class="text-danger">如果你想固定使用某个功能的大屏地址可以添加模板内容:例如动感摇一摇：https://{:request()->host(true)}{:goscreen('dgshake')}/index?hdid=[hdid]</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-lg-3 control-label">* 默认打开活动开始时间弹窗</label>
+    <div class="col-lg-8">
+        {:tpl_switch('fastcreate[opendatepicker]',$config['fastcreate']['opendatepicker']??'1')}
+        <span class="help-block">
+          <div>注意事项:</div>
+          <div>1 开启后点击活动功能与人数菜单就会自动打开活动开始时间选择弹窗</div>
+          <div>2 <span class="text-danger">前期使用推荐打开此开关，这样能保证不会忘记设置真实的活动开始时间</span></div>
+        </span>
+    </div>
+  </div>
+</div>
+<div class="zam-titleBox">微信小程序设置</div>
+<div class="form-group">
+  <label class="col-lg-3 control-label">* 开启小程序</label>
+  <div class="col-lg-3">
+      {:tpl_switch('miniconfig[open]',$config['miniconfig']['open']??"2",'openminibox')}
+      <span class="help-block">开启后活动将生成对应的小程序码</span>
+  </div>
+</div>
+<div class="miniconfigBox{if $config['miniconfig']['open']=='2'} hidden{/if}">
+  <div class="form-group">
+      <label class="col-lg-3 control-label">* APPID</label>
+      <div class="col-lg-8">
+        <input class="form-control" type="text"  name="miniconfig[app_id]" value="{$config['miniconfig']['app_id']??''}" onkeyup="return trimSpace(this)">
+        <span class="help-block">小程序appid</span>
+      </div>
+  </div>
+  <div class="form-group">
+      <label class="col-lg-3 control-label">* APPSECRET</label>
+      <div class="col-lg-8">
+        <input class="form-control" type="text"  name="miniconfig[secret]" value="{$config['miniconfig']['secret']??''}" onkeyup="return trimSpace(this)">
+        <span class="help-block">小程序appsecret</span>
+      </div>
+  </div>
+  <div class="form-group">
+      <label class="col-lg-3 control-label">* 默认活动id</label>
+      <div class="col-lg-8">
+        <input type="text" class="form-control numberincdec" name="miniconfig[hdid]" value="{$config['miniconfig']['hdid']??0}"
+            data-bts-min="0" data-bts-replacement-val="0"
+            data-bts-max="null"
+            data-bts-step="1"
+        >
+        <span class="help-block">默认活动一般是微信小程序审核时候用的，平时使用一般是通过扫每个活动的二维码与链接内的小程序二维码参与活动<br/><span class="text-danger">哪里找活动id？点击我的活动，每个活动的右下角的红色id数字即为活动id</span>
+      </div>
+  </div>
+  <div class="form-group{if !dznormalrequest('wxminisubnotice')} hidden{/if}">
+    <label class="col-lg-3 control-label">* 中奖结果通知模板id</label>
+    <div class="col-lg-8">
+      <input class="form-control" type="text"  name="miniconfig[subtplid]" value="{$config['miniconfig']['subtplid']??''}" onkeyup="return trimSpace(this)">
+      <span class="help-block">小程序订阅消息，标题是中奖结果通知；关键词为：开奖结果、奖品名称、中奖时间、备注</span>
+    </div>
+  </div>
+  <div class="miniadvbox{if !dzhuodongadv()} hidden{/if}">
+    <div class="form-group">
+        <label class="col-lg-3 control-label">* 小程序插屏广告id</label>
+        <div class="col-lg-8">
+          <input class="form-control" type="text"  name="miniconfig[adid]" value="{$config['miniconfig']['adid']??''}" onkeyup="return trimSpace(this)">
+          <span class="help-block">不填写则不会有广告，需要小程序开通流量主并添加一个插屏广告把对应的广告位id复制过来，不要把广告id前后的空白也复制过来了</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-3 control-label">* 页面加载完成多少秒后广告出现</label>
+        <div class="col-lg-4">
+            <input type="text" class="form-control numberincdec" name="miniconfig[adtimeout]" value="{$config['miniconfig']['adtimeout']??6}"
+            data-bts-min="3" data-bts-replacement-val="3"
+            data-bts-max="null"
+            data-bts-step="1"
+            data-bts-postfix="秒"
+            data-bts-postfix-extra-class="touchspin-postfix"
+            >
+            <span class="zam-help-block">注:必须是整数且至少是3秒，由于微信内部有频率限制过快显示会导致广告无法加载出来</span>
+        </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-3 control-label">* 测试活动小程序插屏广告</label>
+      <div class="col-lg-4">
+          {:tpl_switch('miniconfig[ceshihdadv]',$config['miniconfig']['ceshihdadv']??"2")}
+          <span class="help-block">开启后测试活动通过小程序访问会有小程序插屏广告</span>
+      </div>
+    </div>
+    
+    <div class="form-group">
+      <label class="col-lg-3 control-label">* 正式活动小程序插屏广告</label>
+      <div class="col-lg-4">
+          {:tpl_switch('miniconfig[pubhdadv]',$config['miniconfig']['pubhdadv']??"2")}
+          <span class="help-block">开启后已正式发布的活动通过小程序访问会有小程序插屏广告</span>
+      </div>
+    </div>
+    <div class="form-group{if !dzhuodongfree()} hidden{/if}">
+      <label class="col-lg-3 control-label">* 免费活动小程序插屏广告</label>
+      <div class="col-lg-4">
+          {:tpl_switch('miniconfig[freehdadv]',$config['miniconfig']['freehdadv']??"1")}
+          <span class="help-block">开启后免费活动通过小程序访问会有小程序插屏广告</span>
+      </div>
+    </div>
+  </div>
+  <div class="minireawrdadvbox{if !dzminireawrdadv()} hidden{/if}">
+    <div class="form-group">
+        <label class="col-lg-3 control-label">* 小程序激励广告id</label>
+        <div class="col-lg-8">
+          <input class="form-control" type="text"  name="miniconfig[rewardedadid]" value="{$config['miniconfig']['rewardedadid']??''}" onkeyup="return trimSpace(this)">
+          <span class="help-block">不填写则不会有广告，需要小程序开通流量主并添加一个激励广告把对应的广告位id复制过来</span>
+        </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-3 control-label">* 观看一次激励广告会员续期</label>
+      <div class="col-lg-4">
+          <input type="text" class="form-control numberincdec" name="miniconfig[rewardhour]" value="{$config['miniconfig']['rewardhour']??24}"
+          data-bts-min="1" data-bts-replacement-val="24"
+          data-bts-max="null"
+          data-bts-step="1"
+          data-bts-postfix="小时"
+          data-bts-postfix-extra-class="touchspin-postfix"
+          >
+          <span class="zam-help-block">注:必须是整数且至少是1小时</span>
+      </div>
+  </div>
+    <div class="form-group">
+      <label class="col-lg-3 control-label">* 测试活动小程序vip按钮广告</label>
+      <div class="col-lg-4">
+          {:tpl_switch('miniconfig[ceshivipbtn]',$config['miniconfig']['ceshivipbtn']??"2")}
+          <span class="help-block">开启后测试活动通过小程序访问微信端右下角有vip按钮</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-3 control-label">* 正式活动小程序vip按钮广告</label>
+      <div class="col-lg-4">
+          {:tpl_switch('miniconfig[pubvipbtn]',$config['miniconfig']['pubvipbtn']??"2")}
+          <span class="help-block">开启后已正式发布的活动通过小程序访问微信端右下角有vip按钮</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-3 control-label">* 免费活动小程序vip按钮广告</label>
+      <div class="col-lg-4">
+          {:tpl_switch('miniconfig[freevipbtn]',$config['miniconfig']['freevipbtn']??"2")}
+          <span class="help-block">开启后免费活动通过小程序访问访问微信端右下角有vip按钮</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="douyinconfigbox{if !dzdouyin()} hidden{/if}">
+  <div class="zam-titleBox">活动系统抖音网站应用参数<span class="text-danger" style="font-size: 12px;">(定制项目，未参加的定制的用户可以忽略此配置)</span></div>
+  <div class="form-group">
+      <label class="col-lg-3 control-label">* Client Key</label>
+      <div class="col-lg-8">
+        <input class="form-control" type="text" name="douyinconfig[client_key]" value="{$config['douyinconfig']['client_key']??''}" onkeyup="return trimSpace(this)">
+        <span class="help-block"><a href="https://open.douyin.com/platform" data-tooltip="laytip" title="点我去抖音开放平台" target="__blank">抖音开放平台</a> 创建网站应用后复制过来</span>
+      </div>
+  </div>
+  <div class="form-group">
+      <label class="col-lg-3 control-label">* Client Secret</label>
+      <div class="col-lg-8">
+        <input class="form-control" type="text" name="douyinconfig[client_secret]" value="{$config['douyinconfig']['client_secret']??''}" onkeyup="return trimSpace(this)">
+        <span class="help-block"><a href="https://open.douyin.com/platform" data-tooltip="laytip" title="点我去抖音开放平台" target="__blank">抖音开放平台</a> 创建网站应用后复制过来</span>
+      </div>
+  </div>
+</div>
+<div class="feishuconfigbox{if !dzfeishu()} hidden{/if}">
+  <div class="zam-titleBox">活动系统飞书网站应用参数<span class="text-danger" style="font-size: 12px;">(定制项目，未参加的定制的用户可以忽略此配置)</span></div>
+  <div class="form-group">
+      <label class="col-lg-3 control-label">* App ID</label>
+      <div class="col-lg-8">
+        <input class="form-control" type="text" name="feishuconfig[appid]" value="{$config['feishuconfig']['appid']??'appid'}" onkeyup="return trimSpace(this)">
+        <span class="help-block"><a href="https://open.feishu.cn/" data-tooltip="laytip" title="点我去飞书开放平台" target="__blank">飞书开放平台</a> 创建企业自建应用后复制过来</span>
+      </div>
+  </div>
+  <div class="form-group">
+      <label class="col-lg-3 control-label">* App Secret</label>
+      <div class="col-lg-8">
+        <input class="form-control" type="text" name="feishuconfig[appsecret]" value="{$config['feishuconfig']['appsecret']??'appsecret'}" onkeyup="return trimSpace(this)">
+        <span class="help-block"><a href="https://open.feishu.cn/" data-tooltip="laytip" title="点我去飞书开放平台" target="__blank">飞书开放平台</a> 创建企业自建应用后复制过来</span>
+      </div>
+  </div>
+</div>
+<div class="feishuconfigbox{if !dzline()} hidden{/if}">
+  <div class="zam-titleBox">活动系统line授权登录参数<span class="text-danger" style="font-size: 12px;">(定制项目，未参加的定制的用户可以忽略此配置)</span></div>
+  <div class="form-group">
+      <label class="col-lg-3 control-label">* Client Id</label>
+      <div class="col-lg-8">
+        <input class="form-control" type="text" name="lineconfig[client_id]" value="{$config['lineconfig']['client_id']??'client_id'}" onkeyup="return trimSpace(this)">
+        <span class="help-block"><a href="https://developers.line.biz/console/" data-tooltip="laytip" title="点我去line开放平台" target="__blank">line开放平台</a> 创建账号登录后复制过来</span>
+      </div>
+  </div>
+  <div class="form-group">
+      <label class="col-lg-3 control-label">* Client Secret</label>
+      <div class="col-lg-8">
+        <input class="form-control" type="text" name="lineconfig[client_secret]" value="{$config['lineconfig']['client_secret']??'client_secret'}" onkeyup="return trimSpace(this)">
+        <span class="help-block"><a href="https://developers.line.biz/console/" data-tooltip="laytip" title="点我去line开放平台" target="__blank">line开放平台</a> 创建账号登录后复制过来</span>
+      </div>
+  </div>
+</div>
+<div class="zam-titleBox">创建活动参数</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 必须选择活动分类</label>
+    <div class="col-lg-8">
+        {:tpl_switch("createconfig[opencate]",$config['createconfig']['opencate'])}
+        <span class="help-block">关闭则创建活动不需要选择活动所属分类</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 必须选择活动地区</label>
+    <div class="col-lg-8">
+        {:tpl_switch("createconfig[openarea]",$config['createconfig']['openarea'])}
+        <span class="help-block">关闭则创建活动不需要选择活动地区</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 显示绑定公众号关键词</label>
+    <div class="col-lg-8">
+        {:tpl_switch("createconfig[openbindwechat]",$config['createconfig']['openbindwechat'])}
+        <span class="help-block">关闭则创建活动时不需要绑定公众号以及填写关键词</span>
+    </div>
+</div>
+<div class="zam-titleBox">活动正式购买或新增活动功能折扣通道</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 开关</label>
+    <div class="col-lg-8">
+        {:tpl_switch("pubconfig[openday]",$config['pubconfig']['openday']??'2','opendaybox')}
+        <span class="help-block">关闭则用户发布活动时默认就是一天</span>
+    </div>
+</div>
+<div class="form-group daysbox{if !isset($config['pubconfig']['openday']) || (isset($config['pubconfig']['openday']) && $config['pubconfig']['openday']=='2')} hidden{/if}">
+    <label class="col-lg-3 control-label">* 天数通道(全局有效)</label>
+    <div class="col-lg-9">
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th style="width:15%;text-align: center;">默认</th>
+              <th style="width:20%;text-align: center;">名称</th>
+              <th style="width:20%;text-align: center;">天数</th>
+              <th style="width:20%;text-align: center;">折扣</th>
+              <th style="width:10%;text-align: center;">状态</th>
+              <th style="width:15%;text-align: center;">操作</th>
+            </tr>
+          </thead>
+          <tbody class="day-lists">
+            {foreach $config['pubconfig']['days'] as $day}
+            <tr>
+              <td class="text-center isdefaultbox">
+                  <label class="lyear-switch switch-primary normal-swith switch-solid" style="height:38px">
+                      <input type="checkbox" {if isset($day['isdefault']) && $day['isdefault']=='1'}checked="checked"{/if}>
+                      <input type="hidden" name="pubconfig[days][isdefault][]" value="{$day['isdefault']??'2'}">
+                      <span data-status="{$day['isdefault']??'2'}" data-func="opendefault" class="normal-span has-func" data-ajax=""></span>
+                  </label>
+              </td>
+              <td class="text-center">
+                  <input type="text" class="form-control" name="pubconfig[days][name][]" value="{$day['name']}">
+              </td>
+              <td class="text-center">
+                <div class="input-group">
+                  <input type="text" class="form-control" name="pubconfig[days][day][]" value="{$day['day']}">
+                  <div class="input-group-addon">天</div>
+                </div>
+              </td>
+              <td class="text-center">
+                <div class="input-group">
+                  <input type="text" class="form-control" name="pubconfig[days][discount][]" value="{$day['discount']}">
+                  <div class="input-group-addon">折</div>
+                </div>
+              </td>
+              <td class="text-center">
+                  <label class="lyear-switch switch-primary normal-swith switch-solid" style="height:38px">
+                      <input type="checkbox" {if $day['status']=='1'}checked="checked"{/if}>
+                      <input type="hidden" name="pubconfig[days][status][]" value="{$day['status']}">
+                      <span data-status="{$day['status']}" class="normal-span " data-ajax=""></span>
+                  </label>
+              </td>
+              <td class="text-center">
+                <a class="btn btn-xs btn-primary zam-sortable btn-moveitem" href="javascript:void(0)">
+                  <i class="mdi mdi-arrow-all"></i>
+                </a>
+                <a class="btn btn-xs btn-danger" href="javascript:;" onclick="javascript:$(this).parent().parent().remove()">
+                  <i class="mdi mdi-close"></i>
+                </a>
+              </td>
+            </tr>
+            {/foreach}
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="5">
+                <div class="m-b-10"><a class="btn btn-primary btn-xs btn-addday" href="javascript:;"><i class="mdi mdi-plus"></i> 新增通道</a></div>
+                <div class="m-b-10" style="color:gray">折扣必须是大于等于0，小于10内的数字，填写小数时可以填写1-2位小数，<span class="text-danger">0即为不打折</span></div>
+                <div class="m-b-10" style="color:gray">默认通道只能选一个，仅在活动正式购买或新增活动功能时有效</div>
+                <div style="color:gray">通道名称与通道天数必须保证唯一</div>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+    </div>
+</div>
+<div class="zam-titleBox">活动续期天数折扣通道</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 开关</label>
+    <div class="col-lg-8">
+        {:tpl_switch("pubconfig[openrday]",$config['pubconfig']['openrday']??'2','openrdaybox')}
+        <span class="help-block">关闭则使用活动正式购买天数通道，如需让用户给活动续期时享受另外的折扣推荐开启并添加天数通道</span>
+    </div>
+</div>
+<div class="form-group rdaysbox{if !isset($config['pubconfig']['openrday']) || (isset($config['pubconfig']['openrday']) && $config['pubconfig']['openrday']=='2')} hidden{/if}">
+    <label class="col-lg-3 control-label">* 天数通道(全局有效)</label>
+    <div class="col-lg-9">
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th style="width:15%;text-align: center;display: none">默认</th>
+              <th style="width:20%;text-align: center;">名称</th>
+              <th style="width:20%;text-align: center;">天数</th>
+              <th style="width:20%;text-align: center;">折扣</th>
+              <th style="width:10%;text-align: center;">状态</th>
+              <th style="width:15%;text-align: center;">操作</th>
+            </tr>
+          </thead>
+          <tbody class="rday-lists">
+            {foreach $config['pubconfig']['rdays'] as $rday}
+            <tr>
+              <td class="text-center isdefaultbox hidden">
+                  <label class="lyear-switch switch-primary normal-swith switch-solid" style="height:38px">
+                      <input type="checkbox" {if isset($rday['risdefault']) && $rday['risdefault']=='1'}checked="checked"{/if}>
+                      <input type="hidden" name="pubconfig[rdays][risdefault][]" value="{$rday['risdefault']??'2'}">
+                      <span data-status="{$rday['isdefault']??'2'}" data-func="opendefault" class="normal-span has-func" data-ajax=""></span>
+                  </label>
+              </td>
+              <td class="text-center">
+                  <input type="text" class="form-control" name="pubconfig[rdays][rname][]" value="{$rday['rname']}">
+              </td>
+              <td class="text-center">
+                <div class="input-group">
+                  <input type="text" class="form-control" name="pubconfig[rdays][rday][]" value="{$rday['rday']}">
+                  <div class="input-group-addon">天</div>
+                </div>
+              </td>
+              <td class="text-center">
+                <div class="input-group">
+                  <input type="text" class="form-control" name="pubconfig[rdays][rdiscount][]" value="{$rday['rdiscount']}">
+                  <div class="input-group-addon">折</div>
+                </div>
+              </td>
+              <td class="text-center">
+                  <label class="lyear-switch switch-primary normal-swith switch-solid" style="height:38px">
+                      <input type="checkbox" {if $rday['rstatus']=='1'}checked="checked"{/if}>
+                      <input type="hidden" name="pubconfig[rdays][rstatus][]" value="{$rday['rstatus']}">
+                      <span data-status="{$rday['rstatus']}" class="normal-span " data-ajax=""></span>
+                  </label>
+              </td>
+              <td class="text-center">
+                <a class="btn btn-xs btn-primary zam-sortable btn-moveitem" href="javascript:void(0)">
+                  <i class="mdi mdi-arrow-all"></i>
+                </a>
+                <a class="btn btn-xs btn-danger" href="javascript:;" onclick="javascript:$(this).parent().parent().remove()">
+                  <i class="mdi mdi-close"></i>
+                </a>
+              </td>
+            </tr>
+            {/foreach}
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="5">
+                <div class="m-b-10"><a class="btn btn-primary btn-xs btn-addrday" href="javascript:;"><i class="mdi mdi-plus"></i> 新增通道</a></div>
+                <div class="m-b-10" style="color:gray">折扣必须是大于等于0，小于10内的数字，填写小数时可以填写1-2位小数，<span class="text-danger">0即为不打折</span></div>
+                <div class="m-b-10" style="color:gray">用户续期时默认会选择第一个通道</div>
+                <div style="color:gray">通道名称与通道天数必须保证唯一</div>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+    </div>
+</div>
+<div class="zam-titleBox">活动全局oauth域名</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 全局OAUTH域名</label>
+    <div class="col-lg-8">
+      <input class="form-control" type="text"  name="oauthhost" value="{$config['oauthhost']}" onkeyup="return trimSpace(this)">
+      <span class="help-block">全局oauth域名:所有解析的域名访问活动微信端，遇到oauth授权将跳转至此域名进行授权。注意：所有红包模板和支付模板对应的公众号网页授权域名必须填写此域名为oauth域名否则会报错。样例:https://baidu.com，后面没有斜杠</span>
+    </div>
+</div>
+<div class="zam-titleBox">活动全局默认设置</div>
+<div class="form-group">
+  <label class="col-lg-3 control-label">* 默认奖品图片</label>
+  <div class="col-lg-8">
+    {:tpl_image_one('defaultconfig[prizeimg]',$config['defaultconfig']['prizeimg']??'/static/images/sys/prizeimg.png')}
+    <span class="help-block">规格:200*200px</span>
+  </div>
+</div>
+<div class="form-group">
+  <label class="col-lg-3 control-label">* 红包雨轮次内每个用户最多可领取数量上限</label>
+  <div class="col-lg-4">
+      <input type="text" class="form-control numberincdec" name="defaultconfig[redpackmaxnum]" value="{$config['defaultconfig']['redpackmaxnum']??10}"
+      data-bts-min="1" data-bts-replacement-val="10"
+      data-bts-max="null"
+      data-bts-step="1"
+      data-bts-postfix="个"
+      data-bts-postfix-extra-class="touchspin-postfix"
+      >
+      <span class="zam-help-block">注:必须是整数且至少是1个，微信商户规定现金红包或企业付款接口每个人每天最多只能领取10个红包</span>
+  </div>
+</div>
+<div class="form-group{if !dznormalrequest('bigmenu')} hidden{/if}">
+  <label class="col-lg-3 control-label">* 点击查看大屏打开功能</label>
+  <div class="col-lg-8">
+    <label class="lyear-radio radio-inline radio-primary">
+      <input type="radio" name="defaultconfig[clickscreen]" value="1" {if !isset($config['defaultconfig']['clickscreen']) || $config['defaultconfig']['clickscreen']=='1'}checked{/if}><span>默认设置</span>
+    </label>
+    <label class="lyear-radio radio-inline radio-primary">
+      <input type="radio" name="defaultconfig[clickscreen]" value="2" {if isset($config['defaultconfig']['clickscreen']) && $config['defaultconfig']['clickscreen']=='2'}checked{/if}><span>大屏菜单</span>
+    </label>
+    <div class="help-block">
+       <div class="m-b-5">1 即为我的活动的每个活动都有个查看大屏，用户点击后跳转什么功能</div>
+       <div>2 选择了大屏菜单必须活动的大屏菜单功能可用才有效</div>
+    </div>
+  </div>
+</div>
+<div class="form-group">
+  <label class="col-lg-3 control-label">* 解析用户ip地址方式</label>
+  <div class="col-lg-8">
+    <label class="lyear-radio radio-inline radio-primary">
+      <input type="radio" name="defaultconfig[parseip]" value="1" {if !isset($config['defaultconfig']['parseip']) || $config['defaultconfig']['parseip']=='1'}checked{/if}><span>GeoIP库解析</span>
+    </label>
+    <label class="lyear-radio radio-inline radio-primary">
+      <input type="radio" name="defaultconfig[parseip]" value="2" {if isset($config['defaultconfig']['parseip']) && $config['defaultconfig']['parseip']=='2'}checked{/if}><span>第三方Api解析</span>
+    </label>
+    <span class="help-block">注:GeoIP库解析速度快,准确度较低，第三方Api解析速度一般,准确度较高；如果您需要高准确度的ip地址推荐选择第三方Api解析</span>
+  </div>
+</div>
+<div class="form-group{if !dzhideappmenu()} hidden{/if}">
+  <label class="col-lg-3 control-label">* 手机端隐藏部分功能菜单</label>
+  <div class="col-lg-3">
+      {:tpl_switch('defaultconfig[hideappmenu]',$config['defaultconfig']['hideappmenu']??'2')}
+      <span class="help-block">建议关闭，开启后如果活动未开启微信端自定义菜单活动则微信菜单里只会显示上墙，个人中心，投票，大转盘菜单</span>
+  </div>
+</div>
+<div class="zam-titleBox">活动默认版权</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 活动logo</label>
+    <div class="col-lg-8">
+      {:tpl_image_one('copyright[logo]',$config['copyright']['logo'])}
+      <span class="help-block">规格:260*70px</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 活动底部版权信息</label>
+    <div class="col-lg-8">
+      <input class="form-control" type="text"  name="copyright[copyright]" value="{$config['copyright']['copyright']}">
+    </div>
+</div>
+<div class="zam-titleBox">大屏设置</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 登录背景图</label>
+    <div class="col-lg-8">
+      {:tpl_image_one("screenconfig[loginbg]",$config['screenconfig']['loginbg'])}
+      <span class="help-block">规格:1440*800px</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">登录密码</label>
+    <div class="col-lg-8">
+      <input class="form-control" type="text"  name="screenconfig[password]" value="{$config['screenconfig']['password']}" onkeyup="value=value.replace(/[^\a-\z\A-\Z0-9]/g,'')" onpaste="value=value.replace(/[^\a-\z\A-\Z0-9]/g,'')" oncontextmenu = "value=value.replace(/[^\a-\z\A-\Z0-9]/g,'')" maxlength="10">
+      <span class="help-block">必须是6-10位密码，此处可不设置，设置了的话用户创建的所有活动大屏都是必须先输入此密码登录</span>
+    </div>
+</div>
+<div class="form-group">
+      <label class="col-lg-3 control-label">* 自定义大屏二维码</label>
+      <div class="col-lg-3">
+          {:tpl_switch('screenconfig[diyqr]',$config['screenconfig']['diyqr'])}
+          <span class="help-block">建议关闭，开启后必须上传下面的二维码图片</span>
+      </div>
+</div>
+<div class="form-group">
+  <label class="col-lg-3 control-label">大屏二维码</label>
+  <div class="col-lg-8">
+    {:tpl_image_one("screenconfig[qrimg]",$config['screenconfig']['qrimg'])}
+    <span class="help-block">规格:200*200px，上传后活动功能将使用此二维码</span>
+  </div>
+</div>
+<div class="form-group">
+  <label class="col-lg-3 control-label">二维码下说明文字</label>
+  <div class="col-lg-8">
+    <input type="text" class="form-control" name="screenconfig[qrtxt]" value="{$config['screenconfig']['qrtxt']}">
+  </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 关闭底部功能菜单</label>
+    <div class="col-lg-3">
+        {:tpl_switch("screenconfig[hidemenu]",$config['screenconfig']['hidemenu'])}
+        <span class="help-block">关闭后大屏将不显示底部菜单</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 顶部公告</label>
+    <div class="col-lg-3">
+        {:tpl_switch("screenconfig[opennotice]",$config['screenconfig']['opennotice'])}
+        <span class="help-block">关闭后大屏将不显示顶部公告</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">公告内容</label>
+    <div class="col-lg-8">
+      <textarea class="form-control" name="screenconfig[notice]" rows="4" placeholder="注:多条公告必须以#隔开">{$config['screenconfig']['notice']}</textarea>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 公告文字颜色</label>
+    <div class="col-lg-4">
+      <div class="input-group">
+        <span class="input-group-btn"><a class="btn btn-default">大小</a></span>
+        <input type="text" class="form-control" name="screenconfig[noticesize]" value="{$config['screenconfig']['noticesize']}">
+        <span class="input-group-btn"><a class="btn btn-default">px，颜色</a></span>
+        {:tpl_color('screenconfig[noticecolor]',$config['screenconfig']['noticecolor'])}
+      </div>
+    </div>
+</div>
+<div class="form-group hidden">
+    <label class="col-lg-3 control-label">* 点击活动查看大屏</label>
+    <div class="col-lg-8">
+      <select class="form-control" name="defaultmodule">
+		    <option value="0">请选择</option>
+		    <option value="msg">上墙</option>
+		    <option value="sign" selected="true">签到</option>
+		    <option value="shake">摇一摇</option>
+	  </select>
+	  <span class="help-block">此设置仅对测试活动生效，正式活动将进入选择对应活动购买第一个功能</span>
+    </div>
+</div>
+<div class="form-group{if !dzscreenhelp()} hidden{/if}">
+    <label class="col-lg-3 control-label">* 新创建的活动默认是否显示新手指引开关</label>
+    <div class="col-lg-6">
+        {:tpl_switch("screenconfig[opennewerlayer]",$config['screenconfig']['opennewerlayer']??'1')}
+        <span class="help-block">开启则创建的新活动默认打开新手引导层，反之则默认不打开</span>
+    </div>
+</div>
+<div class="form-group">
+  <label class="col-lg-3 control-label">* 大屏加载模式</label>
+  <div class="col-lg-8">
+      <label class="lyear-radio radio-inline radio-primary">
+            <input type="radio" name="screenconfig[loadtype]" value="1" {if !isset($config['screenconfig']['loadtype']) || $config['screenconfig']['loadtype'] == '1'}checked{/if}><span>默认模式</span>
+      </label>
+      <label class="lyear-radio radio-inline radio-primary">
+            <input type="radio" name="screenconfig[loadtype]" value="2" {if isset($config['screenconfig']['loadtype']) && $config['screenconfig']['loadtype'] == '2'}checked{/if}><span>iframe加载模式</span>
+      </label>
+  </div>
+</div>
+<div class="screennewerconfigbox{if !dzscreenhelp()} hidden{/if}">
+  <div class="zam-titleBox">大屏幕新手指引设置<span class="text-danger" style="font-size: 12px">(为了美观，下面主要颜色尽量跟随引导图的主色系设置)</span></div>
+  <div class="form-group">
+      <label class="col-lg-3 control-label">* 默认大屏打开新手引导层</label>
+      <div class="col-lg-6">
+          {:tpl_switch("screennewerconfig[isopen]",$config['screennewerconfig']['isopen']??'1')}
+          <span class="help-block">开启则已经创建好的老活动默认直接展示新手引导层，反之则默认不打开新手引导层</span>
+      </div>
+  </div>
+  <div class="form-group">
+      <label class="col-lg-3 control-label">新手引导菜单名称</label>
+      <div class="col-lg-8">
+        <input class="form-control" type="text"  name="screennewerconfig[cateonename]" value="{$config['screennewerconfig']['cateonename']??'新手引导'}" maxlength="6">
+        <span class="help-block">默认是新手引导</span>
+      </div>
+  </div>
+  <div class="form-group">
+      <label class="col-lg-3 control-label">快捷键菜单名称</label>
+      <div class="col-lg-8">
+        <input class="form-control" type="text"  name="screennewerconfig[catetwoname]" value="{$config['screennewerconfig']['catetwoname']??'通用快捷键'}" maxlength="6">
+        <span class="help-block">默认是通用快捷键</span>
+      </div>
+  </div>
+  <div class="form-group">
+    <label class="col-lg-3 control-label">* 菜单文字大小颜色</label>
+    <div class="col-lg-6">
+      <div class="input-group">
+        <span class="input-group-btn"><a class="btn btn-default">大小</a></span>
+        <input type="text" class="form-control" name="screennewerconfig[catesize]" value="{$config['screennewerconfig']['catesize']??'20'}">
+        <span class="input-group-btn"><a class="btn btn-default">px，颜色</a></span>
+        {:tpl_color('screennewerconfig[catecolor]',$config['screennewerconfig']['catecolor']??'#fff')}
+        <span class="input-group-btn"><a class="btn btn-default">文字阴影颜色</a></span>
+        {:tpl_color('screennewerconfig[cateshadowcolor]',$config['screennewerconfig']['cateshadowcolor']??'#00bcd4')}
+      </div>
+    </div>
+  </div>
+  <div class="form-group">
+      <label class="col-lg-3 control-label">菜单默认背景色</label>
+      <div class="col-lg-8">
+        {:tpl_color('screennewerconfig[catebgcolor]',$config['screennewerconfig']['catebgcolor']??'#515354')}
+        <span class="help-block">默认#515354</span>
+      </div>
+  </div>
+  <div class="form-group">
+    <label class="col-lg-3 control-label">* 菜单激活背景色</label>
+    <div class="col-lg-4">
+      <div class="input-group">
+        <span class="input-group-btn"><a class="btn btn-default">顶部背景色</a></span>
+        {:tpl_color('screennewerconfig[cateactivebgcolor]',$config['screennewerconfig']['cateactivebgcolor']??'#2ab4ff')}
+        <span class="input-group-btn"><a class="btn btn-default">底部背景色</a></span>
+        {:tpl_color('screennewerconfig[cateactivebgcolor2]',$config['screennewerconfig']['cateactivebgcolor2']??'#237eaf')}
+      </div>
+    </div>
+  </div>
+  <div class="form-group">
+      <label class="col-lg-3 control-label">大屏底部菜单边界颜色</label>
+      <div class="col-lg-8">
+        {:tpl_color('screennewerconfig[catebordercolor]',$config['screennewerconfig']['catebordercolor']??'#03a9f4')}
+        <span class="help-block">默认#03a9f4</span>
+      </div>
+  </div>
+  <div class="form-group">
+    <label class="col-lg-3 control-label">* 二维码引导图</label>
+    <div class="col-lg-8">
+      {:tpl_image_one("screennewerconfig[qrpopimg]",$config['screennewerconfig']['qrpopimg']??SIMGURL.'common/help/1.png')}
+      <span class="help-block">规格:320*120px</span>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-lg-3 control-label">* 首页功能引导图</label>
+    <div class="col-lg-8">
+      {:tpl_image_one("screennewerconfig[shouyepopimg]",$config['screennewerconfig']['shouyepopimg']??SIMGURL.'common/help/2.png')}
+      <span class="help-block">规格:320*120px，由于存在模块菜单引导图，首页引导图可以不设置</span>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-lg-3 control-label">* 模块菜单引导图</label>
+    <div class="col-lg-8">
+      {:tpl_image_one("screennewerconfig[modulepopimg]",$config['screennewerconfig']['modulepopimg']??SIMGURL.'common/help/3.png')}
+      <span class="help-block">规格:286*256px</span>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-lg-3 control-label">* 功能菜单引导图</label>
+    <div class="col-lg-8">
+      {:tpl_image_one("screennewerconfig[normalpopimg]",$config['screennewerconfig']['normalpopimg']??SIMGURL.'common/help/4.png')}
+      <span class="help-block">规格:286*256px</span>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-lg-3 control-label">* 帮助菜单引导图</label>
+    <div class="col-lg-8">
+      {:tpl_image_one("screennewerconfig[helppopimg]",$config['screennewerconfig']['helppopimg']??SIMGURL.'common/help/5.png')}
+      <span class="help-block">规格:230*256px</span>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-lg-3 control-label">* 快捷键引导图</label>
+    <div class="col-lg-8">
+      {:tpl_image_one("screennewerconfig[keyboardpopimg]",$config['screennewerconfig']['keyboardpopimg']??SIMGURL.'common/help/6.png')}
+      <span class="help-block">规格:860*574px</span>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-lg-3 control-label">* 关闭引导按钮图</label>
+    <div class="col-lg-8">
+      {:tpl_image_one("screennewerconfig[closebtn]",$config['screennewerconfig']['closebtn']??SIMGURL.'common/help/close.png')}
+      <span class="help-block">注意：此图不应做的太大，尽量控制在300px * 300px内，如果有作图能力推荐做个动图</span>
+    </div>
+  </div>
+</div>
+<div class="zam-titleBox">微信设置</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 用户默认头像</label>
+    <div class="col-lg-8">
+      {:tpl_image_one("mobileconfig[defaultavatar]",$config['mobileconfig']['defaultavatar'])}
+      <span class="help-block">规格:64*64px</span>
+    </div>
+</div>
+<div class="form-group">
+  <label class="col-lg-3 control-label">功能互动按钮</label>
+  <div class="col-lg-8">
+    {:tpl_switch("mobileconfig[showtmenu]",$config['mobileconfig']['showtmenu'])}
+    <span class="help-block">开启后所有功能页将显示互动功能按钮</span>
+  </div>
+</div>
+<div class="form-group">
+  <label class="col-lg-3 control-label">互动按钮图片</label>
+  <div class="col-lg-8">
+    {:tpl_image_one("mobileconfig[tmenuimg]",$config['mobileconfig']['tmenuimg'])}
+    <span class="help-block">规格:64*64px 尽量使用彩色图片</span>
+  </div>
+</div>
+<div class="form-group">
+  <label class="col-lg-3 control-label">个人中心菜单图标</label>
+  <div class="col-lg-8">
+    {:tpl_image_one("mobileconfig[homeicon]",$config['mobileconfig']['homeicon'])}
+    <span class="help-block">微信端互动菜单个人中心小图标，规格:100*100px</span>
+  </div>
+</div>
+<div class="form-group">
+  <label class="col-lg-3 control-label">中奖弹窗</label>
+  <div class="col-lg-8">
+    {:tpl_switch("mobileconfig[showluckeralert]",$config['mobileconfig']['showluckeralert'])}
+    <span class="help-block">开启后用户获得实物奖品将以微信弹窗形式告知用户</span>
+  </div>
+</div>
+<div class="form-group">
+  <label class="col-lg-3 control-label">活动安全验证</label>
+  <div class="col-lg-8">
+    {:tpl_switch("mobileconfig[safeverify]",$config['mobileconfig']['safeverify'])}
+    <span class="help-block">建议关闭，否则新创建的活动微信端必须先输入安全密码才可以进入活动</span>
+  </div>
+</div>
+<div class="form-group">
+  <label class="col-lg-3 control-label">微信安全密码</label>
+  <div class="col-lg-3">
+    <input type="text" class="form-control" name="mobileconfig[safeword]" value="{$config['mobileconfig']['safeword']}" maxlength=6>
+    <span class="zam-help-block">必须是数字</span>
+  </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 全局禁词</label>
+    <div class="col-lg-8">
+      <textarea class="form-control" name="mobileconfig[stopword]" rows="4" placeholder="注:多条公告必须以#隔开">{$config['mobileconfig']['stopword']}</textarea>
+      <span class="help-block">对微信端所有发送内容的功能生效，一般是谩骂、涉黄、涉政等内容</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">拉黑用户进入提示</label>
+    <div class="col-lg-8">
+      <input class="form-control" type="text"  name="mobileconfig[blackword]" value="{$config['mobileconfig']['blackword']}" maxlength="20">
+      <span class="help-block">被拉黑的用户进入活动页面提示语</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">禁止重复中奖提示</label>
+    <div class="col-lg-8">
+      <input class="form-control" type="text"  name="mobileconfig[forbiddenword]" value="{$config['mobileconfig']['forbiddenword']}" maxlength="20">
+      <span class="help-block">开启了中奖唯一或者游戏禁止重复中奖提示语</span>
+    </div>
+</div>
+<div class="form-group">
+  <label class="col-lg-3 control-label">测试活动总人数达到上限提示文案</label>
+  <div class="col-lg-8">
+    <input class="form-control" type="text" name="mobileconfig[nopubovernumword]"
+      value="{$config['mobileconfig']['nopubovernumword']??'您好当前活动未正式发布处于测试状态，仅限【defaultnum】人参与，目前参与总人数已达上限'}"
+      maxlength="50">
+    <span
+      class="help-block">仅对测试状态的活动有效，当活动进入总人数达到了系统测试总人数则会提示此文案，文案内可通过【defaultnum】可调用系统测试总人数，默认文案：您好当前活动未正式发布处于测试状态，仅限【defaultnum】人参与，目前参与总人数已达上限</span>
+  </div>
+</div>
+<div class="form-group">
+  <label class="col-lg-3 control-label">未开始活动总人数达到上限提示文案</label>
+  <div class="col-lg-8">
+    <input class="form-control" type="text" name="mobileconfig[notstartovernumword]"
+      value="{$config['mobileconfig']['notstartovernumword']??'您好活动将于【starttime】正式开始，目前处于测试阶段仅限【defaultnum】人参与，目前参与总人数已达上限'}"
+      maxlength="80">
+    <span
+      class="help-block">仅对已正式发布并处于未开始状态的活动有效，当活动进入总人数达到了系统测试总人数则会提示此文案，文案内可通过【starttime】调用活动开始时间，可通过【defaultnum】可调用系统测试总人数，默认文案：您好活动将于【starttime】正式开始，目前处于测试阶段仅限【defaultnum】人参与，目前参与总人数已达上限</span>
+  </div>
+</div>
+<div class="form-group">
+  <label class="col-lg-3 control-label">活动总人数达到上限提示文案</label>
+  <div class="col-lg-8">
+    <input class="form-control" type="text" name="mobileconfig[overmaxnumword]"
+      value="{$config['mobileconfig']['overmaxnumword']??'您好当前活动购买了【maxnum】人，目前参与总人数已达上限'}" maxlength="50">
+    <span
+      class="help-block">仅对已正式发布并处于进行中状态的活动有效，当活动进入总人数达到了活动购买总人数则会提示此文案，文案内可通过【maxnum】可调用活动已购买人数，默认文案：您好当前活动购买了【maxnum】人，目前参与总人数已达上限</span>
+  </div>
+</div>
+<div class="zam-titleBox">微信分享设置</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 分享</label>
+    <div class="col-lg-3">
+        {:tpl_switch('shareconfig[open]',$config['shareconfig']['open'])}
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 标题</label>
+    <div class="col-lg-8">
+      <input class="form-control inputneedmax" type="text"  name="shareconfig[title]" maxlength="30" value="{$config['shareconfig']['title']}">
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 介绍</label>
+    <div class="col-lg-8">
+      <input class="form-control inputneedmax" type="text"  name="shareconfig[desc]" maxlength="50" value="{$config['shareconfig']['desc']}">
+    </div>
+</div>
+<div class="form-group">
+  <label class="col-lg-3 control-label">* 图标</label>
+  <div class="col-lg-8">
+  {:tpl_image_one("shareconfig[icon]",$config['shareconfig']['icon'])}
+  <span class="help-block">规格:64*64px</span>
+  </div>
+</div>
+<div class="zam-titleBox">公众号回复消息设置</div>
+<div class="form-group">
+      <label class="col-lg-3 control-label">* 公众号回复消息类型</label>
+      <div class="col-lg-8">
+        <label class="lyear-radio radio-inline radio-primary" onclick="keywordtype(this)">
+          <input type="radio" name="keywordconfig[type]" value="1" {if $config['keywordconfig']['type']=='1'}checked{/if}><span>文字消息</span>
+        </label>
+        <label class="lyear-radio radio-inline radio-primary" onclick="keywordtype(this)">
+          <input type="radio" name="keywordconfig[type]" value="2" {if $config['keywordconfig']['type']=='2'}checked{/if}><span>图文消息</span>
+        </label>
+        <span class="help-block">图文消息可以自定义小图片</span>
+      </div>
+</div>
+<div class="form-group keywordtype1{if $config['keywordconfig']['type']=='2'} hidden{/if}">
+<label class="col-lg-3 control-label">* 文字内容</label>
+<div class="col-lg-8">
+  <input type="text" class="form-control"  name="keywordconfig[text]" value="{$config['keywordconfig']['text']}">
+   <span class="help-block">文字内容</span>
+</div>
+</div>
+<div class="form-group keywordtype2{if $config['keywordconfig']['type']=='1'} hidden{/if}">
+  <label class="col-lg-3 control-label">* 图文标题</label>
+  <div class="col-lg-8">
+    <input type="text" class="form-control"  name="keywordconfig[title]" value="{$config['keywordconfig']['title']}">
+    <span class="help-block">图文标题</span>
+  </div>
+</div>
+<div class="form-group keywordtype2{if $config['keywordconfig']['type']=='1'} hidden{/if}">
+  <label class="col-lg-3 control-label">* 图文封面</label>
+  <div class="col-lg-8">
+    {:tpl_image_one('keywordconfig[icon]', $config['keywordconfig']['icon'])}
+    <span class="help-block">图文封面</span>
+  </div>
+</div>
+<div class="form-group keywordtype2{if $config['keywordconfig']['type']=='1'} hidden{/if}">
+  <label class="col-lg-3 control-label">* 图文介绍</label>
+  <div class="col-lg-8">
+    <textarea class="form-control" name="keywordconfig[des]" rows="4">{$config['keywordconfig']['des']}</textarea>
+    <span class="help-block">图文内容</span>
+  </div>
+</div>
+<div class="form-group">
+  <label class="col-lg-3 control-label">点击消息跳转地址(此项尽量不填)</label>
+  <div class="col-lg-8">
+    <input type="text" class="form-control" name="keywordconfig[url]" value="{$config['keywordconfig']['url']}">
+    <span class="help-block">默认是跳转到活动微信主页，可填写跳转至其他功能微信端地址</span>
+  </div>
+</div>
+<div class="zam-titleBox">特殊设置</div>
+<div class="form-group">
+  <label class="col-lg-3 control-label">* 获取微信用户高清头像</label>
+  <div class="col-lg-3">
+      {:tpl_switch('specialconfig[gethighavatar]',$config['specialconfig']['gethighavatar']??'2')}
+      <span class="help-block">开启后新创建的活动默认获取微信用户高清头像</span>
+  </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 屏幕跟随</label>
+    <div class="col-lg-3">
+        {:tpl_switch('specialconfig[followchange]',$config['specialconfig']['followchange'])}
+        <span class="help-block">开启后大屏幕点击哪个功能，微信端将跳转至哪个微信功能</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 中奖唯一</label>
+    <div class="col-lg-6">
+        <label class="lyear-radio radio-inline radio-primary">
+          <input type="radio" name="specialconfig[onlyone]" value="1" {if $config['specialconfig']['onlyone']=='1'}checked{/if}><span>全局唯一</span>
+        </label>
+        <label class="lyear-radio radio-inline radio-primary">
+          <input type="radio" name="specialconfig[onlyone]" value="3" {if $config['specialconfig']['onlyone']=='3'}checked{/if}><span>抽奖功能唯一</span>
+        </label>
+        <label class="lyear-radio radio-inline radio-primary">
+          <input type="radio" name="specialconfig[onlyone]" value="4" {if $config['specialconfig']['onlyone']=='4'}checked{/if}><span>游戏功能唯一</span>
+        </label>
+        <label class="lyear-radio radio-inline radio-primary">
+          <input type="radio" name="specialconfig[onlyone]" value="2" {if $config['specialconfig']['onlyone']=='2'}checked{/if}><span>不限制</span>
+        </label>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 重置活动数据</label>
+    <div class="col-lg-3">
+        {:tpl_switch('specialconfig[resethddata]',$config['specialconfig']['resethddata'])}
+        <span class="help-block">开启后默认所有新创建的活动对应的所属用户可以自行重置活动数据</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 签到写入sign.txt</label>
+    <div class="col-lg-3">
+        {:tpl_switch('specialconfig[signinfy]',$config['specialconfig']['signinfy'])}
+        <span class="help-block">开启后用户签到数据将写入到sign.txt</span>
+    </div>
+</div>
+<div class="zam-titleBox">地区限制设置</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 地区限制</label>
+    <div class="col-lg-8">
+        {:tpl_switch('locconfig[open]',$config['locconfig']['open'])}
+        <span class="help-block">必须是关闭，因为你无法预知活动创建者活动具体的位置</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 限制类型</label>
+    <div class="col-lg-8">
+      <label class="lyear-radio radio-inline radio-primary">
+       <input type="radio" name="locconfig[type]" value="1" {if $config['locconfig']['type']=='1'}checked{/if}><span>位置限制</span>
+      </label>
+      <label class="lyear-radio radio-inline radio-primary">
+       <input type="radio" name="locconfig[type]" value="2" {if $config['locconfig']['type']=='2'}checked{/if}><span>地区限制</span>
+      </label>
+      <span class="help-block">推荐使用位置限制</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 有效范围</label>
+    <div class="col-lg-3">
+        <div class="input-group">
+            <input type="text" class="form-control" name="locconfig[range]" value="{$config['locconfig']['range']}">
+            <div class="input-group-addon">米</div>
+        </div>
+        <span class="zam-help-block">位置中心以外多少米有效</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 地图位置</label>
+    <div class="col-lg-8">
+      <input class="form-control" type="text"  name="locconfig[address]" value="{$config['locconfig']['address']}">
+      <span class="help-block">建议留空</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 地图位置经纬度</label>
+    <div class="col-lg-8">
+      <input class="form-control" type="text"  name="locconfig[latlng]" value="{$config['locconfig']['latlng']}">
+      <span class="help-block">建议留空</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 地区</label>
+    <div class="col-lg-8">
+      <input class="form-control" type="text"  name="locconfig[area]" value="{$config['locconfig']['area']}">
+      <span class="help-block">建议留空</span>
+    </div>
+</div>
+{if dzhuodongadv()}
+<div class="config-titlebox m-l-15">
+  <span class="config-titlename">微信端开屏广告</span>
+</div>
+<div class="form-group">
+  <label class="col-lg-3 control-label">* 开关</label>
+  <div class="col-lg-8">
+    {:tpl_switch('advconfig[h5][open]',$config['advconfig']['h5']['open']??'2')}
+    <div class="help-block">
+      <div>开启则创建新活动默认也会开启广告</div>
+      {if dzhuodongfree()}
+      <div class="text-danger">创建新的免费活动是否自动开启广告需要到用户组免费活动菜单内设置，但是你必须把要下面广告相关的东西设置好，别等下创建的免费活动没广告</div>
+      {/if}
+    </div>
+  </div>
+</div>
+<div class="form-group">
+  <label class="col-lg-3 control-label">加载层</label>
+  <div class="col-lg-8">
+    {:tpl_switch("advconfig[h5][loadopen]",$config['advconfig']['h5']['loadopen']??'1')}
+    <span class="help-block">注:若您需要开启广告层推荐您开启加载层</span>
+  </div>
+</div>
+<div class="form-group">
+  <label class="col-lg-3 control-label">加载层提示图</label>
+  <div class="col-lg-8">
+    {:tpl_image_one("advconfig[h5][loadimg]",$config['advconfig']['h5']['loadimg']??'/static/images/sys/logo.png')}
+    <span class="help-block">规格:150*100px，如果您不设置提示图系统将使用旋转圆圈作为加载提示图</span>
+  </div>
+</div>
+<div class="form-group">
+  <label class="col-lg-3 control-label text-right">* 加载层提示文字</label>
+  <div class="col-lg-8">
+    <div class="input-group">
+        <div class="input-group-btn not-allow"><a class="btn btn-default">文字</a></div>
+        <input type="text" class="form-control" name="advconfig[h5][loadtxt]" value="{$config['advconfig']['h5']['loadtxt']??'大屏互动正在为您加载...'}" />
+        <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
+        <div class="touchspin">
+          <input type="text" class="form-control numberincdec" name="advconfig[h5][loadsize]" 
+            data-bts-min="1" data-bts-replacement-val="1"
+            data-bts-max="40"
+            data-bts-step="1"
+            value="{$config['advconfig']['h5']['loadsize']??24}">
+        </div>
+        <div class="input-group-btn not-allow"><a class="btn btn-default">px，颜色</a></div>
+        {:tpl_color('advconfig[h5][loadcolor]',$config['advconfig']['h5']['loadcolor']??'#000')}
+        <div class="input-group-btn not-allow"><a class="btn btn-default">距提示图距离</a></div>
+        <div class="touchspin">
+          <input type="text" class="form-control numberincdec" name="advconfig[h5][loadmt]" 
+            data-bts-min="1" data-bts-replacement-val="1"
+            data-bts-max="200"
+            data-bts-step="1"
+            value="{$config['advconfig']['h5']['loadmt']??15}">
+        </div>
+    </div>
+  </div>
+</div>
+<div class="form-group">
+  <label class="col-lg-3 control-label">加载层展示时长</label>
+  <div class="col-lg-2">
+    <input type="text" class="form-control numberincdec" name="advconfig[h5][loadtime]" value="{$config['advconfig']['h5']['loadtime']??3}"
+    data-bts-min="1" data-bts-replacement-val="1"
+    data-bts-max="null"
+    data-bts-step="1"
+    data-bts-postfix="秒"
+    data-bts-postfix-extra-class="touchspin-postfix"
+    >
+    <div class="help-block">注:最少1秒</div>
+  </div>
+</div>
+<div class="form-group">
+  <label class="col-lg-3 control-label">广告层</label>
+  <div class="col-lg-8">
+      {:tpl_switch("advconfig[h5][advopen]",$config['advconfig']['h5']['advopen']??'1')}
+      <span class="help-block">开启并设置广告图才会有广告</span>
+  </div>
+</div>
+<div class="form-group">
+  <label class="col-lg-3 control-label">广告标题</label>
+  <div class="col-lg-8">
+    <input type="text" class="form-control" name="advconfig[h5][advtitle]" value="{$config['advconfig']['h5']['advtitle']??'广告'}" />
+    <span class="help-block">尽量简单明了，推荐控制在16个字</span>
+  </div>
+</div>
+<div class="form-group">
+  <label class="col-lg-3 control-label">广告图</label>
+  <div class="col-lg-8">
+    {:tpl_image_one("advconfig[h5][advimg]",$config['advconfig']['h5']['advimg']??'/static/images/wechat/sign/appbgimg.png')}
+    <span class="help-block">规格:640*1260px</span>
+  </div>
+</div>
+<div class="form-group">
+  <label class="col-lg-3 control-label">广告时长</label>
+  <div class="col-lg-2">
+    <input type="text" class="form-control numberincdec" name="advconfig[h5][advtime]" value="{$config['advconfig']['h5']['advtime']??10}"
+    data-bts-min="1" data-bts-replacement-val="1"
+    data-bts-max="null"
+    data-bts-step="1"
+    data-bts-postfix="秒"
+    data-bts-postfix-extra-class="touchspin-postfix"
+    >
+    <div class="help-block">注:最少1秒</div>
+  </div>
+</div>
+<div class="form-group">
+  <label class="col-lg-3 control-label">广告链接</label>
+  <div class="col-lg-8">
+      <input type="text" class="form-control" name="advconfig[h5][advurl]" value="{$config['advconfig']['h5']['advurl']??''}">
+      <div class="help-block">设置了广告链接用户可点击查看详情跳转过去</div>
+  </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 跳过广告</label>
+    <div class="col-lg-8">
+        {:tpl_switch('advconfig[h5][advclose]',$config['advconfig']['h5']['advclose']??'1')}
+        <span class="help-block">开启则用户可点击跳过按钮来关闭广告</span>
+    </div>
+</div>
+<div class="config-titlebox m-l-15">
+  <span class="config-titlename">大屏开屏广告</span>
+</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 开关</label>
+    <div class="col-lg-8">
+        {:tpl_switch('advconfig[pc][open]',$config['advconfig']['pc']['open']??'2')}
+        <div class="help-block">
+          <div>开启则创建新活动默认也会开启广告</div>
+          {if dzhuodongfree()}
+          <div class="text-danger">创建新的免费活动是否自动开启广告需要到用户组免费活动菜单内设置，但是你必须把要下面广告相关的东西设置好，别等下创建的免费活动没广告</div>
+          {/if}
+        </div>
+    </div>
+</div>
+<div class="form-group">
+  <label class="col-lg-3 control-label">加载层</label>
+  <div class="col-lg-8">
+    {:tpl_switch("advconfig[pc][loadopen]",$config['advconfig']['pc']['loadopen']??'1')}
+    <span class="help-block">注:若您需要开启广告层推荐开启加载层</span>
+  </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">加载层提示图</label>
+    <div class="col-lg-8">
+      {:tpl_image_one("advconfig[pc][loadimg]",$config['advconfig']['pc']['loadimg']??'/static/images/sys/logo.png')}
+      <span class="help-block">注:规格:150*100px，如果您不设置提示图系统将使用旋转圆圈作为加载提示图</span>
+    </div>
+</div>
+<div class="form-group">
+  <label class="col-lg-3 control-label">加载中提示文字</label>
+  <div class="col-lg-8">
+    <div class="input-group">
+      <div class="input-group-btn not-allow"><a class="btn btn-default">文字</a></div>
+      <input type="text" class="form-control" name="advconfig[pc][loadtxt]" value="{$config['advconfig']['pc']['loadtxt']??'大屏互动正在为您加载...'}" />
+      <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
+      <div class="touchspin">
+        <input type="text" class="form-control numberincdec" name="advconfig[pc][loadsize]" 
+        data-bts-min="1" data-bts-replacement-val="1"
+        data-bts-max="40"
+        data-bts-step="1"
+        value="{$config['advconfig']['pc']['loadsize']??24}">
+      </div>
+      <div class="input-group-btn not-allow"><a class="btn btn-default">px，颜色</a></div>
+      {:tpl_color('advconfig[pc][loadcolor]',$config['advconfig']['pc']['loadcolor']??'#000')}
+      <div class="input-group-btn not-allow"><a class="btn btn-default">距提示图距离</a></div>
+      <div class="touchspin">
+        <input type="text" class="form-control numberincdec" name="advconfig[pc][loadmt]" 
+        data-bts-min="1" data-bts-replacement-val="1"
+        data-bts-max="200"
+        data-bts-step="1"
+        value="{$config['advconfig']['pc']['loadmt']??15}">
+      </div>
+    </div>
+  </div>
+</div>
+<div class="form-group">
+  <label class="col-lg-3 control-label">加载中提示时长</label>
+  <div class="col-lg-2">
+      <input type="text" class="form-control numberincdec" name="advconfig[pc][loadtime]" value="{$config['advconfig']['pc']['loadtime']??3}"
+      data-bts-min="1" data-bts-replacement-val="1"
+      data-bts-max="null"
+      data-bts-step="1"
+      data-bts-postfix="秒"
+      data-bts-postfix-extra-class="touchspin-postfix"
+      >
+      <div class="help-block">注:最少1秒</div>
+  </div>
+</div>
+<div class="form-group">
+  <label class="col-lg-3 control-label">广告层</label>
+  <div class="col-lg-8">
+      {:tpl_switch("advconfig[pc][advopen]",$config['advconfig']['pc']['advopen']??'1')}
+      <span class="help-block">开启并设置广告图才会有广告</span>
+  </div>
+</div>
+<div class="form-group">
+  <label class="col-lg-3 control-label">广告标题</label>
+  <div class="col-lg-8">
+      <input type="text" class="form-control" name="advconfig[pc][advtitle]" value="{$config['advconfig']['pc']['advtitle']??'广告'}" />
+      <span class="help-block">尽量简单明了，推荐控制在50个字</span>
+  </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">广告图</label>
+    <div class="col-lg-8">
+        {:tpl_image_one("advconfig[pc][advimg]",$config['advconfig']['pc']['advimg']??'/static/images/screen/common/bg.jpg')}
+        <span class="help-block">规格:1920*1080px</span>
+    </div>
+</div>
+<div class="form-group">
+  <label class="col-lg-3 control-label">广告时长</label>
+  <div class="col-lg-2">
+    <input type="text" class="form-control numberincdec" name="advconfig[pc][advtime]" value="{$config['advconfig']['pc']['advtime']??10}"
+    data-bts-min="1" data-bts-replacement-val="1"
+    data-bts-max="null"
+    data-bts-step="1"
+    data-bts-postfix="秒"
+    data-bts-postfix-extra-class="touchspin-postfix"
+    >
+    <div class="help-block">注:最少1秒</div>
+  </div>
+</div>
+<div class="form-group">
+  <label class="col-lg-3 control-label">广告链接</label>
+  <div class="col-lg-8">
+      <input type="text" class="form-control" name="advconfig[pc][advurl]" value="{$config['advconfig']['pc']['advurl']??''}">
+      <div class="help-block">设置了广告链接用户可点击查看详情跳转过去</div>
+  </div>
+</div>
+<div class="form-group">
+  <label class="col-lg-3 control-label">* 跳过广告</label>
+  <div class="col-lg-8">
+      {:tpl_switch('advconfig[pc][advclose]',$config['advconfig']['pc']['advclose']??'1')}
+      <span class="help-block">开启则用户可点击跳过按钮来关闭广告</span>
+  </div>
+</div>
+{/if}
+<div class="zam-titleBox">活动不存在/已结束/已删除等用户提示</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 提示图</label>
+    <div class="col-lg-8">
+      {:tpl_image_one('hdendbg',$config['hdendbg'])}
+      <span class="help-block">规格:640*1260px,作用：广告推广，有些人参与了这个活动并且保存了活动二维码，很可能又去扫这个码，如果提示活动已经结束是没啥用的，这个图就是告诉用户做活动可以找我们，所以可以自己做这个图留下联系方式</span>
+    </div>
+</div>
+<div class="form-group">
+  <label class="col-lg-3 control-label">提示转跳地址</label>
+  <div class="col-lg-8">
+    <input type="text" class="form-control" name="hdendurl" value="{$config['hdendurl']??''}">
+    <span class="help-block">请填写完整的url地址，注意：如果填写了此项则上面的提示图将不生效，而是直接使用转跳地址，一般设置此链接是因为用户在页面发起投诉后，小程序员去审核时发现存在提示图这种异常页面会停封小程序，所以推荐填写自己的官网地址</span>
+  </div>
+</div>
+<div class="zam-titleBox">活动css设置</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label"> css内容</label>
+    <div class="col-lg-8">
+        <textarea class="form-control" name="diycss" rows="3" placeholder="必须是压缩后的css代码">{$config['diycss']}</textarea>
+        <span class="help-block">必须是压缩后的css代码</span>
+    </div>
+</div>
+
+{include file='$Wpath/common/savepanel'}
+</form>
+<script>
+require(['webcore','jconfirmBox','zamnotice','clipboard','zvalidator','jquery.ui'],function(webcore,jconfirmBox,zamnotice,Clipboard){
+  $('.day-lists').sortable({handle: ".btn-moveitem"}).disableSelection();
+  $(".minihdid").val("{$config['miniconfig']['hdid']??''}").trigger("change");
+  $('#formBox').formValidation({
+			framework: 'bootstrap',
+			excluded: [':disabled'],
+			message: '您填写的内容无效',
+			fields: {
+			}
+	}).on('success.form.fv', function(e) {
+		e.preventDefault();
+		var $form = $(e.target);
+		var postData = webcore.serializeObject($form);
+		var bload = $form.find(".zam-fixedbottom button").lyearloading({opacity: 0.2,spinnerSize: 'nm'});
+		$form.formValidation('disableSubmitButtons', true);
+		webcore.ajaxSubmit("{:goweb('hdbasic/index')}",postData).then(function(json){
+			bload.hide();
+			if(json.code==0){
+			    $form.formValidation('disableSubmitButtons', false);
+			    zamnotice.showTips('success','操作成功',2e3,function(){
+			    	window.location.reload();
+			    });
+		    }else{
+		        zamnotice.showTips('error',json.msg);
+		        $form.formValidation('disableSubmitButtons', false);
+		    }
+		}, function(json){
+			bload.hide();
+			zamnotice.showTips('error','网络差。操作失败');
+			$form.formValidation('disableSubmitButtons', false);
+		});
+	});
+  $(".btn-addday").click(function(){
+      $(".day-lists").append(webcore.tpl($("#day-tpl"),{}));
+      setTimeout(function(){
+        tpl_switch();
+      },1e2);
+  });
+  $(".btn-addrday").click(function(){
+      $(".rday-lists").append(webcore.tpl($("#rday-tpl"),{}));
+      setTimeout(function(){
+        tpl_switch();
+      },1e2);
+  });
+  var clipboard = new Clipboard('.zam-clip', {
+    text: function(e) {
+        return $(e).data('text') ||'';
+    }
+  });
+  clipboard.on('success',function(e) {
+    zamnotice.showTips('success','复制成功',2e3);
+    return;
+  });
+  // 获取textarea元素
+ // 为textarea添加keydown事件监听器
+ $('.copytxt-area').keydown(function(event) {
+   // 检查是否按下了Enter键（键码为13）
+   if (event.keyCode === 13) {
+     // 阻止默认行为，即不执行换行
+     event.preventDefault();
+     // 获取textarea当前的值
+     var value = this.value;
+     // 根据光标位置分情况处理
+     if (this.selectionStart || this.selectionStart === 0) {
+       // 有选中文本或光标在文字中间时
+       var startPos = this.selectionStart;
+       var endPos = this.selectionEnd;
+       // 在选中文本前后插入换行符
+       this.value = value.substring(0, startPos) + "\n" + value.substring(endPos, value.length);
+       // 重设光标位置
+       this.selectionStart = this.selectionEnd = startPos + 1;
+     } else {
+       // 光标在行末时
+       // 在光标位置插入换行符
+       this.value += "\n";
+     }
+   }
+ });
+});
+function keywordtype(obj){
+  var type = $(obj).find('input').val();
+  if(type=='1'){
+    $(".keywordtype1").removeClass('hidden');
+    $(".keywordtype2").addClass('hidden');
+  }else{
+    $(".keywordtype2").removeClass('hidden');
+    $(".keywordtype1").addClass('hidden');
+  }
+}
+function openminibox(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".miniconfigBox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".miniconfigBox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function opendaybox(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".daysbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".daysbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openrdaybox(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".rdaysbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".rdaysbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function opendefault(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+    }else{
+        var defaultbox = obj.parent().parent().parent().parent().hasClass('day-lists') ? $(".day-lists .isdefaultbox") : $(".rday-lists .isdefaultbox");
+        defaultbox.each(function(k,item){
+            $(item).find("input[type='checkbox']").prop('checked',false);
+            $(item).find("input[type='hidden']").val('2');
+            $(item).find('span').attr('data-status','2');
+        });
+        setTimeout(function(){
+          obj.prev().val('1');
+          obj.attr('data-status','1');
+        },1e2);
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+</script>
+<script id='day-tpl' type="text/template">
+<tr>
+  <td class="text-center isdefaultbox">
+      <label class="lyear-switch switch-primary normal-swith switch-solid" style="height:38px">
+          <input type="checkbox">
+          <input type="hidden" name="pubconfig[days][isdefault][]" value="2">
+          <span data-status="2" class="normal-span has-func"  data-func="opendefault" data-ajax=""></span>
+      </label>
+  </td>
+  <td class="text-center">
+      <input type="text" class="form-control" name="pubconfig[days][name][]" value="x天">
+  </td>
+  <td class="text-center">
+    <div class="input-group">
+      <input type="text" class="form-control" name="pubconfig[days][day][]" value="1">
+      <div class="input-group-addon">天</div>
+    </div>
+  </td>
+  <td class="text-center">
+    <div class="input-group">
+      <input type="text" class="form-control" name="pubconfig[days][discount][]" value="0">
+      <div class="input-group-addon">折</div>
+    </div>
+  </td>
+  <td class="text-center">
+      <label class="lyear-switch switch-primary normal-swith switch-solid" style="height:38px">
+          <input type="checkbox" checked="checked">
+          <input type="hidden" name="pubconfig[days][status][]" value="1">
+          <span data-status="1" class="normal-span " data-ajax=""></span>
+      </label>
+  </td>
+  <td class="text-center">
+    <a class="btn btn-xs btn-primary zam-sortable btn-moveitem" href="javascript:void(0)">
+      <i class="mdi mdi-arrow-all"></i>
+    </a>
+    <a class="btn btn-xs btn-danger" href="javascript:;" onclick="javascript:$(this).parent().parent().remove()">
+      <i class="mdi mdi-close"></i>
+    </a>
+  </td>
+</tr>
+</script>
+<script id='rday-tpl' type="text/template">
+<tr>
+  <td class="text-center isdefaultbox hidden">
+      <label class="lyear-switch switch-primary normal-swith switch-solid" style="height:38px">
+          <input type="checkbox">
+          <input type="hidden" name="pubconfig[rdays][risdefault][]" value="2">
+          <span data-status="2" class="normal-span has-func"  data-func="opendefault" data-ajax=""></span>
+      </label>
+  </td>
+  <td class="text-center">
+      <input type="text" class="form-control" name="pubconfig[rdays][rname][]" value="x天">
+  </td>
+  <td class="text-center">
+    <div class="input-group">
+      <input type="text" class="form-control" name="pubconfig[rdays][rday][]" value="1">
+      <div class="input-group-addon">天</div>
+    </div>
+  </td>
+  <td class="text-center">
+    <div class="input-group">
+      <input type="text" class="form-control" name="pubconfig[rdays][rdiscount][]" value="0">
+      <div class="input-group-addon">折</div>
+    </div>
+  </td>
+  <td class="text-center">
+      <label class="lyear-switch switch-primary normal-swith switch-solid" style="height:38px">
+          <input type="checkbox" checked="checked">
+          <input type="hidden" name="pubconfig[rdays][rstatus][]" value="1">
+          <span data-status="1" class="normal-span " data-ajax=""></span>
+      </label>
+  </td>
+  <td class="text-center">
+    <a class="btn btn-xs btn-primary zam-sortable btn-moveitem" href="javascript:void(0)">
+      <i class="mdi mdi-arrow-all"></i>
+    </a>
+    <a class="btn btn-xs btn-danger" href="javascript:;" onclick="javascript:$(this).parent().parent().remove()">
+      <i class="mdi mdi-close"></i>
+    </a>
+  </td>
+</tr>
+</script>
+{include file='$Wpath/common/footer'}

@@ -1,0 +1,18 @@
+{include file="$Wpath/common/gamestylebase"}
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 默认游戏方式</label>
+    <div class="col-lg-8">
+      <label class="lyear-radio radio-inline radio-primary">
+       <input type="radio" name="playtype" value="1" {if !isset($config['playtype']) || $config['playtype']=='1'}checked{/if}><span>摇一摇</span>
+      </label>
+      <label class="lyear-radio radio-inline radio-primary">
+       <input type="radio" name="playtype" value="2" {if isset($config['playtype']) && $config['playtype']=='2'}checked{/if}><span>转一转</span>
+      </label>
+      {if isset($gametype) && in_array($gametype,['horse','monkey','swingsnake'])}
+      <label class="lyear-radio radio-inline radio-primary">
+        <input type="radio" name="playtype" value="3" {if isset($config['playtype']) && $config['playtype']=='3'}checked{/if}><span>点一点</span>
+      </label>
+      {/if}
+      <div class="help-block">注:游戏过程中请勿更改游戏方式</div>
+    </div>
+</div>

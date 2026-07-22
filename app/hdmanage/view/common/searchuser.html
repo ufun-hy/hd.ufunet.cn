@@ -1,0 +1,73 @@
+<style>
+.user-item{position:relative;width:100px;min-height:100px;}
+.user-item .zam-select{position:absolute;top:20px;left:0px;}
+.user-item img{width:50px;height:50px;border-radius:50%;}
+.resultuser{
+	flex-wrap: wrap;
+    justify-content: center;
+}
+</style>
+<input type="hidden" class="usertype" value="{$usertype}">
+<div id="formBox">
+{if $isteamadduser=='1'}
+<div class="alert alert-danger">请先选择要加入的团队</div>
+{/if}
+<div class="form-inline">
+	{if $isteamadduser=='1'}
+	<div class="form-group m-b-5">
+      <select name="teamid" class="form-control input-sm" id="jointeamid">
+      	<option value="0" selected="selected">点我选择要加入的团队</option>
+      	{if !empty($teams)}
+      	{foreach $teams as $team}
+        	<option value="{$team['id']}">{$team['teamname']}</option>
+        {/foreach}
+      	{/if}
+      </select>
+	</div>
+	{/if}
+    <div class="form-group m-b-5" style="width: 250px;">
+      <input style="width: 100%;" class="form-control input-sm username" type="text" name="username" placeholder="请输入用户昵称或真实姓名或者手机号..">
+    </div>
+    <a class="btn btn-primary btn-sm m-b-5 searchone" href="javascript:;"><i class="mdi mdi-magnify"></i> 搜索</a>
+</div>
+<div class="form-group"><ul class="resultuser zam-flex"></ul></div>
+</div>
+<script id="user-tpl" type="text/template">
+	<li class="zam-flex-column-center user-item m-b-10">
+		<span class="zam-select">
+			<label class=" lyear-checkbox checkbox-primary ">
+              <input data-id="<% d.id %>" name="selectuser[]" type="checkbox" data-openid="<% d.openid %>">
+              <span></span>
+            </label>
+		</span>
+		<img src="<% d.avatar %>"/>
+		<div><% d.nickname %></div>
+		<%# if(d.bddata && d.bddata.realname){ %><div><% d.bddata.realname %></div><%# } %>
+		<%# if(d.bddata && d.bddata.mobile){ %><div><% d.bddata.mobile %></div><%# } %>
+	</li>
+</script>
+<script>
+require(["webcore","zamnotice"],function(webcore,zamnotice){
+	$(".searchone").on('click',function(){
+		var searchval = $(".username").val();
+		if(searchval=='') return zamnotice.showTips('error','请先输入搜索内容');
+		webcore.ajaxSubmit("{:gohdmanage('common/searchuser',['hdid'=>$hdid])}",{search:searchval,usertype:$(".usertype").val()||'0'},'正在拼命查找用户...').then(function(json){
+			if(json.code==0){
+				var html = '';
+				$.each(json.msg,function(i,v){
+					 html += webcore.tpl($("#user-tpl"),v);
+				});
+				$(".resultuser").html(html);
+				if(html==''){
+					zamnotice.showTips('error','未搜索到相关用户');
+				}
+			}else{
+				$(".resultuser").html('');
+				zamnotice.showTips('error',json.msg);
+			}
+		}, function(json){
+			zamnotice.showTips('error','网络差。操作失败');
+		});
+	});
+});
+</script>

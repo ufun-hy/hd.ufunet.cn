@@ -1,0 +1,206 @@
+{include file='common/header' /}
+<style>
+/**数钱主体样式**/
+.shuqian-mainbox{
+	width: 100%;
+    height: 100%;
+    margin: 0 auto;
+	padding:0;
+    overflow: hidden;
+}
+.shu-rank-list {
+    position: absolute;
+    bottom: 70px;
+	left:40px;
+    width: calc(100% - 80px);
+    text-align: center;
+}
+.shu-rank-item {
+	width:9%;
+	position: relative;
+	display: inline-block
+}
+
+.shu-rank-item-head {
+	background-image: url("{:tomedia($pcconfig['style']['hmoney'])}");
+	background-size:100% 100%;
+	background-repeat:no-repeat;
+	height: 14px
+}
+.shu-rank-item-body {
+	background-image: url("{:tomedia($pcconfig['style']['bmoney'])}");
+	background-size:100% 100%;
+	background-repeat:no-repeat;
+	margin-bottom: -1px;
+}
+.shu-rank-item-footer {
+	background-image: url("{:tomedia($pcconfig['style']['fmoney'])}");
+	background-size:100% 100%;
+	background-repeat:no-repeat;
+	height:12px;
+	width: 100%
+}
+.shu-rank-list>div:last-child {
+	margin-right: 0
+}
+.shu-rank-item-info {
+	text-align: center;
+    font-size: 20px;
+    overflow: hidden;
+    position: absolute;
+    top: -170px;
+    width: 100%;
+    left:0px;
+}
+
+.shu-rank-item-info img {
+	width: 70px;
+	height: 70px;
+	border-radius: 50%;
+	border: 3px solid #fdbe23
+}
+
+.shu-rank-item-info .shu-rank-item-name {
+	display: block;
+	color: #fff;
+	white-space: nowrap;
+	line-height: 200%
+}
+
+.shu-rank-item-info .shu-rank-item-score {
+	display: block;
+	color: #ffd24c;
+	margin-bottom: 20px;
+	white-space: nowrap
+}
+</style>
+<audio id="countaudio" src="/{:WIMGURL}shake/count.mp3"  preload="preload"  style="display:none"></audio>
+<audio id="overaudio" src="/{:SIMGURL}shake/over.mp3"  preload="preload"  style="display:none"></audio>
+<audio id="joinaudio" src="/{:SIMGURL}shake/join.mp3"  preload="preload" style="display:none"></audio>
+<section class="shuqian-mainbox normal-box">
+	<div class="shuqian-wrapper display-none">
+		<div class="shu-rank-list">
+				<div class="shu-rank-item">
+						<div class="shu-rank-item-info">
+							<img style="visibility: hidden;">
+							<span class="shu-rank-item-name"></span>
+							<span class="shu-rank-item-score">0</span>
+						</div>
+						<div class="shu-rank-item-head"></div>
+						<div class="shu-rank-item-body"></div>
+						<div class="shu-rank-item-footer"></div>
+				</div>
+				<div class="shu-rank-item">
+						<div class="shu-rank-item-info">
+							<img style="visibility: hidden;">
+							<span class="shu-rank-item-name"></span>
+							<span class="shu-rank-item-score">0</span>
+						</div>
+						<div class="shu-rank-item-head"></div>
+						<div class="shu-rank-item-body"></div>
+						<div class="shu-rank-item-footer"></div>
+				</div>
+				<div class="shu-rank-item">
+						<div class="shu-rank-item-info">
+							<img style="visibility: hidden;">
+							<span class="shu-rank-item-name"></span>
+							<span class="shu-rank-item-score">0</span>
+						</div>
+						<div class="shu-rank-item-head"></div>
+						<div class="shu-rank-item-body"></div>
+						<div class="shu-rank-item-footer"></div>
+				</div>
+				<div class="shu-rank-item">
+						<div class="shu-rank-item-info">
+							<img style="visibility: hidden;">
+							<span class="shu-rank-item-name"></span>
+							<span class="shu-rank-item-score">0</span>
+						</div>
+						<div class="shu-rank-item-head"></div>
+						<div class="shu-rank-item-body"></div>
+						<div class="shu-rank-item-footer"></div>
+				</div>
+				<div class="shu-rank-item">
+						<div class="shu-rank-item-info">
+							<img style="visibility: hidden;">
+							<span class="shu-rank-item-name"></span>
+							<span class="shu-rank-item-score">0</span>
+						</div>
+						<div class="shu-rank-item-head"></div>
+						<div class="shu-rank-item-body"></div>
+						<div class="shu-rank-item-footer"></div>
+				</div>
+				<div class="shu-rank-item">
+						<div class="shu-rank-item-info">
+							<img style="visibility: hidden;">
+							<span class="shu-rank-item-name"></span>
+							<span class="shu-rank-item-score">0</span>
+						</div>
+						<div class="shu-rank-item-head"></div>
+						<div class="shu-rank-item-body"></div>
+						<div class="shu-rank-item-footer"></div>
+				</div>
+				<div class="shu-rank-item">
+						<div class="shu-rank-item-info">
+							<img style="visibility: hidden;">
+							<span class="shu-rank-item-name"></span>
+							<span class="shu-rank-item-score">0</span>
+						</div>
+						<div class="shu-rank-item-head"></div>
+						<div class="shu-rank-item-body"></div>
+						<div class="shu-rank-item-footer"></div>
+				</div>
+				<div class="shu-rank-item">
+						<div class="shu-rank-item-info">
+							<img style="visibility: hidden;">
+							<span class="shu-rank-item-name"></span>
+							<span class="shu-rank-item-score">0</span>
+						</div>
+						<div class="shu-rank-item-head"></div>
+						<div class="shu-rank-item-body"></div>
+						<div class="shu-rank-item-footer"></div>
+				</div>
+				<div class="shu-rank-item">
+						<div class="shu-rank-item-info">
+							<img style="visibility: hidden;">
+							<span class="shu-rank-item-name"></span>
+							<span class="shu-rank-item-score">0</span>
+						</div>
+						<div class="shu-rank-item-head"></div>
+						<div class="shu-rank-item-body"></div>
+						<div class="shu-rank-item-footer"></div>
+				</div>
+				<div class="shu-rank-item">
+						<div class="shu-rank-item-info">
+							<img style="visibility: hidden;">
+							<span class="shu-rank-item-name"></span>
+							<span class="shu-rank-item-score">0</span>
+						</div>
+						<div class="shu-rank-item-head"></div>
+						<div class="shu-rank-item-body"></div>
+						<div class="shu-rank-item-footer"></div>
+				</div>
+		</div>
+	</div>
+	<div class="emptybox zam-app-flex-ajCenter display-none">
+		<img src="/{:SIMGURL}common/empty.png">
+		<p style="padding:20px;">暂无可用轮次，请到后台添加</p>
+	</div>
+</section>
+<style>
+.start-btn{
+	width:260px;
+	height:85px;
+}
+</style>
+{include file='common/gamewelcome' /}
+{include file='common/gamecommon' /}
+{if !empty($pcconfig['style']['diycss'])}<style>{$pcconfig['style']['diycss']}</style>{/if}
+<script>
+var defaultImg = "{:tomedia($pcconfig['style']['userdefaultimg'])}",powernum = parseInt("{$pcconfig['powernum']??100}");
+var defaultName = "{$pcconfig['style']['userdefaultname']??'虚位以待'}";
+require(['screenshuqian'],function (screenshuqian) {
+	screenshuqian.init();
+});
+</script>
+{include file='common/footer' /}

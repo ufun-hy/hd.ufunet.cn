@@ -1,0 +1,128 @@
+{include file="common/header" /}
+<style>
+.gamerule{
+	position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-color: rgba(0,0,0,.8);
+}
+.gamerule-main{
+    position: absolute;
+    top:30%;
+    left: 0;
+    width: 100%;
+}
+.gamerule-main .guide-txt{
+    color: #fff;
+    font-size: .28rem;
+    font-weight: 700;
+    text-align: center;
+    line-height: 2;
+}
+.gamerule-main .guide-box {
+    width: 100%;
+    margin: 0.74rem auto;
+}
+.gamerule-main .guide-box .playerbox{
+    position: relative;
+    height: 2.6rem;
+}
+.gamerule-main .guide-box .playerbox .player {
+    height: 100%;
+}
+.gamerule-main .guide-box .handbox{
+    position: absolute;
+    left: 0.2rem;
+    top: 0.52rem;
+}
+.gamerule-main .guide-box .handbox .hand{
+    transform: rotate(-30deg);
+    -webkit-transform: rotate(-30deg);
+    width: 1.6rem;
+}
+.pulse{
+    position: absolute;
+    left: -0.38rem;
+    top: -0.2rem;
+    width: 1.6rem;
+    height: 1.6rem;
+    background-color: #f7d30a;
+    border: 2px solid #f7d30a;
+    border-radius: 50%;
+    z-index: 1;
+    opacity: 0;
+    -webkit-animation: warn 0.9s ease-out;
+    -moz-animation: warn 0.9s ease-out;
+    animation: warn 0.9s ease-out;
+    -webkit-animation-iteration-count: infinite;
+    -moz-animation-iteration-count: infinite;
+    animation-iteration-count: infinite;
+}
+@keyframes warn {
+    0% {
+        -moz-transform: scale(0);
+        transform: scale(0);
+        opacity: 1;
+    }
+    100% {
+        -moz-transform: scale(1);
+        transform: scale(1);
+        opacity: 0;
+    }
+}
+.guide-close{text-align:center;}
+</style>
+<div class="zam-app-mainbox" id="zam-app-mainbox"></div>
+<audio id="djsaudio" src="/{:WIMGURL}shake/count.mp3"></audio>
+<div class="gamerule hidden">
+	<div class="gamerule-main">
+		<div class="guide-txt">按住角色<span>1-2秒后松开即可跳至另一个箱子，</span>参与游戏</span></div>
+		<div class="guide-box zam-app-flex-ajCenter">
+            <div class="playerbox">
+                <img src="{:tomedia($appconfig['style']['appplayer'])}" class="player"/>
+                <div class="handbox">
+                    <img src="/{:WIMGURL}jumprace/hand.png?t=1"  class="hand"/>
+                    <div class="pulse"></div>
+                </div>
+            </div>
+        </div>
+		<div class="guide-close"><a class="btn btn-primary">知道了</a></div>
+	</div>
+</div>
+<script>
+var game, sendscore = "{$appconfig['sendscore']}", plates = {}, platesWidths = [];
+{foreach $appconfig['style']['appplates'] as $pkey=>$plate}
+plates["plate{$pkey}"] = "{:tomedia($plate['img'])}";
+platesWidths.push({$plate['h']});
+{/foreach}
+var Gameconfig = {
+	gameW:420,
+	gameH:420 / window.innerWidth * window.innerHeight,
+	gameImgs:{
+        title:"{if empty($appconfig['apptopimg'])}{:tomedia($appconfig['style']['apptopimg'])}{else}{:tomedia($appconfig['apptopimg'])}{/if}",
+        player:"{:tomedia($appconfig['style']['appplayer'])}",
+        scorebox:"{:tomedia($appconfig['style']['appscorebg'])}",
+        timebox:"{:tomedia($appconfig['style']['apptimebg'])}",
+        effect:"{:tomedia($appconfig['style']['appeffect'])}",
+        cloud:"{:tomedia($appconfig['style']['appcloud'])}",
+        jump:"{:tomedia($appconfig['style']['jumpvoice'])}",
+        fall:"{:tomedia($appconfig['style']['fallvoice'])}",
+        score:"{:tomedia($appconfig['style']['scorevoice'])}",
+        score2:"{:tomedia($appconfig['style']['score2voice'])}",
+        gameover:"{:tomedia($appconfig['style']['appoverbg'])}",
+	},
+    showscorebox:"{$appconfig['appshowscore']??1}",
+};
+Gameconfig.gameImgs = {...Gameconfig.gameImgs, ...plates};
+require(['appjumprace'],function (appjumprace) {	
+	appjumprace.init();
+});
+</script>
+{if !empty($appconfig['style']['diycss'])}
+<style>{$appconfig['style']['diycss']}</style>
+{/if}
+{include file="common/gamecommon" /}
+{include file="common/footermenu" /}
+{include file="common/footer" /}

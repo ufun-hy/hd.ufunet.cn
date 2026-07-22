@@ -1,0 +1,112 @@
+{include file='$Wpath/common/header'}
+<div class="alert alert-danger">
+    失败队列：当您的服务器发生异常队列内的红包记录无法正常发放，此时队列的红包将自动放置到发放失败队列并且对应的红包记录将一直显示为待发放或发放中，无法转成发放失败，进而导致对应的记录无法进行红包补发操作。<br>
+    <span class="text-danger">注意: 每次遇到异常均会自动重新发放，重试5次后如果红包记录仍然无法成功发放才会自动放置到失败队列</span>
+</div>
+{include file='$Wpath/common/tabletoolbar'}
+<table id="listtable" class="zam-btable"></table>
+<script>
+var modulelists = {:json_encode($modulelists)};
+require(['webcore','webtable','jconfirmBox','zamnotice'],function(webcore,webtable,jconfirmBox,zamnotice){
+var initConfig = {
+	tableId:'#listtable',
+	url:"{:goweb('hbqueue/fail')}",
+	columnoperate:false,
+	columns:[
+  		{
+  			field: 'id',
+  			title: 'ID',
+  			align: 'center',
+        width:'6%',
+  			visible: false
+		}, {
+          field: 'hdtitle',
+          title: '活动id',
+          align:'center',
+          width:'15%',
+          formatter: function (value, row, index) {
+              var html = value==''?"活动被删除啦":'<div>'+value+'</div>';
+              html += "<br>"+row.data.hdid;
+              return html;
+          },
+      }, {
+          field: 'data',
+          title: '活动用户id',
+          align:'center',
+          width:'10%',
+          formatter: function (value, row, index) {
+              return value.userid;
+          },
+      }, {
+          field: 'data',
+          title: '活动用户openId',
+          align:'center',
+          width:'10%',
+          formatter: function (value, row, index) {
+              return value.openid;
+          },
+      }, {
+          field: 'data',
+          title: '中奖记录id',
+          align:'center',
+          formatter: function (value, row, index) {
+              return value.recordid;
+          },
+          width:'10%',
+      }, {
+          field: 'data',
+          title: '发放金额',
+          align:'center',
+          formatter: function (value, row, index) {
+              return (value.sendmoney/100).toFixed(2)+"元";
+          },
+          width:'10%',
+      },  {
+    			field: 'data',
+    			title: '来源',
+    			align: 'center',
+          width:'10%',
+          formatter: function (value, row, index) {
+              return modulelists[value.fromtype];
+          },
+  		}, {
+          field: 'error',
+          title: '异常原因',
+          align: 'center',
+          width:'15%',
+          formatter: function (value, row, index) {
+              return value.substring(0,100);
+          },
+      }, {
+          field: 'time',
+          title: '异常时间',
+          align: 'center',
+          width:'15%',
+          formatter: function (value, row, index) {
+              return webcore.timeTostring(value,1);
+          },
+          
+      }
+	],
+	searchParamas:[],
+	toolbar:{
+    other:function(ajaxurl){
+        jconfirmBox.confirm('温馨提示','您确定将红包发放异常队列内的所有红包记录转成发放失败么？',function(){
+          webcore.ajaxSubmit(ajaxurl,{},'处理中..').then(function(json){
+            if(json.code==0){
+              webtable.refresh();
+              zamnotice.showTips('success','操作成功');
+            }else{
+              zamnotice.showTips('error',json.msg);
+            }
+          }, function(json){
+            zamnotice.showTips('error','网络差,操作失败');
+          });
+        });
+    },
+	},
+};
+webtable.init(initConfig);
+});
+</script>
+{include file='$Wpath/common/footer'}

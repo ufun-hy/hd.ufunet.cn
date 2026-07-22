@@ -1,0 +1,129 @@
+{include file='common/header' /}
+<style>
+    .swingsnake-mainbox{
+        width: 100%;
+        height: 100%;
+        padding: 0;
+        overflow: hidden;
+    }
+    .swingsnake-wrapper{
+        width: 1280px;
+        height: 620px;
+    }
+    .swingsnake-wrapper .swingsnake-ul{
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+    }
+    .swingsnake-wrapper .swingsnake-ul .swingsnake-li{
+        position: relative;
+        width: 100px;
+        height: 100%;
+    }
+    .swingsnake-wrapper .swingsnake-ul .swingsnake-li .swingsnake-holebox{
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+    }
+    .swingsnake-wrapper .swingsnake-ul .swingsnake-li .swingsnake-holebox img{
+        width: 100%;
+    }
+    .swingsnake-wrapper .swingsnake-ul .swingsnake-li .swingsnake-info{
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: calc(100% - 25px);
+        overflow: hidden;
+    }
+    .swingsnake-wrapper .swingsnake-ul .swingsnake-li .swingsnake-info .swingsnake-info-inner{
+        position: absolute;
+        left: 0;
+        top: {$pcconfig['style']['innermaxheight']??500}px;
+        width: 100%;
+        text-align: center;
+        transition: top .6s linear;
+        -webkit-transition: top .6s linear;
+    }
+    .swingsnake-wrapper .swingsnake-ul .swingsnake-li .swingsnake-info .swingsnake-info-inner .userbox .scorebox{
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 1;
+        color: #ffc107;
+        margin-bottom: 5px;
+    }
+    .swingsnake-wrapper .swingsnake-ul .swingsnake-li .swingsnake-info .swingsnake-info-inner .userbox .avatarbox{
+        margin-bottom: 5px;
+    }
+    .swingsnake-wrapper .swingsnake-ul .swingsnake-li .swingsnake-info .swingsnake-info-inner .userbox .avatarbox img{
+        width: 50px;
+        height: 50px;
+        border: 2px solid #ffc107;
+        border-radius: 50%;
+    }
+    .swingsnake-wrapper .swingsnake-ul .swingsnake-li .swingsnake-info .swingsnake-info-inner .userbox .namebox{
+        font-size: 12px;
+        font-weight: 600;
+        color: #fff;
+        text-shadow: 2px 2px 2px #ffc107;
+        margin-bottom: 5px;
+    }
+    .swingsnake-wrapper .swingsnake-ul .swingsnake-li .swingsnake-info .swingsnake-info-inner .snakebox{
+        width: 100%;
+    }
+    .swingsnake-wrapper .swingsnake-ul .swingsnake-li .swingsnake-info .swingsnake-info-inner .snakebox img{
+        width: 100%;
+    }
+</style>
+<audio id="countaudio" src="/{:WIMGURL}shake/count.mp3"  preload="preload"  style="display:none"></audio>
+<audio id="overaudio" src="/{:SIMGURL}shake/over.mp3"  preload="preload"  style="display:none"></audio>
+<audio id="joinaudio" src="/{:SIMGURL}shake/join.mp3"  preload="preload" style="display:none"></audio>
+<section class="swingsnake-mainbox normal-box zam-app-flex-ajCenter2">
+    <div class="emptybox zam-app-flex-ajCenter display-none">
+		<img src="/{:SIMGURL}common/empty.png">
+		<p style="padding:20px;">请到后台添加游戏轮次</p>
+	</div>
+    <div class="swingsnake-wrapper display-none">
+        <ul class="swingsnake-ul zam-app-flex zam-app-justifyspacebetween"></ul>
+    </div>
+</section>
+<style>
+.start-btn{
+    width:302px;
+    height:66px;
+}
+</style>
+{include file='common/gamewelcome' /}
+<script id="snakeitem-tpl" type="html/javascript">
+    <li class="swingsnake-li">
+        <div class="swingsnake-holebox">
+            <img src="{:tomedia($pcconfig['style']['holeimg'])}">
+        </div>
+        <div class="swingsnake-info">
+            <div class="swingsnake-info-inner">
+                <div class="userbox">
+                    <div class="scorebox">0</div>
+                    <div class="avatarbox zam-app-flex-ajCenter2">
+                        <img src="{:tomedia($pcconfig['style']['userdefaultimg'])}">
+                    </div>
+                    <div class="namebox limitbox">{$pcconfig['style']['userdefaultname']??'虚位以待'}</div>
+                </div>
+                <div class="snakebox">
+                    <img src="{{roleimg}}">
+                </div>
+            </div>
+        </div>
+    </li>
+</script>
+{include file='common/gamecommon' /}
+<script>
+var roleimgs = {:json_encode($pcconfig['style']['roleimgs'])};
+var defaultImg = "{:tomedia($pcconfig['style']['userdefaultimg'])}";
+var defaultName = "{$pcconfig['style']['userdefaultname']??'虚位以待'}";
+var maxheight = {$pcconfig['style']['innermaxheight']??500};
+require(['screenswingsnake'],function (screenswingsnake) {
+    screenswingsnake.init();
+});
+</script>
+{include file='common/footer' /}

@@ -1,0 +1,90 @@
+<style>
+.selAlismsBox{flex-wrap:wrap;-webkit-wrap:wrap}
+.selAlismsBox .alisms-item{
+	width:25%;
+	padding:10px;
+	cursor:pointer;
+    color: #333;
+    cursor: pointer;
+}
+.selAlismsBox .alisms-item .alisms-itemA{
+	position: relative;
+    padding:10px;
+    border: 1px solid #c9c9c9;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.selAlismsBox .alisms-item.sel .alisms-itemA{
+	border: 1px solid #4886ff;
+}
+.selAlismsBox .alisms-item div{text-align:center;}
+.selAlismsBox .alisms-item .alisms-num{
+	height:20px;
+	line-height:20px;
+	font-size:14px;
+}
+.selAlismsBox .alisms-item .alisms-title{
+	font-size:14px;
+}
+.selAlismsBox .alisms-item .alisms-price{
+	border-top:1px dashed #dfe6ec;
+	font-size:20px;
+	font-weight:bold;
+}
+.selAlismsBox .alisms-item .alisms-itemA .alisms-rightjiao{
+	position: absolute;
+    top: -1px;
+    right: -1px;
+    display: none;
+    border-top: 35px solid #4886ff;
+    border-left: 45px solid transparent;
+}
+.selAlismsBox .alisms-item .alisms-itemA .icon-alismssel{
+	position: absolute;
+	top: -1px;
+	right: 3px;
+	display: none;
+	font-size: 14px;
+	color: #fff;
+	text-align: center;
+	transition: 0.3s;
+	-moz-transition: 0.3s;
+	-o-transition: 0.3s;
+	-webkit-transition: 0.3s;
+}
+.selAlismsBox .alisms-item.sel .alisms-itemA .alisms-rightjiao{
+display:block
+}
+.selAlismsBox .alisms-item.sel .alisms-itemA .icon-alismssel{
+display:block
+}
+</style>
+<div class="form-horizontal">
+<div class="selAlismsBox zam-flex">
+	{volist name="baos" id="bao"}
+		<div class="alisms-item" data-id="{$bao['id']}" data-smsnum="{$bao['smsnum']}" data-smsprice="{$bao['smsprice']}">
+			<div class="alisms-itemA">
+				<div class="alisms-num">{$bao['smsnum']}条</div>
+				<div class="alisms-title">短信包</div>
+				<div class="alisms-price">{$bao['smsprice']}元</div>
+				<span class="alisms-rightjiao"></span>
+				<i class="mdi mdi-check icon-alismssel"></i>
+			</div>
+		</div>
+	{/volist}
+</div>
+<div style="padding:5px 0 5px 10px;">
+	<p style="margin: 5px 0 10px">支付方式</p>
+	{include file='$Wpath/common/paytype'}
+</div>
+</div>
+<script>
+require(["webcore"],function(webcore){
+	$(".selAlismsBox").on('click','.alisms-item',function(){
+		$(this).addClass('sel').siblings().removeClass('sel');;
+	});
+	if($(".alisms-item").length > 0 ){
+		$(".alisms-item").eq(0).trigger('click');
+	}
+});
+</script>

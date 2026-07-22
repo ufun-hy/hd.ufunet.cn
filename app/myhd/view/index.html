@@ -1,0 +1,517 @@
+{include file='$Wpath/common/header'}
+<div class="row">
+<div class="col-lg-12">
+<div class="card">
+<div class="zam-activitylistbox"> 
+   <nav class="zam-activitylist-navbox"> 
+    <ul class="zam-activitylist-navbox-ul col-lg-8 col-md-8 col-xs-12 pull-left">
+    {if $showspe=='1'}
+      <li class="col-lg-2 col-md-2 col-xs-2 active text-primary border-primary" data-status='0'>全部活动</li> 
+      <li class="col-lg-2 col-md-2 col-xs-2" data-status='1'>未开始</li> 
+      <li class="col-lg-2 col-md-2 col-xs-2" data-status='2'>进行中</li> 
+      <li class="col-lg-2 col-md-2 col-xs-2" data-status='3'>已结束</li>
+      <li class="col-lg-2 col-md-2 col-xs-2" data-status='4'>特别关心</li>
+    {else /}
+      <li class="col-lg-3 col-md-3 col-xs-3 active text-primary border-primary" data-status='0'>全部活动</li> 
+      <li class="col-lg-3 col-md-3 col-xs-3" data-status='1'>未开始</li> 
+      <li class="col-lg-3 col-md-3 col-xs-3" data-status='2'>进行中</li> 
+      <li class="col-lg-3 col-md-3 col-xs-3" data-status='3'>已结束</li>
+    {/if}
+    </ul> 
+    <div class="zam-activitylist-navbox-createbox pull-right zam-flex-center">
+      <span class="zam-activitylist-navbox-recycle cursor" href="javascript:void(0)" class=""> <i class="mdi mdi-delete"></i> <span>活动回收站 (<span class="totalnum">0</span>)</span></span>
+      {if $opencreatehd == '1'}
+      <a href="{:gomyhd('createhd/index')}" class="zam-activitylist-navbox-create btn-primary"> <i class="mdi mdi-plus"></i> <span>创建新活动</span></a> 
+      {/if}
+      {if $showfastcreate == '1' && dznormalrequest('fastcreate')}
+      <a href="{:gomyhd('fastcreate/index')}" class="zam-activitylist-navbox-create btn-warning fast-create"> <i class="mdi mdi-plus"></i> <span>快速创建活动</span></a> 
+      {/if}
+    </div> 
+   </nav> 
+   <div class="zam-inline-searchbar"> 
+     <div class="form-inline">
+        <div class="form-group m-b-5">
+          <label class="sr-only" for="forusername">用户名或手机号{if $showspe=='1'}或用户备注{/if}</label>
+          <input class="form-control" style="width: 260px" type="text" id="forusername" name="username" placeholder="请输入用户名或手机号{if $showspe=='1'}或用户备注{/if}">
+        </div>
+        <div class="form-group m-b-5">
+          <label class="sr-only" for="forhdtitle">活动主题</label>
+          <input class="form-control" type="text" id="forhdtitle" name="hdtitle" placeholder="请输入活动主题">
+        </div>
+        <div class="form-group m-b-5">
+          <label class="sr-only" for="forhdid">活动id</label>
+          <input class="form-control" type="text" id="forhdid" name="hdid" placeholder="请输入活动id{if $showspe=='1'}或加密id{/if}">
+        </div>
+        <div class="form-group m-b-5">
+          <label class="sr-only" for="forbeizhu">备注信息</label>
+          <input class="form-control" type="text" id="forbeizhu" name="beizhu" placeholder="请输入活动备注信息">
+        </div>
+        <a class="btn btn-primary m-b-5 m-l-10 btn-search-hd" href="javascript:;"><i class="mdi mdi-magnify"></i> 搜索</a>
+      </div>
+   </div>
+   <section class="zam-activitylist-itembox"> 
+    <ul class="zam-activitylist-itembox-ul">
+      <div class="zam-activitylist-loading">活动数据加载中...</div>
+    </ul> 
+    <div class="zam-flex-center hdlist-pager"></div> 
+   </section> 
+</div>   
+</div>
+</div>
+</div>
+<script id='hdlist-tpl' type="text/template">
+  <li class="zam-activitylist-itembox-li border-primary clearfix"> 
+      <div class="zam-activity-delBox" data-hdid="<% d.hdid %>">
+          <div class="copyhd" data-id="<% d.id %>">
+                <i class="mdi mdi-content-copy"></i>
+                <span> 复制活动</span>
+          </div>
+          <%# if(d.showspe=='1'){ %>
+            <div class="addtospe"  data-id="<% d.id %>" data-isspe="<% d.isspe %>">
+                <i class="mdi mdi-heart"></i>
+                <span> <%# if(d.isspe=='1'){ %>取消<%# }else{ %>添加<%# } %>特别关心</span>
+            </div> 
+          <%# } %> 
+          <%# if(d.candel=='1'){ %>
+            <div class="delhd">
+                <i class="mdi mdi-close"></i>
+                <span> 删除</span>
+            </div> 
+          <%# } %> 
+          <%# if(d.showonline=='1'){ %>
+            <div class="showusers">
+                <i class="mdi mdi-account-multiple"></i>
+                <span> 在线统计</span>
+            </div>  
+          <%# } %>
+          <%# if(d.changehdurl=='1'){ %>
+            <div class="changehdurl">
+                <i class="mdi mdi-refresh"></i>
+                <span> 改变活动地址</span>
+            </div>  
+          <%# } %>
+          <%# if(d.canreset=='1'){ %>
+            <div class="resethddata">
+                <i class="mdi mdi-gavel"></i>
+                <span> 重置数据</span>
+            </div>
+          <%# } %>
+          
+          <%# if(d.ispub=='1' && d.showorder=='1'){ %>
+            <div class="editmp">
+                <i class="mdi mdi-view-list"></i>
+                <span> 活动订单</span>
+            </div>  
+          <%# } %>
+      </div> 
+      <div class="zam-activitylist-timeline-circ bg-primary"></div> 
+      <div class="zam-activitylist-timeline-time"> 
+          <span class="zam-activitylist-time">
+              <span>
+                <% d.hdmodenames.prename %>
+                <%# if(d.hdmode=='1'){ %>
+                  <span class="<%# if(d.ispub=='1'){ %>text-primary<%# }else{ %>text-danger<%# } %>">(<% d.hdmodenames.lastname %>)</span>
+                <%# } %>
+              </span>
+              <%# if((d.hdmode=='1' && d.ispub=='1') || d.hdmode=='2'){ %>
+                <span class="m-l-10"><% d.starttime %> 至 <% d.endtime %></span>
+              <%# } %>
+          </span> 
+          <span class="label label-primary zam-activitylist-accountname zam-clip" data-url="<% d.user_name %>">
+             <i class="mdi mdi-account m-r-5"></i><span><% d.user_name %><%# if(d.user_beizhu!=''){ %> (<% d.user_beizhu %>)<%# } %></span>
+          </span>
+          <%# if(d.adminbeizhu!=''){ %>
+            <span class="label label-warning zam-activitylist-accountname zam-clip" data-url="<% d.adminbeizhu %>">
+               <i class="mdi mdi-message-text m-r-5"></i><span><% d.adminbeizhu %></span>
+            </span>
+          <%# } %>
+      </div> 
+      <div class="zam-activitylist-timeline-item clearfix"> 
+       <div class="zam-activitylist-timeline-itemleft bg-primary col-lg-5 col-xs-12"> 
+            <h4 class="zam-activitylist-title text-white col-lg-12"><% d.hdtitle %><%# if(d.beizhu!=''){ %><span class="zam-activity-liuyan zam-clip" data-url="<% d.beizhu %>">(<% d.beizhu %>)</span><%# } %></h4> 
+            <div class="zam-activitylist-keyword col-lg-12"><span><%# if(d.screenconfig && d.screenconfig.password!=''){ %>登录密码: <span class="zam-clip" data-url="88888"><% d.screenconfig.password %></span><%# }else{ %>免密登录<%# } %></span></div> 
+            <div class="zam-activitylist-status clearfix col-lg-12"> 
+              <div class="pull-left">
+              <%# if(d.hdmode=='1'){ %><%# if(d.ispub=='2'){ %>本活动处于 <span class="label label-dark">测试</span> 状态 , 限<strong> <% d.hdpersons %> </strong>人参与测试<%# }else{ %>本活动处于 <span class="label label-warning">正式</span> 状态，活动已购<strong> <% d.hdpersons %> </strong>人<%# } %><%# }else{ %>本活动处于 <span class="label label-warning">正式</span> 状态，活动已购<strong> <% d.hdpersons %> </strong>人<%# } %>
+              </div>
+              <div class="pull-right" style="position:relative">
+                <%# if(d.hdmode=='1'){ %>
+                  <%# if(d.ispub=='2'){ %>
+                      <a class="zam-flex-center btn btn-warning" href="{:gomyhd('buymodules/index')}?hdid=<% d.hdid %>">正式购买</a>
+                  <%# }else{ %>
+                    <a class="zam-flex-center cursor btn-renewal" data-hdid="<% d.id %>" style="width:100%;position: absolute;right: 0;top: -40px;color:red;">我要续期 <i class="mdi mdi-arrow-right"></i></a>
+                    <%# if(d.istimeend=='2'){ %>
+                      <a class="zam-flex-center btn btn-warning"  href="{:gomyhd('addmodules/index')}?hdid=<% d.hdid %>">新增功能与人数</a>
+                    <%# }else{ %>
+                      <a class="zam-flex-center btn btn-secondary" style="color:#fff">活动已结束</a>
+                    <%# } %>
+                  <%# } %>
+                <%# }else{ %>
+                    <%# if(d.istimeend=='1'){ %>
+                      <a class="zam-flex-center" style="width:100%;position: absolute;right: 0;top: -40px;color:#fff;opacity:0.8">活动已结束</a>
+                    <%# } %>
+                    <a class="zam-flex-center btn btn-warning"  href="{:gomyhd('buymodules/index')}?hdid=<% d.hdid %>">升级{$hdnames['mode1']??'商业付费版'}</a>
+                <%# } %>
+              </div>
+            </div> 
+            <ul class="zam-activitylist-detail col-lg-12 clearfix"> 
+                 <li class="zam-activitylist-detail-join pull-left col-lg-6 col-md-5 col-xs-6"> 
+                  <div class="itembox"> 
+                   <div class="zam-activitylist-detail-jointitle">参与人数<a href="{:gohdmanage('datauser/index')}?hdid=<% d.hdid %>" class="btn btn-xs">用户管理</a>
+                   </div> 
+                   <div class="zam-activitylist-detail-joinnums">
+                    <span><% d.wxusernums %></span>&nbsp;人
+                   </div> 
+                  </div> 
+                 </li> 
+                 <li class="zam-activitylist-detail-msg  pull-right col-lg-6 col-md-5 col-xs-6"> 
+                  <div class="itembox"> 
+                   <div class="zam-activitylist-detail-msgtitle">发送消息<a href="{:gohdmanage('datamsg/index')}?hdid=<% d.hdid %>" class="btn btn-xs">消息管理</a>
+                   </div> 
+                   <div class="zam-activitylist-detail-msgnums">
+                    <span><% d.wxmsgnums %></span>&nbsp;条
+                   </div> 
+                  </div> 
+                 </li> 
+                 <div class="activity-type hidden"> 
+                  <i class="mdi mdi-wechat"></i>
+                  <span>网页版</span> 
+                 </div> 
+            </ul> 
+       </div> 
+       <div class="zam-activitylist-timeline-itemright col-lg-7 col-xs-12"> 
+        <ul class="clearfix">
+          <li class="col-lg-4 col-md-4 col-xs-6">
+            <a href="{:gohdmanage('hdmodule/index')}?hdid=<% d.hdid %>">
+              <span class="zam-activitylist-timeline-itemright-icon"><i class="mdi mdi-grid"></i></span> 
+              <span class="zam-activitylist-timeline-itemright-name">活动一览</span> 
+            </a>
+          </li>
+          <li class="col-lg-4 col-md-4 col-xs-6">
+            <a href="{:gohdmanage('hdinfo/index')}?hdid=<% d.hdid %>"> 
+              <span class="zam-activitylist-timeline-itemright-icon"><i class="mdi mdi-file-document"></i></span> <span class="zam-activitylist-timeline-itemright-name">活动信息</span> 
+            </a> 
+         </li>
+         <li class="col-lg-4 col-md-4 col-xs-6">
+            <a href="{:gohdmanage('hdconfig/index')}?hdid=<% d.hdid %>">
+              <span class="zam-activitylist-timeline-itemright-icon"><i class="mdi mdi-settings"></i></span> 
+              <span class="zam-activitylist-timeline-itemright-name">活动设置</span> 
+            </a>
+         </li>
+         <li class="col-lg-4 col-md-4 col-xs-6"> 
+            <a href="{:gohdmanage('datauser/index')}?hdid=<% d.hdid %>"> 
+              <span class="zam-activitylist-timeline-itemright-icon"><i class="mdi mdi-database"></i></span> 
+              <span class="zam-activitylist-timeline-itemright-name">活动数据</span> 
+            </a> 
+         </li>
+         <li class="col-lg-4 col-md-4 col-xs-6"> 
+            <a href="{:gohdmanage('qrurl/index')}?hdid=<% d.hdid %>"> 
+              <span class="zam-activitylist-timeline-itemright-icon"><i class="mdi mdi-credit-card-scan"></i></span> 
+              <span class="zam-activitylist-timeline-itemright-name">二维码与链接</span> 
+            </a> 
+         </li>
+         <li class="col-lg-4 col-md-4 col-xs-6"> 
+            <a href="{:goscreen()}?hdid=<% d.hdid %>" target="__blank" class="text-primary"> 
+              <span class="zam-activitylist-timeline-itemright-icon"><i class="mdi mdi-laptop"></i></span> 
+              <span class="zam-activitylist-timeline-itemright-name">查看大屏</span> 
+            </a> 
+         </li>
+        </ul>
+        <div class="zam-activitylist-itembox-id">ID: <span><% d.id %></span></div>
+       </div> 
+      </div> 
+     </li>
+</script>
+<script>
+require(['webcore','jconfirmBox','zamnotice','clipboard'],function(webcore,jconfirmBox,zamnotice,Clipboard){
+  ajaxhdlist(1);//加载第一页活动数据
+  $(".btn-search-hd").on('click',function(){
+      ajaxhdlist(1);
+  });
+  $(".zam-activitylist-navbox li").click(function(){
+      var $this = $(this);
+      $this.addClass('active text-primary border-primary').siblings().removeClass('active text-primary border-primary');
+      ajaxhdlist(1);
+  });
+  var clipboard = new Clipboard('.zam-clip', {
+    text: function(e) {
+      return $(e).data('url') || $(e).data('href')
+    }
+  });
+  clipboard.on('success',function(e) {
+     zamnotice.showTips('success','复制成功',2e3);
+     return;
+  });
+  $(".zam-activitylist-navbox-recycle").click(function(){
+       var confirmobj = jconfirmBox.ajaxconfirm("我的活动回收站","{:gomyhd('index/myrecyclehd')}",{},'html','col-lg-10 col-lg-offset-1',function(e){
+                },false,'2');
+  });
+  $(".zam-activitylist-itembox-ul").on('click','.delhd',function(){
+      var $this = $(this).parent();
+      jconfirmBox.confirm('温馨提示','删除活动将导致该活动所有用户数据以及游戏轮次，奖品信息等数据全部被删除并且无法恢复，您确定要删除该活动么？',function(){
+          $.post("{:gomyhd('index/delhd')}",{hdid:$this.attr("data-hdid")},function(json){
+             if(json.code==0){
+              zamnotice.showTips('success','删除成功',1e3,function(){
+                ajaxhdlist($(".pagination li.active a").data('page')||1);
+              });
+             }else{
+              zamnotice.showTips('error',json.msg);
+             }
+          },'json')
+      });
+  });
+  $(".zam-activitylist-itembox-ul").on('click','.resethddata',function(){
+      var $this = $(this).parent();
+      jconfirmBox.confirm('温馨提示','重置将清空活动所有用户相关数据并且无法恢复，您确定要重置么？',function(){
+          $.post("{:gomyhd('index/resethd')}",{hdid:$this.attr("data-hdid")},function(json){
+             if(json.code==0){
+              zamnotice.showTips('success','重置活动数据成功',1e3,function(){
+                ajaxhdlist($(".pagination li.active a").data('page')||1);
+              });
+             }else{
+              zamnotice.showTips('error',json.msg);
+             }
+          },'json')
+      });
+  });
+  $(".zam-activitylist-itembox-ul").on('click','.changehdurl',function(){
+      var $this = $(this).parent();
+      jconfirmBox.confirm('温馨提示','改变活动地址将导致之前的活动大屏地址以及微信地址，二维码均失效，您确定要操作么？',function(){
+          $.post("{:gomyhd('index/changehdurl')}",{hdid:$this.attr("data-hdid")},function(json){
+             if(json.code==0){
+              zamnotice.showTips('success','操作成功',1e3,function(){
+                ajaxhdlist($(".pagination li.active a").data('page')||1);
+              });
+             }else{
+              zamnotice.showTips('error',json.msg);
+             }
+          },'json')
+      });
+  });
+  $(".zam-activitylist-itembox-ul").on('click','.showusers',function(){
+      var $this = $(this).parent();
+      var confirmobj = jconfirmBox.ajaxconfirm("活动在线人数详情","{:gomyhd('index/showonline')}",{hdid:$this.attr('data-hdid')},'html','col-lg-8 col-lg-offset-2',function(e){
+        confirmobj.close();
+      },false,'2',[],true,function($ele){
+          $ele.find(".btn").click(function(){
+                webcore.ajaxSubmit("{:gomyhd('index/showonline')}",{hdid:$this.attr('data-hdid'),'isrefresh':'1'},'正在重新计算人数...').then(function(json){
+                if(json.code==0){
+                    $ele.find('.label').eq(0).text(json.msg.total);
+                    $ele.find('.label').eq(1).text(json.msg.web);
+                    $ele.find('.label').eq(2).text(json.msg.app);
+                    $ele.find('.label').eq(3).text(json.msg.hd);
+                }else{
+                  zamnotice.showTips('error',json.msg);
+                  return false;
+                }
+              }, function(json){
+                zamnotice.showTips('error','网络差。操作失败.');
+              });
+          });
+      });
+     });
+     $(".zam-activitylist-itembox-ul").on('click','.editmp',function(){
+        var $this = $(this).parent(),hdid = $this.attr('data-hdid');
+        var confirmobj = jconfirmBox.ajaxconfirm("活动已支付订单","{:gomyhd('index/showorder')}",{hdid:hdid,'isshow':'1'},'html','col-lg-8 col-lg-offset-2',function(e){confirmobj.close();},false,'1',[{hidden:false,txt:'关闭'},{hidden:true,txt:'取消'}],false,function($ele){
+            $ele.find('.order-lists .edit-orderinfo').click(function(){
+              var $this2 = $(this),orderid = $this2.attr('data-orderid');//编辑的订单
+              var confirmobj2 = jconfirmBox.ajaxconfirm("编辑订单内容","{:gomyhd('index/showorder')}",{hdid:hdid,orderid:orderid,'isshow':'2'},'html','col-lg-8 col-lg-offset-2',function(e){
+                  var addnums = $(e).find('.addnums').val(),ordermodules = $(e).find("ul li .active"),hdmodules = [];
+                  ordermodules.each(function(){
+                    hdmodules.push({id:$(this).attr('data-id'),module:$(this).attr('data-modulefield'),name:$(this).attr('data-modulename'),price:'0'});
+                  });
+                  $.post("{:gomyhd('index/showorder')}",{hdid:hdid,orderid:orderid,addnums:addnums,hdmodules:hdmodules,'isshow':'4'},function(json){
+                       confirmobj2.close();
+                       if(json.code==0){
+                          setTimeout(()=>{
+                            confirmobj.close();
+                          },1e2);
+                          zamnotice.showTips('success','操作成功');
+                       }else{
+                          zamnotice.showTips('error',json.msg);
+                       }
+                  },'json')
+              },false,'1',[{hidden:false,txt:'保存'},{hidden:false,txt:'取消'}],false,function($ele){
+                    $ele.find(".ordermodules").on('click','.active',function(){
+                      var $this = $(this);
+                      jconfirmBox.confirm('温馨提示','删除模块将无法恢复，确定要删除么?',function(){
+                        $this.parent().remove();
+                      });
+                    });
+                    $ele.find(".ordermodules .addordermodule").click(function(){
+                      var $this = $(this),hadselms = $(".ordermodules").find('.active'),selids = [];
+                      hadselms.each(function(){
+                        selids.push($(this).attr('data-id'));
+                      });
+                      var confirmobj3 = jconfirmBox.ajaxconfirm("新增模块","{:gomyhd('index/showorder')}",{hdid:hdid,orderid:orderid,selids:selids,isshow:'3'},'html','col-lg-8 col-lg-offset-2',function(e){
+                          var selectModule = e.find(".moduleinfo.active");
+                          if(selectModule.length<=0){
+                              if(e.find(".moduleinfo").length>0){
+                              zamnotice.showTips('error','请先选择模块再提交');
+                              }else{
+                              zamnotice.showTips('error','当前无可选模块');
+                              }
+                          }else{
+                            var addModule = '';
+                            selectModule.each(function(){
+                              var moduleid = $(this).attr('data-id'),modulename = $(this).attr('data-modulename'),modulefield = $(this).attr('data-modulefield');
+                              addModule += '<li class="orderitems"><div class="orderinfo text-primary active" data-id="'+moduleid+'" data-modulefield="'+modulefield+'" data-modulename="'+modulename+'"><span class="zam-righttriangle"></span><i class="mdi mdi-close zam-typeselected"></i><span class="modulename">'+modulename+'</span></div></li>';
+                            });
+                            $("ul .addordermodule").before(addModule);
+                            confirmobj3.close();
+                          }
+                      },false,'1');
+                    });
+              });
+            });
+        });
+     });
+     $(".zam-activitylist-itembox-ul").on('click','.btn-renewal',function(){
+        var hdid = $(this).attr('data-hdid'),confirmobj = jconfirmBox.ajaxconfirm("活动续期","{:gomyhd('index/renewal')}",{hdid:hdid,ishtml:'1'},'html','col-lg-10 col-lg-offset-1',function(e){
+            var daynum = e.find('.daynum').val(),starttime = e.find('input[name=starttime]').val();
+            if(typeof(daynum)=='undefined' || daynum==''){
+                zamnotice.showTips('error','请选择续期天数');
+                return false;
+            }
+            if(typeof(starttime)=='undefined' || starttime==''){
+                zamnotice.showTips('error','请选择活动正式开始时间');
+                return false;
+            }
+            var postData = {
+                hdid:hdid,
+                ishtml:'2',
+                starttime:starttime,
+                daynum:daynum,
+                mjkey:e.find(".mjinfo").attr('data-mjid')||'-1',
+                totalmoney:($(".discountmoney").is(':hidden') ? ( $(".mjinfo").is(':hidden') ? $(".totalMoney").text() : $(".endtotalmoney").text() ) : $(".discountmoney .dismoney").text()),
+                paytype:e.find('.paytype').val()||'1',
+            };
+            webcore.ajaxSubmit("{:gomyhd('index/renewal')}",postData,'正在发起续期订单...').then(function(json){
+               if(json.code==0){
+                    confirmobj.close();
+                    var confirmobj2 = jconfirmBox.confirm('扫码支付续期订单',webcore.tpl($("#pay-tpl"),{'url':json.msg.url,'orderid':json.msg.orderid,'fee':json.msg.fee,'paytype':json.msg.paytype}),function(e){
+                        var payBox = e.$content.find(".payInfoBox"),orderid = payBox.attr('data-id');
+                        webcore.ajaxSubmit("{:gomyhd('buymodules/queryorder')}",{orderid:orderid}).then(function(json){
+                          if(json.code==0){
+                            confirmobj2.close();
+                            zamnotice.showTips('success','支付成功',1e3,function(){
+                              window.location.reload();
+                            });
+                          }else{
+                            zamnotice.showNotice('提示',json.msg,2e3,false,'info','info');
+                          }
+                        });
+                    },false,false,true,[{'hidden':false,'txt':'我已完成支付'},{'hidden':false,'txt':'取消'}]);
+               }else if(json.code==1){
+                  confirmobj.close();
+                  zamnotice.showTips('success','续期成功',1e3,function(){
+                      window.location.reload();
+                  });
+              }else{
+                  zamnotice.showTips('error',json.msg);
+                  return false;
+               }
+            })
+            
+        },false,'1',[{hidden:false,txt:'确定'},{hidden:false,txt:'取消'}]);  
+     });
+     $(".zam-activitylist-itembox-ul").on('click','.copyhd',function(){
+        var copyhdid = $(this).attr('data-id');
+        var confirmobj = jconfirmBox.ajaxconfirm("复制活动","{:gomyhd('index/copyhd')}",{copyhdid:copyhdid},'html','col-lg-8 col-lg-offset-2',function(e){
+            var hdtitle = e.find(".hdtitle").val();
+            if(hdtitle=='') return zamnotice.showTips('error','请设置活动主题');
+            var hdtitle2 = hdtitle.replace(/\s/g,"");
+            if (hdtitle2 === "") {
+              return zamnotice.showTips('error','请设置活动主题');
+            }
+            var postdata = {ishtml:'2',copyhdid:copyhdid,hdtitle:hdtitle};
+            var starttimeinput = e.find(".js-datetimepicker");
+            if(starttimeinput.length){
+              postdata.starttime = starttimeinput.val()||'';
+            }
+            webcore.ajaxSubmit("{:gomyhd('index/copyhd')}",postdata,'正在复制数据并生成新活动...').then(function(json){
+              if(json.code==0){
+                confirmobj.close();
+                zamnotice.showTips('success','复制成功',1e3,function(){
+                    window.location.reload();
+                });
+              }else{
+                zamnotice.showTips('error',json.msg,1e3);
+              }
+            });
+        },false,true,[{'hidden':false,'txt':'确定复制'},{'hidden':false,'txt':'取消'}]);
+     });
+     $(".zam-activitylist-itembox-ul").on('click','.addtospe',function(){
+        var spehdid = $(this).attr('data-id'),isspe = $(this).attr('data-isspe');
+        webcore.ajaxSubmit("{:gomyhd('index/changespe')}",{spehdid:spehdid,isspe:isspe},'正在执行操作...').then(function(json){
+          if(json.code==0){
+            zamnotice.showTips('success','操作成功');
+            ajaxhdlist($(".pagination li.active a").data('page')||1);
+          }else{
+            zamnotice.showTips('error',json.msg,1e3);
+          }
+        });
+     });
+});
+function ajaxhdlist(page,obj){
+    require(["zamnotice","jconfirmBox","webcore"],function(zamnotice,jconfirmBox,webcore){
+        var params = {
+          page:page,hdstatus:$(".zam-activitylist-navbox li.active").attr('data-status'),username:$("#forusername").val(),hdtitle:$("#forhdtitle").val(),hdid:$("#forhdid").val(),beizhu:$("#forbeizhu").val()
+        };
+        webcore.ajaxSubmit("{:gomyhd()}",params).then(function(json){
+            var html = '';
+            if(json.code==0){
+                $.each(json.msg.list,function(i,v){
+                    html += webcore.tpl($("#hdlist-tpl"),v);
+                });
+                if(html==''){
+                    if(json.msg.total=='0'){
+                        html += '<div class="zam-activitylist-none">暂未查询到相关活动，<a href="{:gomyhd('createhd/index')}" class="text-primary" style="font-size:18px;">立即创建新活动</a></div>';
+                    }else{
+                        ajaxhdlist(page-1);
+                    }
+                }
+                if(html!=''){
+                    $(".zam-activitylist-itembox ul").html(html);
+                    $(".zam-activitylist-itembox .hdlist-pager").html(json.msg.pager);
+                }
+                $(".zam-activitylist-navbox-recycle .totalnum").text(json.msg.mydelnums);
+            }else{
+                zamnotice.showTips('error',json.msg);
+            }
+        }, function(json){
+            zamnotice.showTips('error','网络差，操作失败');
+        });
+    });
+}
+function gohdpageto(obj){
+    var gobtn = $(obj),pagemin = gobtn.data('min')||1,pagemax = gobtn.data('max');
+    var inputpage = gobtn.prev().val()||'';
+    if(+inputpage > 0){
+        if(inputpage > pagemax){
+            inputpage = pagemax;
+        }
+        ajaxhdlist(inputpage);
+    }
+}
+</script>
+<script id='pay-tpl' type="text/template">
+<style>
+.paymoney{padding:10px 0;margin-bottom:20px;}
+.paymoney span{color:red}
+.qrcodeImg img{
+    border: 1px solid #333;
+    border-radius: 10px;
+  width:200px;height:200px;
+}
+.paytips{margin-top:20px;}
+</style>
+<section class="payInfoBox zam-flex-column-center" data-id="<% d.orderid %>">
+  <p class="paymoney">支付金额：
+      <span>￥<% d.fee %></span>
+  </p>
+  <div class="qrcodeImg"><img src="<% d.url %>" /></div>
+  <p class="paytips">打开<%# if(d.paytype=='1'){ %>微信<%# }else{ %>支付宝<%# } %>扫一扫，扫码支付</p>
+</section>
+</script>
+{include file='$Wpath/common/footer'}

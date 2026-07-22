@@ -1,0 +1,51 @@
+{include file="common/header_base" /}
+<script>
+	require(['wechatcore'],function (wechatcore) {
+		wechatcore.hidewxmenu();
+		var loadKey = wechatcore.loading('正在发起微信支付');
+		setTimeout(function(){
+			wechatcore.close(loadKey);
+			oauthpay(function(msg){
+				if(msg == 'get_brand_wcpay_request:ok') {
+					wechatcore.ask(false,'支付成功','好的',function(){
+							wechatcore.reloadpage("{$returnUrl}");
+					});
+				} else {
+					wechatcore.ask('温馨提醒','您确定要取消支付么？',['继续支付','残忍取消'],function(index){
+							wechatcore.close(index);
+							wechatcore.reloadpage();
+					},function(index){
+							wechatcore.close(index);
+							wechatcore.reloadpage("{$returnUrl}");
+					});
+				}
+			});
+		},1e3);
+	});
+	function oauthpay(func) {
+		if(window.top!=window.self){
+			parent.WeixinJSBridge.invoke('getBrandWCPayRequest', {
+				'appId' : '<?php echo $result['appId'];?>',
+				'timeStamp': '<?php echo $result['timestamp'];?>',
+				'nonceStr' : '<?php echo $result['nonceStr'];?>',
+				'package' : '<?php echo $result['package'];?>',
+				'signType' : '<?php echo $result['signType'];?>',
+				'paySign' : '<?php echo $result['paySign'];?>'
+			}, function (res) {
+				func(res.err_msg);
+			});
+		}else{
+			WeixinJSBridge.invoke('getBrandWCPayRequest', {
+				'appId' : '<?php echo $result['appId'];?>',
+				'timeStamp': '<?php echo $result['timestamp'];?>',
+				'nonceStr' : '<?php echo $result['nonceStr'];?>',
+				'package' : '<?php echo $result['package'];?>',
+				'signType' : '<?php echo $result['signType'];?>',
+				'paySign' : '<?php echo $result['paySign'];?>'
+			}, function (res) {
+				func(res.err_msg);
+			});
+		}
+	}
+</script>
+{include file='common/footer_base' /}

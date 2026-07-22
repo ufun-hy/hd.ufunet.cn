@@ -1,0 +1,562 @@
+<!doctype html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="google" content="notranslate" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="renderer" content="webkit">
+    <title>{$pcconfig['title']}</title>
+	<link rel="shortcut icon" href="{:globalico()}" />
+	<link rel="stylesheet" href="__STATIC__/css/zam-icon.css" media="all">
+	<link rel="stylesheet" href="__STATIC__/css/mxc-icon.css?t=6" media="all">
+	<link rel="stylesheet" href="__STATIC__/css/screen/style.css?t=202301083" media="all">
+	<link rel="stylesheet" href="__STATIC__/css/animate.css?t=0913"/>
+	<script src="__STATIC__/js/jquery.2.1.4.js"></script>
+	<script src="__STATIC__/js/jquery.extend.js"></script>
+	<script type="text/javascript" src="__STATIC__/js/require.js"></script>
+	<script type="text/javascript">
+		var XCV3Config = {
+		  staticurl:"__STATIC__/",
+		  cookie : {'pre': 'zam'},
+		  hdid:"{$hdinfo['hdid']}",
+		  rhdid:"{$hdinfo['id']}",
+		  wsAddress:"{$wssaddress}",
+		  loadtype:"{$hdinfo['loadtype']??'1'}",
+		  screenfollow:"{$hdinfo['specialconfig']['followchange']??'1'}",
+		  gametype:"{$pcconfig['gametype']??'common'}",
+		  isiframe:window.top!=window.self,
+		  bgmusic:"{:tomedia($pcconfig['bgmusic'])}",
+		  openbgmusic:"{$pcconfig['bgmusicoff']??'2'}",
+		  adv:{if isset($hdinfo['advconfig']['pc']) && !empty($hdinfo['advconfig']['pc'])}{:json_encode($hdinfo['advconfig']['pc'])}{else /}''{/if},
+		};
+		require.config({
+			waitSeconds:20,
+			baseUrl: XCV3Config.staticurl + "js",
+			urlArgs:'v=3.1.1'+(new Date()).getTime(),
+			paths: {
+				 css: "css.min",
+				 'async': "async",
+				 jquery:"jquery.2.1.4",
+				 'jquery.ui': 'jquery.ui',
+				 jquerytrans:'screenjs/jquery.transit.min',
+				 velocity:'screenjs/velocity',
+				 zamnotice: 'zamnotice/zamnotice',
+				 jbox:'jbox/jBox',
+				 jboxnotice:'jbox/plugins/Notice/jBox.Notice.min',
+				 template:"template/template",
+				 swiper:'swiper/swiper.min',
+				 marqueen:"wechatjs/marqueen",
+				 screencore:'screenjs/screencore',
+				 layer:'layer/layer',
+				 layerBox:'layer/layerBox',
+				 layerExt:'layer/layer.ext',
+				 screensocket:'screenjs/screensocket',
+				 keyboard:'keyboard/keyboard.min',
+				 msgs:'screenjs/msgs',
+				 screenbp:'screenjs/screenbp',
+				 screenbpdata:'screenjs/screenbpdata',
+				 bgscreen:'screenjs/bgscreen',
+				 colorPicker:'jqcolorpicker',
+				 colors:'colors',
+				 hls:'videojs/TcPlayer-2.4.1/hls.min',
+				 ionrangeslider:'ionrangeslider/ionrangeslider',
+				 onoffswitch:'onoffswitch/on-off-switch',
+				 onoffswitchauto:'onoffswitch/on-off-switch-onload',
+				 videocontrol:'screenjs/videocontrol',
+				 slideranimate:'screenjs/slideranimate',
+				 rightboxslider:'screenjs/rightboxslider',
+				 signs:'screenjs/signs',
+				 screenvote:'screenjs/screenvote',
+				 screengame:'screenjs/screengame',
+				 screenredpack:'screenjs/screenredpack',
+				 screenydj:'screenjs/screenydj',
+				 screenshuqian:'screenjs/screenshuqian',
+				 screenmonkey:'screenjs/screenmonkey',
+				 screencar:'screenjs/screencar',
+				 screenhorse:'screenjs/screenhorse',
+				 screenmls:'screenjs/screenmls',
+				 screenbike:'screenjs/screenbike',
+				 screenswim:'screenjs/screenswim',
+				 screenthreed:'screenjs/screenthreed',
+				 screentug:'screenjs/screentug',
+				 screenanswerbs:'screenjs/screenanswerbs',
+				 screendzqy:'screenjs/screendzqy',
+				 screenliuyancj:'screenjs/screenliuyancj',
+				 screenbigcj:'screenjs/screenbigcj',
+				 screenlivemark:'screenjs/screenlivemark',
+				 screendgshake:'screenjs/screendgshake',
+				 screendgshake2:'screenjs/screendgshake2',
+				 screenjjb:'screenjs/screenjjb',
+				 screenjumprace:'screenjs/screenjumprace',
+				 screenclickrace:'screenjs/screenclickrace',
+				 screenpuzzle:'screenjs/screenpuzzle',
+				 screencutfruit:'screenjs/screencutfruit',
+				 screenmouse:'screenjs/screenmouse',
+				 screennormalcj:'screenjs/screennormalcj',
+				 screencubecj:'screenjs/screencubecj',
+				 screencjx:'screenjs/screencjx',
+				 screenzjd:'screenjs/screenzjd',
+				 screenshakestart:'screenjs/screenshakestart',
+				 screenshakestart2:'screenjs/screenshakestart2',
+				 screenphotocj:'screenjs/screenphotocj',
+				 screenimportcj:'screenjs/screenimportcj',
+				 screendzp:'screenjs/screendzp',
+				 screenyuyuedj:'screenjs/screenyuyuedj',
+				 screenhbwall:'screenjs/screenhbwall',
+				 screendhh:'screenjs/screendhh',
+				 screenddp:'screenjs/screenddp',
+				 screenqdbook:'screenjs/screenqdbook',
+				 screenphotowall:'screenjs/screenphotowall',
+				 screenlantern: 'screenjs/screenlantern',
+				 dragqr:'screenjs/dragqr',
+				 fulldm:'screenjs/fulldm',
+				 danmuku:'screenjs/danmuku',
+				 autoscroll:'screenjs/autoscroll',
+				 snabbt:'screenjs/snabbt',
+				 screenlottery:'screenjs/screenlottery',
+				 videojs:'videojs/video',
+				 domtoimage:'domtoimg/domtoimage',
+				 html2canvas:"wechatjs/html2canvas",
+				 filesaver:'domtoimg/filesaver',
+				 threejs:'threejs/three.min',
+				 tweenjs:'threejs/tween.min',
+				 css3drenderer:'threejs/css3drenderer',
+				 AMapLoader:'https://webapi.amap.com/loader',
+				 TagCloud:'screenjs/TagCloud',
+				 jqcloud:'jqcloud/jqcloud.min',
+				 luckycanvas:'wechatjs/luckycanvas',
+				 pxloader:'pxloader/PxLoader',
+				 pxLoaderImage:'pxloader/PxLoaderImage',
+				 pxLoaderAudio:'pxloader/PxLoaderAudio',
+				 pxLoaderVideo:'pxloader/PxLoaderVideo',
+				 pxPreload:'pxloader/pxPreload',
+				 svga:'svga/svga.min',
+				 anime:'screenjs/anime',
+			},
+			shim:{
+				'pxLoaderImage':{
+					deps: ['pxloader']
+				},
+				'pxLoaderAudio':{
+					deps: ['pxloader']
+				},
+				'pxLoaderVideo':{
+					deps: ['pxloader']
+				},
+				'zamnotice':{
+					deps: ['css!../js/zamnotice/zamnotice.css']
+				},
+				'jbox':{
+					deps: ['css!../js/jbox/jBox.css',]
+				},
+				'jboxnotice':{
+					deps: ['jbox','css!../js/jbox/plugins/Notice/jBox.Notice.css']
+				},
+				'template':{
+					exports: 'template',
+				},
+				'swiper':{
+					exports:'Swiper',
+					deps: ['css!../js/swiper/swiper.min.css']
+				},
+				'marqueen':{
+					exports:'marqueen',
+				},
+				'screencore':{
+					exports:'screencore'
+				},
+				'layer':{
+					exports: 'layer',
+					deps: ['css!../js/layer/theme/default/layer.css']
+				},
+				'layerBox':{
+					exports: 'layerBox',
+					deps: ['layer']
+				},
+				'layerExt':{
+					deps: ['layer']
+				},
+				'screensocket':{
+					exports:'screensocket',
+				},
+				'keyboard':{
+					exports:'keyboardJS',
+				},
+				'signs':{
+					exports:'signs',
+				},
+				'screenbp':{
+					exports:'screenbp',
+				},
+				'screenbpdata':{
+					exports:'screenbpdata',
+				},
+				'bgscreen':{
+					exports:'bgscreen',
+				},
+				'colorPicker': {
+					deps: [ 'jquery' ],
+					exports: 'jQuery.fn.colorPicker'
+				},
+				'colors':{
+					exports:'Colors'
+				},
+				'slideranimate':{
+					exports:'slideranimate',
+				},
+				'videocontrol':{
+					exports:'videocontrol',
+				},
+				'rightboxslider':{
+					exports:'rightboxslider',
+				},
+				'ionrangeslider':{
+					deps:['css!../js/ionrangeslider/ionrangeslider.css'],
+				},
+				'onoffswitchauto':{
+					deps: ['onoffswitch','css!../js/onoffswitch/on-off-switch.css']
+				},
+				'screenshuqian':{
+					exports:'screenshuqian',
+				},
+				'screenmonkey':{
+					exports:'screenmonkey',
+				},
+				'screencar':{
+					exports:'screencar',
+				},
+				'screenhorse':{
+					exports:'screenhorse',
+				},
+				'screenmls':{
+					exports:'screenmls',
+				},
+				'screenbike':{
+					exports:'screenbike',
+				},
+				'screenswim':{
+					exports:'screenswim',
+				},
+				'screenthreed':{
+					exports:'screenthreed',
+				},
+				'screentug':{
+					exports:'screentug',
+				},
+				'screenanswerbs':{
+					exports:'screenanswerbs',
+				},
+				'screendzqy':{
+					exports:'screendzqy'
+				},
+				'screenliuyancj':{
+					exports:'screenliuyancj',
+				},
+				'screenbigcj':{
+					exports:'screenbigcj',
+				},
+				'screenlivemark':{
+					exports:'screenlivemark',
+				},
+				'screendgshake':{
+					exports:'screendgshake',
+				},
+				'screenmouse':{
+					exports:'screenmouse',
+				},
+				'screencubecj':{
+					exports:'screencubecj',
+				},
+				'dragqr':{
+					exports:'dragqr',
+				},
+				'videojs':{
+					exports:'videojs',
+					deps:['css!../js/videojs/video.css'],
+				},
+				'domtoimage':{
+					exports:'domtoimage'
+				},
+				'threejs':{
+					exports:'THREE'
+				},
+				'tweenjs':{
+					exports:'TWEEN'
+				},
+				'jqcloud':{
+					deps:['css!../js/jqcloud/jqcloud.min.css'],
+				},
+			}
+		});
+		define("jquery", [], function () {
+			return jQuery
+		});
+		var modulepage=1,moduleallpage = 1;
+		!function(t, i, e) {
+				var s = function() {
+					var zoom = (i.innerHeight / 1080).toFixed(4),fullwidth = (i.innerWidth / zoom).toFixed(4);
+					$(".full-main").css({"width":fullwidth+"px","zoom":zoom});
+					setTimeout(function(){
+						var autowidth = fullwidth -  $(".control-normal-list").outerWidth(true);
+						if(XCV3Config.gametype==='msg'){
+							autowidth -= $(".control-msg-list").outerWidth(true);
+						}
+						$(".control-module-list").css({"width":autowidth+'px'});
+						modulepage = 1;
+						var activeobj = $(".control-module-list .icon-box.active");
+						if(activeobj.length > 0){
+							modulepage = (activeobj[0].offsetTop - 5) / 65 + 1;
+							modulepage = parseInt(modulepage);
+						}
+						$(".control-module-list .wrap").css({"transform":"translate3d(0px, "+(-modulepage * 65 + 65)+"px, 0px)"});
+						moduleallpage = parseInt($(".control-module-list-items .wrapbox").height()/65);
+					},80);
+				};
+				t.addEventListener !== e && (i.addEventListener('resize', s, !1), t.addEventListener("DOMContentLoaded", s, !1))
+		}(document, window);
+	</script>
+</head>
+<input type="hidden" class="inputrotateid" value="{$rotateid??'0'}" />
+<input type="hidden" class="inputfulldm" value="2" />
+<body class="screenbody">
+<div class="pc-box">
+    <div class="full-main" style="height: 1080px;">
+        <div class="main-box">
+            <header class="header zam-app-flex">
+            {if isset($pcconfig['gametype']) && $pcconfig['gametype']=='baping'}
+            {else /}
+            <div class="headerLogo zam-app-flex-ajCenter2">
+                {if isset($hdinfo['copyright']['logo']) && !empty($hdinfo['copyright']['logo'])}
+                <img src="{:tomedia($hdinfo['copyright']['logo'])}" />
+                {/if}
+            </div>
+            <ul class="headerTitle">
+                {if isset($hdinfo['screenconfig']['opennotice']) && $hdinfo['screenconfig']['opennotice']=='1' && isset($hdinfo['screenconfig']['notice']) && !empty($hdinfo['screenconfig']['notice'])}
+                    {php}$topnotices = explode('#',$hdinfo['screenconfig']['notice']);{/php}
+                    {volist name="topnotices" id="notice"}
+                    <li class="title-item" style="font-size:{$hdinfo['screenconfig']['noticesize']}px;color: {$hdinfo['screenconfig']['noticecolor']}">{$notice}</li>
+                    {/volist}
+                </ul>
+                {/if}
+            </ul>
+            <div class="headerTips zam-app-flex-ajCenter2">
+                <div class="joinPeople"></div>
+            </div>
+            {/if}
+            </header>	
+<style>
+.shake-mainbox{
+	width: 100%;
+    height: 100%;
+    padding: 0;
+    overflow: hidden;
+}
+.dgshake-list{
+	position:absolute;
+	top:50px;
+	left:0;
+    width:100%;
+    margin:0 auto;
+    z-index: 1;
+}
+.dgshake-list ul{
+    display: flex;
+    flex-wrap: wrap;
+}
+.dgshake-list ul li {
+    width: 10%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    color: rgb(255, 239, 51);
+    margin-bottom: 10px;
+}
+@keyframes shake {
+  10% {
+    transform: rotate(3deg);
+  }
+  20% {
+    transform: rotate(-3deg);
+  }
+  30% {
+    transform: rotate(3deg);
+  }
+  40% {
+    transform: rotate(-3deg);
+  }
+  50%,
+  100% {
+    transform: rotate(0deg);
+  }
+}
+@-webkit-keyframes shake {
+  10% {
+    transform: rotate(3deg);
+  }
+  20% {
+    transform: rotate(-3deg);
+  }
+  30% {
+    transform: rotate(3deg);
+  }
+  40% {
+    transform: rotate(-3deg);
+  }
+  50%,
+  100% {
+    transform: rotate(0deg);
+  }
+}
+.avatarbox{
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 90px;
+    height: 90px;
+}
+.avatarbox.shake{
+	animation: shake 1s 0.2s linear infinite;
+	-webkit-animation: shake 1s 0.2s linear infinite;
+}
+.avatarbox img{
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    border: 2px solid rgb(255, 239, 51);
+}
+.avatar-rank{
+    margin-top: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 700;
+    width: 34px;
+    height: 34px;
+    font-size: 14px;
+    background-image: url(/{:SIMGURL}dgshake/rank.png);
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-position: 0% 0%;
+}
+.dgshake-list ul li .nickname{
+    margin-top: 5px;
+    width: 100%;
+    padding: 0 10px;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 700;
+}
+.dgshake-list .rankBox-btns{
+    position: absolute;
+    bottom: -120px;
+    width:100%;
+	margin-top:20px;
+}
+.dgshake-list .rankBox-btns a.nextround{
+	margin-left:60px;
+}
+.dgshake-list .rankBox-btns a img{
+	width: 120px;
+    height: 50px;
+}
+</style>
+<audio id="countaudio" src="/{:WIMGURL}shake/count.mp3"  preload="preload"  style="display:none"></audio>
+<audio id="overaudio" src="/{:SIMGURL}shake/over.mp3"  preload="preload"  style="display:none"></audio>
+<audio id="joinaudio" src="/{:SIMGURL}shake/join.mp3"  preload="preload" style="display:none"></audio>
+<section class="shake-mainbox car-mainbox normal-box zam-app-flex-ajCenter2">
+    <div class="emptybox zam-app-flex-ajCenter display-none">
+		<img src="/{:SIMGURL}common/empty.png">
+		<p style="padding:20px;">暂无可用轮次，请到后台添加</p>
+	</div>
+	<div class="shake-lists dgshake-list display-none" style="display: flex!important;">
+		<ul></ul>
+        <div class="rankBox rankBox-btns zam-app-flex-ajCenter2 display-none">
+            <a class="paiming" href="javascript:void(0)" title="全部排名"><img src="{:tomedia($pcconfig['style']['pmimg'])}" /></a>
+            <a class="nextround" href="javascript:void(0)" title="下一轮"><img src="{:tomedia($pcconfig['style']['nextimg'])}" /></a> 
+        </div>
+	</div>
+</section>
+<style>
+.welcomeBox{
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    z-index:3;
+    background-color:rgba(0,0,0,0.3);
+    color:#fff;
+}
+.welcomeBox-main{width:1000px;}
+.welcomeBox-logo{
+    width:500px;
+    height:310px;
+    animation: gamelogoani 1s ease-in-out 0s infinite alternate
+}
+@keyframes gamelogoani{from{opacity:1}to{opacity:.8}}
+.welcomeBox-logo img{
+    width:100%;
+    height:100%;
+}
+.welcomeBox-join{width:100%;margin-top:20px;}
+.welcomeBox-nums{
+    width:450px;
+    height:93px;
+    font-size:30px;
+    font-weight: 700;
+    background-image: url("{:tomedia($pcconfig['style']['joinnumimg'])}");
+    background-size:cover;
+    text-shadow: 0 0 0.05rem #1989ff;
+    margin:0 auto;
+}
+.welcomeBox-nums span{display:inline-block;margin-left:20px;font-size:42px;font-weight:800;}
+.start-btn{
+    width:296px;
+    height:91px;
+    text-align:center;
+    background-size:cover;
+    background-repeat:no-repeat;
+    background-image:url("{:tomedia($pcconfig['style']['startbtn'])}?t=1");
+    font-size:30px;
+    cursor:pointer;
+    animation: btnani 2s ease-in-out 0s infinite alternate
+}
+@keyframes btnani{from{opacity:1}to{opacity:.8}}
+</style>
+<div  class="welcomeBox zam-app-flex-ajCenter display-none" style="display: none!important;"> 
+   <div class="welcomeBox-main zam-app-flex-ajCenter">
+        <div class="welcomeBox-logo">
+            <img src="{:tomedia($pcconfig['style']['welcometop'])}">
+        </div>
+        <div class="welcomeBox-join">
+            <div class="welcomeBox-nums zam-app-flex-ajCenter2"><div>当前在线人数</div><span>0</span></div>
+        </div>
+        {include file='common/gamewelcomeusers' /}
+        <div class="start-btn zam-app-flex-ajCenter"></div>
+    </div>
+</div>
+
+<script id="item-tpl" type="html/javascript">
+<li>
+	<div class="avatarbox">
+        <img src="{:tomedia($pcconfig['style']['userdefaultimg'])}">
+    </div>
+	<div class="nickname limitbox">{$pcconfig['style']['userdefaultname']??'虚位以待'}</div>
+    <div class="avatar-rank">{{key}}</div>
+</li>
+</script>
+
+<script>
+var defaultImg = "{:tomedia($pcconfig['style']['userdefaultimg'])}";
+var defaultName = "{$pcconfig['style']['userdefaultname']??'虚位以待'}";
+require(['screendgshake2'],function (screendgshake2) {
+	screendgshake2.init();
+});
+</script>
+{include file='common/gamerank' /}
+{include file='common/gamedjs' /}
+{if !empty($pcconfig['style']['diycss'])}<style>{$pcconfig['style']['diycss']}</style>{/if}
+{include file='common/footer' /}

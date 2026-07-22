@@ -1,0 +1,153 @@
+{include file='$Wpath/common/header'}
+<div class="form-inline zam-inline-searchbar">
+    <div class="form-group">
+      <div class="input-group input-group-sm">
+          <select id="hdtitletype" class="form-control">
+            <option value="1" selected>活动id</option>
+            <option value="2">活动主题</option>
+          </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="input-group input-group-sm">
+        <input type="text" class="form-control" value="" id="keyword" placeholder="请输入活动id" style="width: 140px;">
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="input-group input-group-sm">
+          <span class="input-group-addon">功能</span>
+          <select id="fromtype" class="form-control js_select2">
+          	<option value="0">全部功能</option>
+            {foreach $modulelists as $mkey=>$mval } 
+            <option value="{$mkey}">{$mval}</option>
+            {/foreach}
+          </select>
+      </div>
+    </div>
+    <div class="form-group" style="width: 180px;">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">微信昵称</span>
+        <input type="text" class="form-control" value="" id="nickname" placeholder="请输入微信昵称">
+      </div>
+    </div>
+    <div class="form-group" style="width: 200px;">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">openid</span>
+        <input type="text" class="form-control" value="" id="openid" placeholder="请输入用户openid">
+      </div>
+    </div>
+    <div class="form-group" style="width: 180px;">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">用户id</span>
+        <input type="text" class="form-control" value="" id="userid" placeholder="请输入活动用户id">
+      </div>
+    </div>
+    <a class="btn btn-primary btn-sm btn-search" href="javascript:void(0)"><i class="mdi mdi-magnify"></i> 搜索</a>
+    <a class="btn btn-warning btn-sm btn-export" href="javascript:void(0)"><i class="mdi mdi-export"></i> 导出</a>
+</div>
+<table id="listtable" class="zam-btable"></table>
+<script>
+require(['webcore','webtable','jconfirmBox','zamnotice'],function(webcore,webtable,jconfirmBox,zamnotice){
+var initConfig = {
+	tableId:'#listtable',
+	url:"{:goweb('hbdetail/list')}",
+	columnoperate:false,
+	columns:[{
+			checkbox: true,
+        width:'5%',
+  		}, 
+  		{
+  			field: 'id',
+  			title: 'ID',
+  			align: 'center',
+        width:'6%',
+  			visible: false
+  		}, {
+            field: 'hdtitle',
+            title: '活动',
+            align:'center',
+            width:'15%',
+            formatter: function (value, row, index) {
+                if(row.huodong_id=='0') return '-';
+                var html = "<div><span>"+(value==null?"已删除":value)+"</span></div><div class='m-t-5'><span>id:"+row.huodong_id+"</span></div>";
+                return html;
+            },
+        }, {
+            field: 'userinfo',
+            title: '用户',
+            align:'center',
+            width:'10%',
+            formatter: function (value, row, index) {
+                var html = '<div class="zam-flex-column-center"><img class="avatarImg m-b-10" src="'+value.avatar+'" /><span class="label label-primary">'+value.nickname+'</span><span class="m-b-10">'+value.openid+'</span></div>';
+                return html;
+            },
+        }, {
+            field: 'tradeid',
+            title: '交易单号',
+            align:'center',
+            width:'15%',
+        }, {
+            field: 'wxlistid',
+            title: '商户业务单号',
+            align:'center',
+            width:'15%',
+        }
+        , {
+            field: 'sendmoney',
+            title: '发放金额(元)',
+            align:'center',
+            formatter: function (value, row, index) {
+                var html = '<div class="zam-flex-column-center"><span>' + row.sendtypename + ' </span><span class="m-b-10">' + value + '</span></div>';
+                return html;
+            },
+            width:'10%',
+        },  {
+      			field: 'fromtypename',
+      			title: '来源',
+      			align: 'center',
+            width:'10%',
+    		},  {
+            field: 'create_time',
+            title: '发放时间',
+            align: 'center',
+            width:'15%',
+        }
+	],
+	searchParamas:[{'type':'2','id':'hdtitletype'},{'type':'1','id':'keyword'},{'type':'2','id':'fromtype'},{'type':'1','id':'nickname'},{'type':'1','id':'openid'},{'type':'1','id':'userid'}],
+	toolbar:{
+	},
+};
+webtable.init(initConfig);
+$("#hdtitletype").change(function(e) {
+    var typeval = $(this).val() || '1',keyword = $('#keyword').val('');
+    var placeholder = 'id';
+    if(typeval == '2'){
+      placeholder = '主题';
+      $(".btn-export").addClass('hidden');
+    }else{
+      $(".btn-export").removeClass('hidden');
+    }
+    $('#keyword').attr('placeholder',`请输入活动${placeholder}`);
+    webtable.refresh();
+});
+$('#hdid,#fromtype').change(function(e) {
+     webtable.refresh();
+});
+$('.btn-export').on('click',function(){
+   var hdid = $("#keyword").val();
+   if(hdid=='') {
+    return zamnotice.showTips('error','请输入活动id');
+   }
+   webcore.ajaxSubmit("{:goweb('hbdetail/exportone')}",{hdid:hdid}).then(function(json){
+        if(json.code!=0){
+            zamnotice.showTips('error',json.msg);
+        }else{
+            window.location.href = "{:goweb('hbdetail/exportone')}?hdid="+hdid;
+        }
+    }, function(json){
+        zamnotice.showTips('error','网络差,操作失败');
+    });
+});
+});
+</script>
+{include file='$Wpath/common/footer'}

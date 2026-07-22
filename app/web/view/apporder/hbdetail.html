@@ -1,0 +1,133 @@
+<div class="alert alert-danger">
+注：如果红包模板发放类型选的是商家转账到零钱，补发发起后每个红包需至少等待10秒才可得到是否到账成功的结果<br>
+支付成功的红包订单不超23小时才支持补发，如果超23小时请静候系统自动发起订单退款，退款金额将进入活动微信端个人中心余额
+</div>
+<div class="alert" role="alert" style="margin-bottom: 0">
+		发放成功总额:<span class="text-success smremain m-l-5 m-r-5">xxx</span>元，
+		发放成功总量:<span class="text-success snremain m-l-5 m-r-5">xxx</span>个，
+		剩余总额:<span class="text-danger mremain m-l-5 m-r-5">xxx</span>元，
+		剩余总量:<span class="text-danger nremain m-l-5 m-r-5">xxx</span>个
+</div>
+<div class="m-b-10">
+	<a class="btn btn-primary btn-xs m-l-10" onclick="exporthbrecord()"><i class="mdi mdi-export"></i> 导出发放明细</a>
+	<a class="btn btn-danger btn-xs m-l-10" onclick="bufahbrecord()"><i class="mdi mdi-gavel"></i> 补发失败记录</a>
+</div>
+<table class="table" style="margin-bottom:0px;">
+<thead>
+  <tr>
+  	<th style="width:20%;text-align:center;">用户</th>
+	<th style="width:30%;text-align:center;">金额</th>
+	<th style="width:20%;text-align:center;">状态</th>
+	<th style="width:30%;text-align:center;">原因</th>
+  </tr>
+</thead>
+<tbody class="redpackbao-lists"></tbody>
+</table>
+<div class="redpackbao-pager" style="padding:10px;text-align: center;"></div>
+<script id="detailredpack-tpl" type="text/template">
+	<tr>
+		<td class="text-center">
+			<div class="text-center">
+				<img width="60px" height="60px" src="<% d.userinfo.wxheadimg %>" />
+				<div><% d.userinfo.wxname %></div>
+			</div>
+		</td>
+		<td class="text-center">
+			<% d.sendmoney %>元
+		</td>
+		<td class="text-center">
+		  <%# if(d.status=='1'){ %>
+		  	<span class="label label-success"><% d.statusname %></span>
+		  <%# }else if(d.status=='2'){ %>
+		  	<span class="label label-warning"><% d.statusname %></span>
+		  <%# }else if(d.status=='3'){ %>
+		  	<span class="label label-danger"><% d.statusname %></span>
+		  <%# }else{ %>
+		  	<span class="label"><% d.statusname %></span>
+		  <%# } %>
+		  
+		</td>
+		<td class="text-center">
+		  <%# if(d.status=='3'){ %>
+		  	 <% d.failreason.failreason %>
+		  <%# }else{ %>
+		  		-
+		  <%# } %>
+		</td>
+	</tr>
+</script>
+<script>
+function ajaxbaolist(page,obj){ 
+	require(["zamnotice","layerBox","jconfirmBox","webcore"],function(zamnotice,layerBox,jconfirmBox,webcore){
+		webcore.ajaxSubmit("{:goweb('apporder/hborderdetail')}",{ajaxtype:'2',orderid:"{$orderid}",hdid:"{$hdid}",msgid:"{$msgid}",page:page},'正在加载..').then(function(json){
+			if(json.code==0){
+				var html = '';
+				var detaildata = json.msg.item;
+				$.each(detaildata,function(i,v){
+					html += webcore.tpl($("#detailredpack-tpl"),v);
+				});
+				$(".redpackbao-lists").html(html);
+				$(".redpackbao-pager").html(json.msg.pager);
+				$(".smremain").text(parseFloat(json.msg.successmoney/100).toFixed(2));
+				$(".snremain").text(json.msg.successnum);
+				$(".mremain").text(parseFloat(json.msg.totalmoney/100).toFixed(2));
+				$(".nremain").text(json.msg.totalnum);
+			}else{
+				zamnotice.showTips('error','网络差。操作失败');
+			}
+		}, function(json){
+			zamnotice.showTips('error','网络差。操作失败');
+		});
+	});
+}
+function initbaolist(){
+	require(["zamnotice","layerBox","jconfirmBox","webcore"],function(zamnotice,layerBox,jconfirmBox,webcore){
+		webcore.ajaxSubmit("{:goweb('apporder/hborderdetail')}",{ajaxtype:'2',orderid:"{$orderid}",hdid:"{$hdid}",msgid:"{$msgid}"},'正在加载..').then(function(json){
+			var html = '';
+			if(json.code==0){
+				var detaildata = json.msg.item;
+				$.each(detaildata,function(i,v){
+					html += webcore.tpl($("#detailredpack-tpl"),v);
+				});
+				$(".redpackbao-lists").html(html);
+				$(".redpackbao-pager").html(json.msg.pager);
+				$(".smremain").text(parseFloat(json.msg.successmoney/100).toFixed(2));
+				$(".snremain").text(json.msg.successnum);
+				$(".mremain").text(parseFloat(json.msg.totalmoney/100).toFixed(2));
+				$(".nremain").text(json.msg.totalnum);
+			}else{
+				zamnotice.showTips('error','网络差。操作失败');
+			}
+		}, function(json){
+			zamnotice.showTips('error','网络差。操作失败');
+		});
+	});
+}
+function exporthbrecord(){
+	require(["zamnotice","layerBox","jconfirmBox","webcore"],function(zamnotice,layerBox,jconfirmBox,webcore){
+		webcore.ajaxSubmit("{:goweb('apporder/exporthborderdetail')}",{hdid:"{$hdid}",msgid:"{$msgid}"},'正在导出..').then(function(json){
+			if(json.code==0){
+				window.location.href = "{:goweb('apporder/exporthborderdetail',['hdid'=>$hdid,'msgid'=>$msgid])}";
+			}else{
+				zamnotice.showTips('error',json.msg);
+			}
+		}, function(json){
+			zamnotice.showTips('error','网络差。操作失败');
+		});
+	});
+}
+function bufahbrecord(){
+	require(["zamnotice","layerBox","jconfirmBox","webcore"],function(zamnotice,layerBox,jconfirmBox,webcore){
+		webcore.ajaxSubmit("{:goweb('apporder/bufahborderdetail')}",{orderid:"{$orderid}",hdid:"{$hdid}",msgid:"{$msgid}"},'正在发起补发命令..').then(function(json){
+			if(json.code==0){
+				zamnotice.showTips('success','补发命令已成功发起，请稍后查看补发情况',2e3);
+			}else{
+				zamnotice.showTips('error',json.msg);
+			}
+		}, function(json){
+			zamnotice.showTips('error','网络差。操作失败');
+		});
+	});
+}
+initbaolist();
+</script>

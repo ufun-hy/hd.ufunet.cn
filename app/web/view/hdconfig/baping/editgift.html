@@ -1,0 +1,78 @@
+<div class="form-horizontal confirmbox-pop">
+<form class="confirm-formbox" method="post">
+    <div class="text-center">
+        <div class="btn-group pop-btns" style="margin-bottom:10px;">
+          <a href="javascript:void(0)" class="btn btn-default btn-primary"><span>基础设置</span></a>
+          <a href="javascript:void(0)" class="btn btn-default"><span>风格设置</span></a>
+        </div>
+    </div>
+    <div class="carditem">
+    	<div class="form-group">
+			<label class="col-lg-3 control-label text-right">* 排序序号</label>
+			<div class="col-lg-6">
+			  <input type="text" class="form-control"  name="displayorder" value="{$config['displayorder']}">
+			  <div class="help-block">注意:排序按降序排序，序号越大越排在前面</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-lg-3 control-label text-right">* 礼物名称</label>
+			<div class="col-lg-6">
+			  <input type="text" class="form-control"  name="giftname" value="{$config['giftname']}">
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-lg-3 control-label text-right">* 礼物图标(100*100px)</label>
+			<div class="col-lg-6">
+			   {:tpl_image_one('giftimg',$config['giftimg'])}
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-lg-3 control-label text-right">* 价格</label>
+			<div class="col-lg-6">
+				  <div class="input-group">
+					<input type="text" class="form-control" name="giftprice" value="{$config['giftprice']}">
+					<div class="input-group-addon">元</div>
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-lg-3 control-label text-right">* 霸屏时间</label>
+			<div class="col-lg-6">
+				  <div class="input-group">
+					<input type="text" class="form-control" name="bptime" value="{$config['bptime']}">
+					<div class="input-group-addon">秒</div>
+				</div>
+			</div>
+		</div>
+		
+	</div>
+	<div class="carditem hidden">
+		<div class="form-group">
+			<label class="col-lg-3 control-label text-right">* 微信消息顶部背景(411*50px)</label>
+			<div class="col-lg-6">
+			   {:tpl_image_one('gifttopbg',$config['gifttopbg'])}
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-lg-3 control-label text-right">* 微信消息角标图(65*65px)</label>
+			<div class="col-lg-6">
+			   {:tpl_image_one('giftappicon',$config['giftappicon'])}
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-lg-3 control-label text-right">* 大屏特效动图(1111*625px)</label>
+			<div class="col-lg-6">
+			   {:tpl_image_one('giftpcwebp',$config['giftpcwebp'])}
+			</div>
+		</div>
+	</div>
+</form>
+</div>
+<script>
+require(['webcore','jconfirmBox','zamnotice','layerBox'],function(webcore,jconfirmBox,zamnotice,layerBox){
+    $(".confirmbox-pop .pop-btns a.btn").click(function(){
+        $(this).addClass('btn-primary').siblings().removeClass("btn-primary");
+        $(".confirmbox-pop .carditem").addClass('hidden').eq($(this).index()).removeClass('hidden');
+    });
+});
+</script>

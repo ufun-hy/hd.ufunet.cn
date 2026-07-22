@@ -1,0 +1,84 @@
+<style>
+.uploadattachments-card{
+    margin:0;
+    box-shadow:unset;
+}
+.uploadattachments-card .card-header{
+    display: flex;
+    justify-content: center;
+}
+</style>
+<div class="row" style="margin:0;">
+<div class="card uploadattachments-card">
+    <div class="alert hidden">上传文件时请务必先在左侧激活指定的分类，否则上传的所有文件将无分类</div>
+    <div class="card-header">
+    	  <a class="uploadattachment-upload btn btn-primary"><i class="mdi mdi-plus"></i> 上传图片(可一次性上传多个)</a>
+    </div>
+</div>
+<script>
+require(['webcore','webtable','zamnotice','webupload'],function(webcore,webtable,zamnotice,WebUploader){
+    var upsuccess = 0,upfail = 0,activecate = $(".zam-cates-grouplist li.active"),uploader = WebUploader.create({
+        auto: true,
+        duplicate: true,
+        swf: '__STATIC__/js/webupload/Uploader.swf',
+        server: "{:gohdmanage('configphotocj/uploadphoto',['hdid'=>$hdid])}",
+        formData: {
+            amtype: "1",
+        },
+        compress:false,
+        threads:1,
+        prepareNextFile:true,
+        pick: {
+            id: '.uploadattachment-upload',
+            multiple: true
+        },
+        fileSingleSizeLimit:{$fileconfig['size']} ,
+        accept: {
+            title: "{$typename}s",
+            extensions: "{$fileconfig['ext']}",
+            mimeTypes: "{$typename}/*",
+        }
+    });
+    uploader.on('uploadStart', function(file) {
+        webcore.showLoading(file.name+'上传中...');
+    });
+    uploader.on('uploadFinished', function(file, percentage) {
+        webcore.closeLayer();
+        setTimeout(function(){
+            zamnotice.showTips('success','上传文件结果，成功了'+upsuccess+'个文件，失败了'+upfail+'个文件');
+            upfail = 0;
+            upsuccess = 0;
+            webtable.refresh();
+        },5e2);
+    });
+    uploader.on('uploadSuccess', function(file, json) {
+        if(json.code==0){
+            upsuccess++;
+            zamnotice.showTips('success','上传成功');
+        }else{
+            upfail++;
+            zamnotice.showTips('error',json.msg);
+        }
+    });
+    uploader.on('uploadError', function(file) {
+        upfail++;
+        zamnotice.showTips('error','上传出错，上传失败');
+    });
+    uploader.on('uploadComplete',function(file){
+        webcore.showLoading(file.name+'上传完毕...');
+    });
+    uploader.on('error', function(type) {
+        upfail++;
+        switch (type) {
+            case 'Q_TYPE_DENIED':
+                zamnotice.showTips('error','文件类型不正确，请重新上传');
+                break;
+            case 'F_EXCEED_SIZE':
+                zamnotice.showTips('error','文件太大，请重新上传');
+                break;
+            default:
+                zamnotice.showTips('error','上传失败啦');
+        }
+    });
+});
+</script>

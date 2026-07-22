@@ -1,0 +1,138 @@
+{include file='$Wpath/common/header'}
+<style>
+.catemodulelist{
+    float:left;
+    padding:10px;
+}
+.catemodulelist .catemodule-item{
+    padding:8px;
+    margin-bottom:10px;
+    margin-right: 10px;
+    float:left;
+    color:#fff;
+    background-color: rgba(0,0,0,0.4);
+}
+.btn-addmodule{
+    float:left;
+    padding:10px;
+}
+</style>
+{include file='$Wpath/common/tabletoolbar'}
+<style type="text/css">
+  .card-hdmodule{border:1px solid #dfe6ec}
+  .card-hdmodule:hover{
+    box-shadow: 1px 3px 10px rgba(37,46,64,.2);
+  }
+  .card-hdmodule .hdmodule-switch{
+    position: absolute;
+    right: 20px;
+    top: 10px
+  }
+  .card-hdmodule .hdmodule-edit{
+    position: absolute;
+    right: 30px;
+    bottom: 40px;
+  }
+</style>
+<table id="listtable" class="zam-btable"></table>
+<script>
+require(['webcore','webtable','jconfirmBox','zamnotice'],function(webcore,webtable,jconfirmBox,zamnotice){
+var initConfig = {
+    tableId:'#listtable',
+    url:"{:goweb('hdsetmeal/index')}",
+    columnoperate:{
+        btns:{
+            edit:true,
+            del:true,
+        },
+        func:{
+            edit:function(value, row, index){
+                window.location.href = "{:goweb('hdsetmeal/edit')}?mealid="+row.id;
+            },
+            del:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','您确定要删除么？',function(){
+                      webcore.ajaxSubmit("{:goweb('hdsetmeal/del')}",{mealid:row.id},'处理中..').then(function(json){
+                          if(json.code==0){
+                              webtable.refresh();
+                              zamnotice.showTips('success','删除成功');
+                          }else{
+                              zamnotice.showTips('error',json.msg);
+                          }
+                      }, function(json){
+                          zamnotice.showTips('error','网络差。操作失败');
+                      });
+                });
+            },
+        }
+    },
+    columns:[{
+            checkbox: true,
+        }, 
+        {
+            field: 'id',
+            title: 'ID',
+            align: 'center',
+            width:'6%',
+            visible: false
+        },  {
+            field: 'setmealorder',
+            title: '排序',
+            align: 'center',
+        }, {
+            field: 'setmealname',
+            title: '套餐名',
+            align:'center',
+        }, {
+            field: 'personnum',
+            title: '人数(个)',
+            align:'center',
+        }, {
+            field: 'modules',
+            title: '模块(个)',
+            align:'center',
+            formatter: function (value, row, index) {
+                return '<span class="label label-primary">'+value.length+'</span>';
+            },
+        }, {
+            field: 'fws',
+            title: '增值服务(个)',
+            align:'center',
+            formatter: function (value, row, index) {
+                return '<span class="label label-primary">'+value.length+'</span>';
+            },
+        },  {
+            field: 'create_time',
+            title: '添加时间',
+            align: 'center',
+        }
+    ],
+    searchParamas:[],
+    toolbar:{
+        add:function(ajaxurl){
+            window.location.href = "{:goweb('hdsetmeal/add')}";
+        },
+        del:function(ajaxurl){
+            var getSelects = webtable.getSelections();
+            if(getSelects.length>0){
+                jconfirmBox.confirm('温馨提示','您确定要删除选中的数据么？',function(){
+                    webcore.ajaxSubmit(ajaxurl,{mealid:getSelects},'处理中..').then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','删除成功');
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差,操作失败');
+                    });
+                });
+            }else{
+                zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+        },
+    },
+};
+webtable.init(initConfig);
+});
+</script>
+{include file='$Wpath/common/footer'}

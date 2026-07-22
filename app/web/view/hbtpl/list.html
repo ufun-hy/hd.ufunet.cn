@@ -1,0 +1,180 @@
+{include file='$Wpath/common/header'}
+<div class="form-inline zam-inline-searchbar">
+    <div class="form-group">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">模板名</span>
+        <input type="text" class="form-control" value="" id="keyword"  placeholder="请输入模板名">
+      </div>
+    </div>
+    <div class="form-group m-l-5">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">红包类型</span>
+          <select id="tpltype" class="form-control">
+            {foreach $tpltypes as $key=>$item}
+            <option value="{$key}" {if $key == "0"}selected{/if}>{$item}</option>
+            {/foreach}
+          </select>
+        </div>
+    </div>
+    <div class="form-group m-l-5">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">发放类型</span>
+          <select id="sendtype" class="form-control">
+            {foreach $hbsendtypes as $key=>$item}
+            <option value="{$key}" {if $key == "0"}selected{/if}>{$item}</option>
+            {/foreach}
+          </select>
+        </div>
+    </div>
+    <div class="form-group m-l-5">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">是否支持0.3元</span>
+          <select id="supporttype" class="form-control">
+            {foreach $yesnos as $key=>$item}
+            <option value="{$key}" {if $key == "0"}selected{/if}>{$item}</option>
+            {/foreach}
+          </select>
+        </div>
+    </div>
+    <a class="btn btn-primary btn-sm btn-search" href="javascript:void(0)"><i class="mdi mdi-magnify"></i> 搜索</a>
+</div>
+{include file='$Wpath/common/tabletoolbar'}
+<table id="listtable" class="zam-btable"></table>
+<script>
+require(['webcore','webtable','jconfirmBox','zamnotice'],function(webcore,webtable,jconfirmBox,zamnotice){
+var initConfig = {
+    tableId:'#listtable',
+    url:"{:goweb('hbtpl/list')}",
+    columnoperate:{
+        btns:{
+            edit:true,
+            del:true,
+        },
+        func:{
+            edit:function(value, row, index){
+                var confirmObj = jconfirmBox.ajaxconfirm("编辑模板","{:goweb('hbtpl/edit')}",{ishtml:'1',tplid:row.id},'html','col-lg-8 col-lg-offset-2',function(e){
+                    var postData = webcore.serializeObject(e.find('form'));
+                    postData.tplid = row.id;
+                    webcore.ajaxSubmit("{:goweb('hbtpl/edit')}",postData,'正在提交数据...').then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','保存成功');
+                            confirmObj.close();
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                             return false;
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                         return false;
+                    });
+                });
+            },
+            del:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','您确定要删除么？',function(){
+                        webcore.ajaxSubmit("{:goweb('hbtpl/del')}",{tplid:row.id},'处理中..').then(function(json){
+                            if(json.code==0){
+                                webtable.refresh();
+                                zamnotice.showTips('success','删除成功');
+                            }else{
+                                zamnotice.showTips('error',json.msg);
+                            }
+                        }, function(json){
+                            zamnotice.showTips('error','网络差。操作失败');
+                        });
+                });
+            },
+        }
+    },
+    columns:[{
+            checkbox: true,
+        }, 
+        {
+            field: 'id',
+            title: 'ID',
+            align: 'center',
+            width:'6%',
+            //visible: false
+        }, {
+            field: 'tplname',
+            title: '模板名',
+            align:'center',
+        }, {
+            field: 'issyshtml',
+            title: '模板类型',
+            align:'center',
+        }, {
+            field: 'tpltypehtml',
+            title: '红包类型',
+            align:'center',
+        }, {
+            field: 'sendtypehtml',
+            title: '发放类型',
+            align:'center',
+        }, {
+            field: 'app_id',
+            title: 'APPID',
+            align:'center',
+            width:'20%',
+        },  {
+            field: 'mch_id',
+            title: '商户号',
+            align: 'center',
+        },  {
+            field: 'supporttinyhtml',
+            title: '支持0.3元',
+            align: 'center',
+        },  {
+            field: 'create_time',
+            title: '添加时间',
+            align: 'center',
+        }
+    ],
+    searchParamas:[{'type':'1','id':'keyword'},{'type':'2','id':'tpltype'},{'type':'2','id':'sendtype'},{'type':'2','id':'supporttype'}],
+    toolbar:{
+        add:function(ajaxurl){
+            var confirmObj = jconfirmBox.ajaxconfirm("新增模板",ajaxurl,{ishtml:'1'},'html','col-lg-8 col-lg-offset-2',function(e){
+                var postData = webcore.serializeObject(e.find('form'));
+                webcore.ajaxSubmit(ajaxurl,postData,'正在提交数据...').then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','新增成功');
+                        confirmObj.close();
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                         return false;
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差。操作失败');
+                     return false;
+                });
+            });
+        },
+        del:function(ajaxurl){
+            var getSelects = webtable.getSelections();
+            if(getSelects.length>0){
+                jconfirmBox.confirm('温馨提示','您确定要删除选中的数据么？',function(){
+                    webcore.ajaxSubmit(ajaxurl,{tplid:getSelects},'处理中..').then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','删除成功');
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差,操作失败');
+                    });
+                });
+            }else{
+                zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+        },
+    },
+};
+webtable.init(initConfig);
+$('.zam-inline-searchbar select').change(function(e) {
+    webtable.refresh();
+});
+});
+</script>
+{include file='$Wpath/common/footer'}

@@ -1,0 +1,394 @@
+{include file='$Wpath/common/header'}
+<div class="row">
+<div class="col-lg-12">
+<div class="card zam-createactivitybox">
+	<div class="card-top">
+	  <div class="zam-createactivitybox-title">
+		<button type="button" class="btn btn-default btn-xs" disabled="">创建活动指引</button>
+	  </div>
+	  <ul class="nav-step step-dots">
+	    <li class="nav-step-item active">
+	      <span>创建活动</span>
+	      <a class="active" data-toggle="tab"  aria-expanded="false"></a>
+	    </li>
+
+	    <li class="nav-step-item active">
+	      <span>测试活动</span>
+	      <a class="active"data-toggle="tab"  aria-expanded="false"></a>
+	    </li>
+
+	    <li class="nav-step-item active">
+	      <span>发布活动</span>
+	      <a class="active" data-toggle="tab" aria-expanded="false"></a>
+	    </li>         
+	   </ul>
+	</div>
+   	<div class="card-body">
+		<form id="formBox" class="zam-formvalidation form-horizontal" method="post">
+			{if !empty($freepubconfig) && $freepubconfig['open']=='1'}
+			<div class="zam-titleBox">活动版本</div>
+			<div class="form-group zam-jointypeBox">
+				<label class="col-lg-2 control-label"></label>
+				<div class="col-lg-8 clearfix">
+					<section class="zam-jointype has-selected" data-hdmode="1" data-maxperson="{if $pubconfig['maxperson'] > 0}{$pubconfig['maxperson']}{else}null{/if}">
+						<span class="zam-righttriangle"></span>
+						<i class="mdi mdi-check zam-typeselected"></i>
+						<h3>{$hdnames['mode1']??'商业付费版'}</h3>
+						{:$hdnames['mode1des']??''}
+					</section>
+					<section class="zam-jointype" data-hdmode="2" data-maxperson="{if $freepubconfig['maxperson'] > 0}{$freepubconfig['maxperson']}{else}null{/if}">
+						<span class="zam-righttriangle"></span>
+						<i class="mdi mdi-check zam-typeselected"></i>
+						<h3>{$hdnames['mode2']??'免费版'}</h3>
+						{:$hdnames['mode2des']??''}
+					</section>
+					<input type="hidden" name="hdmode" value="1" />
+				</div>
+			</div>
+			{/if}
+			<div class="zam-titleBox">活动信息</div>
+			<div class="form-group">
+			<label class="col-lg-2 control-label">* 活动主题</label>
+			<div class="col-lg-8">
+			  <input class="form-control inputneedmax" type="text"  name="hdtitle" maxlength="40" placeholder="请输入活动主题..">
+			</div>
+			</div>
+			{if $config['createconfig']['opencate']=='1'}
+			  <div class="form-group">
+				<label class="col-lg-2 control-label">* 活动类型</label>
+				<div class="col-lg-8">
+				   <select name="cate_id" class='form-control js_select2'>
+						 <option  value="">请选择</option>
+						 {volist name="hdcates" id="cate"}
+						 <option  value="{$cate['id']}">{$cate['catename']}</option>
+						 {/volist}
+				   </select>
+				</div>
+			  </div>
+			{/if}
+			{if $config['createconfig']['openarea']=='1'}
+			  <div class="form-group procitydist-unnormal">
+			    <label class="col-lg-2 control-label">* 活动地点</label>
+			    <div class="col-lg-4">
+			        <a href="javascript:void(0)" class="pick-area pick-activityarea" ></a>
+					<input type="text" class="form-control hidden"  name="hdarea">
+			    </div>
+			  </div>
+			{/if}
+			<div class="form-group maxpersonbox">
+				<label class="col-lg-2 control-label">* 活动人数</label>
+				<div class="col-lg-4 maxpersoninputbox">
+					<input type="text" name="maxperson" class="form-control numberincdec" value=""
+					data-bts-max="{if $pubconfig['maxperson'] > 0}{$pubconfig['maxperson']}{else}null{/if}"
+					data-bts-step="1"
+					data-func = "checkmaxperson"
+					/>
+					<div class="zam-help-block">预估本次活动人数</div>
+				</div>
+			</div>
+			{if !empty($freepubconfig) && $freepubconfig['open']=='1'}
+			<div class="form-group timestartbox hidden">
+				<label class="col-lg-2 control-label">* 活动开始时间</label>
+				<div class="col-lg-4">
+					{:tpl_daterangetime([
+						'name'=>'starttime',
+						'val'=>'',
+						'placeholder'=>'点击选择活动正式开始日期',
+						'mintime'=>time(),
+						'issingle'=>'1',
+						'format'=>'YYYY-MM-DD'
+					])}
+					<div class="zam-help-block">
+						<div class="timerangebox m-t-5 hidden">
+							<span class="text-danger m-r-5">活动起止时间:</span><b><span class="m-r-5">2024-04-08 09:00:00</span> 至 <span class="m-l-5">2024-04-08 23:59:59</span></b>
+						</div>
+					</div>
+				</div>
+			</div>
+			{/if}
+			{if !isset($config['createconfig']['openbindwechat']) || $config['createconfig']['openbindwechat']=='1'}
+			  <div class="zam-titleBox">公众号关键词</div>
+			  <div class="form-group">
+			    <label class="col-lg-2 control-label">* 绑定公众号关键词</label>
+			    <div class="col-lg-8">
+			        {:tpl_switch('bindkeyword',$config['bindkeyword'],'bindkeyword')}
+			    </div>
+			  </div>
+			  <div class="zam-jointype-wechataccount zam-wechataccountBox{if $config['bindkeyword']=='2'} hidden{/if}">
+				  <div class="form-group">
+					<label class="col-lg-2 control-label"><span class="laytip-span" style="width:30px;" lay-tips="点击选取右侧的一个公众号，如未显示公众号请点击立即绑定"><i class="fa fa-question-circle"></i></span> * 公众号选择</label>
+					<div class="col-lg-8">
+						<div class="zam-wechataccountList clearfix">
+							{if !empty($mywxaccount)}
+								{foreach $mywxaccount as $akey=>$aval}
+								<div class="zam-wechataccountItem{if $akey=='0'} active{/if}" data-uniacid="{$aval['id']}">
+									<img src="{:tomedia($aval['qrcode'])}" />
+									<p>{$aval['accountname']}</p>
+									<div class="wechat-has-select">
+										<i class="mdi mdi-check"></i>
+									</div>
+								</div>
+								{/foreach}
+								<input type="hidden" name="wechat_id" value="{$mywxaccount[0]['id']}" />
+							{else/}
+								<div class="form-control-static">
+									<span class="mdi mdi-information" style="font-size:14px;margin-right:10px;"></span><span class="text-danger">您暂无可用公众号，</span>
+									<a href="{:gomyhome('wxaccount/index')}" draggable="false">点击立即绑定 &gt;</a>
+									<input type="hidden" name="wechat_id" value="0" />
+								</div>
+							{/if}
+						</div>
+					</div>
+				  </div>
+				  <div class="form-group">
+					<label class="col-lg-2 control-label">* 触发关键词</label>
+					<div class="col-lg-8">
+					  <input type="text" class="form-control inputneedmax" name="wechatkeyword" maxlength="20" placeholder="微信公众号发送此关键词参与活动" >
+					</div>
+				  </div>
+			  </div>
+			{/if}
+			<div class="zam-titleBox">附加信息</div>
+			<div class="form-group">
+				<label class="col-lg-2 control-label">备注信息<span class="text-danger" style="font-size: 12px">(选填项)</span></label>
+				<div class="col-lg-8">
+				  <input type="text" class="form-control"  name="beizhu" placeholder="活动备注信息，32个字符以内" maxlength="30">
+				</div>
+			</div>
+			{include file='$Wpath/common/cancelsavepanel'}
+		</form>
+   	</div>             
+</div>
+</div>
+</div>
+<script>
+require(['webcore','jconfirmBox','zamnotice','zvalidator','pickcity'],function(webcore,jconfirmBox,zamnotice){
+    $('#formBox').formValidation({
+			framework: 'bootstrap',
+			excluded: [':disabled',':hidden'],
+			message: '您填写的内容无效',
+			fields: {
+				hdtitle: {
+					message: '您填写的活动标题内容无效',
+					validators: {
+						notEmpty: {
+							message: '活动标题必须填写'
+						},
+						stringLength: {
+			              min: 1,
+			              max: 40,
+			              message: '活动主题长度只能40个字符内'
+			            },
+					}
+				},
+				cate_id: {
+					validators: {
+						notEmpty: {
+							message: '请选择活动类型'
+						},	
+					}
+				},
+				hdarea:{
+					validators: {
+						callback:{
+							callback:function(value){
+								if(value!=''){
+									var n = (value.split('/')).length-1;
+									if(n==2){
+										return true;
+									}else{
+										if(n==1){
+											return {
+												valid: false,
+												message: '请选择活动所在县'
+											}
+										}else{
+											return {
+												valid: false,
+												message: '请选择活动所在市'
+											}
+										}
+									}
+								}else{
+									return {
+											valid: false,
+											message: '请选择活动所在地区'
+									}
+								}
+							}
+						}
+					}
+				},
+				maxperson:{
+					validators: {
+						notEmpty: {
+							message: '请设置活动人数'
+						},
+						greaterThan: {
+							value:{$pubconfig['minperson']},
+							inclusive:true,
+							message:"活动人数必须大于等于{$pubconfig['minperson']}"
+						},
+						{if $pubconfig['maxperson'] > 0 }
+						lessThan: {
+							value:{$pubconfig['maxperson']},
+							inclusive: true,
+							message:"活动人数最多等于{$pubconfig['maxperson']}"
+						},
+						{/if}
+						integer:{
+							message:"活动人数必须为整数"
+						}
+					}
+				},
+				wechatkeyword:{
+					validators: {
+						notEmpty: {
+							message: '请设置公众号关键词'
+						}
+					}
+				}
+			}
+	}).on('success.form.fv', function(e) {
+		e.preventDefault();
+		var $form = $(e.target);
+		var createValidation = $form.data('formValidation');
+		var postData = webcore.serializeObject($form);
+		if(postData.bindkeyword=='1' && (postData.wechat_id=='' || postData.wechatkeyword=='')){
+			zamnotice.showTips('info','开启绑定关键词就需要选择公众号并且设置关键词');
+			$form.formValidation('disableSubmitButtons', false);
+			if(postData.wechatkeyword==''){
+				$("input[name='wechatkeyword']").focus();
+			}
+			return false;
+		}
+		$form.formValidation('disableSubmitButtons', true);
+		webcore.ajaxSubmit("{:gomyhd('createhd/index')}",postData,'数据提交中..').then(function(json){
+			if(json.code==0){
+			    zamnotice.showTips('success','创建成功');
+			    setTimeout(function(){
+			    	window.location.href = "{:APP_MYHD}";
+			    },1e3);
+		    }else{
+		        zamnotice.showTips('error',json.msg);
+		        $form.formValidation('disableSubmitButtons', false);
+		    }
+		}, function(json){
+			zamnotice.showTips('error','网络差。操作失败');
+			$form.formValidation('disableSubmitButtons', false);
+		});
+	});
+	$(".zam-jointypeBox .zam-jointype").on('click',function(){
+		$(".zam-jointypeBox .zam-jointype").removeClass("has-selected");
+		$(this).addClass("has-selected");
+		var accountType = $(this).attr("data-hdmode"),maxperson = $(this).attr("data-maxperson");
+		$(".zam-jointypeBox input").val(accountType);
+		//改变最大人数
+		setTimeout(function(){
+		    $(".numberincdec").trigger("touchspin.updatesettings", {max: maxperson > 0 ? maxperson :'null'});
+		},1e2);
+		//移除人数验证 重新赋予验证规则
+		$('#formBox').bootstrapValidator('removeField', 'maxperson');
+		var valis = {
+            notEmpty: {
+				message: '请设置活动人数'
+			},
+			greaterThan: {
+				value:{$pubconfig['minperson']},
+				inclusive:true,
+				message:"活动人数必须大于等于{$pubconfig['minperson']}"
+			},
+			integer:{
+				message:"活动人数必须为整数"
+			},
+        };
+        if(maxperson > 0){
+        	valis.lessThan = {
+				value:maxperson,
+				inclusive: true,
+				message:`活动人数最多等于${maxperson}`
+			};
+        }
+		$('#formBox').bootstrapValidator('addField', 'maxperson', {
+            validators:valis 
+        });
+		//免费活动需要验证活动开始时间
+		if(accountType=='2'){
+			$(".timestartbox").removeClass('hidden');
+			$('#formBox').bootstrapValidator('addField', 'starttime', {
+	            validators:{
+	            	notEmpty: {
+						message: '请设置活动开始时间'
+					},
+	            }, 
+	        });
+		}else{	
+			$(".timestartbox").addClass('hidden');
+			$('#formBox').bootstrapValidator('removeField', 'starttime');
+		}
+	});
+	$('input[name="starttime"]').on('apply.daterangepicker', function(ev, picker) {
+		var selday = 1,seldate = picker.startDate.format('YYYY-MM-DD'),stabletime = $(".timerangebox");
+		$(this).val(seldate);
+		var endtime = new Date(picker.startDate.format('YYYY-MM-DD HH:mm:ss')).getTime();
+		endtime = timeTostring(endtime + parseInt(selday)*24*3600000 - 1);
+		stabletime.find('span').eq(1).text(seldate+" 00:00:00");
+		stabletime.find('span').eq(2).text(endtime);
+		stabletime.removeClass('hidden');
+		setTimeout(function(){
+			$('#formBox').data('formValidation').revalidateField('starttime');
+		},1e2);
+	});
+	//初始化城市选择器
+	$(".pick-activityarea").pickArea({
+		"width":"400px",
+		"hoverColor":"#48b0f7",
+		"maxWidth":"100",
+		"getVal":function(){
+			var pickcityDom = $("."+$(".pick-area-dom").val());
+			pickcityDom.next().val($(".pick-area-hidden").val());
+			$('#formBox').data('formValidation').revalidateField('hdarea');
+		},
+		"pickcity":function(){
+			zamnotice.showTips('error','请先选择省');
+		},
+		"pickdist":function(){
+			zamnotice.showTips('error','请先选择省和市');
+		},
+	});
+	$(".zam-wechataccountList .zam-wechataccountItem").on('click',function(e){
+		$(".zam-wechataccountList .zam-wechataccountItem").removeClass("active");
+		$(this).addClass("active");
+		$(".zam-wechataccountList input").val($(this).attr("data-uniacid"));
+	});
+	bindkeyword($(".normal-span"),'1');
+});
+function checkmaxperson(obj){
+	$('#formBox').data('formValidation').revalidateField('maxperson');
+}
+function bindkeyword(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".zam-wechataccountBox").addClass('hidden');
+        $("#formBox").bootstrapValidator('removeField','wechatkeyword');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".zam-wechataccountBox").removeClass('hidden');
+        $('#formBox').data('formValidation').revalidateField('wechatkeyword');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function timeTostring(time){
+  var    now = new Date(time);
+  var    year = now.getFullYear();     
+  var   month = now.getMonth()+1;     
+  var   date = now.getDate();     
+  var   hour = now.getHours();     
+  var   minute = now.getMinutes();     
+  var   second = now.getSeconds(); 
+  return year+'-'+(month<10?'0'+month:month)+"-"+(date<10?'0'+date:date)+" "+(hour<10?'0'+hour:hour)+":"+(minute<10?'0'+minute:minute)+":"+(second<10?'0'+second:second);		
+}
+</script>
+{include file='$Wpath/common/footer'}

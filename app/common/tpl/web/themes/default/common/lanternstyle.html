@@ -1,0 +1,261 @@
+<!-- 风格设置 -->
+<div class="config-titlebox">
+    <span class="config-titlename">风格设置</span>
+    <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#styleconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+</div>
+<div id="styleconfigbox" class="collapse in">
+    <div class="text-center">
+        <div class="btn-group zam-inner-highconfig-btns" style="margin:-5px 0 20px 0;">
+            <a href="javascript:void(0)" class="btn btn-default"><span>大屏风格</span></span></a>
+            <a href="javascript:void(0)" class="btn btn-default"><span>微信风格</span></span></a>
+        </div>
+    </div>
+    <div class="highconfig-item hidden">
+        <div class="form-group">
+			<label class="col-lg-2 control-label text-right">* 孔明灯分布</label>
+			<div class="col-lg-8">
+              <label class="lyear-radio radio-inline radio-primary">
+               <input type="radio" name="pcstyle[miji]" value="1" {if $config['pcstyle']['miji']=='1'}checked{/if}><span>稀疏</span>
+              </label>
+              <label class="lyear-radio radio-inline radio-primary">
+               <input type="radio" name="pcstyle[miji]" value="2" {if $config['pcstyle']['miji']=='2'}checked{/if}><span>密集</span>
+              </label>
+            </div>
+		</div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label text-right">* 准许孔明灯之间重叠</label>
+            <div class="col-lg-5">
+                {:tpl_switch('pcstyle[confusion]',$config['pcstyle']['confusion']??'2')}
+            </div>
+        </div>
+        <div class="form-group">
+			<label class="col-lg-2 control-label text-right">* 运动速度</label>
+			<div class="col-lg-8">
+              <label class="lyear-radio radio-inline radio-primary">
+               <input type="radio" name="pcstyle[speed]" value="1" {if $config['pcstyle']['speed']=='1'}checked{/if}><span>慢</span>
+              </label>
+              <label class="lyear-radio radio-inline radio-primary">
+               <input type="radio" name="pcstyle[speed]" value="2" {if $config['pcstyle']['speed']=='2'}checked{/if}><span>一般</span>
+              </label>
+              <label class="lyear-radio radio-inline radio-primary">
+               <input type="radio" name="pcstyle[speed]" value="3" {if $config['pcstyle']['speed']=='3'}checked{/if}><span>快</span>
+              </label>
+            </div>
+		</div>
+        <div class="form-group">
+			<label class="col-lg-2 control-label text-right">* 孔明灯循环播放</label>
+			<div class="col-lg-5">
+				{:tpl_switch('pcstyle[loop]',$config['pcstyle']['loop']??'1')}
+			</div>
+		</div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label text-right">* 加载历史孔明灯数据</label>
+            <div class="col-lg-5">
+                {:tpl_switch('pcstyle[loadhis]',$config['pcstyle']['loadhis'],'nohistory')}
+            </div>
+        </div>
+        <div class="form-group loadhistory{if $config['pcstyle']['loadhis']=='2'} hidden{/if}">
+            <label class="col-lg-2 control-label text-right">* 加载条数</label>
+            <div class="col-lg-2">
+                <input type="text" class="form-control numberincdec" name="pcstyle[hiscount]" value="{$config['pcstyle']['hiscount']}"
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="null"
+                data-bts-step="1"
+                data-bts-postfix="条"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                >
+                <span class="zam-help-block">注:必须是个大于等于0的整数，0为加载所有</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 灯笼类型</label>
+            <div class="col-lg-9">
+                <table class="table table-bordered" style="margin-bottom: 0;">
+                    <thead>
+                        <tr>
+                            <th style="width:60%;text-align:center;">图片</th>
+                            <th style="width:40%;text-align:center;">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody class="lantern-lists">
+                        {foreach $config['pcstyle']['lanterns'] as $d}
+                        <tr>
+                            <td>
+                                {:tpl_image_one('pcstyle[lanterns]',$d)}
+                                <div class="mt10">注：标准尺寸150 * 190px，推荐使用png图片</div>
+                            </td>
+                            <td class="text-center">
+                                <a class="btn btn-xs btn-primary zam-sortable sortmove" data-tooltip="laytip" title="拖动排序" href="javascript:void(0)"> <i class="mdi mdi-arrow-all"></i> </a>
+                                <a class="btn btn-danger btn-xs btn-del"><i class="mdi mdi-close"></i></a>
+                            </td>
+                        </tr>
+                        {/foreach}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="2">
+                                <a class="btn btn-primary btn-xs addlantern" href="javascript:;"> <i class="mdi mdi-plus"></i>新增灯笼</a>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label text-right">* 灯笼上用户名样式</label>
+            <div class="col-lg-8">
+                <div class="input-group">
+                    <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
+                    <div class="touchspin">
+                    <input type="text" class="form-control numberincdec" name="pcstyle[namesize]" 
+                    data-bts-min="12" data-bts-replacement-val="12"
+                    data-bts-max="80"
+                    data-bts-step="1"
+                    data-bts-postfix="px"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                    value="{$config['pcstyle']['namesize']??16}">
+                    </div>
+                    <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+                    {:tpl_color('pcstyle[namecolor]',$config['pcstyle']['namecolor']??'#ffff99')}
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 灯笼横轴图</label>
+            <div class="col-lg-8">
+                {:tpl_image_one('pcstyle[top]',$config['pcstyle']['top'])}
+                <span class="help-block">规格:140*8px</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 灯笼中间文字背景图</label>
+            <div class="col-lg-8">
+                {:tpl_image_one('pcstyle[center]',$config['pcstyle']['center'])}
+                <span class="help-block">规格:144*53px</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label text-right">* 灯笼中间文字样式</label>
+            <div class="col-lg-8">
+                <div class="input-group">
+                    <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
+                    <div class="touchspin">
+                    <input type="text" class="form-control numberincdec" name="pcstyle[msgsize]" 
+                    data-bts-min="12" data-bts-replacement-val="12"
+                    data-bts-max="80"
+                    data-bts-step="1"
+                    data-bts-postfix="px"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                    value="{$config['pcstyle']['msgsize']??24}">
+                    </div>
+                    <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+                    {:tpl_color('pcstyle[msgcolor]',$config['pcstyle']['msgcolor']??'#ffff99')}
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 灯笼底部丝带图</label>
+            <div class="col-lg-8">
+                {:tpl_image_one('pcstyle[bottom]',$config['pcstyle']['bottom'])}
+                <span class="help-block">规格:144*156px</span>
+            </div>
+        </div>
+    </div>
+    <div class="highconfig-item hidden">
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 放飞孔明灯按钮</label>
+            <div class="col-lg-8">
+                {:tpl_image_one('appstyle[openbtn]',$config['appstyle']['openbtn'])}
+                <span class="help-block">规格:398*161px</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 切换上一个按钮</label>
+            <div class="col-lg-8">
+                {:tpl_image_one('appstyle[prev]',$config['appstyle']['prev'])}
+                <span class="help-block">规格:95*151px</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 切换下一个按钮</label>
+            <div class="col-lg-8">
+                {:tpl_image_one('appstyle[next]',$config['appstyle']['next'])}
+                <span class="help-block">规格:95*151px</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 弹窗顶部图</label>
+            <div class="col-lg-8">
+                {:tpl_image_one('appstyle[poptop]',$config['appstyle']['poptop'])}
+                <span class="help-block">规格:492*230px</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 弹窗中间图</label>
+            <div class="col-lg-8">
+                {:tpl_image_one('appstyle[popcenter]',$config['appstyle']['popcenter'])}
+                <span class="help-block">规格:492*22px</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 弹窗底部图</label>
+            <div class="col-lg-8">
+                {:tpl_image_one('appstyle[popbottom]',$config['appstyle']['popbottom'])}
+                <span class="help-block">规格:492*49px</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 弹窗底部确定按钮</label>
+            <div class="col-lg-8">
+                {:tpl_image_one('appstyle[popbtn]',$config['appstyle']['popbtn'])}
+                <span class="help-block">规格:245*77px</span>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    require(['webcore'],function(webcore){
+        $(".addlantern").click(function () {
+            var whtml = $(webcore.tpl($("#addlantern"), {})).clone();
+            $(".lantern-lists").append(whtml);
+        });
+        $('.lantern-lists').on('click','.btn-del',function(){
+            $(this).parent().parent().remove();
+        })
+        $("#styleconfigbox .zam-inner-highconfig-btns a.btn").click(function(){
+            localStorage.setItem("styleconfigbox-lantern",$(this).index());
+            $(this).addClass('btn-primary').siblings().removeClass("btn-primary");
+            $("#styleconfigbox .highconfig-item").addClass('hidden').eq($(this).index()).removeClass('hidden');
+        });
+        var storageindex = localStorage.getItem("styleconfigbox-lantern");
+        if (storageindex != null && storageindex != 'null') {
+            $("#styleconfigbox .zam-inner-highconfig-btns a.btn").eq(storageindex).trigger('click');
+        }else{
+            $("#styleconfigbox .zam-inner-highconfig-btns a.btn").eq(0).trigger('click');
+        }
+    });
+    function nohistory(obj,status,url){
+        if(status=='1'){
+            obj.prev().val('2');
+            obj.attr('data-status','2');
+            $(".loadhistory").addClass('hidden');
+        }else{
+            obj.prev().val('1');
+            obj.attr('data-status','1');
+            $(".loadhistory").removeClass('hidden');
+        }
+        obj.prev().prev().prop("checked",status=='1'?false:true);
+    }
+</script>
+<script id='addlantern' type="text/template">
+    <tr>
+        <td>
+            {:tpl_image_one('pcstyle[lanterns]','')}
+            <div class="mt10">注：标准尺寸150 * 190px，推荐使用png图片</div>
+        </td>
+        <td class="text-center">
+            <a class="btn btn-xs btn-primary zam-sortable sortmove" data-tooltip="laytip" title="拖动排序" href="javascript:void(0)"> <i class="mdi mdi-arrow-all"></i> </a>
+            <a class="btn btn-danger btn-xs btn-del"><i class="mdi mdi-close"></i></a>
+        </td>
+    </tr>
+</script>

@@ -1,0 +1,207 @@
+{if dzphotowallfromtype()}
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 照片来源</label>
+    <div class="col-lg-8">
+        <label class="lyear-radio radio-inline radio-primary">
+            <input type="radio" name="fromtype" {if !isset($config["fromtype"]) || $config["fromtype"]=="1"}checked{/if} value="1"><span>照片墙</span>
+        </label>
+        <label class="lyear-radio radio-inline radio-primary">
+            <input type="radio" name="fromtype" {if isset($config["fromtype"]) && $config["fromtype"]=="2"}checked{/if} value="2" ><span>签到用户</span>
+        </label>
+        <div class="help-block">注：签到用户默认使用签到头像，如果签到未开启上传签到头像则会使用用户头像</div>
+    </div>
+</div>
+{/if}
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 图层蒙版</label>
+    <div class="col-lg-8">
+        {:tpl_switch('pcstyle[layer]',$config['pcstyle']['layer']??2,'openlayer')}
+        <div class="help-block">注：开启则必须设置蒙版图片以及透明度</div>
+    </div>
+</div>
+<div class="layerbox{if !isset($config['pcstyle']['layer']) || $config['pcstyle']['layer']=='2'} hidden{/if}">
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 蒙版层图片</label>
+        <div class="col-lg-8">
+            {:tpl_image_one('pcstyle[layerimg]',$config['pcstyle']['layerimg']??'')}
+            <span class="help-block">规格:1400*800px</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 蒙版层图片平铺方式</label>
+        <div class="col-lg-8">
+            <label class="lyear-radio radio-inline radio-primary">
+                <input type="radio" name="pcstyle[layersize]" {if !isset($config['pcstyle']["layersize"]) || $config['pcstyle']["layersize"]=="1"}checked{/if} value="1"><span>铺满屏幕，可能部分图片内容被裁剪</span>
+            </label>
+            <label class="lyear-radio radio-inline radio-primary">
+                <input type="radio" name="pcstyle[layersize]" {if isset($config['pcstyle']["layersize"]) && $config['pcstyle']["layersize"]=="2"}checked{/if} value="2" ><span>等比例自动缩放图片，可能会有空白区域</span>
+            </label>
+            <label class="lyear-radio radio-inline radio-primary">
+                <input type="radio" name="pcstyle[layersize]" {if isset($config['pcstyle']["layersize"]) && $config['pcstyle']["layersize"]=="3"}checked{/if} value="3" ><span>强制铺满屏幕，可能图片会变形</span>
+            </label>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label text-right">* 蒙版层透明度</label>
+        <div class="col-lg-8">
+            <div class="touchspin">
+            <input type="text" class="form-control numberincdec" name="pcstyle[layeropacity]" 
+            data-bts-min="0" data-bts-replacement-val="0"
+            data-bts-max="1"
+            data-bts-decimals="2"
+            data-bts-step="0.1"
+            data-bts-postfix=""
+            data-bts-postfix-extra-class="touchspin-postfix"
+            data-bts-force-step-divisibility="xstwo"
+            value="{$config['pcstyle']['layeropacity']??0.5}">
+            </div>
+            <span class="help-block">透明度为0会自动隐藏此蒙版，请根据实际情况设置</span>
+        </div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 照片行数</label>
+    <div class="col-lg-4">
+        <input type="text" class="form-control numberincdec" name="pcstyle[rownum]" value="{$config['pcstyle']['rownum']??5}"
+            data-bts-min="1" data-bts-replacement-val="1"
+            data-bts-max="20"
+            data-bts-step="1"
+            data-bts-postfix="行"
+            data-bts-postfix-extra-class="touchspin-postfix">
+        <div class="help-block">注：至少为1行</div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 每行预留宽度</label>
+    <div class="col-lg-4">
+        <input type="text" class="form-control numberincdec" name="pcstyle[rowoffset]" value="{$config['pcstyle']['rowoffset']??600}"
+            data-bts-min="0" data-bts-replacement-val="0"
+            data-bts-max="5000"
+            data-bts-step="1"
+            data-bts-postfix="px"
+            data-bts-postfix-extra-class="touchspin-postfix">
+        <div class="help-block">注：每行平铺的照片总长大于等于系统屏幕总宽与每行预留宽度之和才会自动滚动，每行预留宽度设置过小可能会出现右侧空白</div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 每行照片闪亮效果</label>
+    <div class="col-lg-8">
+        {:tpl_switch('pcstyle[rowani]',$config['pcstyle']['rowani']??1)}
+        <div class="help-block">注：开启会每行照片会随机触发闪亮效果</div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 每行照片运动时间</label>
+    <div class="col-lg-4">
+        <input type="text" class="form-control numberincdec" name="pcstyle[rowspeed]" value="{$config['pcstyle']['rowspeed']??20}"
+            data-bts-min="1" data-bts-replacement-val="1"
+            data-bts-max="100"
+            data-bts-step="1"
+            data-bts-postfix="秒"
+            data-bts-postfix-extra-class="touchspin-postfix">
+        <div class="help-block">注：设置的越大每行照片运动的越慢</div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 弹窗展示照片</label>
+    <div class="col-lg-8">
+        {:tpl_switch('pcstyle[screenpop][open]',$config['pcstyle']['screenpop']['open']??1,'openscreenpop')}
+        <div class="help-block">注：开启会点击单张图片弹窗后展示用户留言内容</div>
+    </div>
+</div>
+<div class="screenpopbox{if $config['pcstyle']['screenpop']['open']=='2'} hidden{/if}">
+    <div class="form-group photowallpoptypebox{if !dzphotowallpoptype()} hidden{/if}">
+        <label class="col-lg-2 control-label">* 照片弹窗顺序</label>
+        <div class="col-lg-8">
+            <label class="lyear-radio radio-inline radio-primary">
+                <input type="radio" name="pcstyle[screenpop][type]" {if !isset($config['pcstyle']['screenpop']["type"]) || $config['pcstyle']['screenpop']["type"]=="1"}checked{/if} value="1"><span>随机播放</span>
+            </label>
+            <label class="lyear-radio radio-inline radio-primary">
+                <input type="radio" name="pcstyle[screenpop][type]" {if isset($config['pcstyle']['screenpop']["type"]) && $config['pcstyle']['screenpop']["type"]=="2"}checked{/if} value="2" ><span>正常顺序</span>
+            </label>
+            <div class="help-block">注：正常顺序会按照图片加载完成顺序循环播放</div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 照片弹窗展示时间</label>
+        <div class="col-lg-4">
+            <input type="text" class="form-control numberincdec" name="pcstyle[screenpop][seconds]" value="{$config['pcstyle']['screenpop']['seconds']??5}"
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="1000"
+                data-bts-step="1"
+                data-bts-postfix="秒"
+                data-bts-postfix-extra-class="touchspin-postfix">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 历史照片弹窗展示</label>
+        <div class="col-lg-8">
+            {:tpl_switch('pcstyle[screenpop][oldpop]',$config['pcstyle']['screenpop']['oldpop']??1)}
+            <div class="help-block">注：开启后没有新照片数据会随机弹窗历史照片</div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 弹窗展示留言</label>
+        <div class="col-lg-8">
+            {:tpl_switch('pcstyle[screenpop][opentxt]',$config['pcstyle']['screenpop']['opentxt']??1,'openscreenpoptxt')}
+            <div class="help-block">注：开启会点击单张图片弹窗后展示用户留言内容</div>
+        </div>
+    </div>
+    <div class="form-group screenpoptxtbox{if $config['pcstyle']['screenpop']['opentxt']=='2'} hidden{/if}">
+        <label class="col-lg-2 control-label text-right">* 留言样式</label>
+        <div class="col-lg-8">
+            <div class="input-group">
+                <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
+                <div class="touchspin">
+                <input type="text" class="form-control numberincdec" name="pcstyle[screenpop][size]" 
+                data-bts-min="12" data-bts-replacement-val="12"
+                data-bts-max="80"
+                data-bts-step="1"
+                data-bts-postfix="px"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['pcstyle']['screenpop']['size']}">
+                </div>
+                <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+                {:tpl_color('pcstyle[screenpop][color]',$config['pcstyle']['screenpop']['color'])}
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+function openscreenpop(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".screenpopbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".screenpopbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openscreenpoptxt(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".screenpoptxtbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".screenpoptxtbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openlayer(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".layerbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".layerbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+</script>

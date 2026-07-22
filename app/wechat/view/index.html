@@ -1,0 +1,267 @@
+{include file="common/header" /}
+{if $hdinfo['id']!='boshengh5'}
+<style>
+.zam-app-index{height:100%;}
+.app-index{height:auto;padding:0 0.2rem;}
+.userInfoBox{
+	width:100%;
+	color:#fff;
+}
+.userInfoBox .userInfoBox-title{display:inline-block;width:100%;height:0.8rem;line-height:0.8rem;text-align:center;overflow:hidden;font-size:0.5rem}
+.userInfoBox .userInfoBox-user{
+	width:100%;
+}
+.userInfoBox .userInfoBox-user .useravatar{
+	border-radius:50%;
+}
+.userInfoBox .userInfoBox-user .useravatar img{
+	width: 100%;
+	height: 100%;
+	border-radius: 50%;
+	border:4px solid transparent;
+}
+.userInfoBox .userInfoBox-user .username{
+	width:100%;height:0.6rem;line-height:0.6rem;text-align:center;overflow:hidden;font-size:0.3rem;
+}
+.appindexdiybuttons a{
+	display:block;
+	width: 80%;
+	margin: 0 auto;
+	height:0.8rem;
+	line-height:0.8rem;
+	padding:0 0.4rem;
+	font-size:0.34rem;
+}
+</style>
+<section class="zam-app-index g-flexview">
+<section class="app-index">
+	<div class="userInfoBox zam-app-flex-ajCenter">
+	{volist name="appconfig.showitems" id="showitem"}
+	{if $showitem['showzd']=='avatar' || $showitem['showzd']=='uploadimg'}
+		{if !empty($showitem['showcontent'])}
+		<div class="userInfoBox-user zam-app-flex-ajCenter" style="margin-top:{$showitem['showtop']}px;margin-left:{$showitem['showleft']??'0'}px;">
+			{if $showitem['showzd']=='uploadimg' && $appconfig['signcroppertype']=='2'}
+				<div class="useravatar" style="width:{$showitem['showsize']}px;height:calc({$showitem['showsize']}px * (53 / 35));">
+					<img src="{$showitem['showcontent']}" style="border-radius: 2px;border-color:{$showitem['showcolor']}" />
+				</div>
+			{else /}
+				<div class="useravatar" style="width:{$showitem['showsize']}px;height:{$showitem['showsize']}px">
+					<img src="{$showitem['showcontent']}" style="border-color:{$showitem['showcolor']}" />
+				</div>
+			{/if}
+		</div>
+		{/if}
+	{elseif $showitem['showzd']=='nickname' || $showitem['showzd']=='signtime' || $showitem['showzd']=='jointime' || $showitem['showzd']=='diytxt'}
+		<p class="username" style="margin-top:{$showitem['showtop']}px;margin-left:{$showitem['showleft']??'0'}px;color:{$showitem['showcolor']};font-size:{$showitem['showsize']}px">{$showitem['showcontent']}</p>
+	{elseif $showitem['showzd']=='signrank' || $showitem['showzd']=='joinrank'}
+		<p class="username" style="margin-top:{$showitem['showtop']}px;margin-left:{$showitem['showleft']??'0'}px;color:{$showitem['showcolor']};font-size:{$showitem['showsize']}px">{if $showitem['showcontent']!='暂未签到'}您是第 {$showitem['showcontent']} 位{if $showitem['showzd']=='signrank'}签到嘉宾{else /}进入活动嘉宾{/if}{else /}{$showitem['showcontent']}{/if}</p>
+	{else}
+		{if isset($showitem['bdcontent'])}
+		<p class="username" style="margin-top:{$showitem['showtop']}px;margin-left:{$showitem['showleft']??'0'}px;color:{$showitem['showcolor']};font-size:{$showitem['showsize']}px"><span class='bditem-fieldname' {if isset($appconfig['appshowbditemfield']) && $appconfig['appshowbditemfield']=='2'}style="display:none"{/if}>{$showitem['showcontent']}</span>{$showitem['bdcontent']}</p>
+		{/if}
+	{/if}
+	{/volist}
+	</div>
+	<!--diy buttons-->
+	<div class="appindexdiybuttons">
+	{volist name="appconfig.buttons" id="btnval"}
+	<a href="javascript:;" data-href="{if isset($btnval['burl'])}{$btnval['burl']}{else /}{$btnval['url']}{/if}" class="btn btn-primary" style="margin-top:{if isset($btnval['bmartop'])}{$btnval['bmartop']}{else /}18{/if}px;background-color:{if isset($btnval['bcolor'])}{$btnval['bcolor']}{else /}{$btnval['color']}{/if}">{if isset($btnval['bname'])}{$btnval['bname']}{else /}{$btnval['name']}{/if}</a>
+	{/volist}
+	</div>
+	<!--diy end-->
+	{if $appconfig['openmoduletype']=='1'}
+	<div class="moduleInfoBox" style="margin-top:20px;overflow-y:hidden">
+	<div class="moduleInfoBox-main">
+		<div class="moduleInfoBox-title"><span>点击下方图标即可参与互动</span></div>
+		<div class="swiper-container modules-swiper">
+			<div class="swiper-wrapper">
+				{php}$mkey = 0;$mcount = count($menus);{/php}
+				{volist name="menus" id="menu"}
+					{if $menu['openstatus']=='1'}
+					{if $mkey%8 == 0}
+						<ul class="swiper-slide">
+						<li>
+						  <a href="javascript:;" class="zam-app-flex-ajCenter" data-module="{$menu['modulefield']}" data-href="{if $menu['ishandadd']=='2'}{:gowechat($menu['modulefield'].'/index',['hdid'=>$hdinfo['hdid']])}{else}{$menu['moduleurl']}{/if}">
+							<div class="iconbox zam-app-flex-ajCenter2" {if isset($menu['modulebgcolor']) && !empty($menu['modulebgcolor'])}style="background-color:{$menu['modulebgcolor']}"{/if}>
+								<img src="{:tomedia($menu['moduleimg'])}">
+							</div>
+							<span>{$menu['modulename']}</span>
+						  </a>
+						</li>
+						{if ($mkey+1) == $mcount }</ul>{/if}
+					{else /}
+						<li>
+						  <a href="javascript:;" class="zam-app-flex-ajCenter" data-module="{$menu['modulefield']}" data-href="{if $menu['ishandadd']=='2'}{:gowechat($menu['modulefield'].'/index',['hdid'=>$hdinfo['hdid']])}{else}{$menu['moduleurl']}{/if}">
+							<div class="iconbox zam-app-flex-ajCenter2" {if isset($menu['modulebgcolor']) && !empty($menu['modulebgcolor'])}style="background-color:{$menu['modulebgcolor']}"{/if}>
+								<img src="{:tomedia($menu['moduleimg'])}">
+							</div>
+							<span>{$menu['modulename']}</span>
+						  </a>
+						</li>
+						{if ($mkey+1)%8 == 0 || ($mkey+1) == $mcount }</ul>{/if}
+					{/if}
+					{php}$mkey++;{/php}
+					{/if}
+				{/volist}
+			</div>
+			<div class="swiper-pagination" style="bottom:-2px"></div>
+		</div>
+	</div>
+	</div>
+	{/if}
+</section>
+</section>
+<script>
+require(['wechatcore','swiper'],function (wechatcore,Swiper) {
+	if($(".zam-app-index").outerHeight(true) >= $(window).height()){
+		$('.app-index').css({"height":"auto",'padding-bottom':'0.3rem','overflow-y':'scroll'});
+	}
+	var openmoduletype = "{$appconfig['openmoduletype']??'2'}";
+	if(openmoduletype == '1'){
+		new Swiper('.modules-swiper',{
+			watchOverflow: true,
+			pagination: {
+				el: '.swiper-pagination',
+			}
+		});
+	}
+	wechatcore.gameInit(function(){
+		if($("#appbgmusic").length){
+			wechatcore.playAudio($("#appbgmusic")[0]);
+		}
+	});
+});
+</script>
+{if $appconfig['openmoduletype']=='2'}
+{include file="common/footermenu" /}
+{/if}
+{else /}
+<style type="text/css">
+.zam-app-bodyBg{display: none;}
+.bgbox{
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+.bgbox .bg{
+	position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image: url(/static/bosheng2/beijing.jpg);
+    background-repeat:no-repeat;
+    background-size: cover;
+}
+.bgbox .logo{
+	position: absolute;
+	top: 0.62rem;
+	left: 0.62rem;
+	width: 2.49rem;
+	height: 0.86rem;
+	background-image: url(/static/bosheng2/logo.png);
+	background-repeat:no-repeat;
+    background-size: cover;
+}
+.pagebox{
+	position: fixed;
+	top: 2rem;
+	left:0;
+	height: calc(100% - 2rem);
+	overflow: hidden;
+	overflow-y: auto;
+}
+.pageindex{
+	width: 100%;
+	padding: 0 0.2rem;
+	padding-bottom: 2rem;
+}
+.pageindex img{
+	width: 100%;
+}
+.pageiframe{
+	width: 100%;
+	height: 100%;
+	padding: 0 0.1rem;
+}
+.pagemenu{
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+}
+.pagemenu ul{
+	width: 100%;
+	background-color: #fff;
+	height: 1.1rem;
+}
+.pagemenu ul .liitem{
+	width: 2rem;
+}
+.pagemenu ul .liitem div{
+	width:0.68rem;
+	height: 0.733rem;
+	background-repeat: no-repeat;
+	background-size: 100% 100%;
+}
+.pagemenu .shouye div{
+	background-image: url(/static/bosheng2/cate/richeng.png);
+}
+.pagemenu .xiangce div{
+	background-image: url(/static/bosheng2/cate/xiangce.png);
+}
+.pagemenu .wenjuan div{
+	background-image: url(/static/bosheng2/cate/wenjuan.png);
+}
+.pagemenu ul .line{
+	width: 0.1rem;
+}
+.pagemenu ul .line div{
+	width:0.075rem;
+	height: 0.6rem;
+	background-image: url(/static/bosheng2/cate/xian.png);
+	background-repeat: no-repeat;
+	background-size: 100% 100%;
+}
+</style>
+<section class="g-scrollview h5page" style="overflow: hidden;">
+<div class="bgbox">
+	<div class="bg"></div>
+	<div class="logo"></div>
+</div>
+<section class="pagebox">
+	<div class="pageindex">
+		<img src="/static/bosheng2/huiyiricheng.png" />
+	</div>
+	<div class="pageiframe hidden">
+		<iframe id="myframe" name="myframe" sandbox="allow-forms allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts allow-modals allow-top-navigation" src="" scrolling="yes" frameborder="0" width="100%" height="100%"></iframe>
+	</div>
+</section>
+<div class="pagemenu zam-app-flex-ajCenter2">
+	<ul class="zam-app-flex-ajCenter2">
+		<li class="shouye liitem zam-app-flex-ajCenter2" data-type='1'><div></div></li>
+		<li class="line"><div></div></li>
+		<li class="xiangce liitem zam-app-flex-ajCenter2" data-type='2' data-href="https://as.alltuu.com/album/1227715035/?from=qrCode&menu=live"><div></div></li>
+		<li class="line"><div></div></li>
+		<li class="wenjuan liitem zam-app-flex-ajCenter2" data-type='2' data-href="https://www.wjx.cn/vm/O1EQYK1.aspx"><div></div></li>
+	</ul>
+</div>
+</section>
+<script type="text/javascript">
+require(['wechatcore'],function(wechatcore){
+	$(".pageiframe").css('width',$(window).width());
+	$('.pagemenu .liitem').click(function(){
+		var $this = $(this),litype = $this.attr('data-type');
+		if(litype == '1'){
+			$(".pageiframe").addClass('hidden');
+			$(".pageindex").removeClass('hidden');
+		}else{
+			$(".pageindex").addClass('hidden');
+			$(".pageiframe iframe").attr('src',$this.attr('data-href'));
+			$(".pageiframe").removeClass('hidden');
+		}
+	});
+});
+</script>
+{/if}
+{include file="common/footer" /}

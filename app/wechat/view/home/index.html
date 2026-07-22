@@ -1,0 +1,100 @@
+{include file="common/header" /}
+<style>
+.myhome .headerInfo{position:relative;padding:0.62rem 0;background-color:#00aeff;color:#fff}
+.myhome .headerInfo img.avatar{width:1.4rem;height:1.4rem;border-radius:50%;border: 3px solid rgb(255, 157, 0);}
+.myhome .headerInfo .nickname{height:0.8rem;line-height:0.8rem;font-size:0.35rem;max-width: 80%}
+.myhome .headerInfo .mymoney{height:0.6rem;line-height:0.6rem;font-size:0.3rem;}
+.myhome .headerInfo .btn-editinfo{height:0.5rem;line-height:0.5rem;border-radius:0.25rem}
+.myhome .headerInfo .btn-editinfo i{margin-right:3px}
+.myhome .headerInfo .btn-getwechatinfo{position:absolute;right:0.2rem;top:0.2rem;height:0.5rem;line-height:0.5rem;border-radius:0.25rem}
+.myhome .headerInfo .btn-getwechatinfo i{margin-right:3px}
+.btn-getwechatinfo:after{border:0}
+.myhome-menus{
+	margin:0.2rem 0;
+}
+.payjoinexpiredtime{
+	margin-top: 0.32rem;
+	height: 0.4rem;
+	line-height: 0.4rem;
+}
+.payjoinexpiredtime .expiredtime{
+	color: red;
+	margin-left: 0.12rem;
+}
+</style>
+<section class="g-flexview myhome">
+	 <div class="headerInfo zam-app-flex-ajCenter">
+		  <img src="{:tomedia($myuser['avatar'])}" class="avatar">
+		  <p class="nickname limitbox">{$myuser['nickname']}</p>
+		  {if $editprofile == '1'}
+		  <a href="javascript:;" data-href="{:gowechat('home/editprofile',['hdid'=>$hdinfo['hdid']])}" class="btn btn-warning btn-editinfo"><i class="mxc-post"></i>编辑资料</a>
+		  {/if} 
+		  {if $myuser['fromtype'] > 0}
+		  	<a href="{:gowechat('home/index',['hdid'=>$hdinfo['hdid'],'isrefresh'=>'1'])}" class="btn btn-hollow btn-getwechatinfo"><i class="mxc-refresh"></i>同步{$myuser['fromplatname']}信息</a>
+		  {/if}
+		  {if $payjoininfo['expiredtime'] != 0}
+		  <div class="payjoinexpiredtime"><span>{$payjoininfo['expiredtitle']}:</span><span class="expiredtime">{$payjoininfo['expiredtime']}</span></div>
+		  {/if}
+	 </div>
+	 <div class="myhome-menus">
+		<div class="m-cell">
+			<a class="cell-item" href="{:gowechat('home/tx',['hdid'=>$hdinfo['hdid']])}">
+				<div class="cell-left"><i class="cell-icon mxc-moneybag"></i>我的余额</div>
+				<div class="cell-right cell-arrow">{$mymoney}元</div>
+			</a>
+			<a class="cell-item" href="javascript:;"  data-href="{:gowechat('home/myrecord',['hdid'=>$hdinfo['hdid']])}">
+				<div class="cell-left"><i class="cell-icon mxc-upstage"></i>中奖记录</div>
+				<div class="cell-right cell-arrow"></div>
+			</a>
+			<a class="cell-item" href="javascript:;" data-href="{:gowechat('home/myresumer',['hdid'=>$hdinfo['hdid']])}">
+				<div class="cell-left"><i class="cell-icon mxc-form"></i>消费记录</div>
+				<div class="cell-right cell-arrow"></div>
+			</a>
+			<a class="cell-item" href="javascript:;" data-href="{:gowechat('home/myhd',['hdid'=>$hdinfo['hdid']])}">
+				<div class="cell-left"><i class="cell-icon mxc-attention"></i>活动记录</div>
+				<div class="cell-right cell-arrow"></div>
+			</a>
+			<a class="cell-item" href="javascript:;" data-href="{:gowechat('',['hdid'=>$hdinfo['hdid']])}">
+				<div class="cell-left"><i class="cell-icon mxc-pullleft"></i>返回首页</div>
+				<div class="cell-right cell-arrow"></div>
+			</a>
+			{if $myuser['loginout'] == '1'}
+			<a class="cell-item loginout" href="javascript:;">
+				<div class="cell-left"><i class="cell-icon mxc-round_transfer"></i>退出登录</div>
+				<div class="cell-right cell-arrow"></div>
+			</a>
+			{/if}
+		</div>
+	 </div>
+</section>
+<script type="text/javascript">
+	require(['wechatcore'],function(wechatcore){
+		if(XCV3Config.isiframe){
+			$(".btn-getwechatinfo").addClass('hidden');
+		}
+		$('.loginout').click(function(){
+			var tipytxt = '';
+			if(XCV3Config.clienttype == '-1'){
+				tipytxt += '当前为游客登录模式，退出后将无法找回本次登录用户信息并且进入活动需要重新输入登录信息，';
+			}
+			tipytxt += '您确定要退出登录么?';
+			wechatcore.ask(XCV3Config.clienttype=='-1'?'警告':'温馨提醒',tipytxt,['确定','取消'],function(index){
+				wechatcore.close(index);
+				wechatcore.ajaxSubmit("{:gowechat('home/loginout')}",{},'正在执行退出登录操作...').then(function(data){
+					if(data.code==0){
+						wechatcore.msg('退出成功');
+						setTimeout(function(){
+							window.location.reload();
+						},1e3);
+					}else{
+						wechatcore.msg(data.msg);
+					}
+				}, function(){
+					wechatcore.msg('网络太差，请稍后重试');
+				});
+			});
+			
+		});
+	});
+</script>
+{include file="common/footer" /}

@@ -1,0 +1,463 @@
+{include file='common/header' /}
+<style>
+::-webkit-scrollbar {
+    width: 10px;
+}
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-thumb {
+    background-color: rgba(0,0,0,0.5)!important;
+    height: 50px;
+    outline-offset: -2px;
+    -webkit-border-radius: 4px;
+}
+::-webkit-scrollbar-track-piece {
+    -webkit-border-radius: 9px;
+}
+::-webkit-scrollbar-track-piece {
+    background-color: transparent;
+    -webkit-border-radius: 0;
+}
+.webgamedjs{
+	pointer-events: none;
+}
+.answerbs-mainbox{
+	width: 100%;
+    height: 100%;
+    padding: 0;
+    overflow: hidden;
+}
+.answerbs-mainbox .answerbs-lists{
+	position: relative;
+    height: 640px;
+    width: 1260px;
+    margin: 0 auto;
+	color:#fff;
+    z-index: 1;
+}
+.answerbs-onerank{width:300px;background-color: rgba(0,0,0,0.2);border-radius:5px;}
+.answerbs-onerank-title{
+	text-align: center;
+    color: #ff0;
+    font-weight: bold;
+    -webkit-text-stroke: 1px #830202;
+    font-size: 27px;
+    line-height: 60px;
+}
+.answerbs-onerank-lists{
+	height: calc(100% - 60px);
+    overflow-y: auto;
+}
+.answerbs-onerank-lists li{
+	padding:0 6px;
+	margin-bottom:5px;	
+	width: 100%;
+	box-sizing: border-box;
+}
+.answerbs-onerank-lists li .answerbs-onerank-div{background-color: rgba(0,0,0,0.2);}
+.answerbs-onerank-xuhao{width:30px; color: #ff0;font-weight: bold;}
+.answerbs-onerank-head{position:relative;width:65px;height:65px;margin-right:10px;}
+.answerbs-onerank-head img{position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    margin: auto;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+}
+.answerbs-onerank-head .answerbs-onerank-headimg{width:52px;height:52px}
+.answerbs-onerank-info{width:calc( 100% - 105px );}
+.answerbs-onerank-speed{line-height:32px;}
+.answerbs-onerank-name{line-height:33px;}
+.answerbs-quescontent{width:620px;margin:0 20px;background-color: rgba(0,0,0,0.2);border-radius:5px;}
+.answerbs-quescontent .answerbs-questoptitle{
+	text-align: center;
+    font-weight: bold;
+    font-size: 25px;
+    line-height: 56px;
+}
+.answerbs-quescontent .answerbs-questitle{
+	width: 95%;
+    height: 160px;
+    border-radius: 10px;
+    margin: 0 auto;
+    padding: 10px 15px;
+    background-color: rgba(0,0,0,0.1);
+    font-size: 30px;
+    color: #ffff4d;
+    font-weight: bold;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+    line-height: 160%;
+	overflow:hidden;
+	-webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box; 
+}
+.answerbs-quescontent .answerbs-questitle img{
+	max-height: 100px;
+}
+.answerbs-quescontent .answerbs-questionitems{padding:0 30px;}
+.answerbs-quescontent .answerbs-questionitems li{
+	border: 4px solid #fff45c;
+    background: #fca244;
+    border-radius: 40px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+}
+.answerbs-quescontent .answerbs-questionitems.questionitems-hasf li{
+	margin-bottom:2px!important;
+}
+.answerbs-quescontent .answerbs-questionitems li .answerbs-quesitem-precent {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 0;
+    height: 100%;
+    border-radius: 40px;
+    background-color:rgb(255,255,255,0.3);
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    transition: all .5s;
+    -webkit-transition: all .5s;
+    -moz-transition: all .5s;
+    -ms-transition: all .5s;
+    -o-transition: all .5s;
+}
+.answerbs-quesitem-xuhao{
+	height:100%;
+	color: #fff;
+    font-size: 30px;
+    font-weight: bold;
+    position: absolute;
+    left: 20px;
+	display:flex;
+	align-items:center;
+}
+.answerbs-quesitem-name {
+    padding: 10px 60px 10px 65px;
+    font-size: 28px;
+    position: relative;
+    z-index: 1;
+    font-weight: bold;
+    word-wrap: break-word;
+    word-break: normal;
+	-webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box; 
+}
+.answerbs-quesitem-right{
+	width: 50px;
+    height: 37px;
+    position: absolute;
+    top:calc((100% - 37px)/2);
+    line-height: 45px;
+    right: 10px;
+    background: url("{:tomedia($pcconfig['style']['rightoptionimg'])}") no-repeat left;
+    background-size: 100% 100%;
+    display: none;
+}
+.answerbs-allrank{width:300px;background-color: rgba(0,0,0,0.2);border-radius:5px;}
+.answerbs-allrank-title{
+	text-align: center;
+    color: #ff0;
+    font-weight: bold;
+    -webkit-text-stroke: 1px #830202;
+    font-size: 27px;
+    line-height: 60px;
+}
+
+.answerbs-allrank-lists{
+	height: calc(100% - 60px);
+    overflow-y: auto;
+}
+.answerbs-allrank-lists li{
+	padding:0 6px;
+	margin-bottom:5px;
+	width: 100%;
+	box-sizing: border-box;
+}
+.answerbs-allrank-lists li .answerbs-allrank-div{background-color: rgba(0,0,0,0.2);}
+.answerbs-allrank-xuhao{width:30px; color: #ff0;font-weight: bold;}
+.answerbs-allrank-head{position:relative;width:65px;height:65px;margin-right:10px;}
+.answerbs-allrank-head img{
+	position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    margin: auto;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+}
+.answerbs-allrank-head .answerbs-onerank-headimg{width:52px;height:52px}
+.answerbs-allrank-info{width:calc( 100% - 105px );}
+.answerbs-allrank-speed{line-height:32px;}
+.answerbs-allrank-name{line-height:33px;}
+.next-question-box {
+    position: absolute;
+    width: 60%;
+	left: 20%;;
+    bottom: -80px;
+    height: 80px;
+	color: #fff;
+    font-size: 26px;
+	font-weight: 700;
+}
+.next-question-box div{
+	width:200px;
+	height:68px;
+    text-align: center;
+    line-height:68px;
+    cursor: pointer;
+    opacity: .8;
+	background-image:url("{:tomedia($pcconfig['style']['nextquestion'])}");
+	background-size:cover;
+}
+.pubanswer-question-btn{
+	margin-right: 100px;
+}
+.nextquestionbox{position: fixed;top:0;left: 0;margin:0 auto;text-align: center;width: 100%;height: 90px;line-height: 90px;font-size: 30px;color: #fff;display: none}
+/*答题成绩文字过多，显示字体应小一些*/
+.banglist .banglist-item .banglist-score span{font-size:20px!important;}
+
+.grouppmbox{
+	position: absolute;
+	top: 0;
+	left:0;
+	width: 100%;
+	height: 100%;
+	z-index: 10;
+	{if $pcconfig['bgtype']=='1'}
+	background-image:url("{if !empty($pcconfig['bgimg'])}{:tomedia($pcconfig['bgimg'])}{else}__STATIC__/images/screen/common/bg.jpg{/if}");
+	{else /}
+	background-color: #fff;
+	{/if}
+}
+.phbtitle{
+	color:#b82997;
+	font-size: 30px;
+	line-height: 60px;
+	font-weight: bold;
+	margin-bottom: 20px;
+}
+table {
+    font-family: verdana,arial,sans-serif;
+    color:#333333;
+    border: 2px solid #a9c6c9;
+    border-collapse: collapse;
+    width: 80%;
+    table-layout: fixed;
+}
+table thead tr, table tbody tr {
+	box-sizing: border-box;
+	table-layout: fixed;
+	display: table;
+	width: 100%;
+}
+table tbody{
+	display: block;
+	width: 100%;
+	max-height: 510px;
+	overflow-y: auto;
+	-webkit-overflow-scrolling: touch;
+}
+table tbody tr:nth-child(odd){
+    background-color:#cccdd2;
+}
+table tbody tr:nth-child(even){
+    background-color:#e7e8ea;
+}
+table thead th {
+	height: 30px;
+    padding: 4px;
+    border: 2px solid #fff;
+    color: #fff;
+    background-color:#052f61;
+    font-size: 24px;
+}
+table tbody td {
+    padding: 4px;
+    height: 30px;
+    border: 2px solid #fff;
+    font-size: 20px;
+    text-align: center;
+}
+.close-grouppm{
+	position: absolute;
+	top: 40px;
+	right: 40px;
+	font-size: 32px;
+	color: #fff;
+	font-weight: bold;
+	cursor: pointer;
+}
+/* 滚动条宽度 */
+::-webkit-scrollbar {
+	width: 8px;
+	background-color: transparent;
+}
+/* 滚动条颜色 */
+::-webkit-scrollbar-thumb {
+	background-color: #27314d;
+}
+</style>
+<audio id="countaudio" src="/{:WIMGURL}shake/count.mp3"  preload="preload"  style="display:none"></audio>
+<audio id="overaudio" src="/{:SIMGURL}shake/over.mp3"  preload="preload"  style="display:none"></audio>
+<audio id="joinaudio" src="/{:SIMGURL}shake/join.mp3"  preload="preload" style="display:none"></audio>
+<section class="answerbs-mainbox normal-box zam-app-flex-ajCenter2">
+    <div class="emptybox zam-app-flex-ajCenter display-none">
+		<img src="/{:SIMGURL}common/empty.png">
+		<p style="padding:20px;">暂无可用轮次，请到后台添加</p>
+	</div>
+	<div class="answerbs-lists zam-app-flex display-none">
+		<div class="answerbs-onerank">
+			<div class="answerbs-onerank-title">本题排名</div>
+			<ul class="answerbs-onerank-lists"></ul>
+		</div>
+		<div class="answerbs-quescontent"></div>
+		<div class="answerbs-allrank">
+			<div class="answerbs-allrank-title">本轮排名</div>
+			<ul class="answerbs-allrank-lists"></ul>
+		</div>
+		<div class="next-question-box zam-app-flex-ajCenter2">
+			<div class="pubanswer-question-btn display-none">公布答案</div>
+			<div class="next-question-btn display-none">切换下一题</div>
+			<div class="round-pm-btn display-none">查看排行榜</div>
+		</div>
+		
+	</div>
+	<div class="nextquestionbox">即将进入下一题</div>
+</section>
+{if $hdinfo['id']=='boshenglottery'}
+{include file='answerbs/cubepercent' /}
+{/if}
+<script  type="text/html" id="question-tpl">
+<div class="answerbs-questoptitle">{{ nownum }}/{{ totalnum }}</div>
+<div class="answerbs-questitle zam-app-flex-ajCenter2" style="font-size:{{ if questitle.length <=54 }}30{{ else if questitle.length >54 && questitle.length <=84}}25{{ else }}20{{ /if }}px">{{# questitle }}<span class="yesanswer display-none" style="color: red">正确答案是:{{ yesanswer }}</span></div>
+<ul class="answerbs-questionitems question-{{ id }}{{ if answerf }} questionitems-hasf{{ /if }}" data-yesanswer="{{ yesanswer }}">
+    {{ if answera!='' }}
+		<li class="answer-A">
+		<div class="answerbs-quesitem-precent"></div>
+		<div class="answerbs-quesitem-xuhao">A</div>
+		<div class="answerbs-quesitem-name" style="font-size:{{ if answera.length <=15 }}26{{ else if answera.length >15 && answera.length <31 }}20{{ else }}16{{ /if }}px">{{ answera }}</div>
+		{{ if yesanswer.indexOf("A")!=-1 }}
+			<div class="answerbs-quesitem-right"></div>
+		{{ /if }}
+		</li>
+	{{ /if }}
+	{{ if answerb!='' }}
+		<li class="answer-B">
+		<div class="answerbs-quesitem-precent"></div>
+		<div class="answerbs-quesitem-xuhao">B</div>
+		<div class="answerbs-quesitem-name" style="font-size:{{ if answerb.length <=15 }}26{{ else if answerb.length >15 && answerb.length <31 }}20{{ else }}16{{ /if }}px">{{ answerb }}</div>
+		{{ if yesanswer.indexOf("B")!=-1 }}
+			<div class="answerbs-quesitem-right"></div>
+		{{ /if }}
+		</li>
+	{{ /if }}
+	{{ if answerc!='' }}
+		<li class="answer-C">
+		<div class="answerbs-quesitem-precent"></div>
+		<div class="answerbs-quesitem-xuhao">C</div>
+		<div class="answerbs-quesitem-name" style="font-size:{{ if answerc.length <=15 }}26{{ else if answerc.length >15 && answerc.length <31 }}20{{ else }}16{{ /if }}px">{{ answerc }}</div>
+		{{ if yesanswer.indexOf("C")!=-1 }}
+			<div class="answerbs-quesitem-right"></div>
+		{{ /if }}
+		</li>
+	{{ /if }}
+	{{ if answerd!='' }}
+		<li class="answer-D">
+		<div class="answerbs-quesitem-precent"></div>
+		<div class="answerbs-quesitem-xuhao">D</div>
+		<div class="answerbs-quesitem-name" style="font-size:{{ if answerd.length <=15 }}26{{ else if answerd.length >15 && answerd.length <31 }}20{{ else }}16{{ /if }}px">{{ answerd }}</div>
+		{{ if yesanswer.indexOf("D")!=-1 }}
+			<div class="answerbs-quesitem-right"></div>
+		{{ /if }}
+		</li>
+	{{ /if }}
+	{{ if answere!='' }}
+		<li class="answer-E">
+		<div class="answerbs-quesitem-precent"></div>
+		<div class="answerbs-quesitem-xuhao">E</div>
+		<div class="answerbs-quesitem-name" style="font-size:{{ if answere.length <=15 }}26{{ else if answere.length >15 && answere.length <31 }}20{{ else }}16{{ /if }}px">{{ answere }}</div>
+		{{ if yesanswer.indexOf("E")!=-1 }}
+			<div class="answerbs-quesitem-right"></div>
+		{{ /if }}
+		</li>
+	{{ /if }}
+	{{ if answerf }}
+		<li class="answer-F">
+		<div class="answerbs-quesitem-precent"></div>
+		<div class="answerbs-quesitem-xuhao">F</div>
+		<div class="answerbs-quesitem-name" style="font-size:{{ if answerf.length <=15 }}26{{ else if answerf.length >15 && answerf.length <31 }}20{{ else }}16{{ /if }}px">{{ answerf }}</div>
+		{{ if yesanswer.indexOf("F")!=-1 }}
+			<div class="answerbs-quesitem-right"></div>
+		{{ /if }}
+		</li>
+	{{ /if }}
+</ul>
+</script>
+<script type="text/html" id="questionrank-tpl">
+<li class="answerbs-onerank-item">
+	<div class="answerbs-onerank-div zam-app-flex">
+		<div class="answerbs-onerank-xuhao zam-app-flex-ajCenter2">{{ key }}</div>
+		<div class="answerbs-onerank-head">
+			<img src="{:tomedia($pcconfig['style']['useravatarbg'])}">
+			<img class="answerbs-onerank-headimg" src="{{ avatar }}" alt="">
+		</div>
+		<div class="answerbs-onerank-info">
+			<div class="answerbs-onerank-speed">
+				{if in_array(request()->host(true),['zam.miboxianchang.cn','v3.martian.net.cn']) && in_array($hdinfo['id'],['357','13929'])}
+					{{ ys }}s
+				{else/}
+					{{ if typeof(ddnum) == "undefined"}}{{ else }}{{ ddnum }}题，{{ /if }}用时:{{ ys }}s
+				{/if}
+			</div>
+			<div class="answerbs-onerank-name limitbox">{{ nickname }}</div>
+		</div>
+	</div>
+</li>
+</script>
+<script type="text/html" id="allrank-tpl">
+<li class="answerbs-allrank-item">
+	<div class="answerbs-allrank-div zam-app-flex">
+		<div class="answerbs-allrank-xuhao zam-app-flex-ajCenter2">{{ key }}</div>
+		<div class="answerbs-allrank-head">
+			<img src="{:tomedia($pcconfig['style']['useravatarbg'])}" alt="">
+			<img class="answerbs-onerank-headimg" src="{{ avatar }}" alt="">
+		</div>
+		<div class="answerbs-allrank-info">
+			<div class="answerbs-allrank-speed">
+				{if in_array(request()->host(true),['zam.miboxianchang.cn','v3.martian.net.cn']) && in_array($hdinfo['id'],['357','13929'])}
+					{{ if typeof(ddnum) == "undefined"}}{{ else }}{{ ddnum }}pts{{ /if }} ({{ ys }}s)
+				{else/}
+					{{ if typeof(ddnum) == "undefined"}}{{ else }}{{ ddnum }}题，{{ /if }}用时:{{ ys }}s
+				{/if}
+			</div>
+			<div class="answerbs-allrank-name limitbox">{{ nickname }}</div>
+		</div>
+	</div>
+</li>
+</script>
+<style>
+.start-btn{width: 250px;height: 78px;}
+</style>
+{include file='common/gamewelcome' /}
+{include file='common/gamecommon' /}
+{if !empty($pcconfig['style']['diycss'])}<style>{$pcconfig['style']['diycss']}</style>{/if}
+<script>
+var defaultImg = "{:tomedia($pcconfig['style']['userdefaultimg'])}",waitshowquestion = "{if in_array(request()->host(true),['zam.miboxianchang.cn','hotbav3.hotba88.com']) && in_array($hdinfo['id'],['247','894','895','896','897','914','915','916','917','918','919','920','921'])}1{else /}2{/if}";
+var defaultName = "{$pcconfig['style']['userdefaultname']??'虚位以待'}";
+var isLangEn = '2';
+require(['screencore','screenanswerbs'],function (screencore,screenanswerbs) {
+	screenanswerbs.init();
+});
+</script>
+{include file='common/footer' /}

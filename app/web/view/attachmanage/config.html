@@ -1,0 +1,352 @@
+{include file='$Wpath/common/header'}
+<form id="formBox" class="zam-formvalidation form-horizontal" method="post">
+	<div class="zam-titleBox">文件远程附件<a class="btn btn-success btn-xs m-l-10" href="https://www.yuque.com/zanmu/dh95p9/atng1s?# 《后台附件注意事项》" target="__blank">系统附件注意事项文档</a></div>
+	<div class="form-group filetypes">
+    <label class="col-lg-2 control-label">* 附件存储类型</label>
+    <div class="col-lg-8">
+      <label class="lyear-radio radio-inline radio-primary">
+       <input type="radio" name="filetype" value="0" {if $config['filetype']=='0'}checked{/if}><span>本地存储 <b class="label label-warning">不推荐</b></span>
+      </label>
+      <label class="lyear-radio radio-inline radio-primary">
+       <input type="radio" name="filetype" value="1" {if $config['filetype']=='1'}checked{/if}><span>阿里云对象存储 <b class="label label-dark">一般</b></span>
+      </label>
+      <label class="lyear-radio radio-inline radio-primary">
+       <input type="radio" name="filetype" value="2" {if $config['filetype']=='2'}checked{/if}><span>腾讯云对象存储 <b class="label label-success">推荐</b></span>
+      </label>
+      <label class="lyear-radio radio-inline radio-primary">
+       <input type="radio" name="filetype" value="3" {if $config['filetype']=='3'}checked{/if}><span>七牛云对象存储 <b class="label label-success">推荐</b></span>
+      </label>
+      <div class="help-block">默认本地存储，强烈建议开启远程附件，快速，安全，稳定，注:如果您因为某些原因想更换附件存储类型，请务必先将旧版第三方的附件目录(attachment目录)打包上传到新版第三方附件bucket内</div>
+    </div>
+  </div>
+  <div class="filetypebox{if $config['filetype']=='0'} hidden{/if}">
+  	<div class="filetype1{if $config['filetype']!='1'} hidden{/if}">
+  		    <div class="form-group">
+              <label class="col-lg-2 control-label">* Access Key ID</label>
+              <div class="col-lg-8">
+                <input class="form-control" type="text"  name="oss[key]" value="{$config['oss']['key']}" onkeyup="return trimSpace(this)">
+                <div class="help-block">Access Key ID是阿里云API的密钥</div>
+              </div>
+          </div>
+          <div class="form-group">
+              <label class="col-lg-2 control-label">* Access Key Secret</label>
+              <div class="col-lg-8">
+                <input class="form-control" type="text"  name="oss[secret]" value="{$config['oss']['secret']}" onkeyup="return trimSpace(this)">
+                <div class="help-block">Access Key Secret是阿里云API的密钥</div>
+              </div>
+          </div>
+          <div class="form-group">
+              <label class="col-lg-2 control-label">* bucket名称</label>
+              <div class="col-lg-8">
+                <input class="form-control" type="text"  name="oss[bucket]" value="{$config['oss']['bucket']}" onkeyup="return trimSpace(this)">
+                <div class="help-block"><span class="text-danger">创建的bucket必须是公共读写</span></div>
+              </div>
+          </div>
+          <div class="form-group">
+              <label class="col-lg-2 control-label">* 所属地域</label>
+              <div class="col-lg-8">
+                <select class="form-control"  name="oss[location]">
+                  <option value="" {if !isset($config['oss']['location']) || empty($config['oss']['location'])}selected{/if}>请选择</option>
+                  {foreach $areas['ali'] as $k => $l}
+                    <option value="{$k}"{if isset($config['oss']['location']) && $config['oss']['location'] == $k}selected{/if}>{$l}</option>
+                  {/foreach}
+                </select>
+                <div class="help-block"><span class="text-danger">oss支持图片鉴黄的地区</span>：华东1(杭州)，华东2(上海)，华北1(青岛)，华北2(北京)，华南1(深圳)等5个地区；推荐创建bucket时选择这几个地区</div>
+              </div>
+          </div>
+          <div class="form-group">
+              <label class="col-lg-2 control-label">bucket自定义cdn加速域名</label>
+              <div class="col-lg-8">
+                <input class="form-control" type="text"  name="oss[host]" value="{$config['oss']['host']}" onkeyup="return trimSpace(this)">
+                <div class="help-block">一般填写bucket对应的cdn加速域名，不填写系统将自动使用bucket自带域名。注：填写格式为：https://xxx.com，如：https://abc.com，后面没有/</div>
+              </div>
+          </div>
+          <div class="zam-titleBox">阿里云STS临时访问凭证参数<a class="btn btn-primary btn-xs m-l-10" href="https://help.aliyun.com/document_detail/100624.htm?spm=a2c4g.11186623.0.0.524778e8cCVUY3#concept-xzh-nzk-2gb" target="__blank">阿里云sts文档</a><span class="text-danger" style="font-size: 12px;">(由于阿里云sts比较复杂又不得不配置，所以如果条件允许不推荐使用阿里云oss作为远程附件存储)</span></div>
+          <div class="form-group">
+              <label class="col-lg-2 control-label">* 用户key</label>
+              <div class="col-lg-8">
+                <input class="form-control" type="text"  name="oss[stsconfig][key]" value="{$config['oss']['stsconfig']['key']}" onkeyup="return trimSpace(this)">
+                <div class="help-block">RAM控制台用户AccessKey ID</div>
+              </div>
+          </div>
+          <div class="form-group">
+              <label class="col-lg-2 control-label">* 用户secret</label>
+              <div class="col-lg-8">
+                <input class="form-control" type="text"  name="oss[stsconfig][secret]" value="{$config['oss']['stsconfig']['secret']}" onkeyup="return trimSpace(this)">
+                <div class="help-block">RAM控制台用户AccessKey SECRET</div>
+              </div>
+          </div>
+          <div class="form-group">
+              <label class="col-lg-2 control-label">* 角色名称</label>
+              <div class="col-lg-8">
+                <input class="form-control" type="text"  name="oss[stsconfig][sessionname]" value="{$config['oss']['stsconfig']['sessionname']}" onkeyup="return trimSpace(this)">
+                <div class="help-block">RAM控制台角色名称 范例:RamOssTest</div>
+              </div>
+          </div>
+          <div class="form-group">
+              <label class="col-lg-2 control-label">* 角色ARN</label>
+              <div class="col-lg-8">
+                <input class="form-control" type="text"  name="oss[stsconfig][arn]" value="{$config['oss']['stsconfig']['arn']}" onkeyup="return trimSpace(this)">
+                <div class="help-block">RAM控制台角色ARN 范例:acs:ram::1729113156993171:role/ramosstest</div>
+              </div>
+          </div>
+  	</div>
+  	<div class="filetype2{if $config['filetype']!='2'} hidden{/if}">
+  		<div class="form-group">
+              <label class="col-lg-2 control-label">* APPID</label>
+              <div class="col-lg-8">
+                <input class="form-control" type="text"  name="cos[appid]" value="{$config['cos']['appid']}" onkeyup="return trimSpace(this)">
+                <div class="help-block">腾讯云API密钥管理内的APPID</div>
+              </div>
+          </div>
+          <div class="form-group">
+              <label class="col-lg-2 control-label">* SecretID</label>
+              <div class="col-lg-8">
+                <input class="form-control" type="text"  name="cos[key]" value="{$config['cos']['key']}" onkeyup="return trimSpace(this)">
+                <div class="help-block">腾讯云API密钥管理内的SecretID</div>
+              </div>
+          </div>
+          <div class="form-group">
+              <label class="col-lg-2 control-label">* SecretKEY</label>
+              <div class="col-lg-8">
+                <input class="form-control" type="text"  name="cos[secret]" value="{$config['cos']['secret']}" onkeyup="return trimSpace(this)">
+                <div class="help-block">腾讯云API密钥管理内的SecretKEY</div>
+              </div>
+          </div>
+          <div class="form-group">
+              <label class="col-lg-2 control-label">* 存储桶名称</label>
+              <div class="col-lg-8">
+                <input class="form-control" type="text"  name="cos[bucket]" value="{$config['cos']['bucket']}" onkeyup="return trimSpace(this)">
+                <div class="help-block"><span class="text-danger">创建的存储桶必须开启公共读写</span></div>
+              </div>
+          </div>
+          <div class="form-group">
+              <label class="col-lg-2 control-label">* 存储桶所属地域</label>
+              <div class="col-lg-8">
+                <select class="form-control"  name="cos[location]">
+                  <option value="" {if !isset($config['cos']['location']) || empty($config['cos']['location'])}selected{/if}>请选择</option>
+                  {foreach $areas['tx'] as $k => $l}
+                    <option value="{$k}"{if isset($config['cos']['location']) && $config['cos']['location'] == $k}selected{/if}>{$l}</option>
+                  {/foreach}
+                </select>
+                <div class="help-block"><span class="text-danger">cos支持图片鉴黄的地区：</span>北京，南京，上海，广州，成都，重庆等6个地区，推荐创建存储桶时选择这几个地区</div>
+              </div>
+          </div>
+          <div class="form-group">
+              <label class="col-lg-2 control-label">存储桶自定义cdn加速域名</label>
+              <div class="col-lg-8">
+                <input class="form-control" type="text"  name="cos[host]" value="{$config['cos']['host']}" onkeyup="return trimSpace(this)">
+                <div class="help-block">一般填写存储桶自定义cdn加速域名，不填写系统会自动使用存储桶自带的域名。注：填写格式为：https://xxx，如：https://abc.com，后面没有/</div>
+              </div>
+          </div>
+  	</div>
+  	<div class="filetype3{if $config['filetype']!='3'} hidden{/if}">
+  		    <div class="form-group">
+              <label class="col-lg-2 control-label">* Accesskey</label>
+              <div class="col-lg-8">
+                <input class="form-control" type="text"  name="qiniu[key]" value="{$config['qiniu']['key']}" onkeyup="return trimSpace(this)">
+                <div class="help-block">七牛后台右上角进入密钥管理复制AK</div>
+              </div>
+          </div>
+          <div class="form-group">
+              <label class="col-lg-2 control-label">* Secretkey</label>
+              <div class="col-lg-8">
+                <input class="form-control" type="text"  name="qiniu[secret]" value="{$config['qiniu']['secret']}" onkeyup="return trimSpace(this)">
+                <div class="help-block">七牛后台右上角进入密钥管理复制SK</div>
+              </div>
+          </div>
+          <div class="form-group">
+              <label class="col-lg-2 control-label">* 空间名称</label>
+              <div class="col-lg-8">
+                <input class="form-control" type="text"  name="qiniu[bucket]" value="{$config['qiniu']['bucket']}" onkeyup="return trimSpace(this)">
+                <div class="help-block"><span class="text-danger">创建的空间必须是公共读写</span></div>
+              </div>
+          </div>
+          <div class="form-group">
+              <label class="col-lg-2 control-label">* 空间自定义cdn加速域名</label>
+              <div class="col-lg-8">
+                <input class="form-control" type="text"  name="qiniu[host]" value="{$config['qiniu']['host']}" onkeyup="return trimSpace(this)">
+                <div class="help-block">
+                  注意事项：
+                  <div>1 填写格式为：https://xxx，如：https://abc.com，后面没有/</div>
+                  <div>2 七牛云远程附件此项必填并且必须配置好https</div>
+                </div>
+              </div>
+          </div>
+          <div class="form-group">
+            <label class="col-lg-2 control-label">* 空间自定义源站域名</label>
+            <div class="col-lg-8">
+              <input class="form-control" type="text"  name="qiniu[buckethost]" value="{$config['qiniu']['buckethost']??''}" onkeyup="return trimSpace(this)">
+              <div class="help-block">
+                注意事项：
+                <div>1 填写格式为：https://xxx，如：https://abc.com，后面没有/</div>
+                <div>2 如果你需要开启上传文件鉴黄功能则此项必填并且必须配置好https</div>
+              </div>
+            </div>
+          </div>
+  	</div>
+  </div>
+  <div class="zam-titleBox">图片文件</div>
+  <div class="form-group">
+      <label class="col-lg-2 control-label">* 后台上传大小限制</label>
+      <div class="col-lg-8">
+        <input type="text" class="form-control numberincdec" name="image[size]" value="{$config['image']['size']??500}"
+        data-bts-min="1" data-bts-replacement-val="1"
+        data-bts-max="null"
+        data-bts-step="1"
+        data-bts-postfix="KB"
+        data-bts-postfix-extra-class="touchspin-postfix"
+        >
+      </div>
+  </div>
+  <div class="form-group">
+      <label class="col-lg-2 control-label">* 微信端上传大小限制</label>
+      <div class="col-lg-8">
+        <input type="text" class="form-control numberincdec" name="image[appsize]" value="{$config['image']['appsize']??500}"
+        data-bts-min="1" data-bts-replacement-val="1"
+        data-bts-max="null"
+        data-bts-step="1"
+        data-bts-postfix="KB"
+        data-bts-postfix-extra-class="touchspin-postfix"
+        >
+      </div>
+  </div>
+  <div class="form-group">
+      <label class="col-lg-2 control-label">* 上传格式限制</label>
+      <div class="col-lg-8">
+        <input class="form-control js-tags-input" type="text"  name="image[ext]" value="{$config['image']['ext']}" onkeyup="return trimSpace(this)">
+        <div class="help-block">多个格式以英文逗号隔开</div>
+      </div>
+  </div>
+  <div class="form-group">
+      <label class="col-lg-2 control-label">* 鉴黄</label>
+      <div class="col-lg-8">
+        <label class="lyear-radio radio-inline radio-primary">
+         <input type="radio" name="checkimage" value="1" {if $config['checkimage']=='1'}checked{/if}><span>关闭</span>
+        </label>
+        <label class="lyear-radio radio-inline radio-primary">
+         <input type="radio" name="checkimage" value="2" {if $config['checkimage']=='2'}checked{/if}><span>全局鉴黄 <b class="label label-success">推荐</b></span>
+        </label>
+        <label class="lyear-radio radio-inline radio-primary">
+         <input type="radio" name="checkimage" value="3" {if $config['checkimage']=='3'}checked{/if}><span>仅微信端鉴黄</span>
+        </label>
+        <label class="lyear-radio radio-inline radio-primary">
+         <input type="radio" name="checkimage" value="4" {if $config['checkimage']=='4'}checked{/if}><span>仅后台鉴黄</span>
+        </label>
+        <div class="help-block">
+          <div>建议开启鉴黄，具体单张图片鉴黄价格请咨询对应云服务商</div>
+          <div><span class="text-danger">阿里云oss支持图片鉴黄的地区</span>：华东1(杭州)，华东2(上海)，华北1(青岛)，华北2(北京)，华南1(深圳)等5个地区</div>
+          <div><span class="text-danger">腾讯云cos支持图片鉴黄的地区</span>：北京，南京，上海，广州，成都，重庆等6个地区</div>
+        </div>
+      </div>
+  </div>
+  <div class="zam-titleBox">音频文件</div>
+  <div class="form-group">
+      <label class="col-lg-2 control-label">* 后台上传大小限制</label>
+      <div class="col-lg-8">
+        <input type="text" class="form-control numberincdec" name="audio[size]" value="{$config['audio']['size']??500}"
+        data-bts-min="1" data-bts-replacement-val="1"
+        data-bts-max="null"
+        data-bts-step="1"
+        data-bts-postfix="KB"
+        data-bts-postfix-extra-class="touchspin-postfix"
+        >
+      </div>
+  </div>
+  <div class="form-group">
+      <label class="col-lg-2 control-label">* 微信端上传大小限制</label>
+      <div class="col-lg-8">
+        <input type="text" class="form-control numberincdec" name="audio[appsize]" value="{$config['audio']['appsize']??500}"
+        data-bts-min="1" data-bts-replacement-val="1"
+        data-bts-max="null"
+        data-bts-step="1"
+        data-bts-postfix="KB"
+        data-bts-postfix-extra-class="touchspin-postfix"
+        >
+      </div>
+  </div>
+  <div class="form-group">
+      <label class="col-lg-2 control-label">* 上传格式限制</label>
+      <div class="col-lg-8">
+        <input class="form-control js-tags-input" type="text"  name="audio[ext]" value="{$config['audio']['ext']}" onkeyup="return trimSpace(this)">
+        <div class="help-block">多个格式以英文逗号隔开</div>
+      </div>
+  </div>
+  <div class="zam-titleBox">视频文件</div>
+  <div class="form-group">
+      <label class="col-lg-2 control-label">* 后台上传大小限制</label>
+      <div class="col-lg-8">
+        <input type="text" class="form-control numberincdec" name="video[size]" value="{$config['video']['size']??500}"
+        data-bts-min="1" data-bts-replacement-val="1"
+        data-bts-max="null"
+        data-bts-step="1"
+        data-bts-postfix="KB"
+        data-bts-postfix-extra-class="touchspin-postfix"
+        >
+      </div>
+  </div>
+  <div class="form-group">
+      <label class="col-lg-2 control-label">* 微信端上传大小限制</label>
+      <div class="col-lg-8">
+        <input type="text" class="form-control numberincdec" name="video[appsize]" value="{$config['video']['appsize']??500}"
+        data-bts-min="1" data-bts-replacement-val="1"
+        data-bts-max="null"
+        data-bts-step="1"
+        data-bts-postfix="KB"
+        data-bts-postfix-extra-class="touchspin-postfix"
+        >
+      </div>
+  </div>
+  <div class="form-group">
+      <label class="col-lg-2 control-label">* 上传格式限制</label>
+      <div class="col-lg-8">
+        <input class="form-control js-tags-input" type="text"  name="video[ext]" value="{$config['video']['ext']}" onkeyup="return trimSpace(this)">
+        <div class="help-block">多个格式以英文逗号隔开</div>
+      </div>
+  </div>
+{include file='$Wpath/common/savepanel'}
+</form>
+<script>
+require(['webcore','jconfirmBox','zamnotice','zvalidator'],function(webcore,jconfirmBox,zamnotice){
+	$(".filetypes label").click(function(){
+		var filetype = $(this).find('input').val();
+		if(filetype=='0'){
+			$(".filetypebox").addClass('hidden');
+		}else{
+			$(".filetypebox").removeClass('hidden');
+			$(".filetype"+filetype).removeClass('hidden').siblings().addClass('hidden');
+		}
+	});
+  $('#formBox').formValidation({
+			framework: 'bootstrap',
+			excluded: [':disabled'],
+			message: '您填写的内容无效',
+			fields: {
+				
+			}
+	}).on('success.form.fv', function(e) {
+		e.preventDefault();
+		var $form = $(e.target);
+		var postData = webcore.serializeObject($form);
+    var bload = $form.find(".zam-fixedbottom button").lyearloading({opacity: 0.2,spinnerSize: 'nm'});
+		$form.formValidation('disableSubmitButtons', true);
+		webcore.ajaxSubmit("{:goweb('attachmanage/config')}",postData).then(function(json){
+      bload.hide();
+			if(json.code==0){
+			    $form.formValidation('disableSubmitButtons', false);
+			    zamnotice.showTips('success','操作成功',2e3,function(){
+			    	window.location.reload();
+			    });
+		    }else{
+		        zamnotice.showTips('error',json.msg);
+		        $form.formValidation('disableSubmitButtons', false);
+		    }
+		}, function(json){
+      bload.hide();
+			zamnotice.showTips('error','网络差。操作失败');
+			$form.formValidation('disableSubmitButtons', false);
+		});
+	});
+});
+</script>
+{include file='$Wpath/common/footer'}

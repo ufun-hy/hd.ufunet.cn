@@ -1,0 +1,169 @@
+<style>
+.rankInfo{
+    position: absolute;
+    width: 100%;
+    height:100%;
+    top: 0;
+    left: 0;
+    z-index:2;
+    background-color: rgba(0,0,0,.8);
+}
+.rankInfoBox {
+	width: 100%;
+	position: relative;
+	padding: 1rem 0 1.05rem
+}
+
+.rankInfoBox .rankTitle {
+    width: 5rem;
+    height: 1.05rem;
+    margin: 0 auto;
+    background-size: cover;
+    position: absolute;
+    left: calc((100% - 5rem)/2);
+    top: 0.32rem;
+	background-image: url('/{:WIMGURL}jjb/images/rank/title.png');
+	background-repeat: no-repeat;
+}
+
+.rankInfoBox .rankList {
+	margin: 0 .3rem;
+	padding: 0.82rem 0 .25rem 0;
+	background-color: #fff;
+	border-radius:0.2rem;
+}
+.rankInfoBox .rankList table thead {
+	display: table;
+	width: 100%;
+	table-layout: fixed;
+	height: 0.82rem;
+	line-height: 0.82rem;
+	font-size: .32rem;
+	color: #666;
+	background-color: #f9f9f9;
+	border-collapse: collapse;
+}
+
+.rankInfoBox .rankList table thead th:nth-child(1),.rankInfoBox .rankList table tbody td:nth-child(1) {
+	width:26%;
+}
+
+.rankInfoBox .rankList table thead th:nth-child(2),.rankInfoBox .rankList table tbody th:nth-child(2) {
+	width:40%;
+}
+
+.rankInfoBox .rankList table thead th:nth-child(3),.rankInfoBox .rankList table tbody th:nth-child(3) {
+	width:34%;
+}
+.rankInfoBox .rankList table tbody{
+	display: block;
+	max-height:6rem;
+	overflow:hidden;
+	overflow-y:scroll;
+}
+.rankInfoBox .rankList table tbody tr {
+	border-bottom: .05rem solid #f3f3f3;
+	display: table;
+	width: 100%;
+	table-layout: fixed;
+}
+
+.rankInfoBox .rankList table tbody tr td {
+	padding:0.1rem 0;
+}
+.rankInfoBox .rankList table tbody tr .rankNum {
+	width:0.6rem;
+	height:0.79rem;
+	margin:0 auto;
+	line-height:0.6rem;
+	color: #666;
+	font-size: .32rem;
+	text-align: center;
+	background-size:cover;
+	background-position: center;
+	background-repeat: no-repeat
+}
+
+.rankInfoBox .rankList table tbody tr:nth-child(1) .rankNum {
+	color: #fff;
+	background-image: url("/{:WIMGURL}jjb/images/rank/1.png")
+}
+
+.rankInfoBox .rankList table tbody tr:nth-child(2) .rankNum {
+	color: #fff;
+	background-image: url("/{WIMGURL}jjb/images/rank/2.png")
+}
+
+.rankInfoBox .rankList table tbody tr:nth-child(3) .rankNum {
+	color: #fff;
+	background-image: url("/{WIMGURL}jjb/images/rank/3.png")
+}
+
+.rankInfoBox .rankList table tbody tr td:nth-child(2) {
+	text-overflow: ellipsis;
+	white-space: normal;
+	overflow: hidden;
+	font-size: .32rem
+}
+
+.rankInfoBox .rankList table tbody tr .headImg {
+	width:0.7rem;
+	height:0.7rem;
+	border-radius: 50%;
+	margin-right:0.1rem;
+}
+
+.rankInfoBox .rankList table tbody tr .playerName {
+	width:calc(100% - 0.7rem);
+	color: #999;
+	word-wrap: break-word
+}
+
+.rankInfoBox .rankList table tbody tr .voteNum {
+	color: #ff4040;
+	font-size: .32rem;
+	text-align: center
+}
+.rank-close{
+	background-image: url("/{:WIMGURL}jjb/images/rank/close.png");
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    width: .52rem;
+    height: .52rem;
+    margin: auto;
+    margin-top: .2rem;
+}
+</style>
+<script id="phb-tpl" type="text/html">
+<div class="rankInfo zam-app-flex-ajCenter2">
+<div class="rankInfoBox">
+	<div class="rankTitle"></div>
+	<div class="rankList">
+		<table cellspacing="0" cellpadding="0">
+			<thead>
+			<tr>
+				<th>排名</th>
+				<th>用户</th>
+				<th>成绩</th>
+			</tr>
+			</thead>
+			<tbody>
+			<%#  $.each(d.list, function(index, item){ %>
+				<tr>
+					<td><div class="rankNum"><% index+1 %></div></td>
+					<td><div class="zam-app-flex zam-app-alignCenter"><img class="headImg" src="<% item.avatar %>"><div class="playerName"><% item.nickname %></div></div></td>
+					<td><div class="voteNum"><% item.score %>分</div></td>
+				</tr>
+			<%# }) %>
+			</tbody>
+		</table>
+	</div>
+	<div class="rank-close" onclick="javascript:$('.rankInfo').remove();"></div>
+</div>
+</div>
+</script>
+<script id="payrotate-tpl" type="text/html">
+	<div class="app-paytitle">获取游戏参与资格</div>
+	<div class="app-paymoney"><i>￥</i> <span><% d.fee %></span></div>
+	<a href="javascript:;" class="btn btn-primary btn-payrotate">确认支付</a>
+</script>

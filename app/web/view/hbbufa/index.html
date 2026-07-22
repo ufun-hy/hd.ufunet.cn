@@ -1,0 +1,112 @@
+{include file="$Wpath/common/header" /}
+{include file='$Wpath/common/tabletoolbar'}
+<table id="listtable" class="zam-btable"></table>
+<script>
+require(['webcore','webtable','jconfirmBox','zamnotice'],function(webcore,webtable,jconfirmBox,zamnotice){
+var initConfig = {
+	tableId:'#listtable',
+	url:"{:goweb('hbbufa/index')}",
+	columnoperate:false,
+    /*
+    {
+        btns:{
+            shenhe:{title:"停止补发",icon:"mdi-gavel",'except':{'only':'2'}},
+        },
+	    func:{
+    	    shenhe:function(value, row, index){
+            	jconfirmBox.confirm('温馨提示','确定停止当前记录的补发？',function(){
+            			webcore.ajaxSubmit("{:goweb('hbbufa/confirmsend')}",{bufaid:row.id,type:'3'},'处理中..').then(function(json){
+            				if(json.code==0){
+            				    webtable.refresh();
+            				    zamnotice.showTips('success','操作成功');
+            			    }else{
+            			        zamnotice.showTips('error',json.msg);
+            			    }
+            			}, function(json){
+            				zamnotice.showTips('error','网络差。操作失败');
+            			});
+            	});
+    	    },
+	    }
+	},
+    */
+	columns:[
+		{
+			field: 'id',
+			title: 'id',
+			align: 'center',
+            width:'5%',
+			visible: false
+		}, {
+            field: 'hdtitle',
+            title: '活动',
+            align:'center',
+            width:'20%',
+            formatter: function (value, row, index) {
+                if(row.huodong_id=='0') return '-';
+                var html = "<div><span>"+(value==null?"已删除":value)+"</span></div><div class='m-t-5'><span>id:"+row.huodong_id+"</span></div>";
+                return html;
+            },
+        }, {
+            field: 'bufanum',
+            title: '补发个数',
+            align:'center',
+            width:'20%',
+            formatter: function (value, row, index) {
+                return value+'个';
+            },
+        }, {
+            field: 'bufamoney',
+            title: '补发总金额',
+            align:'center',
+            width:'20%',
+            formatter: function (value, row, index) {
+                return value+'元';
+            },
+        },  {
+            field: 'create_time',
+            title: '发起时间',
+            align: 'center',
+            width:'20%',
+        }
+	],
+	searchParamas:[{'type':'1','id':'keyword'}],
+	toolbar:{
+	    other:function(ajaxurl){
+            var confirmObj = jconfirmBox.ajaxconfirm("指定补发活动","{:goweb('hbbufa/confirmsend')}",{type:'1'},'html','col-lg-12 col-lg-offset-0',function(e){
+            var selhdobj = e.find("input:checked");
+            if(selhdobj){
+                if(selhdobj.length==0){
+                    zamnotice.showTips('error','请选择一个活动');
+                    return false;
+                }
+                if(selhdobj.length > 1){
+                    zamnotice.showTips('error','一次只能选择一个活动');
+                    return false;
+                }
+                var selhdid = selhdobj.val();
+                jconfirmBox.confirm('警告','一经确定发起补发，无法撤回，您确定要补发么？',function(){
+                    webcore.ajaxSubmit("{:goweb('hbbufa/confirmsend')}",{type:'3',hdid:selhdid}).then(function(json){
+                        if(json.code==0){
+                            confirmObj.close();
+                            webtable.refresh();
+                            zamnotice.showTips('success','补发发起成功，请耐心等待补发结果');
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                    });
+                });
+            }else{
+                zamnotice.showTips('error','请选择活动');
+                return false;
+            }
+        });
+	    },
+	},
+};
+webtable.init(initConfig);
+});
+</script>
+{include file="$Wpath/common/footer" /}

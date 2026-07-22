@@ -1,0 +1,46 @@
+<div class="alert alert-danger">
+	注意:此二维码仅可加入当前轮次的<span class="text-danger m-l-10 m-r-10" style="font-size: 20px;font-weight: 600;">{$teamname}</span>队伍
+</div>
+<section class="teamjoinBox zam-flex-column-center">
+	<p style="height: 30px;line-height: 30px;font-size: 20px;margin:10px 0;">入队二维码与链接</p>
+	<div class="qrcodeImg"><img src="{$qrcode}" width="200px" height="200px" /></div>
+	<div class="m-t-15 m-b-10">
+		<a class="btn btn-primary btn-xs m-r-10 zam-clip" href="javascript:;" data-href="{$teamurl}"><i class="mdi mdi-content-copy"></i> 复制微信地址</a>
+		<a class="btn btn-success btn-xs btn-download" href="javascript:void(0)" onclick="downloadQr(this);" data-teamname="{$teamname}"><i class="mdi mdi-download"></i> 下载二维码</a>
+  	</div>
+</section>
+<script>
+var clipboard;
+require(["clipboard","zamnotice"],function(Clipboard,zamnotice){
+	if(clipboard){
+   		clipboard.destroy();
+	}
+	clipboard = new Clipboard('.teamjoinBox .zam-clip', {
+		text: function(e) {
+			return $(e).data('url') || $(e).data('href')
+		}
+	});
+	clipboard.on('success',function(e) {
+	   zamnotice.showTips('success','复制成功',2e3);
+	})
+});
+function downloadQr(obj){
+	var $this = $(obj),imgUrl = $this.parent().prev().find('img').attr("src"),teamname = $this.attr('data-teamname');
+	if (window.navigator.msSaveOrOpenBlob) {
+	  var bstr = atob(imgUrl.split(',')[1]);
+	  var n = bstr.length;
+	  var u8arr = new Uint8Array(n);
+	  while (n--) {
+		u8arr[n] = bstr.charCodeAt(n);
+	  }
+	  var blob = new Blob([u8arr]);
+	  window.navigator.msSaveOrOpenBlob(blob, teamname+'.png');
+	} else {
+	  var el = document.createElement('a');
+	  el.href = imgUrl;
+	  el.setAttribute('download', teamname+'.png');
+	  el.setAttribute('target', '__blank');
+	  el.click();
+	}
+}
+</script>

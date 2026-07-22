@@ -1,0 +1,108 @@
+{include file='$Wpath/common/header'}
+<form id="formBox" class="zam-formvalidation form-horizontal" method="post">
+    <div class="config-titlebox">
+        <span class="config-titlename">大屏设置</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#screenconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+    </div>
+    <div id="screenconfigbox" class="collapse in">
+        {include file="$Wpath/common/configscreencommon" /}
+        {include file="$Wpath/common/configscreenmusic" /}
+        <div class="form-group">
+			<label class="col-lg-2 control-label">抽奖进行中背景音效</label>
+			<div class="col-lg-8">
+				{:tpl_audio('cjingmusic',$config['cjingmusic'])}
+				<span class="help-block">尽量控制在200KB内</span>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-lg-2 control-label">中奖弹窗时背景音效</label>
+			<div class="col-lg-8">
+				{:tpl_audio('cjendmusic',$config['cjendmusic'])}
+				<span class="help-block">尽量控制在200KB内</span>
+			</div>
+		</div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 默认头像</label>
+            <div class="col-lg-4">
+              {:tpl_image_one('defaultimg',$config['defaultimg'])}
+              <span class="help-block">规格:100*100px</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label text-right">* 消息来源</label>
+            <div class="col-lg-8">
+                <label class="lyear-radio radio-inline radio-primary">
+                    <input type="radio" name="fromtype" value="1" {if !isset($config['fromtype']) || $config['fromtype']=='1'}checked{/if}><span>{$frommodules['msg']}</span>
+                </label>
+                <label class="lyear-radio radio-inline radio-primary">
+                    <input type="radio" name="fromtype" value="2" {if isset($config['fromtype']) && $config['fromtype']=='2'}checked{/if}><span>{$frommodules['baping']}</span>
+                </label>
+                {if dznormalrequest('liuyancjstyle')}
+                <label class="lyear-radio radio-inline radio-primary">
+                    <input type="radio" name="fromtype" value="3" {if isset($config['fromtype']) && $config['fromtype']=='3'}checked{/if}><span>{$frommodules['qdbook']}</span>
+                </label>
+                <label class="lyear-radio radio-inline radio-primary">
+                    <input type="radio" name="fromtype" value="4" {if isset($config['fromtype']) && $config['fromtype']=='4'}checked{/if}><span>{$frommodules['lantern']}</span>
+                </label>
+                {/if}
+            </div>
+        </div>
+    </div>
+    <div class="config-titlebox">
+        <span class="config-titlename">风格设置</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#welcomeconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+    </div>
+    <div id="welcomeconfigbox" class="collapse in">
+        {include file="$Wpath/common/liuyancjstyle/welcomeconfig" /}
+    </div>
+    <div class="config-titlebox">
+        <span class="config-titlename">红包发送设置</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#srconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+    </div>
+    <div id="srconfigbox" class="collapse in">
+        {include file="$Wpath/common/sendredpackinfo" /}
+    </div>
+    {include file='$Wpath/common/savepanel'}
+</form>
+<script>
+require(['webcore','jconfirmBox','zamnotice','layerBox','zvalidator'],function(webcore,jconfirmBox,zamnotice,layerBox){
+    $('#formBox').formValidation({
+        framework: 'bootstrap',
+        excluded: [':disabled'],
+        message: '您填写的内容无效',
+        fields: {
+            apptitle:{
+                message: '请输入网页标题',
+                validators: {
+                    notEmpty: {
+                        message: '请输入网页标题'
+                    },
+                }
+            },
+        }
+    }).on('success.form.fv', function(e) {
+        e.preventDefault();
+        var $form = $(e.target);
+        var postData = webcore.serializeObject($form);
+        var bload = $form.find(".zam-fixedbottom button").lyearloading({opacity: 0.2,spinnerSize: 'nm'});
+        $form.formValidation('disableSubmitButtons', true);
+        webcore.ajaxSubmit("{:goweb('hdconfig/liuyancj')}",postData).then(function(json){
+            bload.hide();
+            if(json.code==0){
+                $form.formValidation('disableSubmitButtons', false);
+                zamnotice.showTips('success','保存成功',2e3,function(){
+                    window.location.reload();
+                });
+            }else{
+                zamnotice.showTips('error',json.msg);
+                $form.formValidation('disableSubmitButtons', false);
+            }
+        }, function(json){
+            bload.hide();
+            zamnotice.showTips('error','网络差。操作失败');
+            $form.formValidation('disableSubmitButtons', false);
+        });
+    });
+});
+</script>
+{include file='$Wpath/common/footer'}

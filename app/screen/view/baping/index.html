@@ -1,0 +1,334 @@
+{include file='common/header' /}
+<link rel="stylesheet" href="/{:SIMGURL}baping/baping.css?t=2.1.692"/>
+<style>
+{/*礼物css*/}
+{volist name="allgift" id="gift"}
+.baping-item .dsText .gifticon.gifticon-{$gift['id']}{background-image: url("{:tomedia($gift['giftconfig']['giftappicon'])}");}
+{/volist}
+.baping-item .dsText .giftname{display:inline-block;margin:0 10px;}
+/*大屏点歌消息*/
+.baping-item .songText{color:#ffdc17 !important}
+.baping-item .songText .songname{display:inline-block;margin-left:20px;}
+/*霸屏弹窗背景*/
+{volist name="bpzhuti.alldata" id="theme"}
+.msgbptheme-{$theme['id']} .baping-icon{background-image: url("{$theme['themeconfig']['bppcicon']}");}
+.holdtheme-{$theme['id']} .onWallBpHorn {background-image: url("{$theme['themeconfig']['cornerbg']}");}
+.holdtheme-{$theme['id']} .onWallWomanCircle1 {background-image: url("{$theme['themeconfig']['avatarbg']}");}
+.holdtheme-{$theme['id']} .bpHead_womanWing span {background-image: url("{$theme['themeconfig']['leftbpnamebg']}");}
+.holdtheme-{$theme['id']} .themeName_themeBp {background-image: url("{$theme['themeconfig']['nicknamebg']}");}
+.holdtheme-{$theme['id']}  .themeCover_themeBp {background-image: url("{$theme['themeconfig']['timebg']}");}
+{/volist}
+{if isset($pcconfig['barinfo']['logo']) && empty($pcconfig['barinfo']['logo'])}
+.header .logoBox .barlogo{display:none}
+.header .logoBox .barname{width:calc(100% - 60px);margin: 0 30px;}
+{/if}
+{if isset($pcconfig['barinfo']['title']) && empty($pcconfig['barinfo']['title'])}
+.header .logoBox .barname{display:none}
+{/if}
+{if isset($pcconfig['barinfo']['logo']) && empty($pcconfig['barinfo']['logo']) && isset($pcconfig['barinfo']['title']) && empty($pcconfig['barinfo']['title'])}
+.main-box .header .logoBox{width: 0;}
+.main-box .header .marqueenBox{width: calc(100% - 40px);margin:0 20px;}
+{/if}
+{if isset($pcconfig['barinfo']['logo']) && !empty($pcconfig['barinfo']['logo']) && isset($pcconfig['barinfo']['title']) && empty($pcconfig['barinfo']['title'])}
+.main-box .header .logoBox{width: auto;}
+.main-box .header .marqueenBox{width: calc(100% - 120px);}
+{/if}
+</style>
+<section class="normal-box baping-mainbox">
+<section class="baping-itembox msg-itembox showpagebox">
+	<section class="baping-contentsbox full">
+		<ul class="baping-contents"></ul>
+	</section>
+</section>
+{if !empty($pcconfig['widgets']) && isset($pcconfig['widgets']['song']) && $pcconfig['widgets']['song']['widgetshow']=='1'}
+<section class="baping-itembox song-itembox">
+	<section class="baping-songlist zam-app-flex zam-app-alignCenter zam-app-justifyspacearound">
+		<div class="baping-songlist-artistorqr">
+			<div class="baping-songlist-artist">
+				<div class="swiper-container singer-swiper">
+					<div class="swiper-wrapper">
+						{foreach $allsongs['singer'] as $singerkey=>$singeritem}
+						<div class="swiper-slide zam-app-flex-ajCenter2">
+							<div class="baping-songlist-avatar zam-app-flex-ajCenter2">
+								<img src="{$singeritem['artistavatar']}" >
+							</div>
+							<div class="baping-songlist-nickname">{$singeritem['artistname']}</div>
+						</div>
+						{/foreach}
+					</div>
+				</div>
+			</div>
+			<div class="baping-songlist-qrbox zam-app-flex-ajCenter">
+					<div class="baping-songlist-qrimg">
+						<img src="{$qrcode}" >
+					</div>
+					<div class="baping-songlist-qrtxt">扫码点歌</div>
+			</div>
+		</div>
+		<div class="baping-songlist-content">
+			<div class="baping-songlist-songbox">
+				<div class="baping-songlist-songtitle">
+					今夜歌单
+				</div>
+				<div class="baping-songlist-items">
+					<ul class="baping-songlist-items-ul">
+					{foreach $allsongs['song'] as $songkey=>$songitem}
+					 <li>
+						<div class="baping-songlist-item">
+							<div class="baping-songlist-namebox">
+								<div class="baping-songlist-namenum">{$songkey + 1}.</div>
+								<div class="baping-songlist-name">{$songitem['songconfig']['songname']}</div>
+							</div>
+							<div class="baping-songlist-singerbox">
+								<div class="baping-songlist-stitle">艺人：</div>
+								<div class="baping-songlist-sname">{$songitem['singer']['artistname']}</div>
+							</div>
+						</div>
+					  </li>
+					  {/foreach}
+					</ul>
+				</div>
+			</div>
+		</div>
+	</section>
+</section>
+{/if}
+</section>
+<style>
+/*霸屏弹窗文字字体*/
+{volist name="pcconfig.bpfontstyle" id="bpfont"}
+{if $bpfont['fontval']!='normal'&&$bpfont['fontsrc']!=''}
+	@font-face {
+		font-family:"{$bpfont['fontval']}";
+		src:url("{$bpfont['fontsrc']}");
+	}
+	.{$bpfont['fontval']}{
+		font-family:"{$bpfont['fontval']}";
+	}
+{/if}
+{/volist}
+</style>
+<div class="bpfontStyleBox">
+{volist name="pcconfig.bpfontstyle" id="bpfont"}
+{if $bpfont['fontval']!='normal'&&$bpfont['fontsrc']!=''}
+<span class="{$bpfont['fontval']}">赞木赞木</span>
+{/if}
+{/volist}
+</div>
+<script id="msg-tpl" type="html/javascript">
+<li class="baping-item msg-{{ id }} {{ if type=='1'||type=='2' }}normal-msg{{ else if type=='3' }}holdscreen-msg msgbptheme-{{ themeid }}{{ else }}other-msg{{ /if }}{{ if fromhistory }} from-historymsg{{ /if }}" data-msgid="{{ id }}">
+	{{ if type=='3'}}<span class="baping-icon"></span>{{ /if }}
+	<div class="baping-userbox zam-app-flex-ajCenter2">
+		<img class="userHead" src="{{ avatar }}">
+		<img class="baping-userboxbg" src="/{:SIMGURL}baping/level/level1.png" />
+	</div>
+	<div class="baping-itemInfo">
+		<span class="userName">{{ nickname }}{{ if type=='6' && content.deskno }}（台号：{{ content.deskno }}）{{ /if }}</span>
+		<span class="msgTime">
+			<span class="msgHours">{{ create_time }}</span>
+		</span>
+		<div class="baping-itemMain">
+			{{ if type=='1' }}
+				<p class="msgText">{{# content }}</p>
+			{{ else if type=='2' }}
+				<img class="msgImage" src="{{ content }}">
+			{{ else if type=='3' }}
+				<p class="msgText bpText">
+					<span class="bptheme-name">{{ content.bpname }}</span>
+					<span class="bptheme-seconds">{{ content.bptime }}秒</span>
+					{{ if content.bptxt!='' }}:{{ content.bptxt }}{{ /if }}</p>
+				{{ if content.bpimgs }}
+					<div class="bpimgsbox">
+					{{ each content.bpimgs as bpimg bpimkey }}
+			            <img class="msgImage" src="{{ bpimg }}">
+			        {{ /each }}
+			    	</div>
+				{{ /if }}
+				{{ if content.bpvideo }}
+					<img class="msgImage" src="{{ content.bpvideo.video }}.jpg">
+				{{ /if }}
+			{{ else if type=='4' }}
+				<p class="msgText dsText zam-app-flex-alignCenter"><i class="gifticon gifticon-{{ content.themeid }}"></i>打赏<span class="giftname">{{ content.giftname }}</span>给<span class="artistame">"{{ content.artistname }}"</span></p>
+			{{ else if type=='5' }}
+				<p class="msgText hbText"><i class="hbicon"></i>发出{{ content.hbmoney }}元红包：{{ if content.hbtype=='2' }}{{ content.kouling }}{{ else }}{{ content.hbtxt }}{{ /if }}</p>
+			{{ else if type=='6' }}
+				<p class="msgText songText">点了一首歌<span class="songname">{{ content.songname }}</span> - <span class="artistame">{{ content.artistname }}</span></p>
+				<div class="msgText">{{ content.songtxt }}</div>
+			{{ /if }}
+		</div>
+	</div>
+</li>
+</script>
+<script type="text/html" id="soonhold-tpl">
+<div class="soonToBpBox {{ soonid }}">
+	<div class="soonToBp-bg"></div>
+	<div class="soonToBp-userbox">
+		<div class="soonToBp-headbox">
+			<img class="soonToBp-headbg" src="/{:SIMGURL}baping/soonbp/avatarbg.webp" />
+			<img class="soonToBp-head" src="{{ avatar }}" />
+		</div>
+		<div class="soonToBp-name">
+			<img class="soonToBp-namebg" src="/{:SIMGURL}baping/soonbp/namebg.png" />
+			<span class="limitbox">{{ nickname }}</span>
+		</div>
+	</div>
+</div>
+</script>
+<script type="text/html" id="holdscreen-tpl">
+<section class="holdscreen-layout hide holdtheme-{{ themeid }}">
+   <!--<div class="holdscreen-cover"></div>-->
+   <div class="bpCover"></div>
+   <div class="holdscreen-main"> 
+		<div class="holdscreen-maincover"></div> 
+		<div class="holdscreen-mainBox"> 
+			  <div class="newBpMain {{ if !content.bpimgs&&!content.bpvideo&&content.bptxt!='' }}onlyText{{ /if }}">
+					  {{ if content.bpimgs||content.bpvideo }}<div class="newBpUser">{{ /if }}
+					   <div class="newBpHornBox {{ if content.bptxt!='' }}full{{ /if }}" {{ if content.bpimgs&&content.bptxt!='' }}style="padding-top:90px; padding-bottom:90px"{{ /if }}>
+						<div class="_newBpHornBox {{ if (content.bpimgs||content.bpvideo)&&content.bptxt=='' }}onlyImg{{ /if }}" {{ if (content.bpvideo||content.bpimgs)&&content.bptxt!='' }}style="padding-top:115px;"{{ /if }}>
+						 <span class="onWallBpHorn{{ if (content.bpvideo||content.bpimgs)&&content.bptxt!='' }} small{{ else if (content.bpvideo||content.bpimgs)&&content.bptxt=='' }} mini{{ /if }} leftTopHorn onWallBpHorn_themeBp"></span>
+						 <span class="onWallBpHorn{{ if (content.bpvideo||content.bpimgs)&&content.bptxt!='' }} small{{ else if (content.bpvideo||content.bpimgs)&&content.bptxt=='' }} mini{{ /if }} rightTopHorn onWallBpHorn_themeBp"></span>
+						 <span class="onWallBpHorn{{ if (content.bpvideo||content.bpimgs)&&content.bptxt!='' }} small{{ else if (content.bpvideo||content.bpimgs)&&content.bptxt=='' }} mini{{ /if }} leftBottomHorn onWallBpHorn_themeBp"></span>
+						 <span class="onWallBpHorn{{ if (content.bpvideo||content.bpimgs)&&content.bptxt!='' }} small{{ else if (content.bpvideo||content.bpimgs)&&content.bptxt=='' }} mini{{ /if }} rightBottomHorn onWallBpHorn_themeBp"></span>
+						 <span class="onWallNewUserBox">
+							<span class="onWallUserCircle1 onWallWomanCircle1"></span>
+							<img class="onWallNewUser" src="{{ avatar }}" />
+							<tt class="bpHead_wing{{ if (content.bpvideo||content.bpimgs)}} mini{{ /if }} bpHead_womanWing"><span></span><i>{{ content.bpname }}</i></tt>
+							<tt class="bpHead_wing{{ if (content.bpvideo||content.bpimgs)}} mini{{ /if }} bpHead_womanWing right"><span></span><i>{{ content.bptime }}秒</i></tt>
+						 </span>
+						 <div class="onWallBpNameDiv{{ if (content.bpvideo||content.bpimgs)}} mini{{ /if }}">
+						  <span class="{{ if (content.bpvideo||content.bpimgs)}}mini {{ /if }}themeName_theme themeName_themeBp"></span>{{ nickname }}
+						 </div>
+						 <div class="newBpHornBoxText{{ if (content.bpvideo||content.bpimgs)}} mini{{ /if }}">
+							{{ if content.bptxt!='' }}<b class="bpColor" id="newBpMsg">{{ content.bptxt }}</b>{{ /if }}
+						 </div>
+						 <div class="onWallBpTimeBox{{ if (content.bpvideo||content.bpimgs)}} mini{{ /if }}" {{ if (content.bpvideo||content.bpimgs)&&content.bptxt!='' }}style="bottom:-75px"{{ /if }}>
+						  <div class="themeCover_theme{{ if (content.bpvideo||content.bpimgs)}} mini{{ /if }} themeCover_themeBp"></div>
+						  <tt><span class="themeLogo_theme{{ if (content.bpvideo||content.bpimgs)}} mini{{ /if }} themeLogo_themeBp"></span>{{ content.bpname }} <b class="bpTime">{{ content.bptime }}</b> 秒<tt></tt></tt>
+						 </div>
+						</div>
+					   </div>
+					  {{ if content.bpimgs||content.bpvideo }}</div>{{ /if }}
+				</div>
+		</div>
+   </div>
+</section>
+</script>
+<script type="text/html" id="ds-tpl">
+<div class="ds-layout">
+	<div class="ds-mainbox ds-mainboxani">
+		<div class="ds-bridge-box ds-bridge-box-ani">
+			<img src="/{:SIMGURL}baping/ds/bridge.png">
+			<div class="ds-bridge-arrows">
+				<img src="/{:SIMGURL}baping/ds/arrow.png">
+				<img src="/{:SIMGURL}baping/ds/arrow.png">
+				<img src="/{:SIMGURL}baping/ds/arrow.png">
+				<img src="/{:SIMGURL}baping/ds/arrow.png">
+			</div>
+			<span>打赏"{{ content.giftname }}"</span>
+		</div>
+		<p class="ds-user-liuyan">{{ content.dstxt }}</p>
+		<p class="ds-user-liuyan">{{ content.dstxt }}</p>
+		<div class="ds-userinfo">
+			<img class="ds-useravatar" src="{{ avatar }}">
+			<div class="ds-username">
+				<div class="ds-username-bg"></div>
+				<div class="ds-username-bg2"></div>
+				<div class="ds-username-box">{{ nickname }}</div>
+			</div>
+		</div>
+		<div class="ds-artistinfo">
+			<img class="ds-useravatar" src="{{ content.artistavatar }}">
+			<div class="ds-username">
+				<div class="ds-username-bg"></div>
+				<div class="ds-username-bg2"></div>
+				<div class="ds-username-box">{{ content.artistname }}</div>
+			</div>
+		</div>
+	</div>
+	<div class="ds-bgimg">
+		<img src="{{ giftpcwebp }}">
+	</div>
+</div>
+</script>
+<script type="text/html" id="song-tpl">
+<div class="song-layout zam-app-flex-ajCenter2 hide">
+	<div class="song-mainbox">
+		<div class="song-mainbox-left">
+			<div class="song-mainbox-yfimgs">
+				<img class="song-mainbox-yf1" src="/{:SIMGURL}baping/song/yf1.png">
+				<img class="song-mainbox-yf2" src="/{:SIMGURL}baping/song/yf2.png">
+				<img class="song-mainbox-yf3" src="/{:SIMGURL}baping/song/yf3.png">
+				<img class="song-mainbox-yf32" src="/{:SIMGURL}baping/song/yf3.png">
+			</div>
+			<img class="song-mainbox-yp" src="/{:SIMGURL}baping/song/yp.png">
+			<img class="song-mainbox-ypline" src="/{:SIMGURL}baping/song/ypline.png">
+			<img class="song-mainbox-ypbar" src="/{:SIMGURL}baping/song/ypbar.png">
+			<div class="song-mainbox-userbox">
+				<img class="song-mainbox-useravatar" src="{{ avatar }}">
+			</div>
+			<div class="song-mainbox-username">{{ nickname }}</div>
+			<div class="song-mainbox-userlogo"></div>
+		</div>
+		<div class="song-mainbox-right">
+			<p class="song-mainbox-songname">付费歌曲：{{ content.songname }} <br> <span>艺人：{{ content.artistname }}</span></p>
+			<p class="song-mainbox-liuyan">{{ content.songtxt }}</p>
+		</div>
+	</div>
+	<div class="song-mainbox-djsbox hidden"><span></span></div>
+</div>
+</script>
+<script type="text/html" id="hb-tpl">
+<section class="hongbao-layout">
+	<img src="/{:SIMGURL}baping/hb/1.png" class="fhb">
+	<img src="/{:SIMGURL}baping/hb/1.gif" class="hby">
+	<div class="hbpop-content">
+        <div class="hbpop-content">
+            <div>土豪<span>{{ nickname }}</span>发红包啦</div>
+        </div>
+    </div>
+</section>
+</script>
+<script type="text/html" id="tuhaolist-tpl">
+<div  class="tuhao-list">
+	<div  class="tuhao-light"></div>
+	<div  class="tuhao-oneitem tuhao-first">
+		<div  class="tuhao-avatar"><div  class="tuhao-userbg"></div></div>
+		<p >虚位以待</p>
+	</div>
+	<div  class="tuhao-oneitem tuhao-second">
+		<div  class="tuhao-avatar"><div  class="tuhao-userbg"></div></div>
+		<p >虚位以待</p>
+	</div>
+	<div  class="tuhao-oneitem tuhao-third">
+		<div  class="tuhao-avatar"><div  class="tuhao-userbg"></div></div>
+		<p >虚位以待</p>
+	</div>
+</div>
+</script>
+<script>
+var barConfig = {:json_encode($pcconfig)};
+var soonholdimgs = ["/{:SIMGURL}baping/soonbp/bg.webp","/{:SIMGURL}baping/soonbp/namebg.png","/{:SIMGURL}baping/soonbp/avatarbg.webp"];
+var bpZhuti = {:json_encode($bpzhuti)};
+var dsgift = {:json_encode($allgiftimgs)};
+var allsongs = {:json_encode($allsongs)};
+var songbgvideo = "/{:SIMGURL}baping/song/bg.webm";
+require(['screenbp'],function (screenbp) {
+	screenbp.init({});
+});
+function fullshowImg(obj){
+	require(['screenbp'],function (screenbp) {
+		screenbp.fullshowImg(obj);
+	});
+}
+function hadLoadRightImg(obj){
+	require(['rightboxslider'],function (rightboxslider) {
+		rightboxslider.load(obj);
+	});
+}
+function failLoadRightImg(obj){
+	require(['rightboxslider'],function (rightboxslider) {
+		rightboxslider.error(obj);
+	});
+}
+</script>
+{include file='common/footer' /}

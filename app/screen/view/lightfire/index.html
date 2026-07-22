@@ -1,0 +1,109 @@
+{include file='common/header' /}
+<style>
+    .lightfire-mainbox{
+        width: 100%;
+        height: 100%;
+        margin: 0 auto;
+        padding:0;
+        overflow: hidden;
+    }
+    .lightfire-wrapper {
+        width: 1360px;
+        height: 612px;
+    }
+    .lightfire-wrapper .fire-one{
+        flex: 1;
+    }
+    .fireuser{
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    .fireuser .username{
+        width: 100%;
+        padding: 0 5px;
+        box-sizing: border-box;
+        text-align: center;
+        font-weight: 700;
+        font-size: 16px;
+        color: #ff9326;
+    }
+    .fireuser .useravatar{
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        border: 3px solid #ffefbf;
+        margin-top: 5px;
+    }
+    .firelight{
+        position: relative;
+    }
+    .firelight .fires{
+        width: 56px;
+        margin: 0 auto;
+    }
+    .firelight .fires div{
+        width: 56px;
+        height: 50px;
+        margin-top: -25px;
+        background-image: url("{:tomedia($pcconfig['style']['fireimg'])}");
+        background-size: 100% 100%;
+    }
+    .firelight .fires div.hidden{
+        display: none;
+    }
+    .firelight .lights{
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translate(-50%, 50%);
+        width: 231px;
+        height: 201px;
+        background-image: url("{:tomedia($pcconfig['style']['firedimg'])}");
+        background-size: 100% 100%;
+    }
+</style>
+<audio id="countaudio" src="/{:WIMGURL}shake/count.mp3"  preload="preload"  style="display:none"></audio>
+<audio id="overaudio" src="/{:SIMGURL}shake/over.mp3"  preload="preload"  style="display:none"></audio>
+<audio id="joinaudio" src="/{:SIMGURL}shake/join.mp3"  preload="preload" style="display:none"></audio>
+<div class="lightfire-mainbox zam-app-flex-ajCenter2">
+    <div class="emptybox zam-app-flex-ajCenter display-none">
+		<img src="/{:SIMGURL}common/empty.png">
+		<p style="padding:20px;">暂无可用轮次，请到后台添加</p>
+	</div>
+    <ul class="lightfire-wrapper zam-app-flex display-none"></ul>
+</div>
+<style>
+.start-btn{
+    width:260px;
+    height:85px;
+}
+</style>
+{include file='common/gamewelcome' /}
+{include file='common/gamecommon' /}
+{if !empty($pcconfig['style']['diycss'])}<style>{$pcconfig['style']['diycss']}</style>{/if}
+<script id="lineItem-tpl" type="html/javascript">
+    <li class="fire-one">
+        <div class="fireuser">
+            <div class="username limitbox">{$pcconfig['style']['userdefaultname']??'虚位以待'}</div>
+            <img class="useravatar" src="{:tomedia($pcconfig['style']['userdefaultimg'])}">
+        </div>
+        <div class="firelight">
+            <div class="fires">
+                <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+            </div>
+            <div class="lights"></div>
+        </div>
+    </li>
+</script>
+<script>
+var defaultImg = "{:tomedia($pcconfig['style']['userdefaultimg'])}";
+var defaultName = "{$pcconfig['style']['userdefaultname']??'虚位以待'}";
+require(['screenlightfire'],function(screenlightfire){
+    screenlightfire.init();
+});
+</script>
+{include file='common/footer' /}

@@ -1,0 +1,63 @@
+<div class="form-horizontal confirmbox-pop">
+<form class="confirm-formbox" method="post">    
+        <input type="hidden"  name="menustatus"  value="{$config['mstatus']??'1'}">
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 菜单名</label>
+            <div class="col-lg-8">
+              <input type="text" class="form-control"  name="menuname"  value="{$config['menuname']}" maxlength="6">
+              <span class="help-block">注:最多6个字</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 菜单类型</label>
+            <div class="col-lg-8">
+                <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.inurlbox').removeClass('hidden'),$('.outurlbox,.yqbbox').addClass('hidden');">
+                    <input type="radio" name="menutype" {if $config['type']=="1"}checked{/if} value="1"><span>内链</span>
+                </label>
+                <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.inurlbox,.yqbbox').addClass('hidden'),$('.outurlbox').removeClass('hidden');">
+                    <input type="radio" name="menutype" {if $config['type']=="2"}checked{/if} value="2" ><span>外链</span>
+                </label>
+                {if dzpclive()}
+                <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.inurlbox,.outurlbox').addClass('hidden'),$('.yqbbox').removeClass('hidden');">
+                    <input type="radio" name="menutype" {if $config['type']=="4"}checked{/if} value="4" ><span>邀请榜</span>
+                </label>
+                {/if}
+            </div>
+        </div>
+        <div class="form-group inurlbox{if $config['type']!='1'} hidden{/if}">
+            <label class="col-lg-3 control-label">* 游戏模块</label>
+            <div class="col-lg-8">
+              {:tpl_hdmodules('menuinurl',$config['inurl'])}
+              <span class="help-block">注:因为你选的模块可能用户发布活动时候不一定会选择所以尽量选择活动常用模块</span>
+            </div>
+        </div>
+        <div class="form-group outurlbox{if $config['type']!='2'} hidden{/if}">
+            <label class="col-lg-3 control-label">* 外链</label>
+            <div class="col-lg-8">
+                <input class="form-control" type="text"  name="menuouturl" value="{$config['outurl']}">
+                <span class="help-block">注:必须是完整的url，此链接用户点击后将会跳出直播间</span>
+            </div>
+        </div>
+        <div class="form-group yqbbox{if $config['type']!='4'} hidden{/if}">
+            <label class="col-lg-3 control-label">排行榜人数</label>
+            <div class="col-lg-8">
+                <input type="text" class="form-control numberincdec" name="phbnum" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="100"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$config['phbnum']??'20'}">
+                <span class="help-block">最多100人</span>
+            </div>
+        </div>
+</form>
+</div>    
+<script>    
+require(['webcore','jconfirmBox','zamnotice','layerBox',"select2-zhcn","bootstrap-touchspin"],function(webcore,jconfirmBox,zamnotice,layerBox){
+    $(".confirmbox-pop .numberincdec").TouchSpin().on("change", function(){
+        var $this = $(this),funcstr = $this.data('func');
+        var func = window[funcstr];
+        func && func();
+    });
+})
+</script>

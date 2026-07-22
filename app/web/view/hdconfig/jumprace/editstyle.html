@@ -1,0 +1,249 @@
+{include file='$Wpath/common/header'}
+<style>
+.cloudimgbox img{background-color: rgba(0,0,0,0.1);}
+</style>
+<div class="confirmbox-pop">
+<div class="text-center">
+      <div class="btn-group pop-btns" style="margin-bottom:10px;">
+        <a href="javascript:void(0)" class="btn btn-default btn-primary"><span>基础设置</span></a>
+        <a href="javascript:void(0)" class="btn btn-default"><span>大屏欢迎页</span></a>
+        <a href="javascript:void(0)" class="btn btn-default"><span>大屏设置</span></a>
+        <a href="javascript:void(0)" class="btn btn-default"><span>排行榜</span></a>
+        <a href="javascript:void(0)" class="btn btn-default"><span>微信设置</span></a>
+        <a href="javascript:void(0)" class="btn btn-default"><span>自定义css</span></a>
+      </div>
+</div>
+<form id="formBox" class="zam-formvalidation form-horizontal" method="post">
+  <div class="carditem">
+    {include file='$Wpath/common/gamestyle/basic'}
+    {include file='$Wpath/common/gamestyle/bgmusic'}
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 起跳蓄力音效</label>
+      <div class="col-lg-8">
+        {:tpl_audio('jumpvoice', $config['jumpvoice'])}
+        <span class="help-block">注意:必须控制在100KB内</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 跳中音效</label>
+      <div class="col-lg-8">
+        {:tpl_audio('scorevoice', $config['scorevoice'])}
+        <span class="help-block">注意:必须控制在100KB内</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 跳中正中间音效</label>
+      <div class="col-lg-8">
+        {:tpl_audio('score2voice', $config['score2voice'])}
+        <span class="help-block">注意:必须控制在100KB内</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 未跳中音效</label>
+      <div class="col-lg-8">
+        {:tpl_audio('fallvoice', $config['fallvoice'])}
+        <span class="help-block">注意:必须控制在100KB内</span>
+      </div>
+    </div>
+  </div>
+  <div class="carditem hidden">
+    {include file='$Wpath/common/gamestyle/welcome'}
+  </div>
+  <div class="carditem hidden">
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 平台顶</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('hplate', $config['hplate'])}
+        <span class="help-block">{$desconfig['hplate']}</span>
+      </div>
+     </div>
+     <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 平台身</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('bplate', $config['bplate'])}
+        <span class="help-block">{$desconfig['bplate']}</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 平台底</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('fplate', $config['fplate'])}
+        <span class="help-block">{$desconfig['fplate']}</span>
+      </div>
+    </div>
+  </div>
+  <div class="carditem hidden">
+    {include file='$Wpath/common/gamestyle/phb'}
+  </div>
+  <div class="carditem hidden">
+    <div class="form-group">
+      <label class="col-md-2 control-label text-right">* 微信背景图</label>
+      <div class="col-md-8">
+        {:tpl_image_one('appbgimg', $config['appbgimg'])}
+        <span class="help-block">规格:640*1240px</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 顶部图</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('apptopimg', $config['apptopimg'])}
+        <span class="help-block">{$desconfig['apptopimg']}</span>
+      </div>
+     </div>
+     <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 角色</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('appplayer', $config['appplayer'])}
+        <span class="help-block">{$desconfig['appplayer']}</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label"> 自定义平台</label>
+      <div class="col-lg-10">
+          <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th style="width:40%;text-align: center;">平台图</th>
+                  <th style="width:40%;text-align: center;">平台顶部高度</th>
+                  <th style="width:20%;text-align: center;">操作</th>
+                </tr>
+              </thead>
+              <tbody class="plates-lists">
+              {volist name="config.appplates" id="plate"}    
+              <tr>
+                  <td class="text-center">
+                    {:tpl_image_one('appplates[img][]', $plate['img'])}
+                  </td>
+                  <td class="text-center">
+                     <div class="input-group">
+                          <input type="text" class="form-control" name="appplates[h][]" value="{$plate['h']}">
+                          <div class="input-group-addon">px</div>
+                     </div>
+                  </td>
+                  <td class="text-center">
+                      <a class="btn btn-xs btn-primary zam-sortable btn-moveplate" href="javascript:void(0)"> <i class="mdi mdi-arrow-all"></i> </a>
+                      <a class="btn btn-xs btn-danger btn-delplate" href="javascript:void(0)"> <i class="mdi mdi-close"></i> </a>
+                  </td>
+              </tr>
+              {/volist}
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="3">
+                    <a class="btn btn-primary btn-xs addplate" href="javascript:;"> <i class="mdi mdi-plus"></i>新增平台</a>
+                    <div class="m-t-10">每个平台必须上传平台图片并设置平台顶部高度，尽量做正方体或圆柱体，平台顶部高度就是平台顶面的图高</div>
+                  </td>
+                </tr>
+              </tfoot>
+          </table>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 顶部得分背景</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('appscorebg', $config['appscorebg'])}
+        <span class="help-block">规格:269*125px</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 顶部时间背景</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('apptimebg', $config['apptimebg'])}
+        <span class="help-block">规格:267*115px</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 游戏结束背景</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('appoverbg', $config['appoverbg'])}
+        <span class="help-block">规格:546*490px</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 跳中正中间波纹效果图</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('appeffect', $config['appeffect'])}
+        <span class="help-block">{$desconfig['appeffect']}</span>
+      </div>
+    </div>
+    <div class="form-group cloudimgbox">
+      <label class="col-lg-2 control-label text-right">* 云朵图</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('appcloud', $config['appcloud'])}
+        <span class="help-block">{$desconfig['appcloud']}</span>
+      </div>
+    </div>
+    
+  </div>
+  <div class="carditem hidden">
+    {include file='$Wpath/common/gamestyle/diycss'}
+  </div>
+  {include file='$Wpath/common/cancelsavepanel'}
+</form>
+</div>
+<script type="text/javascript">
+require(['webcore','jconfirmBox','zamnotice','zvalidator','jquery.ui'],function(webcore,jconfirmBox,zamnotice){
+  $('.plates-lists').sortable({handle: ".btn-moveplate"}).disableSelection();
+  $(".plates-lists").disableSelection();
+  $(".plates-lists").on('click','.btn-delplate',function(){
+    $(this).parent().parent().remove();
+  });
+  $(".addplate").click(function(){
+    $(".plates-lists").append(webcore.tpl($("#newplate-tpl"),{}));
+  });
+  $(".confirmbox-pop .pop-btns a.btn").click(function(){
+      $(this).addClass('btn-primary').siblings().removeClass("btn-primary");
+      $(".confirmbox-pop .carditem").addClass('hidden').eq($(this).index()).removeClass('hidden');
+  });
+  $(".confirmbox-pop .type-btns a.btn").click(function(){
+      $(this).addClass('btn-primary').siblings().removeClass("btn-primary");
+      $(".confirmbox-pop .typeitem").addClass('hidden').eq($(this).index()).removeClass('hidden');
+  });
+  $('#formBox').formValidation({
+      framework: 'bootstrap',
+      excluded: [':disabled'],
+      message: '您填写的内容无效',
+      fields: {}
+  }).on('success.form.fv', function(e) {
+    e.preventDefault();
+    var $form = $(e.target);
+    var postData = webcore.serializeObject($form);
+    var bload = $form.find(".zam-fixedbottom button").lyearloading({opacity: 0.2,spinnerSize: 'nm'});
+    $form.formValidation('disableSubmitButtons', true);
+    webcore.ajaxSubmit("{:goweb('hdconfig/edit'.$gametype.'style')}",postData).then(function(json){
+      bload.hide();
+      if(json.code==0){
+          $form.formValidation('disableSubmitButtons', false);
+          zamnotice.showTips('success','操作成功',1e3,function(){
+            window.location.href = "{:goweb('hdconfig/'.$gametype.'style')}";
+          });
+        }else{
+            zamnotice.showTips('error',json.msg);
+            $form.formValidation('disableSubmitButtons', false);
+        }
+    }, function(json){
+      bload.hide();
+      zamnotice.showTips('error','网络差。操作失败');
+      $form.formValidation('disableSubmitButtons', false);
+    });
+  });
+});
+</script>
+<script id='newplate-tpl' type="text/template">
+  <tr>
+    <td class="text-center">
+      {:tpl_image_one('appplates[img][]', $config['appplates'][0]['img']??'')}
+    </td>
+    <td class="text-center">
+        <div class="input-group">
+            <input type="text" class="form-control" name="appplates[h][]" value="{$config['appplates'][0]['h']??'152'}">
+            <div class="input-group-addon">px</div>
+        </div>
+    </td>
+    <td class="text-center">
+        <a class="btn btn-xs btn-primary zam-sortable btn-moveplate" href="javascript:void(0)"> <i class="mdi mdi-arrow-all"></i> </a>
+        <a class="btn btn-xs btn-danger btn-delplate" href="javascript:void(0)"> <i class="mdi mdi-close"></i> </a>
+    </td>
+  </tr>
+</script>
+{include file='$Wpath/common/footer'}

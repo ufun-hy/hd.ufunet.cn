@@ -1,0 +1,263 @@
+
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 弹窗背景图</label>
+    <div class="col-lg-8">
+        {:tpl_image_one('pcstyle[pop][boxbg]',$config['pcstyle']['pop']['boxbg'])}
+        <span class="help-block">规格:500*659px</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 弹窗头像形状</label>
+    <div class="col-lg-8">
+      <label class="lyear-radio radio-inline radio-primary">
+       <input type="radio" name="pcstyle[pop][avatarshape]" value="1" {if !isset($config['pcstyle']['pop']['avatarshape']) || $config['pcstyle']['pop']['avatarshape']=='1'}checked{/if}  onclick="avatarshape(this)"><span>圆形</span>
+      </label>
+      <label class="lyear-radio radio-inline radio-primary">
+       <input type="radio" name="pcstyle[pop][avatarshape]" value="2" {if isset($config['pcstyle']['pop']['avatarshape']) && $config['pcstyle']['pop']['avatarshape']=='2'}checked{/if}  onclick="avatarshape(this)"><span>正方形</span>
+      </label>
+    </div>
+</div>
+<div class="usercirclebgbox{if isset($config['pcstyle']['pop']['avatarshape']) && $config['pcstyle']['pop']['avatarshape']=='2'} hidden{/if}">
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 圆形头像背景</label>
+        <div class="col-lg-8">
+            {:tpl_switch('pcstyle[pop][needuserbg]',$config['pcstyle']['pop']['needuserbg']??'1','openuserbg')}
+            <div class="help-block">关闭后将不再展示头像背景图</div>
+        </div>
+    </div>
+    <div class="form-group userbgbox{if isset($config['pcstyle']['pop']['needuserbg']) && $config['pcstyle']['pop']['needuserbg'] == '2'} hidden{/if}">
+        <label class="col-lg-2 control-label">* 圆形头像背景图</label>
+        <div class="col-lg-8">
+            {:tpl_image_one('pcstyle[pop][userbg]',$config['pcstyle']['pop']['userbg'])}
+            <span class="help-block">规格:330*330px</span>
+        </div>
+    </div>
+</div>
+<div class="userfangbgbox{if !isset($config['pcstyle']['pop']['avatarshape']) || $config['pcstyle']['pop']['avatarshape']=='1'} hidden{/if}">
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 正方形头像绕圈线条</label>
+        <div class="col-lg-8">
+            {:tpl_switch('pcstyle[pop][needfanguserbg]',$config['pcstyle']['pop']['needfanguserbg']??'1','openuserfangbg')}
+            <div class="help-block">关闭后将不再展示头像绕圈线条</div>
+        </div>
+    </div>
+    <div class="form-group userbgfangbox{if isset($config['pcstyle']['pop']['needfanguserbg']) && $config['pcstyle']['pop']['needfanguserbg'] == '2'} hidden{/if}">
+        <label class="col-lg-2 control-label">* 正方形头像绕圈线条图</label>
+        <div class="col-lg-8">
+            {:tpl_image_one('pcstyle[pop][userfangbg]',$config['pcstyle']['pop']['userfangbg']??SIMGURL.'mosaicqd/userfangbg.png')}
+            <span class="help-block">规格:160 * 27px，此背景图围绕正方形头像运动</span>
+        </div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 弹窗头像背面光效</label>
+    <div class="col-lg-8">
+        {:tpl_switch('pcstyle[pop][needlightbg]',$config['pcstyle']['pop']['needlightbg']??'1','openlightbg')}
+        <div class="help-block">开启则头像背面有旋转光效</div>
+    </div>
+</div>
+<div class="form-group lightbgbox{if isset($config['pcstyle']['pop']['needlightbg']) && $config['pcstyle']['pop']['needlightbg'] == '2'} hidden{/if}">
+    <label class="col-lg-2 control-label">* 头像背面光效图</label>
+    <div class="col-lg-8">
+        {:tpl_image_one('pcstyle[pop][lightbg]',$config['pcstyle']['pop']['lightbg'])}
+        <span class="help-block">规格:440*440px</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 弹窗内头像数量/展示时间/间距</label>
+    <div class="col-lg-8">
+        <div class="input-group">
+            <div class="input-group-btn not-allow"><a class="btn btn-default">最大个数</a></div>
+            <div class="touchspin">
+            <input type="text" class="form-control numberincdec" name="pcstyle[pop][itemnum]" 
+            data-bts-min="1" data-bts-replacement-val="1"
+            data-bts-max="4"
+            data-bts-step="1"
+            data-bts-postfix="个"
+            data-bts-postfix-extra-class="touchspin-postfix"
+            value="{$config['pcstyle']['pop']['itemnum']}">
+            </div>
+            <div class="input-group-btn not-allow"><a class="btn btn-default">单个展示时间</a></div>
+            <div class="touchspin">
+            <input type="text" class="form-control numberincdec" name="pcstyle[pop][itemtime]" 
+            data-bts-min="1" data-bts-replacement-val="1"
+            data-bts-max="100"
+            data-bts-step="1"
+            data-bts-postfix="秒"
+            data-bts-postfix-extra-class="touchspin-postfix"
+            value="{$config['pcstyle']['pop']['itemtime']}">
+            </div>
+            <div class="input-group-btn not-allow"><a class="btn btn-default">左右间距</a></div>
+            <div class="touchspin">
+            <input type="text" class="form-control numberincdec" name="pcstyle[pop][itemmargin]" 
+            data-bts-min="1" data-bts-replacement-val="1"
+            data-bts-max="100"
+            data-bts-step="1"
+            data-bts-postfix="px"
+            data-bts-postfix-extra-class="touchspin-postfix"
+            value="{$config['pcstyle']['pop']['itemmargin']}">
+            </div>
+        </div>
+        <span class="help-block">最大个数即为大屏此刻查询到新签到或者历史签到数据总条数大于等于最大个数则大屏一次可展示最大个数个用户签到信息，请根据实际情况设置</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 弹窗内文字</label>
+    <div class="col-lg-8">
+        <div class="input-group">
+            <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
+            <div class="touchspin">
+            <input type="text" class="form-control numberincdec" name="pcstyle[pop][wordsize]" 
+            data-bts-min="1" data-bts-replacement-val="1"
+            data-bts-max="40"
+            data-bts-step="1"
+            data-bts-postfix="px"
+            data-bts-postfix-extra-class="touchspin-postfix"
+            value="{$config['pcstyle']['pop']['wordsize']}">
+            </div>
+            <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+            {:tpl_color('pcstyle[pop][wordcolor]',$config['pcstyle']['pop']['wordcolor'])}
+            <div class="input-group-btn not-allow"><a class="btn btn-default">阴影颜色</a></div>
+            {:tpl_color('pcstyle[pop][wordshadowcolor]',$config['pcstyle']['pop']['wordshadowcolor'])}
+        </div>
+        <span class="help-block">请根据实际情况设置</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 历史签到用户随机弹窗播放</label>
+    <div class="col-lg-8">
+        {:tpl_switch('pcstyle[pop][oldopenpop]',$config['pcstyle']['pop']['oldopenpop']??'2','openoldpop')}
+        <div class="help-block">开启后若没有新用户签到时则从历史签到记录内随机选几条签到记录弹窗播放</div>
+    </div>
+</div>
+<div class="form-group oldpopsecondsbox{if isset($config['pcstyle']['pop']['oldopenpop']) && $config['pcstyle']['pop']['oldopenpop'] == '2'} hidden{/if}">
+    <label class="col-lg-2 control-label">* 间隔多久播放历史签到用户弹窗</label>
+    <div class="col-lg-4">
+        <input type="text" class="form-control numberincdec" name="pcstyle[pop][oldpopseconds]" 
+        data-bts-min="0" data-bts-replacement-val="0"
+        data-bts-max="10000"
+        data-bts-step="1"
+        data-bts-postfix="秒"
+        data-bts-postfix-extra-class="touchspin-postfix"
+        value="{$config['pcstyle']['pop']['oldpopseconds']??0}">
+        <div class="help-block">设置0即为监听到无新签到用户就播放历史签到用户信息弹窗</div>
+    </div>
+</div>
+<div class="form-group oldpopsecondsbox{if isset($config['pcstyle']['pop']['oldopenpop']) && $config['pcstyle']['pop']['oldopenpop'] == '2'} hidden{/if}">
+    <label class="col-lg-2 control-label">* 历史签到用户弹窗落地后替换落点头像</label>
+    <div class="col-lg-8">
+        {:tpl_switch('pcstyle[pop][oldpopreplace]',$config['pcstyle']['pop']['oldpopreplace']??'1')}
+        <div class="help-block">开启后弹窗头像落地后会替换落点方格头像，反之不替换</div>
+    </div>
+</div>
+<div class="form-group oldpopsecondsbox{if isset($config['pcstyle']['pop']['oldopenpop']) && $config['pcstyle']['pop']['oldopenpop'] == '2'} hidden{/if}">
+    <label class="col-lg-2 control-label">* 历史签到用户弹窗落地后播放闪亮特效</label>
+    <div class="col-lg-8">
+        {:tpl_switch('pcstyle[pop][oldpopstagger]',$config['pcstyle']['pop']['oldpopstagger']??'1')}
+        <div class="help-block">开启后弹窗头像落地后会播放闪亮特效，反之不播放特效</div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 弹窗落地头像墙闪亮特效</label>
+    <div class="col-lg-8">
+        {:tpl_switch('pcstyle[pop][needstagger]',$config['pcstyle']['pop']['needstagger']??'1','openstagger')}
+        <div class="help-block">开启后弹窗落地后会播放头像墙闪亮特效动画</div>
+    </div>
+</div>
+<div class="form-group staggersecondsbox{if isset($config['pcstyle']['pop']['needstagger']) && $config['pcstyle']['pop']['needstagger'] == '2'} hidden{/if}">
+    <label class="col-lg-2 control-label">* 间隔多久播放一次落地闪耀动画</label>
+    <div class="col-lg-4">
+        <input type="text" class="form-control numberincdec" name="pcstyle[pop][staggerseconds]" 
+        data-bts-min="0" data-bts-replacement-val="0"
+        data-bts-max="10000"
+        data-bts-step="1"
+        data-bts-postfix="秒"
+        data-bts-postfix-extra-class="touchspin-postfix"
+        value="{$config['pcstyle']['pop']['staggerseconds']??0}">
+        <div class="help-block">设置0即为每个签到用户弹窗落地均闪亮一次</div>
+    </div>
+</div>
+<script>
+function openpopstatus(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".popbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".popbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function avatarshape(obj){
+    var type = $(obj).val();
+	if(type=='1'){
+		$('.usercirclebgbox').removeClass('hidden');
+        $('.userfangbgbox').addClass('hidden');
+	}else{
+        $('.userfangbgbox').removeClass('hidden');
+		$('.usercirclebgbox').addClass('hidden');
+	}
+}
+function openuserbg(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".userbgbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".userbgbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openuserfangbg(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".userbgfangbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".userbgfangbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openlightbg(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".lightbgbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".lightbgbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openoldpop(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".oldpopsecondsbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".oldpopsecondsbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openstagger(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".staggersecondsbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".staggersecondsbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+</script>

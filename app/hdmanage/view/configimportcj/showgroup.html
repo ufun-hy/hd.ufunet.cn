@@ -1,0 +1,17 @@
+<div class="form-horizontal confirmbox-pop">
+<form class="confirm-formbox" method="post">
+    <div class="carditem">
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 分组</label>
+            <div class="col-lg-8">
+                <select name="groupid" class="form-control">
+					<option value="" {if !isset($groupid) || $groupid=='0'}selected{/if}>请选择分组</option>
+					{volist name="groups" id="group"}
+						<option value="{$group['id']}" {if isset($groupid) && $groupid==$group['id']}selected{/if}>{$group['groupname']}</option>
+					{/volist}
+				</select>
+            </div>
+        </div>
+    </div>
+</form>
+</div>

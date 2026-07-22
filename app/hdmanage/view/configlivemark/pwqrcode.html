@@ -1,0 +1,66 @@
+<div class="form-horizontal confirmbox-pop">
+<div class="form-group">
+	    <label class="col-lg-3 control-label">参与方式一&nbsp;:</label>
+	    <div class="col-lg-8">
+	    	<div style="line-height: 36px">
+				打开微信扫一扫，扫码参与
+			</div>
+			<div class="joinqrImg">
+				<img src="{$qrcode}" width="150px" height="150px">
+				<a class="btn btn-primary m-l-10 btn-downqrcode" onclick="downloadQr(this)">下载二维码图片</a>
+			</div>
+	    </div>
+</div>
+<div class="form-group">
+	    <label class="col-lg-3 control-label">参与方式二&nbsp;:</label>
+	    <div class="col-lg-8">
+	    	<div style="line-height: 36px">
+				复制评委入口链接，浏览器打开<span class="text-danger">(此链接不一定非要在微信里使用，任何浏览器都可以使用)</span>
+			</div>
+			<div class="joinqrImg">
+				<div class="input-group">
+					<div class="input-group-addon">微信参与地址</div>
+					<input type="text" class="form-control"  value="{$hdurl}">
+					<a class="input-group-addon btn-primary zam-clip" data-href="{$hdurl}">点击复制</a>	
+				</div>
+			</div>
+	    </div>
+</div>
+</div>
+<script>
+var clipboard;
+require(["clipboard","zamnotice"],function(Clipboard,zamnotice){
+	if(clipboard){
+   		clipboard.destroy();
+	}
+	clipboard = new Clipboard('.confirmbox-pop .zam-clip', {
+		text: function(e) {
+			return $(e).data('url') || $(e).data('href')
+		}
+	});
+	clipboard.on('success',
+	function(e) {
+	   zamnotice.showTips('success','复制成功',2e3);
+	})
+});
+function downloadQr(obj){
+	var $this = $(obj);
+	var imgUrl = $this.prev().attr("src");
+	if (window.navigator.msSaveOrOpenBlob) {
+	  var bstr = atob(imgUrl.split(',')[1]);
+	  var n = bstr.length;
+	  var u8arr = new Uint8Array(n);
+	  while (n--) {
+		u8arr[n] = bstr.charCodeAt(n);
+	  }
+	  var blob = new Blob([u8arr]);
+	  window.navigator.msSaveOrOpenBlob(blob, 'qrcode.png');
+	} else {
+	  var el = document.createElement('a');
+	  el.href = imgUrl;
+	  el.setAttribute('download', 'qrcode.png');
+	  el.setAttribute('target', '__blank');
+	  el.click();
+	}
+}
+</script>

@@ -1,0 +1,242 @@
+{include file="common/header" /}
+<style>
+input,textarea{font:inherit;font-family: 微软雅黑,"Microsoft YaHei";background: none;}
+.zam-app-sign{
+	height:100%;
+	background-repeat: no-repeat;
+    background-size: cover;
+}
+.zam-app-signbox{
+	width:6.5rem;
+	padding:0.4rem;
+	margin:0 auto;
+	border-radius: 0.18rem;
+    color: #fff;
+    text-align: center;
+    margin-top:{$appconfig['appstyle']['margintop']??0}px;
+}
+.zam-app-signbox .zam-input-item .postbtn{
+	display: inline-block;
+	height: auto;
+	background:none;
+	padding: 0;
+	text-align: center;
+	margin: 0 auto;
+}
+
+.zam-input-item{
+	width: {$appconfig['appstyle']['input']['width']??100}%;
+    margin-bottom:{$appconfig['appstyle']['jianju']??20}px;
+}
+input::-webkit-input-placeholder,textarea::-webkit-input-placeholder,.zam-input-box .zam-app-cell-input,.zam-input-box .zam-input-select,.zam-input-box .cell-textarea{
+	color:{$appconfig['appstyle']['input']['color']??'#555'};
+}
+.zam-input-box {
+    border: {$appconfig['appstyle']['input']['bordersize']??1}px solid {$appconfig['appstyle']['input']['bordercolor']??'#f4f4f4'};
+    border-radius: {$appconfig['appstyle']['input']['borderraduis']??5}px;
+    background-color: {$appconfig['appstyle']['input']['bgcolor']??'#fff'};
+    padding: {$appconfig['appstyle']['input']['padtop']??5}px {$appconfig['appstyle']['input']['padleft']??10}px;
+}
+.zam-input-box .zam-app-cell-input,.zam-input-box .zam-input-select,.zam-input-box .cell-textarea{
+	width: 100%;
+	text-align:left;
+	font-size: {$appconfig['appstyle']['input']['size']??16}px;
+}
+.zam-input-box .cell-textarea{padding: 0;}
+.zam-input-box .zam-app-cell-input,.zam-input-box .zam-input-select,.zam-input-box .btn{
+	height: {$appconfig['appstyle']['input']['height']??32}px;
+	line-height: {$appconfig['appstyle']['input']['height']??32}px;
+}
+.zam-app-sign .successtip{
+    text-align: center;
+    font-weight: bold;
+    font-size: {$appconfig['appstyle']['successsize']??24}px;
+    color: {$appconfig['appstyle']['successcolor']??'#fff'};
+}
+</style>
+<section class="zam-app-sign g-flexview zam-app-justifyCenter">
+    {if empty($mysigndata)}
+	 <div class="zam-app-signbox zam-app-flex-ajCenter">
+		{foreach $appconfig['appbddata'] as $bd}
+            {if $bd['status']=='1'}
+                <div class="zam-input-item">
+                    <div class="zam-input-box">
+                        {if $bd['zd']=='myname'}
+                            <input type="text" name="{$bd['zd']}" class="cell-input zam-app-cell-input" autocomplete="off"  data-dtip="{$bd['defaulttip']}" data-etip="{$bd['errortip']}" data-title="{$bd['title']}" data-isfloat="{$bd['isfloat']}" data-min="{$bd['min']}" data-max="{$bd['max']}" placeholder="{$bd['defaulttip']}">
+                        {else /}
+                            <textarea class="cell-textarea" name="{$bd['zd']}" data-dtip="{$bd['defaulttip']}" data-etip="{$bd['errortip']}" data-title="{$bd['title']}" data-isfloat="{$bd['isfloat']}" data-min="{$bd['min']}" data-max="{$bd['max']}" placeholder="{$bd['defaulttip']}"></textarea>
+                        {/if}
+                        {if $bd['zd']=='message' && !empty($appconfig['appyulus'])}
+                            {include file="common/yulubtn" /}
+                        {/if}
+                    </div>
+                </div>
+            {/if}
+		{/foreach}
+		<div class="zam-input-item" style="margin-bottom: 0;margin-top: 0.12rem;">
+            <a class="postbtn postsign"><img src="{:tomedia($appconfig['appstyle']['postbutton'])}" /></a>
+		</div>
+	</div>
+    {else /}
+        <div class="successtip">{$appconfig['appstyle']['successtxt']??'签到成功'}</div>
+    {/if}
+</section>
+<script>
+var typenames = {'2':'汉字','3':'字母','4':'数字','5':'汉字与字母组合','6':'汉字与数字组合','7':'字母与数字组合','8':'汉字或字母','9':'汉字或数字','10':'字母或数字'},clickpost = '2';
+require(['wechatcore'],function (wechatcore) {
+	$(".zam-app-signbox .postsign").on('click',function(){
+		var uploadImgBox = $(".zam-app-uploadimg .upload-box"), postData = {},fieldBox = $(".zam-app-signbox input,.zam-app-signbox textarea");
+		if(fieldBox.length <= 0){
+			return wechatcore.msg('签到表单项目异常');
+		}
+		var hascheck = true;
+		fieldBox.each(function(k,v){
+			var inputval = $(this).val(),bdtitle = $(this).attr('data-title')||'';
+            if(typeof inputval != 'undefined' && inputval!=''){
+                var isfloat = $(this).attr('data-isfloat') || 1, dmin = $(this).attr('data-min') || 0, dmax = $(this).attr('data-max') || 0;
+                if(isfloat > 1){
+                    if(isfloat == '2' && !/^[\u4e00-\u9fa5]+$/.test(inputval)){
+                        wechatcore.showtopmsg(bdtitle+'只能输入'+typenames[isfloat]);
+                        hascheck = false;
+                        return false;
+                    }
+                    if(isfloat == '3' && !/^[A-Za-z]+$/.test(inputval)){
+                        wechatcore.showtopmsg(bdtitle+'只能输入'+typenames[isfloat]);
+                        hascheck = false;
+                        return false;
+                    }
+                    if(isfloat == '4' && !/^-?\d+$/.test(inputval)){
+                        wechatcore.showtopmsg(bdtitle+'只能输入整数'+typenames[isfloat]);
+                        hascheck = false;
+                        return false;
+                    }
+                    if(isfloat == '5'){
+                        if(!/^[a-zA-Z\u4e00-\u9fa5]+$/.test(inputval)){
+                            wechatcore.showtopmsg(bdtitle+'只能输入'+typenames[isfloat]);
+                            hascheck = false;
+                            return false;
+                        }else{
+                            if(/^[\u4e00-\u9fa5]+$/.test(inputval)){
+                                wechatcore.showtopmsg(bdtitle+'不能是纯汉字');
+                                hascheck = false;
+                                return false;
+                            }
+                            if(/^[A-Za-z]+$/.test(inputval)){
+                                wechatcore.showtopmsg(bdtitle+'不能是纯字母');
+                                hascheck = false;
+                                return false;
+                            }
+                        }
+                    }
+                    if(isfloat == '6'){
+                        if(!/^[0-9\u4e00-\u9fa5]+$/.test(inputval)){
+                            wechatcore.showtopmsg(bdtitle+'只能输入'+typenames[isfloat]);
+                            hascheck = false;
+                            return false;
+                        }else{
+                            if(/^[\u4e00-\u9fa5]+$/.test(inputval)){
+                                wechatcore.showtopmsg(bdtitle+'不能是纯汉字');
+                                hascheck = false;
+                                return false;
+                            }
+                            if(/^[0-9]+$/.test(inputval)){
+                                wechatcore.showtopmsg(bdtitle+'不能是纯数字');
+                                hascheck = false;
+                                return false;
+                            }
+                        }
+                    }
+                    if(isfloat == '7'){
+                        if(!/^[A-Za-z0-9]+$/.test(inputval)){
+                            wechatcore.showtopmsg(bdtitle+'只能输入'+typenames[isfloat]);
+                            hascheck = false;
+                            return false;
+                        }else{
+                            if(/^[A-Za-z]+$/.test(inputval)){
+                                wechatcore.showtopmsg(bdtitle+'不能是纯字母');
+                                hascheck = false;
+                                return false;
+                            }
+                            if(/^[0-9]+$/.test(inputval)){
+                                wechatcore.showtopmsg(bdtitle+'不能是纯数字');
+                                hascheck = false;
+                                return false;
+                            }
+                        }
+                    }
+                    if(isfloat == '8'){
+                        if(!/^[a-zA-Z\u4e00-\u9fa5]+$/.test(inputval)){
+                            wechatcore.showtopmsg(bdtitle+'只能输入'+typenames[isfloat]);
+                            hascheck = false;
+                            return false;
+                        }
+                    }
+                    if(isfloat == '9'){
+                        if(!/^[0-9\u4e00-\u9fa5]+$/.test(inputval)){
+                            wechatcore.showtopmsg(bdtitle+'只能输入'+typenames[isfloat]);
+                            hascheck = false;
+                            return false;
+                        }
+                    }
+                    if(isfloat == '10'){
+                        if(!/^[a-zA-Z0-9]+$/.test(inputval)){
+                            wechatcore.showtopmsg(bdtitle+'只能输入'+typenames[isfloat]);
+                            hascheck = false;
+                            return false;
+                        }
+                    }
+                    if(dmin > 0 && inputval.length < dmin){
+                        wechatcore.showtopmsg(bdtitle+'最少需输入'+dmin+'位'+typenames[isfloat]);
+                        hascheck = false;
+                        return false;
+                    }
+                    if(dmax > 0 && inputval.length > dmax){
+                        wechatcore.showtopmsg(bdtitle+'最多只能输入'+dmax+'位'+typenames[isfloat]);
+                        hascheck = false;
+                        return false;
+                    }
+                }
+            }else{
+                wechatcore.showtopmsg($(this).attr('data-dtip')||'请输入'+bdtitle);
+				hascheck = false;
+				return false;
+            }
+            postData[$(this).attr('name')] = $(this).val() || '';
+		});
+		if(!hascheck){
+			return false;
+		}
+		if(clickpost == '1') return false;
+		clickpost = '1';
+		wechatcore.ajaxSubmit("{:gowechat('qdbook/postsign')}",{data:postData},'数据提交中...').then(function(data){
+			if(data.code==0){
+                var successtxt = "{$appconfig['appstyle']['successtxt']??'签到成功'}";
+                var successurl = "{$appconfig['appstyle']['successurl']??''}";
+                if(successtxt != ''){
+                    wechatcore.showtopmsg(successtxt,1e3,function(){
+                        clickpost = '2';
+                        wechatcore.reloadpage(successurl);
+                    });
+                }else{
+                    wechatcore.reloadpage(successurl);
+                }
+			}else{
+				wechatcore.showtopmsg(data.msg,2e3,function(){
+					clickpost = '2';
+				});
+			}
+		}, function(){
+			wechatcore.msg('网络异常，请稍后重试');
+			clickpost = '2';
+		});
+	});
+	if(wechatcore.ios12over()){
+		$("body").on('blur','input,select', function () {
+			var scrollHeight = document.documentElement.scrollTop || document.body.scrollTop || 0;
+			window.scrollTo(0 ,Math.max(scrollHeight - 1, 0));
+		});
+	}
+})
+</script>
+{include file="common/footermenu" /}
+{include file="common/footer" /}

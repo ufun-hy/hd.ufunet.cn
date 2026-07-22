@@ -1,0 +1,164 @@
+<div class="form-group">
+    <label class="col-lg-2 control-label">主色调</label>
+    <div class="col-lg-8">
+        {:tpl_color('welcomestyle[color]',$config['welcomestyle']['color']??'#feca00')}
+        <span class="help-block">奖品名，奖项名，中奖名单等均会生效</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">顶部奖品背景图</label>
+    <div class="col-lg-8">
+        {:tpl_image_one('welcomestyle[topbg]',$config['welcomestyle']['topbg'])}
+        <span class="help-block">规格:1034px * 76px</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">奖品动态背景图</label>
+    <div class="col-lg-8">
+        {:tpl_image_one('welcomestyle[prizebg]',$config['welcomestyle']['prizebg'])}
+        <span class="help-block">规格:600px * 600px</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">奖品动态背景图2</label>
+    <div class="col-lg-8">
+        {:tpl_image_one('welcomestyle[prizebg2]',$config['welcomestyle']['prizebg2'])}
+        <span class="help-block">规格:600px * 600px</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">底部背景图</label>
+    <div class="col-lg-8">
+        {:tpl_image_one('welcomestyle[bottombg]',$config['welcomestyle']['bottombg'])}
+        <span class="help-block">规格:1056px * 116px</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">抽奖按钮背景图</label>
+    <div class="col-lg-8">
+        {:tpl_image_one('welcomestyle[btn]',$config['welcomestyle']['btn']??'')}
+        <span class="help-block">规格:153px * 45px</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">开始抽奖奖品变小背景视频（变小再散花效果）</label>
+    <div class="col-lg-8">
+        {:tpl_video('welcomestyle[hidevideo]',$config['welcomestyle']['hidevideo'])}
+        <span class="help-block">规格:1920px * 1080px</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">结束抽奖背景视频（爆炸效果）</label>
+    <div class="col-lg-8">
+        {:tpl_video('welcomestyle[baozhavideo]',$config['welcomestyle']['baozhavideo'])}
+        <span class="help-block">规格:1920px * 1080px</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 抽奖进行中显示停止按钮</label>
+    <div class="col-lg-8">
+        {:tpl_switch('welcomestyle[showstopbtn]',$config['welcomestyle']['showstopbtn']??'2')}
+            <span class="help-block">默认不显示停止按钮，直接通过点击键盘空格键来停止抽奖，一般是空格键坏了等特殊原因才开启此项</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">中奖记录背景图</label>
+    <div class="col-lg-8">
+        {:tpl_image_one('welcomestyle[luckerbg]',$config['welcomestyle']['luckerbg'])}
+        <span class="help-block">规格:576px * 388px</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 中奖用户名称颜色</label>
+    <div class="col-lg-8">
+        {:tpl_color('welcomestyle[name][color]',$config['welcomestyle']['name']['color']??'#feca00')}
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 中奖用户名大小</label>
+    <div class="col-lg-10">
+        <div class="input-group">
+            <div class="input-group-btn not-allow"><a class="btn btn-default">1-2个</a></div>
+            <div class="touchspin">
+                <input type="text" class="form-control numberincdec" name="welcomestyle[name][size1]" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="300"
+                data-bts-step="1"
+                data-bts-postfix="px"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['welcomestyle']['name']['size1']??56}">
+            </div>
+            <div class="input-group-btn not-allow"><a class="btn btn-default">3-4个</a></div>
+            <div class="touchspin">
+                <input type="text" class="form-control numberincdec" name="welcomestyle[name][size2]" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="300"
+                data-bts-step="1"
+                data-bts-postfix="px"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['welcomestyle']['name']['size2']??50}">
+            </div>
+            <div class="input-group-btn not-allow"><a class="btn btn-default">5个及以上</a></div>
+            <div class="touchspin">
+                <input type="text" class="form-control numberincdec" name="welcomestyle[name][size3]" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="300"
+                data-bts-step="1"
+                data-bts-postfix="px"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['welcomestyle']['name']['size3']??24}">
+            </div>
+        </div>
+        <span class="zam-help-block">注:最大可以是300，请结合文字长度设置此数值</span>
+    </div>
+ </div>
+<div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 中奖留言颜色</label>
+    <div class="col-lg-8">
+        {:tpl_color('welcomestyle[msg][color]',$config['welcomestyle']['msg']['color']??'#fff')}
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 中奖留言大小</label>
+    <div class="col-lg-10">
+        <div class="input-group">
+            <div class="input-group-btn not-allow"><a class="btn btn-default">1-2个</a></div>
+            <div class="touchspin">
+                <input type="text" class="form-control numberincdec" name="welcomestyle[msg][size1]" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="300"
+                data-bts-step="1"
+                data-bts-postfix="px"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['welcomestyle']['msg']['size1']??40}">
+            </div>
+            <div class="input-group-btn not-allow"><a class="btn btn-default">3-4个</a></div>
+            <div class="touchspin">
+                <input type="text" class="form-control numberincdec" name="welcomestyle[msg][size2]" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="300"
+                data-bts-step="1"
+                data-bts-postfix="px"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['welcomestyle']['msg']['size2']??36}">
+            </div>
+            <div class="input-group-btn not-allow"><a class="btn btn-default">5个及以上</a></div>
+            <div class="touchspin">
+                <input type="text" class="form-control numberincdec" name="welcomestyle[msg][size3]" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="300"
+                data-bts-step="1"
+                data-bts-postfix="px"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['welcomestyle']['msg']['size3']??20}">
+            </div>
+        </div>
+        <span class="zam-help-block">注:最大可以是300，请结合文字长度设置此数值</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 右侧中奖列表别名</label>
+    <div class="col-lg-8">
+      <input type="text" class="form-control"  name="welcomestyle[listname]"  value="{$config['welcomestyle']['listname']??'中奖列表'}" maxlength="15" placeholder="15个字符以内">
+    </div>
+</div>

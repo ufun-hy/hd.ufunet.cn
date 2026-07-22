@@ -1,0 +1,148 @@
+{include file='$Wpath/common/header'}
+<div class="form-inline zam-inline-searchbar">
+    <div class="form-group m-l-5">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">选择轮次</span>
+          <select id="rotateid" class="form-control">
+            {if empty($rotates)}
+                <option value="0">暂无轮次</option>
+            {/if}
+            {foreach $rotates as $k=>$r} 
+                <option value="{$r['id']}" {if $rotate['id'] == $r['id']}selected{/if}>{$r['title']}</option>
+            {/foreach}
+          </select>
+        </div>
+    </div>
+    <div class="form-group" style="max-width: 200px">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">昵称或表单内容</span>
+        <input type="text" class="form-control" value="" id="keyword" placeholder="请输入用户昵称或表单内容">
+      </div>
+    </div>
+    <a class="btn btn-primary btn-sm btn-search" href="javascript:void(0)"><i class="mdi mdi-magnify"></i> 搜索</a>
+    <a class="btn btn-warning btn-sm btn-export" href="javascript:void(0)"><i class="mdi mdi-export"></i> 导出</a>
+</div>
+{include file='$Wpath/common/tabletoolbar'}
+<table id="listtable" class="zam-btable"></table>
+<script>    
+require(['webcore','webtable','jconfirmBox','zamnotice'],function(webcore,webtable,jconfirmBox,zamnotice){
+var searchParamas = [{'type':'2','id':'rotateid'},{'type':'2','id':'goodsid'},{'type':'1','id':'keyword'}];
+var initConfig = {
+    tableId:'#listtable',
+    url:"{:gohdmanage('datadhh/user',['hdid'=>$hdid])}",
+    columnoperate:{
+        btns:{
+            del:true,
+        },
+        func:{
+            del:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','删除将无法恢复，您确定要删除么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('datadhh/deluserrecord',['hdid'=>$hdid])}",{rotateid:$("#rotateid option:selected").val(),recordid:row.id}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','删除成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差。操作失败');
+                });
+                });
+            },
+            
+        }
+    },
+    columns:[{
+            checkbox: true,
+        }, 
+        {
+            field: 'id',
+            title: 'id',
+            align: 'center',
+            visible: false
+        },{
+            field: 'nickname',
+            title: '订货用户',
+            align: 'center',
+            formatter:function(value,row,index){
+                return `
+                <div class='zam-flex-column-center'>
+                    <img src="${row.avatar}" class="avatarImg" />
+                    <span>${value||'已删除'}</span>
+                </div>
+                `;
+            }
+        }
+        ,{
+            field: 'totalcount',
+            title: '订单量',
+            align: 'center',
+        }
+        ,{
+            field: 'totalmoney',
+            title: '订单金额',
+            align: 'center',
+        }
+    ],
+    searchParamas:searchParamas,
+    toolbar:{
+        del:function(){
+            var getSelects = webtable.getSelections();
+            if(!getSelects.length){
+                return zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+            jconfirmBox.confirm('温馨提示','删除数据将无法恢复，您确定要删除选中的记录数据么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('datadhh/deluserrecord',['hdid'=>$hdid])}",{rotateid:$("#rotateid option:selected").val(),recordid:getSelects}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','删除成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+        },
+        reset:function(){
+            var rotateid = $("#rotateid option:selected").val()||'';
+            if(+rotateid < 1) {
+                return zamnotice.showTips('info','请选择轮次');
+            }
+            jconfirmBox.confirm('温馨提示','清空将删除本轮所有用户订单数据并且无法恢复，您确定要清空么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('datadhh/resetuserrecord',['hdid'=>$hdid])}",{rotateid:rotateid}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','清空成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+        },
+    },
+};
+webtable.init(initConfig);
+$('#rotateid').change(function(e) {
+    webtable.refresh();
+});
+$('.btn-export').on('click',function(){
+    var rotateid = $("#rotateid option:selected").val()||'';
+    if(+rotateid < 1) {
+        return zamnotice.showTips('info','请选择轮次');
+    }
+    webcore.ajaxSubmit("{:gohdmanage('datadhh/exportuserrecord',['hdid'=>$hdid])}",{rotateid:rotateid}).then(function(json){
+        if(json.code!=0){
+            zamnotice.showTips('error',json.msg);
+        }else{
+            window.location.href = `{:gohdmanage('datadhh/exportuserrecord',['hdid'=>$hdid])}&rotateid=${rotateid}`;
+        }
+    }, function(json){
+        zamnotice.showTips('error','网络差,操作失败');
+    });
+});
+});
+</script>
+{include file='$Wpath/common/footer'}

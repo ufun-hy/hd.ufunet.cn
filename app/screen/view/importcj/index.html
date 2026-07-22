@@ -1,0 +1,547 @@
+{include file='common/header' /}
+<style>
+::-webkit-scrollbar {
+    width: 10px;
+    border-radius: 10px;
+}
+::-webkit-scrollbar-track {
+    background-color: #fff;
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    outline-offset: -2px;
+    background-color: {$pcconfig['styleconfig']['color']};
+}
+::-webkit-scrollbar-thumb:hover {
+    background-color: {$pcconfig['styleconfig']['color']};
+}
+.hidden{display: none}
+.header{pointer-events: none;}
+.header ul{visibility: hidden}
+.importcj-mainbox {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+}
+{/* 数据进屏幕内部 */}
+.importcj-wall{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    transform: translate3d(0,0,0);
+    pointer-events: none;
+}
+.importcj-wall .importcj-luckerbox-item {
+    font-weight: bold;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+    color:{$pcconfig['styleconfig']['color']};
+    transform-style: preserve-3d;
+    will-change: transform;
+}
+.importcj-wall .importcj-luckerbox-item .lucker-one-item {
+    width: 100%;
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    /* background-color: green; */
+}
+.importcj-wall .lucker-one-item .data-box{
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+}
+.importcj-wall .lucker-one-item .data-box .data-one{
+    text-align: center;
+    {if isset($pcconfig['styleconfig']['flytype'])}
+        font-size:{if $pcconfig['styleconfig']['flytype'] == '2'}{$pcconfig['styleconfig']['flyonesize']??50}{elseif $pcconfig['styleconfig']['flytype'] == '3'}{$pcconfig['styleconfig']['flygridsize']??50}{else}{$pcconfig['styleconfig']['flyspheresize']??50}{/if}px;
+    {/if}
+}
+{if !empty($pcconfig) && isset($pcconfig['fieldconfig']) && !empty($pcconfig['fieldconfig'])}
+    {foreach $pcconfig['fieldconfig'] as $ckey=>$cfield}
+    .importcj-wall .lucker-one-item .data-box .datafield{$ckey+1}{
+        color:{$cfield['fieldcolor']};
+    }
+    {/foreach}
+    {if count($pcconfig['fieldconfig']) < 4}
+        {if !isset($pcconfig['fieldconfig'][0])}
+        .importcj-wall .lucker-one-item .data-box .datafield1{display: none;}
+        {/if}
+        {if !isset($pcconfig['fieldconfig'][1])}
+        .importcj-wall .lucker-one-item .data-box .datafield2{display: none;}
+        {/if}
+        {if !isset($pcconfig['fieldconfig'][2])}
+        .importcj-wall .lucker-one-item .data-box .datafield3{display: none;}
+        {/if}
+        {if !isset($pcconfig['fieldconfig'][3])}
+        .importcj-wall .lucker-one-item .data-box .datafield4{display: none;}
+        {/if}
+    {/if}
+{/if}
+.importcj-wall .deldata{display: none}
+
+{/*视频效果*/}
+.firevideo1 {display:none;transform: translate(-50%, -50%) scale(1); object-fit: cover; mix-blend-mode: screen; width: 100%; height: 100%; left: 50%; top: 50%; position: absolute;}
+.firevideo2 { display: none; transform: translate(-50%, -50%) scale(2); object-fit: cover; mix-blend-mode: screen; width: 100%; height: 100%; left: 50%; top: 50%; position: absolute; }
+{/*抽奖弹窗*/}
+.importcj-lists {width: 100%; height: 100%; position: absolute;left: 0;right: 0;}
+{/*顶部*/}
+.importcj-lists .importcj-header{
+    position: relative;
+    top: 18px;
+}
+.importcj-lists .importcj-header .importcj-headerbg {width: 1034px;height: 76px;text-align: center;margin: 0 auto; background: url({:tomedia($pcconfig['styleconfig']['topbg'])}) no-repeat; background-size: cover;}
+.importcj-lists .importcj-header .awardname {font-weight: bold; font-size: {$pcconfig['styleconfig']['awardsize']??30}px;color: {$pcconfig['styleconfig']['color']};line-height:1}
+.importcj-lists .importcj-header .prizename {height:30px;text-align: center;font-size: {$pcconfig['styleconfig']['prizesize']??25}px;font-weight: bold;color:{$pcconfig['styleconfig']['color']};line-height: 1;}
+.isroundcj .importcj-header .prizename{display: none;}
+.headerani { animation: headerani 0.6s ease-out 0s both; }
+@keyframes headerani { 
+    0% {
+        opacity:0;
+        transform: translateY(-100px)
+    }
+    50% {
+        opacity:1
+    }
+}
+{/*尾部*/}
+.importcj-lists .importcj-footer {position:relative;width: 1056px; height: 116px;}
+.footerani { animation: footerani 0.6s ease-out 0s both; }
+@keyframes footerani { 
+    0% {
+        opacity:0;
+        transform: translateY(100px)
+    }
+    50% {
+        opacity:1
+    }
+}
+.importcj-lists .importcj-footer-box {width: 100%; height: 100%; background: url({:tomedia($pcconfig['styleconfig']['bottombg'])}) no-repeat center center; background-size: 100% 100%; box-sizing: border-box;color: {$pcconfig['styleconfig']['color']}; font-size: 18px;}
+.importcj-lists .importcj-footer-box .select-prize{height: 45px; line-height: 45px; position: absolute; top:16px;left: 120px;}
+.importcj-lists .importcj-footer-box .select-prize .active-prize{padding:0 10px;width: 100px;text-align: center;}
+.importcj-lists .importcj-footer-box .select-prize span{font-size: 20px;font-weight: bold;cursor: pointer;}
+.importcj-lists .importcj-footer-box .select-box {position: absolute; top:-10px;left: 50%;transform: translate(-50%, 0%); width: 220px; height: 45px; line-height: 45px;display: flex; flex-wrap: nowrap; justify-content: center; font-size: 14px;}
+.importcj-lists .importcj-footer-box input{width:45px;line-height: 45px; font-size: 18px; height: 25px; margin: 10px 4px; border-radius: 6px; border: 0; text-align: center; color: {$pcconfig['styleconfig']['color']}; background-color: rgba(255,235,59,0.15);}
+.importcj-lists .importcj-footer-box input:focus{outline: 0;border: 0;}
+.importcj-lists .importcj-footer-box .btn-start,.importcj-lists .importcj-footer-box .btn-close {width: 153px; height: 45px; line-height: 45px; position: absolute; top:50px;left: calc(50% - 153px/2);text-align: center; border-radius: 45px;cursor: pointer; color: #fff; font-size: 18px;font-weight:bold;letter-spacing: 3px;background-image: url({:tomedia($pcconfig['styleconfig']['btn'])});backgroud-repeat: no-repeat; background-size: cover;}
+.importcj-lists .importcj-footer-box .btn-showalllucker {width: 200px; height: 45px; line-height: 45px; position: absolute; top:16px;right: 140px; text-align: center; cursor: pointer;}
+.importcj-lists .importcj-footer-box .btn-showalllucker .lucker-numbox{display: inline-block;margin-left: 10px;}
+.importcj-lists .importcj-footer-box .btn-showalllucker .lucker-numbox .lucker-num{display: inline-block;margin-right: 10px;}
+.importcj-lists .importcj-footer-box .btn-showalllucker .lucker-numbox .prize-num{display: inline-block;margin-left: 10px;}
+{/*底部提示词*/}
+.importcj-lists .importcj-tip { position: absolute; bottom: 12px; color:#fff;width: 300px; text-align: center; left: 50%; margin-left: -150px; font-size: 20px;display: none}
+.isdrawing .importcj-awardbox { animation: awardboxshine 1s ease-out 0s both;}
+@keyframes awardboxshine { 
+    0% {
+        opacity:1
+        transform:scale(1);
+    }
+    100% {
+        opacity:0;
+        transform:scale(0);
+    }
+}
+.isdrawing2 .importcj-header {animation: headerhideani 0.5s ease-out 0s both; }
+@keyframes headerhideani { 
+    0% {
+        opacity:1;
+    }
+    100% {
+        opacity:0;
+        transform: translateY(-100px)
+    }
+}
+.isdrawing .importcj-footer{
+    height: 58px;
+    animation: footerhideani 0.5s ease-out 0s both;
+}
+@keyframes footerhideani { 
+    0% {
+        opacity:1;
+        transform: translateY(0px)
+    }
+    100% {
+        opacity:0;
+        transform: translateY(100px);
+    }
+}
+.isdrawing .importcj-tip {
+    animation: opacityani 2s ease-in-out infinite backwards; display: block
+}
+@-webkit-keyframes opacityani{0%{opacity:.2}50%{opacity:0.6}to{opacity:.2}}
+{/*中奖部分*/}
+.importcj-lists .importcj-body{
+    margin-top: 15px;
+    position:relative;
+    width: 100%;
+    flex: 1;
+    -webkit-flex: 1;
+    overflow: hidden auto;
+}
+.isdrawing .importcj-lists .importcj-body,.isdrawing .importcj-lists .importcj-body .importcj-luckerbox .importcj-luckerbox-content{
+    overflow: hidden;
+}
+.importcj-lists .importcj-body .importcj-awardlist{
+    width: 100%;
+    min-height: 100%;
+    color: #fff;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-content: center;
+}
+.importcj-lists .importcj-body .importcj-awardbox { 
+}
+.awardboxani {animation: awardboxani 1s ease-out 0s both;}
+@keyframes awardboxani { 
+    0% {
+        opacity:0;
+        transform: scale(0);
+    }
+    100% {
+        opacity:1;
+        transform: scale(1);
+    }
+}
+.importcj-lists .importcj-body .importcj-awardbox .importcj-prizeimg {
+    position: relative;
+    width: 500px;
+    height: 500px;
+}
+.importcj-lists .importcj-body .importcj-awardbox .importcj-prizeimg::after {
+    content: "";
+    position: absolute; 
+    left:0;
+    top:0;
+    width: 100%; 
+    height: 100%; 
+    background: url({:tomedia($pcconfig['styleconfig']['prizebg'])}) no-repeat; 
+    background-size: cover;
+}
+.importcj-lists .importcj-body .importcj-awardbox .importcj-prizeimg img{
+    width:250px; 
+    height: 250px;
+}
+.importcj-lists .importcj-body .importcj-awardbox .importcj-prizeinfo{
+    text-align: center;
+    color: #fff;
+    font-size:20px;
+    font-weight: bold;
+}
+.importcj-lists .importcj-body .importcj-awardbox .importcj-prizeinfo .importcj-prizenum{
+    margin-top: 0;
+}
+/*中奖用户*/
+.importcj-lists .importcj-body .importcj-luckerbox {position:absolute;top:0;left:0;width: 100%;height: 100%; display: none;}
+.importcj-lists .importcj-body .importcj-luckerbox .importcj-luckerbox-content {
+    width: calc(100% - 10px); 
+    height: 100%;
+    margin:0 5px; 
+    overflow: hidden auto;
+    transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+}
+/*抽奖结束时刻隐藏中间的奖品，切换奖品 以及 抽奖人数 以及中奖名单*/
+.isdrawed .importcj-lists .importcj-footer{height: 58px;}
+.isdrawed .importcj-lists .importcj-footer .btn-start,.isdrawed .importcj-lists .importcj-footer .btn-close{top: 10px;}
+.isdrawed .importcj-lists .importcj-body .importcj-luckerbox{display: block!important}
+.isdrawed .importcj-lists .importcj-footer-box{background:none;}
+.isdrawed .importcj-awardbox,.isdrawed .importcj-footer-box .select-box,.isdrawed .importcj-footer-box .select-prize,.isdrawed .importcj-footer-box .btn-showalllucker{display: none}
+.importcj-luckerbox-lists {transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;text-align: center; min-height: 100%;box-sizing: border-box; display: flex; align-items: center; align-content: center; flex-wrap: wrap; justify-content: space-evenly}
+/*中奖图片大小*/
+.importcj-luckerbox-lists li.importcj-luckerbox-item {
+    width: calc(100% / {$pcconfig['styleconfig']['over8linenum']??5});
+    margin:{$pcconfig['styleconfig']['margin']??0}px 0;
+    font-weight: bold;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+    transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    color:{$pcconfig['styleconfig']['color']};
+}
+.importcj-luckerbox-lists li.importcj-luckerbox-item .lucker-one-item {
+    padding: {$pcconfig['styleconfig']['padding']??7}px;
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+}
+.importcj-luckerbox-lists .lucker-one-item .data-box{position: relative;}
+.importcj-luckerbox-lists .lucker-one-item .data-box .data-one{
+    font-size:{$pcconfig['styleconfig']['rolltxt5']??25}px;
+    /* margin-bottom: 5px; */
+}
+.flybox2.isdrawing .dataxuhao{display:none}
+.importcj-luckerbox-lists .lucker-one-item .data-box .dataxuhao span{
+    margin-left: 5px;
+}
+{if !empty($pcconfig) && isset($pcconfig['fieldconfig']) && !empty($pcconfig['fieldconfig'])}
+    {foreach $pcconfig['fieldconfig'] as $ckey=>$cfield}
+    .importcj-luckerbox-lists .lucker-one-item .data-box .datafield{$ckey+1}{
+        color:{$cfield['fieldcolor']};
+    }
+    {/foreach}
+    {if count($pcconfig['fieldconfig']) < 4}
+        {if !isset($pcconfig['fieldconfig'][0])}
+        .importcj-luckerbox-lists .lucker-one-item .data-box .datafield1{display: none;}
+        {/if}
+        {if !isset($pcconfig['fieldconfig'][1])}
+        .importcj-luckerbox-lists .lucker-one-item .data-box .datafield2{display: none;}
+        {/if}
+        {if !isset($pcconfig['fieldconfig'][2])}
+        .importcj-luckerbox-lists .lucker-one-item .data-box .datafield3{display: none;}
+        {/if}
+        {if !isset($pcconfig['fieldconfig'][3])}
+        .importcj-luckerbox-lists .lucker-one-item .data-box .datafield4{display: none;}
+        {/if}
+    {/if}
+{/if}
+.importcj-luckerbox-lists.bigdata1 .importcj-luckerbox-item{
+    width: auto;
+}
+.importcj-luckerbox-lists.bigdata1 .lucker-one-item .data-box .data-one{
+    font-size:{$pcconfig['styleconfig']['rolltxt1']??50}px;
+}
+.importcj-luckerbox-lists.bigdata2 .importcj-luckerbox-item{
+    width: 50%;
+}
+.importcj-luckerbox-lists.bigdata2 .lucker-one-item .data-box .data-one{
+    font-size:{$pcconfig['styleconfig']['rolltxt2']??45}px;
+}
+.importcj-luckerbox-lists.bigdata3 .importcj-luckerbox-item{
+    width: 33%;
+}
+.importcj-luckerbox-lists.bigdata3 .lucker-one-item .data-box .data-one{
+    font-size:{$pcconfig['styleconfig']['rolltxt3']??35}px;
+}
+.importcj-luckerbox-lists.bigdata4 .importcj-luckerbox-item{
+    width: 25%;
+}
+.importcj-luckerbox-lists.bigdata4 .lucker-one-item .data-box .data-one{
+    font-size:{$pcconfig['styleconfig']['rolltxt4']??30}px;
+}
+.importcj-luckerbox-lists li .deldata{position:absolute;top:0;left:0;width:100%;height:100%;color:#fff;font-size: 24px;font-weight:bold;display: none}
+.importcj-luckerbox-lists li .deldata i{cursor:pointer}
+.importcj-luckerbox-lists li .data-box:hover .deldata{
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-justify-content: center;
+    justify-content: center;
+}
+.userani { 
+    animation: userani 1s ease-out 0s both;
+}
+@keyframes userani {
+    0% {
+        opacity:0;
+        transform: translateZ(-1000px) scale(0);
+    }
+    60% {
+        opacity:1;
+        transform:translateZ(0) scale(1)
+    }
+}
+.isdrawing .importcj-luckerbox-lists li .data-box:hover .deldata{display: none}
+
+.importcj-luckerbox-lists .roundlucker-item{
+    width: 100%;
+    /* margin-bottom: 10px; */
+    color: #fff;
+}
+.importcj-luckerbox-lists .roundlucker-item .prizename{
+    line-height: 50px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: #fff;
+}
+.importcj-luckerbox-lists .roundlucker-item ul{
+    width: 100%;
+}
+{/* 轮次抽奖不需要在弹窗上删除记录 */}
+.importcj-luckerbox-lists .roundlucker-item li .data-box:hover .deldata{display: none}
+{/* 轮次抽奖中奖记录底部描述文字 */}
+.importcj-btip{
+    position: absolute;
+    left: 0;
+    bottom: 20px;
+    width: 100%;
+    text-align: center;
+    color: #fff;
+    font-size:{$pcconfig['styleconfig']['rolltxt5']??25}px;
+}
+{if isset($pcconfig['styleconfig']['showstopbtn']) && $pcconfig['styleconfig']['showstopbtn'] == '1'}
+{/* 显示停止按钮 */}
+.isdrawing .importcj-footer{animation:none!important}
+.isdrawing .importcj-awardbox,.isdrawing .importcj-footer-box .select-box,.isdrawing .importcj-footer-box .select-prize,.isdrawing .importcj-footer-box .btn-showalllucker,.isdrawing .importcj-tip{
+    display:none;
+}
+.isdrawing .importcj-footer-box{
+    background:none;
+}
+.isdrawing .importcj-footer .btn-start{
+    top: 12px;
+    animation:btnani 0.5s ease-out 3s both;
+}
+@keyframes btnani{
+    0%{opacity:0;transform: scale(0);}
+    100%{opacity:1;transform: scale(1);}
+}
+{/if}
+</style>
+{if !empty($pcconfig['iscjingmusic'])}
+<audio id="cjingmusic" src="{:tomedia($pcconfig['iscjingmusic'])}" loop preload="preload" style="display:none"></audio>
+{/if}
+{if !empty($pcconfig['iscjendmusic'])}
+<audio id="cjendmusic" src="{:tomedia($pcconfig['iscjendmusic'])}" preload="preload" style="display:none"></audio>
+{/if}
+<div class="importcj-mainbox normalbox flybox{$pcconfig['styleconfig']['flytype']??1}{if isset($pcconfig['isroundcj']) && $pcconfig['isroundcj'] =='1'} isroundcj{/if}">
+    <div class="emptybox zam-app-flex-ajCenter hidden">
+        <img src="/{:SIMGURL}common/empty.png">
+        <p style="padding:20px;">请到后台添加{if isset($pcconfig['isroundcj']) && $pcconfig['isroundcj']=='1'}轮次{else /}奖品{/if}</p>
+    </div>
+    <div class="importcj-lists zam-app-flex-ajCenter hidden">
+        <div class="importcj-header zam-app-flex-ajCenter headerani">
+            <div class="importcj-headerbg"><span class="awardname">xxx</span></div>
+            <div class="prizename">xxx奖品</div>
+        </div>
+        <div class="importcj-body zam-app-flex-ajCenter">
+            <div class="importcj-awardlist"></div>
+            <div class="importcj-luckerbox">
+                <div class="importcj-luckerbox-content">
+                    <ul class="importcj-luckerbox-lists"></ul>
+                    <div class="importcj-btip hidden">尽显公平与公正</div>
+                </div>
+            </div>
+        </div>
+        <div class="importcj-footer footerani">
+            <div class="importcj-footer-box">
+                <div class="select-prize zam-app-flex">
+                    <div class="prev-prize"><span class="mxc-back"></span></div>
+                    <div class="active-prize limitbox">一等奖</div>
+                    <div class="next-prize"><span class="mxc-right"></span></div>
+                </div>
+                <div class="select-box">
+                    <div class="select-txt">一次抽取</div>
+                    <input class="onceout" type="text" value="1" placeholder="请输入抽取数量" onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}" onafterpaste="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}" />
+                    <div class="txt">人</div>
+                </div>
+                <div class="btn-start">开始</div>
+                <div class="btn-close hidden">关闭</div>
+                <div class="btn-showalllucker">{$pcconfig['styleconfig']['listname']??'中奖列表'}<span class="lucker-numbox"><span class="lucker-num">0</span>/<span class="prize-num">0</span></span></div>
+            </div>
+        </div>
+        <div class="importcj-tip">按空格键停止</div>
+    </div>
+</div>
+<script type="text/javascript">
+var isroundcj = "{$pcconfig['isroundcj']??2}",maxrollnum = parseInt("{$pcconfig['styleconfig']['maxrollnum']??20}"),isautoscroll = "{$pcconfig['autoscroll']??2}",autoscrollspeed = parseInt({$pcconfig['styleconfig']['autoscrollspeed']??30});
+require(['screenimportcj'],function(screenimportcj){
+    var html = '';
+    {if !empty($pcconfig['styleconfig']['hidevideo'])}
+        html += '<video src="{:tomedia($pcconfig['styleconfig']['hidevideo'])}" class="firevideo1" preload="auto" muted="muted"></video>';
+    {/if}
+    {if !empty($pcconfig['styleconfig']['baozhavideo'])}
+        html += '<video src="{:tomedia($pcconfig['styleconfig']['baozhavideo'])}" class="firevideo2" preload="auto" muted="muted"></video>';
+    {/if}
+    $("body").append(html);
+    screenimportcj.init({:json_encode($pcconfig['styleconfig']??'')});
+})
+</script>
+<script id="prize-tpl" type="html/javascript">
+<div class="importcj-awardbox zam-app-flex-ajCenter awardboxani">
+    <div class="importcj-prizeimg zam-app-flex-ajCenter"><img src="{{ prizeimg }}"></div>
+    {{ if isroundcj == '1' }}
+    <div class="importcj-prizeinfo">
+        <div class="importcj-prizename">{{ prizename }}</div>
+        <div class="importcj-prizenum">{{ num }}个</div>
+    </div>
+    {{ /if }}
+</div>
+</script>
+<script id="lucker-tpl" type="html/javascript">
+<li class="importcj-luckerbox-item{{ if isdrawed == '1' }} userani{{ /if }}">
+    <div class="lucker-one-item">
+        <div class="data-box">
+            <div class="data-one dataxuhao hidden">{{# xuhao || '' }}</div>
+            <div class="data-one datafield1">{{ datafield1 }}</div>
+            <div class="data-one datafield2">{{ datafield2 }}</div>
+            <div class="data-one datafield3">{{ datafield3 }}</div>
+            <div class="data-one datafield4">{{ datafield4 }}</div>
+            <div class="deldata"><i class="mxc-close" data-id="{{ luckerid }}"></i></div>
+        </div>
+    </div>
+</li>
+</script>
+<script id="roundlucker-item" type="html/javascript" >
+<div class="roundlucker-item">
+	<div class="prizename"><span class="rawardname">{{ prize.awardname }}</span><span class="rprizename"> - {{ prize.prizename }}</span></div>
+	<div class="prizelucklist zam-app-flex-ajCenter">
+		<ul class="zam-app-flex-ajCenter2 zam-app-flex-wrap">
+			{{ if luckers.length }}
+			{{ each luckers as lucker lkey }}
+			<li class="importcj-luckerbox-item{{ if lucker.isdrawed=='1' }} userani{{ /if }}">
+                <div class="lucker-one-item">
+                    <div class="data-box">
+                        <div class="data-one datafield1">{{ lucker.datafield1 }}</div>
+                        <div class="data-one datafield2">{{ lucker.datafield2 }}</div>
+                        <div class="data-one datafield3">{{ lucker.datafield3 }}</div>
+                        <div class="data-one datafield4">{{ lucker.datafield4 }}</div>
+                        <div class="deldata"><i class="mxc-close" data-id="{{ lucker.luckerid }}"></i></div>
+                    </div>
+                </div>
+            </li>
+			{{ /each }}
+			{{ else }}
+			<div class="nodata">暂无中奖记录</div>
+			{{ /if }}
+		</ul>
+	</div>
+</div>
+</script>
+{include file='common/footer' /}

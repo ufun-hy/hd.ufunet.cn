@@ -1,0 +1,532 @@
+{include file='$Wpath/common/header'}
+<style type="text/css">
+    .jconfirm .jconfirmBox-text {
+        font-size: 14px;
+    }
+</style>
+<div class="form-inline zam-inline-searchbar">
+    <div class="form-group">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">状态</span>
+          <select id="userstatus" class="form-control js_select2">
+            {foreach $userstatus as $ukey=>$uval } 
+            <option value="{$ukey}">{$uval}</option>
+            {/foreach}
+          </select>
+        </div>
+    </div>
+    <div class="form-group">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">用户组</span>
+          <select id="groupid" class="form-control js_select2">
+            <option value="0" selected="selected">全部</option>
+            {foreach $usergroup as $gkey=>$gval } 
+            <option value="{$gval['id']}">{$gval['groupname']}</option>
+            {/foreach}
+          </select>
+        </div>
+    </div>
+    <div class="form-group">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">用户名/手机号/备注</span>
+        <input type="text" class="form-control" value="" id="keyword" placeholder="请输入用户名/手机号/备注" style="width: 200px">
+      </div>
+    </div>
+    <div class="form-group">
+        <div class="input-group input-group-sm">
+          <span class="input-group-addon">过期状态</span>
+            <select id="loginstatus" class="form-control js_select2">
+              {foreach $loginstatus as $ukey=>$uval } 
+              <option value="{$ukey}">{$uval}</option>
+              {/foreach}
+            </select>
+          </div>
+    </div>
+    <a class="btn btn-primary btn-sm btn-search" href="javascript:void(0)"><i class="mdi mdi-magnify"></i> 搜索</a>
+</div>
+{include file='$Wpath/common/tabletoolbar'}
+<table id="listtable" class="zam-btable" data-show-export="true"></table>
+<script>
+require(['webcore','webtable','jconfirmBox','zamnotice',"select2-zhcn"],function(webcore,webtable,jconfirmBox,zamnotice){
+var initConfig = {
+    tableId:'#listtable',
+    url:"{:goweb('usermanage/index')}",
+    columnoperate:{
+        btns:{
+            edit:true,
+            del:true,
+        },
+        func:{
+            edit:function(value, row, index){
+                var confirmObj = jconfirmBox.ajaxconfirm("编辑用户","{:goweb('usermanage/edit')}",{ishtml:'1',userid:row.id},'html','col-lg-10 col-lg-offset-1',function(e){
+                    var postData = webcore.serializeObject(e.find('form'));
+                    postData.userid = row.id;
+                    webcore.ajaxSubmit("{:goweb('usermanage/edit')}",postData).then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','保存成功');
+                            confirmObj.close();
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                             return false;
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                         return false;
+                    });
+                });
+            },
+            del:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','您确定要删除么？',function(){
+                    webcore.ajaxSubmit("{:goweb('usermanage/del')}",{userid:row.id}).then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','删除成功');
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                    });
+                });
+            },
+        }
+    },
+    columns:[{
+        checkbox: true,
+    }, {
+        field: 'id',
+        title: 'id',
+        align: 'center',
+        visible: false,
+        width:'5',
+    }, {
+        field: 'statushtml',
+        title: '状态',
+        align:'center',
+    },  {
+        field: 'user_name',
+        title: '用户名',
+        align: 'center',
+        formatter: function(value, row, index){
+            var html = value;
+            html += `<div class="m-t-5" style="font-size:10px;font-weight:500">有效期:${row.loginlimittime ?  `<span class="text-danger">${row.loginlimittime}</span>` : '长期有效' }</div>`;
+            if(row.user_beizhu != ''){
+                html += `<div class="m-t-5" style="font-size:10px;font-weight:500">备注:${row.user_beizhu}</div>`;
+            }
+            if(row.loginlock=='1'){
+                html += `<div><a class="btn btn-danger btn-xs m-t-5 btn-unlock" data-userid="${row.id}">登录解锁</a></div>`;
+            }
+            html += `<div><a class="btn btn-primary btn-xs m-t-5 btn-showprofile" data-userid="${row.id}">查看资料</a></div>`;
+            return html;
+        }
+    },  {
+        field: 'user_mobile',
+        title: '手机号',
+        align: 'center',
+        width:'10',
+        formatter: function(value, row, index){
+            return value ? value : '-';
+        }
+    },  {
+        field: 'groupname',
+        title: '用户组',
+        align: 'center',
+        formatter: function(value, row, index){
+            var html =  `<div>${(value==null ? '<span class="label label-danger">未设置</span>':`<span class="label label-primary">${value}</span>`)}</div>`;
+            if(row.pubconfig && row.pubconfig.isfree == '1'){
+                html += `<div class="m-t-5">免费截止日期:<span class="label label-${row.freeendtime ? 'primary' : 'danger' } d-inline-block m-l-5 m-t-5">${row.freeendtime ? row.freeendtime : '未设置' }</span></div>`;
+            }
+            return html;
+        }
+    },  {
+        field: 'moneynum',
+        title: '红包余额',
+        align: 'center',
+        sortable:true,
+        sortOrder:'desc',
+        formatter:function(value,row,index){
+            return `<div>${value}元</div>
+            <div class="btn btn-danger btn-xs m-t-5 btn-showmyredpack"  data-userid="${row.id}">余额明细</div>
+            <div class="btn btn-primary btn-xs m-t-5 m-l-5 btn-editmyredpack" href="javascript:void(0)" data-title="点击增减余额" data-toggle="tooltip" data-userid="${row.id}" data-username="${row.user_name}"><i class="mdi mdi-pencil"></i></div>
+            `;
+        }
+    },  {
+        field: 'smsnum',
+        title: '短信余量',
+        align: 'center',
+        sortable:true,
+        sortOrder:'desc',
+        formatter:function(value,row,index){
+            return `<div>${value}条</div>
+            <div class="btn btn-success btn-xs m-t-5 btn-showmysms" data-userid="${row.id}">短信明细</div>
+            <div class="btn btn-primary btn-xs m-t-5 m-l-5 btn-editmysms" href="javascript:void(0)" data-title="点击增减余量" data-toggle="tooltip" data-userid="${row.id}"  data-username="${row.user_name}"><i class="mdi mdi-pencil"></i></div>
+            `;
+        }
+    },  {
+        field: 'hdnum',
+        title: '活动数量',
+        align: 'center',
+        sortable:true,
+        sortOrder:'desc',
+        formatter:function(value){
+            return `<div>${value}个</div>`;
+        },
+    },  {
+        field: 'incomeremain',
+        title: '收入余额',
+        align: 'center',
+        sortable:true,
+        sortOrder:'desc',
+        formatter:function(value){
+            return `<div>${value}元</div>`;
+        },
+    },  {
+        field: 'roles',
+        title: '角色权限',
+        align: 'center',
+        formatter: function(value, row, index){
+            if(row.id == '1') {
+                return '-';
+            }
+            var groups = '';
+            if(value.length > 0) {
+                value.sort(function(a,b){
+                    if(a.id > b.id) return 1 ;
+                    if(a.id < b.id) return -1 ;
+                    return 0 ;
+                });
+                $.each(value,function(i,v){
+                      groups += `<a class="btn btn-xs btn-primary m-l-5 m-t-5 delgroup" href="javascript:void(0)" title="${v.rolename}" data-toggle="tooltip" data-roleid="${v.id}" data-userid="${row.id}">${v.rolename}</a>`;
+                });
+            }
+            groups += `<a class="btn btn-xs m-t-5 m-l-5 btn-success addgroup" href="javascript:;" data-toggle="tooltip" title="编辑权限" data-userid="${row.id}"><i class="mdi mdi-plus"></a>`;
+            return groups;
+        },
+    },
+    {
+        field: 'create_time',
+        title: '注册时间',
+        align: 'center',
+    }
+    ],
+    onload:function(){
+        
+    },
+    onloadsuccess:function(){
+        /*setTimeout(function(){
+            if($('.zam-btable thead .desc').length > 0 || $('.zam-btable thead .asc').length > 0){
+                var obj = $('.zam-btable thead .desc').length > 0?$('.zam-btable thead .desc'):$('.zam-btable thead .asc');
+                obj.trigger('click');
+                obj.trigger('click');
+                obj.trigger('click');
+            }
+        },1e3);*/
+    },
+    onpagechange:function(){
+        
+    },
+    editsave: function (field, row, oldvalue, $el) {
+        webcore.ajaxSubmit("{:goweb('usermanage/save')}",{userid:row.id,field:field,fieldv:row[field]}).then(function(json,status,xhr){
+            var value = row[field];
+            if(json.code==0){
+                zamnotice.showTips('success',json.msg);
+            }else{
+                zamnotice.showTips('error',json.msg);
+                value = oldvalue;
+            }
+            $('#listtable').bootstrapTable('updateCellById', {id: row.id, field: field, value: value});
+        }, function(json){
+            zamnotice.showTips('error','网络差,操作失败');
+        });
+    },
+    searchParamas:[{'type':'2','id':'userstatus'},{'type':'2','id':'groupid'},{'type':'2','id':'loginstatus'},{'type':'1','id':'keyword'}],
+    toolbar:{
+        add:function(){
+            var confirmobj = jconfirmBox.confirm('新增用户',webcore.tpl($("#adduser-tpl"),{}),function(e){
+                var username = e.$content.find(".username").val();
+                if(username=='') return zamnotice.showTips('error','请设置用户名');
+                var password = e.$content.find(".password").val();
+                if(password=='') return zamnotice.showTips('error','请设置用户密码');
+                var repassword = e.$content.find(".repassword").val();
+                if(repassword=='') return zamnotice.showTips('error','请设置确认密码');
+                if(password != repassword) return zamnotice.showTips('error','2次输入的密码不一致');
+                var groupid = e.$content.find(".usergroup").find("option:selected").val();
+                if(groupid=='' || typeof(groupid) == "undefined") return zamnotice.showTips('error','请选择用户组');
+                webcore.ajaxSubmit("{:goweb('usermanage/add')}",{username:username,password:password,repassword:repassword,mobile:e.$content.find(".mobile").val(),beizhu:e.$content.find(".beizhu").val(),groupid:groupid},'正在处理..').then(function(json){
+                     if(json.code==0){
+                        confirmobj.close();
+                        zamnotice.showTips('success','新增成功');
+                        webtable.refresh();
+                     }else{
+                        zamnotice.showTips('error',json.msg);
+                     }
+                })
+            },false,'col-lg-8 col-lg-offset-2',true,[{'hidden':false,'txt':'确定新增'},{'hidden':false,'txt':'取消'}],function(){
+                confirmobj.$content.find(".usergroup").select2({width: 'resolve',placeholder: '请选择'});
+            });
+        },
+        del:function(){
+            var getSelects = webtable.getSelections();
+            if(getSelects.length>0){
+                jconfirmBox.confirm('温馨提示','您确定要删除选中的用户么？',function(){
+                    webcore.ajaxSubmit("{:goweb('usermanage/del')}",{userid:getSelects}).then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','删除成功');
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差,操作失败');
+                    });
+                });
+            }else{
+                zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+        },
+        import:function(){
+            webcore.importxls({title:'导入第三方用户信息',url:"{:goweb('usermanage/importuser')}",moban:"/{:SYSIMGURL}excel/thirduser.xls?t=2",uptxt:"点击上传用户信息",xlstxt:"注:请务必严格按照模板内容制作xls文件"},function(){
+                    webtable.refresh();
+            });
+        },
+        other:function(){
+            var confirmobj = jconfirmBox.ajaxconfirm("回收站用户","{:goweb('usermanage/recycleuser')}",{},'html','col-lg-8 col-lg-offset-2',function(e){
+                },false,'2');
+        },
+        export:function(){
+            webcore.ajaxSubmit("{:goweb('usermanage/exportuser')}",{}).then(function(json){
+                if(json.code!=0){
+                    zamnotice.showTips('error',json.msg);
+                }else{
+                    window.location.href = "{:goweb('usermanage/exportuser')}";
+                }
+            }, function(json){
+                zamnotice.showTips('error','网络差,操作失败');
+            });
+        },
+    },
+};
+webtable.init(initConfig);
+$('.zam-inline-searchbar select').change(function(e) {
+    webtable.refresh();
+});
+//点击新增
+$("#listtable").on('click','.addgroup',function(){
+    var $this = $(this),userid = $this.attr('data-userid');
+    var confirmObj = jconfirmBox.ajaxconfirm("编辑角色","{:goweb('usermanage/rolecontrol')}",{userid:userid,type:'1'},'html','col-lg-6 col-lg-offset-3',function(e){
+        var activeBox = e.find('.active');
+        var roleids = [];
+        activeBox.each(function(){
+            roleids.push($(this).attr('data-roleid'));
+        });
+        webcore.ajaxSubmit("{:goweb('usermanage/rolecontrol')}",{userid:userid,roleids:roleids,type:'2'}).then(function(json){
+            if(json.code==0){
+                zamnotice.showTips('success','操作成功');
+                webtable.refresh();
+            }else{
+                zamnotice.showTips('error',json.msg);
+            }
+        }, function(json){
+            zamnotice.showTips('error','网络差,操作失败');
+        });
+        var checkright = false;
+        confirmObj.close();
+    });
+});
+//查看用户所有活动发放与充值明细
+$("#listtable").on('click','.btn-showmyredpack',function(){
+    var userid = $(this).data('userid');
+    var confirmobj = jconfirmBox.ajaxconfirm("红包账户明细","{:goweb('usermanage/redpackmx')}",{userid:userid},'html','col-lg-8 col-lg-offset-2',function(e){
+            
+    },false,'2');
+});
+$("#listtable").on('click','.btn-showmysms',function(){
+    var userid = $(this).data('userid');
+    var confirmobj = jconfirmBox.ajaxconfirm("短信账户明细","{:goweb('usermanage/smsmx')}",{userid:userid},'html','col-lg-8 col-lg-offset-2',function(e){
+            
+    },false,'2');
+});
+$("#listtable").on('click','.btn-showprofile',function(){
+    var userid = $(this).data('userid');
+    var confirmobj = jconfirmBox.ajaxconfirm("用户其他资料","{:goweb('usermanage/showotherdata')}",{userid:userid},'html','col-lg-8 col-lg-offset-2',function(e){
+            
+    },false,'2');
+});
+$("#listtable").on('click','.btn-unlock',function(){
+    var userid = $(this).data('userid');
+    jconfirmBox.confirm('温馨提示','您确定要解锁用户登录24小时的限制么？',function(){
+        webcore.ajaxSubmit("{:goweb('usermanage/loginlock')}",{userid:userid}).then(function(json){
+            if(json.code==0){
+                webtable.refresh();
+                zamnotice.showTips('success','解锁成功');
+            }else{
+                zamnotice.showTips('error',json.msg);
+            }
+        }, function(json){
+            zamnotice.showTips('error','网络差,操作失败');
+        });
+    });
+});
+
+$("#listtable").on('click','.btn-editmyredpack',function(){
+    var userid = $(this).data('userid'),username = $(this).data('username');
+    var confirmobj = jconfirmBox.confirm('操作('+username+')的红包账户余额',webcore.tpl($("#indemoney-tpl"),{}),function(e){
+        var objdata = webcore.serializeObject(e.$content.find('form'));
+        objdata.userid = userid;
+        if(objdata.addnums=='' || objdata.addnums < 0){
+            return zamnotice.showTips('error','金额必须大于0');
+        }
+        if(objdata.reason==''){
+            return zamnotice.showTips('error','理由必填');
+        }
+        webcore.ajaxSubmit("{:goweb('usermanage/indemoney')}",objdata,'正在处理..').then(function(json){
+             if(json.code==0){
+                confirmobj.close();
+                zamnotice.showTips('success',json.msg);
+                webtable.refresh();
+             }else{
+                zamnotice.showTips('error',json.msg);
+             }
+        })
+    },false,false,true,[{'hidden':false,'txt':'确定'},{'hidden':false,'txt':'取消'}]);
+});
+$("#listtable").on('click','.btn-editmysms',function(){
+    var userid = $(this).data('userid'),username = $(this).data('username');
+    var confirmobj = jconfirmBox.confirm('操作('+username+')的短信账户余额',webcore.tpl($("#indesms-tpl"),{}),function(e){
+        var objdata = webcore.serializeObject(e.$content.find('form'));
+        objdata.userid = userid;
+        if(objdata.addnums=='' || objdata.addnums < 0){
+            return zamnotice.showTips('error','数量必须大于0');
+        }
+        if(objdata.reason==''){
+            return zamnotice.showTips('error','理由必填');
+        }
+        webcore.ajaxSubmit("{:goweb('usermanage/indesms')}",objdata,'正在处理..').then(function(json){
+             if(json.code==0){
+                confirmobj.close();
+                zamnotice.showTips('success',json.msg);
+                webtable.refresh();
+             }else{
+                zamnotice.showTips('error',json.msg);
+             }
+        })
+    },false,false,true,[{'hidden':false,'txt':'确定'},{'hidden':false,'txt':'取消'}]);
+});
+});
+</script>
+<script id='adduser-tpl' type="text/template">
+<div class="form-horizontal">
+  <div class="form-group">
+    <label class="col-lg-3 control-label">* 用户名</label>
+    <div class="col-lg-7">
+      <input class="form-control username" type="text"  name="username" placeholder="4-16个字符，可包含汉字，字母，数字，下划线">
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-lg-3 control-label">* 密码</label>
+    <div class="col-lg-7">
+      <input class="form-control password" type="text"  name="password" placeholder="6-32个字符，可包含汉字，字母，数字">
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-lg-3 control-label">* 确认密码</label>
+    <div class="col-lg-7">
+      <input class="form-control repassword" type="text"  name="repassword" placeholder="请再次输入密码">
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-lg-3 control-label">手机号</label>
+    <div class="col-lg-7">
+      <input class="form-control mobile" type="text"  name="mobile" placeholder="选填项" maxlength='11'>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-lg-3 control-label">备注</label>
+    <div class="col-lg-7">
+      <input class="form-control beizhu" type="text"  name="beizhu" placeholder="选填项" maxlength='30'>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-lg-3 control-label">* 用户组</label>
+    <div class="col-lg-7">
+        <select class="form-control js_select2 usergroup" name="groupid">
+            <option value="">-----请选择-----</option>
+            {volist name="usergroup" id="group"}
+            <option value="{$group['id']}" {if $group['isdefault']=='1'}selected{/if}>{$group['groupname']}{if $group['isdefault']=='1'}（系统默认用户组）{/if}</option>
+            {/volist}
+        </select>
+        <span class="help-block">一定要选择一个用户组，推荐选择系统默认用户组</span>
+    </div>
+  </div>
+</div>
+</script>
+<script id='indemoney-tpl' type="text/template">
+<div class="form-horizontal confirmbox-pop">
+    <form class="confirm-formbox" method="post">
+    <div class="form-group">
+        <label class="col-lg-3 control-label">* 增减类型</label>
+        <div class="col-lg-7">
+          <label class="lyear-radio radio-inline radio-primary">
+           <input type="radio" name="isadd" value="1" checked><span>新增</span>
+          </label>
+          <label class="lyear-radio radio-inline radio-primary">
+           <input type="radio" name="isadd" value="2"><span>减去</span>
+          </label>
+        </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-3 control-label">* 金额</label>
+      <div class="col-lg-7">
+            <div class="input-group">
+                <input type="text" class="form-control" name="addnums" value="100">
+                <div class="input-group-addon">元</div>
+            </div>
+            <span class="zam-help-block">注:金额必须大于0</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-3 control-label">* 理由</label>
+      <div class="col-lg-7">
+            <input type="text" class="form-control" name="reason" value="">
+            <span class="zam-help-block">注:必须填写个理由，以防后期不知道为啥给操作了红包余额</span>
+      </div>
+    </div>
+    </form>
+</div>
+</script>
+<script id='indesms-tpl' type="text/template">
+<div class="form-horizontal confirmbox-pop">
+    <form class="confirm-formbox" method="post">
+    <div class="form-group">
+        <label class="col-lg-3 control-label">* 增减类型</label>
+        <div class="col-lg-7">
+          <label class="lyear-radio radio-inline radio-primary">
+           <input type="radio" name="isadd" value="1" checked><span>新增</span>
+          </label>
+          <label class="lyear-radio radio-inline radio-primary">
+           <input type="radio" name="isadd" value="2"><span>减去</span>
+          </label>
+        </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-3 control-label">* 数量</label>
+      <div class="col-lg-7">
+            <div class="input-group">
+                <input type="text" class="form-control" name="addnums" value="100">
+                <div class="input-group-addon">条</div>
+            </div>
+            <span class="zam-help-block">注:数量必须大于0</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-3 control-label">* 理由</label>
+      <div class="col-lg-7">
+            <input type="text" class="form-control" name="reason" value="">
+            <span class="zam-help-block">注:必须填写个理由，以防后期不知道为啥给操作了短信余量</span>
+      </div>
+    </div>
+    </form>
+</div>
+</script>
+{include file='$Wpath/common/footer'}

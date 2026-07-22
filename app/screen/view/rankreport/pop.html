@@ -1,0 +1,109 @@
+<style>
+    /*弹窗*/
+.rankreport-popBox {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    z-index: 4;
+    pointer-events: none;
+}
+.rankreport-popBox .poptip{
+    width: 100%;
+    text-align: center;
+    font-weight: 600;
+    opacity: 0;
+    transform: rotateX(90deg);
+    color: {$pcconfig['popconfig']['color']??'#fff'};
+    font-size: {$pcconfig['popconfig']['size']??'42'}px;
+}
+.rankreport-popBox.maskopen .poptip{
+    animation:poptipopen 0.8s linear 0s 1 normal forwards;
+}
+@keyframes poptipopen{
+    from{opacity:0;transform:rotateX(90deg)}
+    to{opacity:1;transform:rotateX(0deg)}
+}
+.rankreport-popBox.maskclose .poptip{
+    animation: poptipclose 0.8s linear 0s 1 normal forwards;
+}
+@keyframes poptipclose{
+    from{opacity:1;transform:rotateX(0deg)}
+    to{opacity:0;transform:rotateX(90deg)}
+}
+.rankreport-maskbox{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+.rankreport-maskbox div{
+    width: 100%;
+    height: 0;
+    position: absolute;
+    left: 0px;
+    opacity: 1;
+    background: {$pcconfig['popconfig']['bgcolor']??'rgba(0, 0, 0, 0.5)'};
+}
+.rankreport-maskbox .masktop {
+    bottom: 50%;
+}
+.rankreport-maskbox .maskbottom {
+    top: 50%;
+}
+.rankreport-popBox.maskopen .rankreport-maskbox div{
+    animation:maskopen 0.8s linear 0s forwards
+}
+@keyframes maskopen{
+    from{
+        height: 0;
+        opacity: 0;
+    }to{
+        height:50%;
+        opacity: 1;
+    }
+}
+.rankreport-popBox.maskclose .rankreport-maskbox div{
+    animation:maskclose 0.8s linear 0s forwards
+}
+@keyframes maskclose{
+    from{
+        height: 50%;
+        opacity: 1;
+    }to{
+        height:0;
+        opacity: 0;
+    }
+}
+.yanhuabox{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+}
+.yanhuabox.hidden{display: none;}
+.yanhuabox .yanhuaitem{
+    position: absolute;
+    top: 0;
+    width: 480px;
+    height: 270px;
+    background-image: url(/static/images/screen/mapqd/yanhua.gif);
+    background-size: cover;
+}
+.yanhuabox .yanhuaitem.yanhua-left{left:0;}
+.yanhuabox .yanhuaitem.yanhua-right{right:0;}
+</style>
+<section class="rankreport-popBox zam-app-flex-ajCenter">
+    <div class="rankreport-maskbox">
+        <div class="masktop"></div>
+        <div class="maskbottom"></div>
+    </div>
+    <div class="poptip zam-app-flex-ajCenter2"></div>
+    <div class="yanhuabox hidden">
+        <div class="yanhuaitem yanhua-left"></div>
+        <div class="yanhuaitem yanhua-right"></div>
+    </div>
+</section>

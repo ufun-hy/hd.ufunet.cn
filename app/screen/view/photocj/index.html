@@ -1,0 +1,500 @@
+{include file='common/header' /}
+<style>
+::-webkit-scrollbar {
+    width: 10px;
+    border-radius: 10px;
+}
+::-webkit-scrollbar-track {
+    background-color: #fff;
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    outline-offset: -2px;
+    background-color: {$pcconfig['styleconfig']['color']};
+}
+::-webkit-scrollbar-thumb:hover {
+    background-color: {$pcconfig['styleconfig']['color']};
+}
+.hidden{display: none}
+.header ul{visibility: hidden}
+.photocj-mainbox {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+}
+.photocj-wall{
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+    -webkit-user-drag: none;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    -webkit-perspective: 1200px;
+    perspective:1200px;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-transform: translateZ(0); 
+    -moz-transform: translateZ(0); 
+    -ms-transform: translateZ(0); 
+    -o-transform: translateZ(0); 
+    transform: translateZ(0);
+}
+.photocj-wall .three3d {
+    position: absolute;
+    top: -100px;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-transform: translateZ(0); 
+    -moz-transform: translateZ(0); 
+    -ms-transform: translateZ(0); 
+    -o-transform: translateZ(0); 
+    transform: translateZ(0);
+}
+.three3d ul {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width:100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-transform: translateZ(0); 
+    -moz-transform: translateZ(0); 
+    -ms-transform: translateZ(0); 
+    -o-transform: translateZ(0); 
+    transform: translateZ(0);
+}
+
+.three3d li {
+    position: absolute;
+    width: 160px;
+    height: 160px;
+    margin: -80px 0 0 -80px;
+    top: 50%;
+    left: 50%;
+}
+.three3d ul .imgbox{
+    position: absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    padding: 14px;
+    box-sizing: border-box;
+    background: url({:tomedia($pcconfig['styleconfig']['imgbg'])}) no-repeat;
+    background-size: cover;
+}
+.three3d ul li img {
+    width: 100%;
+    height:100%;
+    -o-object-position: center;
+    object-position: center;
+    -o-object-fit: cover;
+    object-fit: cover;
+}
+{/*视频效果*/}
+.firevideo1 {display:none;transform: translate(-50%, -50%) scale(1); object-fit: cover; mix-blend-mode: screen; width: 100%; height: 100%; left: 50%; top: 50%; position: absolute;}
+.firevideo2 { display: none; transform: translate(-50%, -50%) scale(2); object-fit: cover; mix-blend-mode: screen; width: 100%; height: 100%; left: 50%; top: 50%; position: absolute; }
+{/*抽奖弹窗*/}
+.photocj-lists {width: 100%; height: 100%; position: absolute;left: 0;right: 0;}
+{/*顶部*/}
+.photocj-lists .photocj-header .photocj-headerbg {width: 1034px;height: 76px;text-align: center;margin: 0 auto; background: url({:tomedia($pcconfig['styleconfig']['topbg'])}) no-repeat; background-size: cover;}
+.photocj-lists .photocj-header .awardname {font-weight: bold; font-size: 30px;color: {$pcconfig['styleconfig']['color']}; text-shadow: 0px 0px 3px #620700, 0px 0px 10px #ff9800, 0px 0px 15px #ffeb3b; }
+.photocj-lists .photocj-header .prizename {height:30px;line-height:30px;margin-bottom:8px;margin-top:-5px;text-align: center;font-size: 25px;font-weight: bold;color:{$pcconfig['styleconfig']['color']};}
+.headerani { animation: headerani 0.6s ease-out 0s both; }
+@keyframes headerani { 
+    0% {
+        opacity:0;
+        transform: translateY(-100px)
+    }
+    50% {
+        opacity:1
+    }
+}
+{/*尾部*/}
+.photocj-lists .photocj-footer {position:relative;width: 1056px; height: 116px;}
+.footerani { animation: footerani 0.6s ease-out 0s both; }
+@keyframes footerani { 
+    0% {
+        opacity:0;
+        transform: translateY(100px)
+    }
+    50% {
+        opacity:1
+    }
+}
+.photocj-lists .photocj-footer-box {width: 100%; height: 100%; background: url({:tomedia($pcconfig['styleconfig']['bottombg'])}) no-repeat center center; background-size: 100% 100%; box-sizing: border-box;color: {$pcconfig['styleconfig']['color']}; font-size: 18px;}
+.photocj-lists .photocj-footer-box .select-prize{height: 45px; line-height: 45px; position: absolute; top:16px;left: 120px;}
+.photocj-lists .photocj-footer-box .select-prize .active-prize{padding:0 10px;width: 100px;text-align: center;}
+.photocj-lists .photocj-footer-box .select-prize span{font-size: 20px;font-weight: bold;cursor: pointer;}
+.photocj-lists .photocj-footer-box .select-box {position: absolute; top:-10px;left: 50%;transform: translate(-50%, 0%); width: 220px; height: 45px; line-height: 45px;display: flex; flex-wrap: nowrap; justify-content: center; font-size: 14px;}
+.photocj-lists .photocj-footer-box input{width:45px;line-height: 45px; font-size: 18px; height: 25px; margin: 10px 4px; border-radius: 6px; border: 0; text-align: center; color: {$pcconfig['styleconfig']['color']}; background-color: rgba(255,235,59,0.15);}
+.photocj-lists .photocj-footer-box input:focus{outline: 0;border: 0;}
+.photocj-lists .photocj-footer-box .btn-start,.photocj-lists .photocj-footer-box .btn-close {width: 153px; height: 45px; line-height: 45px; position: absolute; top:50px;left: calc(50% - 153px/2);text-align: center; border-radius: 45px;cursor: pointer; color: #fff; font-size: 18px;font-weight:bold;letter-spacing: 3px;background-image: url({:tomedia($pcconfig['styleconfig']['btn'])});backgroud-repeat: no-repeat; background-size: cover;}
+.photocj-lists .photocj-footer-box .btn-showalllucker {width: 200px; height: 45px; line-height: 45px; position: absolute; top:16px;right: 140px; text-align: center; cursor: pointer;}
+.photocj-lists .photocj-footer-box .btn-showalllucker .lucker-numbox{display: inline-block;margin-left: 10px;}
+.photocj-lists .photocj-footer-box .btn-showalllucker .lucker-numbox .lucker-num{display: inline-block;margin-right: 10px;}
+.photocj-lists .photocj-footer-box .btn-showalllucker .lucker-numbox .prize-num{display: inline-block;margin-left: 10px;}
+{/*底部提示词*/}
+.photocj-lists .photocj-tip { position: absolute; bottom: 80px; color:#fff;width: 300px; text-align: center; left: 50%; margin-left: -150px; font-size: 20px;display: none}
+.isdrawing .photocj-lists .photocj-body .photocj-awardbox .photocj-prizebg2 {display: block}
+.isdrawing .photocj-awardbox { animation: awardboxshine 2s ease-out 0s both;}
+@keyframes awardboxshine { 
+    0% {
+        opacity:1
+    }
+    20% {
+        opacity:1;
+        transform:scale(0);
+    }
+    60% {
+        opacity:1;
+        transform:scale(0);
+    }
+    100% {
+        opacity:1;
+        transform:scale(0.6);
+    }
+}
+.isdrawing .photocj-header {animation: headerhideani 0.5s ease-out 0s both; }
+@keyframes headerhideani { 
+    0% {
+        opacity:1;
+    }
+    100% {
+        opacity:0;
+        transform: translateY(-100px)
+    }
+}
+.isdrawing .photocj-footer{animation: footerhideani 0.5s ease-out 0s both;}
+@keyframes footerhideani { 
+    0% {
+        opacity:1;
+        transform: translateY(0px)
+    }
+    100% {
+        opacity:0;
+        transform: translateY(100px);
+    }
+}
+.isdrawing .photocj-tip {animation: opacityani 2s ease-in-out infinite backwards; display: block}
+@-webkit-keyframes opacityani{0%{opacity:.2}50%{opacity:0.6}to{opacity:.2}}
+{/*中奖部分*/}
+.photocj-lists .photocj-body{position:relative;width: 100%;height: 530px;}
+.photocj-lists .photocj-body .photocj-awardbox { 
+    position: relative;
+    width: 500px;
+    height: 500px;
+}
+.awardboxani {animation: awardboxani 1s ease-out 0s both;}
+@keyframes awardboxani { 
+    0% {
+        opacity:0;
+        transform: scale(0);
+    }
+    50% {
+        opacity:1;
+        transform: scale(1);
+    }
+}
+.photocj-lists .photocj-body .photocj-awardbox .photocj-prizeimg {width:500px; height: 500px;}
+.photocj-lists .photocj-body .photocj-awardbox .photocj-prizeimg img{width:250px; height: 250px;}
+.photocj-lists .photocj-body .photocj-awardbox .photocj-prizebg1 {position: absolute; left:0;top:0;width: 100%; height: 100%; background: url({:tomedia($pcconfig['styleconfig']['prizebg'])}) no-repeat; background-size: cover;}
+.photocj-lists .photocj-body .photocj-awardbox .photocj-prizebg2 {position: absolute; left:0;top:0; width: 100%; height: 100%; background: url({:tomedia($pcconfig['styleconfig']['prizebg2'])}) no-repeat; background-size: cover;display: none}
+/*中奖用户*/
+.photocj-lists .photocj-body .photocj-luckerbox {position:absolute;top:0;left:0;width: 100%;height: 562px; display: none}
+.photocj-lists .photocj-body .photocj-luckerbox .photocj-luckerbox-content {
+    width: calc(100% - 60px); 
+    height: 100%;margin:0 30px; 
+    overflow-x: hidden; overflow-y: auto;
+    transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+}
+/*抽奖结束时刻隐藏中间的奖品，切换奖品 以及 抽奖人数 以及中奖名单*/
+.isdrawed .photocj-lists{
+    background-color: rgba(0,0,0,0.32);
+}
+.isdrawed .photocj-lists .photocj-body .photocj-luckerbox{display: block}
+.isdrawed .photocj-lists .photocj-footer-box{background:none;}
+.isdrawed .photocj-awardbox,.isdrawed .photocj-footer-box .select-box,.isdrawed .photocj-footer-box .select-prize,.isdrawed .photocj-footer-box .btn-showalllucker{display: none}
+.photocj-luckerbox-lists {transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;text-align: center; min-height: 100%;box-sizing: border-box; display: flex; align-items: center; align-content: center; flex-wrap: wrap; justify-content: space-evenly}
+.photocj-luckerbox-lists li.photocj-luckerbox-item {
+    width: 20%;
+    min-width: 160px;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+    margin:15px 0;
+    margin-top: 30px;
+    transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+}
+.photocj-luckerbox-lists li.photocj-luckerbox-item .delphoto{position:absolute;top:0;left:0;width:100%;height:100%;color:#fff;font-size: 24px;font-weight:bold;background-color: rgba(0,0,0,0.52);display: none}
+.photocj-luckerbox-lists li.photocj-luckerbox-item .delphoto i{cursor:pointer}
+.photocj-luckerbox-lists li.photocj-luckerbox-item .photo-imgbox:hover .delphoto{
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-justify-content: center;
+    justify-content: center;
+}
+.userani { animation: userani 1s ease-out 0s both;}
+@keyframes userani {
+    0% {
+        opacity:0;
+        transform: translateZ(-1000px) scale(0);
+    }
+    60% {
+        opacity:1;
+        transform:translateZ(0) scale(1)
+    }
+}
+/*中奖图片大小*/
+.photocj-luckerbox-lists .photocj-luckerbox-item .lucker-one-item {
+    width: 152px;
+    height: 224px;
+    padding: 7px;
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    background-image: url({:tomedia($pcconfig['styleconfig']['luckerbg'])});
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-size: 100% 100%;
+}
+.photocj-luckerbox-lists .photocj-luckerbox-item .nickname{
+    width: 100%;
+    margin-top: 6px;
+    padding: 0 24px;
+    font-weight: 600;
+    box-sizing: border-box;
+    
+}
+.photocj-luckerbox-lists .photocj-luckerbox-item .nickname div{
+    margin-top: 5px;
+    color: {$pcconfig['styleconfig']['name']['color']??"#fff"};
+    font-size: {$pcconfig['styleconfig']['name']['size']??18}px;
+}
+.photocj-luckerbox-lists.bigphoto1 .lucker-one-item{
+    width: 304px;
+    height: 448px;
+    padding:14px;
+}
+.photocj-luckerbox-lists.bigphoto2 .lucker-one-item{
+    width: 228px;
+    height: 336px;
+    padding:11px;
+}
+.photocj-luckerbox-lists .photocj-luckerbox-item .lucker-one-item .photo-imgbox {
+    position: relative;
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
+    overflow: hidden;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    background-color: {$pcconfig['styleconfig']['color']};
+    border: 2px solid {$pcconfig['styleconfig']['color']};
+}
+.photocj-luckerbox-lists .photocj-luckerbox-item .lucker-one-item img {
+    width: 100%;
+    height: 100%;
+    border: none;
+    border-radius: 6px;
+    vertical-align: middle;
+    -o-object-position: center;
+    object-position: center;
+    -o-object-fit: cover;
+    object-fit: cover;
+}
+
+.photocj-threebox{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    transform: translate3d(0,0,0);
+    pointer-events: none;
+    z-index: 0;
+}
+.photocj-threebox li {
+    width: 200px;
+    height: 200px;
+    transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    will-change: transform;
+}
+.photocj-threebox li .imgbox{
+    width:100%;
+    height:100%;
+    padding: 14px;
+    box-sizing: border-box;
+    background-size: cover;
+    background-repeat:no-repeat;
+    background-image:url("{:tomedia($pcconfig['styleconfig']['imgbg'])}");
+}
+.photocj-threebox li img {
+    width:100%;
+    height:100%;
+    -o-object-position: center;
+    object-position: center;
+    -o-object-fit: cover;
+    object-fit: cover;
+}
+{if isset($pcconfig['styleconfig']['showstopbtn']) && $pcconfig['styleconfig']['showstopbtn'] == '1'}
+{/* 显示停止按钮 */}
+.isdrawing .photocj-footer{animation:none!important}
+.isdrawing .photocj-footer-box .select-box,
+.isdrawing .photocj-footer-box .select-prize,
+.isdrawing .photocj-footer-box .btn-showalllucker,
+.isdrawing .photocj-tip{
+    display:none;
+}
+.isdrawing .photocj-footer-box{
+    background:none;
+}
+.isdrawing .photocj-footer .btn-start{
+    top: 12px;
+    animation:btnani 0.5s ease-out 3s both;
+}
+@keyframes btnani{
+    0%{opacity:0;transform: scale(0);}
+    100%{opacity:1;transform: scale(1);}
+}
+{/if}
+</style>
+<script id="photo-item" type="html/javascript">
+<li class="zam-app-flex-ajCenter">
+  <div class="imgbox"><img src="{{ src }}" /></div>  
+</li>
+</script>
+{if !empty($pcconfig['iscjingmusic'])}
+<audio id="cjingmusic" src="{:tomedia($pcconfig['iscjingmusic'])}" loop preload="preload" style="display:none"></audio>
+{/if}
+{if !empty($pcconfig['iscjendmusic'])}
+<audio id="cjendmusic" src="{:tomedia($pcconfig['iscjendmusic'])}" preload="preload" style="display:none"></audio>
+{/if}
+<div class="photocj-mainbox normalbox">
+<div class="emptybox zam-app-flex-ajCenter hidden">
+    <img src="/{:SIMGURL}common/empty.png">
+    <p style="padding:20px;">请到后台添加奖品</p>
+</div>
+<div class="photocj-wall hidden">
+    <div class="three3d">
+        <ul class="avatarbox1"></ul>
+        <ul class="avatarbox2"></ul>
+        <ul class="avatarbox3"></ul>
+        <ul class="avatarbox4"></ul>
+        <ul class="avatarbox5"></ul>
+        <ul class="avatarbox6"></ul>
+    </div>
+</div>
+<div class="photocj-lists zam-app-flex-ajCenter hidden">
+    <div class="photocj-header zam-app-flex-ajCenter headerani">
+        <div class="photocj-headerbg"><span class="awardname">xxx</span></div>
+        <div class="prizename">xxx奖品</div>
+    </div>
+    <div class="photocj-body zam-app-flex-ajCenter">
+        <div class="photocj-awardbox zam-app-flex-ajCenter awardboxani">
+            <div class="photocj-prizeimg zam-app-flex-ajCenter"><img src="/static/images/screen/photocj/prize.png"></div>
+            <div class="photocj-prizebg1"></div>
+            <div class="photocj-prizebg2"></div>
+        </div>
+        <div class="photocj-luckerbox">
+            <div class="photocj-luckerbox-content">
+                <ul class="photocj-luckerbox-lists"></ul>
+            </div>
+        </div>
+    </div>
+    <div class="photocj-footer footerani">
+        <div class="photocj-footer-box">
+            <div class="select-prize zam-app-flex">
+                <div class="prev-prize"><span class="mxc-back"></span></div>
+                <div class="active-prize limitbox">一等奖</div>
+                <div class="next-prize"><span class="mxc-right"></span></div>
+            </div>
+            <div class="select-box">
+                <div class="select-txt">一次抽取</div>
+                <input class="onceout" type="text" value="1" placeholder="请输入抽取数量" onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}" onafterpaste="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}" />
+                <div class="txt">人</div>
+            </div>
+            <div class="btn-start">开始</div>
+            <div class="btn-close hidden">关闭</div>
+            <div class="btn-showalllucker">{$pcconfig['styleconfig']['listname']??'中奖列表'}<span class="lucker-numbox"><span class="lucker-num">0</span>/<span class="prize-num">0</span></span></div>
+        </div>
+    </div>
+    <div class="photocj-tip">按空格键停止</div>
+</div>
+</div>
+<script type="text/javascript">
+var flytype = "{$pcconfig['flytype']??1}",isautoscroll = "{$pcconfig['autoscroll']??2}",flyspeed = parseInt("{$pcconfig['flyspeed']??100}");
+var hidevideo = "{:tomedia($pcconfig['styleconfig']['hidevideo']??'')}",baozhavideo = "{:tomedia($pcconfig['styleconfig']['baozhavideo']??'')}";
+require(['screenphotocj'],function(screenphotocj){
+    var html = '';
+    if(hidevideo){
+        html += `<video src="${hidevideo}" class="firevideo1" preload="auto" muted="muted"></video>`;
+    }
+    if(baozhavideo){
+        html += `<video src="${baozhavideo}" class="firevideo2" preload="auto" muted="muted"></video>`;
+    }
+    if(html){
+        $("body").append(html);
+    }
+    screenphotocj.init();
+});
+</script>
+<script id="lucker-tpl" type="html/javascript">
+<li class="photocj-luckerbox-item userani">
+    <div class="lucker-one-item zam-app-flex-ajCenter">
+        <div class="photo-imgbox">
+            <img src="{{ filepath }}" {{ if filepath=='' }}class="hidden"{{ /if }}>
+            <div class="delphoto"><i class="mxc-close" data-id="{{ luckerid }}"></i></div>
+        </div>
+    </div>
+    <div class="nickname">
+        {{ if  nameisarr=='1' }}
+            {{ each nickname as val }}
+              <div class="limitbox">{{ val }}</div>
+            {{ /each }}
+        {{ else }}
+            <div class="limitbox">{{ nickname }}</div>
+        {{ /if }}
+    </div>
+</li>
+</script>
+{include file='common/footer' /}

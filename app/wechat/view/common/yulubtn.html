@@ -1,0 +1,126 @@
+<style>
+.btn-yulu{
+    position: absolute;
+    right: 0.12rem;
+    bottom: 0.12rem;
+    border-radius: 0.1rem;
+    padding:0.1rem;
+    color: {$appconfig['appstyle']['yulubtn']['color']??'#fff'};
+    background-color: {$appconfig['appstyle']['yulubtn']['bgcolor']??'rgba(0,0,0,0.29)'};
+    font-size:{$appconfig['appstyle']['yulubtn']['size']??12}px;
+}
+.yulubox{
+    position: absolute;
+    bottom: 0.72rem;
+    left: 0;
+    width: 100%;
+    border-radius: 0.16rem;
+    background-color:{$appconfig['appstyle']['yulubox']['bgcolor']??'rgba(0,0,0,0.9)'};
+}
+.yulubox-title{
+    max-width: 100%;
+    padding: 0.12rem 0.32rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    box-sizing: border-box;
+    font-weight: bold;
+    font-size: {$appconfig['appstyle']['yulubox']['tipsize']??12}px;
+    color:{$appconfig['appstyle']['yulubox']['tipcolor']??'#fff'};
+}
+.yulubox ul{
+    text-align: left;
+    margin: 0.14rem 0;
+    padding: 0 0.2rem;
+    box-sizing: border-box;
+    overflow: hidden;
+    overflow-y:auto;
+    max-height: {$appconfig['appstyle']['yulubox']['height']??120}px;
+    color:{$appconfig['appstyle']['yulubox']['color']??'rgb(255 219 126)'};
+}
+.yulubox ul li{
+    word-break: break-all;
+    font-weight: bold;
+    padding:0.14rem;
+    margin-bottom: 0.12rem;
+    border-radius: 3px;
+    font-size: {$appconfig['appstyle']['yulubox']['size']??12}px;
+    background-color:{$appconfig['appstyle']['yulubox']['txtbgcolor']??'#fff'};
+}
+.yulubox ul li:last-child{
+    margin-bottom: 0;
+}
+</style>
+<a href="javascript:;" class="btn-yulu">{$appconfig['appstyle']['yulubtn']['txt']??'快捷'}</a>
+<div class="yulubox hidden">
+    {if isset($appconfig['appstyle']['yulubox']['tiptxt']) && !empty($appconfig['appstyle']['yulubox']['tiptxt'])}
+        <div class="yulubox-title limitbox">{$appconfig['appstyle']['yulubox']['tiptxt']}</div>
+    {/if}
+    <ul>
+    {volist name="appconfig.appyulus" id="yulu"}
+        <li>{$yulu}</li>
+    {/volist}
+    </ul>
+</div>
+<script>
+    require(['wechatcore','anime'],function(wechatcore,anime){
+        $(".btn-yulu").click(function(){
+            var yulubox = $(".yulubox");
+            yulubox.css({
+                'bottom':($(".btn-yulu").outerHeight() + 20)+'px',
+                'width':(yulubox.parent().parent().outerWidth() + 8) + 'px',
+                'left':'-4px',
+            });
+            if(yulubox.hasClass('hidden')){
+                yulubox.removeClass('hidden');
+                anime({
+                    targets: yulubox[0],
+                    translateY:[100,0],
+                    opacity:[0, 1],
+                    transformY:[-100,0],
+                    easing: 'linear',
+                    duration: 3e2,
+                });
+            }else{
+                anime({
+                    targets: yulubox[0],
+                    opacity:[1, 0],
+                    translateY:[0,100],
+                    easing: 'linear',
+                    duration: 3e2,
+                    complete:function(){
+                        yulubox.addClass('hidden');
+                    }
+                });
+            }
+        });
+        $(".yulubox li").click(function(){
+            $(this).parent().parent().parent().find('textarea').val($(this).text());
+            anime({
+                targets: $(".yulubox")[0],
+                opacity:[1, 0],
+                translateY:[0,100],
+                easing: 'linear',
+                duration: 3e2,
+                complete:function(){
+                    $(".yulubox").addClass('hidden');
+                }
+            });
+        });
+        if($(".yulubox").length > 0){
+            $(document).on('click', function(event) {
+                var clickTarget = $(event.target);
+                if (!clickTarget.hasClass('btn-yulu') && !clickTarget.closest('.yulubox').length) {
+                    anime({
+                        targets: $(".yulubox")[0],
+                        opacity:[1, 0],
+                        translateY:[0,100],
+                        easing: 'linear',
+                        duration: 3e2,
+                        complete:function(){
+                            $(".yulubox").addClass('hidden');
+                        }
+                    });
+                }
+            });
+        }
+    });
+</script>

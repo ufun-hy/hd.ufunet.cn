@@ -1,0 +1,161 @@
+<style>
+/**排名样式**/
+.banglistBox{
+    position: absolute;
+    top:0;
+    left:0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,.6);
+    color:#fff;
+    z-index: 9;
+}
+.banglistBox-main{
+    position:relative;
+    width:1200px;
+    border-radius:5px;
+    height:490px;
+    
+}
+.banglist-top{
+    position:absolute;
+    top:-86px;
+    width:100%;
+    height:70px;
+    font-size:32px;
+    line-height:70px;
+    text-align:center;
+}
+.banglist-title{
+    width:100%;
+    height:60px;
+    font-size:30px;
+}
+
+.banglist-close{
+    position: absolute;
+    top: -50px;
+    right: -80px;
+    cursor:pointer;
+}
+.banglist-close i{
+    font-size:32px;
+    color:#fff;
+}
+.banglist{
+    width:100%;
+    height:420px;
+    overflow-x:hidden;
+    overflow-y:auto;
+}
+.banglist-box-item{
+    width: 580px;
+    border: 1px solid rgba(255,255,255,.4);
+    -webkit-box-shadow: inset 0 0 5px rgba(255,255,255,.4), 0 0 5px rgba(0,0,0,.4);
+    -moz-box-shadow: inset 0 0 5px rgba(255,255,255,.4), 0 0 5px rgba(0,0,0,.4);
+    box-shadow: inset 0 0 5px rgba(255,255,255,.4), 0 0 5px rgba(0,0,0,.4);
+    background: -webkit-linear-gradient(235deg, rgba(255,255,255,.1) 60%, rgba(255,255,255,0) 60%);
+    background: -moz-linear-gradient(235deg, rgba(255,255,255,.1) 60%, rgba(255,255,255,0) 60%);
+    background: -o-linear-gradient(235deg, rgba(255,255,255,.1) 60%, rgba(255,255,255,0) 60%);
+}
+.banglist .banglist-item {
+    width:100%;
+    height:70px;
+    border-top: 1px solid rgba(255,255,255,.4);
+    box-sizing: border-box;
+}
+.banglist .banglist-item div{
+    height:100%;
+}
+.banglist .banglist-item .banglist-pm span {
+    display: inline-block;
+    text-align: center;
+    font-size: 21px;
+}
+.banglist .banglist-item .banglist-pm .banglist-tag {
+    width:40px;
+}
+.banglist .banglist-item .banglist-avatar img{
+    width: 45px;
+    height:45px;
+    border-radius: 100%;
+}
+.banglist .banglist-item .banglist-nickname p{
+    width: 100%;
+    font-size:25px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-align:center;
+    text-overflow: ellipsis;
+}
+.banglist .banglist-item .banglist-score span {
+    display:inline-block;
+    color: yellow;
+    font-size:16px!important;
+    font-style:normal;
+}
+.banglist .banglist-item .banglist-jp span {
+    display:inline-block;
+    width: 100%;
+    padding: 0 3px;
+    color: yellow;
+    font-size:18px;
+    box-sizing: border-box;
+    text-align: center;
+}
+.banglistBox-btns{
+    width: 100%;
+    text-align: center;
+    position: absolute;
+    bottom: -80px;
+    left: 0;
+}
+.banglistBox-btns .banglistBox-btn{
+    display: inline-block;
+    border: 1px solid #fff;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor:pointer;
+}
+.banglistBox-btns .banglistBox-btn:hover{
+    background-color:#fff;
+    color:#333;
+}
+</style>
+<div  class="banglistBox zam-app-flex-ajCenter display-none"> 
+<section class="banglistBox-main">
+	<div class="banglist-close"><i class="zam-icon-error"></i></div>
+	<div class="banglist-top">排行榜</div>
+    <div class="banglist-boxs zam-app-flex zam-app-justifyspacebetween">
+        <div class="banglist-box-item">
+            <section class="banglist-title zam-app-flex"></section>
+            <ul class="banglist"></ul>
+        </div>
+        <div class="banglist-box-item">
+            <section class="banglist-title zam-app-flex"></section>
+            <ul class="banglist"></ul>
+        </div>
+    </div>
+	<section class="banglistBox-btns">
+		<a class="banglistBox-btn banglistBox-btn-prev" style="margin-right: 200px;">上一轮</a>
+		<a class="banglistBox-btn banglistBox-btn-next">下一轮</a>
+	</section>
+</section>
+</div>
+<script id="pmshakeItem-tpl" type="html/javascript">
+<li class="banglist-item zam-app-flex" style="height:{{ if leftbangnum == '5' }}84{{ else }}42{{ /if }}px">
+    <div class="banglist-pm zam-app-flex-ajCenter2" style="width:20%">
+        <span>{{ key+1 }}</span>
+    </div>
+    <div class="banglist-nickname zam-app-flex-ajCenter2" style="width:40%"><p>{{ nickname }}</p></div>
+    <div class="banglist-score zam-app-flex-ajCenter2" style="width:40%">
+        <span>{{ score }}</span>
+    </div>
+</li>
+</script>
+<script id="pmshakeHeader-tpl" type="html/javascript">
+    <div class="banglist-num zam-app-flex-ajCenter2" style="width:20%">排名</div>
+    <div class="banglist-name zam-app-flex-ajCenter2" style="width:40%">代表队名称</div>
+    <div class="banglist-cj zam-app-flex-ajCenter2" style="width:40%">结果</div>
+</script>
+    

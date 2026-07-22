@@ -1,0 +1,32 @@
+<div class="form-group">
+	<label class="col-lg-2 control-label">* 网页标题</label>
+	<div class="col-lg-8">
+	  <input type="text" class="form-control"  name="title"  value="{$config['title']}" maxlength="50" placeholder="50个字符以内">
+	</div>
+</div>
+<div class="bgtypebox{if isset($gametype) && in_array($gametype,['monkey','horse','car','bike','swim','mls','mouse','clickrace'])} hidden{/if}{if isset($gametype)} {$gametype}bgtypebox{:request()->realhdid}{/if}">
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 背景类型</label>
+    <div class="col-lg-8">
+        <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.bgimgbox').removeClass('hidden'),$('.bgvideobox').addClass('hidden');">
+            <input type="radio" name="bgtype" {if $config["bgtype"]=="1"}checked{/if} value="1"><span>图片</span>
+        </label>
+        <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.bgimgbox').addClass('hidden'),$('.bgvideobox').removeClass('hidden');">
+            <input type="radio" name="bgtype" {if $config["bgtype"]=="2"}checked{/if} value="2" ><span>视频</span>
+        </label>
+    </div>
+</div>
+<div class="form-group bgimgbox{if $config["bgtype"] == "2"} hidden{/if}">
+    <label class="col-lg-2 control-label">* 背景图片</label>
+    <div class="col-lg-8">
+        {:tpl_image_one('bgimg',$config['bgimg'])}
+        <span class="help-block">规格:1400*800px，具体尺寸需结合屏幕实际尺寸设计</span>
+    </div>
+</div>
+<div class="form-group bgvideobox{if $config["bgtype"]=="1"} hidden{/if}">
+    <label class="col-lg-2 control-label">* 背景视频</label>
+    <div class="col-lg-8">
+        {:tpl_video('bgvideo',$config['bgvideo'])}
+    </div>
+</div>
+</div>

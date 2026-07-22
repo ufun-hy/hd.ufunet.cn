@@ -1,0 +1,106 @@
+{include file="common/header" /}
+<style>
+body{overflow-y:auto}
+.zam-app-sign{
+	height:100%;  
+}
+.zam-app-signbglogo{
+	width: 5.8rem;
+	margin-bottom: 0.42rem;
+}
+.zam-app-signbox{
+	width:5.8rem;
+	padding:0.82rem 0.4rem;
+	margin:0 auto;
+	border-radius: 0.24rem;
+    background-color:{if isset($appconfig['appbdbgcolor'])}{$appconfig['appbdbgcolor']}{else /}rgba(0,0,0,0.5){/if};
+    color: #fff;
+    text-align: center;
+    margin-top:{$appconfig['waitscanconfig']['margintop']??0}px;
+}
+.hxqrcode{
+	width: calc(100% - 1rem);
+	border-radius: 0.24rem;
+}
+.hxtipbox{
+	margin-top: 0.52rem;
+	width: calc(100% - 1rem);
+	border-top: 1px solid rgba(255,255,255,0.32);
+	padding-top: 0.42rem;
+}
+.hxtipbox .hadhxed{
+	font-size: 0.32rem;
+	margin-bottom: 0.12rem;
+	color: #fff;
+}
+.hxtipbox .tip1{
+	font-size: 0.42rem;
+	margin-bottom: 0.12rem;
+}
+.hxtipbox .tip2{
+	font-size: 0.26rem;
+	margin-bottom:0.24rem; 
+}
+.hxtipspe{
+	font-size: 0.18rem;
+}
+</style>
+<section class="zam-app-sign signscanbox g-flexview zam-app-flex-ajCenter">
+	 {if !empty($appconfig['appbdlogo'])}<img class="zam-app-signbglogo" src="{:tomedia($appconfig['appbdlogo'])}" />{/if}
+	 <div class="zam-app-signbox zam-app-flex-ajCenter">
+	 	<img class="hxqrcode" src="{$qrcode}" />
+		{if isset($appconfig['waitscanconfig']['success1']) && is_string($appconfig['waitscanconfig']['success1'])}
+			<div class="hxtipbox">
+				{if $hxuser['status']=='1'}
+					{if isset($appconfig['waitscanconfig']['hxtip']) && !empty($appconfig['waitscanconfig']['hxtip'])}
+					<div class="hadhxed">{:$appconfig['waitscanconfig']['hxtip']}</div>
+					{/if}
+				{/if}
+				{if isset($appconfig['waitscanconfig']['success1']) && !empty($appconfig['waitscanconfig']['success1'])}
+					<div class="tip1">{:$appconfig['waitscanconfig']['success1']}</div>
+				{/if}
+				{if isset($appconfig['waitscanconfig']['success2']) && !empty($appconfig['waitscanconfig']['success2'])}
+					<div class="tip2">{:$appconfig['waitscanconfig']['success2']}</div>
+				{/if}
+			</div>
+			{if isset($appconfig['waitscanconfig']['success3']) && !empty($appconfig['waitscanconfig']['success3'])}
+				<div class="hxtipspe">{:$appconfig['waitscanconfig']['success3']}</div>
+			{/if}
+		{elseif isset($appconfig['waitscanconfig']['success1']) && is_array($appconfig['waitscanconfig']['success1']) /}
+			<div class="hxtipbox">
+				{if $hxuser['status']=='1'}
+					{if isset($appconfig['waitscanconfig']['hxtip']['txt']) && !empty($appconfig['waitscanconfig']['hxtip']['txt'])}
+					<div style="font-size:{$appconfig['waitscanconfig']['hxtip']['size']}px;color:{$appconfig['waitscanconfig']['hxtip']['color']};margin-bottom:{$appconfig['waitscanconfig']['hxtip']['margin']}px">{:$appconfig['waitscanconfig']['hxtip']['txt']}</div>
+					{/if}
+				{/if}
+				{if isset($appconfig['waitscanconfig']['success1']['txt']) && !empty($appconfig['waitscanconfig']['success1']['txt'])}
+					<div style="font-size:{$appconfig['waitscanconfig']['success1']['size']}px;color:{$appconfig['waitscanconfig']['success1']['color']};margin-bottom:{$appconfig['waitscanconfig']['success1']['margin']}px">{:$appconfig['waitscanconfig']['success1']['txt']}</div>
+				{/if}
+				{if isset($appconfig['waitscanconfig']['success2']['txt']) && !empty($appconfig['waitscanconfig']['success2']['txt'])}
+					<div style="font-size:{$appconfig['waitscanconfig']['success2']['size']}px;color:{$appconfig['waitscanconfig']['success2']['color']};margin-bottom:{$appconfig['waitscanconfig']['success2']['margin']}px">{:$appconfig['waitscanconfig']['success2']['txt']}</div>
+				{/if}
+				{if isset($appconfig['waitscanconfig']['success3']['txt']) && !empty($appconfig['waitscanconfig']['success3']['txt'])}
+					<div style="font-size:{$appconfig['waitscanconfig']['success3']['size']}px;color:{$appconfig['waitscanconfig']['success3']['color']};margin-bottom:{$appconfig['waitscanconfig']['success3']['margin']}px">{:$appconfig['waitscanconfig']['success3']['txt']}</div>
+				{/if}
+				{if isset($appconfig['waitscanconfig']['success4']['txt']) && !empty($appconfig['waitscanconfig']['success4']['txt'])}
+					<div style="font-size:{$appconfig['waitscanconfig']['success4']['size']}px;color:{$appconfig['waitscanconfig']['success4']['color']};margin-bottom:{$appconfig['waitscanconfig']['success4']['margin']}px">{:$appconfig['waitscanconfig']['success4']['txt']}</div>
+				{/if}
+			</div>
+		{/if}
+	</div>
+</section>
+<script>
+require(['wechatcore'],function (wechatcore) {
+	if($(".zam-app-signbox").outerHeight(true) >= $(window).height()){
+		$('.zam-app-sign').css({
+			"height":"auto",
+			'margin':'0.3rem 0',
+			'overflow-y':'scroll',
+			'background':'none'
+		});
+		$(".zam-app-bodyBg").css({"opacity":'1'});
+	}
+})
+</script>
+{include file="sign/xieyi" /}
+{include file="common/footer" /}

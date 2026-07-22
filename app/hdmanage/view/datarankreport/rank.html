@@ -1,0 +1,129 @@
+{include file='$Wpath/common/header'}
+{include file='datarankreport/search'}
+{include file='datarankreport/common'}
+{include file='$Wpath/common/tabletoolbar'}
+<table id="listtable" class="zam-btable"></table>
+<script>
+require(['webcore','webtable','jconfirmBox','zamnotice'],function(webcore,webtable,jconfirmBox,zamnotice){
+var initConfig = {
+    tableId:'#listtable',
+    url:"{:gohdmanage('datarankreport/rank',['hdid'=>$hdid])}",
+    columnoperate:{
+        btns:{
+            del:true,
+        },
+        func:{
+            del:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','此操作将删除该用户所有的提交记录并且无法恢复，您确定删除么？',function(){
+                    webcore.ajaxSubmit("{:gohdmanage('datarankreport/delrank',['hdid'=>$hdid])}",{recordid:row.id}).then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','删除成功');
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                    });
+                });
+            }
+        }
+    },
+    columns:[{
+            checkbox: true,
+        }, 
+        {
+            field: 'id',
+            title: 'id',
+            align: 'center',
+            visible: false
+        },{
+            field: 'nickname',
+            title: '用户',
+            align: 'center',
+            width:"20%",
+            formatter:function(value,row,index){
+                var html = `
+                <div class='zam-flex-column-center'>
+                    <img src="${row.avatar}" class="avatarImg" />
+                    <span>${value||'已删除'}</span>
+                </div>
+                `;
+                return html;
+            }
+        },{
+            field: 'odata',
+            title: '提交内容',
+            align: 'center',
+            width:"30%",
+            formatter: function(value, row, index){
+                 if(!value) {
+                    return ''; 
+                 }
+                 return webcore.tpl($("#binddata-tpl"),{datas:value,titles:bdtitles});
+            }
+        },{
+            field: 'total',
+            title: "{$calcbd['bdtitle']??'目标'}总计",
+            align: 'center',
+            width:"20%",
+        },{
+            field: 'count',
+            title: '提交次数',
+            align: 'center',
+            width:"20%",
+        }
+    ],
+    searchParamas:[{'type':'1','id':'keyword'},{'type':'1','id':'okeyword'}],
+    onloadsuccess:function(data){
+    },
+    toolbar:{
+        del:function(){
+            var getSelects = webtable.getSelections();
+            if(!getSelects.length){
+                return zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+            jconfirmBox.confirm('温馨提示','此操作将删除所选用户的所有的提交记录并且无法恢复，您确定删除么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('datarankreport/delrank',['hdid'=>$hdid])}",{recordid:getSelects}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','删除成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+        },
+        reset:function(){
+            jconfirmBox.confirm('温馨提示','清空将删除所有用户的提交记录并且无法恢复，您确定要清空么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('datarankreport/resetrank',['hdid'=>$hdid])}",{}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','清空成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+        },
+    },
+};
+webtable.init(initConfig);
+$('.btn-export').click(function(){
+    webcore.ajaxSubmit("{:gohdmanage('datarankreport/exportrank',['hdid'=>$hdid])}",{}).then(function(json){
+        if(json.code!=0){
+            zamnotice.showTips('error',json.msg);
+        }else{
+            window.location.href = "{:gohdmanage('datarankreport/exportrank',['hdid'=>$hdid])}";
+        }
+    }, function(json){
+        zamnotice.showTips('error','网络差,操作失败');
+    });
+});
+});
+</script>
+{include file='$Wpath/common/footer'}

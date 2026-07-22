@@ -1,0 +1,161 @@
+<div class="form-horizontal confirmbox-pop">
+  <form class="confirm-formbox" method="post">
+  <div class="text-center">
+        <div class="btn-group pop-btns" style="margin-bottom:10px;">
+          <a href="javascript:void(0)" class="btn btn-default btn-primary"><span>基础设置</span></a>
+          <a href="javascript:void(0)" class="btn btn-default"><span>支付证书</span></a>
+        </div>
+  </div>
+  <div class="carditem">
+    <div class="form-group">
+      <label class="col-lg-4 control-label">* 模板名</label>
+      <div class="col-lg-7">
+        <input class="form-control" type="text"  name="tplname" placeholder="请务必填写一个您觉得唯一的名称" value="{$config['tplname']}" onkeyup="return trimSpace(this)">
+      </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-4 control-label">* 模板类型</label>
+        <div class="col-lg-8">
+          <label class="lyear-radio radio-inline radio-primary">
+           <input type="radio" name="issys" value="1" {if $config['issys']=='1'}checked{/if}><span>系统模板</span>
+          </label>
+          <label class="lyear-radio radio-inline radio-primary">
+           <input type="radio" name="issys" value="2" {if $config['issys']=='2'}checked{/if}><span>用户模板</span>
+          </label>
+          <span class="help-block">这个一定要选对，系统模板即为平台内使用的，用户模板即为平台内注册用户创建的活动专用的</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-4 control-label">* 支付方式</label>
+        <div class="col-lg-8">
+          <label class="lyear-radio radio-inline radio-primary" onclick="changepaytype(this)">
+           <input type="radio" name="paytype" value="1" {if $config['paytype']=='1'}checked{/if}><span>微信支付</span>
+          </label>
+          <label class="lyear-radio radio-inline radio-primary" onclick="changepaytype(this)">
+           <input type="radio" name="paytype" value="2" {if $config['paytype']=='2'}checked{/if}><span>支付宝支付</span>
+          </label>
+          <span class="help-block">按实际情况选择</span>
+        </div>
+    </div>
+    <div class="form-group tpltypebox{if $config['paytype']=='2'} hidden{/if}">
+        <label class="col-lg-4 control-label">* 微信借权支付</label>
+        <div class="col-lg-8">
+          <label class="lyear-radio radio-inline radio-primary" onclick="changetpltype(this)">
+           <input type="radio" name="tpltype" value="1" {if $config['tpltype']=='1'}checked{/if}><span>否</span>
+          </label>
+          <label class="lyear-radio radio-inline radio-primary" onclick="changetpltype(this)">
+           <input type="radio" name="tpltype" value="2" {if $config['tpltype']=='2'}checked{/if}><span>是</span>
+          </label>
+          <span class="help-block">一般而言：填写的appid与系统公众号appid不一致才选择是，借权需要填写公众号appsecret</span>
+        </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-4 control-label">APPID</label>
+      <div class="col-lg-7">
+        <input class="form-control" type="text"  name="app_id" value="{$config['app_id']}" onkeyup="return trimSpace(this)">
+        <span class="help-block">微信支付填写认证服务号公众号appid，支付宝支付填写应用appid</span>
+      </div>
+    </div>
+    <div class="form-group tplappsecret{if $config['paytype']=='2' || $config['tpltype']=='1'} hidden{/if}">
+      <label class="col-lg-4 control-label">微信公众号APPSECRET</label>
+      <div class="col-lg-7">
+        <input class="form-control" type="text"  name="app_secret" value="{$config['app_secret']}" onkeyup="return trimSpace(this)">
+        <span class="help-block">微信支付填写认证服务号appsecret，支付宝支付不需要填写</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-4 control-label">微信商户号/支付宝账户id</label>
+      <div class="col-lg-7">
+        <input class="form-control" type="text"  name="mch_id" value="{$config['mch_id']}" onkeyup="return trimSpace(this)">
+        <span class="help-block">注:支付宝支付填写主账户信息内的账户id</span>
+      </div>
+    </div>
+    <div class="form-group signkeybox{if $config['paytype']=='2'} hidden{/if}">
+      <label class="col-lg-4 control-label">商户APIv2密钥</label>
+      <div class="col-lg-7">
+        <input class="form-control" type="text"  name="signkey" value="{$config['signkey']}" onkeyup="return trimSpace(this)">
+        <span class="help-block">微信支付填写商户秘钥，支付宝支付不需要填写</span>
+      </div>
+    </div>
+  </div>
+  <div class="carditem hidden">
+    <div class="wxpaypembox{if $config['paytype']=='2'} hidden{/if}">
+      <div class="form-group">
+        <label class="col-lg-4 control-label">微信支付证书apiclient_cert.pem文件内容</label>
+        <div class="col-lg-7">
+          <textarea class="form-control" name="cert_path" rows="3" placeholder="为保证安全性, 不显示证书内容. 若要修改, 请直接复制粘贴"></textarea>
+          <span class="help-block">{if $config['certsave']=='1'}<span class="text-danger">已保存 </span>{/if}注:微信支付是将证书文件包内的apiclient_cert.pem文件内的所有内容复制黏贴到此处</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-4 control-label">微信支付证书apiclient_key.pem文件内容</label>
+        <div class="col-lg-7">
+          <textarea class="form-control" name="key_path" rows="3" placeholder="为保证安全性, 不显示证书内容. 若要修改, 请直接复制粘贴"></textarea>
+          <span class="help-block">{if $config['keysave']=='1'}<span class="text-danger">已保存 </span>{/if}注:微信支付是证书文件夹内的apiclient_key.pem文件内的所有内容复制黏贴到此处<br>支付宝支付：应用私钥复制黏贴到此处</span>
+        </div>
+      </div>
+    </div>
+    <div class="alipaycrtbox{if $config['paytype']=='1'} hidden{/if}">
+      <div class="form-group">
+        <label class="col-lg-4 control-label">支付宝应用私钥</label>
+        <div class="col-lg-7">
+          <textarea class="form-control" name="ali_app_private_keypath" rows="3" placeholder="为保证安全性, 不显示证书内容. 若要修改, 请直接复制粘贴"></textarea>
+          <span class="help-block">{if $config['aliappprivatekeysave']=='1'}<span class="text-danger">已保存 </span>{/if}注:支付宝支付是将支付宝开放平台开发工具的生成密钥内的应用私钥直接复制黏贴到此处</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-4 control-label">支付宝应用公钥证书文件内容</label>
+        <div class="col-lg-7">
+          <textarea class="form-control" name="ali_app_cert_public_keypath" rows="3" placeholder="为保证安全性, 不显示证书内容. 若要修改, 请直接复制粘贴"></textarea>
+          <span class="help-block">{if $config['aliapppublickeysave']=='1'}<span class="text-danger">已保存 </span>{/if}注:支付宝支付是将支付宝应用公钥证书文件下载下来(appCertPublicKey_xxxxxxxxxxxxx.crt)打开后将所有内容复制黏贴到此处</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-4 control-label">支付宝公钥证书文件内容</label>
+        <div class="col-lg-7">
+          <textarea class="form-control" name="alipay_public_keypath" rows="3" placeholder="为保证安全性, 不显示证书内容. 若要修改, 请直接复制粘贴"></textarea>
+          <span class="help-block">{if $config['alipaypublickeysave']=='1'}<span class="text-danger">已保存 </span>{/if}注:支付宝支付是将支付宝应用对应的支付宝公钥证书文件下载下来(alipayCertPublicKey_RSA2.crt)打开后将所有内容复制黏贴到此处</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-4 control-label">支付宝根证书文件内容</label>
+        <div class="col-lg-7">
+          <textarea class="form-control" name="alipay_root_certpath" rows="3" placeholder="为保证安全性, 不显示证书内容. 若要修改, 请直接复制粘贴"></textarea>
+          <span class="help-block">{if $config['alipayrootkeysave']=='1'}<span class="text-danger">已保存 </span>{/if}注:支付宝支付是将支付宝应用对应的支付宝根证书文件下载下来(alipayRootCert.crt文件)打开后将所有内容复制黏贴到此处</span>
+        </div>
+      </div>
+    </div>
+ </div>
+</form>
+</div>
+<script type="text/javascript">
+$(function(){
+  $(".confirmbox-pop .pop-btns a.btn").click(function(){
+      $(this).addClass('btn-primary').siblings().removeClass("btn-primary");
+      $(".confirmbox-pop .carditem").addClass('hidden').eq($(this).index()).removeClass('hidden');
+  });
+});
+function changepaytype(obj){
+  var paytype = $(obj).find('input').val();
+  /*是否为借用支付*/
+  if(paytype=='1'){
+    if($(".tpltypebox").find('input:radio:checked').val()=='2'){
+      $(".tplappsecret").removeClass('hidden');
+    }
+    $(".tpltypebox,.signkeybox,.wxpaypembox").removeClass('hidden');
+    $(".alipaycrtbox").addClass('hidden');
+  }else{    
+    $(".tpltypebox,.tplappsecret,.signkeybox,.wxpaypembox").addClass('hidden');
+    $(".alipaycrtbox").removeClass('hidden');
+  }
+}
+function changetpltype(obj){
+  var tpltype = $(obj).find('input').val();
+  /*是否为借用支付*/
+  if(tpltype=='1'){
+    $(".tplappsecret").addClass('hidden');
+  }else{
+    $(".tplappsecret").removeClass('hidden');
+  }
+}
+</script>

@@ -1,0 +1,87 @@
+{include file='$Wpath/common/header'}
+<form id="formBox" class="zam-formvalidation form-horizontal" method="post">
+<div class="zam-titleBox">微信端红包</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 微信端通用红包模板</label>
+    <div class="col-lg-7">
+      <select class="form-control js_select2 hbtpl"  name="hbtpl">
+        <option value="">请选择</option>
+        {volist name="tpls" id="tpl"}
+          {if $tpl['issys']=='1'}
+          <option value="{$tpl['id']}">{$tpl['tplname']}</option>
+          {/if}
+        {/volist}
+      </select>
+      <div class="help-block">此模板适用于所有未自定义红包模板的活动，发放红包雨、摇红包、霸屏等功能的红包</div>
+    </div>
+</div>
+<div class="zam-titleBox">现金红包默认值</div>
+<div class="form-group">
+  <label class="col-lg-2 control-label">* 活动名</label>
+  <div class="col-lg-7">
+    <input class="form-control inputneedmax" type="text"  name="act_name" placeholder="" value="{$config['act_name']}" maxlength="10">
+  </div>
+</div>
+<div class="form-group">
+  <label class="col-lg-2 control-label">* 发放主办方</label>
+  <div class="col-lg-7">
+    <input class="form-control inputneedmax" type="text"  name="send_name" placeholder="" value="{$config['send_name']}" maxlength="10">
+  </div>
+</div>
+<div class="form-group">
+  <label class="col-lg-2 control-label">* 祝福</label>
+  <div class="col-lg-7">
+    <input class="form-control inputneedmax" type="text"  name="wishing" placeholder="" value="{$config['wishing']}" maxlength="42">
+  </div>
+</div>
+<div class="form-group">
+  <label class="col-lg-2 control-label">* 备注</label>
+  <div class="col-lg-7">
+    <input class="form-control inputneedmax" type="text"  name="remark" placeholder="" value="{$config['remark']}" maxlength="85">
+  </div>
+</div>
+<div class="zam-titleBox">企业付款或商家转账默认值</div>
+<div class="form-group">
+  <label class="col-lg-2 control-label">* 备注</label>
+  <div class="col-lg-7">
+    <input class="form-control inputneedmax" type="text"  name="desc" placeholder="" value="{$config['desc']}" maxlength="33">
+  </div>
+</div>
+{include file='$Wpath/common/savepanel'}
+</form>
+<script>
+require(['webcore','jconfirmBox','zamnotice','zvalidator'],function(webcore,jconfirmBox,zamnotice){
+  $(".hbtpl").val("{$config['hbtpl']}").trigger("change");
+  $('#formBox').formValidation({
+      framework: 'bootstrap',
+      excluded: [':disabled'],
+      message: '您填写的内容无效',
+      fields: {
+        
+      }
+  }).on('success.form.fv', function(e) {
+    e.preventDefault();
+    var $form = $(e.target);
+    var postData = webcore.serializeObject($form);
+    var bload = $form.find(".zam-fixedbottom button").lyearloading({opacity: 0.2,spinnerSize: 'nm'});
+    $form.formValidation('disableSubmitButtons', true);
+    webcore.ajaxSubmit("{:goweb('hbtpl/config')}",postData).then(function(json){
+      bload.hide();
+      if(json.code==0){
+          $form.formValidation('disableSubmitButtons', false);
+          zamnotice.showTips('success','操作成功',2e3,function(){
+            window.location.reload();
+          });
+        }else{
+            zamnotice.showTips('error',json.msg);
+            $form.formValidation('disableSubmitButtons', false);
+        }
+    }, function(json){
+      bload.hide();
+      zamnotice.showTips('error','网络差。操作失败');
+      $form.formValidation('disableSubmitButtons', false);
+    });
+  });
+});
+</script>
+{include file='$Wpath/common/footer'}

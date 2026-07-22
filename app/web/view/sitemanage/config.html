@@ -1,0 +1,361 @@
+{include file='$Wpath/common/header'}
+<style type="text/css">
+#edui145_iframeholder{max-height: 500px;}
+</style>
+<form id="formBox" class="zam-formvalidation form-horizontal" method="post">
+<div class="zam-titleBox">基础设置</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 站点名称</label>
+    <div class="col-lg-8">
+      <input class="form-control" type="text"  name="sitetitle" value="{$config['sitetitle']}">
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 站点logo</label>
+    <div class="col-lg-8">
+        {:tpl_image_one('sitelogo',$config['sitelogo'])}
+        <span class="help-block">尺寸控制在210*68px</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 站点网页icon</label>
+    <div class="col-lg-8">
+        {:tpl_image_one('siteicon',$config['siteicon'])}
+        <span class="help-block">32*32px</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 后台用户默认头像</label>
+    <div class="col-lg-8">
+        {:tpl_image_one('siteavatar',$config['siteavatar'])}
+        <span class="help-block">64*64px</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 后台版权信息</label>
+    <div class="col-lg-8">
+         <input class="form-control" type="text"  name="sitecopyright" value="{$config['sitecopyright']}">
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 后台布局类型</label>
+    <div class="col-lg-8">
+      <label class="lyear-radio radio-inline radio-primary">
+       <input type="radio" name="responsetype" value="1" {if !isset($config['responsetype']) || (isset($config['responsetype']) && $config['responsetype']=='1')}checked{/if}><span>多端等比缩放自适应</span>
+      </label>
+      <label class="lyear-radio radio-inline radio-primary">
+       <input type="radio" name="responsetype" value="2" {if isset($config['responsetype']) && $config['responsetype']=='2'}checked{/if}><span>多端不缩放自适应</span>
+      </label>
+      <div class="help-block">
+        <div>多端等比缩放自适应即为根据客户端屏幕大小自动调节网页大小，某些页面一些小地方可能自动调节的有小缺陷</div>
+        <div>多端不缩放自适应即为不论客户端屏幕大小直接全局展示网页原本大小，对一些小屏幕手机访问后台更加友好<span class="text-danger" style="font-size: 12px;">(类似宝塔服务器管理后台)</span></div>
+      </div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 系统信息</label>
+    <div class="col-lg-8">
+        {:tpl_switch('opensysinfo',$config['opensysinfo'])}
+        <span class="help-block">关闭后后台管理首页将不显示系统信息</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 自定义首页</label>
+    <div class="col-lg-8">
+        {:tpl_switch('indexpage[open]',$config['indexpage']['open']??'2','openindexpage')}
+        <span class="help-block">
+          <div class="m-b-5">关闭后用户访问域名将跳转到系统后台登录页面</div>
+          <div class="m-b-5 text-danger">此处设置目的主要是解决有些人想用户直接访问域名的时候能够打开他自己的官网，而不是用户后台登录页</div>
+        </span>
+    </div>
+</div>
+<div class="indexpagebox{if !isset($config['indexpage']) || (isset($config['indexpage']['open']) && $config['indexpage']['open']=='2')} hidden{/if}">
+  <div class="form-group indexpagetypes">
+      <label class="col-lg-2 control-label">* 首页类型</label>
+      <div class="col-lg-8">
+        <label class="lyear-radio radio-inline radio-primary">
+            <input type="radio" name="indexpage[type]" value="1" {if !isset($config['indexpage']['type']) || (isset($config['indexpage']['type']) && $config['indexpage']['type']=='1')}checked{/if}><span>自定义首页html内容</span>
+        </label>
+        <label class="lyear-radio radio-inline radio-primary">
+            <input type="radio" name="indexpage[type]" value="2" {if isset($config['indexpage']['type']) && $config['indexpage']['type']=='2'}checked{/if}><span>跳转到自有官网url地址</span>
+        </label>
+      </div>
+  </div>
+  <div class="form-group diyhtmlbox{if isset($config['indexpage']['type']) && $config['indexpage']['type']=='2'} hidden{/if}">
+      <label class="col-lg-2 control-label">* 自定义首页内容</label>
+      <div class="col-lg-8">
+          {:tpl_ueditor('indexpage[pagecontent]',$config['indexpage']['pagecontent']??'<p>我是首页内容</p>')}
+          <span class="help-block">首页内容可以是html或者纯文本内容，用户直接访问域名将展示当前填写的内容</span>
+      </div>
+  </div>
+  <div class="form-group urlbox{if !isset($config['indexpage']['type']) || (isset($config['indexpage']['type']) && $config['indexpage']['type']=='1')} hidden{/if}">
+      <label class="col-lg-2 control-label">* 自有官网url地址</label>
+      <div class="col-lg-8">
+        <input class="form-control" type="text"  name="indexpage[url]" value="{$config['indexpage']['url']??''}">
+        <span class="zam-help-block">用户直接访问域名会跳转到该url地址</span>
+      </div>
+  </div>
+</div>
+<div class="zam-titleBox">顶部菜单</div>
+<div class="form-group">
+<label class="col-lg-2 control-label"> 菜单列表</label>
+<div class="col-lg-8">
+    <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th style="width:10%;text-align:center;">菜单图标</th>
+            <th style="width:15%;text-align:center;">菜单名</th>
+            <th style="width:53%;text-align:center;">菜单链接</th>
+            <th style="width:10%;text-align:center;">状态</th>
+            <th style="width:12%;text-align:center;">操作</th>
+          </tr>
+        </thead>
+        <tbody class="toplinks-lists">
+        {volist name="config.toplinks" id="toplink"}    
+        <tr>
+            <td class="text-center">
+               {:tpl_icon('toplinks[linkicon]',$toplink['linkicon'])}
+            </td>
+            <td class="text-center">
+                <input class="form-control" name="toplinks[linkname]" value="{$toplink['linkname']}" placeholder="菜单名称必须设置">
+            </td>
+            <td class="text-center">
+               <input class="form-control" name="toplinks[linkurl]" value="{$toplink['linkurl']}" placeholder="菜单链接必须设置">
+            </td>
+            <td class="text-center">
+               {:tpl_switch('toplinks[linkstatus]',$toplink['linkstatus'])}
+            </td>
+            <td class="text-center">
+               <a class="btn btn-danger btn-xs btn-del"><i class="mdi mdi-close"></i></a>
+               <a class="btn btn-primary btn-xs mousemove zam-sortable"><i class="mdi mdi-arrow-all"></i></a>
+            </td>
+        </tr>
+        {/volist}
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="5">
+              <a class="btn btn-primary btn-xs addtoplink" href="javascript:;" > <i class="mdi mdi-plus"></i>新增菜单</a>
+              <span class="help-block">注：菜单链接必须是完整的一个url地址</span>
+            </td>
+          </tr>
+        </tfoot>
+    </table>
+</div>
+</div>
+<div class="zam-titleBox">右侧客服主开关</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 状态</label>
+    <div class="col-lg-8">
+      {:tpl_switch('kefu[open]',$config['kefu']['open'])}
+      <span class="zam-help-block">关闭后右侧所有客服信息将会隐藏</span>
+    </div>
+</div>
+<div class="zam-titleBox">QQ客服设置</div>
+<div class="kefubox">
+  <div class="form-group">
+      <label class="col-lg-2 control-label">启用</label>
+      <div class="col-lg-8">
+        {:tpl_switch('kefu[openqq]',$config['kefu']['openqq'])}
+      </div>
+  </div>
+  <div class="qqkefubox">
+    <div class="form-group">
+        <label class="col-lg-2 control-label">客服标题</label>
+        <div class="col-lg-8">
+          <input class="form-control" name="kefu[qqtitle]" value="{$config['kefu']['qqtitle']}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">客服简介</label>
+        <div class="col-lg-8">
+          <input class="form-control" name="kefu[qqdes]" value="{$config['kefu']['qqdes']}">
+        </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label">* QQ列表</label>
+      <div class="col-lg-8">
+          <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th style="width:40%;text-align:center;">客服名</th>
+                  <th style="width:40%;text-align:center;">QQ号</th>
+                  <th style="width:20%;text-align:center;">操作</th>
+                </tr>
+              </thead>
+              <tbody class="qq-lists">
+              {volist name="config.kefu.qqlist" id="oneqq"}    
+              <tr>
+                  <td class="text-center">
+                     <input class="form-control" name="qqlist[qqname]" value="{$oneqq['qqname']}" placeholder="客服名称必须设置">
+                  </td>
+                  <td class="text-center">
+                      <input class="form-control" name="qqlist[qqnum]" value="{$oneqq['qqnum']}" placeholder="qq号必须设置">
+                  </td>
+                  <td class="text-center">
+                     <a class="btn btn-danger btn-xs btn-del"><i class="mdi mdi-close"></i></a>
+                     <a class="btn btn-primary btn-xs mousemove zam-sortable"><i class="mdi mdi-arrow-all"></i></a>
+                  </td>
+              </tr>
+              {/volist}
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="5">
+                    <a class="btn btn-primary btn-xs addqqkefu" href="javascript:;" > <i class="mdi mdi-plus"></i>新增客服</a>
+                  </td>
+                </tr>
+              </tfoot>
+          </table>
+      </div>
+    </div>
+  </div>
+  <div class="zam-titleBox">电话客服设置</div>
+  <div class="form-group">
+      <label class="col-lg-2 control-label">启用</label>
+      <div class="col-lg-8">
+        {:tpl_switch('kefu[openmobile]',$config['kefu']['openmobile'])}
+      </div>
+  </div>
+  <div class="form-group">
+        <label class="col-lg-2 control-label">客服号码与介绍</label>
+        <div class="col-lg-8">
+          {:tpl_ueditor('kefu[mobilecode]',$config['kefu']['mobilecode'])}
+        </div>
+  </div>
+  <div class="form-group">
+      <label class="col-lg-2 control-label">客服简介</label>
+      <div class="col-lg-8">
+        <input class="form-control" name="kefu[mobiletitle]" value="{$config['kefu']['mobiletitle']}">
+      </div>
+  </div>
+  <div class="zam-titleBox">微信客服设置</div>
+  <div class="form-group">
+      <label class="col-lg-2 control-label">启用</label>
+      <div class="col-lg-8">
+        {:tpl_switch('kefu[openwx]',$config['kefu']['openwx'])}
+      </div>
+  </div>
+  <div class="form-group">
+      <label class="col-lg-2 control-label">客服二维码</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('kefu[wxqr]',$config['kefu']['wxqr'])}
+      </div>
+  </div>
+  <div class="form-group">
+      <label class="col-lg-2 control-label">客服简介</label>
+      <div class="col-lg-8">
+        <input class="form-control" name="kefu[wxtitle]" value="{$config['kefu']['wxtitle']}">
+      </div>
+  </div>
+</div>
+{include file='$Wpath/common/savepanel'}
+</form>
+<script>
+require(['webcore','jconfirmBox','zamnotice','zvalidator',"jquery.ui"],function(webcore,jconfirmBox,zamnotice){
+    $('.qq-lists,.toplinks-lists').sortable({handle: ".mousemove"}).disableSelection();
+    $(".qq-lists,.toplinks-lists").disableSelection();
+    $('#formBox').formValidation({
+  		framework: 'bootstrap',
+  		excluded: [':disabled'],
+  		message: '您填写的内容无效',
+  		fields: {}
+  	}).on('success.form.fv', function(e) {
+  		e.preventDefault();
+  		var $form = $(e.target);
+  		var postData = webcore.serializeObject($form);
+  		var bload = $form.find(".zam-fixedbottom button").lyearloading({opacity: 0.2,spinnerSize: 'nm'});
+  		$form.formValidation('disableSubmitButtons', true);
+  		webcore.ajaxSubmit("{:goweb('sitemanage/config')}",postData).then(function(json){
+  			bload.hide();
+  			if(json.code==0){
+  			    $form.formValidation('disableSubmitButtons', false);
+  			    zamnotice.showTips('success','操作成功',2e3,function(){
+  			    	window.location.reload();
+  			    });
+  		    }else{
+  		        zamnotice.showTips('error',json.msg);
+  		        $form.formValidation('disableSubmitButtons', false);
+  		    }
+  		}, function(json){
+  			bload.hide();
+  			zamnotice.showTips('error','网络差。操作失败');
+  			$form.formValidation('disableSubmitButtons', false);
+  		});
+  	});
+    $(".addtoplink").click(function(){
+      var whtml = $(webcore.tpl($("#addtoplink"),{})).clone();
+      $(".toplinks-lists").append(whtml);
+      tpl_switch();
+      $('.icon-picker').fontIconPicker({
+        theme: 'fip-bootstrap',
+        source:webcore.fontarr,
+      });
+    });
+    $(".addqqkefu").click(function(){
+      var whtml = $(webcore.tpl($("#addqqkefu"),{})).clone();
+      $(".qq-lists").append(whtml);
+    });
+    $("table").on('click','.btn-del',function(){
+      $(this).parent().parent().remove();
+    });
+    $(".indexpagetypes label").click(function(){
+      var filetype = $(this).find('input').val();
+      if(filetype=='1'){
+        $(".diyhtmlbox").removeClass('hidden');
+        $(".urlbox").addClass('hidden');
+      }else{
+        $(".diyhtmlbox").addClass('hidden');
+        $(".urlbox").removeClass('hidden');
+      }
+    });
+});
+function openindexpage(obj,status){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".indexpagebox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".indexpagebox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+
+</script>
+<script id='addtoplink' type="text/template">
+<tr>
+    <td class="text-center">
+       {:tpl_icon('toplinks[linkicon]','mdi mdi-file')}
+    </td>
+    <td class="text-center">
+        <input class="form-control" name="toplinks[linkname]" value="" placeholder="菜单名称必须设置">
+    </td>
+    <td class="text-center">
+       <input class="form-control" name="toplinks[linkurl]" value="" placeholder="菜单链接必须设置">
+    </td>
+    <td class="text-center">
+       {:tpl_switch('toplinks[linkstatus]','1')}
+    </td>
+    <td class="text-center">
+       <a class="btn btn-danger btn-xs btn-del"><i class="mdi mdi-close"></i></a>
+       <a class="btn btn-primary btn-xs mousemove zam-sortable"><i class="mdi mdi-arrow-all"></i></a>
+    </td>
+</tr>
+</script>
+<script id='addqqkefu' type="text/template">
+<tr>
+    <td class="text-center">
+        <input class="form-control" name="qqlist[qqname]" value="" placeholder="客服名称必须设置">
+    </td>
+    <td class="text-center">
+       <input class="form-control" name="qqlist[qqnum]" value=""  placeholder="qq号必须设置">
+    </td>
+    <td class="text-center">
+       <a class="btn btn-danger btn-xs btn-del"><i class="mdi mdi-close"></i></a>
+       <a class="btn btn-primary btn-xs mousemove zam-sortable"><i class="mdi mdi-arrow-all"></i></a>
+    </td>
+</tr>
+</script>
+{include file='$Wpath/common/footer'}

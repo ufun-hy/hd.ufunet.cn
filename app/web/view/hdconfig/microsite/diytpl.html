@@ -1,0 +1,26 @@
+{extend name="./../../common/tpl/web/themes/default/common/diylayout"}
+{block name="title"}<title>活动微站模板页面设计</title>{/block}
+{block name="header"}
+<script>
+    var XCV3Config = {
+        tplid:"{$tplid}",
+        staticurl:"__STATIC__/",
+        amconfig:{:json_encode(amconfig())},
+    };
+</script>
+{/block}
+{block name="header-buttons"}
+<el-button type="primary" icon="el-icon-baocun" size="medium" :loading="issaving" @click="saveDiydata" >保存</el-button>
+{/block}
+{block name="footer"}
+<script src="__STATIC__/js/diy/utils/index.js?t={$timestamp}"></script>
+<script src="__STATIC__/js/diy/utils/http.js?t={$timestamp}"></script>
+<script src="__STATIC__/js/diy/mixin/index.js?t={$timestamp}"></script>
+<script src="__STATIC__/js/diy/components/web/common/index.js?t={$timestamp}"></script>
+<script src="__STATIC__/js/diy/components/web/free/index.js?t={$timestamp}"></script>
+<script src="__STATIC__/js/diy/components/web/free/style.js?t={$timestamp}"></script>
+<script src="__STATIC__/js/diy/components/web/base/index.js?t={$timestamp}"></script>
+<script src="__STATIC__/js/diy/components/web/base/style.js?t={$timestamp}"></script>
+<script src="__STATIC__/js/diy/components/web/config.js?t={$timestamp}"></script>
+<script src="__STATIC__/js/diy/index.js?t={$timestamp}"></script>
+{/block}

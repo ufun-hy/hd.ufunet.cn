@@ -1,0 +1,250 @@
+{include file='$Wpath/common/header'}
+{include file='$Wpath/common/tabletoolbar'}
+<table id="listtable" class="zam-btable"></table>
+<script>   
+var yhcates = {:json_encode($cates)}; 
+require(['webcore','webtable','jconfirmBox','zamnotice','clipboard','layerBox','jcode'],function(webcore,webtable,jconfirmBox,zamnotice,Clipboard,layerBox){
+var initConfig = {
+    tableId:'#listtable',
+    url:"{:gohdmanage('configyaohao/rotate',['hdid'=>$hdid])}",
+    columnoperate:{
+        btns:{
+            edit:true,
+            del:true,
+            data:true,
+        },
+        func:{
+            edit:function(value, row, index){
+                var confirmObj = jconfirmBox.ajaxconfirm("编辑轮次","{:gohdmanage('configyaohao/editrotate',['hdid'=>$hdid])}",{rotateid:row.id},'html','col-lg-10 col-lg-offset-1',function(e){
+                    var postData = webcore.serializeObject(e.find('form'));
+                    postData.rotateid = row.id;
+                    webcore.ajaxSubmit("{:gohdmanage('configyaohao/saverotate',['hdid'=>$hdid])}",postData).then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','保存成功');
+                            confirmObj.close();
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                             return false;
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                         return false;
+                    });
+                });
+            },
+            del:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','删除将删除当前轮次的中奖数据并且无法恢复，您确定要删除么？',function(){
+                        webcore.ajaxSubmit("{:gohdmanage('configyaohao/delrotate',['hdid'=>$hdid])}",{rotateid:row.id}).then(function(json){
+                            if(json.code==0){
+                                webtable.refresh();
+                                zamnotice.showTips('success','删除成功');
+                            }else{
+                                zamnotice.showTips('error',json.msg);
+                            }
+                        }, function(json){
+                            zamnotice.showTips('error','网络差。操作失败');
+                        });
+                });
+            },
+            data:function(value, row, index){
+                window.location.href = "{:gohdmanage('datayaohao/index',['hdid'=>$hdid])}&rotateid="+row.id;
+            },
+        }
+    },
+    columns:[{
+            checkbox: true,
+        }, 
+        {
+            field: 'id',
+            title: 'Id',
+            align: 'center',
+            visible: false
+        }, {
+            field: 'displayorder',
+            title: '序号',
+            align: 'center',
+            formatter:function(value,row,index){
+                return value + '<i class="mdi mdi-pencil m-l-10 cursor editorder" data-order="'+value+'" data-rotateid="'+row.id+'"></i>';
+            }
+        }
+        ,{
+            field: 'rotatetitle',
+            title: '轮次',
+            align: 'center',
+        }, {
+            field: 'rangetypehtml',
+            title: '用户范围',
+            align: 'center',
+            width:'15%',
+            formatter: function(value, row, index){
+                if(row.rangetype == '2' && row.cateids.length > 0){
+                    var html = '<div>'+value+'</div>';
+                    $.each(row.cateids,function(i,v){
+                        $.each(yhcates,function(j,m){
+                            if(m.id==v){
+                                html += '<div style="margin:5px 0;"><span class="label label-default">'+m.catename+'</span></div>';
+                            }
+                        });
+                    });
+                    return html;
+                }
+                return value;
+            },
+        }, {
+            field: 'yaonums',
+            title: '摇号数量',
+            align: 'center',
+        },{
+            field: 'needndhtml',
+            title: '内定',
+            align: 'center',
+        }
+        ,{
+            field: 'outnums',
+            title: '中奖人数',
+            align: 'center',
+        }
+        ,{
+            field: 'create_time',
+            title: '创建时间',
+            align: 'center',
+        }
+    ],
+    searchParamas:[],
+    toolbar:{
+        add:function(){
+            var confirmObj = jconfirmBox.ajaxconfirm("新增轮次","{:gohdmanage('configyaohao/editrotate',['hdid'=>$hdid])}",{},'html','col-lg-10 col-lg-offset-1',function(e){
+	            var postData = webcore.serializeObject(e.find('form'));
+	            webcore.ajaxSubmit("{:gohdmanage('configyaohao/saverotate',['hdid'=>$hdid])}",postData,'正在创建轮次...').then(function(json){
+	                if(json.code==0){
+	                    webtable.refresh();
+	                    zamnotice.showTips('success','创建成功');
+	                    confirmObj.close();
+	                }else{
+	                    zamnotice.showTips('error',json.msg);
+	                     return false;
+	                }
+	            }, function(json){
+	                zamnotice.showTips('error','网络差。操作失败');
+	                 return false;
+	            });
+	        });
+        },
+        del:function(){
+            var getSelects = webtable.getSelections();
+            if(getSelects.length>0){
+                jconfirmBox.confirm('温馨提示','删除将删除所选轮次下的中奖数据并且无法恢复，您确定要删除么？',function(){
+                    webcore.ajaxSubmit("{:gohdmanage('configyaohao/delrotate',['hdid'=>$hdid])}",{rotateid:getSelects}).then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','删除成功');
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差,操作失败');
+                    });
+                });
+            }else{
+                zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+        },
+        reset:function(){
+            jconfirmBox.confirm('温馨提示','清空将删除所有轮次下的中奖数据并且无法恢复，您确定要清空么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('configyaohao/resetallrotate',['hdid'=>$hdid])}",{}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','清空成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+        },
+        {/*
+         当成重置
+        */}
+        shenhe:function(){
+            var getSelects = webtable.getSelections();
+            if(getSelects.length>0){
+                jconfirmBox.confirm('温馨提示','重置将删除所选轮次下中奖数据并且无法恢复，您确定要重置么？',function(){
+                    webcore.ajaxSubmit("{:gohdmanage('configyaohao/resetrotate',['hdid'=>$hdid])}",{rotateid:getSelects}).then(function(json){
+                        webtable.refresh();
+                        zamnotice.showTips('success','重置成功');
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                    });
+                });
+            }else{
+                zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+            
+        },
+    },
+};
+webtable.init(initConfig);
+var clickedshow = false;
+$(".zam-Table").on('click','.clickdownmainimg',function() {
+    var rotateid = $(this).attr('data-rotateid');
+    webcore.ajaxSubmit("{:gohdmanage('configyaohao/showrotateimg',['hdid'=>$hdid])}",{rotateid:rotateid},'稍等，正在查询..').then(function(json){
+        clickedshow = false;
+        if(json.code==0){
+            prevshowattachs(json.msg,1);
+        }else{
+            zamnotice.showTips('error',json.msg);
+        }
+    }, function(json){
+        clickedshow = false;
+        zamnotice.showTips('error','网络异常');
+    });
+});
+var clipboard = new Clipboard('.zam-clip', {
+    text: function(e) {
+      return $(e).data('url') || $(e).data('href')
+    }
+});
+clipboard.on('success',function(e) {
+ zamnotice.showTips('success','复制成功',2e3);
+ return;
+});
+$(".zam-Table").on('click','.clickshowclients',function() {
+    var rotateid = $(this).attr('data-rotateid');
+    var confirmobj = jconfirmBox.ajaxconfirm("本轮签约客户端一览","{:gohdmanage('configyaohao/showallclients',['hdid'=>$hdid])}",{rotateid:rotateid},'html','col-lg-10 col-lg-offset-1',function(e){
+            
+    },false,'2');
+});
+$("#listtable").on('click','.editorder',function(){
+    var $this = $(this),disorder=  $this.attr('data-order');
+    var confirmobj = jconfirmBox.confirm('编辑轮次排序序号',webcore.tpl($("#rotateorder-tpl"),{displayorder:disorder}),function(e){
+        var displayorder = e.$content.find(".displayorder").val();
+        if(displayorder=='') return zamnotice.showTips('error','请设置排序序号');
+        webcore.ajaxSubmit("{:gohdmanage('configyaohao/editrotateorder',['hdid'=>$hdid])}",{rotateid:$this.attr('data-rotateid'),displayorder:displayorder},'正在处理..').then(function(json){
+             if(json.code==0){
+                confirmobj.close();
+                zamnotice.showTips('success','修改成功');
+                webtable.refresh();
+             }else{
+                zamnotice.showTips('error',json.msg);
+             }
+        })
+    },false,false,true);
+});
+});
+</script>
+<script id='rotateorder-tpl' type="text/template">
+<div class="form-horizontal confirmbox-pop">
+  <form class="confirm-formbox" method="post">
+    <div class="form-group">
+      <label class="col-lg-3 control-label">* 序号</label>
+      <div class="col-lg-7">
+        <input class="form-control displayorder" type="text"  placeholder="排序序号" value="<% d.displayorder %>">
+        <span class="help-block">轮次排序序号越小排在越前</span>
+      </div>
+    </div>
+  </form>
+</div>
+</script>
+{include file='$Wpath/common/footer'}

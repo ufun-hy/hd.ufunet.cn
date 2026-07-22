@@ -1,0 +1,680 @@
+{include file='$Wpath/common/header'}
+<style>
+    /* 选择用户 */
+.searchuser-list{
+    flex-wrap: wrap;
+}
+.searchuser-list li{
+    position: relative;
+    width: 126px;
+    margin:0 10px 10px 0;
+    border-radius: 5px;
+    border: 1px solid rgba(0,0,0,0.1);
+    padding: 10px;
+    cursor: pointer;
+}
+.searchuser-list li .user-avatar{
+    width: 110px;
+    height: 100px;
+}
+.searchuser-list li .user-avatar img{
+    width: 100%;
+    height: 100%;
+}
+.searchuser-list li .user-name{
+    margin: 10px 0;
+    width: 100%;
+    padding: 0 10px;
+    font-size: 12px;
+    text-align: center;
+    font-weight: bold;
+    height: 20px;
+    overflow: hidden;
+}
+.searchuser-list li .radio{
+    position: absolute;
+    right: 0px;
+    top: 0px;
+}
+/* 可选模块与分类 */
+.zam-modulebox{padding: 0}
+.zam-modulebox ul{
+	display:flex;
+	flex-wrap: wrap;
+	height:auto;
+}
+
+.zam-modulebox ul li{
+	position:relative;
+	width:184px;
+	margin:0 10px 10px 0;
+	cursor:pointer;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	
+}
+.zam-modulebox ul li .zam-modulebox-item{
+	border:2px solid rgba(0, 0, 0, .1);
+	border-radius: 4px;
+	box-shadow: -3px 5px 15px rgb(64 102 178 / 30%);
+	overflow: hidden;
+}
+.zam-modulebox ul li.isactive .zam-modulebox-item,.zam-modulebox ul li:hover .zam-modulebox-item{
+	border-color:#48b0f7;
+}
+.zam-modulebox ul li.isactive:after {
+    content: '';
+    clear: both;
+    display: block;
+	width: 0;
+    height: 0;
+    border-top: 40px solid #48b0f7;
+    border-left: 40px solid transparent;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+}
+.zam-modulebox ul li .hadsel{
+	position: absolute;
+    top: 1px;
+    right:3px;
+    z-index: 1;
+	font-size:16px;
+	color:#fff;
+	display:none;
+}
+.zam-modulebox ul li.isactive .hadsel{
+	display:block
+}
+.zam-modulebox ul li .moduleimgbox{
+	width:180px;
+	height:101px;
+	background-color: #f0f0f0
+}
+.zam-modulebox ul li img{
+	width:100%;
+	height:100%;
+}
+
+.pub-module-name-price{
+	height:30px;
+	line-height:30px;
+	font-size:15px;
+    padding: 0 5px;
+}
+.pub-module-name-price .pub-module-name{
+    flex: 1;
+}
+.pub-module-name-price .pub-module-price{
+    max-width: 100px;
+}
+/*已选功能*/
+.sel-modules-ul li{
+	position:relative;
+	width:104px;
+	margin:0 10px 10px 0;
+	padding:10px 0;
+	border:1px solid #48b0f7;
+	border-radius:3px;
+	cursor:pointer;
+	float:left;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+.sel-modules-ul li:after {
+    width: 0;
+    height: 0;
+    border-top: 40px solid #48b0f7;
+    border-left: 40px solid transparent;
+    display: block;
+    content: '';
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    clear: both;
+}
+.sel-modules-ul li .delsel {
+    position: absolute;
+    right: 3px;
+    top: 1px;
+    color: #fff;
+	font-size:15px;
+    z-index: 1;
+}
+.sel-modules-ul li .sel-module-icon{
+	width:60px;
+	height:60px;
+	border-radius:50%;
+}
+.sel-modules-ul li .sel-module-icon img{
+	width:100%;
+	height:100%;
+	border-radius:50%;
+}
+.sel-modules-ul li .sel-module-name{
+	height:30px;
+	line-height:30px;
+}
+/* 创建成功提示 */
+.success-page{
+    display: flex;
+    justify-content: center;
+}
+.success-page .success-content {
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 0 30px rgba(99, 99, 99, 0.06);
+    padding: 50px;
+    background-color: #fff;
+    width: 100%;
+    max-width: 560px;
+}
+
+.success-page .success-header {
+    font-size: 40px;
+    line-height: 60px;
+    letter-spacing: -1px;
+    margin-bottom: 20px;
+    color: #777;
+}
+.success-header .success {
+    color: #2ecc71;
+}
+.success-page .success-des {
+    font-size: 26px;
+    line-height: 46px;
+    color: #494949;
+}
+
+.success-page .hr {
+    height: 1px;
+    background-color: #eee;
+    width: 80%;
+    max-width: 350px;
+    margin: 25px auto;
+}
+
+.success-page .success-btns {
+    margin-top: 35px;
+    overflow: hidden;
+}
+.success-page .success-btns .btn-set{
+    margin: 0 20px;
+}
+</style>
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card zam-createactivitybox" style="padding: 30px;">
+            <div class="fast-createbox">
+                <div class="alert alert-danger zam-flex zam-alignItems">
+                    <span class="tipicon mdi mdi-bell"></span>
+                    快速创建活动旨在给新用户或者现有用户快速创建并发布一个新活动，提升服务效率
+                </div>
+                <form id="formBox" class="zam-formvalidation form-horizontal rankreportconfigbox" method="post">
+                    <div class="text-center typebox">
+                        <div class="btn-group zam-inner-highconfig-btns" style="margin:10px 0 20px 0;">
+                            <a href="javascript:void(0)" class="btn btn-default btn-primary"><span>用户账号信息</span></a>
+                            <a href="javascript:void(0)" class="btn btn-default"><span>活动功能与人数</span></a>
+                        </div>
+                    </div>
+                    <div class="typebox-items">
+                        <div class="highconfig-item">
+                            <div class="form-group">
+                                <label class="col-lg-2 control-label">* 账号类型</label>
+                                <div class="col-lg-8">
+                                <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.newuserbox').removeClass('hidden'),$('.olduserbox').addClass('hidden');">
+                                <input type="radio" name="isnewuser" value="1" checked><span>创建新账号</span>
+                                </label>
+                                <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.newuserbox').addClass('hidden'),$('.olduserbox').removeClass('hidden');">
+                                <input type="radio" name="isnewuser" value="2" ><span>使用现有账号</span>
+                                </label>
+                                </div>
+                            </div>
+                            <div class="newuserbox">
+                                <div class="form-group">
+                                    <label class="col-lg-2 control-label">* 用户名</label>
+                                    <div class="col-lg-8">
+                                        <input class="form-control" type="text"  name="user_name" maxlength="20" placeholder="请输入用户名称..">
+                                        <div class="zam-help-block">
+                                            <div class="text-danger">注册的新账号会自动分配到系统默认用户组</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-lg-2 control-label">* 用户密码</label>
+                                    <div class="col-lg-8">
+                                        <input class="form-control" type="text"  name="user_password" maxlength="20" placeholder="请输入用户密码..">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-lg-2 control-label">用户手机号(选填项)</label>
+                                    <div class="col-lg-8">
+                                        <input class="form-control" type="text"  name="user_mobile" maxlength="11" placeholder="请输入用户手机号..">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="olduserbox hidden">
+                                <div class="form-group">
+                                    <label class="col-lg-2 control-label">* 搜索用户</label>
+                                    <div class="col-lg-8">
+                                        <div class="form-inline">
+                                            <div class="form-group" style="margin-left:0px">
+                                            <label class="sr-only" for="forusername">用户名或手机号</label>
+                                            <input 
+                                            class="form-control username" 
+                                            type="text" 
+                                            placeholder="请输入用户名或手机号" 
+                                            style="width: 252px" 
+                                            />
+                                            </div>
+                                            <a class="btn btn-primary btn-search" href="javascript:;"><i class="mdi mdi-magnify"></i> 搜索</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-lg-2 control-label">* 选择用户</label>
+                                    <div class="col-lg-8">
+                                        <div class="form-control-static">
+                                            <ul class="searchuser-list zam-flex"></ul>
+                                        </div>    
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="highconfig-item hidden">
+                            <div class="form-group">
+                                <label class="col-lg-2 control-label">* 活动主题</label>
+                                <div class="col-lg-8">
+                                <input class="form-control" type="text"  name="hdtitle" maxlength="40" value="{$fastcreateconfig['hdtitle']}" placeholder="请输入活动主题..">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-lg-2 control-label">活动备注(选填项)</label>
+                                <div class="col-lg-8">
+                                    <input class="form-control" type="text"  name="beizhu" maxlength="32" value="" placeholder="请输入活动备注..">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-lg-2 control-label">活动备注(管理员，选填项)</label>
+                                <div class="col-lg-8">
+                                    <input class="form-control" type="text"  name="adminbeizhu" maxlength="32" value="" placeholder="请输入管理员活动备注..">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-lg-2 control-label">* 活动人数</label>
+                                <div class="col-lg-8">
+                                    <input 
+                                    type="text" 
+                                    name="person" 
+                                    class="form-control numberincdec" 
+                                    value="{$fastcreateconfig['person']}"
+                                    data-bts-min="0" data-bts-replacement-val="0"
+                                    data-bts-max="null"
+                                    data-bts-step="1"
+                                    data-bts-postfix="人"
+                                    data-bts-postfix-extra-class="touchspin-postfix"
+                                    />
+                                </div>
+                            </div>
+                            <div class="form-group fastcreate-starttimebox">
+                                <label class="col-lg-2 control-label">* 活动开始时间</label>
+                                <div class="col-lg-8">
+                                {:tpl_daterangetime([
+                                    'name'=>'starttime',
+                                    'autoval'=>'1',
+                                    'needsfm'=>'2',
+                                    'needsdd'=>'1',
+                                    'issingle'=>'1',
+                                    'placeholder'=>'点击选择活动正式开始日期',
+                                    'val'=>time(),
+                                    'neededit'=>'1'
+                                ])}
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-lg-2 control-label">* 活动天数</label>
+                                <div class="col-lg-8">
+                                    <input 
+                                    type="text" 
+                                    name="daynum" 
+                                    class="form-control numberincdec" 
+                                    value="{$fastcreateconfig['daynum']}"
+                                    data-bts-min="1" data-bts-replacement-val="1"
+                                    data-bts-max="null"
+                                    data-bts-step="1"
+                                    data-bts-postfix="天"
+                                    data-bts-postfix-extra-class="touchspin-postfix"
+                                    />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-lg-2 control-label">* 活动功能</label>
+                                <div class="col-lg-8 catemodule-boxs">
+                                    <div>
+                                        <div class="btn-group zam-inner-highconfig-btns" style="margin:10px 0 20px 0;">
+                                            {if !empty($usersetmeals)}
+                                            <a href="javascript:;" class="btn btn-default">超值套餐</a>
+                                            {/if}
+                                            {foreach $catemodules as $cm}
+                                            {if !empty($cm['catemodules'])}
+                                                <a href="javascript:;" class="btn btn-default">{$cm['catename']}</a>
+                                            {/if}
+                                            {/foreach}
+                                        </div>
+                                    </div>
+                                    {if !empty($usersetmeals)}
+                                    <div class="zam-modulebox setmealbox hidden">
+                                            <ul>
+                                            {foreach $usersetmeals as $setmeal}
+                                                <li class="setmeal-module" data-id="{$setmeal['id']}" data-modules="{:implode(',',$setmeal['modules'])}">
+                                                    <div class="zam-modulebox-item">
+                                                        <div class="moduleimgbox">
+                                                            <img src="{:tomedia($setmeal['setmealimg'])}" onerror="javascript:this.src='/static/images/sys/nopic.jpg';this.title='暂无图片'">
+                                                        </div>
+                                                        <div class="pub-module-name-price zam-flex">
+                                                            <span class="pub-module-name limitbox" title="{$setmeal['setmealname']}">{$setmeal['setmealname']}</span>
+                                                            <span  class="pub-module-price">￥ {$setmeal['setmealprice']}</span>
+                                                        </div>
+                                                        <div class="hadsel mdi mdi-check"></div>
+                                                    </div>
+                                                </li>									
+                                            {/foreach}
+                                            </ul>
+                                            <div class="tip text-danger">
+                                                <div class="text-danger">注意事项：</div>
+                                                <div>1 仅显示默认用户组可用且含有模块的套餐</div>
+                                                <div>2 选中套餐后会自动将套餐内的模块加到已选功能内</div>
+                                            </div>
+                                    </div>
+                                    {/if}
+                                    {foreach $catemodules as $cm}
+                                    {if !empty($cm['catemodules'])}
+                                    <div class="zam-modulebox modulebox hidden">
+                                        <ul>
+                                        {foreach $cm['catemodules'] as $cmm}
+                                            <li class="normal-module" data-id="{$cmm['id']}" data-price="{$cmm['moduleprice']}" data-field="{$cmm['modulefield']}" data-img="{:tomedia($cmm['moduleimg'])}"  data-bgcolor="{$cmm['modulebgcolor']??''}">
+                                                <div class="zam-modulebox-item">
+                                                    <div class="moduleimgbox">
+                                                        <img src="{:tomedia($cmm['moduleprev'])}" onerror="javascript:this.src='/static/images/sys/nopic.jpg';this.title='暂无图片'">
+                                                    </div>
+                                                    <div class="pub-module-name-price zam-flex">
+                                                        <span class="pub-module-name limitbox" title="{$cmm['modulename']}">{$cmm['modulename']}</span>
+                                                        <span class="pub-module-price">￥ {$cmm['moduleprice']}</span>
+                                                    </div>
+                                                    <div class="hadsel mdi mdi-check"></div>
+                                                </div>
+                                            </li>							
+                                        {/foreach}
+                                        </ul>
+                                        <div class="tip text-danger">
+                                            <div class="text-danger">注意事项：所有可选模块均来自系统默认用户组</div>
+                                        </div>
+                                    </div>
+                                    {/if}
+                                    {/foreach}
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-lg-2 control-label">* 已选功能</label>
+                                <div class="col-lg-8">
+                                    <ul class="sel-modules-ul clearfix"></ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {include file='$Wpath/common/cancelsavepanel'}
+                </form>
+            </div>
+            <div class="success-page hidden">
+                <div class="success-content">
+                    <div class="success-header">
+                        <i class="mdi mdi-check-circle success"></i>
+                    </div>
+                    <div class="success-des">活动创建成功</div>
+                    <div class="hr"></div>
+                    <div class="success-btns">
+                        <a class="btn btn-primary btn-copy zam-clip" href="javascript:void(0)" data-text="wait"><i class="mdi mdi-content-copy"></i> 复制信息</a>
+                        <a class="btn btn-success btn-set"><i class="mdi mdi-settings"></i> 设置活动</a>
+                        <a class="btn btn-default btn-refresh" href="javascript:void(0)" onclick="javascript:window.location.reload()"><i class="mdi mdi-plus"></i> 继续创建</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+require(['webcore','jconfirmBox','zamnotice','clipboard','zvalidator'],function(webcore,jconfirmBox,zamnotice,Clipboard){
+    $(".zam-createactivitybox .typebox .zam-inner-highconfig-btns a.btn").click(function(){
+        $(this).addClass('btn-primary').siblings().removeClass("btn-primary");
+        $(".zam-createactivitybox .typebox-items .highconfig-item").addClass('hidden').eq($(this).index()).removeClass('hidden');
+        {if !isset($fastcreateconfig['opendatepicker']) || $fastcreateconfig['opendatepicker'] == '1'}
+        if($(this).index() == 1){
+            $('.fastcreate-starttimebox input').data('daterangepicker').show();
+        }
+        {/if}
+    });
+    $(".btn-search").click(function(){
+        var username = $.trim($('.username').val()||'');
+        if(username == ''){
+            return zamnotice.showTips('error','请输入用户名或者手机号');
+        }
+        webcore.ajaxSubmit("{:gomyhd('fastcreate/searchuser')}",{username:username},'搜索中..').then(function(json){
+			if(json.code != 0){
+		        return zamnotice.showTips('error',json.msg);
+		    }
+            var list = json.msg||[],listHtml = '';
+            if(list.length){
+                $.each(list,function(i,v){
+                    listHtml += webcore.tpl($("#seluser-tpl"),v);
+                });
+            }else{
+                listHtml += `<span class="text-danger">未搜索到相关用户</span>`
+            }
+            $(".searchuser-list").html(listHtml);
+		}, function(json){
+			zamnotice.showTips('error','网络差。操作失败');
+		});
+    });
+    $(".searchuser-list").on('click','li',function(){
+        $(this).find('input').prop('checked', true);
+    });
+    $(".catemodule-boxs .zam-inner-highconfig-btns a.btn").click(function(){
+        $(this).addClass('btn-primary').siblings().removeClass("btn-primary");
+        $(".catemodule-boxs .zam-modulebox").addClass('hidden').eq($(this).index()).removeClass('hidden');
+    });
+    $(".catemodule-boxs .zam-inner-highconfig-btns a.btn").eq(0).trigger('click');
+    //选择模块
+	$(".zam-modulebox ul li.normal-module").on('click',function(){
+        var $this = $(this),dataid = $this.attr('data-id');
+		if(!$this.hasClass('isactive')){
+			var tpldata = {
+				id:dataid,
+				field:$this.attr('data-field'),
+				name:$this.find('.pub-module-name').text(),
+				img:$this.attr('data-img'),
+				price:$this.attr('data-price'),
+				bgcolor:$this.attr('data-bgcolor')||'',
+			};
+			var tplhtml = webcore.tpl($("#selmodule-tpl"),tpldata);
+			$(".sel-modules-ul").append(tplhtml);
+			$this.addClass('isactive');
+		}else{
+			$(".sel-modules-ul li.sel-module[data-id=" + dataid + "]").remove();
+			$this.removeClass('isactive');
+		}
+	});
+    $(".zam-modulebox ul li.setmeal-module").on('click',function(){
+        var $this = $(this),setmealmodules = $this.attr('data-modules')||'';
+		if(!$this.hasClass('isactive')){
+            if(!setmealmodules){
+                return false;
+            }
+            setmealmodules = setmealmodules.split(",");
+            if(setmealmodules.length){
+                $.each(setmealmodules,function(i,v){
+                    var activemodule = $(".zam-modulebox ul li.normal-module[data-id=" + v + "]");
+                    if(activemodule.length && !activemodule.hasClass('isactive')){
+                        activemodule.trigger('click');
+                    }
+                });
+            }
+			$this.addClass('isactive');
+		}else{
+			if(setmealmodules){
+                setmealmodules = setmealmodules.split(",");
+                if(setmealmodules.length){
+                    $.each(setmealmodules,function(i,v){
+                        var activemodule = $(".zam-modulebox ul li.normal-module[data-id=" + v + "]");
+                        if(activemodule.length && activemodule.hasClass('isactive')){
+                            activemodule.trigger('click');
+                        }
+                    });
+                }
+            }
+			$this.removeClass('isactive');
+		}
+	});
+    $(".sel-modules-ul").on('click','li .delsel',function(){
+		var $this = $(this).parent();
+		var moduleid = $this.attr('data-id');
+		$(".catemodule-boxs ul li.normal-module[data-id=" + moduleid + "]").removeClass('isactive');
+		$this.remove();
+	});
+    $('#formBox').formValidation({
+			framework: 'bootstrap',
+			excluded: [':disabled',':hidden'],
+			message: '您填写的内容无效',
+			fields: {
+				hdtitle: {
+					message: '您填写的活动标题内容无效',
+					validators: {
+						notEmpty: {
+							message: '活动标题必须填写'
+						},
+						stringLength: {
+			              min: 1,
+			              max: 40,
+			              message: '活动主题长度只能40个字符内'
+			            },
+					}
+				},
+                person: {
+					message: '您填写活动人数',
+					validators: {
+						notEmpty: {
+							message: '您填写活动人数'
+						},
+						stringLength: {
+			              min: 1,
+			              message: '活动人数至少是1人'
+			            },
+					}
+				},
+                daynum: {
+					message: '您填写活动天数',
+					validators: {
+						notEmpty: {
+							message: '您填写活动天数'
+						},
+						stringLength: {
+			              min: 1,
+			              message: '活动天数至少是1天'
+			            },
+					}
+				},
+			}
+	}).on('success.form.fv', function(e) {
+		e.preventDefault();
+		var $form = $(e.target);
+		var createValidation = $form.data('formValidation');
+		var postData = webcore.serializeObject($form);
+		$form.formValidation('disableSubmitButtons', true);
+        var isnewuser = postData.isnewuser||'1';
+        if(isnewuser == '1'){
+            if(postData.user_name == '' || postData.user_password == ''){
+                zamnotice.showTips('error','请填写用户账号密码');
+                $form.formValidation('disableSubmitButtons', false);
+                return;
+            }
+        }else{
+            var user_id = postData.user_id||'';
+            if(user_id == ''){
+                zamnotice.showTips('error','请先选择用户');
+                $form.formValidation('disableSubmitButtons', false);
+                return;
+            }
+        }
+        var addpersons = postData.person;
+		if(addpersons == '' || addpersons <= 0){
+			zamnotice.showTips('error','请先设置活动人数');
+			$form.formValidation('disableSubmitButtons', false);
+			return;
+		}
+        var selectedmodules = $(".sel-modules-ul li");
+		if(selectedmodules.length <= 0 ){
+			zamnotice.showTips('error','请先选择活动功能');
+			$form.formValidation('disableSubmitButtons', false);
+			return;
+		}
+		var selmodules = [];
+		selectedmodules.each(function(){
+			selmodules.push({moduleid:$(this).attr('data-id'),module:$(this).attr('data-field')});
+		});
+        postData.selmodules = selmodules;
+		webcore.ajaxSubmit("{:gomyhd('fastcreate/index')}",postData,'拼命创建中，请稍后..').then(function(json){
+			if(json.code==0){
+			    $(".fast-createbox").addClass('hidden');
+                $(".btn-copy").attr('data-text',json.msg.text);
+                $(".btn-set").attr('href',json.msg.seturl);
+                var clipboard = new Clipboard('.zam-clip', {
+                    text: function(e) {
+                        return $(e).attr('data-text') ||'';
+                    }
+                });
+                clipboard.on('success',function(e) {
+                    zamnotice.showTips('success','复制成功',2e3);
+                    return;
+                });
+                $(".success-page").removeClass('hidden');
+		    }else{
+		        zamnotice.showTips('error',json.msg);
+		        $form.formValidation('disableSubmitButtons', false);
+		    }
+		}, function(json){
+			zamnotice.showTips('error','网络差。操作失败');
+			$form.formValidation('disableSubmitButtons', false);
+		});
+	});
+});
+</script>
+<script id='seluser-tpl' type="text/template">
+    <li class="zam-flex-column-center">
+        <div class="user-avatar">
+            <img src="<% d.user_avatar %>" onerror="javascript:this.src='/static/images/sys/avatar.jpg';">
+        </div>
+        <div class="user-name"><% d.user_name %></div>
+        <div class="user-mobile"><% d.mobile || '暂无手机号' %></div>
+        <div class="radio">
+            <label class="lyear-radio radio-primary">
+                <input type="radio" name="user_id" value="<% d.id %>">
+                <span></span>
+            </label>
+        </div>
+    </li>
+</script>
+<script id='selmodule-tpl' type="text/template">
+	<li class="zam-flex-column-center sel-module" data-id="<% d.id %>" data-field="<% d.field %>" data-price="<% d.price %>">
+		<div class="sel-module-icon" <%# if(d.bgcolor){ %>style="background-color:<% d.bgcolor %>"<%# } %>>
+			<img src="<% d.img %>">
+		</div>
+		<div class="sel-module-name"><% d.name %></div>
+		<div class="sel-module-price">￥ <span class="signal-price"><% d.price %></span></div>
+		<div class="delsel mdi mdi-close"></div>
+
+	</li>
+</script>
+{include file='$Wpath/common/footer'}

@@ -1,0 +1,306 @@
+{include file='common/header' /}
+<style type="text/css">
+:root{
+    --title-top:140px;
+    --title-size: 32px;
+    --title-color:#fff;
+    --title-mb: 100px;
+    --lists-w: 901px;
+    --lists-h: 80px;
+    --lists-padding-top: 10px;
+    --lists-padding-left: 12px;
+    --lists-bgimg:url(/static/images/screen/vote/pk/centerbg.png);
+    --item-h: calc(var(--lists-h) - var(--lists-padding-top) * 2);
+    --item-vs-img: url(/static/images/screen/vote/pk/vs2.png);
+    --item-vs-w: 100px;
+    --item-vs-h: 100px;
+    --item-l-color:#3740da;
+    --item-r-color:#f14c6c;
+    --item-name-top: -130px;
+    --item-name-w: 270px;
+    --item-name-h: 90px;
+    --item-name-limg: url(/static/images/screen/vote/pk/left.png);
+    --item-name-rimg: url(/static/images/screen/vote/pk/right.png);
+    --item-name-num-w: 54px;
+    --item-name-num-size:20px;
+    --item-name-num-l: 183px;
+    --item-name-num-t: 32px;
+    --item-barfill-bg: linear-gradient(
+    -45deg, 
+    rgba(255, 255, 255, 0.2) 25%, 
+    transparent 25%, 
+    transparent 50%, 
+    rgba(255, 255, 255, 0.2) 50%, 
+    rgba(255, 255, 255, 0.2) 75%, 
+    transparent 75%, 
+    transparent
+    );
+}
+.vote-roundtitle{
+    position: absolute;
+    top: var(--title-top);
+    width: 100%;
+    text-align: center;
+    font-size: var(--title-size);
+    color: var(--title-color);
+    font-weight: bold;
+}
+.vote-container{
+	position: absolute;
+    top: 0px;
+	left:0;
+	width: 100%;
+    height: 100%;
+    color: #fff;
+}
+
+.vote-lists{
+	width: var(--lists-w);
+    height: var(--lists-h);
+    padding: var(--lists-padding-top) var(--lists-padding-left);
+    box-sizing: border-box;
+    background-image: var(--lists-bgimg);
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+.voteitems{
+    position: relative;
+    height: 100%;
+    width: 100%;
+}
+.voteitems::before{
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    
+}
+.vote-lists .vote-item{
+    position: relative;
+    height: var(--item-h);
+    width: 50%;
+    transition: width 1s linear;
+    -webkit-transition:  all 1s linear;
+}
+
+.vote-lists .vote-item .vote-progress {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+.vote-lists .vote-item:nth-child(1) .vote-progress
+{
+    border-top-left-radius: calc(var(--item-h) / 2);
+    border-bottom-left-radius: calc(var(--item-h) / 2);
+}
+.vote-lists .vote-item:nth-child(2) .vote-progress
+{
+    border-top-right-radius: calc(var(--item-h) / 2);
+    border-bottom-right-radius: calc(var(--item-h) / 2);
+}
+.vote-lists .vote-item .vote-bar {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+.vote-lists .vote-item:nth-child(1) .vote-bar
+{
+    background-color: var(--item-l-color);
+    border-top-left-radius: calc(var(--item-h) / 2);
+    border-bottom-left-radius: calc(var(--item-h) / 2);
+}
+.vote-lists .vote-item:nth-child(2) .vote-bar
+{
+    background-color: var(--item-r-color);
+    border-top-right-radius: calc(var(--item-h) / 2);
+    border-bottom-right-radius: calc(var(--item-h) / 2);
+}
+.vote-lists .vote-item .vote-barfill {
+    width: 100%;
+    height: 100%;
+    animation: progress 1.2s linear infinite;
+    /* background-repeat: repeat-x; */
+    background-size: calc(var(--item-h) - 6px) calc(var(--item-h) - 6px);
+    background-image: var(--item-barfill-bg);
+}
+@keyframes progress {
+    to {
+        background-position: calc(var(--item-h) - 6px) 0
+    }
+}
+
+.vote-lists .logo{
+    position: absolute;
+    top: 50%;
+    transform: translate(0,-50%);
+    width: var(--item-vs-w);
+    height:var(--item-vs-h);
+    left: calc((var(--item-vs-w) / 2) * -1);
+    background-image: var(--item-vs-img);
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+.vote-container .votename{
+    position: absolute;
+    width: var(--item-name-w);
+    height: var(--item-name-h);
+    background-size: cover;
+    background-repeat: no-repeat;
+    top: var(--item-name-top);
+    font-weight: bold;
+}
+.votename span{
+    position: absolute;
+    top: var(--item-name-num-t);
+    left: var(--item-name-num-l);
+    width: var(--item-name-num-w);
+    font-size: var(--item-name-num-size);
+    text-align: center;
+}
+.vote-lists .vote-item:nth-child(1) .votename{
+    left: 0;
+    background-image: var(--item-name-limg);
+}
+.vote-lists .vote-item:nth-child(2) .votename{
+    right: 0;
+    background-image: var(--item-name-rimg);
+}
+/*底部轮次*/
+.vote-rounds{
+    position: absolute;
+    bottom: 30px;
+	text-align:center;
+}
+.vote-rounds a{
+	display: inline-block;
+    padding: 5px 10px;
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.65);
+    border-radius: 10px;
+    margin-right: 10px;
+}
+.vote-rounds a:last-child{margin: 0;}
+.vote-rounds a.active,.vote-rounds a.active:hover {
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    background-color: rgb(255, 255, 255);
+    color: #000;
+}
+.vote-rounds a:hover {
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    background-color: rgba(255, 255, 255,0.5);
+    color: #000;
+}
+
+</style>
+<div class="vote-roundtitle">{$rotate['title']}</div>
+<div class="vote-container zam-app-flex-ajCenter">
+	<div class="vote-lists">
+		<div class="voteitems zam-app-flex-ajCenter2">
+            {foreach $rotate['items'] as $key=>$item}
+                {if $key < 2}
+                <div class="vote-item vote{$item['id']}">
+                    {if $key == 1}
+                        <div class="logo"></div>
+                    {/if}
+                    <div class="votename">
+                        <span>{$item['votenums']}</span>
+                    </div>
+                    <div class="vote-progress">
+                        <span class="vote-bar">
+                            <div class="vote-barfill"></div>
+                        </span>
+                    </div>
+                </div>
+                {/if}
+            {/foreach}
+        </div>
+	</div>
+    <section class="vote-rounds">
+        {foreach $rotate['rotates'] as $rkey=>$ritem}
+            <a href="javascript:;" data-rotateid="{$ritem['id']}" {if $ritem['active']=='1'}class="active"{/if}>第{$rkey + 1}轮</a> 
+        {/foreach}
+    </section>
+</div>
+<script>
+var votetxt = "{$pcconfig['votetxt']??'投票'}",rotateid = "{$rotate['id']??''}",status = "{$rotate['status']??1}";
+require(['screencore','template','keyboard','layerBox'],function(screencore,template,keyboardJS,layerBox){
+	function ajaxvoteuser(){
+		screencore.ajaxSubmit("/screen/vote/dzajaxvotedata",{}).then(function(json){
+			if(json.code==0){
+                var items = json.msg.items??[];
+				$.each(items,function(i,v){
+					if($(".vote-lists .vote"+v.id).length > 0){
+                        $(".vote-lists .vote"+v.id).find('.votename span').text(v.votenums);
+					}
+				});
+                if(items.length > 1){
+                    var item1 = items[0]??{votenums:0,id:0,voteper:'50%'};
+                    var item1per = parseFloat(item1.voteper);
+                    var item2 = items[1]??{votenums:0,id:0,voteper:'50%'};
+                    var item2per = parseFloat(item2.voteper);
+                    if(item1per == item2per){
+                        $(".vote-lists .vote-item").css("width",'50%');
+                    }else{
+                        if(item1per < 5){
+                            item1per = 5;
+                        }
+                        item2per = 100 - item1per;
+                        if(item2per < 5){
+                            item2per = 5;
+                            item1per = 95;
+                        }
+                        $(".vote-lists .vote"+item1.id).css("width",`${item1per}%`);
+                        $(".vote-lists .vote"+item2.id).css("width",`${item2per}%`);
+                    }
+                }
+                
+			}
+		});
+	}
+    ajaxvoteuser();
+	setInterval(function(){
+		ajaxvoteuser();
+	},3e3);
+    //切换上下轮次
+    keyboardJS.bind('right', function(e) {
+        var nextDom = $('.vote-rounds .active').next();
+        if(nextDom.length<=0){
+            $('.vote-rounds a:first').trigger('click');
+        }else{
+            nextDom.trigger('click');
+        }
+    });
+    keyboardJS.bind('left', function(e) {
+        var prevDom = $('.vote-rounds .active').prev();
+        if(prevDom.length<=0){
+            $('.vote-rounds a:last').trigger('click');
+        }else{
+            prevDom.trigger('click');
+        }
+    });
+    $(".vote-rounds a").click(function(){
+        var clickrotateid = $(this).attr('data-rotateid')||'';
+        if(!clickrotateid){
+            return;
+        }
+        screencore.ajaxSubmit("/screen/vote/changerotate",{rotateid:clickrotateid}).then(function(json){
+			 window.location.reload();
+        })
+    });
+    keyboardJS.bind('space', function(e) {
+        screencore.ajaxSubmit("/screen/vote/changestate",{rotateid:rotateid,status:(status=='1'?'2':'1')}).then(function(data){
+            if(data.code==0){
+                layerBox.showMsg(votetxt + (status == '1' ? '通道已关闭' : '通道已开启'));
+                status = (status == '1' ? '2' : '1');
+            }else{
+                layerBox.showMsg('网络异常，操作失败');
+            }
+        });
+    });
+});
+</script>
+{include file='common/footer' /}

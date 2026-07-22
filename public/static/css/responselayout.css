@@ -1,0 +1,104 @@
+/*
+* @Author: 赞木
+* @Date:   2022-10-06 10:44:31
+* @Last Modified by:   赞木
+* @Last Modified time: 2022-10-06 10:50:35
+*/
+/** ----------------------------------
+ * 响应式处理 
+ -------------------------------------- */
+.lyear-aside-toggler {
+    display: block;
+}
+@media (max-width: 1024px) {
+    .lyear-layout-sidebar {
+        transform: translateX(-100%);
+    }
+    .lyear-layout-header,
+    .lyear-layout-content,.lyear-layout-content.no-son,.lyear-layout-content.no-left {
+        padding-left: 0;
+    }
+    .lyear-layout-sidebar,
+    .lyear-layout-sub-column {
+        -webkit-box-shadow: none;
+        -moz-webkit-box-shadow: none;
+        box-shadow: none;
+    }
+    .lyear-layout-sidebar.lyear-aside-open {
+        transform: translateX(0);
+    }
+    
+    .lyear-mask-modal {
+        background-color: rgba(0, 0, 0, 0.5);
+        height: 100%;
+        left: 0;
+        opacity: 1;
+        top: 0;
+        visibility: visible;
+        width: 100%;
+        z-index: 5;
+        position: fixed;
+        -webkit-transition: visibility 0 linear 0.4s, opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: visibility 0 linear 0.4s, opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
+    }
+    .lyear-layout-sidebar-close .lyear-layout-header,
+    .lyear-layout-sidebar-close .lyear-layout-content {
+        padding-left: 0px;
+    }
+}
+
+@media screen and (max-width: 767px) {
+    .table-responsive {
+        border-color: #eceeef;
+    }
+    .sidebar-header{display:none;}
+    .diy-topnav{display: none!important}
+}
+@media screen and (max-width: 700px) {
+    .card-toolbar .search-bar {
+        max-width: 100%;
+        margin-bottom: 10px;
+        float: none!important;
+    }
+}
+@media screen and (max-width: 430px) {
+    .dropdown-skin .dropdown-menu {
+        left: -80px!important; 
+    }
+    .nav-step .nav-step-item p {
+        display: none;
+    }
+}
+@media (min-width: 1024px) {
+    .lyear-layout-sidebar-close .lyear-layout-sub-column {
+        transform: translateX(-100%);
+    }
+    .lyear-aside-toggler{display:none;}
+    .lyear-layout-sidebar-close .sidebar-footer {
+        visibility: hidden;
+        opacity: 0;
+    }
+    .lyear-layout-sidebar {
+        -webkit-transition: all .3s ease-in-out;
+        transition: all .3s ease-in-out;
+        -webkit-box-shadow: none;
+        -moz-webkit-box-shadow: none;
+        box-shadow: none;
+    }
+    .lyear-layout-sidebar-close .lyear-layout-sidebar {
+        width: 100px;
+    }
+    .lyear-layout-sidebar-close .lyear-layout-content {
+        padding-left: 100px;
+    }
+    .lyear-layout-sidebar-close .lyear-layout-content.no-left {
+        padding-left: 0px;
+    }
+    .masonry-grid {
+        -webkit-column-count: 4;
+        -moz-column-count: 4;
+        column-count: 4;
+    }
+}

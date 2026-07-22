@@ -1,0 +1,517 @@
+{include file='$Wpath/common/header'}
+<style>
+.zam-cates-Box{
+    border: 1px solid #e8e9eb;
+    overflow: hidden;
+    padding:10px;
+}
+.zam-cates-grouplist{
+    width: calc(20% - 10px);
+    height:100%;
+    float: left;
+    border: 1px solid #e8e9eb;
+    overflow: hidden;
+    margin-right:10px;
+}
+.zam-cates-grouplist {font-size: 14px;}
+.zam-cates-grouplist .nav-title{position:relative;border-bottom:1px solid #e8e9eb;height: 40px;line-height: 40px;text-align: center;}
+.zam-cates-grouplist .fnav{min-height: 100px}
+.zam-cates-grouplist li{padding-left: 18px;line-height: 40px;text-align:left;cursor: pointer;user-select: none;-webkit-user-select:none;}
+.zam-cates-grouplist li a{
+    position: unset;
+    color: inherit;
+    white-space: nowrap;
+    padding: 0px;
+    box-sizing: border-box;
+}
+.zam-cates-grouplist li a:after {
+    position: absolute;
+    top: 6px;
+    right: unset;
+    left: 0;
+    font-family: 'Material Design Icons';
+    font-size: 16px;
+    line-height: 1.75;
+    content: '\f142';
+    -webkit-transition: -webkit-transform 0.3s linear;
+    transition: transform 0.3s linear;
+}
+.zam-cates-grouplist .nav{padding-left: 10px}
+.zam-cates-grouplist ul > li.active{
+    color: #48b0f7;
+    background-color: #edf6ff;
+}
+.zam-cates-grouplist .open>a, .zam-cates-grouplist .open>a:focus, .zam-cates-grouplist .open>a:hover {
+    background-color: transparent;
+    border-color: none;
+}
+.btn-addfcate,.btn-addscate{
+    position: absolute;
+    right: 10px;
+    top: 8px;
+    cursor: pointer;
+}
+.zam-cates-grouplist .btn-addscate{display: none}
+.zam-cates-grouplist .nav-subnav  li:hover .btn-addscate{display: block}
+.zam-cates-grouplist li.nav-nosub:hover .btn-addscate{display: block}
+.zam-cates-grouplist .cate-title:hover .btn-addscate{display: block}
+.zam-cates-list {
+    width: 80%;
+    float: left;
+}
+#userlistTable .avatarImg{width:100px;height:100px;}
+</style>
+<div class="zam-cates-Box">
+    <div class="zam-cates-grouplist">
+        <div class="nav-item">
+            <div class="nav-title">全部分类<span class="btn btn-primary btn-xs btn-addfcate" data-title="新增一级分类" data-toggle="tooltip"><i class="mdi mdi-plus"></i></span></div>
+            <ul class="nav fnav">
+                <li class="nav-total active" data-cateid="0">全部文件</li>
+            </ul>
+        </div>
+    </div>
+    <div class="zam-cates-list">
+        <div class="form-inline zam-inline-searchbar">
+            <div class="form-group fcates">
+              <div class="input-group input-group-sm">
+                <span class="input-group-addon">一级分类</span>
+                  <select id="fcateid" class="form-control">
+                    <option value="0" selected data-children="[]">全部</option>
+                    {foreach $groups as $fkey=>$fvo } 
+                    <option value="{$fvo['id']}" data-children='{$fvo["children"]|json_encode}'>{$fvo['catename']}</option>
+                    {/foreach}
+                  </select>
+                </div>
+            </div>
+            <div class="form-group soncates">
+              <div class="input-group input-group-sm">
+                <span class="input-group-addon">二级分类</span>
+                  <select id="scateid" class="form-control">
+                    <option value="0" selected>全部</option>
+                    <option value="-2">无分类</option>
+                  </select>
+                </div>
+            </div>
+            <div class="form-group">
+              <div class="input-group input-group-sm">
+                <span class="input-group-addon">文件名</span>
+                <input type="text" class="form-control" value="" id="filename" placeholder="请输入文件名">
+              </div>
+            </div>
+            <a class="btn btn-primary btn-sm btn-sousuo" href="javascript:void(0)"><i class="mdi mdi-magnify"></i> 搜索</a>
+        </div>
+        {include file='$Wpath/common/tabletoolbar'}
+        <table id="listtable" class="zam-btable"></table>
+    </div>
+</div>
+<script>
+require(["zamnotice","layerBox","jconfirmBox","webcore","webtable"],function(zamnotice,layerBox,jconfirmBox,webcore,webtable){
+        var initConfig = {
+            tableId:'#listtable',
+            url:"{:goweb('sucaiku/videoku')}",
+            columnoperate:{
+                btns:{
+                    edit:{title:"预览文件",icon:"mdi-eye"},
+                    shenhe:{title:"移动文件",icon:"mdi-export"},
+                    del:true,
+                },
+                func:{
+                    del:function(value, row, index){
+                        jconfirmBox.confirm('温馨提示','删除将无法恢复，您确定要删除么？',function(){
+                                webcore.ajaxSubmit("{:goweb('sucaiku/delvideofile')}",{fileid:row.id},'处理中..').then(function(json){
+                                    if(json.code==0){
+                                        webtable.refresh();
+                                        zamnotice.showTips('success','删除成功');
+                                    }else{
+                                        zamnotice.showTips('error',json.msg);
+                                    }
+                                }, function(json){
+                                    zamnotice.showTips('error','网络差。操作失败');
+                                });
+                        });
+                    },
+                    edit:function(value, row, index){
+                        webcore.showVideos([row.filesrc],row.type);
+                    },
+                    shenhe:function(value, row, index){
+                        var confirmObj = jconfirmBox.ajaxconfirm("移动文件分组","{:goweb('sucaiku/movevideofile')}",{ishtml:'1',fileid:row.id},'html','col-lg-8 col-lg-offset-2',function(e){
+                            var postData = webcore.serializeObject(e.find('form'));
+                            postData.fileid = row.id;
+                            webcore.ajaxSubmit("{:goweb('sucaiku/movevideofile')}",postData).then(function(json){
+                                if(json.code==0){
+                                    webtable.refresh();
+                                    zamnotice.showTips('success','操作成功');
+                                    confirmObj.close();
+                                }else{
+                                    zamnotice.showTips('error',json.msg);
+                                    return false;
+                                }
+                            }, function(json){
+                                zamnotice.showTips('error','网络差。操作失败');
+                                 return false;
+                            });
+                        });
+                    },
+                }
+            },
+            columns:[
+                {
+                    checkbox: true,
+                    width:'5%',
+                }, 
+                {
+                    field: 'id',
+                    title: 'id',
+                    align: 'center',
+                    width:'5%',
+                    visible: false
+                }, {
+                    field: 'fcatename',
+                    title: '一级分类',
+                    align:'center',
+                    width:'10%',
+                }, {
+                    field: 'catename',
+                    title: '二级分类',
+                    align:'center',
+                    width:'10%',
+                }, {
+                    field: 'filename',
+                    title: '上传文件名',
+                    align:'center',
+                    width:'10%',
+                },  {
+                    field: 'filepath',
+                    title: '文件路径',
+                    align: 'center',
+                    width:'30%',
+                    formatter: function (value, row, index) {
+                        if(row.videoicon!=''){
+                            value += '<div class="cursor"><img style="max-width:120px;" onclick="prevshowattachs(this,1);" src="'+row.videoicon+'" /></div>';
+                        }
+                        return value;
+                    }
+                },  {
+                    field: 'create_time',
+                    title: '上传时间',
+                    align: 'center',
+                    width:'20%',
+                }
+            ],
+            searchParamas:[
+                {'type':'1','id':'filename'},
+                {'type':'2','id':'fcateid'},
+                {'type':'2','id':'scateid'},
+                {'type':'3','items':
+                    [
+                         {
+                          'field':'cateid',
+                          'dom':".zam-cates-grouplist li.active",
+                          'isstable':false,
+                          'isdata':true,//是否为data属性值 不是则为val值
+                          'datasx':'data-cateid',//data属性值
+                          'val':'',
+                         },
+                    ]
+                },
+            ],
+            toolbar:{
+                add:function(){
+                    var confirmobj = jconfirmBox.ajaxconfirm("上传文件","{:goweb('sucaiku/addvideofile')}",{cateid:$(".zam-cates-grouplist li.active").data('cateid')},'html','col-lg-8 col-lg-offset-2',function(e){},false,'2');
+                },
+                del:function(ajaxurl){
+                    var getSelects = webtable.getSelections();
+                    if(getSelects.length>0){
+                        jconfirmBox.confirm('温馨提示','您确定要删除选中的数据么？',function(){
+                            webcore.ajaxSubmit(ajaxurl,{fileid:getSelects},'处理中..').then(function(json){
+                                if(json.code==0){
+                                    webtable.refresh();
+                                    zamnotice.showTips('success','删除成功');
+                                }else{
+                                    zamnotice.showTips('error',json.msg);
+                                }
+                            }, function(json){
+                                zamnotice.showTips('error','网络差,操作失败');
+                            });
+                        });
+                    }else{
+                        zamnotice.showTips('info','请先选择您要操作的数据');
+                    }
+                },
+                other:function(){
+                    var getSelects = webtable.getSelections();
+                    if(getSelects.length>0){
+                        var confirmObj = jconfirmBox.ajaxconfirm("移动文件分组","{:goweb('sucaiku/movevideofile')}",{ishtml:'1',fileid:getSelects},'html','col-lg-8 col-lg-offset-2',function(e){
+                            var postData = webcore.serializeObject(e.find('form'));
+                            postData.fileid = getSelects;
+                            webcore.ajaxSubmit("{:goweb('sucaiku/movevideofile')}",postData).then(function(json){
+                                if(json.code==0){
+                                    webtable.refresh();
+                                    zamnotice.showTips('success','操作成功');
+                                    confirmObj.close();
+                                }else{
+                                    zamnotice.showTips('error',json.msg);
+                                    return false;
+                                }
+                            }, function(json){
+                                zamnotice.showTips('error','网络差。操作失败');
+                                 return false;
+                            });
+                        });
+                    }else{
+                        zamnotice.showTips('info','请先选择您要操作的数据');
+                    }
+                },
+            },
+        };
+        webtable.init(initConfig);
+        function loadcate(func){
+            webcore.ajaxSubmit("{:gocommon('attachment/loadsucaicate')}",{type:'3'}).then(function(json){
+                if(json.code != 0){
+                    zamnotice.showTips('error',json.msg);
+                    return false;
+                }
+                var fnav = $(".zam-cates-grouplist .fnav"),navtotal = fnav.find('.nav-total');
+                navtotal.nextAll().remove();
+                var html = '';
+                $.each(json.msg,function(i,v){
+                    if(v.children.length){
+                        html += webcore.tpl($("#fscate-tpl"),v);
+                    }else{
+                        html += webcore.tpl($("#onlyfcate-tpl"),v);
+                    }
+                });
+                navtotal.after(html);
+                func && func();
+            }, function(json){
+                zamnotice.showTips('error','网络差。操作失败.');
+            });
+        }
+        loadcate();
+        $('.zam-cates-grouplist').on('click', '.nav-item-has-subnav > a', function() {
+            var $subnavToggle = $(this),$navHasSubnav = $subnavToggle.parent(),$subnav = $navHasSubnav.find('.nav-subnav').first();
+            //$navHasSubnav.siblings().find('.nav-subnav:visible').slideUp(500).parent().removeClass('open');
+            $subnav.slideToggle(300, function() {
+                $navHasSubnav.toggleClass('open');
+            });
+        });
+        $('.zam-cates-grouplist').on('click','.nav-nosub .btn-addscate,.cate-title .btn-addscate,.nav-subnav li .btn-addscate',function(e){
+            e.stopPropagation();
+            var $this = $(this),$parent = $this.parent(),isson = true,fhasson = false;
+            if($parent.hasClass('nav-nosub') || $parent.hasClass('cate-title')){
+                isson = false;
+                if($parent.hasClass('cate-title')) fhasson = true;
+            }
+            var confirmobj = jconfirmBox.confirm('选择操作类型',webcore.tpl($("#editcate-tpl"),{isson:isson}),function(e){},false,false,true,false,function(){
+                var $this2 = confirmobj.$content;
+                $this2.parent().parent().find('.jconfirm-buttons').remove();
+                $this2.find(".btn-catecontrollers a").off('click').on('click',function(){
+                    if($(this).hasClass('btn-addsoncate')){
+                        if(isson) return false;
+                        var confirmobj2 = jconfirmBox.confirm('新增二级分类',webcore.tpl($("#editgroup-tpl"),{catename:'',displayorder:0,isson:true}),function(e){
+                            var catename = e.$content.find('.catename').val();
+                            if(catename==''){
+                                zamnotice.showTips('error','分类名必须填写');
+                                return false;
+                            }
+                            var displayorder = e.$content.find('.displayorder').val();
+                            if(displayorder == ''){
+                                zamnotice.showTips('error','分类排序序号必须填写');
+                                return false;
+                            }
+                            confirmobj.close();
+                            setTimeout(()=>{
+                                confirmobj2.close();
+                            },1e2);
+                            webcore.ajaxSubmit("{:goweb('sucaiku/addvideocate')}",{fcateid:$parent.data('cateid'),catename:catename,displayorder:displayorder}).then(function(json){
+                                if(json.code==0){
+                                    loadcate(function(){
+                                        $(`.zam-cates-grouplist .fnav li[data-cateid='${json.msg}']`).trigger('click');
+                                    });
+                                    zamnotice.showTips('success','新增成功');
+                                }else{
+                                    zamnotice.showTips('error',json.msg);
+                                    return false;
+                                }
+                            }, function(json){
+                                zamnotice.showTips('error','网络差。操作失败.');
+                            });
+                        },false,false,true,[{'hidden':false,'txt':'确定新增'},{'hidden':false,'txt':'取消'}]);
+                    }else if($(this).hasClass('btn-editname')){
+                        var confirmobj2 = jconfirmBox.confirm('编辑分类名称',webcore.tpl($("#editgroup-tpl"),{catename:$parent.text(),displayorder:$parent.data('order')}),function(e){
+                            var cateid = $parent.data('cateid');
+                            var catename = e.$content.find('.catename').val();
+                            if(catename==''){
+                                zamnotice.showTips('error','分类名必须填写');
+                                return false;
+                            }
+                            var displayorder = e.$content.find('.displayorder').val();
+                            if(displayorder == ''){
+                                zamnotice.showTips('error','分类排序序号必须填写');
+                                return false;
+                            }
+                            confirmobj.close();
+                            setTimeout(()=>{
+                                confirmobj2.close();
+                            },1e2);
+                            webcore.ajaxSubmit("{:goweb('sucaiku/addvideocate')}",{isedit:'1',cateid:cateid,catename:catename,displayorder:displayorder}).then(function(json){
+                                if(json.code==0){
+                                    zamnotice.showTips('success','保存成功');
+                                    loadcate(function(){
+                                        $(`.zam-cates-grouplist .fnav li[data-cateid='${cateid}']`).trigger('click');
+                                    });
+                                }else{
+                                    zamnotice.showTips('error',json.msg);
+                                    return false;
+                                }
+                            }, function(json){
+                                zamnotice.showTips('error','网络差。操作失败.');
+                            });
+                        },false,false,true,[{'hidden':false,'txt':'确定保存'},{'hidden':false,'txt':'取消'}]);
+                    }else{
+                        jconfirmBox.confirm('温馨提示','删除分类会将分类下的所有图片设置为未分类(并非删除分类下的文件)，并且将无法恢复，您确定要删除么？',function(){
+                            confirmobj.close();
+                            webcore.ajaxSubmit("{:goweb('sucaiku/delvideocate')}",{cateid:$parent.data('cateid')}).then(function(json){
+                                if(json.code==0){
+                                    if(isson){
+                                        var $pparent = $parent.parent();
+                                        $parent.remove();
+                                        if($pparent.find('li').length == 0){
+                                            var fcateli = $pparent.parent(),fcateA = $pparent.prev();
+                                            var onlyfdom = $(webcore.tpl($("#onlyfcate-tpl"),{id:fcateA.data('cateid'),catename:fcateA.text()}));
+                                            fcateli.after(onlyfdom);
+                                            onlyfdom.trigger('click');
+                                            fcateli.remove();                                    
+                                        }else{
+                                            $pparent.find('li:first-child').trigger('click');
+                                        }
+                                    }else{
+                                        $(".zam-cates-grouplist .nav-total").trigger('click');
+                                    }
+                                    zamnotice.showTips('success','删除成功');
+                                }else{
+                                    zamnotice.showTips('error',json.msg);
+                                }
+                            }, function(json){
+                                zamnotice.showTips('error','网络差。操作失败.');
+                            });                            
+                        });
+                    }
+                });
+            });
+        });
+        $('.zam-cates-grouplist').on('click', ".nav li:not(.nav-item)", function(e) {
+            e.stopPropagation();
+            var cateid = $(this).data('cateid');
+            if(cateid=='0'){
+                window.location.reload(true);
+                return false;
+            }else{
+                $(".fcates,.soncates").addClass('hidden');
+            }
+            $(".zam-cates-grouplist .nav li:not(.nav-item)").removeClass('active');
+            $(this).addClass('active');
+            webtable.refresh();
+        });
+        $(".zam-inline-searchbar .btn-sousuo").click(function() {
+            webtable.refresh();
+        });
+        $("#fcateid").change(function(){
+            var fval = $(this).find("option:selected").val(),schildren = $(this).find("option:selected").data('children');
+            if(schildren.length==0){
+                if(fval=='0'){
+                    var html = '<option value="0" selected>全部</option><option value="-2">无分类</option>';
+                }else{
+                    var html = '<option value="-1" selected>无二级</option>';
+                }
+            }else{
+                var html = '<option value="0" selected>全部</option><option value="-1" >无二级</option>';
+                $.each(schildren,function(i,v){
+                    html += '<option value="'+v.id+'">'+v.catename+'</option>';
+                });
+            }
+            $("#scateid").html(html);
+            webtable.refresh();
+        });
+        $("#scateid").change(function(){
+            webtable.refresh();
+        });
+        $(".btn-addfcate").on('click',function(){
+            var confirmobj = jconfirmBox.confirm('新增一级分类',webcore.tpl($("#editgroup-tpl"),{catename:'',displayorder:0}),function(e){
+                var catename = e.$content.find('.catename').val();
+                if(catename==''){
+                    zamnotice.showTips('error','分类名必须填写');
+                    return false;
+                }
+                var displayorder = e.$content.find('.displayorder').val();
+                if(displayorder == ''){
+                    zamnotice.showTips('error','分类排序序号必须填写');
+                    return false;
+                }
+                webcore.ajaxSubmit("{:goweb('sucaiku/addvideocate')}",{catename:catename,displayorder:displayorder}).then(function(json){
+                    if(json.code==0){
+                        confirmobj.close();
+                        zamnotice.showTips('success','新增成功');
+                        loadcate(function(){
+                            $(`.zam-cates-grouplist .fnav li[data-cateid='${json.msg}']`).trigger('click');
+                        });
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                        return false;
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差。操作失败.');
+                    confirmobj.close();
+                });
+            },false,false,true,[{'hidden':false,'txt':'确定新增'},{'hidden':false,'txt':'取消'}]);
+        });
+});
+</script>
+<script id='onlyfcate-tpl' type="text/template">
+<li class="nav-nosub" data-cateid="<% d.id %>" data-order="<% d.displayorder %>"><% d.catename %><span class="btn btn-default btn-xs btn-addscate"><i class="mdi mdi-dots-horizontal"></i></span></li>
+</script>
+<script id='onlyscate-tpl' type="text/template">
+<li data-cateid="<% d.id %>" data-order="<% d.displayorder %>"><% d.catename %><span class="btn btn-default btn-xs btn-addscate"><i class="mdi mdi-dots-horizontal"></i></span></li>
+</script>
+<script id='fscate-tpl' type="text/template">
+<li class="nav-item nav-item-has-subnav open">
+    <a class="cate-title" href="javascript:void(0)" data-cateid="<% d.id %>" data-order="<% d.displayorder %>"><% d.catename %><span class="btn btn-default btn-xs btn-addscate"><i class="mdi mdi-dots-horizontal"></i></span></a>
+    <ul class="nav nav-subnav">
+        <%#  $.each(d.children, function(index, item){ %>
+        <li data-cateid="<% item.id %>" data-order="<% item.displayorder %>"><% item.catename %><span class="btn btn-default btn-xs btn-addscate"><i class="mdi mdi-dots-horizontal"></i></span></li>
+        <%# }) %>
+    </ul>
+</li>
+</script>
+<script id='editgroup-tpl' type="text/template">
+<div id="formBox" class="zam-formvalidation form-horizontal">
+    <div class="form-group">
+        <label class="col-lg-3 control-label">* 排序序号</label>
+        <div class="col-lg-7">
+            <input type="text" class="form-control numberincdec displayorder" name="displayorder" value="<% d.displayorder %>"
+            data-bts-min="0" data-bts-replacement-val="0"
+            data-bts-max="null"
+            data-bts-step="1"
+            >
+            <span class="help-block">序号越大越排在前面</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-3 control-label">* 分类名称</label>
+        <div class="col-lg-7">
+        <input class="form-control catename" type="text"  name="catename" placeholder="请务必填写一个您觉得唯一的名称" value="<% d.catename %>">
+        <%# if(d.isson){ %><span class="help-block">如果当前二级分类是一级分类的第一个二级分类那么该一级分类下的所有图片均会归为此二级分类</span><%# } %>
+        </div>
+    </div>
+</div>
+</script>
+<script id='editcate-tpl' type="text/template">
+<div class="btn-groups zam-inner-highconfig-btns btn-catecontrollers" style="text-align:center">
+      <%# if(!d.isson){ %>
+      <a href="javascript:void(0)" class="btn btn-default btn-addsoncate"><i class="mdi mdi-plus"></i> 新增分类</a>
+      <%# } %>
+      <a href="javascript:void(0)" class="btn btn-default btn-editname"><i class="mdi mdi-pencil"></i> 编辑分类</a>
+      <a href="javascript:void(0)" class="btn btn-default btn-delcate"><i class="mdi mdi-close"></i> 删除分类</a>
+</div>
+</script>
+{include file='$Wpath/common/footer'}

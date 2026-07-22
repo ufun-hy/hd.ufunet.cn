@@ -1,0 +1,355 @@
+{include file='$Wpath/common/header'}
+<div class="form-inline zam-inline-searchbar">
+    <div class="form-group">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">活动主题</span>
+        <input type="text" class="form-control" value="" id="keyword"  placeholder="请输入活动主题">
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">活动id</span>
+        <input type="text" class="form-control" value="" id="hdid"  placeholder="请输入活动id或者加密id">
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">用户或者手机号</span>
+        <input type="text" class="form-control" value="" id="username"  placeholder="请输入用户名/手机号">
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">备注</span>
+        <input type="text" class="form-control" value="" id="beizhu"  placeholder="请输入活动备注">
+      </div>
+    </div>
+    <a class="btn btn-primary btn-sm btn-search" href="javascript:void(0)"><i class="mdi mdi-magnify"></i> 搜索</a>
+</div>
+{include file='$Wpath/common/tabletoolbar'}
+<table id="listtable" class="zam-btable"></table>
+<script>
+require(['webcore','webtable','jconfirmBox','zamnotice'],function(webcore,webtable,jconfirmBox,zamnotice){
+var initConfig = {
+    tableId:'#listtable',
+    url:"{:goweb('hdlist/index')}",
+    columnoperate:{
+        btns:{
+            edit:true,
+            del:{'except':{'field':'isdel','only':'2'}},
+            shenhe:{title:"恢复",icon:"mdi-gavel",'except':{'field':'isdel','only':'1'}},
+            reset:{title:"强制删除",class:"danger",icon:"mdi-delete",'except':{'field':'isdel','only':'1'}},
+        },
+        func:{
+            edit:function(value, row, index){
+                window.location.href = "{:gohdmanage('hdconfig/index')}?hdid="+row.hdid;
+            },
+            del:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','删除活动将导致活动相关数据被删除，您确定要删除么？',function(){
+                        webcore.ajaxSubmit("{:goweb('hdlist/del')}",{hdid:row.id},'处理中..').then(function(json){
+                            if(json.code==0){
+                                webtable.refresh();
+                                zamnotice.showTips('success','删除成功');
+                            }else{
+                                zamnotice.showTips('error',json.msg);
+                            }
+                        }, function(json){
+                            zamnotice.showTips('error','网络差。操作失败');
+                        });
+                });
+            },
+            shenhe:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','您确定要恢复当前已删除的活动么？',function(){
+                        webcore.ajaxSubmit("{:goweb('hdlist/shenhe')}",{hdid:row.id},'处理中..').then(function(json){
+                            if(json.code==0){
+                                webtable.refresh();
+                                zamnotice.showTips('success','操作成功');
+                            }else{
+                                zamnotice.showTips('error',json.msg);
+                            }
+                        }, function(json){
+                            zamnotice.showTips('error','网络差。操作失败');
+                        });
+                });
+            },
+            reset:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','<span class="text-danger m-b-10">因财务统计需要，仅支持彻底删除未产生支付收入与红包发放的活动</span><br/>强制删除将导致该活动永久无法恢复，您确定要强制删除当前活动么？',function(){
+                        webcore.ajaxSubmit("{:goweb('hdlist/forcedel')}",{hdid:row.id},'处理中..').then(function(json){
+                            if(json.code==0){
+                                webtable.refresh();
+                                zamnotice.showTips('success','操作成功');
+                            }else{
+                                zamnotice.showTips('error',json.msg);
+                            }
+                        }, function(json){
+                            zamnotice.showTips('error','网络差。操作失败');
+                        });
+                });
+            },
+        }
+    },
+    columns:[{
+            checkbox: true,
+        }, 
+        {
+            field: 'id',
+            title: 'id',
+            align: 'center',
+            width:'6%',
+            visible: false
+        }, {
+            field: 'user_name',
+            title: '创建者',
+            align:'center',
+            formatter: function(value, row, index){
+                var html = value;
+                html += "<div><a class='btn btn-primary btn-xs m-t-5 btn-edituid' href=\"javascript:void(0)\" data-title=\"点击修改活动创建者\" data-toggle=\"tooltip\"><i class='mdi mdi-pencil'></i></a></div>"
+                return html;
+            },
+            events: {
+                'click .btn-edituid': function (event, value, row, index) {
+                    var confirmobj = jconfirmBox.ajaxconfirm("选择需要转移的用户","{:gocommon('basic/searchuser')}",{ishtml:'1'},'html','col-lg-6 col-lg-offset-3',function(e){
+                          var selectuser = e.find("input:checked");
+                        if(selectuser.length>0){
+                            if(selectuser.length > 1){
+                                zamnotice.showTips('error','只能选择一个用户');
+                                return false;
+                            }
+                            var uid = selectuser.val();
+                            if(parseInt(uid) <=0){
+                                zamnotice.showTips('error','所选用户异常');
+                                return false;
+                            }
+                            if(uid==row.user_id){
+                                zamnotice.showTips('error','不能自己转移给自己');
+                                return false;
+                            }
+                            var confirmobj2 = jconfirmBox.confirm('温馨提示','转移活动给其他用户将会使活动发布与新增功能已支付成功的订单一并转移给新用户，您确定要将该活动转移给<span class="text-danger"> '+selectuser.parent().parent().next().text()+' </span>么？<div class="m-t-10"><span class="text-danger">注:已产生红包支出或收入的活动暂不支持转移</span></div>',function(){
+                                webcore.ajaxSubmit("{:goweb('hdlist/edithduid')}",{hdid:row.id,olduid:row.user_id,uid:uid}).then(function(json){
+                                    if(json.code==0){
+                                        confirmobj.close();
+                                        webtable.refresh();
+                                        zamnotice.showTips('success','操作成功');
+                                    }else{
+                                        zamnotice.showTips('error',json.msg);
+                                    }
+                                }, function(json){
+                                    zamnotice.showTips('error','网络差,操作失败');
+                                });
+                            });
+                        }else{
+                            zamnotice.showTips('error','请选择用户');
+                        }
+                    });
+                },
+            }
+        }, {
+            field: 'user_mobile',
+            title: '手机号',
+            align:'center',
+            width:8,
+        }, {
+            field: 'hdtitle',
+            title: '活动主题',
+            align:'center',
+            formatter: function(value, row, index){
+                var html = value + "(id:"+row.id+")";
+                if(row.adminbeizhu!=''){
+                    html += '<div class="m-t-5" style="font-size:10px;font-weight:500">备注:'+row.adminbeizhu+'</div>';
+                }
+                if(row.beizhu!=''){
+                    html += '<div class="m-t-5" style="font-size:10px;font-weight:500">用户备注:'+row.beizhu+'</div>';
+                }
+                return html;
+            },
+            width:15,
+        }, {
+            field: 'ispubhtml',
+            title: '版本',
+            align:'center',
+            formatter:function(value,row,index){
+                var html = value;
+                if(row.hdmode=='2'){
+                    html += '<div class="m-t-10"><span class="label label-warning">人数:'+row.maxperson+'人</span></div>';
+                    html += '<div class="btn btn-primary btn-xs m-t-5 btn-edithdperson" href="javascript:void(0)" data-title="点击修改活动人数" data-toggle="tooltip" data-hdid="'+row.id+'"><i class="mdi mdi-pencil"></i></div>';
+                }
+                return html;
+            }
+        }, {
+            field: 'wxusernums',
+            title: '用户量',
+            align:'center',
+            formatter:function(value,row,index){
+                return value+'人';
+            }
+        }, {
+            field: 'screenconfig',
+            title: '登录密码',
+            align:'center',
+            formatter:function(value,row,index){
+                if(value!=null && value.password && value.password!='') {
+                    return value.password;
+                }
+            }
+        }, {
+            field: 'starttime',
+            title: '活动时间',
+            align:'center',
+            formatter:function(value,row,index){
+                if(!value || !row.endtime){
+                    return '-';
+                }
+                var html = `<div>${value}<span class="m-l-5 m-r-5">至</span>${row.endtime}</div>`;
+                if(row.istimeend == '1') {
+                    html += '<div class="btn btn-danger btn-xs m-t-5">已结束</div>';
+                }
+                html += `<div class="btn btn-primary btn-xs m-t-5 btn-edithdtime" href="javascript:void(0)" data-title="点击修改活动时间" data-toggle="tooltip" data-hdid="${row.id}"><i class="mdi mdi-pencil"></i></div>`;
+                return html;
+            },
+            width:10,
+        }, {
+            field: 'isdelhtml',
+            title: '已删除',
+            align:'center',
+        },  {
+            field: 'create_time',
+            title: '创建时间',
+            align: 'center',
+            width:10,
+        }
+    ],
+    searchParamas:[{'type':'1','id':'keyword'},{'type':'1','id':'hdid'},{'type':'1','id':'username'},{'type':'1','id':'beizhu'}],
+    toolbar:{
+        add:function(ajaxurl){
+            var confirmObj = jconfirmBox.ajaxconfirm("手动创建活动","{:goweb('hdlist/add')}",{ishtml:'1'},'html','col-lg-8 col-lg-offset-2',function(e){
+                var postData = webcore.serializeObject(e.find('form'));
+                if(postData.user_id==''){
+                    zamnotice.showTips('error','请先给活动绑定一个用户');
+                    return false;
+                }
+                if(postData.hdtitle==''){
+                    zamnotice.showTips('error','请设置活动主题');
+                    return false;
+                }
+                if(postData.maxperson=='' || postData.maxperson=='0'){
+                    zamnotice.showTips('error','请设置活动人数');
+                    return false;
+                }
+                webcore.ajaxSubmit("{:goweb('hdlist/add')}",postData).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','创建成功');
+                        confirmObj.close();
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                        return false;
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差，操作失败');
+                    return false;
+                });
+            });
+        },
+        del:function(ajaxurl){
+            var getSelects = webtable.getSelections();
+            if(getSelects.length>0){
+                jconfirmBox.confirm('温馨提示','删除活动将导致活动相关数据被删除，您确定要删除选中的数据么？',function(){
+                    webcore.ajaxSubmit("{:goweb('hdlist/del')}",{hdid:getSelects},'处理中..').then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','删除成功');
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差,操作失败');
+                    });
+                });
+            }else{
+                zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+        },
+        shenhe:function(ajaxurl){
+            var getSelects = webtable.getSelections();
+            if(getSelects.length>0){
+                jconfirmBox.confirm('温馨提示','您确定要恢复选中的活动么？',function(){
+                    webcore.ajaxSubmit("{:goweb('hdlist/shenhe')}",{hdid:getSelects},'处理中..').then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','操作成功');
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差,操作失败');
+                    });
+                });
+            }else{
+                zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+        },
+        reset:function(ajaxurl){
+            var getSelects = webtable.getSelections();
+            if(getSelects.length>0){
+                jconfirmBox.confirm('温馨提示','重置活动将导致活动相关数据被删除，您确定要重置选中的活动数据么？',function(){
+                    webcore.ajaxSubmit("{:goweb('hdlist/reset')}",{hdid:getSelects},'处理中..').then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','操作成功');
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差,操作失败');
+                    });
+                });
+            }else{
+                zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+        },
+    },
+};
+webtable.init(initConfig);
+$("#listtable").on('click','.btn-edithdtime',function(){
+    var $this = $(this),hdid = $this.attr('data-hdid');
+    var confirmObj = jconfirmBox.ajaxconfirm("编辑活动时间","{:goweb('hdlist/edithdtime')}",{ishtml:'1',hdid:hdid},'html','col-lg-8 col-lg-offset-2',function(e){
+        var postData = webcore.serializeObject(e.find('form'));
+        postData.hdid = hdid;
+        webcore.ajaxSubmit("{:goweb('hdlist/edithdtime')}",postData).then(function(json){
+            if(json.code==0){
+                webtable.refresh();
+                zamnotice.showTips('success','保存成功');
+                confirmObj.close();
+            }else{
+                zamnotice.showTips('error',json.msg);
+                 return false;
+            }
+        }, function(json){
+            zamnotice.showTips('error','网络差。操作失败');
+             return false;
+        });
+    });
+});
+$("#listtable").on('click','.btn-edithdperson',function(){
+    var $this = $(this),hdid = $this.attr('data-hdid');
+    var confirmObj = jconfirmBox.ajaxconfirm("编辑活动人数","{:goweb('hdlist/edithdmaxperson')}",{ishtml:'1',hdid:hdid},'html','col-lg-8 col-lg-offset-2',function(e){
+        var postData = webcore.serializeObject(e.find('form'));
+        postData.hdid = hdid;
+        webcore.ajaxSubmit("{:goweb('hdlist/edithdmaxperson')}",postData).then(function(json){
+            if(json.code==0){
+                webtable.refresh();
+                zamnotice.showTips('success','保存成功');
+                confirmObj.close();
+            }else{
+                zamnotice.showTips('error',json.msg);
+                 return false;
+            }
+        }, function(json){
+            zamnotice.showTips('error','网络差。操作失败');
+             return false;
+        });
+    });
+});
+});
+</script>
+{include file='$Wpath/common/footer'}

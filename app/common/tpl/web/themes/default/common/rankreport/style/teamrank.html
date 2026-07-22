@@ -1,0 +1,385 @@
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 开关</label>
+    <div class="col-lg-8">
+        {:tpl_switch('teamrankconfig[open]',$config['teamrankconfig']['open'],'openteamrank')}
+        <span class="zam-help-block">关闭则不显示团队排行榜</span>
+    </div>
+</div>
+<div class="teamrank-main{if $config['teamrankconfig']['open'] == '2'} hidden{/if}">
+    <div class="form-group">
+        <label class="col-lg-2 control-label text-right">* 排行榜宽高与位置</label>
+        <div class="col-lg-10">
+            <div class="input-group">
+                <div class="input-group-btn not-allow"><a class="btn btn-default">宽度</a></div>
+                <div class="touchspin">
+                <input type="text" class="form-control numberincdec" name="teamrankconfig[width]" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="null"
+                data-bts-step="1"
+                data-bts-postfix="px"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['teamrankconfig']['width']}">
+                </div>
+                <div class="input-group-btn not-allow"><a class="btn btn-default">高度</a></div>
+                <div class="touchspin">
+                <input type="text" class="form-control numberincdec" name="teamrankconfig[height]" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="null"
+                data-bts-step="1"
+                data-bts-postfix="px"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['teamrankconfig']['height']}">
+                </div>
+                <div class="input-group-btn not-allow"><a class="btn btn-default">距屏幕顶部距离</a></div>
+                <div class="touchspin">
+                <input type="text" class="form-control numberincdec" name="teamrankconfig[top]" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="null"
+                data-bts-step="1"
+                data-bts-postfix="px"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['teamrankconfig']['top']}">
+                </div>
+                <div class="input-group-btn not-allow"><a class="btn btn-default">距屏幕左侧距离</a></div>
+                <div class="touchspin">
+                <input type="text" class="form-control numberincdec" name="teamrankconfig[left]" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="null"
+                data-bts-step="1"
+                data-bts-postfix="px"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['teamrankconfig']['left']}">
+                </div>
+            </div>
+            <span class="help-block">注:位置与大小均可在大屏幕调节</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 顶部图开关</label>
+        <div class="col-lg-8">
+            {:tpl_switch('teamrankconfig[topimg][open]',$config['teamrankconfig']['topimg']['open'],'openteamranktopimg')}
+            <span class="zam-help-block">关闭则不显示顶部图</span>
+        </div>
+    </div>
+    <div class="teamranktopimgbox{if $config['teamrankconfig']['topimg']['open'] =='2'} hidden{/if}">
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 顶部图</label>
+            <div class="col-lg-8">
+                {:tpl_image_one('teamrankconfig[topimg][img]',$config['teamrankconfig']['topimg']['img'])}
+                <span class="help-block">推荐尺寸:421*65px</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label text-right">* 顶部图宽度与距表底部间距</label>
+            <div class="col-lg-8">
+                <div class="input-group">
+                    <div class="input-group-btn not-allow"><a class="btn btn-default">宽度</a></div>
+                    <div class="touchspin">
+                    <input type="text" class="form-control numberincdec" name="teamrankconfig[topimg][width]" 
+                    data-bts-min="1" data-bts-replacement-val="1"
+                    data-bts-max="100"
+                    data-bts-step="1"
+                    data-bts-postfix="%"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                    value="{$config['teamrankconfig']['topimg']['width']}">
+                    </div>
+                    <div class="input-group-btn not-allow"><a class="btn btn-default">距表底部间距</a></div>
+                    <div class="touchspin">
+                    <input type="text" class="form-control numberincdec" name="teamrankconfig[topimg][margin]" 
+                    data-bts-min="null" data-bts-replacement-val="20"
+                    data-bts-max="null"
+                    data-bts-step="1"
+                    data-bts-postfix="px"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                    value="{$config['teamrankconfig']['topimg']['margin']}">
+                    </div>
+                </div>
+                <span class="help-block">注:高度自适应</span>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label text-right">* 表数据与个数</label>
+        <div class="col-lg-7">
+            <div class="input-group">
+                <div class="input-group-btn not-allow"><a class="btn btn-default">展示前</a></div>
+                <div class="touchspin">
+                <input type="text" class="form-control numberincdec" name="teamrankconfig[limit]" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="null"
+                data-bts-step="1"
+                data-bts-postfix="名"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['teamrankconfig']['limit']}">
+                </div>
+                <div class="input-group-btn not-allow"><a class="btn btn-default">分成</a></div>
+                <div class="touchspin">
+                <input type="text" class="form-control numberincdec" name="teamrankconfig[col]" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="5"
+                data-bts-step="1"
+                data-bts-postfix="个表"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['teamrankconfig']['col']}">
+                </div>
+                <div class="input-group-btn not-allow"><a class="btn btn-default">间距</a></div>
+                <div class="touchspin">
+                <input type="text" class="form-control numberincdec" name="teamrankconfig[margin]" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="null"
+                data-bts-step="1"
+                data-bts-postfix="px"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['teamrankconfig']['margin']}">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label text-right">* 数据表样式</label>
+        <div class="col-lg-10">
+            <div class="input-group">
+                <div class="input-group-btn not-allow"><a class="btn btn-default">行高</a></div>
+                <div class="touchspin">
+                    <input type="text" class="form-control numberincdec" name="teamrankconfig[lineheight]" 
+                    data-bts-min="12" data-bts-replacement-val="12"
+                    data-bts-max="null"
+                    data-bts-step="1"
+                    data-bts-postfix="px"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                    value="{$config['teamrankconfig']['lineheight']}">
+                </div>
+                <div class="input-group-btn not-allow"><a class="btn btn-default">外边界</a></div>
+                <div class="touchspin">
+                <input type="text" class="form-control numberincdec" name="teamrankconfig[borderoutsize]" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="null"
+                data-bts-step="1"
+                data-bts-postfix="px"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['teamrankconfig']['borderoutsize']}">
+                </div>
+                <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+                {:tpl_color('teamrankconfig[borderoutcolor]',$config['teamrankconfig']['borderoutcolor'])}
+                <div class="input-group-btn not-allow"><a class="btn btn-default">内边界</a></div>
+                <div class="touchspin">
+                <input type="text" class="form-control numberincdec" name="teamrankconfig[borderinnersize]" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="null"
+                data-bts-step="1"
+                data-bts-postfix="px"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['teamrankconfig']['borderinnersize']}">
+                </div>
+                <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+                {:tpl_color('teamrankconfig[borderinnercolor]',$config['teamrankconfig']['borderinnercolor'])}
+            </div>
+        </div>
+    </div>
+    {if isset($config['appbddata']) && !empty($config['appbddata']) }
+    <div class="form-group">
+        <label class="col-lg-2 control-label"> 数据表的列</label>
+        <div class="col-lg-10">
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th style="width:12.5%">列名称</th>
+                    <th style="width:12.5%">列名大小</th>
+                    <th style="width:12.5%">列名颜色</th>
+                    <th style="width:12.5%">列名背景</th>
+                    <th style="width:12.5%">文字大小(px)</th>
+                    <th style="width:12.5%">文字颜色</th>
+                    <th style="width:12.5%">列宽(%)</th>
+                    <th style="width:12.5%">操作</th>
+                </tr>
+                </thead>
+                <tbody class="teamrank-list">
+                    {if isset($config['teamrankconfig']['items']) && !empty($config['teamrankconfig']['items'])}
+                    {foreach $config['teamrankconfig']['items'] as $tbd}
+                    <tr data-zd="{$tbd['bdzd']}">
+                        <td class="text-center">
+                            <input type="hidden" name="teamrankconfig[items][bdzd][]" value="{$tbd['bdzd']}">
+                            <input class="form-control" name="teamrankconfig[items][name][]" value="{$tbd['name']}" />
+                        </td>
+                        <td class="text-center">
+                            <div class="touchspin">
+                                <input type="text" class="form-control numberincdec" name="teamrankconfig[items][thsize][]" 
+                                data-bts-min="0" data-bts-replacement-val="0"
+                                data-bts-max="null"
+                                data-bts-step="1"
+                                value="{$tbd['thsize']??'16'}">
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div class="zam-flex zam-justifyContent">
+                                {:tpl_color('teamrankconfig[items][thcolor][]',$tbd['thcolor']??'#fff')}
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div class="zam-flex zam-justifyContent">
+                                {:tpl_color('teamrankconfig[items][thbgcolor][]',$tbd['thbgcolor']??'red')}
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div class="touchspin">
+                                <input type="text" class="form-control numberincdec" name="teamrankconfig[items][size][]" 
+                                data-bts-min="0" data-bts-replacement-val="0"
+                                data-bts-max="null"
+                                data-bts-step="1"
+                                value="{$tbd['size']}">
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div class="zam-flex zam-justifyContent">
+                                {:tpl_color('teamrankconfig[items][color][]',$tbd['color'])}
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div class="touchspin">
+                                <input type="text" class="form-control numberincdec" name="teamrankconfig[items][width][]" 
+                                data-bts-min="0" data-bts-replacement-val="0"
+                                data-bts-max="null"
+                                data-bts-step="1"
+                                value="{$tbd['width']}">
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <a class="btn btn-xs btn-primary btn-xs zam-sortable btn-moveitem" href="javascript:void(0)"> <i class="mdi mdi-arrow-all"></i> </a>
+                            <a class="btn btn-xs btn-danger btn-xs btn-delitem" href="javascript:void(0)"> <i class="mdi mdi-delete"></i> </a>
+                        </td>
+                    </tr>
+                    {/foreach}
+                    {/if}
+                </tbody>
+            </table>
+            <span class="help-block">注:列宽可在大屏幕调节</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label"> 可选列数据</label>
+        <div class="col-lg-10">
+            {php}
+            $trzds = [];
+            if(isset($config['teamrankconfig']['items']) && !empty($config['teamrankconfig']['items'])){
+                $trzds = array_column($config['teamrankconfig']['items'],'bdzd');
+            }
+            {/php}
+            <div class="card card-totalitems teamrankitems">
+                <div class="card-header">可选项目</div>
+                <div class="card-body normalitems">
+                    <span class="btn btn-default btn-sm{if in_array('pm',$trzds)} disabled{/if}" data-zd="pm" data-title="排名">排名</span>
+                    <span class="btn btn-default btn-sm{if in_array('team',$trzds)} disabled{/if}" data-zd="team" data-title="团队名称">团队名称</span>
+                    <span class="btn btn-default btn-sm{if in_array('total',$trzds)} disabled{/if}" data-zd="total" data-title="提交总额">提交总额</span>
+                    <span class="btn btn-default btn-sm{if in_array('person',$trzds)} disabled{/if}" data-zd="person" data-title="提交人数">提交人数</span>
+                    <span class="btn btn-default btn-sm{if in_array('count',$trzds)} disabled{/if}" data-zd="count" data-title="提交次数">提交次数</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    {/if}
+</div>
+<script id='teamrank-tpl' type="text/template">
+<tr data-zd="<% d.zd %>">
+    <td class="text-center">
+        <input type="hidden" name="teamrankconfig[items][bdzd][]" value="<% d.zd %>">
+        <input class="form-control" name="teamrankconfig[items][name][]" value="<% d.title %>" />
+    </td>
+    <td class="text-center">
+        <div class="touchspin">
+            <input type="text" class="form-control numberincdec" name="teamrankconfig[items][thsize][]" 
+            data-bts-min="0" data-bts-replacement-val="0"
+            data-bts-max="null"
+            data-bts-step="1"
+            value="<% d.size %>">
+        </div>
+    </td>
+    <td class="text-center">
+        <div class="zam-flex zam-justifyContent">
+            {:tpl_color('teamrankconfig[items][thcolor][]','#fff')}
+        </div>
+    </td>
+    <td class="text-center">
+        <div class="zam-flex zam-justifyContent">
+            {:tpl_color('teamrankconfig[items][thbgcolor][]','red')}
+        </div>
+    </td>
+    <td class="text-center">
+        <div class="touchspin">
+            <input type="text" class="form-control numberincdec" name="teamrankconfig[items][size][]" 
+            data-bts-min="0" data-bts-replacement-val="0"
+            data-bts-max="null"
+            data-bts-step="1"
+            value="<% d.size %>">
+        </div>
+    </td>
+    <td class="text-center">
+        <div class="zam-flex zam-justifyContent">
+        {:tpl_color('teamrankconfig[items][color][]','#fff')}
+        </div>
+    </td>
+    <td class="text-center">
+        <div class="touchspin">
+            <input type="text" class="form-control numberincdec" name="teamrankconfig[items][width][]" 
+            data-bts-min="0" data-bts-replacement-val="0"
+            data-bts-max="null"
+            data-bts-step="1"
+            value="<% d.width %>">
+        </div>
+    </td>
+    <td class="text-center">
+        <a class="btn btn-xs btn-primary btn-xs zam-sortable btn-moveitem" href="javascript:void(0)"> <i class="mdi mdi-arrow-all"></i> </a>
+        <a class="btn btn-xs btn-danger btn-xs btn-delitem" href="javascript:void(0)"> <i class="mdi mdi-delete"></i> </a>
+    </td>
+</tr>
+</script>
+<script>
+    require(['webcore','jconfirmBox','zamnotice',"jquery.ui","bootstrap-touchspin"],function(webcore,jconfirmBox,zamnotice){
+        $('.teamrank-list').sortable({handle: ".btn-moveitem"}).disableSelection();
+        $('.teamrank-list').on("click",".btn-delitem",function(){
+            var trnode = $(this).parent().parent();
+            jconfirmBox.confirm('温馨提示','删除将无法回复，您确定要删除么？',function(){
+                trnode.remove();
+                $(`.teamrankitems .btn[data-zd='${trnode.attr('data-zd')}']`).removeClass('disabled')
+            });
+        });
+        $(".teamrankitems span").click(function(){
+            var $this = $(this),zd = $this.attr('data-zd'),title = $this.attr('data-title'),type = $this.attr('data-type');
+            if($this.hasClass('disabled')) {
+                return false;
+            }
+            var width = 20;
+            $(".teamrank-list").append(webcore.tpl($("#teamrank-tpl"),{zd:zd,title:title,width:width,size:16}));
+            $this.addClass('disabled');
+            $(".teamrank-list .numberincdec").TouchSpin().on("change", function(){
+                var $this = $(this),funcstr = $this.data('func');
+                var func = window[funcstr];
+                func && func(this);
+            });
+            tpl_colorpicker();
+        });
+    });
+    function openteamrank(obj,status){
+        if(status=='1'){
+            obj.prev().val('2');
+            obj.attr('data-status','2');
+            $(".teamrank-main").addClass('hidden');
+        }else{
+            obj.prev().val('1');
+            obj.attr('data-status','1');
+            $(".teamrank-main").removeClass('hidden');
+        }
+        obj.prev().prev().prop("checked",status=='1'?false:true);
+    }
+    function openteamranktopimg(obj,status){
+        if(status=='1'){
+            obj.prev().val('2');
+            obj.attr('data-status','2');
+            $(".teamranktopimgbox").addClass('hidden');
+        }else{
+            obj.prev().val('1');
+            obj.attr('data-status','1');
+            $(".teamranktopimgbox").removeClass('hidden');
+        }
+        obj.prev().prev().prop("checked",status=='1'?false:true);
+    }
+</script>

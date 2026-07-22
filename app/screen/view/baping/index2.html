@@ -1,0 +1,1408 @@
+<!doctype html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="google" content="notranslate" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="renderer" content="webkit">
+    <title>{$pcconfig['title']}</title>
+	<link rel="shortcut icon" href="{:globalico()}" />
+	<link rel="stylesheet" href="__STATIC__/css/zam-icon.css" media="all">
+	<link rel="stylesheet" href="__STATIC__/css/mxc-icon.css?t=5" media="all">
+	<link rel="stylesheet" href="__STATIC__/css/screen/style.css?t=202201022" media="all">
+	<link rel="stylesheet" href="__STATIC__/css/animate.css?t=0913"/>
+	<script src="__STATIC__/js/jquery.2.1.4.js"></script>
+	<script src="__STATIC__/js/jquery.extend.js"></script>
+	<script type="text/javascript" src="__STATIC__/js/require.js"></script>
+	<script type="text/javascript">
+		var XCV3Config = {
+		  staticurl:"__STATIC__/",
+		  cookie : {'pre': 'zam'},
+		  hdid:"{$hdinfo['hdid']}",
+		  rhdid:"{$hdinfo['id']}",
+		  wsAddress:"{$wssaddress}",
+		  loadtype:"{$hdinfo['loadtype']??'1'}",
+		  screenfollow:"{$hdinfo['specialconfig']['followchange']??'1'}",
+		  gametype:"{$pcconfig['gametype']??'common'}",
+		  isiframe:window.top!=window.self,
+		  bgmusic:"{:tomedia($pcconfig['bgmusic'])}",
+		  openbgmusic:"{$pcconfig['bgmusicoff']??'2'}",
+		  adv:{if isset($hdinfo['advconfig']['pc']) && !empty($hdinfo['advconfig']['pc'])}{:json_encode($hdinfo['advconfig']['pc'])}{else /}''{/if},
+		};
+		require.config({
+			waitSeconds:20,
+			baseUrl: XCV3Config.staticurl + "js",
+			urlArgs:'v=2.9.71',//+(new Date()).getTime(),
+			paths: {
+				 css: "css.min",
+				 'async': "async",
+				 jquery:"jquery.2.1.4",
+				 'jquery.ui': 'jquery.ui',
+				 jquerytrans:'screenjs/jquery.transit.min',
+				 velocity:'screenjs/velocity',
+				 zamnotice: 'zamnotice/zamnotice',
+				 jbox:'jbox/jBox',
+				 jboxnotice:'jbox/plugins/Notice/jBox.Notice.min',
+				 template:"template/template",
+				 swiper:'swiper/swiper.min',
+				 marqueen:"wechatjs/marqueen",
+				 screencore:'screenjs/screencore',
+				 layer:'layer/layer',
+				 layerBox:'layer/layerBox',
+				 layerExt:'layer/layer.ext',
+				 screensocket:'screenjs/screensocket',
+				 keyboard:'keyboard/keyboard.min',
+				 msgs:'screenjs/msgs',
+				 screenbp:'screenjs/screenbp',
+				 screenbpdata:'screenjs/screenbpdata',
+				 bgscreen:'screenjs/bgscreen',
+				 colorPicker:'jqcolorpicker',
+				 colors:'colors',
+				 hls:'videojs/TcPlayer-2.4.1/hls.min',
+				 ionrangeslider:'ionrangeslider/ionrangeslider',
+				 onoffswitch:'onoffswitch/on-off-switch',
+				 onoffswitchauto:'onoffswitch/on-off-switch-onload',
+				 videocontrol:'screenjs/videocontrol',
+				 slideranimate:'screenjs/slideranimate',
+				 rightboxslider:'screenjs/rightboxslider',
+				 signs:'screenjs/signs',
+				 screenvote:'screenjs/screenvote',
+				 screengame:'screenjs/screengame',
+				 screenredpack:'screenjs/screenredpack',
+				 screenydj:'screenjs/screenydj',
+				 screenshuqian:'screenjs/screenshuqian',
+				 screenmonkey:'screenjs/screenmonkey',
+				 screencar:'screenjs/screencar',
+				 screenhorse:'screenjs/screenhorse',
+				 screenmls:'screenjs/screenmls',
+				 screenbike:'screenjs/screenbike',
+				 screenswim:'screenjs/screenswim',
+				 screenthreed:'screenjs/screenthreed',
+				 screentug:'screenjs/screentug',
+				 screenanswerbs:'screenjs/screenanswerbs',
+				 screendzqy:'screenjs/screendzqy',
+				 screenliuyancj:'screenjs/screenliuyancj',
+				 screenbigcj:'screenjs/screenbigcj',
+				 screenlivemark:'screenjs/screenlivemark',
+				 screendgshake:'screenjs/screendgshake',
+				 screenjjb:'screenjs/screenjjb',
+				 screencutfruit:'screenjs/screencutfruit',
+				 screenmouse:'screenjs/screenmouse',
+				 screennormalcj:'screenjs/screennormalcj',
+				 screencubecj:'screenjs/screencubecj',
+				 screencjx:'screenjs/screencjx',
+				 screenzjd:'screenjs/screenzjd',
+				 screenshakestart:'screenjs/screenshakestart',
+				 screenshakestart2:'screenjs/screenshakestart2',
+				 screenphotocj:'screenjs/screenphotocj',
+				 screenimportcj:'screenjs/screenimportcj',
+				 screendzp:'screenjs/screendzp',
+				 screenyuyuedj:'screenjs/screenyuyuedj',
+				 screenhbwall:'screenjs/screenhbwall',
+				 screendhh:'screenjs/screendhh',
+				 screenddp:'screenjs/screenddp',
+				 dragqr:'screenjs/dragqr',
+				 fulldm:'screenjs/fulldm',
+				 danmuku:'screenjs/danmuku',
+				 autoscroll:'screenjs/autoscroll',
+				 snabbt:'screenjs/snabbt',
+				 screenlottery:'screenjs/screenlottery',
+				 videojs:'videojs/video',
+				 domtoimage:'domtoimg/domtoimage',
+				 filesaver:'domtoimg/filesaver',
+				 threejs:'threejs/three.min',
+				 tweenjs:'threejs/tween.min',
+				 css3drenderer:'threejs/css3drenderer',
+				 AMapLoader:'https://webapi.amap.com/loader',
+				 TagCloud:'screenjs/TagCloud',
+				 jqcloud:'jqcloud/jqcloud.min',
+				 luckycanvas:'wechatjs/luckycanvas',
+				 pxloader:'pxloader/PxLoader',
+				 pxLoaderImage:'pxloader/PxLoaderImage',
+				 pxLoaderAudio:'pxloader/PxLoaderAudio',
+				 pxLoaderVideo:'pxloader/PxLoaderVideo',
+				 pxPreload:'pxloader/pxPreload',
+				 svga:'svga/svga.min',
+				 anime:'screenjs/anime',
+			},
+			shim:{
+				'pxLoaderImage':{
+					deps: ['pxloader']
+				},
+				'pxLoaderAudio':{
+					deps: ['pxloader']
+				},
+				'pxLoaderVideo':{
+					deps: ['pxloader']
+				},
+				'zamnotice':{
+					deps: ['css!../js/zamnotice/zamnotice.css']
+				},
+				'jbox':{
+					deps: ['css!../js/jbox/jBox.css',]
+				},
+				'jboxnotice':{
+					deps: ['jbox','css!../js/jbox/plugins/Notice/jBox.Notice.css']
+				},
+				'template':{
+					exports: 'template',
+				},
+				'swiper':{
+					exports:'Swiper',
+					deps: ['css!../js/swiper/swiper.min.css']
+				},
+				'marqueen':{
+					exports:'marqueen',
+				},
+				'screencore':{
+					exports:'screencore'
+				},
+				'layer':{
+					exports: 'layer',
+					deps: ['css!../js/layer/theme/default/layer.css']
+				},
+				'layerBox':{
+					exports: 'layerBox',
+					deps: ['layer']
+				},
+				'layerExt':{
+					deps: ['layer']
+				},
+				'screensocket':{
+					exports:'screensocket',
+				},
+				'keyboard':{
+					exports:'keyboardJS',
+				},
+				'signs':{
+					exports:'signs',
+				},
+				'screenbp':{
+					exports:'screenbp',
+				},
+				'screenbpdata':{
+					exports:'screenbpdata',
+				},
+				'bgscreen':{
+					exports:'bgscreen',
+				},
+				'colorPicker': {
+					deps: [ 'jquery' ],
+					exports: 'jQuery.fn.colorPicker'
+				},
+				'colors':{
+					exports:'Colors'
+				},
+				'slideranimate':{
+					exports:'slideranimate',
+				},
+				'videocontrol':{
+					exports:'videocontrol',
+				},
+				'rightboxslider':{
+					exports:'rightboxslider',
+				},
+				'ionrangeslider':{
+					deps:['css!../js/ionrangeslider/ionrangeslider.css'],
+				},
+				'onoffswitchauto':{
+					deps: ['onoffswitch','css!../js/onoffswitch/on-off-switch.css']
+				},
+				'screenshuqian':{
+					exports:'screenshuqian',
+				},
+				'screenmonkey':{
+					exports:'screenmonkey',
+				},
+				'screencar':{
+					exports:'screencar',
+				},
+				'screenhorse':{
+					exports:'screenhorse',
+				},
+				'screenmls':{
+					exports:'screenmls',
+				},
+				'screenbike':{
+					exports:'screenbike',
+				},
+				'screenswim':{
+					exports:'screenswim',
+				},
+				'screenthreed':{
+					exports:'screenthreed',
+				},
+				'screentug':{
+					exports:'screentug',
+				},
+				'screenanswerbs':{
+					exports:'screenanswerbs',
+				},
+				'screendzqy':{
+					exports:'screendzqy'
+				},
+				'screenliuyancj':{
+					exports:'screenliuyancj',
+				},
+				'screenbigcj':{
+					exports:'screenbigcj',
+				},
+				'screenlivemark':{
+					exports:'screenlivemark',
+				},
+				'screendgshake':{
+					exports:'screendgshake',
+				},
+				'screenmouse':{
+					exports:'screenmouse',
+				},
+				'screencubecj':{
+					exports:'screencubecj',
+				},
+				'dragqr':{
+					exports:'dragqr',
+				},
+				'videojs':{
+					exports:'videojs',
+					deps:['css!../js/videojs/video.css'],
+				},
+				'domtoimage':{
+					exports:'domtoimage'
+				},
+				'threejs':{
+					exports:'THREE'
+				},
+				'tweenjs':{
+					exports:'TWEEN'
+				},
+				'jqcloud':{
+					deps:['css!../js/jqcloud/jqcloud.min.css'],
+				},
+			}
+		});
+		define("jquery", [], function () {
+			return jQuery
+		});
+		var modulepage=1,moduleallpage = 1;
+		!function(t, i, e) {
+				var s = function() {
+					var zoom = (i.innerHeight / 4032).toFixed(4),fullwidth = (i.innerWidth / zoom).toFixed(4);
+			    	$(".full-main").css({"width":fullwidth+"px","zoom":zoom});
+					setTimeout(function(){
+						var autowidth = fullwidth -  $(".control-normal-list").outerWidth(true);
+						if(XCV3Config.gametype==='msg'){
+							autowidth -= $(".control-msg-list").outerWidth(true);
+						}
+						$(".control-module-list").css({"width":autowidth+'px'});
+						modulepage = 1;
+						var activeobj = $(".control-module-list .icon-box.active");
+						if(activeobj.length > 0){
+							modulepage = (activeobj[0].offsetTop - 5) / 65 + 1;
+							modulepage = parseInt(modulepage);
+							//Math.round()
+						}
+						$(".control-module-list .wrap").css({"transform":"translate3d(0px, "+(-modulepage * 65 + 65)+"px, 0px)"});
+						moduleallpage = parseInt($(".control-module-list-items .wrapbox").height()/65);
+					},80);
+				};
+				t.addEventListener !== e && (i.addEventListener('resize', s, !1), t.addEventListener("DOMContentLoaded", s, !1))
+		}(document, window);
+	</script>
+</head>
+<input type="hidden" class="inputrotateid" value="{$rotateid??'0'}" />
+<input type="hidden" class="inputfulldm" value="2" />
+<body class="screenbody">
+<style>
+.full-main{height: 4032px}
+.header{
+	height: 400px;
+}
+.footer{display: none}
+.main-box .header .logoBox .barlogo{
+	padding-left: 200px!important;
+	padding-right: 100px!important;
+}
+.main-box .header .logoBox .barlogo img{
+	height: 320px!important;
+	width: 320px!important;
+	margin-top: 40px!important;
+}
+.main-box .header .logoBox .barname{
+	height: 400px!important;
+	line-height: 400px!important;
+	font-size: 160px!important;
+}
+.logoBox .barname .barnameBox.namescroll li{
+	height: 400px!important;
+	line-height: 400px!important;
+}
+.marqueenBox{
+	height: 400px!important;
+}
+.main-box .header .marqueenBox ul{
+	height: 400px!important;
+}
+.main-box .header .marqueenBox ul li{
+	height: 400px!important;
+	line-height: 400px!important;
+	font-size: 200px!important;
+}
+.baping-mainbox{
+	top:400px!important;
+	height: calc(100% - 440px)!important;
+}
+.loading-box{position:fixed;top:0;left:0;width:100%;height:100%;z-index:91;background-color:#fff;opacity:1}.load-wait{height:60px;line-height:60px;font-size:20px;font-weight:bold;color:gray}.load-percent{height:40px;line-height:40px;font-size:20px;font-weight:bold;color:gray}.load-progress{width:260px;height:15px;background:#282828;border:4px solid #282828;border-radius:20px;-moz-border-radius:20px;-webkit-border-radius:20px;box-shadow:0 5px 17px rgb(40 40 40 / 50%);margin-bottom:30px}.load-bar{display:block;height:30px;height:15px;border-radius:12px;-moz-border-radius:12px;-webkit-border-radius:10px;background-color:CornflowerBlue;box-shadow:inset 0 0 6px 2px rgba(255,255,255,.3);width:0}.load-barfill{width:100%;height:15px;border-radius:20px;-webkit-animation:progress 1s linear infinite;-moz-animation:progress 1s linear infinite;animation:progress 1s linear infinite;background-repeat:repeat-x;background-size:30px 30px;background-image:-webkit-linear-gradient(-45deg,rgba(255,255,255,0.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,0.15) 50%,rgba(255,255,255,0.15) 75%,transparent 75%,transparent);background-image:linear-gradient(-45deg,rgba(255,255,255,0.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,0.15) 50%,rgba(255,255,255,0.15) 75%,transparent 75%,transparent)}@-webkit-keyframes progress{to{background-position:30px 0}}@-moz-keyframes progress{to{background-position:30px 0}}@keyframes progress{to{background-position:30px 0}}
+</style>
+<link href="__STATIC__/css/loading.css" rel="stylesheet">
+<div class="loading-box zam-app-flex-ajCenter">
+	<div class="la-square-jelly-box la-dark">
+		<div></div>
+		<div></div>
+	</div>
+	<div class="load-wait">正在加载图片视频等资源，马上开始</div>
+	<div class="load-percent">0%</div>
+	<div class=""><span class="css3"></span></div>
+	<div class="load-progress">
+		<span class="load-bar">
+			<div class="load-barfill"></div>
+		</span>
+	</div>
+</div>
+<div class="pc-box">
+		<div class="full-main">
+		  <div class="main-box">
+			  <header class="header zam-app-flex">
+			  	{if isset($pcconfig['gametype']) && $pcconfig['gametype']=='baping'}
+			  	{else /}
+			    <div class="headerLogo zam-app-flex-ajCenter2">
+					{if isset($hdinfo['copyright']['logo']) && !empty($hdinfo['copyright']['logo'])}
+					<img src="{:tomedia($hdinfo['copyright']['logo'])}" />
+					{/if}
+				</div>
+				<ul class="headerTitle">
+					{if isset($hdinfo['screenconfig']['opennotice']) && $hdinfo['screenconfig']['opennotice']=='1' && isset($hdinfo['screenconfig']['notice']) && !empty($hdinfo['screenconfig']['notice'])}
+						{php}$topnotices = explode('#',$hdinfo['screenconfig']['notice']);{/php}
+						{volist name="topnotices" id="notice"}
+						<li class="title-item" style="font-size:{$hdinfo['screenconfig']['noticesize']}px;color: {$hdinfo['screenconfig']['noticecolor']}">{$notice}</li>
+						{/volist}
+					</ul>
+					{/if}
+				</ul>
+				<div class="headerTips zam-app-flex-ajCenter2">
+					<div class="joinPeople"></div>
+				</div>
+				{/if}
+			  </header>	
+<link rel="stylesheet" href="/{:SIMGURL}baping/baping.css?t=2.1.31"/>
+<style>
+{/*礼物css*/}
+{volist name="allgift" id="gift"}
+.baping-item .dsText .gifticon.gifticon-{$gift['id']}{background-image: url("{:tomedia($gift['giftconfig']['giftappicon'])}");}
+{/volist}
+.baping-item .dsText .giftname{display:inline-block;margin:0 10px;}
+/*大屏点歌消息*/
+.baping-item .songText{color:#ffdc17 !important}
+.baping-item .songText .songname{display:inline-block;margin-left:20px;}
+/*霸屏弹窗背景*/
+{volist name="bpzhuti.alldata" id="theme"}
+.msgbptheme-{$theme['id']} .baping-icon{background-image: url("{$theme['themeconfig']['bppcicon']}");}
+.holdtheme-{$theme['id']} .onWallBpHorn {background-image: url("{$theme['themeconfig']['cornerbg']}");}
+.holdtheme-{$theme['id']} .onWallWomanCircle1 {background-image: url("{$theme['themeconfig']['avatarbg']}");}
+.holdtheme-{$theme['id']} .bpHead_womanWing span {background-image: url("{$theme['themeconfig']['leftbpnamebg']}");}
+.holdtheme-{$theme['id']} .themeName_themeBp {background-image: url("{$theme['themeconfig']['nicknamebg']}");}
+.holdtheme-{$theme['id']}  .themeCover_themeBp {background-image: url("{$theme['themeconfig']['timebg']}");}
+{/volist}
+{if isset($pcconfig['barinfo']['logo']) && empty($pcconfig['barinfo']['logo'])}
+.header .logoBox .barlogo{display:none}
+.header .logoBox .barname{width:calc(100% - 60px);margin: 0 30px;}
+{/if}
+{if isset($pcconfig['barinfo']['title']) && empty($pcconfig['barinfo']['title'])}
+.header .logoBox .barname{display:none}
+{/if}
+{if isset($pcconfig['barinfo']['logo']) && empty($pcconfig['barinfo']['logo']) && isset($pcconfig['barinfo']['title']) && empty($pcconfig['barinfo']['title'])}
+.main-box .header .logoBox{width: 0;}
+.main-box .header .marqueenBox{width: calc(100% - 40px);margin:0 20px;}
+{/if}
+{if isset($pcconfig['barinfo']['logo']) && !empty($pcconfig['barinfo']['logo']) && isset($pcconfig['barinfo']['title']) && empty($pcconfig['barinfo']['title'])}
+.main-box .header .logoBox{width: auto;}
+.main-box .header .marqueenBox{width: calc(100% - 120px);}
+{/if}
+.hdQrbox img{
+	height: calc(100% - 200px)!important;
+}
+.hdQrbox-txt{
+	height: 200px!important;
+	line-height: 200px!important;
+	font-size: 100px;
+}
+.baping-item{
+	margin-bottom: 50px;
+}
+.baping-item .baping-userbox{
+	width: 580px;
+	height: 580px;
+	top: 30px;
+}
+.baping-item .baping-userbox .userHead{
+	width: 360px;
+	height: 360px;
+}
+.baping-item .baping-itemInfo{
+	margin-left: 520px;
+	min-height: 520px;
+}
+.baping-item .userName{
+	font-size: 100px;
+}
+.baping-item .msgTime{
+	font-size: 120px;
+}
+.baping-item .baping-icon{
+	top: 20%;
+	width: calc( 542px * 2);
+	height: calc( 394px * 2);
+}
+</style>
+<section class="normal-box baping-mainbox">
+<section class="baping-itembox msg-itembox showpagebox">
+	<section class="baping-contentsbox full">
+		<ul class="baping-contents"></ul>
+	</section>
+</section>
+{if !empty($pcconfig['widgets']) && isset($pcconfig['widgets']['song']) && $pcconfig['widgets']['song']['widgetshow']=='1'}
+<section class="baping-itembox song-itembox">
+	<section class="baping-songlist zam-app-flex zam-app-alignCenter zam-app-justifyspacearound">
+		<div class="baping-songlist-artistorqr">
+			<div class="baping-songlist-artist">
+				<div class="swiper-container singer-swiper">
+					<div class="swiper-wrapper">
+						{foreach $allsongs['singer'] as $singerkey=>$singeritem}
+						<div class="swiper-slide zam-app-flex-ajCenter2">
+							<div class="baping-songlist-avatar zam-app-flex-ajCenter2">
+								<img src="{$singeritem['artistavatar']}" >
+							</div>
+							<div class="baping-songlist-nickname">{$singeritem['artistname']}</div>
+						</div>
+						{/foreach}
+					</div>
+				</div>
+			</div>
+			<div class="baping-songlist-qrbox zam-app-flex-ajCenter">
+					<div class="baping-songlist-qrimg">
+						<img src="{$qrcode}" >
+					</div>
+					<div class="baping-songlist-qrtxt">扫码点歌</div>
+			</div>
+		</div>
+		<div class="baping-songlist-content">
+			<div class="baping-songlist-songbox">
+				<div class="baping-songlist-songtitle">
+					今夜歌单
+				</div>
+				<div class="baping-songlist-items">
+					<ul class="baping-songlist-items-ul">
+					{foreach $allsongs['song'] as $songkey=>$songitem}
+					 <li>
+						<div class="baping-songlist-item">
+							<div class="baping-songlist-namebox">
+								<div class="baping-songlist-namenum">{$songkey + 1}.</div>
+								<div class="baping-songlist-name">{$songitem['songconfig']['songname']}</div>
+							</div>
+							<div class="baping-songlist-singerbox">
+								<div class="baping-songlist-stitle">艺人：</div>
+								<div class="baping-songlist-sname">{$songitem['singer']['artistname']}</div>
+							</div>
+						</div>
+					  </li>
+					  {/foreach}
+					</ul>
+				</div>
+			</div>
+		</div>
+	</section>
+</section>
+{/if}
+</section>
+<style>
+/*霸屏弹窗文字字体*/
+{volist name="pcconfig.bpfontstyle" id="bpfont"}
+{if $bpfont['fontval']!='normal'&&$bpfont['fontsrc']!=''}
+	@font-face {
+		font-family:"{$bpfont['fontval']}";
+		src:url("{$bpfont['fontsrc']}");
+	}
+	.{$bpfont['fontval']}{
+		font-family:"{$bpfont['fontval']}";
+	}
+{/if}
+{/volist}
+</style>
+<div class="bpfontStyleBox">
+{volist name="pcconfig.bpfontstyle" id="bpfont"}
+{if $bpfont['fontval']!='normal'&&$bpfont['fontsrc']!=''}
+<span class="{$bpfont['fontval']}">赞木赞木</span>
+{/if}
+{/volist}
+</div>
+<script id="msg-tpl" type="html/javascript">
+<li class="baping-item msg-{{ id }} {{ if type=='1'||type=='2' }}normal-msg{{ else if type=='3' }}holdscreen-msg msgbptheme-{{ themeid }}{{ else }}other-msg{{ /if }}{{ if fromhistory }} from-historymsg{{ /if }}" data-msgid="{{ id }}">
+	{{ if type=='3'}}<span class="baping-icon"></span>{{ /if }}
+	<div class="baping-userbox zam-app-flex-ajCenter2">
+		<img class="userHead" src="{{ avatar }}">
+		<img class="baping-userboxbg" src="/{:SIMGURL}baping/level/level1.png" />
+	</div>
+	<div class="baping-itemInfo">
+		<span class="userName">{{ nickname }}</span>
+		<span class="msgTime">
+			<span class="msgHours">{{ create_time }}</span>
+		</span>
+		<div class="baping-itemMain">
+			{{ if type=='1' }}
+				<p class="msgText">{{# content }}</p>
+			{{ else if type=='2' }}
+				<img class="msgImage" src="{{ content }}">
+			{{ else if type=='3' }}
+				<p class="msgText bpText">
+					<span class="bptheme-name">{{ content.bpname }}</span>
+					<span class="bptheme-seconds">{{ content.bptime }}秒</span>
+					{{ if content.bptxt!='' }}:{{ content.bptxt }}{{ /if }}</p>
+				{{ if content.bpimgs }}
+					<div class="bpimgsbox">
+					{{ each content.bpimgs as bpimg bpimkey }}
+			            <img class="msgImage" src="{{ bpimg }}">
+			        {{ /each }}
+			    	</div>
+				{{ /if }}
+				{{ if content.bpvideo }}
+					<img class="msgImage" src="{{ content.bpvideo.video }}.jpg">
+				{{ /if }}
+			{{ else if type=='4' }}
+				<p class="msgText dsText zam-app-flex-alignCenter"><i class="gifticon gifticon-{{ content.themeid }}"></i>打赏<span class="giftname">{{ content.giftname }}</span>给<span class="artistame">"{{ content.artistname }}"</span></p>
+			{{ else if type=='5' }}
+				<p class="msgText hbText"><i class="hbicon"></i>发出{{ content.hbmoney }}元红包：{{ if content.hbtype=='2' }}{{ content.kouling }}{{ else }}{{ content.hbtxt }}{{ /if }}</p>
+			{{ else if type=='6' }}
+				<p class="msgText songText">点了一首歌<span class="songname">{{ content.songname }}</span> - <span class="artistame">{{ content.artistname }}</span></p>
+			{{ /if }}
+		</div>
+	</div>
+</li>
+</script>
+<script type="text/html" id="soonhold-tpl">
+<div class="soonToBpBox {{ soonid }}">
+	<div class="soonToBp-bg"></div>
+	<div class="soonToBp-userbox">
+		<div class="soonToBp-headbox">
+			<img class="soonToBp-headbg" src="/{:SIMGURL}baping/soonbp/avatarbg.webp" />
+			<img class="soonToBp-head" src="{{ avatar }}" />
+		</div>
+		<div class="soonToBp-name">
+			<img class="soonToBp-namebg" src="/{:SIMGURL}baping/soonbp/namebg.png" />
+			<span class="limitbox">{{ nickname }}</span>
+		</div>
+	</div>
+</div>
+</script>
+<script type="text/html" id="holdscreen-tpl">
+<section class="holdscreen-layout hide holdtheme-{{ themeid }}">
+   <!--<div class="holdscreen-cover"></div>-->
+   <div class="bpCover"></div>
+   <div class="holdscreen-main"> 
+		<div class="holdscreen-maincover"></div> 
+		<div class="holdscreen-mainBox"> 
+			  <div class="newBpMain {{ if !content.bpimgs&&!content.bpvideo&&content.bptxt!='' }}onlyText{{ /if }}">
+					  {{ if content.bpimgs||content.bpvideo }}<div class="newBpUser">{{ /if }}
+					   <div class="newBpHornBox {{ if content.bptxt!='' }}full{{ /if }}" {{ if content.bpimgs&&content.bptxt!='' }}style="padding-top:90px; padding-bottom:90px"{{ /if }}>
+						<div class="_newBpHornBox {{ if (content.bpimgs||content.bpvideo)&&content.bptxt=='' }}onlyImg{{ /if }}" {{ if (content.bpvideo||content.bpimgs)&&content.bptxt!='' }}style="padding-top:115px;"{{ /if }}>
+						 <span class="onWallBpHorn{{ if (content.bpvideo||content.bpimgs)&&content.bptxt!='' }} small{{ else if (content.bpvideo||content.bpimgs)&&content.bptxt=='' }} mini{{ /if }} leftTopHorn onWallBpHorn_themeBp"></span>
+						 <span class="onWallBpHorn{{ if (content.bpvideo||content.bpimgs)&&content.bptxt!='' }} small{{ else if (content.bpvideo||content.bpimgs)&&content.bptxt=='' }} mini{{ /if }} rightTopHorn onWallBpHorn_themeBp"></span>
+						 <span class="onWallBpHorn{{ if (content.bpvideo||content.bpimgs)&&content.bptxt!='' }} small{{ else if (content.bpvideo||content.bpimgs)&&content.bptxt=='' }} mini{{ /if }} leftBottomHorn onWallBpHorn_themeBp"></span>
+						 <span class="onWallBpHorn{{ if (content.bpvideo||content.bpimgs)&&content.bptxt!='' }} small{{ else if (content.bpvideo||content.bpimgs)&&content.bptxt=='' }} mini{{ /if }} rightBottomHorn onWallBpHorn_themeBp"></span>
+						 <span class="onWallNewUserBox">
+							<span class="onWallUserCircle1 onWallWomanCircle1"></span>
+							<img class="onWallNewUser" src="{{ avatar }}" />
+							<tt class="bpHead_wing{{ if (content.bpvideo||content.bpimgs)}} mini{{ /if }} bpHead_womanWing"><span></span><i>{{ content.bpname }}</i></tt>
+							<tt class="bpHead_wing{{ if (content.bpvideo||content.bpimgs)}} mini{{ /if }} bpHead_womanWing right"><span></span><i>{{ content.bptime }}秒</i></tt>
+						 </span>
+						 <div class="onWallBpNameDiv{{ if (content.bpvideo||content.bpimgs)}} mini{{ /if }}">
+						  <span class="{{ if (content.bpvideo||content.bpimgs)}}mini {{ /if }}themeName_theme themeName_themeBp"></span>{{ nickname }}
+						 </div>
+						 <div class="newBpHornBoxText{{ if (content.bpvideo||content.bpimgs)}} mini{{ /if }}">
+							{{ if content.bptxt!='' }}<b class="bpColor" id="newBpMsg">{{ content.bptxt }}</b>{{ /if }}
+						 </div>
+						 <div class="onWallBpTimeBox{{ if (content.bpvideo||content.bpimgs)}} mini{{ /if }}" {{ if (content.bpvideo||content.bpimgs)&&content.bptxt!='' }}style="bottom:-75px"{{ /if }}>
+						  <div class="themeCover_theme{{ if (content.bpvideo||content.bpimgs)}} mini{{ /if }} themeCover_themeBp"></div>
+						  <tt><span class="themeLogo_theme{{ if (content.bpvideo||content.bpimgs)}} mini{{ /if }} themeLogo_themeBp"></span>{{ content.bpname }} <b class="bpTime">{{ content.bptime }}</b> 秒<tt></tt></tt>
+						 </div>
+						</div>
+					   </div>
+					  {{ if content.bpimgs||content.bpvideo }}</div>{{ /if }}
+				</div>
+		</div>
+   </div>
+</section>
+</script>
+<script type="text/html" id="ds-tpl">
+<div class="ds-layout">
+	<div class="ds-mainbox ds-mainboxani">
+		<div class="ds-bridge-box ds-bridge-box-ani">
+			<img src="/{:SIMGURL}baping/ds/bridge.png">
+			<div class="ds-bridge-arrows">
+				<img src="/{:SIMGURL}baping/ds/arrow.png">
+				<img src="/{:SIMGURL}baping/ds/arrow.png">
+				<img src="/{:SIMGURL}baping/ds/arrow.png">
+				<img src="/{:SIMGURL}baping/ds/arrow.png">
+			</div>
+			<span>打赏"{{ content.giftname }}"</span>
+		</div>
+		<p class="ds-user-liuyan">{{ content.dstxt }}</p>
+		<p class="ds-user-liuyan">{{ content.dstxt }}</p>
+		<div class="ds-userinfo">
+			<img class="ds-useravatar" src="{{ avatar }}">
+			<div class="ds-username">
+				<div class="ds-username-bg"></div>
+				<div class="ds-username-bg2"></div>
+				<div class="ds-username-box">{{ nickname }}</div>
+			</div>
+		</div>
+		<div class="ds-artistinfo">
+			<img class="ds-useravatar" src="{{ content.artistavatar }}">
+			<div class="ds-username">
+				<div class="ds-username-bg"></div>
+				<div class="ds-username-bg2"></div>
+				<div class="ds-username-box">{{ content.artistname }}</div>
+			</div>
+		</div>
+	</div>
+	<div class="ds-bgimg">
+		<img src="{{ giftpcwebp }}">
+	</div>
+</div>
+</script>
+<script type="text/html" id="song-tpl">
+<div class="song-layout zam-app-flex-ajCenter2 hide">
+	<div class="song-mainbox">
+		<div class="song-mainbox-left">
+			<div class="song-mainbox-yfimgs">
+				<img class="song-mainbox-yf1" src="/{:SIMGURL}baping/song/yf1.png">
+				<img class="song-mainbox-yf2" src="/{:SIMGURL}baping/song/yf2.png">
+				<img class="song-mainbox-yf3" src="/{:SIMGURL}baping/song/yf3.png">
+				<img class="song-mainbox-yf32" src="/{:SIMGURL}baping/song/yf3.png">
+			</div>
+			<img class="song-mainbox-yp" src="/{:SIMGURL}baping/song/yp.png">
+			<img class="song-mainbox-ypline" src="/{:SIMGURL}baping/song/ypline.png">
+			<img class="song-mainbox-ypbar" src="/{:SIMGURL}baping/song/ypbar.png">
+			<div class="song-mainbox-userbox">
+				<img class="song-mainbox-useravatar" src="{{ avatar }}">
+			</div>
+			<div class="song-mainbox-username">{{ nickname }}</div>
+			<div class="song-mainbox-userlogo"></div>
+		</div>
+		<div class="song-mainbox-right">
+			<p class="song-mainbox-songname">付费歌曲：{{ content.songname }} <br> <span>艺人：{{ content.artistname }}</span></p>
+			<p class="song-mainbox-liuyan">{{ content.songtxt }}</p>
+		</div>
+	</div>
+	<div class="song-mainbox-djsbox hidden"><span></span></div>
+</div>
+</script>
+<script type="text/html" id="hb-tpl">
+<section class="hongbao-layout">
+	<img src="/{:SIMGURL}baping/hb/1.png" class="fhb">
+	<img src="/{:SIMGURL}baping/hb/1.gif" class="hby">
+	<div class="hbpop-content">
+        <div class="hbpop-content">
+            <div>土豪<span>{{ nickname }}</span>发红包啦</div>
+        </div>
+    </div>
+</section>
+</script>
+<script type="text/html" id="tuhaolist-tpl">
+<div  class="tuhao-list">
+	<div  class="tuhao-light"></div>
+	<div  class="tuhao-oneitem tuhao-first">
+		<div  class="tuhao-avatar"><div  class="tuhao-userbg"></div></div>
+		<p >虚位以待</p>
+	</div>
+	<div  class="tuhao-oneitem tuhao-second">
+		<div  class="tuhao-avatar"><div  class="tuhao-userbg"></div></div>
+		<p >虚位以待</p>
+	</div>
+	<div  class="tuhao-oneitem tuhao-third">
+		<div  class="tuhao-avatar"><div  class="tuhao-userbg"></div></div>
+		<p >虚位以待</p>
+	</div>
+</div>
+</script>
+<script>
+var barConfig = {:json_encode($pcconfig)};
+var soonholdimgs = ["/{:SIMGURL}baping/soonbp/bg.webp","/{:SIMGURL}baping/soonbp/namebg.png","/{:SIMGURL}baping/soonbp/avatarbg.webp"];
+var bpZhuti = {:json_encode($bpzhuti)};
+var dsgift = {:json_encode($allgiftimgs)};
+var allsongs = {:json_encode($allsongs)};
+var songbgvideo = "/{:SIMGURL}baping/song/bg.webm";
+require(['screenbp'],function (screenbp) {
+	screenbp.init({});
+});
+function fullshowImg(obj){
+	require(['screenbp'],function (screenbp) {
+		screenbp.fullshowImg(obj);
+	});
+}
+function hadLoadRightImg(obj){
+	require(['rightboxslider'],function (rightboxslider) {
+		rightboxslider.load(obj);
+	});
+}
+function failLoadRightImg(obj){
+	require(['rightboxslider'],function (rightboxslider) {
+		rightboxslider.error(obj);
+	});
+}
+</script>
+			<footer class="footer">{if isset($hdinfo['copyright']['copyright']) && !empty($hdinfo['copyright']['copyright'])}{$hdinfo['copyright']['copyright']}{/if}</footer>
+		</div><!--main-box-->
+		{if !isset($pcconfig['islogin'])}
+			{if isset($hdinfo['loadtype']) && $hdinfo['loadtype']=='2'}
+				{include file='common/footer-help-box' /}
+			{else /}
+				{include file='common/footer_menu' /}
+			{/if}
+			{include file='common/footer_fulldm' /}
+			{include file='common/footer_qrbox' /}
+		{/if}
+	  </div><!--full-main-->
+ </div><!--pc-box-->
+ {if isset($pcconfig['gametype']) && $pcconfig['gametype']=='baping'}
+ {include file='baping/leftcontrol' /}
+ {/if}
+ <div class="pcbgBox">
+	<div class="main-bg">
+		{if isset($pcconfig['gametype']) && $pcconfig['gametype']=='baping'}
+		{else /}
+		{if $pcconfig['bgtype']=='2'}
+			<video class="videoBg" src="{:tomedia($pcconfig['bgvideo'])}" autoplay="autoplay" loop="loop" data-src="{:tomedia($pcconfig['bgvideo'])}"></video>
+		{elseif $pcconfig['bgtype']=='1'}
+			<style>
+				.pcbgBox .main-bg{background-image:url("{if !empty($pcconfig['bgimg'])}{:tomedia($pcconfig['bgimg'])}{else}__STATIC__/images/screen/common/bg.jpg{/if}");}
+			</style>
+		{/if}
+		{/if}
+	</div>
+	{if isset($pcconfig['gametype']) && $pcconfig['gametype']=='shakestart'}
+	<div class="videosbox">
+		{if $pcconfig['startconfig']['showdjs']=='1'}
+			{if isset($pcconfig['preload']) && $pcconfig['preload']=='2'}<video muted class="djsvideo hidden" src="{:tomedia($pcconfig['startconfig']['djsvideo'])}"></video>{/if}
+		{/if}
+		{if $pcconfig['startconfig']['bgtype']=='2'}
+			{if isset($pcconfig['preload']) && $pcconfig['preload']=='2'}<video muted class="startvideo hidden" src="{:tomedia($pcconfig['startconfig']['bgvideo'])}" loop="loop"></video>{/if}
+		{else /}
+			<img src="{:tomedia($pcconfig['startconfig']['bgimg'])}" class="startimg hidden" />
+		{/if}
+		{if $pcconfig['endconfig']['bgdiy']=='1'}
+			{if $pcconfig['endconfig']['bgtype']=='2'}
+				{if isset($pcconfig['preload']) && $pcconfig['preload']=='2'}<video muted class="endvideo hidden" src="{:tomedia($pcconfig['endconfig']['bgvideo'])}" loop="loop"></video>{/if}
+			{else /}
+				<img src="{:tomedia($pcconfig['endconfig']['bgimg'])}" class="endimg hidden" />
+			{/if}
+		{/if}
+	</div>
+	{/if}
+ </div>
+{if !empty($pcconfig['bgmusic'])}<audio id="bgmusic" src="{:tomedia($pcconfig['bgmusic'])}" autoload loop="loop"></audio>{/if}
+<div class="offlinebox" title="网络连接出现异常，请检查您的网络是否正常"></div>
+<script type="text/html" id="google-tpl">
+<div class="broswer-tip zam-app-flex-ajCenter2">
+		<i class="mxc-infofill"></i> 
+		<p class="red">为了保证您的使用效果，强烈推荐使用</p> 
+		<a class="downgoogle" href="https://www.google.cn/intl/zh-CN/chrome/" target="_blank">
+			<div class="zam-app-flex-ajCenter2">
+				<img src="__STATIC__/images/screen/common/google.png"> 
+				<span>谷歌浏览器</span>
+			</div>
+		</a> 
+		<div class="close-broswer-tip" onclick="javascript:$('.broswer-tip').remove();">
+			<i class="mxc-close"></i>
+		</div>
+	</div>
+</div>
+</script>
+<script>
+var isselfsocket = "{if isselfsocket()}1{else /}2{/if}",needinitfulldm = "{if isset($menus['fulldm']) && !empty($dmconfig)}1{else /}2{/if}";
+require(['screencore','template','layerBox','marqueen','screensocket','fulldm','keyboard','dragqr'],function (screencore,template,layerBox,marqueen,screensocket,fulldm,keyboardJS,dragqr) {
+	if(isselfsocket=='2'){
+		screensocket.init({
+			onmessage:function(data){
+				if(data.type=='connected'){
+					screensocket.isclose = false;
+					screencore.connectsocket({clientid:data.clientid});
+				}else if(data.type=='screendm'){
+					var messages = data.messages;
+					if(messages){
+						if($.isArray(messages)&&messages.length>0){
+							$.each(messages,function(i, val){
+								fulldm.addBullet(val);
+							});
+						}
+					}else{
+						fulldm.addBullet(data);
+					}
+				}else if(data.type=='screendeldm'){
+					if(!$.isArray(data.msgid)){
+						fulldm.delBullet(data.msgid);
+					}else{
+						$.each(data.msgid,function(index,val){
+							fulldm.delBullet(val);
+						});
+					}
+				}else if(data.type=='screenresetdm'){
+					fulldm.resetBullet();
+				}
+			}
+		});
+	}
+	var ischrome =  navigator.userAgent.indexOf('Chrome') > -1;
+	if(!ischrome){
+		$("body").append(template('google-tpl',{}));
+	}
+	if(needinitfulldm=='1'){
+		var dmconfig = {:json_encode($dmconfig)};
+		dmconfig.height = 400;
+		fulldm.init($(".fulldmBox"),dmconfig);
+	}
+	$(".headerTitle li").length>0&&marqueen.init('.headerTitle',0.02,10e3);
+	dragqr.init("hdQrbox1",true);
+	$(window).resize(function () {  
+		if($(".videoBg").length>0){
+			screencore.videofullScreen(".videoBg",screencore.getvideoData($(".videoBg")[0]));
+		}
+	});
+	$("body").on("mouseenter", "*[lay-tips]", function() {
+		var e = this;
+		layerBox.showTips($(e).attr("lay-tips"),e,$(e).attr('lay-direction'));
+	}).on("mouseleave", "*[lay-tips]", function() {
+		layerBox.close($(this).data("index"));
+	}).on("click", "*[lay-tips]", function() {
+		layerBox.close($(this).data("index"));
+	});
+	{// 单页加载模式}
+	{if !isset($hdinfo['loadtype']) || $hdinfo['loadtype']=='1'}
+		$('.footer-controlBox').on('mouseover',function(){
+			$('.footer-controlBox').removeClass('down').addClass('up');
+			$(".menuArrowbox-icon-up").removeClass("menuArrowbox-icon-up").addClass("menuArrowbox-icon-down");
+		})
+		$('.footer-controlBox').on('mouseleave',function(){
+			$(".menutooltip").remove();
+			$('.footer-controlBox').removeClass('up').addClass('down');
+			$(".menuArrowbox-icon-down").removeClass("menuArrowbox-icon-down").addClass("menuArrowbox-icon-up");
+		});
+		$('.footer-controlBox .menuArrowbox').on('click',function(){
+			if($(".menuArrowbox-icon-down").length>0){
+				$(".menuArrowbox-icon-down").removeClass("menuArrowbox-icon-down").addClass("menuArrowbox-icon-up");
+				$('.footer-controlBox').removeClass('down').addClass('up');
+			}else{
+				$(".menuArrowbox-icon-up").removeClass("menuArrowbox-icon-up").addClass("menuArrowbox-icon-down");
+				$('.footer-controlBox').removeClass('up').addClass('down');
+			}		
+		});
+		$(".control-module-list .icon-box").on('click',function(){
+			var $this = $(this);
+			if(XCV3Config.screenfollow=='1'){
+				screencore.ajaxSubmit('/screen/common/followurl',{module:$this.attr("data-module")}).then(function(data){
+					if(data.code!=0){
+						layerBox.showMsg(data.msg);
+					}
+				}, function(){
+					layerBox.showMsg('网络太差，请稍后重试');
+				});
+			}
+			window.location.href = $this.attr('data-href') + ($this.data('ishandadd')=='2' ? "?hdid={$hdinfo['hdid']}":"");
+		});
+		$(".control-module-list .icon-box").on('mouseenter',function(e) {
+			$(".menutooltip").remove();
+			var modulestyles = $(this).attr("data-styles");
+			modulestyles = JSON.parse(modulestyles);
+			if($.isArray(modulestyles) && modulestyles.length > 0){
+				var left = $(this).offset().left - 30,css = "left:"+left+"px;width:"+$(this).outerWidth(true)+"px",html = "<ul class='menutooltip' style='"+css+"'>";
+				$.each(modulestyles,function(i,v){
+						html += "<li data-styleid="+v.styleid+" data-module="+v.stylemodule+"  class="+(v.issel=='1'?'active':'')+" >"+v.stylename+"<span class='mxc-unie657'></span></li>";
+				});
+				html += "</ul>";
+				$('.footer-controlBox').append(html);
+			}
+		});
+		$('.footer-controlBox').on('click','.menutooltip li',function(){
+				var $this = $(this),isactive = $this.hasClass('active')?'1':'2';
+				screencore.ajaxSubmit('/screen/common/changestyle',{module:$this.attr("data-module"),styleid:$this.attr("data-styleid"),isactive:isactive,rotateid:"{$rotateid??'0'}"}).then(function(data){
+					if(data.code==0){
+						screensocket.isclose = false;
+						window.location.href = data.msg;
+					}else{
+						layerBox.showMsg(data.msg);
+					}
+				}, function(){
+					console.log('网络太差，请稍后重试.');
+				});
+		});
+		$(".control-module-list .switch-next").on('click',function(){
+			$(".menutooltip").remove();
+			if(modulepage >= moduleallpage){
+				modulepage = 1;
+			}else{
+				modulepage++;
+			}
+			$(".control-module-list .wrap").css({"transform":"translate3d(0px,"+(-modulepage*65+65)+"px, 0px)"});
+		});
+		$(".control-module-list .switch-prev").on('click',function(){
+			$(".menutooltip").remove();
+			if(modulepage==1){
+				modulepage = moduleallpage;
+			}else{
+				modulepage--;
+			}
+			$(".control-module-list .wrap").css({"transform":"translate3d(0px,"+(-modulepage*65+65)+"px, 0px)"});
+		});
+		$(".control-normal-list .openqr").on('click',function(e,params){
+			var stopicon = $(this).find('.isstop');
+			if ($('.hdQrbox').is(':hidden')) {
+				$(".hdQrbox").fadeIn();
+				stopicon.hide();
+				params!='1' && window.localStorage.setItem("openqr"+XCV3Config.hdid,'1');
+			}else{
+				$(".hdQrbox").fadeOut();
+				stopicon.show();
+				params!='1' && window.localStorage.setItem("openqr"+XCV3Config.hdid,'2');
+			}
+		});
+		var nofootermenumodules = ['dzqy','yaohao','ppqd','photocj','importcj'],hdhidefootermenu = "{$hdinfo['screenconfig']['hidemenu']??'2'}",openqrstatus = window.localStorage.getItem("openqr"+XCV3Config.hdid);
+		if($.inArray(XCV3Config.gametype,nofootermenumodules)==-1){
+			if(hdhidefootermenu=='1'){
+				screencore.hideFootMenu();
+			}
+			if(openqrstatus!='2'){
+				$(".control-normal-list .openqr").trigger('click');
+			}
+		}else{
+			$('.footer-controlBox').trigger('mouseleave');
+		}
+		$(".control-normal-list .openfull").on('click',function(){
+			if ($(this).attr('data-open')=='2') {
+				screencore.fullScreen();
+				$(this).attr('data-open','1');
+			}else{
+				screencore.exitFullScreen();
+				$(this).attr('data-open','2');
+			}
+		});
+		$(".control-normal-list .openmusic").on('click',function(){
+			if($("#bgmusic").length<=0) return;
+			var $this = $(this),stopicon = $this.find('.isstop'),videobgobj = $(".pcbgBox .videoBg");
+			if ($this.attr('data-open')=='1') {
+				stopicon.removeClass('display-none');
+				$("#bgmusic")[0].pause();
+				$this.attr('data-open','2');
+			}else{
+				$("#bgmusic")[0].play().then(() => {
+	           		stopicon.addClass('display-none');
+					$this.attr('data-open','1');
+		        }).catch(err => {
+		            console.log('您的浏览器暂不支持自动播放音频，请通过点击右下角的音频按钮播放');
+		        });
+		        if(videobgobj.length > 0){
+					var videosrc = videobgobj.attr('data-src'),videosrcs = videosrc.split('.'),videotype = (videosrcs[videosrcs.length-1] ?videosrcs[videosrcs.length-1] : '' );
+					if(videotype.indexOf('m3u8')!=-1){
+						videobgobj[0].volume = 1;
+						videobgobj[0].play();
+
+					}
+				}
+			}
+		});
+		if(XCV3Config.gametype!='baping' && XCV3Config.openbgmusic=='1' && $("#bgmusic").length > 0 ){ 
+			$(".control-normal-list .openmusic").trigger('click');
+		}
+		keyboardJS.bind('1', function(e) {
+			$(".control-normal-list .openmusic").trigger('click');
+		});
+		keyboardJS.bind('2', function(e) {
+			$(".control-normal-list .opendm").trigger('click');
+		});
+		keyboardJS.bind('3', function(e) {
+			$(".control-normal-list .openqr").trigger('click');
+		});
+		keyboardJS.bind('4', function(e) {
+			$(".control-normal-list .openfull").trigger('click');
+		});
+		keyboardJS.bind('5', function(e) {
+			$(".hdQrbox img").trigger('dblclick');
+		});
+		{// 初始化模块快捷键}
+		{foreach $menus as $menu}
+			{if $menu['modulefield']!='fulldm' && !empty($menu['modulekjj'])}
+				keyboardJS.bind('{$menu['modulekjj']}', function(e) {
+					$(".control-module-list .icon-box[data-module='{$menu['modulefield']}']").trigger('click');
+				});
+			{/if}
+		{/foreach}
+	{else /}
+		{// 非frame打开功能跳转到frame内}
+		if(!XCV3Config.isiframe){	
+			window.location.href = "{:goscreen('frame/index',['hdid'=>$hdinfo['hdid']])}";
+		}
+		{// frame加载模式 } 
+		if(XCV3Config.gametype!='baping' && XCV3Config.openbgmusic=='1' && $("#bgmusic").length > 0 ){ 
+			screencore.sendMsg2frame({'type':'bgmusicopen'});
+		}else{
+			screencore.sendMsg2frame({'type':'bgmusicclose'});
+		}
+		var nofootermenumodules = ['dzqy','yaohao','ppqd','photocj','importcj'],hdhidefootermenu = "{$hdinfo['screenconfig']['hidemenu']??'2'}",openqrstatus = window.localStorage.getItem("openqr"+XCV3Config.hdid);
+		{// 关闭二维码 } 
+		if($.inArray(XCV3Config.gametype,nofootermenumodules)==-1){
+			{// 默认折叠了菜单 }
+			if(hdhidefootermenu=='1') {
+				screencore.hideFootMenu();
+			}
+			{// 未关闭二维码默认开启 }
+			if(openqrstatus!='2'){
+				screencore.sendMsg2frame({'type':'qrboxopen'});
+			}
+		}else{
+			//部分功能自动关闭大屏 菜单和二维码
+			screencore.sendMsg2frame({'type':'qrboxclose'});
+			screencore.sendMsg2frame({'type':'controllboxhide'});
+		}
+		window.addEventListener('message', function(e){
+	        if (e.origin.indexOf(window.location.host)!=-1 && typeof e.data === 'string') {
+	            var fdata = JSON.parse(e.data);
+	            if(fdata.type=='fulldmopen'){
+	            	fulldm.start();
+	            }else if(fdata.type=='fulldmclose'){
+	            	fulldm.stop();
+	            }else if(fdata.type=='resetqrbox'){
+	            	$(".hdQrbox img").trigger('dblclick');
+	            }else if(fdata.type=='fkeyboardjs'){
+	            	var keycode = fdata.keycode;
+	            	keyboardJS.pressKey(keycode);
+					keyboardJS.releaseKey(keycode);
+					if(keycode=='esc' || keycode=='enter'){
+						if(keycode=='esc'){
+							$('.layui-layer-dialog .layui-layer-btn1').trigger('click');
+						}else{
+							$('.layui-layer-dialog .layui-layer-btn0').trigger('click');
+						}
+					}
+	            }
+	        }
+		});
+		keyboardJS.bind('1', function(e) {
+			screencore.sendMsg2frame({'type':'keyboardjs','keycode':'1'});
+		});
+		keyboardJS.bind('2', function(e) {
+			screencore.sendMsg2frame({'type':'keyboardjs','keycode':'2'});
+		});
+		keyboardJS.bind('3', function(e) {
+			screencore.sendMsg2frame({'type':'keyboardjs','keycode':'3'});
+		});
+		keyboardJS.bind('4', function(e) {
+			screencore.sendMsg2frame({'type':'keyboardjs','keycode':'4'});
+		});
+		keyboardJS.bind('5', function(e) {
+			screencore.sendMsg2frame({'type':'keyboardjs','keycode':'5'});
+		});
+		{// 初始化模块快捷键}
+		{foreach $menus as $menu}
+			{if $menu['modulefield']!='fulldm' && !empty($menu['modulekjj'])}
+				keyboardJS.bind('{$menu['modulekjj']}', function(e) {
+					screencore.sendMsg2frame({'type':'keyboardjs','keycode':'{$menu['modulefield']}'});
+				});
+			{/if}
+		{/foreach}
+	{/if}
+});
+{// 背景视频加载完成后全屏并自动播放}
+var videobgobj = $(".pcbgBox .videoBg");
+if(videobgobj.length > 0){
+	var videosrc = videobgobj.attr('data-src'),videosrcs = videosrc.split('.'),videotype = (videosrcs[videosrcs.length-1] ? videosrcs[videosrcs.length-1] : '');
+	if(videotype.indexOf('m3u8')!=-1){
+		require(['hls'],function (Hls) {
+			var hls = new Hls();
+			hls.loadSource(videosrc);
+			hls.attachMedia(videobgobj[0]);
+			videobgobj[0].play().then(function(){}).catch(function(err){
+				videobgobj[0].volume = 0;
+	            videobgobj[0].play();
+	        });
+		});
+	}else{
+		videobgobj[0].oncanplaythrough = function(){
+			require(['screencore'],function (screencore) {
+				screencore.videofullScreen(".videoBg",screencore.getvideoData(videobgobj[0]));
+				videobgobj[0].play().then(function(){}).catch(function(err){
+					videobgobj[0].volume = 0;
+		            videobgobj[0].play();
+		        });
+		    });
+		};
+	}
+}
+{// 网络断开与连接上}
+window.addEventListener("offline", function (e) {
+  $(".offlinebox").fadeIn();
+});
+window.addEventListener("online", function (e) {
+  $(".offlinebox").fadeOut();
+});
+</script>
+{:globalcss()}
+{if !empty($hdinfo['diycss'])}
+<style type="text/css">{:$hdinfo['diycss']}</style>
+{/if}
+{if isset($pcconfig['style']) && isset($pcconfig['style']['diycss']) && !empty($pcconfig['style']['diycss'])}
+<style type="text/css">{$pcconfig['style']['diycss']}</style>
+{/if}
+{if isset($pcconfig['gametype']) && $pcconfig['gametype']=='baping'}
+<div class="screenlight"></div>
+{/if}
+{if isset($hdinfo['screenconfig']['hidemenu']) &&  $hdinfo['screenconfig']['hidemenu']== '3'}
+<style type="text/css">.footer-controlBox{display: none}</style>
+{/if}
+{include file="common/adv"}
+<style>
+.fulldmBox-item{
+	{if $dmconfig['dmrolltype'] < 3}
+		height:400px;
+		padding:10px 0;
+	{else /}
+		width:{$dmconfig['vwidth']??'270'}px;
+		padding:0 5px;
+	{/if}
+	{if $dmconfig['dmrolltype'] != '3'}
+		top:0;
+	{else /}
+		bottom:0;
+	{/if}
+	border:0;
+	border-radius:5px;
+	box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	{if $dmconfig['clickdel']=='2' && $dmconfig['hoverstop']=='2'}
+		pointer-events: none!important;
+	{/if}
+}
+.fulldmBox-one{
+	display: -webkit-box!important;
+	display: -webkit-flex!important;
+	display: -ms-flexbox!important;
+	display: flex!important;
+	border-radius:8px;
+}
+.fulldmBox-one.fulldmBox-one2{
+	min-height: 80px;
+	
+}
+.fulldmBox-one .fulldmBox-avatar {
+	height: 380px;
+	padding:0 45px;
+	display: -webkit-box!important;
+	display: -webkit-flex!important;
+	display: -ms-flexbox!important;
+	display: flex!important;
+	-webkit-box-pack: center;
+	-webkit-justify-content: center;
+	-ms-flex-pack: center;
+	justify-content: center;
+	-webkit-box-align: center;
+	-webkit-align-items: center;
+	-ms-flex-align: center;
+	align-items: center;
+}
+.fulldmBox-one .fulldmBox-avatar.fulldmBox-avatar2{
+	position: absolute;
+	top: 0;
+	width: 320px;
+	height: 340px;
+	padding: 0;
+}
+.fulldmBox-one .fulldmBox-avatar img {
+	width: 300px;
+	height: 300px;
+	display:inline-block;
+	border-radius: 50%;
+}
+.fulldmBox-one .fulldmBox-info{
+	position: relative;
+	display: -webkit-box!important;
+	display: -webkit-flex!important;
+	display: -ms-flexbox!important;
+	display: flex!important;
+	-webkit-box-pack: center;
+	-webkit-justify-content: center;
+	-ms-flex-pack: center;
+	justify-content: center;
+	-webkit-box-align: center;
+	-webkit-align-items: center;
+	-ms-flex-align: center;
+	align-items: center;
+	border-radius: 20px;
+	{if $dmconfig['dmrolltype'] < 3}
+		padding-right:20px;
+		{if $dmconfig['dmrolltype']=='1' && (($dmconfig['needavatar']!='1' && $dmconfig['neednickname']!='1') || ($dmconfig['needavatar']!='1' && $dmconfig['neednickname']=='1'))}
+			padding-left:20px;
+		{/if}
+	{else /}
+		width:100%;
+	{/if}
+}
+
+.fulldmBox-one .fulldmBox-info span.qipao{display: none}
+.fulldmBox-one .fulldmBox-info div{
+	{if $dmconfig['dmrolltype'] < 3}
+		height:80px;
+		line-height:80px;
+		white-space: nowrap;
+	{else /}
+		width:100%;
+	{/if}
+	color:{$dmconfig['fontcolor']};
+	font-size:120px;
+}
+.fulldmBox-one .fulldmBox-info.fulldmBox-info2 .fulldmBox-nickname{
+}
+.fulldmBox-one .fulldmBox-info .fulldmBox-nickname {
+	{if $dmconfig['dmrolltype']=='1'}
+		margin-right:10px;
+	{elseif $dmconfig['dmrolltype']=='2' /}
+		margin-left:10px;
+	{/if}
+}
+{if $dmconfig['dmrolltype']=='2'}
+.fulldmBox-one .fulldmBox-info .fulldmBox-msg {
+	margin-left:20px;
+}
+{/if}
+.fulldmBox-one .fulldmBox-info.fulldmBox-info2  .fulldmBox-msg{
+	width:100%;
+	{if $dmconfig['dmrolltype'] < 3}
+		padding: 10px 0;
+	{else /}
+		padding:10px;
+		word-break: break-all;
+	{/if}
+	text-align: left;
+	box-sizing: border-box;
+}
+.fulldmBox-one .fulldmBox-info .fulldmBox-msg .faceImg{
+	width:120px;
+	height:120px;
+	vertical-align:middle
+}
+/*风格一 普通弹幕*/
+.fulldmBox-one.style1 .fulldmBox-avatar,.fulldmBox-one.style1 .fulldmBox-info{
+	{if $dmconfig['bgcolortype']=='1'}
+		background-color:{if $dmconfig['needbg']=='1'}{$dmconfig['bgcolor']}{else}transparent{/if};
+	{/if}
+}
+.fulldmBox-one.style1 .fulldmBox-avatar{
+	{if $dmconfig['dmrolltype'] > 2}
+		z-index:1;
+		background-color:transparent!important;
+	{/if}
+}
+.fulldmBox-one.style1 .fulldmBox-avatar{
+	{if $dmconfig['dmrolltype']=='1'}
+		border-radius: 20px;
+		border-top-right-radius: 0;
+		border-bottom-right-radius: 0;
+	{elseif $dmconfig['dmrolltype']=='2'}
+		border-radius: 20px;
+		border-top-left-radius: 0;
+		border-bottom-left-radius: 0;
+	{else /}
+		border-radius:0
+	{/if}
+}
+.fulldmBox-one.style1 .fulldmBox-info{
+	{if $dmconfig['dmrolltype']=='1'}
+		{if $dmconfig['needavatar']=='1'}
+		border-top-left-radius: 0;
+		border-bottom-left-radius: 0;
+		{/if}
+	{elseif $dmconfig['dmrolltype']=='2'}
+		{if $dmconfig['needavatar']=='1'}
+			border-top-right-radius: 0;
+			border-bottom-right-radius: 0;
+		{/if}
+	{/if}
+}
+.fulldmBox-one.style1 .fulldmBox-info.fulldmBox-info2{
+	{if $dmconfig['needavatar']=='1'}padding-left: 70px;box-sizing: border-box;{/if}
+}
+/*气泡弹幕*/
+.fulldmBox-one.style2 .fulldmBox-info.fulldmBox-info2{
+	{if $dmconfig['needavatar']=='1'}margin-left: 380px;{/if}
+}
+.fulldmBox-one.style2 .fulldmBox-avatar{background:none;}
+.fulldmBox-one.style2 .fulldmBox-avatar img{
+	width: 300px;
+	height:300px;
+	border:4px solid {if $dmconfig['needbg']=='1'}{$dmconfig['bgcolor']}{else}transparent{/if};
+}
+.fulldmBox-one.style2 .fulldmBox-info span.qipao{
+	display: inline-block;
+	border-top: 50px solid transparent;
+    border-bottom: 50px solid transparent;
+	position: absolute;
+	top: 40px;
+	{if $dmconfig['dmrolltype']!='2'}
+		border-right: 40px solid {if $dmconfig['needbg']=='1'}{$dmconfig['bgcolor']}{else}transparent{/if};
+		left: -40px;
+	{else /}
+		right:-40px;
+		border-left: 40px solid {if $dmconfig['needbg']=='1'}{$dmconfig['bgcolor']}{else}transparent{/if};
+	{/if}
+}
+.fulldmBox-one.style2 .fulldmBox-info{
+	{if $dmconfig['dmrolltype']=='1'}
+		padding-left:20px;
+	{elseif $dmconfig['dmrolltype']=='2' /}
+		padding-right:20px;
+	{/if}
+	background-color: {if $dmconfig['needbg']=='1'}{$dmconfig['bgcolor']}{else}transparent{/if};}
+.fulldmBox-imgbox{
+	width: 100%;
+	overflow: hidden;
+	border-radius: 10px;
+	{if $dmconfig['bgcolortype']=='1'}
+		background-color:{if $dmconfig['needbg']=='1'}{$dmconfig['bgcolor']}{else}transparent{/if};
+	{/if}
+}
+.fulldmBox-img{
+	width: 100%;
+	margin-top: 38px;
+}
+.fulldmBox-img img{
+	max-width: 80%;
+	border-radius: 5px;
+}
+.fulldmBox-user{
+	width:100%;
+	padding: 25px;
+	box-sizing: border-box;
+}
+.fulldmBox-userimg{
+	width: 330px;
+	height: 320px;
+}
+.fulldmBox-userimg img{
+	width: 300px;
+	height: 300px;
+	display:inline-block;
+	border-radius: 50%;
+}
+.fulldmBox-username{
+	max-width: calc(100% - 330px);
+	color:{$dmconfig['fontcolor']};
+	font-size:100px;
+}
+</style>
+{include file='common/footer_base' /}

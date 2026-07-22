@@ -1,0 +1,1028 @@
+{include file="common/header" /}
+<style>
+::-webkit-scrollbar {
+    width: 10px;
+}
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-thumb {
+    background-color: rgba(0,0,0,0.2);
+    height: 50px;
+    outline-offset: -2px;
+    -webkit-border-radius: 4px;
+}
+::-webkit-scrollbar-track-piece {
+    -webkit-border-radius: 9px;
+}
+::-webkit-scrollbar-track-piece {
+    background-color: transparent;
+    -webkit-border-radius: 0;
+}
+.lottery-mainbox{
+	width: 100%;
+    height: 100%;
+    margin: 0 auto;
+    padding: 0;
+    overflow: hidden;
+}
+.hidden{
+    display: none;
+}
+.lottory-container {
+	width: 100%;
+	height:100%;
+}
+.lottory-left-box {
+	width:476px;
+	height: 620px;
+}
+.lottory-right-box {
+	width: 694px;
+	height: 620px;
+	
+}
+.lottory-title {
+	margin-top: 110px;
+	color: #f7e7b0;
+	font-size: 20px;
+	width: 100%;
+	text-align:center;
+	height:30px;
+	line-height:30px;
+}
+.lottory-title span {
+	color: #f7e7b0
+}
+.lottory_award_box{
+	width:260px;
+	height:260px;
+	margin: 5px auto;
+}
+.lottory_award_box img{
+	width:210px;
+	height:210px;
+	border-radius:50%;
+}
+.lottory_award_box div{
+	font-size: 20px;
+	color: #f7e7b0;
+	text-align:center;
+	width:100%;
+	height:30px;
+	line-height:30px;
+}
+.prize_number {
+	width:100%;
+	margin: 20px auto;
+	overflow: hidden
+}
+.lottory-prev-btn {
+	width: 35px;
+	height: 38px;
+	cursor: pointer
+}
+.lottory-next-btn {
+	width: 35px;
+	height: 38px;
+	cursor: pointer
+}
+.lottory-awardname {
+	text-align: center;
+	width: 160px;
+	padding: 0 20px;
+	font-size:18px;
+	color: #f3d65a;
+	margin-bottom: 5px;
+}
+.lottory-selectbox {
+	color: #fff;
+	text-align: center;
+	width: 300px;
+	margin: 20px auto;
+}
+.lottory-selectbox .numbernum {
+	width: 80px;
+    height: 36px;
+    background-color: rgb(255, 255, 255);
+    line-height: 36px;
+    color: rgb(117, 117, 117);
+    text-align: center;
+    border: none;
+    border-radius: 3px;
+    margin: 0 10px;
+    font-size: 20px;
+    outline:none
+}
+.lottory-selectbox img{cursor: pointer;}
+.lottory-start-btn {
+    width: 200px;
+    height: 53px;
+    cursor: pointer;
+    margin: 0 auto;
+}
+.lottory-start-btn.stopclick{pointer-events: none}
+.lottory-stop-btn {
+    width: 200px;
+    height: 53px;
+    cursor: pointer;
+    position: fixed; 
+    right: 10px; 
+    bottom: 90px;
+    z-index: 1
+}
+.lottory-start-btn img{
+	width:120px;
+	height:38px;
+}
+.lottory-right-box .lottory-reward-box{
+	width:588px;
+	margin:0px auto;
+	padding-right: 6px;
+	margin-top: 10px;
+	overflow:hidden;
+	overflow-y:auto;
+	height:calc(100% - 152px);
+}
+.lottory-right-box .lottory-reward-box .lottory-reward-people{
+	display:flex;
+	width:100px;
+	margin:8px;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+	float:left;
+	position: relative;
+	cursor: pointer;
+	
+}
+.lottory-right-box .lottory-reward-box .lottory-reward-people .lottory-r-div{
+	position: relative;
+	width: 86px;
+    height: 86px;
+}
+.lottory-right-box .lottory-reward-box .lottory-reward-people .lottory-r-div:before {
+    content: " ";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-image: url("{:tomedia($pcconfig['styleconfig']['userbg'])}");
+    animation: foreverrotate 2s linear infinite;
+}
+.lottory-right-box .lottory-reward-box .lottory-reward-people .lottory-reward-people-img{
+	width:calc(100% - 4px);
+	height:calc(100% - 4px);
+	border-radius:50%;
+}
+.lottory-right-box .lottory-reward-box .lottory-reward-people .lottory-r-name{
+	color:#fff;
+	width:100px;
+	height: 48px;
+	font-size:14px;
+}
+.lottory-right-box .lottory-reward-box .lottory-reward-people .lottory-r-name div{
+	text-align:center;
+	height: 24px;
+	line-height: 24px;
+	white-space: nowrap;
+    word-break: break-all;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+.lottory-right-box .lottory-reward-box .lottory-reward-people .lottory-delbtn{
+	position: absolute;
+    right: -14px;
+    top:  -14px;pointer-events: none;
+	display:block;
+	width: 32px;
+    height: 32px;
+    background-image: url("{:tomedia($pcconfig['styleconfig']['delbtn'])}");
+	background-repeat: no-repeat;
+	background-size:cover;
+    cursor: pointer;
+    transform: scale(0.5);
+    pointer-events: none;
+    opacity: 0;
+}
+.lottory-close-btn{
+	position: absolute;
+	top:90px;
+	right: 40px;
+	display:block;
+	width: 32px;
+    height: 32px;
+    background-image: url("{:tomedia($pcconfig['styleconfig']['delbtn'])}");
+	background-repeat: no-repeat;
+	background-size:cover;
+    cursor: pointer;
+}
+.lottory-right-box .lottory-reward-box .lottory-reward-people:hover .lottory-delbtn{
+	opacity: 1;
+	pointer-events: auto;
+}
+/*轮次抽奖相关*/
+.lottery-roundcjbox{
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	padding: 0;
+	background-color: rgba(0, 0, 0, 0.62);
+}
+.lottery-wrapper{
+	width: 100%;
+	height: 100%;
+}
+.roundcj-box{
+	height: 100%;
+	padding: 60px 40px 0 40px;
+	box-sizing: border-box;
+}
+.roundcj-box .roundcj-body{
+	width: 100%;
+	height: calc(100% - 140px);
+	overflow: hidden;
+	overflow-y: auto;
+}
+.roundcj-box .roundcj-body .roundcj-prizelist{
+	width: 100%;
+	min-height: 100%;
+	color: #fff;
+	display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-content: center;
+}
+.roundcj-box .roundcj-body .roundcj-prizelist .round-noprize{
+	text-align: center;
+	font-size:32px;
+	font-weight: bold;
+	color:#FF9800;
+}
+.roundcj-box .roundcj-body .roundcj-prizelist .roundcj-item{
+	font-size: 18px;
+	font-weight: bold;
+}
+.roundcj-box .roundcj-body .roundcj-prizelist .roundcj-item .prizeimgbox{
+	position: relative;
+	width: 300px;
+	height: 300px;
+}
+.roundcj-box .roundcj-body .roundcj-prizelist .roundcj-item .prizeimgbox::after {
+    content: "";
+    position: absolute; 
+    left:0;
+    top:0;
+    width: 100%; 
+    height: 100%; 
+    background: url({if !isset($pcconfig['styleconfig']['roundprizebg']) || empty($pcconfig['styleconfig']['roundprizebg'])}/static/images/screen/importcj/guangquan.png{else /}{:tomedia($pcconfig['styleconfig']['roundprizebg'])}{/if}) no-repeat; 
+    background-size: cover;
+}
+.roundcj-box .roundcj-body .roundcj-prizelist .roundcj-item .prizeimgbox .prizeimg{
+	{if isset($pcconfig['styleconfig']['roundprizebg']) && empty($pcconfig['styleconfig']['roundprizebg'])}width: calc(100% - 40px);height: calc(100% - 40px);{else /}width: 50%;height: 50%;{/if}
+}
+.roundcj-box .roundcj-body .roundcj-prizelist .roundcj-item .prizename{
+	max-width: 100%;
+	padding: 0 5px;
+	box-sizing: border-box;
+	color:#FF9800;
+}
+.roundcj-box .roundcj-body .roundcj-prizelist .roundcj-item .prizenum{
+	color: #fff;
+}
+.roundcj-box .roundcj-footer{
+	max-width: 100%;
+	height: 80px;
+	padding: 0 40px;
+	box-sizing: border-box;
+}
+.roundcj-box .roundcj-footer .lottery-setroundbox{
+	width: 200px;
+	height: 32px;
+	border:1px solid #c4a071;
+	border-radius:3px;
+	color: #fefdfa;
+	background: #292420;
+	font-size: 17px;
+	position: relative;
+}
+.roundcj-box .roundcj-footer .lottery-setroundname{
+	color: #fff;
+	margin-right: 10px;
+}
+.roundcj-box .roundcj-footer .lottery-setroundbox .lottery-setarrow{
+	width: 16px;
+	height:10px;
+	background-image: url(/static/images/screen/bigcj/arrow.png);
+	background-size: 100% 100%;
+	position: absolute;
+	top: calc(50% - 5px);
+	right: 7px;
+	cursor: pointer;
+	transform: rotate(180deg);
+	transition: all .5s;
+	pointer-events:none;
+}
+.roundcj-box .roundcj-footer .lottery-setroundbox .lottery-roundname {
+	width: 100%;
+	padding: 0 20px;
+	box-sizing: border-box;
+	height: 30px;
+	line-height: 30px;
+	position: absolute;
+	left: 0;
+	text-align: center;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	cursor:pointer;
+}
+.roundcj-box .roundcj-footer .lottery-setroundbox .lottery-roundlist{
+	width: 100%;
+	height: 0;
+	overflow: hidden;
+	overflow-y: auto;
+	position: absolute;
+	bottom: 42px;
+	left: 0;
+}
+.roundcj-box .roundcj-footer .lottery-setroundbox .lottery-roundlist li {
+	height: 40px;
+	line-height: 40px;
+	border-radius: 3px;
+	background: rgba(0,0,0,.5);
+	cursor: pointer;
+	text-align: center;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	margin-top: 2px;
+}
+.roundcj-box .roundcj-footer .lottory-start-btn{
+	margin: 0 10px;
+    width: 192px;
+	height: 50px;	
+}
+.roundcj-box .roundcj-footer .btn-allrecord{
+	color: #fff;
+	cursor: pointer;
+}
+/**pop 弹窗***/
+.pop_3d{
+	position: fixed;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height:100%;
+	background: rgba(0,0,0,.85);
+	overflow: hidden;
+	
+}
+.pop_box{
+	position: relative;
+	width: 512px;
+	height:  512px;
+}
+.pop_3d .light{
+	width: 512px;
+	height:  512px;
+	position:absolute;
+	top:0;
+	left:0;
+	z-index:-1
+}
+.pop_userInfo{
+	width: 100%;
+	height:100%;
+	position: relative;
+}
+.pop_userInfo .lucker_avatar{
+	height: 256px;
+	width: 256px;
+	border-radius: 50%;
+	background: #fff;
+	border: 5px solid #fff;
+	box-sizing: border-box;
+}
+.pop_3d .fireworks {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	margin-left: -329.5px;
+	margin-top: -174.5px;
+	width: 659px;
+	height: 349px;
+	transform: scale(0);
+}
+.aniResult .pop_box{
+  -webkit-animation-name:zoomInDown;animation-name:zoomInDown;
+  -webkit-animation-duration:1s;animation-duration:1s;
+  -webkit-animation-fill-mode:both;animation-fill-mode:both
+}
+@keyframes zoomInDown{
+  0%{
+    opacity:0;
+    -webkit-transform:scale3d(.1,.1,.1) translate3d(0,-1000px,0);
+    -ms-transform:scale3d(.1,.1,.1) translate3d(0,-1000px,0);
+    transform:scale3d(.1,.1,.1) translate3d(0,-1000px,0);
+    -webkit-animation-timing-function:cubic-bezier(0.55,.055,.675,.19);
+    animation-timing-function:cubic-bezier(0.55,.055,.675,.19)
+  }
+  60%{
+    opacity:1;
+    -webkit-transform:scale3d(.475,.475,.475) translate3d(0,60px,0);
+    -ms-transform:scale3d(.475,.475,.475) translate3d(0,60px,0);
+    transform:scale3d(.475,.475,.475) translate3d(0,60px,0);
+    -webkit-animation-timing-function:cubic-bezier(0.175,.885,.32,1);
+    animation-timing-function:cubic-bezier(0.175,.885,.32,1)}
+}
+/*光束*/
+.aniResult .light{
+  animation: toRot  8s  900ms linear infinite forwards;
+}
+@keyframes toRot{
+  0%{
+    opacity: 1;
+    transform: rotate(0deg);
+  }
+  100%{
+    opacity: 1;
+    transform: rotate(360deg);
+  }
+}
+/*礼花*/
+.aniResult .fireworks{
+  animation: toBig 600ms 600ms ease-in-out 1 forwards;
+}
+@keyframes toBig{
+  0%{
+    transform: scale(0);
+  }
+  100%{
+    transform: scale(1);
+  }
+}
+/**皇冠以及提示**/
+.pop_box .pop_userInfo  em {
+    position: absolute;
+    left: 150px;
+    top: 55px;
+    display: block;
+    width: 124px;
+    height: 96px;
+}
+.pop_box .pop_userInfo  span {
+    position: absolute;
+	left: 180px;
+    bottom: 70px;
+    display: block;
+    width: 152px;
+    height: 96px;
+}
+.pop_box .pop_userInfo .lucker_nickname{
+	position: absolute;
+	bottom:5px;
+	width:100%;
+	font-size: 20px;
+	color: #fff;
+	text-shadow: 0 0 10px rgba(0,0,0,.4);
+}
+.lucker_nickname div{
+	text-align: center;
+    height: 30px;
+    line-height: 30px;
+    white-space: nowrap;
+    word-break: break-all;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+.close-detail-btn{
+	width: 50px;
+    height: 50px;
+    right: 30px;
+    top: 30px;
+    cursor: pointer;
+    transform: scale(0.6);
+    position: absolute;
+}
+.win-bg {
+	width: 100%;
+	height: 100%;
+	z-index: 100;
+	position: fixed;
+	top: 0;
+	left: 0;
+	opacity: 0;
+}
+.winMove .win-bg {
+	-webkit-animation: win-bg 1s ease-in-out forwards;
+	animation: win-bg 1s ease-in-out forwards;
+	-webkit-transition-property: all;
+	transition-property: all;
+	opacity: 0;
+	-webkit-transform: scale(0,0);
+	-moz-transform: scale(0,0);
+	-ms-transform: scale(0,0);
+	transform: scale(0,0);
+}
+@keyframes win-bg {
+	0% {
+		transform: rotate(0);
+		opacity: 0;
+	}
+	50% {
+		transform: rotate(90deg);
+		opacity: 1;
+	}
+	90% {
+		transform: rotate(170deg);
+		opacity: 1;
+	}
+	100% {
+		transform: rotate(180deg);
+		opacity: 0;
+	}
+}
+.win-box {
+	width: 100%;
+	height: 100%;
+	z-index: 200;
+	position: fixed;
+	top: 0;
+	left: 0;
+	pointer-events: none;
+}
+.winMove {
+	animation: win-box .1s ease-in-out forwards 1.5s;
+	-webkit-animation: win-box .1s ease-in-out forwards 1.5s;
+	transition-property: all;
+	-webkit-transition-property: all;
+	opacity: 1;
+}
+@keyframes win-box {
+	0% {}
+	100% {opacity: 0;}
+}
+.win {
+	width: 100%;
+	height: 100%;
+	z-index: 200;
+	position: fixed;
+	top: 0;
+	left: 0;
+	opacity: 0;
+}
+.winMove .win {
+	-webkit-animation: win 1.8s ease-in-out forwards;
+	animation: win 1.8s ease-in-out forwards;
+	-webkit-transition-property: all;
+	transition-property: all;
+	opacity: 0;
+	-webkit-transform: scale(0,0);
+	-moz-transform: scale(0,0);
+	-ms-transform: scale(0,0);
+	transform: scale(0,0);
+}
+@keyframes win {
+	0% {
+		-webkit-transform: scale(0,0);
+		-moz-transform: scale(0,0);
+		-ms-transform: scale(0,0);
+		transform: scale(0,0);
+		opacity: 0.4;
+	}
+	10% {
+		-webkit-transform: scale(0,0);
+		-moz-transform: scale(0,0);
+		-ms-transform: scale(0,0);
+		transform: scale(0,0);
+		opacity: 1;
+	}
+	100% {
+		-webkit-transform: scale(2,2);
+		-moz-transform: scale(2,2);
+		-ms-transform: scale(2,2);
+		transform: scale(2,2);
+		opacity: 0;
+	}
+}
+.lottory-left-box {
+	background-image: url("{:tomedia($pcconfig['styleconfig']['leftbg'])}");
+	background-repeat: no-repeat;
+	background-size:cover;
+}
+.lottory-right-box {
+	background-image: url("{:tomedia($pcconfig['styleconfig']['rightbg'])}");
+	background-repeat: no-repeat;
+	background-size:cover;
+}
+.lottory_award_box{
+	background-image: url("{:tomedia($pcconfig['styleconfig']['prizebg'])}");
+	background-repeat: no-repeat;
+	background-size:cover;
+}
+.lottory-prev-btn {
+	background-image: url("{:tomedia($pcconfig['styleconfig']['prevbtn'])}");
+	background-repeat: no-repeat;
+	background-size:cover;
+	
+}
+.lottory-next-btn {
+	background-image: url("{:tomedia($pcconfig['styleconfig']['nextbtn'])}");
+	background-repeat: no-repeat;
+	background-size:cover;
+}
+.lottory-start-btn {
+	background-image: url("{:tomedia($pcconfig['styleconfig']['startbtn'])}");
+	background-repeat: no-repeat;
+	background-size:cover;
+}
+.lottory-stop-btn{
+	background-image: url("{:tomedia($pcconfig['styleconfig']['stopbtn'])}");
+	background-repeat: no-repeat;
+	background-size:cover;
+}
+.pop_3d .light{
+	background-image: url("{:tomedia($pcconfig['styleconfig']['onelightbg'])}");
+	background-repeat:no-repeat;
+	background-size:cover;
+}
+.pop_3d .fireworks {
+	background: url("{:tomedia($pcconfig['styleconfig']['onefirebg'])}") no-repeat;
+}
+.pop_box .pop_userInfo  em {
+	
+	background: url("{:tomedia($pcconfig['styleconfig']['onetopbg'])}") no-repeat;
+}
+.pop_box .pop_userInfo  span {
+	background: url("{:tomedia($pcconfig['styleconfig']['onebottombg'])}") no-repeat;
+}
+.lottory_selected{
+	height:100%;
+	width:100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-wrap:wrap
+}
+.lottory_selected ul{
+	width:960px;
+	height:620px;
+	margin:0 auto;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-wrap:wrap;
+	overflow:hidden;
+	overflow-y:auto;
+}
+.lottory_selected .total_userone{
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	float:left;
+	width:160px;
+	flex-direction:column;
+	margin-top:20px;
+}
+.lottory_selected .total_userone .userimgbox{
+	position: relative;
+	width: 120px;
+    height: 120px;
+}
+.lottory_selected .total_userone .userimgbox:before {
+    content: " ";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-image: url("{:tomedia($pcconfig['styleconfig']['userbg'])}");
+    animation: foreverrotate 2s linear infinite;
+}
+@keyframes foreverrotate {
+	0% {transform: rotate(0)}
+	to {transform: rotate(-1turn)}
+}
+.lottory_selected .total_userone img{
+	width:calc(100% - 4px);
+	height:calc(100% - 4px);
+	border-radius:50%;
+}
+.lottory_selected .total_userone .userone_name{
+	width:100%;
+	padding:0 5px;
+	height: 48px;
+	color:#fff;
+	font-size:16px;
+	box-sizing: border-box;
+}
+.lottory_selected .total_userone .userone_name div{
+	text-align: center;
+    height: 24px;
+    line-height: 24px;
+    white-space: nowrap;
+    word-break: break-all;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+.pop_zoomInDown{
+  -webkit-animation-name:zoomInDown;animation-name:zoomInDown;
+  -webkit-animation-duration:1s;animation-duration:1s;
+  -webkit-animation-fill-mode:both;animation-fill-mode:both
+}
+/*threed*/
+#container{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events: none;display: none;}
+#container .scene3d .element {
+  width: 300px;
+  height: 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#container .scene3d .element img {width:150px;height:150px;border-radius:25px;}
+/**中奖用户弹窗**/
+.lottery-luckers{
+	position: absolute;
+	width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: rgba(0,0,0,.42);
+    border-radius: 0;
+    box-shadow: none;
+    border-radius: 10px;
+    box-shadow: 0 0 200px #c4a071;
+	transform: rotateX(180deg);
+}
+.lottery-popBox-ani {
+    animation: 1s linear 0s 1 normal forwards running lotterypopAni;
+}
+@keyframes lotterypopAni{from{opacity:0;transform:rotateX(180deg)}to{opacity:1;transform:rotateX(360deg)}}
+.lottery-luckers.hidden{display:none}
+
+.lottery-close-btn {
+	position: absolute;
+    top: 30px;
+    right: 30px;
+	width: 78px;
+	height: 32px;
+    cursor: pointer;
+	margin:0 auto;
+    margin-top: 10px;
+	background-image: url(/static/images/screen/lottery/close.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+.lottery-roundluckerbox{
+	position: relative;
+	width: 1309px;
+	height: 660px;
+	background-size: cover;
+	background-repeat: no-repeat;
+	background-image: url({if !isset($pcconfig['styleconfig']['roundluckerbg']) || empty($pcconfig['styleconfig']['roundluckerbg'])}/static/images/screen/lottery/rbg.png{else /}{:tomedia($pcconfig['styleconfig']['roundluckerbg'])}{/if});
+	padding-top: 38px;
+	box-sizing: border-box;
+}
+.roundtitle{
+	position: absolute;
+	left: calc(50% - 178.5px);
+	top: 10px;
+	width: 336px;
+	font-size: 20px;
+	margin: 0 auto;
+	color: #fff;
+	text-align: center;
+	padding: 0 5px;
+	box-sizing: border-box;
+}
+.roundlucker-lists{
+	width: 1260px;
+	height: 590px;
+	color: #fff;
+	overflow: hidden;
+	overflow-y: auto;
+}
+.roundlucker-item{
+	margin-bottom: 10px;
+}
+.roundlucker-item .prizename{
+	height: 50px;
+	line-height: 50px;
+	text-align: center;
+	font-size: 24px;
+	font-weight: bold;
+	color: #FF9800;
+}
+.prizelucklist ul{
+	width: 100%;
+}
+.prizelucklist ul li{
+	width: 200px;
+	margin-bottom: 10px;
+}
+.prizelucklist ul li .avatar{
+	position: relative;
+	width: 150px;
+	height: 150px;
+	border-radius: 50%;
+	padding: 8px;
+	box-sizing: border-box;
+	margin-top: 10px;
+}
+.prizelucklist ul li .avatar.frotate:after {
+	content: " ";
+	width: 100%;
+	height: 100%;
+	display: inline-block;
+	position: absolute;
+	top: 0;
+	left: 0;
+	animation: foreverrotate linear infinite;
+	animation-duration: 2s;
+	background-image: url("{:tomedia($pcconfig['styleconfig']['userbg'])}");
+	background-size: 100% 100%
+}
+.prizelucklist ul li .avatar img{
+	width: 100%;
+	height: 100%;
+	border-radius: 50%;
+}
+
+.prizelucklist ul li .nickname{
+	padding: 0 6px;
+	box-sizing: border-box;
+	font-size: 18px;
+}
+.prizelucklist ul li div{
+	max-width: 100%;
+	text-align: center;
+}
+.prizelucklist ul li .nickname div{
+	margin-top: 10px;
+}
+</style>
+{if !empty($pcconfig['styleconfig']['lotterymusic'])}
+<audio id="lotterymusic" src="{:tomedia($pcconfig['styleconfig']['lotterymusic'])}" loop preload="preload" style="display:none"></audio>
+{/if}
+{if !empty($pcconfig['styleconfig']['overmusic'])}
+<audio id="overmusic" src="{:tomedia($pcconfig['styleconfig']['overmusic'])}" preload="preload" style="display:none"></audio>
+{/if}
+<section class="lottery-mainbox normal-box">
+<!--stop button-->
+<div class="lottory-stop-btn hidden"></div>
+<!--lottory-container start--->
+<div class="lottory-container zam-app-flex-ajCenter2{if isset($pcconfig['isroundcj']) && $pcconfig['isroundcj']=='1'} lottery-roundcjbox{/if}">
+	{if isset($pcconfig['isroundcj']) && $pcconfig['isroundcj']=='1'}
+		<div class="lottery-wrapper">
+			<div class="roundcj-box">
+				<div class="roundcj-body">
+					<ul class="roundcj-prizelist"></ul>
+				</div>
+				<div class="roundcj-footer zam-app-flex-ajCenter2">
+					<div class="lottery-setroundname">选择轮次</div>
+					<div class="lottery-setroundbox">
+						<div class="lottery-setarrow"></div>
+						<div class="lottery-roundname" data-id="0"></div>
+						<ul class="lottery-roundlist"></ul>
+					</div>
+					<div class="lottory-start-btn zam-app-flex-ajCenter stopclick"></div>
+					<div class="btn-allrecord">查看轮次中奖记录</div>
+				</div>
+			</div>
+		</div>
+	{else /}
+    <div class="lottory-left-box">
+        <div class="lottory-title left-top-title" {if $pcconfig['showjoin']!='1'}style="opacity:0"{/if}>参加人数：<span>0</span></div>
+        <div class="lottory_award_box zam-app-flex-ajCenter" data-id="0">
+			<img src="/static/images/sys/prizeimg.png">
+			<div class="limitbox"></div>
+		</div>
+		<div class="prize_number zam-app-flex-ajCenter2">
+            <div class="lottory-prev-btn"></div>
+			<div class="lottory-awardname limitbox"></div>
+            <div class="lottory-next-btn"></div>
+        </div>
+        
+        <div class="lottory-selectbox zam-app-flex-ajCenter2">
+               <img id="prize_decrement" src="/static/images/screen/normalcj/reduce.png">
+               <input class="numbernum" value="0">
+               <img id="prize_increment" src="/static/images/screen/normalcj/add.png">
+        </div>
+		<div class="lottory-start-btn stopclick"></div>
+    </div>
+    <div class="lottory-right-box">
+        <div class="lottory-title right-top-title" {if $pcconfig['showluckernum']!='1'}style="opacity:0"{/if}>获奖人数：<span>0</span></div>
+        <div class="lottory-reward-box"></div>
+    </div>
+	{/if}
+</div>
+<div class="emptybox zam-app-flex-ajCenter hidden">
+	<img src="/{:SIMGURL}common/empty.png">
+	<p style="padding:20px;">请到后台添加{if isset($pcconfig['isroundcj']) && $pcconfig['isroundcj']=='1'}轮次{else /}奖品{/if}</p>
+</div>
+</section>
+<div id="container"></div>
+<div class="win-box hidden">
+	<img class="win" src="{if empty($pcconfig['styleconfig']['morefirebg'])}/static/images/screen/normalcj/morefirebg.png{else /}{:tomedia($pcconfig['styleconfig']['morefirebg'])}{/if}">
+</div>
+<div class="lottery-luckers zam-app-flex-ajCenter hidden">
+	<div class="lottery-roundluckerbox zam-app-flex-ajCenter">
+		<div class="roundtitle limitbox"></div>
+		<div class="lottery-close-btn"></div>
+		<div class="roundlucker-lists"></div>
+	</div>
+</div>
+<script>
+var oneshowtype = "{if empty($pcconfig['oneshowtype'])}1{else /}{$pcconfig['oneshowtype']}{/if}",oneanitime = parseInt("{if empty($pcconfig['oneanitime'])}4000{else /}{$pcconfig['oneanitime']*1000}{/if}"),defaultimg = "{if !empty($pcconfig['defaultimg'])}{:tomedia($pcconfig['defaultimg'])}{else /}/static/images/bigcj/default.jpg{/if}";
+var cjconfig = {
+	isroundcj:"{$pcconfig['isroundcj']??'2'}",
+	arrowflag:'show',
+	prizenum:0,
+};
+require(['screennormalcj'],function (screennormalcj) {
+	screennormalcj.init();
+});
+function onerrorimg(obj){
+	$(obj).attr('src',defaultimg);
+}
+</script>
+<script type="text/html" id="lucker-tpl">
+<div class="lottory-reward-people" data-id="{{ luckerid }}">
+	<div class="lottory-r-div zam-app-flex-ajCenter2">
+		<img class="lottory-reward-people-img" src="{{ avatar }}" {if !empty($pcconfig['defaultimg'])}onerror="javascript:this.src='{:tomedia($pcconfig['defaultimg'])}';"{/if}>
+	</div>
+	<div class="lottory-r-name">{{# nickname}}</div>
+	<span class="lottory-delbtn"></span>
+</div>
+</script>
+<script type="text/html" id="showone-tpl">
+<div class="pop_3d zam-app-flex-ajCenter2 hidden">
+	<div class="fireworks"></div>
+	<div class="pop_box">
+		<div class="light"></div>
+		<div class="pop_userInfo zam-app-flex-ajCenter">
+			<img class="lucker_avatar" src="{{ avatar }}" {if !empty($pcconfig['defaultimg'])}onerror="javascript:this.src='{:tomedia($pcconfig['defaultimg'])}';"{/if}>
+			<em></em>
+			<span></span>
+			<div class="lucker_nickname">{{# nickname}}</div>
+		</div>
+	</div>
+</div>
+</script>
+<script  type="text/html" id="showtotal-tpl">
+<div class="pop_3d lottory_totalshow zam-app-flex-ajCenter2 hidden">
+	<a class="lottory-close-btn" href="javascript:void(0)"></a>
+	<div class="lottory_selected">
+		<ul>
+			{{each lists as v k}}
+			<li class="total_userone">
+				<div class="userimgbox zam-app-flex-ajCenter2">
+					<img src="{{ v.avatar }}" {if !empty($pcconfig['defaultimg'])}onerror="javascript:this.src='{:tomedia($pcconfig['defaultimg'])}';"{/if}>
+				</div>
+				<div class="userone_name">{{# v.nickname}}</div>
+			</li>
+			{{/each}}
+		</ul>
+	</div>
+</div>
+</script>
+<script type="text/html" id="roundprize-item">
+	<li class="roundcj-item zam-app-flex-ajCenter">
+		<div class="prizeimgbox zam-app-flex-ajCenter">
+			<img class="prizeimg" src="{{ prize.prizeimg }}" />
+		</div>
+		<div class="prizename limitbox">{{ prize.prizename }}</div>
+		<div class="prizenum">{{ num }}个</div>
+	</li>
+</script>
+<script type="text/html" id="roundlucker-item">
+	<div class="roundlucker-item">
+	<div class="prizename">{{ prize.awardname }} - {{ prize.prizename }}</div>
+	<div class="prizelucklist zam-app-flex-ajCenter">
+		<ul class="zam-app-flex-ajCenter2 zam-app-flex-wrap">
+			{{ if luckers.length > 0 }}
+			{{ each luckers as lucker lkey }}
+			<li class="zam-app-flex-ajCenter">
+				<div class="avatar frotate">
+					<img src="{{ lucker.avatar }}" />
+				</div>
+				<div class="nickname">{{# lucker.nickname }}</div>
+			</li>
+			{{ /each }}
+			{{ else }}
+			<div class="nodata">暂无中奖记录</div>
+			{{ /if }}
+		</ul>
+	</div>
+</div>
+</script>
+{include file="common/footer" /}

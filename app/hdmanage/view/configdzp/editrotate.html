@@ -1,0 +1,473 @@
+<style>
+table tr td{text-align:center!important}
+.confirmbox-pop .zam-titleBox{font-weight: 600;padding:5px 0;}
+.userimgbox img{height:40px!important;}
+.edui-default .edui-toolbar .edui-for-fullscreen {
+    display: none!important
+}
+#edui_fixedlayer{z-index: 9999!important}
+</style>
+<div class="form-horizontal confirmbox-pop rotate-pop">
+<form class="confirm-formbox" method="post">
+    <div class="text-center">
+        <div class="btn-group pop-btns" style="margin-bottom:10px;">
+          <a href="javascript:void(0)" class="btn btn-default btn-primary"><span>基础设置</span></a>
+          <a href="javascript:void(0)" class="btn btn-default"><span>抽奖时间与奖品</span></a>
+        </div>
+    </div>
+    <div class="carditem">
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 轮次名</label>
+            <div class="col-lg-8">
+                <input class="form-control" type="text"  name="title" value="{$rotate['title']}">
+            </div>
+        </div>
+        <div class="form-group">
+			<label class="col-lg-3 control-label text-right">* 游戏规则</label>
+			<div class="col-lg-8">
+				{:tpl_ueditor('ruledes', $rotate['ruledes'],['height'=>'100'])}
+			</div>
+		</div>
+		<div class="form-group cjmodebox">
+			<label class="col-lg-3 control-label">* 抽奖方式</label>
+			<div class="col-lg-8">
+				<label class="lyear-radio radio-inline radio-primary" title="现场用户听从安排上台点击空格参与抽奖" data-tooltip="laytip" onclick="cjmodebox(this)" {if !$editcjmode}style="pointer-events:none"{/if}>
+                    <input type="radio" name="cjmode" value="1" {if $rotate['cjmode']=='1'}checked{/if}><span>大屏点击抽奖</span>
+                </label>
+                <label class="lyear-radio radio-inline radio-primary" title="微信扫码手机上点击按钮抽奖" data-tooltip="laytip" onclick="cjmodebox(this)" {if !$editcjmode}style="pointer-events:none"{/if}>
+                    <input type="radio" name="cjmode" value="2" {if $rotate['cjmode']=='2'}checked{/if}><span>微信扫码抽奖</span>
+                </label>
+                {if dzdzpcardno()}
+                	<label class="lyear-radio radio-inline radio-primary" title="券号抽奖，用户输入券号参与抽奖，需提前添加或者导入券号" data-tooltip="laytip" onclick="cjmodebox(this)" {if !$editcjmode}style="pointer-events:none"{/if}>
+                    	<input type="radio" name="cjmode" value="3" {if $rotate['cjmode']=='3'}checked{/if}><span>券号抽奖</span>
+                	</label>
+                {/if}
+                <div class="help-block">抽奖数据产生后此项不可更改{if !$editcjmode}<span class="text-danger">，已产生中奖数据此项不可更改</span>{/if}</div>
+			</div>
+		</div>
+		<div class="cjtypebox2{if $rotate['cjmode']!='2'} hidden{/if}">
+	        <div class="form-group">
+	            <label class="col-lg-3 control-label">* 参与限制</label>
+	            <div class="col-lg-4" style="padding-right: 0">
+					<label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.daymaxgetbox').addClass('hidden')">
+		                <input type="radio" name="maxcjtype" value="1" {if $rotate['maxcjtype']=='1'}checked{/if}><span>每人最多</span>
+		            </label>
+		            <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.daymaxgetbox').removeClass('hidden')">
+		                <input type="radio" name="maxcjtype" value="2" {if $rotate['maxcjtype']=='2'}checked{/if}><span>每人每天最多</span>
+		            </label>
+				</div>
+				<div class="col-lg-4" style="padding: 0">
+					<div class="input-group">
+						<div class="input-group-btn not-allow"><a class="btn btn-default">可抽</a></div>
+						<div class="touchspin">
+							<input type="text" class="form-control numberincdec" name="maxcjtimes" 
+			                data-bts-min="1" data-bts-replacement-val="1"
+			                data-bts-max="null"
+			                data-bts-step="1"
+			                data-bts-postfix="次"
+			                data-bts-postfix-extra-class="touchspin-postfix"
+			                value="{$rotate['maxcjtimes']}">
+		                </div>
+	                </div>
+				</div>
+			</div>
+			<div class="form-group daymaxgetbox{if $rotate['maxcjtype']=='1'} hidden{/if}">
+	            <label class="col-lg-3 control-label">* 每个用户最大中奖次数<br><span class="text-danger">(每天)</span></label>
+	            <div class="col-lg-4">
+	                <input type="text" class="form-control numberincdec" name="daymaxget" 
+	                data-bts-min="0" data-bts-replacement-val="0"
+	                data-bts-max="null"
+	                data-bts-step="1"
+	                data-bts-postfix="次"
+		            data-bts-postfix-extra-class="touchspin-postfix"
+	                value="{$rotate['daymaxget']??'0'}">
+	               	<div class="help-block"><span class="text-danger">此项设置用于控制当前轮次每个用户每天最大中奖次数，0为不限制每天中奖次数</span></div>
+	            </div>
+	        </div>
+	        <div class="form-group">
+	            <label class="col-lg-3 control-label">* 每个用户总中奖次数<br><span class="text-danger">(本轮)</span></label>
+	            <div class="col-lg-4">
+	                <input type="text" class="form-control numberincdec" name="maxget" 
+	                data-bts-min="0" data-bts-replacement-val="0"
+	                data-bts-max="null"
+	                data-bts-step="1"
+	                data-bts-postfix="次"
+		            data-bts-postfix-extra-class="touchspin-postfix"
+	                value="{$rotate['maxget']}">
+	            	<div class="help-block"><span class="text-danger">此项设置用于控制当前轮次每个用户总中奖次数，0为不限制总中奖次数</span></div>
+	            </div>
+	        </div>
+	        <div class="form-group">
+			    <label class="col-lg-3 control-label">* 微信端中奖记录轮播</label>
+			    <div class="col-lg-8">
+			        {:tpl_switch('showrollbox',$rotate['showrollbox']??'1')}
+			        <span class="zam-help-block">开启后微信端将轮播历史中奖记录</span>
+			    </div>
+			</div>
+		</div>
+		<div class="form-group cjtypebox1{if $rotate['cjmode']!='1'} hidden{/if}">
+		    <label class="col-lg-3 control-label">* 大屏出结果时语音播报</label>
+		    <div class="col-lg-8">
+		        {:tpl_switch('speaktext',$rotate['speaktext']??'2')}
+		        <span class="zam-help-block">开启后大屏幕将播报中奖结果(限抽奖方式为大屏点击抽奖有效)</span>
+		    </div>
+		</div>
+		<div class="form-group">
+			<label class="col-lg-3 control-label">* 抽奖风格</label>
+			<div class="col-lg-8">
+				<label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.jggstylebox').addClass('hidden')">
+                    <input type="radio" name="cjstyle" value="1" {if $rotate['cjstyle']=='1'}checked{/if}><span>大转盘</span>
+                </label>
+                <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.jggstylebox').removeClass('hidden')">
+                    <input type="radio" name="cjstyle" value="2" {if $rotate['cjstyle']=='2'}checked{/if}><span>九宫格</span>
+                </label>
+			</div>
+		</div>
+		<div class="jggstylebox{if $rotate['cjstyle']=='1'} hidden{/if}">
+			<div class="form-group">
+			    <label class="col-lg-3 control-label">* 转动时格子背景色</label>
+			    <div class="col-lg-8">
+			        {:tpl_color('jggbgcolor',$rotate['jggbgcolor']??'#f9732e')}
+			        <span class="help-block">此项用于设置九宫格抽奖开始后滚动格子背景色</span>
+			    </div>
+			</div>
+			<div class="form-group">
+			    <label class="col-lg-3 control-label">* 转动时奖品名颜色</label>
+			    <div class="col-lg-8">
+			        {:tpl_color('jggfontcolor',$rotate['jggfontcolor']??'#fff')}
+			        <span class="help-block">此项用于设置九宫格抽奖开始后滚动格子内奖品名称颜色</span>
+			    </div>
+			</div>
+		</div>
+	</div>
+    <div class="carditem hidden">
+    	<div class="form-group">
+		      <label class="col-lg-3 control-label">* 抽奖时间范围</label>
+		      <div class="col-lg-7">
+		        {:tpl_daterangetime([
+		        	'name'=>'startendtime',
+		        	'autoval'=>'1',
+		        	'needsfm'=>'1',
+		        	'needsdd'=>'1',
+		        	'val'=>[
+		        		'start'=>$rotate['starttime']?:time(),
+                        'end'=>$rotate['endtime']?:time()+24*3600
+		        	]
+		        ])}
+		      </div>
+		</div>
+		<div class="form-group">
+            <label class="col-lg-3 control-label">* 所有奖品被抽完提示语</label>
+            <div class="col-lg-8">
+                <input class="form-control" type="text"  name="noawardtip" value="{$rotate['noawardtip']??'所有奖品已抽完'}">
+            	<div class="help-block">当所有奖品均有数量限制，所有奖品数量全部被抽出后提示文字，当奖品中存在中奖概率不等于0的谢谢参与类型的奖品时此项将不生效</div>
+            </div>
+        </div>
+        <div class="form-group col-lg-12" style="margin-right: 0;margin-left: 0">
+        	<table class="we7-table table table-bordered" style="margin-bottom:0px;">
+				<thead>
+				  <tr>
+				  	<th style="width:20%;text-align:center;">类型</th>
+					<th style="width:20%;text-align:center;">奖品</th>
+					<th style="width:20%;text-align:center;">个数</th>
+					<th style="width:20%;text-align:center;">抽中概率(千分制)</th>
+					<th style="width:20%;text-align:center;">操作</th>
+				  </tr>
+				</thead>
+				<tbody class="prize-list">
+					{volist name="rotate.prizes" id="item"}
+						<tr>
+							<td>
+							   <input type="hidden" name="prizeid[]" value="{$item['id']}">
+					           <p>
+					            <span class="label label-{if $item['prizetype']=='1'}primary{elseif $item['prizetype']=='2'}warning{else /}danger{/if}">{if $item['prizetype']=='1'}实物{elseif $item['prizetype']=='2'}红包{else /}谢谢参与{/if}</span>
+					           </p>
+					           <input type="hidden" name="prizetype[]" value="{$item['prizetype']}">
+					        </td>
+							<td>
+							  <input type="hidden" name="prizeimg[]" value="{$item['prizeimg']}">
+							  <input type="hidden" name="prizename[]" value="{$item['prizename']}">
+							  <input type="hidden" name="prizemoney[]" value="{$item['prizemoney']}">
+							  <div class="userimgbox"><img src="{:tomedia($item['prizeimg']);}"></div>
+							  <div>{$item['prizename']}</div>
+							  {if $item['prizetype']=='2'}
+							  <div>{$item['prizemoney']}元</div>
+							  {/if}
+							</td>
+							<td>
+							  <input type="hidden" name="prizenum[]" value="{$item['prizenum']}">
+							  <span>{if $item['prizetype']!='3'}{$item['prizenum']}个{else /}不限量{/if}</span>
+							</td>
+							<td>
+							  <input type="hidden" name="prizegl[]" value="{$item['prizegl']}">
+							  <input type="hidden" name="saverecord[]" value="{$item['saverecord']}">
+							  <input type="hidden" name="canrepeat[]" value="{$item['canrepeat']}">
+							  <input type="hidden" name="fontcolor[]" value="{$item['fontcolor']}">
+							  <input type="hidden" name="bgcolor[]" value="{$item['bgcolor']}">
+							  <input type="hidden" name="ndids[]" value="{if !empty($item['ndids'])}{:implode(',',$item['ndids'])}{else /}0{/if}" />
+							  <span>{$item['prizegl']}/1000</span>
+							</td>
+							<td>
+							  <a href="javascript:;" data-prizeid="{$item['id']}" class="btn btn-primary btn-xs btn-editprize">
+								  <i class="mdi mdi-pencil"></i>
+							  </a>
+							  <a href="javascript:;" data-prizeid="{$item['id']}" class="btn btn-danger btn-xs btn-delprize">
+								  <i class="mdi mdi-close"></i>
+							  </a>
+							  <a href="javascript:;"  class="btn btn-default btn-sm mousemove zam-sortable" title="拖动排序"><i class="mdi mdi-arrow-all"></i></a>
+							</td>
+						</tr>
+					{/volist}
+				</tbody>
+				<tfoot style="border: 1px solid #efefef;">
+				  <tr>
+					<td colspan="5">
+					  <div class="m-b-10">
+					  	<a  class="btn btn-primary btn-sm addprizeitem" href="javascript:;"> <i class="mdi mdi-plus"></i>&nbsp;<span>新增奖品</span></a>
+					  </div>
+					  <div><span class="text-danger">最多可添加{$maxcount}种奖品，请尽量保证所有奖品概率之和等于1000</span></div>
+					</td>
+				  </tr>
+				</tfoot>
+			</table>
+        </div>
+    </div>
+</form>
+</div> 
+<script id='oneprize-tpl' type="text/template">
+<tr>
+	<td>
+	   <input type="hidden" name="prizeid[]" value="<% d.id %>">
+       <p>
+        <span class="label label-<%# if(d.prizetype=='1'){ %>primary<%# }else if(d.prizetype=='2'){ %>warning<%# }else{ %>danger<%# } %>"><%# if(d.prizetype=='1'){ %>实物<%# }else if(d.prizetype=='2'){ %>红包<%# }else{ %>谢谢参与<%# } %></span>
+       </p>
+       <input type="hidden" name="prizetype[]" value="<% d.prizetype %>">
+    </td>
+	<td>
+	  <input type="hidden" name="prizeimg[]" value="<% d.prizeimg %>">
+	  <input type="hidden" name="prizename[]" value="<% d.prizename %>">
+	  <input type="hidden" name="prizemoney[]" value="<% d.prizemoney %>">
+	  <div class="userimgbox"><img src="<% d.prevprizeimg %>"></div>
+	  <div><% d.prizename %></div>
+	  <%# if(d.prizetype=='2'){ %>
+	  <div><% d.prizemoney %>元</div>
+	  <%# } %>
+	</td>
+	<td>
+	  <input type="hidden" name="prizenum[]" value="<% d.prizenum %>">
+	  <span><%# if(d.prizetype!='3'){ %><% d.prizenum %>个<%# }else{ %>不限量<%# } %></span>
+	</td>
+	<td>
+	  <input type="hidden" name="prizegl[]" value="<% d.prizegl %>">
+	  <input type="hidden" name="saverecord[]" value="<% d.saverecord %>">
+	  <input type="hidden" name="canrepeat[]" value="<% d.canrepeat %>">
+	  <input type="hidden" name="fontcolor[]" value="<% d.fontcolor %>">
+	  <input type="hidden" name="bgcolor[]" value="<% d.bgcolor %>">
+	  <input type="hidden" name="ndids[]" value="<% d.ndids %>" />
+	  <span><% d.prizegl %>/1000</span>
+	</td>
+	<td>
+	  <a href="javascript:;" <%# if(d.id){ %>data-prizeid="<% d.id %>"<%# } %> class="btn btn-primary btn-xs btn-editprize">
+		  <i class="mdi mdi-pencil"></i>
+	  </a>
+	  <a href="javascript:;" <%# if(d.id){ %>data-prizeid="<% d.id %>"<%# } %> class="btn btn-danger btn-xs btn-delprize">
+		  <i class="mdi mdi-close"></i>
+	  </a>
+	  <a href="javascript:;"  class="btn btn-default btn-sm mousemove zam-sortable" title="拖动排序"><i class="mdi mdi-arrow-all"></i></a>
+	</td>
+</tr>
+</script>        
+<script>
+var maxcount = parseInt("{$maxcount}");
+require(['webcore','jconfirmBox','zamnotice','layerBox',"ueditor","bootstrap-touchspin","jquery.ui","bootstrap-daterangepicker"],function(webcore,jconfirmBox,zamnotice,layerBox,UE){
+	if($('[data-tooltip="laytip"]').length) {
+        var tipindex;
+        $('[data-tooltip="laytip"]').on({
+            mouseover : function(){
+                var $this = this;
+                tipindex = layer.tips($($this).attr('title') || '', $this, {skin:'laytip',tips:1,anim:-1,time: 0}); //不自动关闭
+            },
+            mouseout : function(){
+                layer.close(tipindex);
+            }
+        });
+    }
+	tpl_switch();
+	$('.js-datetimepicker').each(function() {
+        var $input = $(this),$obj = {
+                singleDatePicker: $input.data('issingle')=='1'?true:false,
+                timePicker: $input.data('needsfm')=='1'?true:false,
+                showDropdowns: $input.data('needsdd')=='1'?true:false,
+                timePicker24Hour:true,
+                timePickerSeconds:true,
+                autoUpdateInput:$input.data('autoval')=='1'?true:false,
+                locale: {
+                    format: $input.attr('data-format'),
+                }
+            };
+            if($input.data('start')) $obj.startDate = $input.data('start');
+            if($input.data('end')) $obj.endDate = $input.data('end');
+            if($input.data('mintime')) $obj.minDate = $input.data('mintime');
+            if($input.data('maxtime')) $obj.maxDate = $input.data('maxtime');
+            $input.daterangepicker($obj,function(start, end, label){
+                var funcstr = $input.data('func');
+                var func = window[funcstr];
+                func && func(start,end);
+            });
+    });
+	$('.prize-list').sortable({handle: ".mousemove"}).disableSelection();
+    $(".prize-list").disableSelection();
+	$("[data-toggle='tooltip']").tooltip({
+        trigger : 'hover',
+	});
+    $(".rotate-pop .pop-btns a.btn").click(function(){
+        $(this).addClass('btn-primary').siblings().removeClass("btn-primary");
+        $(".rotate-pop .carditem").addClass('hidden').eq($(this).index()).removeClass('hidden');
+    });
+    $(".confirmbox-pop .numberincdec").TouchSpin().on("change", function(){
+        var $this = $(this),funcstr = $this.data('func');
+        var func = window[funcstr];
+        func && func();
+    });
+    if($("#edui_fixedlayer").length > 0) UE.getEditor('ruledes').destroy();
+    $(function(){
+      $(".sp-container").remove();
+      $(".js-colorpicker").each(function(){
+            tpl_colorpicker(this);
+      });
+      tpl_ueditor(); 
+    })
+    var rotateid = "{if isset($rotate['id'])}{$rotate['id']}{else}{/if}";
+	$(".addprizeitem").on('click',function(){
+		if($(".prize-list tr").length >= maxcount){
+			zamnotice.showTips('error',`最多只可以添加${maxcount}种奖品`);
+			return false;
+		}
+		var confirmObj = jconfirmBox.ajaxconfirm("新增奖品","{:gohdmanage('configdzp/editprize',['hdid'=>$hdid])}",{rotateid:rotateid,cjmode:$(".cjmodebox input:radio:checked").val()},'html','col-lg-8 col-lg-offset-2',function(e){
+			var prizearr = webcore.serializeObject(e.find('form'));
+			if(prizearr['ndids[]']){
+				prizearr['ndids'] = prizearr['ndids[]'].toString();
+				delete prizearr['ndids[]'];
+			}else{
+				prizearr['ndids'] = '0';
+			}
+			prizearr.prevprizeimg = e.find('img').attr("src");
+			if(prizearr.prizename=='') {
+				zamnotice.showTips('error','奖品名必须设置');
+				return false;
+			}
+			if(prizearr.prizeimg==''){
+				zamnotice.showTips('error','奖品图必须设置');
+				return false;
+			}
+			if(rotateid!=''){
+				webcore.ajaxSubmit("{:gohdmanage('configdzp/saveprize',['hdid'=>$hdid])}",{rotateid:rotateid,prizearr:prizearr}).then(function(json){
+					if(json.code==0){
+						confirmObj.close();
+						prizearr.id = json.msg;
+						$(".prize-list").append(webcore.tpl($("#oneprize-tpl"),prizearr));
+						zamnotice.showTips('success','新增成功');
+					}else{
+						zamnotice.showTips('error',json.msg);
+					}
+				}, function(json){
+					zamnotice.showTips('error','网络差。操作失败');
+				});
+			}else{
+				$(".prize-list").append(webcore.tpl($("#oneprize-tpl"),prizearr));
+				confirmObj.close();
+			}
+		},false,true,[{'hidden':false,'txt':'确定新增'},{'hidden':false,'txt':'取消'}],true,function(){
+				tpl_switch();
+		});
+	});
+	$(".prize-list").on('click','.btn-editprize',function(){
+		var $this = $(this),fdom = $this.parent().parent(); 
+		var prizeid = $this.attr('data-prizeid');
+		var editprizearr = {};
+		if(!prizeid){
+			fdom.find("input").each(function(){
+				var $this = $(this),inputname = $this[0].name.replace("[]","");
+				editprizearr[inputname] = $this.val();
+				
+			});
+		}
+		var confirmObj = jconfirmBox.ajaxconfirm("编辑奖品","{:gohdmanage('configdzp/editprize',['hdid'=>$hdid])}",{rotateid:rotateid,cjmode:$(".cjmodebox input:radio:checked").val(),prizeid:prizeid,editprizearr:editprizearr},'html','col-lg-8 col-lg-offset-2',function(e){
+			var prizearr = webcore.serializeObject(e.find('form'));
+			if(prizearr['ndids[]']){
+				prizearr['ndids'] = prizearr['ndids[]'].toString();
+				delete prizearr['ndids[]'];
+			}else{
+				prizearr['ndids'] = '0';
+			}
+			prizearr.prevprizeimg = e.find('img').attr("src");
+			if(prizearr.prizename==''||prizearr.prizename=='') {
+				zamnotice.showTips('error','奖品名与奖品图必须设置');
+				return false;
+			}
+			if(prizearr.prizemoney==''){
+				prizearr.prizemoney = " ";
+			}
+			if(prizearr.prizemin==''){
+				prizearr.prizemin = " ";
+			}
+			if(prizearr.opengroup=='1' && prizearr.groupid=='0'){
+				zamnotice.showTips('error','指定用户组必须选择一个组');
+				return false;
+			}
+			if(prizeid){
+				webcore.ajaxSubmit("{:gohdmanage('configdzp/saveprize',['hdid'=>$hdid])}",{rotateid:rotateid,prizeid:prizeid,prizearr:prizearr}).then(function(json){
+					if(json.code==0){
+						confirmObj.close();
+						prizearr.id = prizeid;
+						fdom.html($(webcore.tpl($("#oneprize-tpl"),prizearr)).html());
+						zamnotice.showTips('success','编辑成功');
+					}else{
+						zamnotice.showTips('error',json.msg);
+					}
+				}, function(json){
+					zamnotice.showTips('error','网络差。操作失败');
+				});
+			}else{
+				fdom.html($(webcore.tpl($("#oneprize-tpl"),prizearr)).html());
+				confirmObj.close();
+			}
+		},false,true,[{'hidden':false,'txt':'确定保存'},{'hidden':false,'txt':'取消'}],true,function(){
+				tpl_switch();
+		});
+	});
+	$(".prize-list").on('click','.btn-delprize',function(){
+		var $this = $(this);
+		var prizeid = $this.attr('data-prizeid');
+		jconfirmBox.confirm('温馨提示','删除将无法恢复，您确定要删除么？',function(){
+				if(prizeid){
+					webcore.ajaxSubmit("{:gohdmanage('configdzp/delprize',['hdid'=>$hdid])}",{rotateid:rotateid,prizeid:prizeid}).then(function(json){
+						if(json.code==0){
+							zamnotice.showTips('success','删除成功');
+							$this.parent().parent().remove();
+						}else{
+							zamnotice.showTips('error',json.msg);
+						}
+					}, function(json){
+						zamnotice.showTips('error','网络差，操作失败');
+					});
+				}else{
+					$this.parent().parent().remove();
+				}
+		});
+	});
+});
+function cjmodebox(obj){
+	var type = $(obj).find('input').val();
+	if(type=='1'){
+		$('.cjtypebox2').addClass('hidden');
+		$('.cjtypebox1').removeClass('hidden');
+	}else if(type=='2'){
+        $('.cjtypebox2').removeClass('hidden');
+        $('.cjtypebox1').addClass('hidden');
+	}else{
+		$('.cjtypebox1').addClass('hidden');
+        $('.cjtypebox2').addClass('hidden');
+	}
+}
+</script>

@@ -1,0 +1,686 @@
+<!doctype html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="google" content="notranslate" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="renderer" content="webkit">
+    <title>{$pcconfig['title']}</title>
+	<link rel="shortcut icon" href="{:globalico()}" />
+	<link rel="stylesheet" href="__STATIC__/css/zam-icon.css" media="all">
+	<link rel="stylesheet" href="__STATIC__/css/mxc-icon.css?t=5" media="all">
+	<link rel="stylesheet" href="__STATIC__/css/screen/style.css?t=202201022" media="all">
+	<link rel="stylesheet" href="__STATIC__/css/animate.css?t=0913"/>
+	<script src="__STATIC__/js/jquery.2.1.4.js"></script>
+	<script src="__STATIC__/js/jquery.extend.js"></script>
+	<script type="text/javascript" src="__STATIC__/js/require.js"></script>
+	<script type="text/javascript">
+		var XCV3Config = {
+		  staticurl:"__STATIC__/",
+		  cookie : {'pre': 'zam'},
+		  hdid:"{$hdinfo['hdid']}",
+		  rhdid:"{$hdinfo['id']}",
+		  wsAddress:"{$wssaddress}",
+		  loadtype:"{$hdinfo['loadtype']??'1'}",
+		  screenfollow:"{$hdinfo['specialconfig']['followchange']??'1'}",
+		  gametype:"{$pcconfig['gametype']??'common'}",
+		  isiframe:window.top!=window.self,
+		  bgmusic:"{:tomedia($pcconfig['bgmusic'])}",
+		  openbgmusic:"{$pcconfig['bgmusicoff']??'2'}",
+		};
+		require.config({
+			baseUrl: XCV3Config.staticurl + "js",
+			urlArgs:'v=2.6.5312'+Math.random(),
+			paths: {
+				 css: "css.min",
+				 jquery:"jquery.2.1.4",
+				 'jquery.ui': 'jquery.ui',
+				 jquerytrans:'screenjs/jquery.transit.min',
+				 velocity:'screenjs/velocity',
+				 zamnotice: 'zamnotice/zamnotice',
+				 jbox:'jbox/jBox',
+				 jboxnotice:'jbox/plugins/Notice/jBox.Notice.min',
+				 template:"template/template",
+				 swiper:'swiper/swiper.min',
+				 marqueen:"wechatjs/marqueen",
+				 screencore:'screenjs/screencore',
+				 layer:'layer/layer',
+				 layerBox:'layer/layerBox',
+				 layerExt:'layer/layer.ext',
+				 screensocket:'screenjs/screensocket',
+				 keyboard:'keyboard/keyboard.min',
+				 msgs:'screenjs/msgs',
+				 screenbp:'screenjs/screenbp',
+				 screenbpdata:'screenjs/screenbpdata',
+				 bgscreen:'screenjs/bgscreen',
+				 colorPicker:'jqcolorpicker',
+				 colors:'colors',
+				 ionrangeslider:'ionrangeslider/ionrangeslider',
+				 onoffswitch:'onoffswitch/on-off-switch',
+				 onoffswitchauto:'onoffswitch/on-off-switch-onload',
+				 videocontrol:'screenjs/videocontrol',
+				 slideranimate:'screenjs/slideranimate',
+				 rightboxslider:'screenjs/rightboxslider',
+				 signs:'screenjs/signs',
+				 screenvote:'screenjs/screenvote',
+				 screengame:'screenjs/screengame',
+				 screenredpack:'screenjs/screenredpack',
+				 screenydj:'screenjs/screenydj',
+				 screenshuqian:'screenjs/screenshuqian',
+				 screenmonkey:'screenjs/screenmonkey',
+				 screencar:'screenjs/screencar',
+				 screenhorse:'screenjs/screenhorse',
+				 screenmls:'screenjs/screenmls',
+				 screenbike:'screenjs/screenbike',
+				 screenswim:'screenjs/screenswim',
+				 screenthreed:'screenjs/screenthreed',
+				 screentug:'screenjs/screentug',
+				 screenanswerbs:'screenjs/screenanswerbs',
+				 screendzqy:'screenjs/screendzqy',
+				 screenliuyancj:'screenjs/screenliuyancj',
+				 screenbigcj:'screenjs/screenbigcj',
+				 screenlivemark:'screenjs/screenlivemark',
+				 screendgshake:'screenjs/screendgshake',
+				 screenjjb:'screenjs/screenjjb',
+				 screencutfruit:'screenjs/screencutfruit',
+				 screenmouse:'screenjs/screenmouse',
+				 screennormalcj:'screenjs/screennormalcj',
+				 screencubecj:'screenjs/screencubecj',
+				 screencjx:'screenjs/screencjx',
+				 screenzjd:'screenjs/screenzjd',
+				 screenshakestart:'screenjs/screenshakestart',
+				 screenphotocj:'screenjs/screenphotocj',
+				 screenimportcj:'screenjs/screenimportcj',
+				 screendzp:'screenjs/screendzp',
+				 screenyuyuedj:'screenjs/screenyuyuedj',
+				 dragqr:'screenjs/dragqr',
+				 fulldm:'screenjs/fulldm',
+				 danmuku:'screenjs/danmuku',
+				 autoscroll:'screenjs/autoscroll',
+				 snabbt:'screenjs/snabbt',
+				 screenlottery:'screenjs/screenlottery',
+				 videojs:'videojs/video',
+				 domtoimage:'domtoimg/domtoimage',
+				 filesaver:'domtoimg/filesaver',
+				 threejs:'threejs/three.min',
+				 tweenjs:'threejs/tween.min',
+				 css3drenderer:'threejs/css3drenderer',
+				 AMapLoader:'https://webapi.amap.com/loader',
+				 TagCloud:'screenjs/TagCloud',
+				 jqcloud:'jqcloud/jqcloud.min',
+				 luckycanvas:'wechatjs/luckycanvas',
+			},
+			shim:{
+				'zamnotice':{
+					deps: ['css!../js/zamnotice/zamnotice.css']
+				},
+				'jbox':{
+					deps: ['css!../js/jbox/jBox.css',]
+				},
+				'jboxnotice':{
+					deps: ['jbox','css!../js/jbox/plugins/Notice/jBox.Notice.css']
+				},
+				'template':{
+					exports: 'template',
+				},
+				'swiper':{
+					exports:'Swiper',
+					deps: ['css!../js/swiper/swiper.min.css']
+				},
+				'marqueen':{
+					exports:'marqueen',
+				},
+				'screencore':{
+					exports:'screencore'
+				},
+				'layer':{
+					exports: 'layer',
+					deps: ['css!../js/layer/theme/default/layer.css']
+				},
+				'layerBox':{
+					exports: 'layerBox',
+					deps: ['layer']
+				},
+				'layerExt':{
+					deps: ['layer']
+				},
+				'screensocket':{
+					exports:'screensocket',
+				},
+				'keyboard':{
+					exports:'keyboardJS',
+				},
+				'signs':{
+					exports:'signs',
+				},
+				'screenbp':{
+					exports:'screenbp',
+				},
+				'screenbpdata':{
+					exports:'screenbpdata',
+				},
+				'bgscreen':{
+					exports:'bgscreen',
+				},
+				'colorPicker': {
+					deps: [ 'jquery' ],
+					exports: 'jQuery.fn.colorPicker'
+				},
+				'colors':{
+					exports:'Colors'
+				},
+				'slideranimate':{
+					exports:'slideranimate',
+				},
+				'videocontrol':{
+					exports:'videocontrol',
+				},
+				'rightboxslider':{
+					exports:'rightboxslider',
+				},
+				'ionrangeslider':{
+					deps:['css!../js/ionrangeslider/ionrangeslider.css'],
+				},
+				'onoffswitchauto':{
+					deps: ['onoffswitch','css!../js/onoffswitch/on-off-switch.css']
+				},
+				'screenshuqian':{
+					exports:'screenshuqian',
+				},
+				'screenmonkey':{
+					exports:'screenmonkey',
+				},
+				'screencar':{
+					exports:'screencar',
+				},
+				'screenhorse':{
+					exports:'screenhorse',
+				},
+				'screenmls':{
+					exports:'screenmls',
+				},
+				'screenbike':{
+					exports:'screenbike',
+				},
+				'screenswim':{
+					exports:'screenswim',
+				},
+				'screenthreed':{
+					exports:'screenthreed',
+				},
+				'screentug':{
+					exports:'screentug',
+				},
+				'screenanswerbs':{
+					exports:'screenanswerbs',
+				},
+				'screendzqy':{
+					exports:'screendzqy'
+				},
+				'screenliuyancj':{
+					exports:'screenliuyancj',
+				},
+				'screenbigcj':{
+					exports:'screenbigcj',
+				},
+				'screenlivemark':{
+					exports:'screenlivemark',
+				},
+				'screendgshake':{
+					exports:'screendgshake',
+				},
+				'screenmouse':{
+					exports:'screenmouse',
+				},
+				'screencubecj':{
+					exports:'screencubecj',
+				},
+				'dragqr':{
+					exports:'dragqr',
+				},
+				'videojs':{
+					exports:'videojs',
+					deps:['css!../js/videojs/video.css'],
+				},
+				'domtoimage':{
+					exports:'domtoimage'
+				},
+				'threejs':{
+					exports:'THREE'
+				},
+				'tweenjs':{
+					exports:'TWEEN'
+				},
+				'jqcloud':{
+					deps:['css!../js/jqcloud/jqcloud.min.css'],
+				},
+			}
+		});
+		define("jquery", [], function () {
+			return jQuery
+		});
+		/*
+		var modulepage=1,footerMenu_w,footerMenu_os_w,footerMenu_t,footerMenu_lt,footerMenu_tp;
+		!function(t, i, e) {
+				var s = function() {
+					var zoom = (i.innerHeight / 3840).toFixed(4);
+			    	$(".full-main").css({"width":(i.innerWidth / zoom).toFixed(4)+"px","zoom":zoom});
+					var autowidth = ((i.innerWidth / zoom).toFixed(4)) - $(".control-msg-list").outerWidth(true) - $(".control-normal-list").outerWidth();
+					$(".control-module-list").css({"width":autowidth+'px'});
+					modulepage = 1;
+					$(".control-module-list .wrap").css({"transform":"translate3d(0px,0px, 0px)"});
+					footerMenu_w = (autowidth - 60)*zoom;
+					var totalson = $(".control-module-list .wrap .icon-box");
+					var visibleNums = 0;
+					totalson.each(function(){
+						var top = $(this)[0].getBoundingClientRect().top;
+						if(top==totalson[0].getBoundingClientRect().top){
+							visibleNums++;
+						}
+					});
+					footerMenu_t = $(".control-module-list .wrap .icon-box").length;
+					footerMenu_tp = Math.ceil(footerMenu_t/visibleNums);
+				};
+				t.addEventListener !== e && (i.addEventListener('resize', s, !1), t.addEventListener("DOMContentLoaded", s, !1))
+		}(document, window);
+		*/
+	</script>
+</head>
+<style type="text/css">
+.hdQrbox-txt{font-size:20px!important;height:50px!important;line-height:50px!important}
+/*.full-main{position: absolute!important;width:2428px;height: 5760px;z-index: 11}*/
+.full-main{position: absolute!important;width:1624px;height: 3840px;z-index: 11}
+.fulldmBox{
+	border: 1px dashed gray;
+	margin:0 auto;
+}
+.fulldmBox-item{padding:0 20px!important;}
+.fulldmBox-one .fulldmBox-avatar.fulldmBox-avatar2{
+	position: absolute;
+	top: 0;
+	width: 110px!important;
+	height: 110px!important;
+	padding: 0;
+}
+.fulldmBox-one .fulldmBox-avatar img {
+	width: 100px!important;
+	height: 100px!important;
+	display:inline-block;
+	border-radius: 50%;
+}
+.fulldmBox-one.style1 .fulldmBox-info.fulldmBox-info2{
+	{if $dmconfig['needavatar']=='1'}padding-left: 110px!important;{/if}
+}
+.fulldmBox-one.style2 .fulldmBox-info.fulldmBox-info2{
+	{if $dmconfig['needavatar']=='1'}margin-left: 116px!important;{/if}
+}
+.fulldmBox-img img{
+	max-width: 40%!important;
+	border-radius: 5px;
+}
+.hdQrbox{
+    right: 100px!important;
+    bottom: 600px!important;
+    left: unset!important;
+    top: unset!important;
+}
+</style>
+<body>
+<div class="pc-box zam-app-flex-ajCenter2">
+		<div class="full-main">
+		  <div class="main-box">
+			<footer class="footer">{if isset($hdinfo['copyright']['copyright']) && !empty($hdinfo['copyright']['copyright'])}{$hdinfo['copyright']['copyright']}{/if}</footer>
+		</div><!--main-box-->
+		{if !isset($pcconfig['islogin'])}
+			{if $hdinfo['loadtype']=='1'}
+				{include file='common/footer_menu' /}
+			{/if}
+			{include file='common/footer_fulldm' /}
+			{include file='common/footer_qrbox' /}
+		{/if}
+	  </div><!--full-main-->
+ </div><!--pc-box-->
+ {if isset($pcconfig['gametype']) && $pcconfig['gametype']=='baping'}
+ {include file='baping/leftcontrol' /}
+ {/if}
+ <div class="pcbgBox">
+	<div class="main-bg">
+		{if isset($pcconfig['gametype']) && $pcconfig['gametype']=='baping'}
+		{else /}
+		{if $pcconfig['bgtype']=='2'}
+			<video class="videoBg" src="{:tomedia($pcconfig['bgvideo'])}" autoplay="autoplay" oncanplaythrough="videobgloadend(this)" loop="loop"></video>
+		{elseif $pcconfig['bgtype']=='1'}
+			<style>
+				.pcbgBox .main-bg{background-image:url("{if !empty($pcconfig['bgimg'])}{:tomedia($pcconfig['bgimg'])}{else}__STATIC__/images/screen/common/bg.jpg{/if}");}
+			</style>
+		{/if}
+		{/if}
+	</div>
+	{if isset($pcconfig['gametype']) && $pcconfig['gametype']=='shakestart'}
+	<div class="videosbox">
+		{if $pcconfig['startconfig']['showdjs']=='1'}
+			{if isset($pcconfig['preload']) && $pcconfig['preload']=='2'}<video muted class="djsvideo hidden" src="{:tomedia($pcconfig['startconfig']['djsvideo'])}"></video>{/if}
+		{/if}
+		{if $pcconfig['startconfig']['bgtype']=='2'}
+			{if isset($pcconfig['preload']) && $pcconfig['preload']=='2'}<video muted class="startvideo hidden" src="{:tomedia($pcconfig['startconfig']['bgvideo'])}" loop="loop"></video>{/if}
+		{else /}
+			<img src="{:tomedia($pcconfig['startconfig']['bgimg'])}" class="startimg hidden" />
+		{/if}
+		{if $pcconfig['endconfig']['bgdiy']=='1'}
+			{if $pcconfig['endconfig']['bgtype']=='2'}
+				{if isset($pcconfig['preload']) && $pcconfig['preload']=='2'}<video muted class="endvideo hidden" src="{:tomedia($pcconfig['endconfig']['bgvideo'])}" loop="loop"></video>{/if}
+			{else /}
+				<img src="{:tomedia($pcconfig['endconfig']['bgimg'])}" class="endimg hidden" />
+			{/if}
+		{/if}
+	</div>
+	{/if}
+ </div>
+{if !empty($pcconfig['bgmusic'])}<audio id="bgmusic" src="{:tomedia($pcconfig['bgmusic'])}" autoload loop="loop"></audio>{/if}
+<div class="offlinebox" title="网络连接出现异常，请检查您的网络是否正常"></div>
+<script type="text/html" id="google-tpl">
+<div class="broswer-tip zam-app-flex-ajCenter2">
+		<i class="mxc-infofill"></i> 
+		<p class="red">为了保证您的使用效果，强烈推荐使用</p> 
+		<a class="downgoogle" href="https://www.google.cn/intl/zh-CN/chrome/" target="_blank">
+			<div class="zam-app-flex-ajCenter2">
+				<img src="__STATIC__/images/screen/common/google.png"> 
+				<span>谷歌浏览器</span>
+			</div>
+		</a> 
+		<div class="close-broswer-tip" onclick="javascript:$('.broswer-tip').remove();">
+			<i class="mxc-close"></i>
+		</div>
+	</div>
+</div>
+</script>
+<script>
+var needinitfulldm = "{if isset($menus['fulldm']) && !empty($dmconfig)}1{else /}2{/if}";
+require(['screencore','template','layerBox','marqueen','screensocket','fulldm','keyboard','dragqr'],function (screencore,template,layerBox,marqueen,screensocket,fulldm,keyboardJS,dragqr) {
+	screensocket.init({
+		onmessage:function(data){
+			if(data.type=='connected'){
+				screensocket.isclose = false;
+				screencore.connectsocket({clientid:data.clientid});
+			}else if(data.type=='screendm'){
+				var messages = data.messages;
+				if(messages){
+					if($.isArray(messages)&&messages.length>0){
+						$.each(messages,function(i, val){
+							fulldm.addBullet(val);
+						});
+					}
+				}else{
+					fulldm.addBullet(data);
+				}
+			}else if(data.type=='screendeldm'){
+				if(!$.isArray(data.msgid)){
+					fulldm.delBullet(data.msgid);
+				}else{
+					$.each(data.msgid,function(index,val){
+						fulldm.delBullet(val);
+					});
+				}
+			}else if(data.type=='screenresetdm'){
+				fulldm.resetBullet();
+			}
+		}
+	});
+	var ischrome =  navigator.userAgent.indexOf('Chrome') > -1;
+	if(!ischrome){
+		$("body").append(template('google-tpl',{}));
+	}
+	if(needinitfulldm=='1'){
+		fulldm.init($(".fulldmBox"),{:json_encode($dmconfig)});
+	}
+	$(".headerTitle li").length>0&&marqueen.init('.headerTitle',0.02,10e3);
+	dragqr.init("hdQrbox1",true);
+	$(window).resize(function () {  
+		if($(".videoBg").length>0){
+			screencore.videofullScreen(".videoBg",screencore.getvideoData($(".videoBg")[0]));
+		}
+	});
+	$("body").on("mouseenter", "*[lay-tips]", function() {
+		var e = this;
+		layerBox.showTips($(e).attr("lay-tips"),e,$(e).attr('lay-direction'));
+	}).on("mouseleave", "*[lay-tips]", function() {
+		layerBox.close($(this).data("index"));
+	}).on("click", "*[lay-tips]", function() {
+		layerBox.close($(this).data("index"));
+	});
+	{// 单页加载模式}
+	{if !isset($hdinfo['loadtype']) || $hdinfo['loadtype']=='1'}
+		$('.footer-controlBox').on('mouseover',function(){
+			$('.footer-controlBox').removeClass('down').addClass('up');
+			$(".menuArrowbox-icon-up").removeClass("menuArrowbox-icon-up").addClass("menuArrowbox-icon-down");
+		})
+		$('.footer-controlBox').on('mouseleave',function(){
+			$(".menutooltip").remove();
+			$('.footer-controlBox').removeClass('up').addClass('down');
+			$(".menuArrowbox-icon-down").removeClass("menuArrowbox-icon-down").addClass("menuArrowbox-icon-up");
+		});
+		$('.footer-controlBox .menuArrowbox').on('click',function(){
+			if($(".menuArrowbox-icon-down").length>0){
+				$(".menuArrowbox-icon-down").removeClass("menuArrowbox-icon-down").addClass("menuArrowbox-icon-up");
+				$('.footer-controlBox').removeClass('down').addClass('up');
+			}else{
+				$(".menuArrowbox-icon-up").removeClass("menuArrowbox-icon-up").addClass("menuArrowbox-icon-down");
+				$('.footer-controlBox').removeClass('up').addClass('down');
+			}		
+		});
+		$(".control-module-list .icon-box").on('click',function(){
+			var $this = $(this);
+			if(XCV3Config.screenfollow=='1'){
+				screencore.ajaxSubmit('/screen/common/followurl',{module:$this.attr("data-module")}).then(function(data){
+					if(data.code!=0){
+						layerBox.showMsg(data.msg);
+					}
+				}, function(){
+					layerBox.showMsg('网络太差，请稍后重试');
+				});
+			}
+			window.location.href = $this.attr('data-href') + ($this.data('ishandadd')=='2' ? "?hdid={$hdinfo['hdid']}":"");
+		});
+		$(".control-module-list .icon-box").on('mouseenter',function(e) {
+			$(".menutooltip").remove();
+			var modulestyles = $(this).attr("data-styles");
+			modulestyles = JSON.parse(modulestyles);
+			if($.isArray(modulestyles) && modulestyles.length > 0){
+				var left = $(this).offset().left - 30,css = "left:"+left+"px;width:"+$(this).outerWidth(true)+"px",html = "<ul class='menutooltip' style='"+css+"'>";
+				$.each(modulestyles,function(i,v){
+						html += "<li data-styleid="+v.styleid+" data-module="+v.stylemodule+"  class="+(v.issel=='1'?'active':'')+" >"+v.stylename+"<span class='mxc-unie657'></span></li>";
+				});
+				html += "</ul>";
+				$('.footer-controlBox').append(html);
+			}
+		});
+		$('.footer-controlBox').on('click','.menutooltip li',function(){
+				var $this = $(this),isactive = $this.hasClass('active')?'1':'2';
+				screencore.ajaxSubmit('/screen/common/changestyle',{module:$this.attr("data-module"),styleid:$this.attr("data-styleid"),isactive:isactive,rotateid:"{$rotateid??'0'}"}).then(function(data){
+					if(data.code==0){
+						screensocket.isclose = false;
+						window.location.href = data.msg;
+					}else{
+						layerBox.showMsg(data.msg);
+					}
+				}, function(){
+					console.log('网络太差，请稍后重试.');
+				});
+		});
+		$(".control-module-list .switch-next").on('click',function(){
+			$(".menutooltip").remove();
+			modulepage>=footerMenu_tp?modulepage = 1:modulepage++;
+			$(".control-module-list .wrap").css({"transform":"translate3d(0px,"+(-modulepage*65+65)+"px, 0px)"});
+		});
+		$(".control-module-list .switch-prev").on('click',function(){
+			$(".menutooltip").remove();
+			modulepage==1?modulepage = footerMenu_tp:modulepage--;
+			$(".control-module-list .wrap").css({"transform":"translate3d(0px,"+(-modulepage*65+65)+"px, 0px)"});
+		});
+		
+		$(".control-normal-list .openqr").on('click',function(e,params){
+			var stopicon = $(this).find('.isstop');
+			if ($('.hdQrbox').is(':hidden')) {
+				$(".hdQrbox").fadeIn();
+				stopicon.hide();
+				params!='1' && window.localStorage.setItem("openqr"+XCV3Config.hdid,'1');
+			}else{
+				$(".hdQrbox").fadeOut();
+				stopicon.show();
+				params!='1' && window.localStorage.setItem("openqr"+XCV3Config.hdid,'2');
+			}
+		});
+		var nofootermenumodules = ['dzqy','yaohao','ppqd','photocj','importcj'],hdhidefootermenu = "{$hdinfo['screenconfig']['hidemenu']??'2'}",openqrstatus = window.localStorage.getItem("openqr"+XCV3Config.hdid);
+		if($.inArray(XCV3Config.gametype,nofootermenumodules)==-1){
+			if(hdhidefootermenu=='1'){
+				screencore.hideFootMenu();
+			}
+			if(openqrstatus!='2'){
+				$(".control-normal-list .openqr").trigger('click');
+			}
+		}else{
+			$('.footer-controlBox').trigger('mouseleave');
+		}
+		$(".control-normal-list .openfull").on('click',function(){
+			if ($(this).attr('data-open')=='2') {
+				screencore.fullScreen();
+				$(this).attr('data-open','1');
+			}else{
+				screencore.exitFullScreen();
+				$(this).attr('data-open','2');
+			}
+		});
+		$(".control-normal-list .openmusic").on('click',function(){
+			if($("#bgmusic").length<=0) return;
+			var $this = $(this),stopicon = $this.find('.isstop');
+			if ($this.attr('data-open')=='1') {
+				stopicon.removeClass('display-none');
+				$("#bgmusic")[0].pause();
+				$this.attr('data-open','2');
+			}else{
+				$("#bgmusic")[0].play().then(() => {
+	           		stopicon.addClass('display-none');
+					$this.attr('data-open','1');
+		        }).catch(err => {
+		            console.log('您的浏览器暂不支持自动播放音频，请通过点击右下角的音频按钮播放');
+		        });
+			}
+		});
+		if(XCV3Config.gametype!='baping' && XCV3Config.openbgmusic=='1' && $("#bgmusic").length > 0 ){ 
+			$(".control-normal-list .openmusic").trigger('click');
+		}
+		keyboardJS.bind('1', function(e) {
+			$(".control-normal-list .openmusic").trigger('click');
+		});
+		keyboardJS.bind('2', function(e) {
+			$(".control-normal-list .opendm").trigger('click');
+		});
+		keyboardJS.bind('3', function(e) {
+			$(".control-normal-list .openqr").trigger('click');
+		});
+		keyboardJS.bind('4', function(e) {
+			$(".control-normal-list .openfull").trigger('click');
+		});
+		keyboardJS.bind('5', function(e) {
+			$(".hdQrbox img").trigger('dblclick');
+		});
+		{// 初始化模块快捷键}
+		{foreach $menus as $menu}
+			{if $menu['modulefield']!='fulldm' && !empty($menu['modulekjj'])}
+				keyboardJS.bind('{$menu['modulekjj']}', function(e) {
+					$(".control-module-list .icon-box[data-module='{$menu['modulefield']}']").trigger('click');
+				});
+			{/if}
+		{/foreach}
+	{else /}
+		{// 非frame打开功能跳转到frame内}
+		if(!XCV3Config.isiframe){	
+			window.location.href = "{:goscreen('frame/index',['hdid'=>$hdinfo['hdid']])}";
+		}
+		{// frame加载模式 } 
+		if(XCV3Config.gametype!='baping' && XCV3Config.openbgmusic=='1' && $("#bgmusic").length > 0 ){ 
+			screencore.sendMsg2frame({'type':'bgmusicopen'});
+		}else{
+			screencore.sendMsg2frame({'type':'bgmusicclose'});
+		}
+		var nofootermenumodules = ['dzqy','yaohao','ppqd','photocj','importcj'],hdhidefootermenu = "{$hdinfo['screenconfig']['hidemenu']??'2'}",openqrstatus = window.localStorage.getItem("openqr"+XCV3Config.hdid);
+		{// 关闭二维码 } 
+		if($.inArray(XCV3Config.gametype,nofootermenumodules)==-1){
+			if(openqrstatus!='2'){
+				screencore.sendMsg2frame({'type':'qrboxopen'});
+			}
+		}else{
+			screencore.sendMsg2frame({'type':'qrboxclose'});
+		}
+		window.addEventListener('message', function(e){
+	        if (e.origin.indexOf(window.location.host)!=-1 && typeof e.data === 'string') {
+	            var fdata = JSON.parse(e.data);
+	            if(fdata.type=='fulldmopen'){
+	            	fulldm.start();
+	            }else if(fdata.type=='fulldmclose'){
+	            	fulldm.stop();
+	            }else if(fdata.type=='resetqrbox'){
+	            	$(".hdQrbox img").trigger('dblclick');
+	            }
+	        }
+		});
+		keyboardJS.bind('1', function(e) {
+			screencore.sendMsg2frame({'type':'keyboardjs','keycode':'1'});
+		});
+		keyboardJS.bind('2', function(e) {
+			screencore.sendMsg2frame({'type':'keyboardjs','keycode':'2'});
+		});
+		keyboardJS.bind('3', function(e) {
+			screencore.sendMsg2frame({'type':'keyboardjs','keycode':'3'});
+		});
+		keyboardJS.bind('4', function(e) {
+			screencore.sendMsg2frame({'type':'keyboardjs','keycode':'4'});
+		});
+		keyboardJS.bind('5', function(e) {
+			screencore.sendMsg2frame({'type':'keyboardjs','keycode':'5'});
+		});
+		{// 初始化模块快捷键}
+		{foreach $menus as $menu}
+			{if $menu['modulefield']!='fulldm' && !empty($menu['modulekjj'])}
+				keyboardJS.bind('{$menu['modulekjj']}', function(e) {
+					screencore.sendMsg2frame({'type':'keyboardjs','keycode':'{$menu['modulefield']}'});
+				});
+			{/if}
+		{/foreach}
+	{/if}
+});
+{// 背景视频加载完成后全屏并自动播放}
+function videobgloadend(obj){
+	require(['screencore'],function (screencore) {
+		screencore.videofullScreen(".videoBg",screencore.getvideoData($(".videoBg")[0]));
+		$(".videoBg")[0].play().then(function(){}).catch(function(err){
+			$(".videoBg")[0].volume = 0;
+            $(".videoBg")[0].play();
+        });
+	});
+}
+{// 网络断开与连接上}
+window.addEventListener("offline", function (e) {
+  $(".offlinebox").fadeIn();
+});
+window.addEventListener("online", function (e) {
+  $(".offlinebox").fadeOut();
+});
+</script>
+{:globalcss()}
+{if !empty($hdinfo['diycss'])}
+<style type="text/css">{$hdinfo['diycss']}</style>
+{/if}
+{if isset($pcconfig['style']) && isset($pcconfig['style']['diycss']) && !empty($pcconfig['style']['diycss'])}
+<style type="text/css">{$pcconfig['style']['diycss']}</style>
+{/if}
+{if isset($pcconfig['gametype']) && $pcconfig['gametype']=='baping'}
+<div class="screenlight"></div>
+{/if}
+{if isset($hdinfo['screenconfig']['hidemenu']) &&  $hdinfo['screenconfig']['hidemenu']== '3'}
+<style type="text/css">.footer-controlBox{display: none}</style>
+{/if}
+{:globalbaiducalc()}
+</body>
+</html>

@@ -1,0 +1,492 @@
+{include file='common/header' /}
+<style>
+.cutfruit-mainbox{
+	width: 100%;
+    height: 100%;
+    margin: 0 auto;
+	padding:0;
+    overflow: hidden;
+}
+.cutfruit-user-list {
+    position: absolute;
+    left:0px;
+    top:90px;
+	width:100%;
+    height:calc(100% - 200px);
+	-webkit-justify-content: space-around;
+    -ms-flex-pack: distribute;
+    justify-content: space-around;
+    -webkit-box-align: end;
+    -webkit-align-items: flex-end;
+    -ms-flex-align: end;
+    align-items: flex-end;	
+	display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+}
+.cutfruit-user-item{
+	position:relative;
+	width:130px;
+}
+.cutfruit-user-item .fruitbag{width:100%;}
+.cutfruit-user-item .gamenamebg{
+	position:absolute;
+	bottom:-20px;
+	left:12px;
+	width:170px;
+	height:72px;
+	background-image:url("{:tomedia($pcconfig['style']['gamenamebg'])}");
+	background-size:cover;
+	background-repeat:no-repeat;
+	zoom:0.7;
+}
+.cutfruit-user-item .gamenamebg .useravatar{position:absolute;top:22px;left:1px;width:38px;height:38px;border:1px solid #fff;}
+.cutfruit-user-item .useravatar img{width:100%;height:100%;}
+.cutfruit-user-item .username{position:absolute;top:22px;left:50px;height:40px;line-height:40px;width:108px;font-size:18px;color:#fff;}
+.cutfruit-user-item .userscore{position:absolute;top:0px;right:6px;color:#fff;width:64px;font-size:18px;text-align:center;}
+</style>
+{if !empty($pcconfig['style']['diycss'])}<style>{$pcconfig['style']['diycss']}</style>{/if}
+<audio id="countaudio" src="/{:WIMGURL}shake/count.mp3"  preload="preload"  style="display:none"></audio>
+<audio id="overaudio" src="/{:SIMGURL}shake/over.mp3"  preload="preload"  style="display:none"></audio>
+<audio id="joinaudio" src="/{:SIMGURL}shake/join.mp3"  preload="preload" style="display:none"></audio>
+<section class="cutfruit-mainbox normal-box">
+	<div class="cutfruit-wrapper display-none">
+		<div class="cutfruit-user-list">
+			<div class="cutfruit-user-item">
+				<img  class="fruitbag" src="{:tomedia($pcconfig['style']['emptylanzi'])}">
+				<div class="gamenamebg">
+					<div class="useravatar"><img src=""></div>
+					<div class="username limitbox"></div>
+					<div class="userscore">0</div>
+				</div>
+			</div>
+			<div class="cutfruit-user-item">
+				<img  class="fruitbag" src="{:tomedia($pcconfig['style']['emptylanzi'])}">
+				<div class="gamenamebg">
+					<div class="useravatar"><img src=""></div>
+					<div class="username limitbox"></div>
+					<div class="userscore">0</div>
+				</div>
+			</div>
+			<div class="cutfruit-user-item">
+				<img  class="fruitbag" src="{:tomedia($pcconfig['style']['emptylanzi'])}">
+				<div class="gamenamebg">
+					<div class="useravatar"><img src=""></div>
+					<div class="username limitbox"></div>
+					<div class="userscore">0</div>
+				</div>
+			</div>
+			<div class="cutfruit-user-item">
+				<img  class="fruitbag" src="{:tomedia($pcconfig['style']['emptylanzi'])}">
+				<div class="gamenamebg">
+					<div class="useravatar"><img src=""></div>
+					<div class="username limitbox"></div>
+					<div class="userscore">0</div>
+				</div>
+			</div>
+			<div class="cutfruit-user-item">
+				<img  class="fruitbag" src="{:tomedia($pcconfig['style']['emptylanzi'])}">
+				<div class="gamenamebg">
+					<div class="useravatar"><img src=""></div>
+					<div class="username limitbox"></div>
+					<div class="userscore">0</div>
+				</div>
+			</div>
+			<div class="cutfruit-user-item">
+				<img  class="fruitbag" src="{:tomedia($pcconfig['style']['emptylanzi'])}">
+				<div class="gamenamebg">
+					<div class="useravatar"><img src=""></div>
+					<div class="username limitbox"></div>
+					<div class="userscore">0</div>
+				</div>
+			</div>
+			<div class="cutfruit-user-item">
+				<img  class="fruitbag" src="{:tomedia($pcconfig['style']['emptylanzi'])}">
+				<div class="gamenamebg">
+					<div class="useravatar"><img src=""></div>
+					<div class="username limitbox"></div>
+					<div class="userscore">0</div>
+				</div>
+			</div>
+			<div class="cutfruit-user-item">
+				<img  class="fruitbag" src="{:tomedia($pcconfig['style']['emptylanzi'])}">
+				<div class="gamenamebg">
+					<div class="useravatar"><img src=""></div>
+					<div class="username limitbox"></div>
+					<div class="userscore">0</div>
+				</div>
+			</div>
+			<div class="cutfruit-user-item">
+				<img  class="fruitbag" src="{:tomedia($pcconfig['style']['emptylanzi'])}">
+				<div class="gamenamebg">
+					<div class="useravatar"><img src=""></div>
+					<div class="username limitbox"></div>
+					<div class="userscore">0</div>
+				</div>
+			</div>
+			<div class="cutfruit-user-item">
+				<img  class="fruitbag" src="{:tomedia($pcconfig['style']['emptylanzi'])}">
+				<div class="gamenamebg">
+					<div class="useravatar"><img src=""></div>
+					<div class="username limitbox"></div>
+					<div class="userscore">0</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="emptybox zam-app-flex-ajCenter display-none">
+		<img src="/{:SIMGURL}common/empty.png">
+		<p style="padding:20px;">暂无可用轮次，请到后台添加</p>
+	</div>
+</section>
+<style>
+
+.start-btn{
+	width:282px;
+	height:86px;
+}
+</style>
+{include file='common/gamewelcome' /}
+<style>
+/**排名样式**/
+.rankBox{
+	position: absolute;
+	top:0;
+	left:0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0,0,0,.6);
+	z-index: 1;
+}
+.rank-all-user{
+	width:1360px;
+	margin-top:30px;
+	-webkit-justify-content: space-around;
+    -ms-flex-pack: distribute;
+    justify-content: space-around;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;	
+	display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+	flex-wrap:wrap;
+}
+.rank-all-user .rank-user-item{
+	position: relative;
+	width:20%;
+	max-height:272px;
+	margin-top:20px;
+	zoom:0.8;
+}
+.rank-all-user .rank-user-item:nth-child(-n+5){
+	margin-bottom:50px;
+}
+.rank-all-user .rank-user-item .pmfruitbag{width:240px;}
+.rank-all-user .rank-user-item .pmnamebg{
+	position:absolute;
+	bottom:-56px;
+	left:58px;
+	width:230px;
+	height:90px;
+	background-image:url("{:tomedia($pcconfig['style']['pmnamebg'])}");
+	background-size:cover;
+	background-repeat:no-repeat;
+}
+.rank-all-user .rank-user-item .pmnamebg .pmavatar{position:absolute;top:29px;left:12px;width:48px;height:48px;border:1px solid #fff;}
+.rank-all-user .rank-user-item .pmavatar img{width:100%;height:100%;}
+.rank-all-user .rank-user-item .pmname{
+	position: absolute;
+    top: 32px;
+    left: 66px;
+    height: 50px;
+    line-height: 50px;
+    width: 158px;
+    font-size: 22px;
+    color: #fff;
+	padding-left:5px;
+}
+.rank-all-user .rank-user-item .pmscore{
+	position: absolute;
+    top: 0px;
+    right: 6px;
+    color: #fff;
+    width: 94px;
+    font-size: 24px;
+    height: 38px;
+    line-height: 38px;
+    text-align: center;
+}
+.rank-all-user .rank-user-item .pmicon{
+	position: absolute;
+    bottom: 15px;
+    left: 86px;
+	width:56px;
+	height:78px;
+	background-size:cover;
+	background-repeat:no-repeat;
+}
+.rank-all-user li:nth-child(1) .pmicon{
+  background-image:url("{:tomedia($pcconfig['style']['pmicon'][0])}");
+}
+.rank-all-user li:nth-child(2) .pmicon{
+  background-image:url("{:tomedia($pcconfig['style']['pmicon'][1])}");
+}
+.rank-all-user li:nth-child(3) .pmicon{
+  background-image:url("{:tomedia($pcconfig['style']['pmicon'][2])}");
+}
+.rank-all-user li:nth-child(4) .pmicon{
+  background-image:url("{:tomedia($pcconfig['style']['pmicon'][3])}");
+}
+.rank-all-user li:nth-child(5) .pmicon{
+  background-image:url("{:tomedia($pcconfig['style']['pmicon'][4])}");
+}
+.rank-all-user li:nth-child(6) .pmicon{
+  background-image:url("{:tomedia($pcconfig['style']['pmicon'][5])}");
+}
+.rank-all-user li:nth-child(7) .pmicon{
+  background-image:url("{:tomedia($pcconfig['style']['pmicon'][6])}");
+}
+.rank-all-user li:nth-child(8) .pmicon{
+  background-image:url("{:tomedia($pcconfig['style']['pmicon'][7])}");
+}
+.rank-all-user li:nth-child(9) .pmicon{
+  background-image:url("{:tomedia($pcconfig['style']['pmicon'][8])}");
+}
+.rank-all-user li:nth-child(10) .pmicon{
+  background-image:url("{:tomedia($pcconfig['style']['pmicon'][9])}");
+}
+.rankBox-btns{
+	width:100%;
+	margin-top:60px;
+}
+.rankBox-btns a.nextround{
+	margin-left:60px;
+}
+.rankBox-btns a img{
+	width: 196px;
+    height: 60px;
+}
+</style>
+<div  class="rankBox zam-app-flex-ajCenter display-none"> 
+	<ul  class="rank-all-user">
+		<li class="rank-user-item zam-app-flex-ajCenter">
+			<img  class="pmfruitbag" src="{:tomedia($pcconfig['style']['pmlanzi'][0])}">
+			<div class="pmnamebg">
+				<div class="pmavatar"><img src=""></div>
+				<div class="pmname limitbox"></div>
+				<div class="pmscore">0</div>
+			</div>
+			<div class="pmicon"></div>
+		</li>
+		<li class="rank-user-item zam-app-flex-ajCenter">
+			<img  class="pmfruitbag" src="{:tomedia($pcconfig['style']['pmlanzi'][1])}">
+			<div class="pmnamebg">
+				<div class="pmavatar"><img src=""></div>
+				<div class="pmname limitbox"></div>
+				<div class="pmscore">0</div>
+			</div>
+			<div class="pmicon"></div>
+		</li>
+		<li class="rank-user-item zam-app-flex-ajCenter">
+			<img  class="pmfruitbag" src="{:tomedia($pcconfig['style']['pmlanzi'][2])}">
+			<div class="pmnamebg">
+				<div class="pmavatar"><img src=""></div>
+				<div class="pmname limitbox"></div>
+				<div class="pmscore">0</div>
+			</div>
+			<div class="pmicon"></div>
+		</li>
+		<li class="rank-user-item zam-app-flex-ajCenter">
+			<img  class="pmfruitbag" src="{:tomedia($pcconfig['style']['pmlanzi'][3])}">
+			<div class="pmnamebg">
+				<div class="pmavatar"><img src=""></div>
+				<div class="pmname limitbox"></div>
+				<div class="pmscore">0</div>
+			</div>
+			<div class="pmicon"></div>
+		</li>
+		<li class="rank-user-item zam-app-flex-ajCenter">
+			<img  class="pmfruitbag" src="{:tomedia($pcconfig['style']['pmlanzi'][4])}">
+			<div class="pmnamebg">
+				<div class="pmavatar"><img src=""></div>
+				<div class="pmname limitbox"></div>
+				<div class="pmscore">0</div>
+			</div>
+			<div class="pmicon"></div>
+		</li>
+		<li class="rank-user-item zam-app-flex-ajCenter">
+			<img  class="pmfruitbag" src="{:tomedia($pcconfig['style']['pmlanzi'][5])}">
+			<div class="pmnamebg">
+				<div class="pmavatar"><img src=""></div>
+				<div class="pmname limitbox"></div>
+				<div class="pmscore">0</div>
+			</div>
+			<div class="pmicon"></div>
+		</li>
+		<li class="rank-user-item zam-app-flex-ajCenter">
+			<img  class="pmfruitbag" src="{:tomedia($pcconfig['style']['pmlanzi'][6])}">
+			<div class="pmnamebg">
+				<div class="pmavatar"><img src=""></div>
+				<div class="pmname limitbox"></div>
+				<div class="pmscore">0</div>
+			</div>
+			<div class="pmicon"></div>
+		</li>
+		<li class="rank-user-item zam-app-flex-ajCenter">
+			<img  class="pmfruitbag" src="{:tomedia($pcconfig['style']['pmlanzi'][7])}">
+			<div class="pmnamebg">
+				<div class="pmavatar"><img src=""></div>
+				<div class="pmname limitbox"></div>
+				<div class="pmscore">0</div>
+			</div>
+			<div class="pmicon"></div>
+		</li>
+		<li class="rank-user-item zam-app-flex-ajCenter">
+			<img  class="pmfruitbag" src="{:tomedia($pcconfig['style']['pmlanzi'][8])}">
+			<div class="pmnamebg">
+				<div class="pmavatar"><img src=""></div>
+				<div class="pmname limitbox"></div>
+				<div class="pmscore">0</div>
+			</div>
+			<div class="pmicon"></div>
+		</li>
+		<li class="rank-user-item zam-app-flex-ajCenter">
+			<img  class="pmfruitbag" src="{:tomedia($pcconfig['style']['pmlanzi'][9])}">
+			<div class="pmnamebg">
+				<div class="pmavatar"><img src=""></div>
+				<div class="pmname limitbox"></div>
+				<div class="pmscore">0</div>
+			</div>
+			<div class="pmicon"></div>
+		</li>
+	</ul>
+	<div class="rankBox-btns zam-app-flex-ajCenter2">
+		<a class="paiming" href="javascript:;" title="全部排名"><img src="{:tomedia($pcconfig['style']['pmimg'])}" /></a>
+		<a class="nextround" href="javascript:;" title="下一轮"><img src="{:tomedia($pcconfig['style']['nextimg'])}" /></a> 
+	</div>
+</div>
+<div id="leafContainer" class="display-none"></div>
+{include file='common/gamerank' /}
+{include file='common/gamedjs' /}  
+<style>
+ #leafContainer 
+{
+    position: fixed;
+    z-index:-2;
+	width:100%;
+    height: 800px;
+	top:0;
+	left:0;
+}
+ #leafContainer > div 
+{
+    position: absolute;
+    max-width: 100px;
+    max-height: 100px;
+	animation-iteration-count: infinite, infinite;
+    animation-direction: normal, normal;
+    animation-timing-function: linear, ease-in;
+    -webkit-animation-iteration-count: infinite, infinite;
+    -webkit-animation-direction: normal, normal;
+    -webkit-animation-timing-function: linear, ease-in;
+}
+
+#leafContainer > div > img {
+     width: 100%;
+	 animation-iteration-count: infinite;
+     animation-direction: alternate;
+     animation-timing-function: ease-in-out;
+     transform-origin: 50% -100%;
+     -webkit-animation-iteration-count: infinite;
+     -webkit-animation-direction: alternate;
+     -webkit-animation-timing-function: ease-in-out;
+     -webkit-transform-origin: 50% -100%;
+}
+@keyframes fade
+{
+    0%   { opacity: 1; }
+    95%  { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+ @keyframes drop
+{
+    0%   { -webkit-transform: translate(0px, -50px); }
+    100% { -webkit-transform: translate(0px, 900px); }
+}
+ @keyframes clockwiseSpin
+{
+    0%   { -webkit-transform: rotate(-50deg); }
+    100% { -webkit-transform: rotate(50deg); }
+}
+ @keyframes counterclockwiseSpinAndFlip 
+{
+    0%   { -webkit-transform: scale(-1, 1) rotate(50deg); }
+    100% { -webkit-transform: scale(-1, 1) rotate(-50deg); }
+}
+ @-webkit-keyframes fade
+{
+    0%   { opacity: 1; }
+    95%  { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+ @-webkit-keyframes drop
+{
+	0%   { -webkit-transform: translate(0px, -50px); }
+    100% { -webkit-transform: translate(0px, 900px); }
+}
+ @-webkit-keyframes clockwiseSpin
+{
+    0%   { -webkit-transform: rotate(-50deg); }
+    100% { -webkit-transform: rotate(50deg); }
+}
+ @-webkit-keyframes counterclockwiseSpinAndFlip 
+{
+    0%   { -webkit-transform: scale(-1, 1) rotate(50deg); }
+    100% { -webkit-transform: scale(-1, 1) rotate(-50deg); }
+}
+ </style>
+<script>
+var defaultImg = "{:tomedia($pcconfig['style']['userdefaultimg'])}";
+var defaultName = "{$pcconfig['style']['userdefaultname']??'虚位以待'}";
+var percentimg = "{:tomedia($pcconfig['style']['emptylanzi'])}";
+var percentImgs = [
+"{:tomedia($pcconfig['style']['lanzi'][0])}",
+"{:tomedia($pcconfig['style']['lanzi'][1])}",
+"{:tomedia($pcconfig['style']['lanzi'][2])}",
+"{:tomedia($pcconfig['style']['lanzi'][3])}",
+"{:tomedia($pcconfig['style']['lanzi'][4])}",
+"{:tomedia($pcconfig['style']['lanzi'][5])}",
+"{:tomedia($pcconfig['style']['lanzi'][6])}",
+"{:tomedia($pcconfig['style']['lanzi'][7])}",
+"{:tomedia($pcconfig['style']['lanzi'][8])}",
+"{:tomedia($pcconfig['style']['lanzi'][9])}",
+];
+var dropImgs = [
+"{:tomedia($pcconfig['style']['appleimg'][0])}",
+"{:tomedia($pcconfig['style']['appleimg'][1])}",
+"{:tomedia($pcconfig['style']['appleimg'][2])}",
+"{:tomedia($pcconfig['style']['bananaimg'][0])}",
+"{:tomedia($pcconfig['style']['bananaimg'][1])}",
+"{:tomedia($pcconfig['style']['bananaimg'][2])}",
+"{:tomedia($pcconfig['style']['basahaimg'][0])}",
+"{:tomedia($pcconfig['style']['basahaimg'][1])}",
+"{:tomedia($pcconfig['style']['basahaimg'][2])}",
+"{:tomedia($pcconfig['style']['peachimg'][0])}",
+"{:tomedia($pcconfig['style']['peachimg'][1])}",
+"{:tomedia($pcconfig['style']['peachimg'][2])}",
+"{:tomedia($pcconfig['style']['sandiaimg'][0])}",
+"{:tomedia($pcconfig['style']['sandiaimg'][1])}",
+"{:tomedia($pcconfig['style']['sandiaimg'][2])}",
+];
+require(['screencore','screencutfruit'],function (screencore,screencutfruit) {
+	screencutfruit.init();
+});
+</script>
+{if !empty($pcconfig['style']['diycss'])}<style>{$pcconfig['style']['diycss']}</style>{/if}
+{include file='common/footer' /}

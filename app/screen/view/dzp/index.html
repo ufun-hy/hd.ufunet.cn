@@ -1,0 +1,297 @@
+{include file="common/header" /}
+<style>
+.dzp-mainbox{
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	padding: 0;
+}
+.dzp-container{width: 100%;height: 100%;}
+.dzp-center{width: 620px;}
+.titlebox img{margin-bottom:14px;height: 114px}
+.titlebox img.hidden{display:none;}
+.dzp-box{
+	position: relative;
+	width: 550px;
+	height: 550px;
+	border-radius: 50%;
+	background-image: url("{:tomedia($pcconfig['dzpstyle']['dot1'])}");
+	background-repeat: no-repeat;
+	background-size: cover;
+	animation: bgani 500ms step-start infinite;
+	-webkit-animation: bgani 500ms step-start infinite;
+}
+.dzp-box .lucky-btn{
+	width: 134px;
+    height: 150px;
+    background-image: url("{:tomedia($pcconfig['dzpstyle']['startbtn'])}");
+    cursor: pointer;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+	background-repeat: no-repeat;
+	background-size: cover;
+}
+.dzp-jggbox{
+	position: relative;
+	width: 531px;
+	height: 550px;
+	border-radius: 0;
+	background-image: url("{:tomedia($pcconfig['jggstyle']['dot1'])}");
+	animation: bgani2 500ms step-start infinite;
+	-webkit-animation: bgani2 500ms step-start infinite;
+}
+.dzp-jggbox .lucky-btn{
+    width: 140px;
+    height: 140px;
+    background-image: url("{:tomedia($pcconfig['jggstyle']['startbtn'])}");
+}
+.lucky-btn.stopclick{
+	pointer-events: none;
+}
+@-webkit-keyframes bgani {
+	0% {
+		background-image: url("{:tomedia($pcconfig['dzpstyle']['dot1'])}");
+	}
+	50% {
+		background-image: url("{:tomedia($pcconfig['dzpstyle']['dot2'])}");
+	}
+}
+@-webkit-keyframes bgani2 {
+	0% {
+		background-image: url("{:tomedia($pcconfig['jggstyle']['dot1'])}");
+	}
+	50% {
+		background-image: url("{:tomedia($pcconfig['jggstyle']['dot2'])}");
+	}
+}
+.dzp-left{
+	width: 308px;
+    height: 451px;
+    padding: 68px 40px 40px 40px;
+    box-sizing: border-box;
+    background-image: url("{:tomedia($pcconfig['basicstyle']['leftbg'])}");
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+.dzp-left .rulecont{
+    color: #fff;
+    font-size: 16px;
+    line-height: 1.4;
+    word-wrap: break-word;
+    white-space: normal;
+}
+.dzp-right{
+	width: 344px;
+    height: 451px;
+    padding: 68px 20px 30px 20px;
+    box-sizing: border-box;
+    background-image: url("{:tomedia($pcconfig['basicstyle']['rightbg'])}");
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+.dzp-popbox{
+	position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+.dzp-popbox .popbg{
+	position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.32);
+}
+.dzp-popbox.hidden{display: none}
+.dzp-popbox .popbox{
+	position: relative;
+	width: 380px;
+	height: 515px;
+	background-image: url("{:tomedia($pcconfig['basicstyle']['popbg'])}");
+	background-repeat: no-repeat;
+	background-size: cover;
+	animation: popshow 1s ease-out 0s both;
+	-webkit-animation: popshow 1s ease-out 0s both;
+}
+@keyframes popshow {
+    0% {
+        transform: scale(0);
+    }
+    100% {
+        transform: scale(1)
+    }
+}
+.dzp-popbox .popbox .cjmode1,.dzp-popbox .popbox .cjmode2{width: 100%;color:#fff;}
+.dzp-popbox .popbox .cjmode1.hidden,.dzp-popbox .popbox .cjmode2.hidden{display: none}
+.dzp-popbox .popbox .cjmode1 .tip{width:100%;text-align: center;font-size: 30px;margin: 0 auto;}
+.dzp-popbox .popbox .cjmode1 .prizeimg{height:200px;margin:18px auto;}
+
+.dzp-popbox .popbox .cjmode2 .tip{width:100%;text-align: center;font-size: 30px;margin: 0 auto;margin-bottom: 20px;}
+.dzp-popbox .popbox .cjmode2 .avatar{width:100px;height:100px;border-radius: 50%;}
+.dzp-popbox .popbox .cjmode2 .username{width: 80%;text-align: center;margin:10px 0;font-size: 20px;}
+
+.dzp-popbox .popbox .awardname{width:100%;padding:0 20px;box-sizing:border-box;text-align: center;font-size: 26px;color:#fff;}
+.dzp-popbox .popbox .close-pop{
+	position: absolute;
+	top: -25px;
+	right: -50px;
+	width: 50px;
+	height: 50px;
+	background-image: url("{:tomedia($pcconfig['basicstyle']['closebtn'])}");
+	background-repeat: no-repeat;
+	background-size: cover;
+	cursor: pointer;
+}
+
+.lucker-rollbox{
+	position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+	box-sizing: border-box; 
+    -webkit-box-sizing: border-box; 
+    -moz-box-sizing: border-box;
+    color: #fff;
+}
+.lucker-rolllist{
+	width: 100%;
+    height: auto;
+	overflow: hidden;
+	-webkit-perspective: 1000;
+    perspective: 1000;
+   -webkit-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+}
+.lucker-rolllist li{
+	height: 52px;
+    margin-top: 6px;
+	padding:0 10px;
+	box-sizing: border-box; 
+    -webkit-box-sizing: border-box; 
+    -moz-box-sizing: border-box; 
+}
+.lucker-item-info{
+	width:100%;	
+}
+.lucker-item-info img{
+	width:32px;
+	height: 32px;
+	border-radius: 50%;
+	margin-right: 4px;
+	border:1px solid #fff;
+	box-sizing: border-box;
+	box-shadow: 0 0 5px #fff;
+}
+.lucker-item-info .lucker-item-username{
+	margin-right: 6px;
+    width: 82px;
+    font-size: 14px;
+}
+.lucker-item-content{
+	width: 180px;
+    white-space: nowrap;
+    font-size:16px;
+}
+.lucker-item-onlytxt{
+	height:52px;
+	line-height:52px;
+	font-size:18px;
+}
+</style>
+{if isset($pcconfig['dzpstyle']['rotatemusic']) && !empty($pcconfig['dzpstyle']['rotatemusic'])}
+<audio id="dzprotatemusic" src="{:tomedia($pcconfig['dzpstyle']['rotatemusic'])}"  preload="preload"  style="display:none"></audio>
+{/if}
+{if isset($pcconfig['dzpstyle']['successmusic']) && !empty($pcconfig['dzpstyle']['successmusic'])}
+<audio id="dzpsumusic" src="{:tomedia($pcconfig['dzpstyle']['successmusic'])}"  preload="preload"  style="display:none"></audio>
+{/if}
+{if isset($pcconfig['jggstyle']['rotatemusic']) && !empty($pcconfig['jggstyle']['rotatemusic'])}
+<audio id="jggrotatemusic" src="{:tomedia($pcconfig['jggstyle']['rotatemusic'])}"  preload="preload"  style="display:none"></audio>
+{/if}
+{if isset($pcconfig['jggstyle']['successmusic']) && !empty($pcconfig['jggstyle']['successmusic'])}
+<audio id="jggsumusic" src="{:tomedia($pcconfig['jggstyle']['successmusic'])}"  preload="preload"  style="display:none"></audio>
+{/if}
+<section class="dzp-mainbox normal-box">
+	<div class="dzp-container zam-app-flex-ajCenter display-none">
+		<div class="titlebox">
+			{if !empty($pcconfig['dzpstyle']['topbg'])}
+			<img class="dzptopimg hidden" src="{:tomedia($pcconfig['dzpstyle']['topbg'])}">
+			{/if}
+			{if !empty($pcconfig['jggstyle']['topbg'])}
+			<img class="jggtopimg hidden" src="{:tomedia($pcconfig['jggstyle']['topbg'])}">
+			{/if}
+		</div>
+		<div class="dzp-content zam-app-flex-ajCenter2">
+			<div class="dzp-left zam-app-flex zam-app-alignCenter zam-app-directionColumn">
+				<div class="rulecont"></div>
+			</div>
+			<div class="dzp-center zam-app-flex-ajCenter">
+				<div class="dzp-box zam-app-flex-ajCenter">
+					<div id="my-lucky"></div>
+					<div class="lucky-btn"></div>
+				</div>
+			</div>
+			<div class="dzp-right">
+				<div class="lucker-rollbox"><ul class="lucker-rolllist"></ul></div>
+			</div>
+		</div>
+	</div>
+	<div class="emptybox zam-app-flex-ajCenter display-none">
+	    <img src="/{:SIMGURL}common/empty.png">
+	    <p style="padding:20px;">暂无可用轮次，请到后台添加</p>
+	</div>
+</section>
+<section class="dzp-popbox zam-app-flex-ajCenter hidden">
+	<div class="popbg"></div>
+	<div class="popbox zam-app-flex-ajCenter">
+		<div class="cjmode1 zam-app-flex-ajCenter hidden">
+			<div class="tip">{$pcconfig['basicstyle']['topsuccesstxt']??'恭喜获得'}</div>
+			<img class="prizeimg" src="/static/images/sys/prizeimg.png">
+		</div>
+		<div class="cjmode2 zam-app-flex-ajCenter hidden">
+			<img class="avatar" src="/static/images/sys/avatar.jpg" />
+			<p class="username limitbox">用户名称</p>
+			<div class="tip">{$pcconfig['basicstyle']['topsuccesstxt']??'恭喜获得'}</div>
+		</div>
+		<p class="awardname">奖品名称</p>
+		<span class="close-pop"></span>
+	</div>
+</section>
+<script>
+var rotateid = "{$rotateid}",successtip = "{$pcconfig['basicstyle']['topsuccesstxt']??'恭喜获得'}",failtip = "{$pcconfig['basicstyle']['topfailtxt']??'很遗憾'}";
+var bigwheelConfig = {
+	accelerationTime:{$pcconfig['dzpstyle']['acctime']??'1'},
+	decelerationTime:{$pcconfig['dzpstyle']['dcctime']??'1'},
+	fonts:{ top:'16px',text: ''},
+	imgs:{	top:'60px',width:'66px',src:''},
+};
+var jggConfig = {
+	accelerationTime:{$pcconfig['jggstyle']['acctime']??'1'},
+	decelerationTime:{$pcconfig['jggstyle']['dcctime']??'1'},
+	fonts:{ top:'94px',text: ''},
+	imgs:{	top:'14px',width:'68px',src:''},
+};
+require(['screendzp'],function (screendzp) {
+	screendzp.init();
+});
+</script>
+<script id="rollone-tpl" type="html/javascript">
+<li class="zam-app-flex">
+	{{ if cjmode=='1'}}
+		<div class="lucker-item-onlytxt limitbox">{$pcconfig['basicstyle']['pretxt']??'有人抽中了'}{{ prizename }}</div>
+	{{ else }}
+		<div class="lucker-item-info zam-app-flex zam-app-alignCenter zam-app-justifyspacebetween">
+			<img src="{{ avatar }}">
+			<div class="lucker-item-username limitbox">{{ nickname }}</div>
+			<div class="lucker-item-content limitbox">{{ prizename }}</div>
+		</div>
+	{{ /if }}
+</li>
+</script>
+{include file="common/footer" /}

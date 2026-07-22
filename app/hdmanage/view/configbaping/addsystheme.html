@@ -1,0 +1,31 @@
+<style>
+.user-item{position:relative;width:100px;height:100px;}
+.user-item .zam-select{position:absolute;top:20px;left:0px;}
+.user-item img{width:50px;height:50px;border-radius:50%;}
+.resultuser{
+	flex-wrap: wrap;
+    justify-content: center;
+}
+</style>
+<div class="zam-confirmBox">
+	<ul class="alert resultuser zam-flex"> 
+		{volist name="sysbpthemes" id="theme"}
+			{if !in_array($theme['id'],$hdsysthemeids) && $theme['isshow']=='1'}
+				<li class="zam-flex-column-center user-item">
+					<span class="zam-select">
+						<label class=" lyear-checkbox checkbox-primary ">
+			              <input data-id="{$theme['id']}" name="selectuser[]" type="checkbox">
+			              <span></span>
+			            </label>
+					</span>
+					<img src="{:tomedia($theme['themeconfig']['bpicon'])}" class="loaded"> <p>{$theme['themeconfig']['bpname']}</p> 
+				</li>
+			{/if}
+		{/volist}
+	</ul>
+</div>
+<script>
+require(["webcore"],function(webcore){
+	$(".zam-confirmBox .resultuser li").length<=0&&$(".zam-confirmBox .resultuser").html("<span class='text-error'>暂无主题可选</span>");
+});
+</script>

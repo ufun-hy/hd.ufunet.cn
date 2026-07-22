@@ -1,0 +1,113 @@
+{include file='common/header' /}
+<style>
+.shake-mainbox{
+	width: 100%;
+    height: 100%;
+    padding: 0;
+    overflow: hidden;
+}
+.car-mainbox .swim-box{
+	position: absolute;
+	width: 100%;
+	height: 200%;
+	bottom:0;
+}
+.swim-box.runbg2 {
+	 animation: runbg2 {$pcconfig['style']['trackimgspeed']}s linear 0s infinite;
+     animation-fill-mode: forwards;
+}
+.swim-box .swimbg{
+	width: 100%;
+    height: 50%;
+    background: url("{:tomedia($pcconfig['style']['trackimg']);}");
+    background-size: 100% 100%;
+}
+@-webkit-keyframes runbg2 {
+	from{
+        bottom: 0;
+    }
+    to{
+        bottom: -100%;
+    }
+}
+.shakelineBox {
+	bottom: 0;
+	width:100%;
+	height:100%;
+	position: absolute
+}
+.shakelineBox li{
+	background-size: 100% 100%;
+    position: absolute;
+    transition: bottom 1s linear 0s;
+	display: block;
+	width:300px;
+	height:400px;
+    bottom:-200px;
+}
+.player{
+	position: relative;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+}
+.player img {
+    width: 45px;
+    height: 45px;
+    position: absolute;
+    border: 1px solid #fff;
+    border-radius: 100%;
+    bottom: -45px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+.player .nickname {
+    position: absolute;
+    color: #FFF;
+    text-shadow: 2px 2px 1px #000;
+    width:30px;
+	font-size:20px;
+    word-wrap: break-word;
+    transform: translateX(-50%);
+	top:240px;
+}
+</style>
+<audio id="countaudio" src="/{:WIMGURL}shake/count.mp3"  preload="preload"  style="display:none"></audio>
+<audio id="overaudio" src="/{:SIMGURL}shake/over.mp3"  preload="preload"  style="display:none"></audio>
+<audio id="joinaudio" src="/{:SIMGURL}shake/join.mp3"  preload="preload" style="display:none"></audio>
+<section class="shake-mainbox car-mainbox normal-box zam-app-flex-ajCenter2">
+    <div class="emptybox zam-app-flex-ajCenter display-none">
+		<img src="/{:SIMGURL}common/empty.png">
+		<p style="padding:20px;">请到后台添加游戏轮次</p>
+	</div>
+	<div class="shake-lists swim-box">
+		<div class="swimbg"></div>
+		<div class="swimbg"></div>
+	</div>
+	<ul class="shakelineBox"></ul>
+</section>
+<style>
+
+.start-btn{
+	width:302px;
+	height:103px;
+}
+</style>
+{include file='common/gamewelcome' /}
+<script id="shakeItem-tpl" type="html/javascript">
+<li class="carBoxItem" style="background-image:url('{{carImg}}')">
+	<div class="player display-none">
+		<img src="" class="display-none">
+		<span class="nickname">{$pcconfig['style']['userdefaultname']??'虚位以待'}</span>
+	</div>
+</li>
+</script>
+{include file='common/gamecommon' /}
+<script>
+var carImgs = {:json_encode($pcconfig['style']['roleimgs'])},defaultImg = "{:tomedia($pcconfig['style']['userdefaultimg'])}";
+var defaultName = "{$pcconfig['style']['userdefaultname']??'虚位以待'}";
+require(['screenswim'],function (screenswim) {
+	screenswim.init();
+});
+</script>
+{include file='common/footer' /}

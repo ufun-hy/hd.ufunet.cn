@@ -1,0 +1,117 @@
+<div class="form-horizontal confirmbox-pop">
+<form class="confirm-formbox" method="post">
+    <div class="text-center">
+        <div class="btn-group pop-btns" style="margin-bottom:10px;">
+          <a href="javascript:void(0)" class="btn btn-default btn-primary"><span>基础设置</span></a>
+          <a href="javascript:void(0)" class="btn btn-default"><span>视频设置</span></a>
+          <a href="javascript:void(0)" class="btn btn-default"><span>风格设置</span></a>
+        </div>
+    </div>
+    <div class="carditem">
+    	<div class="form-group">
+			<label class="col-lg-3 control-label text-right">* 排序序号</label>
+			<div class="col-lg-6">
+			  <input type="text" class="form-control"  name="displayorder" value="{$config['displayorder']}">
+			  <div class="help-block">注意:排序按降序排序，序号越大越排在前面</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-lg-3 control-label text-right">* 主题名称</label>
+			<div class="col-lg-6">
+			  <input type="text" class="form-control"  name="bpname" value="{$config['bpname']}">
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-lg-3 control-label text-right">* 图标(100*100px)</label>
+			<div class="col-lg-6">
+			   {:tpl_image_one('bpicon',$config['bpicon'])}
+			</div>
+		</div>
+		<div class="form-group">
+            <label class="col-lg-3 control-label">* 可选最少秒数</label>
+            <div class="col-lg-4">
+                <input type="text" class="form-control numberincdec" name="minseconds" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="null"
+                data-bts-step="1"
+                data-bts-postfix="秒"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['minseconds']}">
+            </div>
+        </div>
+		<div class="form-group">
+			<label class="col-lg-3 control-label text-right">* 微信消息顶部背景(411*50px)</label>
+			<div class="col-lg-6">
+			   {:tpl_image_one('apptopbg',$config['apptopbg'])}
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-lg-3 control-label text-right">* 微信角标图(65*65px)</label>
+			<div class="col-lg-6">
+			   {:tpl_image_one('bpappicon',$config['bpappicon'])}
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-lg-3 control-label text-right">* 大屏角标(342*263px)</label>
+			<div class="col-lg-6">
+			   {:tpl_image_one('bppcicon',$config['bppcicon'])}
+			</div>
+		</div>
+	</div>
+	<div class="carditem hidden">
+		<div class="form-group">
+			<label class="col-lg-3 control-label text-right">* 霸屏前置视频</label>
+			<div class="col-lg-6">
+			   {:tpl_video('beforevideo',$config['beforevideo'])}
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-lg-3 control-label text-right">* 霸屏背景视频</label>
+			<div class="col-lg-6">
+			   {:tpl_video('bgvideo',$config['bgvideo'])}
+			</div>
+		</div>
+	</div>
+	<div class="carditem hidden">
+		<div class="form-group">
+			<label class="col-lg-3 control-label text-right">* 大屏弹层头像背景(320*320px)</label>
+			<div class="col-lg-6">
+			   {:tpl_image_one('avatarbg',$config['avatarbg'])}
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-lg-3 control-label text-right">* 大屏弹层用户名背景(537*150px)</label>
+			<div class="col-lg-6">
+			   {:tpl_image_one('nicknamebg',$config['nicknamebg'])}
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-lg-3 control-label text-right">* 大屏弹层角落背景(607*535px)</label>
+			<div class="col-lg-6">
+			   {:tpl_image_one('cornerbg',$config['cornerbg'])}
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-lg-3 control-label text-right">* 大屏弹层顶部霸屏名与时间背景(558*203px)</label>
+			<div class="col-lg-6">
+			   {:tpl_image_one('leftbpnamebg',$config['leftbpnamebg'])}
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-lg-3 control-label text-right">* 大屏弹层顶部倒计时背景(914*170px)</label>
+			<div class="col-lg-6">
+			   {:tpl_image_one('timebg',$config['timebg'])}
+			</div>
+		</div>
+	</div>
+</form>
+</div>
+<script>
+require(['webcore','jconfirmBox','zamnotice','layerBox',"bootstrap-touchspin"],function(webcore,jconfirmBox,zamnotice,layerBox){
+	$(".confirmbox-pop .numberincdec").TouchSpin();
+    $(".confirmbox-pop .pop-btns a.btn").click(function(){
+        $(this).addClass('btn-primary').siblings().removeClass("btn-primary");
+        $(".confirmbox-pop .carditem").addClass('hidden').eq($(this).index()).removeClass('hidden');
+    });
+});
+</script>

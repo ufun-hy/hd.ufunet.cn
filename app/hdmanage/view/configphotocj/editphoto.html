@@ -1,0 +1,22 @@
+<div class="form-horizontal confirmbox-pop">
+<form class="confirm-formbox" method="post">
+    <div class="carditem">
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 图片名称</label>
+            <div class="col-lg-8">
+                <input class="form-control" type="text"  name="photoname" value="{$config['photoname']}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">分组</label>
+            <div class="col-lg-8">
+            	<select name="groupid" class="form-control">
+            	<option value='' {if empty($config['cateid'])}selected{/if}>请选择分组</option>
+                {volist name="groups" id="group"}
+				<option value="{$group['id']}" {if $config['groupid']==$group['id']}selected{/if}>{$group['groupname']}</option>
+				{/volist}
+				</select>
+            </div>
+        </div>
+    </div>
+</form>

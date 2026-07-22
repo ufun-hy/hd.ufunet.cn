@@ -1,0 +1,142 @@
+{include file="$Wpath/common/header" /}
+<style type="text/css">
+  .zam-titleBox {
+      border-left: 4px solid #48b0f7;
+      padding-left: 15px;
+      font-size: 20px;
+      font-weight: 600;
+      margin: 15px 0;
+  }
+  .card-hdmodule{border:1px solid #dfe6ec;border-radius: 10px;}
+  .card-hdmodule:hover{
+    box-shadow: 1px 3px 10px rgba(37,46,64,.2);
+  }
+  .card-hdmodule .hdmodule-switch{
+    position: absolute;
+    right: 20px;
+    top: 10px
+  }
+  .card-hdmodule .hdmodule-edit{
+    position: absolute;
+    right: 30px;
+    bottom: 40px;
+  }
+</style>
+<div class="hdmodule-dzlist{if hidedzmodules()} hidden{/if}">
+<div class="zam-titleBox">定制模块<div class="pull-right"><a class="btn btn-primary btn-sm btn-refreshdz"><i class="mdi mdi-refresh"></i> 刷新</a></div></div>
+<div class="alert alert-danger zam-flex zam-alignItems">
+  <span class="position-relative m-r-5">
+    <i class="mdi mdi-bell fa-1-5x"></i>
+  </span>
+  <span>功能型模块实际上仅仅是一个功能并非真实模块，故此类模块尽量按需选择性购买。</span>
+</div>
+<div class="row">
+{volist name="dzmodules" id="dzmodule"}
+  <div class="col-sm-6 col-lg-4">
+    <div class="card card-hdmodule">
+      <div class="card-body clearfix">
+        <div class="pull-left"> <img class="img-avatar bg-translucent" src="{:tomedia($dzmodule['moduleimg'])}" /> </div>
+        <div class="pull-left m-l-10">
+          <p class="h4 m-t-0 modulename" style="font-size: 16px;font-weight: 600">{$dzmodule['modulename']}</p>
+          <p class="h6 m-t-0">
+            <span>售价:<span class="text-danger moduleprice m-l-5">￥{$dzmodule['payprice']}</span></span>
+          </p>
+          <p class="h4 m-t-10 hdmodule-pay">
+             {if $dzmodule['issysmodule']=='2'}<span class="badge bg-primary">功能型</span>{/if}
+             {if $dzmodule['hadpay']=='2'}
+             <span class="btn btn-xs btn-primary">立即购买</span>
+             {else /}
+             <span class="badge bg-success">模块已购</span>
+             {/if}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+{/volist}
+</div>
+</div>
+<div class="zam-titleBox">已购模块</div>
+<div class="row">
+{volist name="modules" id="module"}
+  <div class="col-sm-6 col-lg-4">
+    <div class="card card-hdmodule">
+      <div class="card-body clearfix">
+        <div class="pull-left"> <img class="img-avatar bg-translucent" src="{:tomedia($module['moduleimg'])}" /> </div>
+        <div class="pull-left m-l-10">
+          <p class="h4 m-t-0" style="font-size: 16px;font-weight: 600">{$module['modulename']}{if isset($module['isdz']) && $module['isdz']=='1'}<span class="badge bg-primary m-l-5">定制模块</span>{else /}<span class="badge bg-success m-l-5">免费模块</span>{/if}</p>
+          <p class="h6 m-t-0">
+            <span>标示:<span class="text-warning m-l-5">{$module['modulefield']}</span></span>
+            <span>售价:<span class="text-danger m-l-5">￥{$module['moduleprice']}</span></span>
+          </p>
+          <p class="h4 m-b-0">
+            <span>快捷键:<span class="text-primary m-l-5">{$module['modulekjj']}</span></span>
+          </p>
+        </div>
+        <div class="hdmodule-switch hidden">
+          {:tpl_switch('modulestatus',$module['modulestatus'])}
+        </div>
+        <div class="hdmodule-edit cursor text-primary" data-id="{$module['id']}">
+          <span><i class="mdi mdi-pencil"></i> 编辑</span>
+        </div>
+      </div>
+    </div>
+  </div>
+{/volist}
+</div>
+
+<script type="text/javascript">
+  require(['webcore','jconfirmBox','zamnotice'],function(webcore,jconfirmBox,zamnotice){
+    $(".hdmodule-edit").click(function(){
+        var mid = $(this).attr('data-id');
+        var confirmObj = jconfirmBox.ajaxconfirm("编辑模块","{:goweb('hdmodule/edit')}",{ishtml:'1',moduleid:mid},'html','col-lg-8 col-lg-offset-2',function(e){
+            var postData = webcore.serializeObject(e.find('form'));
+            postData.moduleid = mid;
+            webcore.ajaxSubmit("{:goweb('hdmodule/edit')}",postData).then(function(json){
+                if(json.code==0){
+                    window.location.reload();
+                    zamnotice.showTips('success','保存成功');
+                    confirmObj.close();
+                }else{
+                    zamnotice.showTips('error',json.msg);
+                    return false;
+                }
+            }, function(json){
+                zamnotice.showTips('error','网络差。操作失败');
+                 return false;
+            });
+        });
+    });
+    $(".hdmodule-pay").click(function(){
+        var $this = $(this),hadpay = $this.find('.btn-primary'),modulename = $this.parent().find('.modulename').text(),moduleprice = $this.parent().find('.moduleprice').text();
+        if(hadpay.length > 0){
+          var confirmobj = jconfirmBox.ajaxconfirm("购买模块","{:goweb('hdmodule/paymodule')}",{modulename:modulename,moduleprice:moduleprice},'html','col-lg-8 col-lg-offset-2',function(e){
+            confirmobj.close();
+          },false,'2',[],true,function($ele){
+          });
+        }
+    });
+    var clickrefresh = false;
+    $(".btn-refreshdz").click(function(){
+        if(clickrefresh){
+          return false;
+        }
+        clickrefresh = true;
+        jconfirmBox.confirm('温馨提示','确定要刷新系统模块列表吗？',function(){
+            webcore.ajaxSubmit("{:goweb('hdmodule/refreshdz')}",{},'正在刷新，请稍后....').then(function(json){
+                 if(json.code==0){
+                    zamnotice.showTips('success','操作成功',1.5e3,function(){
+                        window.location.reload();
+                    });
+                 }else{
+                    zamnotice.showTips('error',json.msg);
+                    clickrefresh = false;
+                 }
+            });
+        },function(){
+          clickrefresh = false;
+        });
+    });
+});
+</script>
+{include file="$Wpath/common/footer" /}

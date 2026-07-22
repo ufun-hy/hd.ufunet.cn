@@ -1,0 +1,47 @@
+<div class="form-horizontal confirmbox-pop">
+    <div class="zam-flex-column-center">
+        <div style="font-size:24px;margin-bottom:20px">首次扫下面的二维码进入活动可自动加入<span class="text-danger">{$groupname}</span></div>
+        <img src="{$qrcode}" width="200px" height="200px">
+        <a class="btn btn-primary btn-downqrcode" onclick="downloadQr(this)" data-groupname="{$groupname}" style="margin-top: 26px;">下载二维码</a>
+        <div class="m-t-10" style="margin-top: 26px;">
+            <span class="text-danger">注意事项：</span><br>
+            1 每个自定义分组都有一个唯一的二维码<br>
+            2 若用户已分配了其他分组，扫二维码将不会对其进行再次自动分组<br>
+            3 扫自动分组二维码最终将进入活动首页，若签到功能自定义了签到成功转跳地址将无法对用户自动分组
+        </div>
+    </div>
+</div>
+    <script>
+    var clipboard;
+    require(["clipboard","zamnotice"],function(Clipboard,zamnotice){
+        if(clipboard){
+               clipboard.destroy();
+        }
+        clipboard = new Clipboard('.confirmbox-pop .zam-clip', {
+            text: function(e) {
+                return $(e).data('url') || $(e).data('href')
+            }
+        });
+        clipboard.on('success',function(e) {
+           zamnotice.showTips('success','复制成功',2e3);
+        })
+    });
+    function downloadQr(obj){
+        var $this = $(obj),groupname = $(obj).attr('data-groupname') + '.png',imgUrl = $this.prev().attr("src");
+        if (window.navigator.msSaveOrOpenBlob) {
+          var bstr = atob(imgUrl.split(',')[1]),n = bstr.length,u8arr = new Uint8Array(n);
+          while (n--) {
+            u8arr[n] = bstr.charCodeAt(n);
+          }
+          var blob = new Blob([u8arr]);
+          window.navigator.msSaveOrOpenBlob(blob, groupname);
+        } else {
+          var el = document.createElement('a');
+          el.href = imgUrl;
+          el.setAttribute('download', groupname);
+          el.setAttribute('target', '__blank');
+          el.click();
+        }
+    }
+    </script>
+    

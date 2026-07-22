@@ -1,0 +1,32 @@
+{include file='$Wpath/common/header'}
+<div class="alert alert-info">
+  后台在线用户即为已登录后台的实时在线用户
+</div>
+<table class="table table-bordered">
+    <thead>
+      <tr>
+        <th class="text-center" style="width:33%">用户id</th>
+        <th class="text-center" style="width:33%">用户</th>
+        <th class="text-center" style="width:33%">手机号</th>
+      </tr>
+    </thead>
+    <tbody class="online-users">
+    {foreach $users as $user}    
+    <tr>
+        <td class="text-center">
+          {$user['id']}
+        </td>
+        <td class="text-center">
+          <div class="zam-app-flex">
+            <img class="avatarImg" src="{:tomedia($user['user_avatar'])}" onerror="javascript:this.src='{:tomedia($siteinfo['siteavatar'])}';" />
+            <p class="m-t-10">{$user['user_name']}</p>
+          </div>
+        </td>
+        <td class="text-center">
+          <p>{$user['user_mobile']}</p>
+        </td>
+    </tr>
+    {/foreach}
+    </tbody>
+</table>
+{include file='$Wpath/common/footer'}

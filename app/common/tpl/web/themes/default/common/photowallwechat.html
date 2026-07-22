@@ -1,0 +1,245 @@
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 顶部banner图片</label>
+    <div class="col-lg-8">
+        {:tpl_image_one('appstyle[banner]',$config['appstyle']['banner'])}
+        <span class="help-block">规格:600*400px，注：不设置此图则不展示</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 顶部主题</label>
+    <div class="col-lg-8">
+        <div class="input-group">
+            <div class="input-group-btn not-allow"><a class="btn btn-default">文字</a></div>
+            <input type="text" class="form-control" name="appstyle[toptitle][txt]" value="{$config['appstyle']['toptitle']['txt']}">
+            <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
+            <div class="touchspin">
+            <input type="text" class="form-control numberincdec" name="appstyle[toptitle][size]" 
+            data-bts-min="12" data-bts-replacement-val="12"
+            data-bts-max="52"
+            data-bts-step="1"
+            data-bts-postfix="px"
+            data-bts-postfix-extra-class="touchspin-postfix"
+            value="{$config['appstyle']['toptitle']['size']}">
+            </div>
+            <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+            {:tpl_color('appstyle[toptitle][color]',$config['appstyle']['toptitle']['color'])}
+        </div>
+        <div class="help-block">主题文字不设置则不显示</div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 顶部主题2</label>
+    <div class="col-lg-8">
+        <div class="input-group">
+            <div class="input-group-btn not-allow"><a class="btn btn-default">文字</a></div>
+            <input type="text" class="form-control" name="appstyle[toptitle2][txt]" value="{$config['appstyle']['toptitle2']['txt']}">
+            <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
+            <div class="touchspin">
+            <input type="text" class="form-control numberincdec" name="appstyle[toptitle2][size]" 
+            data-bts-min="12" data-bts-replacement-val="12"
+            data-bts-max="52"
+            data-bts-step="1"
+            data-bts-postfix="px"
+            data-bts-postfix-extra-class="touchspin-postfix"
+            value="{$config['appstyle']['toptitle2']['size']}">
+            </div>
+            <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+            {:tpl_color('appstyle[toptitle2][color]',$config['appstyle']['toptitle2']['color'])}
+        </div>
+        <div class="help-block">主题文字不设置则不显示</div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 浏览量</label>
+    <div class="col-lg-8">
+        {:tpl_switch('appstyle[views][open]',$config['appstyle']['views']['open'],'openviews')}
+        <div class="help-block">注：开启会展示出当前照片墙总浏览量</div>
+    </div>
+</div>
+<div class="viewsbox{if $config['appstyle']['views']['open']=='2'} hidden{/if}">
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 基础浏览量</label>
+        <div class="col-lg-4">
+            <input type="text" class="form-control numberincdec" name="appstyle[views][count]" value="{$config['appstyle']['views']['count']}"
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="null"
+                data-bts-step="1"
+                data-bts-postfix="次"
+                data-bts-postfix-extra-class="touchspin-postfix">
+            <div class="help-block">注：展示浏览量即为基础浏览量+真实浏览量</div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 进入一次增加多少次</label>
+        <div class="col-lg-4">
+            <input type="text" class="form-control numberincdec" name="appstyle[views][incnum]" value="{$config['appstyle']['views']['incnum']}"
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="null"
+                data-bts-step="1"
+                data-bts-postfix="次"
+                data-bts-postfix-extra-class="touchspin-postfix">
+        </div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 发布照片</label>
+    <div class="col-lg-8">
+        {:tpl_switch('appstyle[pub][open]',$config['appstyle']['pub']['open'],'openpub')}
+        <div class="help-block">注：开启会展示发布按钮，用户可发布照片，关闭后活动管理员不受影响</div>
+    </div>
+</div>
+<div class="pubbox{if $config['appstyle']['pub']['open']=='2'} hidden{/if}">
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 发布审核</label>
+        <div class="col-lg-8">
+            {:tpl_switch('appverify',$config['appverify'])}
+            <div class="help-block">注：开启后用户发布的照片需要审核通过才可显示</div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 单用户最大发布次数</label>
+        <div class="col-lg-4">
+            <input type="text" class="form-control numberincdec" name="appstyle[pub][maxtimes]" value="{$config['appstyle']['pub']['maxtimes']}"
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="null"
+                data-bts-step="1"
+                data-bts-postfix="次"
+                data-bts-postfix-extra-class="touchspin-postfix">
+            <div class="help-block">注：0为不限制用户发布次数，活动管理员不受此次数限制</div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 留言</label>
+        <div class="col-lg-8">
+            {:tpl_switch('appstyle[pub][input]',$config['appstyle']['pub']['input'],'openinput')}
+            <div class="help-block">注：开启会用户需要先输入留言内容方可发布照片</div>
+        </div>
+    </div>
+    <div class="form-group inpubbox{if $config['appstyle']['pub']['input']=='2'} hidden{/if}">
+        <label class="col-lg-2 control-label">* 留言内容最大长度</label>
+        <div class="col-lg-4">
+            <input type="text" class="form-control numberincdec" name="appstyle[pub][maxlength]" value="{$config['appstyle']['pub']['maxlength']}"
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="null"
+                data-bts-step="1"
+                data-bts-postfix="个字符"
+                data-bts-postfix-extra-class="touchspin-postfix">
+            <div class="help-block">注：0为不限制内容长度</div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 举办时间</label>
+        <div class="col-lg-8">
+            <input class="form-control" type="text"  name="appstyle[time]" value="{$config['appstyle']['time']}">
+            <div class="help-block">注：不填写则不展示</div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 举办地点</label>
+        <div class="col-lg-8">
+            <input class="form-control" type="text"  name="appstyle[area]" value="{$config['appstyle']['area']}">
+            <div class="help-block">注：不填写则不展示</div>
+        </div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 照片默认排版方式</label>
+    <div class="col-lg-8">
+      <label class="lyear-radio radio-inline radio-primary">
+       <input type="radio" name="appstyle[photosettype]" value="1" {if $config['appstyle']['photosettype']=='1'}checked{/if}><span>瀑布流</span>
+      </label>
+      <label class="lyear-radio radio-inline radio-primary">
+       <input type="radio" name="appstyle[photosettype]" value="2" {if $config['appstyle']['photosettype']=='2'}checked{/if}><span>九宫格</span>
+      </label>
+      <div class="help-block">注：此处仅设置默认排版方式，用户可在微信端自由切换</div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 优化加载</label>
+    <div class="col-lg-8">
+        {:tpl_switch('appstyle[autoscale]',$config['appstyle']['autoscale']??2)}
+        <div class="help-block">注：开启后缩略图会自动在原图基础上缩放到合适大小，可降低图片加载时间，关闭则直接加载原图</div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 弹窗照片展示留言</label>
+    <div class="col-lg-8">
+        {:tpl_switch('appstyle[poptxt][open]',$config['appstyle']['poptxt']['open'],'openpoptxt')}
+        <div class="help-block">注：开启会点击单张图片弹窗后展示用户留言内容</div>
+    </div>
+</div>
+<div class="poptxtbox{if $config['appstyle']['poptxt']['open']=='2'} hidden{/if}">
+    <div class="form-group">
+        <label class="col-lg-2 control-label text-right">* 留言样式</label>
+        <div class="col-lg-8">
+            <div class="input-group">
+                <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
+                <div class="touchspin">
+                <input type="text" class="form-control numberincdec" name="appstyle[poptxt][size]" 
+                data-bts-min="12" data-bts-replacement-val="12"
+                data-bts-max="52"
+                data-bts-step="1"
+                data-bts-postfix="px"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['appstyle']['poptxt']['size']}">
+                </div>
+                <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+                {:tpl_color('appstyle[poptxt][color]',$config['appstyle']['poptxt']['color'])}
+                <div class="input-group-btn not-allow"><a class="btn btn-default">背景色</a></div>
+                {:tpl_color('appstyle[poptxt][bgcolor]',$config['appstyle']['poptxt']['bgcolor'])}
+                <div class="input-group-btn not-allow"><a class="btn btn-default">边界色</a></div>
+                {:tpl_color('appstyle[poptxt][bordercolor]',$config['appstyle']['poptxt']['bordercolor'])}
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+function openviews(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".viewsbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".viewsbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openpub(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".pubbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".pubbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openinput(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".inpubbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".inpubbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openpoptxt(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".poptxtbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".poptxtbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+</script>

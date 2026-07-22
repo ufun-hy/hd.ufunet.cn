@@ -1,0 +1,155 @@
+{include file='$Wpath/common/header'}
+{include file='$Wpath/common/tabletoolbar'}
+<style type="text/css">
+  .card-hdmodule{border:1px solid #dfe6ec}
+  .card-hdmodule:hover{
+    box-shadow: 1px 3px 10px rgba(37,46,64,.2);
+  }
+  .card-hdmodule .hdmodule-switch{
+    position: absolute;
+    right: 20px;
+    top: 10px
+  }
+  .card-hdmodule .hdmodule-edit{
+    position: absolute;
+    right: 30px;
+    bottom: 40px;
+  }
+</style>
+<table id="listtable" class="zam-btable"></table>
+<script>
+require(['webcore','webtable','jconfirmBox','zamnotice'],function(webcore,webtable,jconfirmBox,zamnotice){
+var initConfig = {
+    tableId:'#listtable',
+    url:"{:goweb('hdfw/index')}",
+    columnoperate:{
+        btns:{
+            edit:true,
+            del:true,
+        },
+        func:{
+            edit:function(value, row, index){
+                var confirmObj = jconfirmBox.ajaxconfirm("编辑服务","{:goweb('hdfw/edit')}",{ishtml:'1',fwid:row.id},'html','col-lg-6 col-lg-offset-3',function(e){
+                    var postData = webcore.serializeObject(e.find('form'));
+                    postData.fwid = row.id;
+                    webcore.ajaxSubmit("{:goweb('hdfw/edit')}",postData).then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','保存成功');
+                            confirmObj.close();
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                             return false;
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                         return false;
+                    });
+                });
+            },
+            del:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','您确定要删除么？',function(){
+                      webcore.ajaxSubmit("{:goweb('hdfw/del')}",{fwid:row.id},'处理中..').then(function(json){
+                          if(json.code==0){
+                              webtable.refresh();
+                              zamnotice.showTips('success','删除成功');
+                          }else{
+                              zamnotice.showTips('error',json.msg);
+                          }
+                      }, function(json){
+                          zamnotice.showTips('error','网络差。操作失败');
+                      });
+                });
+            },
+        }
+    },
+    columns:[{
+            checkbox: true,
+        }, 
+        {
+            field: 'id',
+            title: 'ID',
+            align: 'center',
+            width:'6%',
+            visible: false
+        },  {
+            field: 'fworder',
+            title: '排序',
+            align: 'center',
+        }, {
+            field: 'fwtypehtml',
+            title: '类型',
+            align:'center',
+        }, {
+            field: 'fwname',
+            title: '服务名',
+            align:'center',
+        }, {
+            field: 'fwicon',
+            title: '图标',
+            align:'center',
+            formatter: function (value, row, index) {
+                return '<img width=60px height=60px src="'+value+'" >';
+            },
+        }, {
+            field: 'fwimg',
+            title: '预览图',
+            align:'center',
+            formatter: function (value, row, index) {
+                return '<img width=180px height=101px src="'+value+'" >';
+            },
+        }, {
+            field: 'fwprice',
+            title: '价格(元)',
+            align:'center',
+        },  {
+            field: 'create_time',
+            title: '添加时间',
+            align: 'center',
+        }
+    ],
+    searchParamas:[],
+    toolbar:{
+        add:function(ajaxurl){
+            var confirmObj = jconfirmBox.ajaxconfirm("新增服务",ajaxurl,{ishtml:'1'},'html','col-lg-6 col-lg-offset-3',function(e){
+                var postData = webcore.serializeObject(e.find('form'));
+                webcore.ajaxSubmit(ajaxurl,postData).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','新增成功');
+                        confirmObj.close();
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                         return false;
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差。操作失败');
+                     return false;
+                });
+            });
+        },
+        del:function(ajaxurl){
+            var getSelects = webtable.getSelections();
+            if(getSelects.length>0){
+                jconfirmBox.confirm('温馨提示','您确定要删除选中的数据么？',function(){
+                    webcore.ajaxSubmit(ajaxurl,{fwid:getSelects},'处理中..').then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','删除成功');
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差,操作失败');
+                    });
+                });
+            }else{
+                zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+        },
+    },
+};
+webtable.init(initConfig);
+});
+</script>
+{include file='$Wpath/common/footer'}

@@ -1,0 +1,187 @@
+{include file='common/header' /}
+<style type="text/css">
+.slotsbox{
+	position: fixed;
+	top: 160px;
+	left: 70px;
+	width:650px;
+	height: 562px;
+	background-image:url(/static/images/screen/labaji/kuang.png);
+	background-repeat:no-repeat;
+	background-size: cover;
+}
+.slotsbox .slots{
+	background:url(/static/images/screen/labaji/slogbg.png) no-repeat center center;
+    width: 420px;
+    height: 181px;
+    margin-top: 80px;
+    margin-right: 32px;
+    position: relative;
+}
+.slotbg{
+	width: 100%;
+    height: 100%;
+    overflow: hidden;
+    margin: 0 auto;
+    position: relative;
+}
+.slotbg:before{
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 1;
+	width: 100%;
+	height: 100%;
+	background: url(/static/images/screen/labaji/panel.png) no-repeat center center;
+    background-size: cover;
+}
+.slotsbox .slots .slotbg #slot2{margin:0 6px;}
+.startbtn {
+    width: 200px;
+    height: 68px;
+    cursor: pointer;
+    margin-top: 40px;
+    margin-right: 16px;
+    background-image: url(/static/images/screen/labaji/startbtn.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+</style>
+<div class="slotsbox zam-app-flex-ajCenter">
+	<div class="slots zam-app-flex-ajCenter2">
+		<div class="slotbg zam-app-flex zam-app-alignCenter">
+			<div id="slot"></div>
+			<div id="slot2"></div>
+			<div id="slot3"></div>
+		</div>
+	</div>
+	<div class="startbtn"></div>
+</div>
+<script type="text/javascript">
+var slotconfig = {
+	dpr:0.78,
+	width:'150px',
+	height:'192px',
+	fontTop:'52px',
+	defaultStyle:{fontSize: '32px',fontColor: '#333',},
+	defaultConfig:{rowSpacing: '25px',colSpacing: '10px'},
+	blocks:[{ padding: '0px', background: '#fff' },],
+	slots:[{ speed: 20 ,direction:-1},],
+};
+var alldatas = {:json_encode($alldatas)},companydatas = [],fnamedatas = [],snamedatas=[],eachtimer,eachend = false,eachindex = 0;
+if(alldatas.length > 0){
+	$.each(alldatas,function(key,item){
+		companydatas.push({
+			fonts:[{
+				text:item.companyname,
+				top:slotconfig.fontTop,
+				id:item.id
+			}],
+		});
+		fnamedatas.push({
+			fonts:[{
+				text:item.username.substring(0,1),
+				top:slotconfig.fontTop,
+				id:item.id
+			}],
+		});
+		snamedatas.push({
+			fonts:[{
+				text:item.username.substring(1),
+				top:slotconfig.fontTop,
+				id:item.id
+			}],
+		});
+		eachindex++;
+		if(eachindex >= alldatas.length){
+			eachend = true;
+		}
+	});
+}
+require(['screencore','layerBox','luckycanvas','keyboard'],function(screencore,layerBox,LuckyCanvas,keyboardJS){
+	eachtimer = setInterval(function(){
+		if(eachend){
+			eachend = false;
+			clearInterval(eachtimer);
+			var slot = new LuckyCanvas.SlotMachine({
+	            divElement: document.querySelector('#slot'),
+                dpr: slotconfig.dpr,
+	        }, {
+				width: slotconfig.width,
+				height: slotconfig.height,
+				blocks: slotconfig.blocks,
+				slots: slotconfig.slots,
+				defaultStyle:slotconfig.defaultStyle,
+			    defaultConfig: slotconfig.defaultConfig,
+				prizes: companydatas
+			})
+			var slot2 = new LuckyCanvas.SlotMachine({
+	            divElement: document.querySelector('#slot2'),
+                dpr: slotconfig.dpr,
+	        }, {
+				width: slotconfig.width,
+				height: slotconfig.height,
+				blocks: slotconfig.blocks,
+				slots: slotconfig.slots,
+				defaultStyle:slotconfig.defaultStyle,
+			    defaultConfig: slotconfig.defaultConfig,
+				prizes: fnamedatas
+			})
+			var slot3 = new LuckyCanvas.SlotMachine({
+	            divElement: document.querySelector('#slot3'),
+                dpr: slotconfig.dpr,
+	        }, {
+				width: slotconfig.width,
+				height: slotconfig.height,
+				blocks: slotconfig.blocks,
+				slots: slotconfig.slots,
+				defaultStyle:slotconfig.defaultStyle,
+			    defaultConfig: slotconfig.defaultConfig,
+				prizes: snamedatas,
+			})
+			var stopindex = 0,clicked = false;
+			$('.startbtn').click(function(){
+				if(clicked){
+					return false;
+				}
+				clicked = true;
+				screencore.ajaxSubmit('/screen/labaji/savelucker',{}).then(function(data){
+					if(data.code==0) {
+						stopindex = data.msg;
+						slot.play();
+						setTimeout(function(){
+							slot2.play();
+						},1e3);
+						setTimeout(function(){
+							slot3.play();
+						},2e3);
+						setTimeout(function(){
+							slot.stop(stopindex);
+							setTimeout(function(){
+								slot2.stop(stopindex);
+							},1e3);
+							setTimeout(function(){
+								slot3.stop(stopindex);
+								setTimeout(function(){
+									clicked = false;
+								},1e3);
+							},2e3);
+						},5e3);
+					}else{
+						clicked = false;
+						return layerBox.showMsg(data.msg);
+					}
+				},function(){
+					clicked = false;
+					return layerBox.showMsg('网络异常','0');
+				});
+			});
+			keyboardJS.bind('space', function(e) {
+				$(".startbtn").trigger('click');
+			});
+		}
+	},50);
+});
+</script>
+{include file='common/footer' /}

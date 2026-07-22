@@ -1,0 +1,651 @@
+               
+                {if !noleftMenu()}
+                    </div><!--card-body end-->
+                </div><!--card end-->
+                {/if}
+                <div class="text-center" role="footer" style="margin: 20px 0 30px 0">
+                    <div class="copyright">{$siteinfo['sitecopyright']}</div>
+                </div>
+            </div><!--row end-->
+        </div><!--container-fluid end-->
+    </main>
+ <!--End 页面主要内容-->
+  </div><!--lyear-layout-container-->
+</div><!--lyear-layout-web-->
+{include file="$Wpath/common/footer-kefu"}
+{include file="$Wpath/common/coretpl"}
+<script type="text/javascript">
+window.onload = function (){   
+  document.body.onkeydown=function(event){
+    if(event.keyCode==13){
+        event.keyCod=0; 
+        return false;
+    }
+  }
+};
+require(["webcore","sitesocket","zamnotice","jconfirmBox","bscroll",'layer',"fontpicker","bootstrap-daterangepicker","bootstrap-touchspin","bootstrap-maxlength","select2-zhcn"],function(webcore,sitesocket,zamnotice,jconfirmBox,BScroll,layer){
+    //连接socket
+    var wsConfig = {};
+    wsConfig.onmessage = function(data){
+        if(data.type=='connected'){
+            sitesocket.isclose = false;
+            webcore.ajaxSubmit("{:gocommon('basic/binduid')}",{clientid:data.clientid}).then(function(data){
+                if(data.code!=0){
+                    webcore.showMsg(data.msg);
+                }
+            }, function(){
+                webcore.showMsg('网络太差，请稍后重试.');
+            });
+        }else if(data.type=='bindtxwxaccount'){
+            if($(".txaccountbox").length >0 && $(".txaccountbox").attr("data-userid")==data.userid){
+                var bindwxuser = $(".txaccountbox .bindwxuser");
+                bindwxuser.find("a img").attr('src',data.wxuser.avatar);
+                bindwxuser.find("a span").text(data.wxuser.nickname);
+                bindwxuser.find("input").eq(0).val(data.wxuser.openid);
+                bindwxuser.find("input").eq(1).val(data.wxuser.nickname);
+                bindwxuser.find("input").eq(2).val(data.wxuser.avatar);
+                bindwxuser.find("a").show();
+                $(".jconfirm-closeIcon").trigger('click');
+            }
+        }else if(data.type=='binduserwx'){
+            if($(".binduserwx").length >0 && $(".binduserwx").attr("data-userid")==data.userid){
+                $(".jconfirm-closeIcon").trigger('click');
+                zamnotice.showTips('success','微信绑定成功',2e3,function(){
+                    window.location.reload();
+                });
+            }
+        }else if(data.type=='bindsfz'){
+            if($(".myshimingbox").length > 0 && $(".myshimingbox").attr("data-userid")==data.userid){
+                $(".jconfirm-closeIcon").trigger('click');
+                if(data.errcode=='0'){
+                    zamnotice.showTips('success',data.errmsg,1e3,function(){
+                        window.location.reload();
+                    });
+                }else{
+                    zamnotice.showTips('error',data.errmsg,1e3,function(){
+                        $(".myshimingbox .sfzconfirm").trigger('click');
+                    });
+                }
+            }
+        }
+    };
+    sitesocket.init(wsConfig);
+    $("body").on('click','[data-stopPropagation]',function (e) {
+        e.stopPropagation();
+    });
+    // 提示
+    if($('[data-tooltip="laytip"]').length) {
+        var tipindex;
+        $('[data-tooltip="laytip"]').on({
+            mouseover : function(){
+                var $this = this;
+                tipindex = layer.tips($($this).attr('title') || '', $this, {skin:'laytip',tips:1,anim:-1,time: 0}); //不自动关闭
+            },
+            mouseout : function(){
+                layer.close(tipindex);
+            }
+        });
+    }
+    //colspan start
+    //展开
+    $(".collapse").on("show.bs.collapse", function () {
+         $(this).prev().find(".config-titlebtn i").removeClass("mdi-chevron-double-down").addClass("mdi-chevron-double-up");
+         $(this).prev().find(".config-titlebtn span").text("折叠");
+    })
+    //折叠
+    $(".collapse").on("hide.bs.collapse", function () {
+        $(this).prev().find(".config-titlebtn i").removeClass("mdi-chevron-double-up").addClass("mdi-chevron-double-down");
+        $(this).prev().find(".config-titlebtn span").text("展开");
+    })
+    //折叠 end
+    
+    // 侧边栏
+    $(document).on('click', '.lyear-aside-toggler', function() {
+        $('.lyear-layout-sidebar').toggleClass('lyear-aside-open');
+        $("body").toggleClass('lyear-layout-sidebar-close');
+        
+        if ($('.lyear-mask-modal').length == 0) {
+            $('<div class="lyear-mask-modal"></div>').prependTo('body');
+        } else {
+            $( '.lyear-mask-modal' ).remove();
+        }
+    });
+    // 遮罩层
+    $(document).on('click', '.lyear-mask-modal', function() {
+        $( this ).remove();
+        $('.lyear-layout-sidebar').toggleClass('lyear-aside-open');
+        $('body').toggleClass('lyear-layout-sidebar-close');
+    });
+    // 侧边栏导航
+    $('.lyear-layout-sub-column').on('click', '.nav-item-has-subnav > a', function() {
+        var $subnavToggle = $(this),$navHasSubnav = $subnavToggle.parent(),$subnav = $navHasSubnav.find('.nav-subnav').first();
+        $navHasSubnav.siblings().find('.nav-subnav:visible').slideUp(500).parent().removeClass('open');
+        $subnav.slideToggle(300,function() {
+            $navHasSubnav.toggleClass('open');
+        });
+    });
+    // 滚动条
+    if($('.lyear-layout-sub-column').length) {
+        var menuscroll = new BScroll($('.lyear-layout-sub-column')[0], {
+            click: true,
+            scrollY:true,
+            mouseWheel: true,
+            scrollbar: {
+                fade: false,
+                interactive: true
+            }
+        });
+        menuscroll.scrollToElement($(".lyear-layout-sub-column li.active")[0],250,true,true);
+    }
+    $(".logout").on('click',function(){
+        jconfirmBox.confirm('温馨提示','您确定要退出系统么？',function(){
+			webcore.ajaxSubmit("{:goweb('login/logout')}",{}).then(function(json){
+				 if(json.code==0){
+					zamnotice.showTips('success','退出成功',1e3,function(){
+						window.location.href = json.url;
+					});
+				 }else{
+					zamnotice.showTips('error',json.msg);
+				 }
+			})
+		});
+    });
+    
+    
+    //图标选择
+    $('.icon-picker').fontIconPicker({
+        theme: 'fip-bootstrap',
+        source:webcore.fontarr,
+    });
+    //时间范围选择
+    $('.js-datetimepicker').each(function() {
+        var $input = $(this),$obj = {
+                singleDatePicker: $input.data('issingle')=='1'?true:false,
+                timePicker: $input.data('needsfm')=='1'?true:false,
+                showDropdowns: $input.data('needsdd')=='1'?true:false,
+                timePicker24Hour:true,
+                timePickerSeconds:$input.data('needseconds')=='1'?true:false,
+                autoUpdateInput:$input.data('autoval')=='1'?true:false,
+                locale: {
+                    format: $input.attr('data-format'),
+                },
+            };
+            if($input.data('start')) $obj.startDate = $input.data('start');
+            if($input.data('end')) $obj.endDate = $input.data('end');
+            if($input.data('mintime')) $obj.minDate = $input.data('mintime');
+            if($input.data('maxtime')) $obj.maxDate = $input.data('maxtime');
+            $input.daterangepicker($obj,function(start, end, label){
+                var funcstr = $input.data('func');
+                var func = window[funcstr];
+                func && func(start,end);
+            });
+    });
+    //数字点击增长减少
+    $(".numberincdec").TouchSpin().on("change", function(){
+        var $this = $(this),funcstr = $this.data('func');
+        var func = window[funcstr];
+        func && func(this);
+    });
+    $(".inputneedmax").maxlength({
+        alwaysShow: true,
+        placement: "bottom-right-inside",
+        warningClass: "label label-info",
+        limitReachedClass: "label label-warning"
+    });
+    $.fn.select2.defaults.set('width', '100%');
+    $('.js_select2').select2({
+        width: 'resolve',
+        placeholder: '请选择',
+    });
+    tpl_colorpicker();
+    tpl_switch();
+    if($(".utextarea").length > 0) tpl_ueditor(); 
+});
+if($("form.zam-formvalidation").length<=0){
+	 window.formInited = true;
+}else{
+	$("form.zam-formvalidation button.zam-btn").addClass('disabled');
+}
+if($("table.zam-btable").length<=0){
+	 window.tableInited = true;
+}else{
+    $(".zam-toolbar a").addClass('disabled');
+}
+window.formtableInitTimer = setInterval(function () {
+	if (window.formInited&&window.tableInited) {
+		$("form.zam-formvalidation button.zam-btn").removeClass('disabled');
+		$(".zam-toolbar a").removeClass('disabled');
+		clearInterval(window.formtableInitTimer);
+	}else{
+		if($(".zam-formvalidation.fv-form-bootstrap").length>0){
+			 window.formInited = true;
+             $(".zam-fixedbottom").width($(".container-fluid").width()+30);
+		}
+		if($(".bootstrap-table").length>0){
+			window.tableInited = true;
+		}
+	}
+},10);
+$( function() {
+    //提交框位置重置
+    $(".container-fluid").on('resize',function(){
+        $(".zam-fixedbottom").width($(".container-fluid").width()+30);
+    });
+    
+});
+{/*
+通用函数 单图上传
+*/}
+function tpl_image_one(obj,func) {
+    require(["jconfirmBox","zamnotice"], function(jconfirmBox,zamnotice){
+        var $this = $(obj);
+        var confirmObj = jconfirmBox.ajaxconfirm("选择图片","{:gocommon('attachment/showuploadattattachment')}",{type:"1"},"html","attachmentpop col-lg-12 col-lg-offset-0",function(e){
+            var selimg = e.find(".uploadattachments-box .active");
+            if(selimg.length==0){
+                zamnotice.showTips("error","请选择图片");
+                return false;
+            }else{
+                if(selimg.length > 1){
+                    zamnotice.showTips("error","最多可以选择1张图片");
+                    return false;
+                }
+                var $imgsrc = selimg.css("backgroundImage").split("(")[1].split(")")[0].replace(/\"/g, ""),srcpath = selimg.attr("data-filepath");
+                if(func){
+                    func($imgsrc,srcpath,obj);
+                }else{
+                    $this.parent().prev().val(srcpath);
+                    $this.parent().parent().next().find("img").attr("src",$imgsrc);
+                }
+            }
+            confirmObj.close();
+        },false,'1',[{'hidden':false,'txt':'确定'},{'hidden':false,'txt':'取消'}],true,function(e){        
+            initAttachmentHeight(e);
+        });
+    });
+}
+{/*
+通用函数 多图图上传
+*/}
+function tpl_image_multi(obj,func) {
+    require(["webcore","jconfirmBox","zamnotice"], function(webcore,jconfirmBox,zamnotice){
+        var $this = $(obj);
+        var confirmObj = jconfirmBox.ajaxconfirm("选择图片","{:gocommon('attachment/showuploadattattachment')}",{type:'1'},'html','col-lg-12 col-lg-offset-0',function(e){
+            var selimgs = e.find(".uploadattachments-box .active");
+            if(func) {
+                var flag = func(selimgs);
+                if(!flag){
+                    return flag;
+                }
+            }else{
+                if(selimgs.length==0){
+                    zamnotice.showTips('error','请先选择图片');
+                    return false;
+                }else{
+                    var multiitem = '';
+                    selimgs.each(function(){
+                        var $this2 = $(this);
+                        var obj = {
+                            filesrc:$this2.css("backgroundImage").split('(')[1].split(')')[0].replace(/\"/g, ""),
+                            filepath:$this2.attr('data-filepath'),
+                            inputname:$this.attr('data-name'),
+                        };
+                        multiitem += webcore.tpl($("#multiimg-item-tpl"),obj);
+                    });
+                    $this.parent().parent().next().append(multiitem);
+                }
+            }
+            confirmObj.close();
+        },false,'1',[{'hidden':false,'txt':'确定'},{'hidden':false,'txt':'取消'}],true,function(e){
+            initAttachmentHeight(e);
+        });
+    });
+}
+{/*
+通用函数 音频上传
+*/}
+function tpl_audio(obj) {
+    require(["jconfirmBox","zamnotice"], function(jconfirmBox,zamnotice){
+        var $this = $(obj);
+        var confirmObj = jconfirmBox.ajaxconfirm("选择音频","{:gocommon('attachment/showuploadattattachment')}",{type:'2'},'html','col-lg-12 col-lg-offset-0',function(e){
+            var selimgs = e.find(".uploadattachments-box .active");
+            if(selimgs.length==0){
+                zamnotice.showTips('error','请先选择音频');
+                return false;
+            }else{
+                if(selimgs.length > 1){
+                    zamnotice.showTips('error','最多可以选择1个音频文件');
+                    return false;
+                }
+                $this.parent().prev().val(selimgs.attr('data-filepath'));
+            }
+            confirmObj.close();
+        },false,'1',[{'hidden':false,'txt':'确定'},{'hidden':false,'txt':'取消'}],true,function(e){
+            initAttachmentHeight(e);
+        });
+    });
+}
+{/*
+通用函数 视频上传
+*/}
+function tpl_video(obj,func) {
+    require(["jconfirmBox","zamnotice"], function(jconfirmBox,zamnotice){
+        var $this = $(obj);
+        var confirmObj = jconfirmBox.ajaxconfirm("选择视频","{:gocommon('attachment/showuploadattattachment')}",{type:'3'},'html','col-lg-12 col-lg-offset-0',function(e){
+            var selimg = e.find(".uploadattachments-box .active");
+            if(selimg.length==0){
+                zamnotice.showTips("error","请先选择视频");
+                return false;
+            }else{
+                if(selimg.length > 1){
+                    zamnotice.showTips("error","最多可以选择1个视频文件");
+                    return false;
+                }
+                var videopath = selimg.attr("data-filepath");
+                if(func){
+                    var videosrc = selimg.attr("data-filesrc"),videoprevimg = (typeof(selimg.css("backgroundImage"))!='undefined' && selimg.css("backgroundImage")!='none') ? selimg.css("backgroundImage").split("(")[1].split(")")[0].replace(/\"/g, ""):"";
+                    func(videoprevimg,videopath,videosrc,obj);
+                }else{
+                    $this.parent().prev().val(videopath);
+                }
+            }
+            confirmObj.close();
+        },false,'1',[{'hidden':false,'txt':'确定'},{'hidden':false,'txt':'取消'}],true,function(e){
+            initAttachmentHeight(e);
+        });
+    });
+}
+function initAttachmentHeight(e){
+    var pane = $(e).parent();
+    pane.css({"margin":'0',"display":"block"});
+    setTimeout(()=>{
+        var wrapper = pane.find('.card-body'),pageH = pane.find('.attachment-files-footer').outerHeight(true);
+        var maxH = parseInt(pane.css("max-height")) - pane.find(".card-header").height() - pageH;
+        var limb = 10;
+        var liborder = 2;
+        var lih = (wrapper.find(".attachment-files-wrapper").outerWidth(true) / 5) - limb + 2 * liborder;
+        var lih2 = pageH + limb;
+        var maxHeight = maxH;
+        if(maxHeight > (lih * 3 + lih2)){
+            maxHeight = lih * 3 + lih2;
+        }else if(maxHeight > (lih * 2 + lih2)){
+            maxHeight = lih * 2 + lih2;
+        }
+        wrapper.css({"height":maxHeight});
+    },120);
+}
+{/*
+ 附件文件预览
+*/}
+function prevshowattachs(arr,type,css) {
+    type = type||'1';
+    css = css||"";
+    require(["webcore"], function(webcore){
+        if(!$.isArray(arr)){
+            if(typeof(arr)=='string'){
+                var filetypes = ['.png','.jpg','.jpeg','.gif','.mp4','.mp3','.webm','.ogg','.mov'];
+                var filetype = webcore.getfileExtension(arr);
+                if(filetype!='' && $.inArray(filetype,filetypes)!=-1){
+                    arr = [arr+'?t='+Math.random()];
+                }else{
+                    arr = [$(arr).attr('src')];
+                }
+            }else{
+                arr = [$(arr).attr('src')];
+            }
+        }
+        webcore.showVideos(arr,type,css);
+    });
+}
+/*颜色选择器*/
+function tpl_colorpicker(){
+require(["colorpicker2"], function(){
+    $(".js-colorpicker").each(function(){
+        var $this = $(this);
+        $this.spectrum({
+        allowEmpty:true,
+        color: $this.val(),
+        showInput: true,
+        containerClassName: "full-spectrum",
+        showInitial: true,
+        showPalette: true,
+        showSelectionPalette: true,
+        showAlpha: true,
+        maxPaletteSize: 10,
+        preferredFormat: "hex",
+        showButtons:true,
+        cancelText: "取消",
+        chooseText: "确定",
+        move: function (color) {
+            $this.val(color);
+        },
+        change:function(color){
+            $this.val(color);
+        },
+        palette: [
+            ["rgb(0, 0, 0)", "rgb(67, 67, 67)", "rgb(102, 102, 102)", /*"rgb(153, 153, 153)","rgb(183, 183, 183)",*/
+            "rgb(204, 204, 204)", "rgb(217, 217, 217)", /*"rgb(239, 239, 239)", "rgb(243, 243, 243)",*/ "rgb(255, 255, 255)"],
+            ["rgb(152, 0, 0)", "rgb(255, 0, 0)", "rgb(255, 153, 0)", "rgb(255, 255, 0)", "rgb(0, 255, 0)",
+            "rgb(0, 255, 255)", "rgb(74, 134, 232)", "rgb(0, 0, 255)", "rgb(153, 0, 255)", "rgb(255, 0, 255)"],
+            ["rgb(230, 184, 175)", "rgb(244, 204, 204)", "rgb(252, 229, 205)", "rgb(255, 242, 204)", "rgb(217, 234, 211)",
+            "rgb(208, 224, 227)", "rgb(201, 218, 248)", "rgb(207, 226, 243)", "rgb(217, 210, 233)", "rgb(234, 209, 220)",
+            "rgb(221, 126, 107)", "rgb(234, 153, 153)", "rgb(249, 203, 156)", "rgb(255, 229, 153)", "rgb(182, 215, 168)",
+            "rgb(162, 196, 201)", "rgb(164, 194, 244)", "rgb(159, 197, 232)", "rgb(180, 167, 214)", "rgb(213, 166, 189)",
+            "rgb(204, 65, 37)", "rgb(224, 102, 102)", "rgb(246, 178, 107)", "rgb(255, 217, 102)", "rgb(147, 196, 125)",
+            "rgb(118, 165, 175)", "rgb(109, 158, 235)", "rgb(111, 168, 220)", "rgb(142, 124, 195)", "rgb(194, 123, 160)",
+            "rgb(166, 28, 0)", "rgb(204, 0, 0)", "rgb(230, 145, 56)", "rgb(241, 194, 50)", "rgb(106, 168, 79)",
+            "rgb(69, 129, 142)", "rgb(60, 120, 216)", "rgb(61, 133, 198)", "rgb(103, 78, 167)", "rgb(166, 77, 121)",
+            /*"rgb(133, 32, 12)", "rgb(153, 0, 0)", "rgb(180, 95, 6)", "rgb(191, 144, 0)", "rgb(56, 118, 29)",
+            "rgb(19, 79, 92)", "rgb(17, 85, 204)", "rgb(11, 83, 148)", "rgb(53, 28, 117)", "rgb(116, 27, 71)",*/
+            "rgb(91, 15, 0)", "rgb(102, 0, 0)", "rgb(120, 63, 4)", "rgb(127, 96, 0)", "rgb(39, 78, 19)",
+            "rgb(12, 52, 61)", "rgb(28, 69, 135)", "rgb(7, 55, 99)", "rgb(32, 18, 77)", "rgb(76, 17, 48)"]
+        ]
+        })
+    })
+})
+}
+/*switch*/
+function tpl_switch(){
+    var lyearswiths = $(".normal-swith");
+    lyearswiths.each(function(){
+        $(this).unbind("click").click(function(e){
+            e.preventDefault(); 
+            e.stopPropagation();
+            var $this = $(this),spanbox = $this.find(".normal-span");
+            var status = spanbox.attr('data-status'),func = spanbox.attr("data-func"), url = spanbox.attr("data-ajax");
+            if(spanbox.hasClass('has-func')){
+                window[func] && window[func](spanbox, status, url);
+            } else {
+                $this.find("input[type='checkbox']").prop("checked",status=='1'?false:true);
+                $this.find("input[type='hidden']").val(status=='2'?'1':'2');
+                spanbox.attr('data-status',status=='1'?'2':'1');
+            }
+        });
+    })
+}
+/*links*/
+function tpl_hdlinks(obj){
+    var selmodules = $(obj).attr('data-selmodules'),data = {};
+    if(typeof(selmodules)!='undefined'){
+        data.selmodules = JSON.parse(selmodules);
+    }
+    require(["jconfirmBox","zamnotice"], function(jconfirmBox,zamnotice){
+        var $this = $(obj);
+        var confirmObj = jconfirmBox.ajaxconfirm("选择活动模块链接","{:gohdmanage('qrurl/hdmodules',['hdid'=>isset($hdcodeid)?$hdcodeid:""])}",data,'html','col-lg-8 col-lg-offset-2',function(e){
+            var selmodule = e.find('.addcatemodulelist .active');
+            if(selmodule.length==0){
+                zamnotice.showTips('error','请选择模块');
+                return false;
+            }else{
+                if(selmodule.length > 1){
+                    zamnotice.showTips('error','一次只能选一个模块');
+                    return false;
+                }
+                $this.parent().prev().val(selmodule.data('url'));
+                confirmObj.close();
+            }
+        });
+    });
+}
+/*modules*/
+function tpl_hdmodules(obj){
+    var selmodules = $(obj).attr('data-selmodules'),data = {};
+    if(typeof(selmodules)!='undefined'){
+        data.selmodules = JSON.parse(selmodules);
+    }
+    require(["jconfirmBox","zamnotice"], function(jconfirmBox,zamnotice){
+        var $this = $(obj);
+        var confirmObj = jconfirmBox.ajaxconfirm("选择系统模块","{:gocommon('basic/sysmodules')}",data,'html','col-lg-8 col-lg-offset-2',function(e){
+            var selmodule = e.find('.addcatemodulelist .active');
+            if(selmodule.length==0){
+                zamnotice.showTips('error','请选择模块');
+                return false;
+            }else{
+                if(selmodule.length > 1){
+                    zamnotice.showTips('error','一次只能选一个模块');
+                    return false;
+                }
+                $this.parent().prev().val(selmodule.attr('data-modulefield'));
+                confirmObj.close();
+            }
+        });
+    });
+}
+/*ueditor*/
+function tpl_ueditor(func){
+    require(["ueditor","zamnotice"], function(UE,zamnotice){
+        UE.registerUI("myinsertimage", function(o, e) {
+            o.registerCommand(e, {
+                execCommand: function() {
+                    tpl_image_multi(n,function(t){
+                        if(t.length!=0){
+                            var e = '';
+                            t.each(function(){
+                                var $this = $(this);
+                                e += '<p><img src="' + $this.css("backgroundImage").split('(')[1].split(')')[0].replace(/\"/g, "") + '" data-src="' + $this.attr('data-filepath') + '" style="max-width: 100%"/></p>';
+                            });
+                            o.execCommand("inserthtml", e);
+                            return true;
+                        }else{
+                            zamnotice.showTips('error','请先选择图片');
+                            return false;
+                        }
+                    });
+                }
+            });
+            var n = new UE.ui.Button({
+                name: "插入图片",
+                title: "插入图片",
+                cssRules: "background-position: -726px -77px",
+                onclick: function() {
+                    o.execCommand(e)
+                }
+            });
+            return o.addListener("selectionchange", function() {
+                var t = o.queryCommandState(e); - 1 == t ? (n.setDisabled(!0), n.setChecked(!1)) : (n.setDisabled(!1), n.setChecked(t))
+            }),n;
+        }, 19),UE.registerUI("myinsertvideo", function(i, e) {
+            i.registerCommand(e, {
+                execCommand: function() {
+                    tpl_video(o,function(videoprevimg,videopath,videosrc,clickobj){
+                        if(videopath==''){
+                            zamnotice.showTips('error','请先选择视频');
+                            return false;
+                        }
+                        i.execCommand("insertvideo", {
+                            url: videosrc,
+                            width: 300,
+                            height: 200
+                        }, 'upload')
+                        return true;
+                    })
+                    
+                }
+            });
+            var o = new UE.ui.Button({
+                name: "插入视频",
+                title: "插入视频",
+                cssRules: "background-position: -320px -20px",
+                onclick: function() {
+                    i.execCommand(e)
+                }
+            });
+            return i.addListener("selectionchange", function() {
+                var t = i.queryCommandState(e); - 1 == t ? (o.setDisabled(!0), o.setChecked(!1)) : (o.setDisabled(!1), o.setChecked(t))
+            }),o;
+        }, 20);
+        var utextareas = $(".utextarea");
+        utextareas.each(function(){
+            var $this = $(this);
+            var ue = UE.getEditor($this.attr('id'));
+            ue.ready(function() {
+                ue.setHeight($this.height());
+                func && func(ue);
+            });
+        })
+    });
+}
+/*导入xls文件前先读取文件格式*/
+function readexcl(node){
+  if(node.files && node.files[0] ){
+    var file = node.files[0];
+  }else if(node.files && node.files.item(0)) {
+    var file = node.files.item(0);
+  }
+  var filetype = file.name.split(".")[1],upfiletype = $(node).attr('data-filetype');
+  if(filetype != upfiletype){
+    require(["zamnotice"],function(zamnotice){
+        $(node).val('');
+        if(!$(".placefilename").hasClass('hidden')) $(".placefilename").addClass('hidden');
+        return zamnotice.showTips('error','请上传'+upfiletype+'格式的文件');
+    });
+  }else{
+    if(filetype=='txt' && file.name.indexOf('MP_verify_')==-1){
+        require(["zamnotice"],function(zamnotice){
+            $(node).val('');
+            if(!$(".placefilename").hasClass('hidden')) $(".placefilename").addClass('hidden');
+            return zamnotice.showTips('error','文件名必须以MP_verify_开头，文件名错误');
+        });
+    }
+    $(".placefilename .filename span").text(file.name);
+    $(".placefilename").removeClass('hidden');
+  }
+}
+function playresource(obj,amtype){
+    require(["webcore","zamnotice"], function(webcore,zamnotice){
+        var filepath = $(obj).parent().prev().val() || '';
+        if(!filepath) return zamnotice.showTips('error','请先选择文件再播放');
+        webcore.ajaxSubmit('/common/attachment/getfileurl',{amtype:amtype,filepath:filepath}).then(function(json){
+            if(json.code==0){
+                webcore.showVideos([json.msg],amtype,'z-index:9999');
+            }else{
+                zamnotice.showTips('error',json.msg);
+            }
+        }, function(){
+            zamnotice.showTips('error','文件异常，无法播放');
+        });
+    });
+}
+function paytype(obj){
+    var $this = $(obj),paytype = $this.data('paytype');
+    if($this.hasClass('active')) return false;
+    $this.parent().find('input').val(paytype);
+    $this.addClass('active').siblings().removeClass('active');
+}
+function trimSpace(obj,type){
+    var type = type || '1',str = obj.value || '';
+    if(str!=''){
+        str = str.replace(/(^\s+)|(\s+$)/g,"");//首尾空格
+        if(type == '2'){
+            str = str.replace(/\s/g,"");
+        }
+    }
+    obj.value = str;
+    return true;
+}
+</script>
+{:globalcss()}
+{php}$hdinfo = request()->hdinfo;{/php}
+{if !empty($hdinfo) && isset($hdinfo['diycss']) && !empty($hdinfo['diycss'])}
+<style type="text/css">{$hdinfo['diycss']}</style>
+{/if}
+{include file="$Wpath/common/footer_base"}

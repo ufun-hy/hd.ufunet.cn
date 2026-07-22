@@ -1,0 +1,74 @@
+{include file='$Wpath/common/header'}
+<form id="formBox" class="zam-formvalidation form-horizontal" method="post">
+    <div class="config-titlebox">
+        <span class="config-titlename">微信设置</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#wechatconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+    </div>
+    <div id="wechatconfigbox" class="collapse in">
+        {include file="$Wpath/common/configwechatcommon" /}
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 专业评委登录背景图</label>
+            <div class="col-lg-8">
+                {:tpl_image_one('pwloginbg',$config['pwloginbg'])}
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 评委复用</label>
+            <div class="col-lg-8">
+                {:tpl_switch('pwrepeat',$config['pwrepeat'])}
+                <span class="help-block">开启后专业评委可以多轮复用，如需开启评委复用建议第一轮评分将所有的专业评委添加好</span>
+            </div>
+        </div>
+    </div>
+    <div class="config-titlebox">
+        <span class="config-titlename">大屏设置</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#screenconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+    </div>
+    <div id="screenconfigbox" class="collapse in">
+        {include file="$Wpath/common/configscreencommon" /}
+        {include file="$Wpath/common/configscreenmusic" /}
+    </div>
+    {include file='$Wpath/common/savepanel'}
+</form>
+<script>
+require(['webcore','jconfirmBox','zamnotice','layerBox','zvalidator'],function(webcore,jconfirmBox,zamnotice,layerBox){
+    $('#formBox').formValidation({
+        framework: 'bootstrap',
+        excluded: [':disabled'],
+        message: '您填写的内容无效',
+        fields: {
+            apptitle:{
+                message: '请输入网页标题',
+                validators: {
+                    notEmpty: {
+                        message: '请输入网页标题'
+                    },
+                }
+            },
+        }
+    }).on('success.form.fv', function(e) {
+        e.preventDefault();
+        var $form = $(e.target);
+        var postData = webcore.serializeObject($form);
+        var bload = $form.find(".zam-fixedbottom button").lyearloading({opacity: 0.2,spinnerSize: 'nm'});
+        $form.formValidation('disableSubmitButtons', true);
+        webcore.ajaxSubmit("{:goweb('hdconfig/livemark')}",postData).then(function(json){
+            bload.hide();
+            if(json.code==0){
+                $form.formValidation('disableSubmitButtons', false);
+                zamnotice.showTips('success','保存成功',2e3,function(){
+                    window.location.reload();
+                });
+            }else{
+                zamnotice.showTips('error',json.msg);
+                $form.formValidation('disableSubmitButtons', false);
+            }
+        }, function(json){
+            bload.hide();
+            zamnotice.showTips('error','网络差。操作失败');
+            $form.formValidation('disableSubmitButtons', false);
+        });
+    });
+});
+</script>
+{include file='$Wpath/common/footer'}

@@ -1,0 +1,276 @@
+<style type="text/css">
+.cateBox .catespan{
+    display: flex;
+    align-items: center;
+    border: 1px solid #dfe6ec;
+    margin: 0 5px 5px 0;
+    border-radius:5px;
+    padding:10px;
+}
+.cateBox .catespan label{margin-top: 0!important}
+.cateBox .catespan .personnum{position:absolute;right:60px;}
+.cateBox .catespan input{margin:0;margin-right:5px;}
+.nditem-lists tr td{text-align: center}
+</style>
+<div class="form-horizontal confirmbox-pop">
+<form class="confirm-formbox" method="post">
+        <div class="localphotobox">
+            <div class="form-group grouptypes">
+                <label class="col-lg-3 control-label">* 中奖数据来源</label>
+                <div class="col-lg-8">
+                  <label class="lyear-radio radio-inline radio-primary">
+                   <input type="radio" name="grouptype" value="1" {if $config['grouptype']=='1'}checked{/if}><span>全部数据</span>
+                  </label>
+                  <label class="lyear-radio radio-inline radio-primary">
+                   <input type="radio" name="grouptype" value="2" {if $config['grouptype']=='2'}checked{/if}><span>分组数据</span>
+                  </label>
+                  <div class="help-block">如果您选择了分组数据必须保证分组内数据数量大于奖品数量</div>
+                  {if isset($config['luckernum']) && $config['luckernum'] >0}<div><span class="text-danger">本奖品已经产生数据请不要切换来源</span></div>{/if}
+                </div>
+            </div>
+            <div class="cateBox{if $config['grouptype']=='1'} hidden{/if}">
+                <div class="form-group">
+                    <label class="col-lg-3 control-label text-right">* 选择分组<br>(<span class="text-danger" style="font-size: 12px;">可选多个分组</span>)</label>
+                    <div class="col-lg-8">
+                        {if !empty($groups)}
+                            {foreach $groups as $group}
+                                <span class="catespan">
+                                    <label class="lyear-checkbox checkbox-inline checkbox-primary">
+                                        <input type="checkbox" name="groupids[]" value="{$group['id']}" {if !empty($config['groupids']) && in_array($group['id'],$config['groupids'])}checked{/if}><span>{$group['groupname']}</span>
+                                    </label>
+                                    <span class="personnum pull-right text-danger">{$group['num']} 个</span>
+                                </span>
+                            {/foreach}
+                        {else /}
+                        <div class="form-control-static">暂未添加分组，<a href="{:gohdmanage('configimportcj/groups',['hdid'=>$hdid])}">点我添加分组</a></div>
+                        {/if}
+                        <div class="help-block">
+                            <span class="text-error">选择了分组，本奖品的数据只能从所选的分组内的数据里抽出，请一定保证所选分组内包含的名单数量大于等于本奖品数量</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-3 control-label">* 大屏效果数据来源</label>
+                    <div class="col-lg-8">
+                      <label class="lyear-radio radio-inline radio-primary">
+                       <input type="radio" name="flydata" value="1" {if !isset($config['flydata']) || $config['flydata']=='1'}checked{/if}><span>分组内数据</span>
+                      </label>
+                      <label class="lyear-radio radio-inline radio-primary">
+                       <input type="radio" name="flydata" value="2" {if isset($config['flydata']) && $config['flydata']=='2'}checked{/if}><span>全部数据</span>
+                      </label>
+                      <div class="help-block">默认使用分组内数据，如果分组内数据数量较少，建议选择全部数据，作用于开始抽奖后大屏上滚动的数据或者飞出效果飞出的数据</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 奖项名</label>
+            <div class="col-lg-6">
+                <input class="form-control" type="text"  name="awardname" value="{$config['awardname']}" maxlength="20" placeholder="20字内">
+                <span class="help-block">如:一等奖，二等奖</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 奖品名字</label>
+            <div class="col-lg-6">
+                <input class="form-control" type="text"  name="prizename" value="{$config['prizename']}" maxlength="40" placeholder="40字内">
+            </div>
+        </div>
+        <div class="form-group">
+			  <label class="col-lg-3 control-label">* 奖品图</label>
+			  <div class="col-lg-8">
+			    {:tpl_image_one('prizeimg', $config['prizeimg'])}
+			    <span class="help-block">规格:500px*500px</span>
+			  </div>
+		</div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 奖品个数</label>
+            <div class="col-lg-4">
+                <input type="text" class="form-control numberincdec prizenum" name="prizenum" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="null"
+                data-bts-step="1"
+                value="{$config['prizenum']}">
+                <div class="help-block m-0">至少为1个</div>
+            </div>
+        </div>
+        <div class="form-group{if $isroundcj=='1'} hidden{/if}">
+            <label class="col-lg-3 control-label">* 单次抽出个数</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec" name="onceout" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="null"
+                data-bts-step="1"
+                value="{$config['onceout']}">
+                <span class="help-block">一次性抽出名单数量</span>
+            </div>
+        </div>
+        <div class="form-group{if request()->opencjnd=='2'} hidden{/if}">
+            <label class="col-lg-3 control-label">* 特殊名单</label>
+            <div class="col-lg-9">
+                <table class="table table-bordered">
+                    <thead>
+                      <tr>
+                        {foreach $fieldconfig as $field}
+                        <th style="text-align:center;">{$field['fieldname']}</th>
+                        {/foreach}
+                        <th style="width:12%;text-align:center;">操作</th>
+                      </tr>
+                    </thead>
+                    <tbody class="nditem-lists">
+                        {volist name="config.ndids" id="ndval"}
+                        <tr>
+                            <input type="hidden" name="ndids[]" value="{$ndval['id']}" />
+                            {if isset($fieldconfig[0])}
+                                <td>{$ndval['datafield1']}</td>
+                            {/if}
+                            {if isset($fieldconfig[1])}
+                                <td>{$ndval['datafield2']}</td>
+                            {/if}
+                            {if isset($fieldconfig[2])}
+                                <td>{$ndval['datafield3']}</td>
+                            {/if}
+                            {if isset($fieldconfig[3])}
+                                <td>{$ndval['datafield4']}</td>
+                            {/if}
+                            <td>
+                                <a class="btn btn-danger btn-xs delnd" href="javascript:;">删除</a>
+                            </td>
+                        </tr>
+                        {/volist}
+                    </tbody>
+                    <tfoot style="border: 1px solid #efefef;">
+                      <tr>
+                        <td colspan="8">
+                          <a  class="btn btn-primary btn-sm addnditem" href="javascript:;"> <i class="mdi mdi-plus"></i>&nbsp;<span>新增特殊名单</span></a>
+                        </td>
+                      </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+        <!--仅限风格类型选择了随机滚动有效-->
+        {if isset($pcconfig['styleconfig']['flytype']) && $pcconfig['styleconfig']['flytype'] == '1' && isset($pcconfig['isroundcj']) && $pcconfig['isroundcj'] == '2' && dznormalrequest('importcjstyle')}
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 抽中停止效果</label>
+            <div class="col-lg-8">
+                <label class="lyear-radio radio-inline radio-primary">
+                    <input type="radio" name="stoptype" value="1" {if !isset($config['stoptype']) || $config['stoptype']=='1'}checked{/if}><span>默认</span>
+                </label>
+                <label class="lyear-radio radio-inline radio-primary">
+                    <input type="radio" name="stoptype" value="2" {if isset($config['stoptype']) && $config['stoptype']=='2'}checked{/if}><span>逐项停止</span>
+                </label>
+                <label class="lyear-radio radio-inline radio-primary">
+                    <input type="radio" name="stoptype" value="3" {if isset($config['stoptype']) && $config['stoptype']=='3'}checked{/if}><span>逐个停止</span>
+                </label>
+                <label class="lyear-radio radio-inline radio-primary hidden">
+                    <input type="radio" name="stoptype" value="4" {if isset($config['stoptype']) && $config['stoptype']=='4'}checked{/if}><span>逐字停止</span>
+                </label>
+                <div class="help-block">
+                    <div class="m-t-5">默认即为一次性全部抽出。</div>
+                    <div class="m-t-5">逐项停止即为按空格先将第一项停止，再依次按空格将其他项目停止。一般用于数据结构存在多项的场景</div>
+                    <div class="m-t-5">逐个停止即为抽取多个名单，逐个名单按空格停止。</div>
+                    <div class="m-t-5 hidden">逐字停止即为一个一个字停止。</div>
+                    <div class="text-danger">限基础设置内风格类型设置为随机滚动有效</div>
+                </div>
+            </div>
+        </div>
+        {/if}
+        <div class="form-group hidden">
+            <label class="col-lg-3 control-label">* 准许重复中奖</label>
+            <div class="col-lg-8">
+                {:tpl_switch('canrepeat',$config['canrepeat'])}
+                <span class="help-block">注:开启后当前奖品同一条数据可中多次</span>
+            </div>
+        </div>
+</form>
+</div>  
+<script>
+require(['webcore','jconfirmBox','zamnotice','layerBox',"bootstrap-touchspin","bootstrap-daterangepicker",'jztree'],function(webcore,jconfirmBox,zamnotice,layerBox){
+    tpl_switch();
+    $(".grouptypes label").click(function(){
+        var grouptype = $(this).find('input').val();
+        if(grouptype=='1'){
+            $(".cateBox").addClass('hidden');
+        }else{
+            $(".cateBox").removeClass('hidden');
+        }
+    });
+    $(".confirmbox-pop .numberincdec").TouchSpin();
+    $(".addnditem").click(function(){
+        var confirmObj = jconfirmBox.ajaxconfirm("新增特殊名单","{:gohdmanage('configimportcj/editnditem',['hdid'=>$hdid])}",{awardid:"{$config['id']??''}"},'html','col-lg-8 col-lg-offset-2',function(e){
+            var selectuser = e.find("input:checked");
+            if(selectuser){
+                var html = '';
+                selectuser.each(function(){
+                    var lis = $(this).parent().parent().parent().find('li');
+                    var nuser = {
+                        id:$(this).val(),
+                        datafield1:lis.eq(1).find('span').text(),
+                        datafield2:lis.eq(2).find('span').text(),
+                        datafield3:lis.eq(3).find('span').text(),
+                        datafield4:lis.eq(4).find('span').text(),
+                    };
+                    html += webcore.tpl($("#nditem-tpl"),nuser);
+                });
+                if(html==''){
+                    zamnotice.showTips('error','请选择');
+                }else{
+                    $(".nditem-lists").append(html);
+                    confirmObj.close();
+                }
+            }else{
+                zamnotice.showTips('error','请选择用户');
+            }
+            
+        });
+    });
+    $(".nditem-lists").on('click','.delnd',function(){
+        $(this).parent().parent().remove();
+    });
+});
+</script>
+<script id='editnum-tpl' type="text/template">
+<div class="form-horizontal">
+  <div class="form-group">
+    <label class="col-lg-3 control-label">* 抽取</label>
+    <div class="col-lg-4">
+        <div class="input-group">
+            <input type="number" class="form-control outnum" name="outnum" value="<%# if(d.outnum){ %><% d.outnum %><%# }else{ %>0<%# } %>" onkeyup="this.value=this.value.replace(/\D/g,'')">
+            <div class="input-group-addon">人</div>
+       </div>
+       <span class="help-block">注意:0为随机人数</span>
+    </div>
+  </div>
+</div>
+</script>
+<script id='nditem-tpl' type="text/template">
+    <tr>
+        <input type="hidden" name="ndids[]" value="<% d.id %>" />
+        {if isset($fieldconfig[0])}
+        <td>
+            <% d.datafield1 %>
+        </td>
+        {/if}
+        {if isset($fieldconfig[1])}
+        <td>
+            <% d.datafield2 %>
+        </td>
+        {/if}
+        {if isset($fieldconfig[2])}
+        <td>
+            <% d.datafield3 %>
+        </td>
+        {/if}
+        {if isset($fieldconfig[3])}
+        <td>
+            <% d.datafield4 %>
+        </td>
+        {/if}
+        <td class="text-center">
+          <a href="javascript:;"  class="btn btn-danger btn-xs delnd">
+              删除
+          </a>
+        </td>
+    </tr>
+</script>         

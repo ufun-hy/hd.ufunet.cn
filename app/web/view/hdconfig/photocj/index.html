@@ -1,0 +1,80 @@
+{include file='$Wpath/common/header'}
+{if $hasbuy=='2'}
+<div class="alert alert-danger">您还未购买当前功能，购买后可正常使用</div>
+{/if}
+<form id="formBox" class="zam-formvalidation form-horizontal" method="post">
+    <div class="config-titlebox">
+        <span class="config-titlename">大屏设置</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#screenconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+    </div>
+    <div id="screenconfigbox" class="collapse in">
+        {include file="$Wpath/common/configscreencommon" /}
+        {include file="$Wpath/common/configscreenmusic" /}
+        {include file="$Wpath/common/prizeimg" /}
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 中奖图片列表是否自动滚动</label>
+            <div class="col-lg-8">
+                {:tpl_switch('autoscroll',$config['autoscroll']??'2')}
+                 <span class="help-block">注：仅中奖图片数量超过外框总高度才可以自动滚动，如果您想停止自动滚动，将鼠标移动到某个中奖图片上将自动停止滚动，移开后将会自动重新开始滚动</span>
+            </div>
+        </div>
+        <div class="form-group">
+			<label class="col-lg-2 control-label">抽奖进行中背景音效</label>
+			<div class="col-lg-8">
+				{:tpl_audio('iscjingmusic',$config['iscjingmusic'])}
+				<span class="help-block">尽量控制在200KB内</span>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-lg-2 control-label">中奖弹窗时背景音效</label>
+			<div class="col-lg-8">
+				{:tpl_audio('iscjendmusic',$config['iscjendmusic'])}
+				<span class="help-block">尽量控制在200KB内</span>
+			</div>
+		</div>
+    </div>
+    {include file='$Wpath/common/photocjstyle'}
+    {include file='$Wpath/common/savepanel'}
+</form>
+<script>
+require(['webcore','jconfirmBox','zamnotice','layerBox','zvalidator'],function(webcore,jconfirmBox,zamnotice,layerBox){
+    $('#formBox').formValidation({
+        framework: 'bootstrap',
+        excluded: [':disabled'],
+        message: '您填写的内容无效',
+        fields: {
+            apptitle:{
+                message: '请输入网页标题',
+                validators: {
+                    notEmpty: {
+                        message: '请输入网页标题'
+                    },
+                }
+            },
+        }
+    }).on('success.form.fv', function(e) {
+        e.preventDefault();
+        var $form = $(e.target);
+        var postData = webcore.serializeObject($form);
+        var bload = $form.find(".zam-fixedbottom button").lyearloading({opacity: 0.2,spinnerSize: 'nm'});
+        $form.formValidation('disableSubmitButtons', true);
+        webcore.ajaxSubmit("{:goweb('hdconfig/photocj')}",postData).then(function(json){
+            bload.hide();
+            if(json.code==0){
+                $form.formValidation('disableSubmitButtons', false);
+                zamnotice.showTips('success','保存成功',2e3,function(){
+                    window.location.reload();
+                });
+            }else{
+                zamnotice.showTips('error',json.msg);
+                $form.formValidation('disableSubmitButtons', false);
+            }
+        }, function(json){
+            bload.hide();
+            zamnotice.showTips('error','网络差。操作失败');
+            $form.formValidation('disableSubmitButtons', false);
+        });
+    });
+});
+</script>
+{include file='$Wpath/common/footer'}

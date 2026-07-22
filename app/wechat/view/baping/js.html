@@ -1,0 +1,1483 @@
+<script type="text/javascript">
+require(['wechatcore','bscroll','marqueen','swiper','emojicore','appsocket','videojs','bubbleHearts','sweetalert'],function (wechatcore,BScroll,marqueen,Swiper,emojicore,appsocket,videojs,BubbleHearts) {
+		var bsconfig = {click: true,pullDownRefresh:{threshold:10,stop:20}},firstload = false;
+		if(wechatcore.ios134over()) bsconfig.useTransition = false;
+		var Scroll = new BScroll($('.zam-app-msg-scroll')[0],bsconfig),maxid = 0,scrollhasmore = true,wsConfig = {};
+		wechatcore.ajaxSubmit('/wechat/baping/loadhistory',{maxid:maxid},'正在加载历史消息...').then(function(data){
+			firstload = true;
+			if(data.code==0){
+				var pagedata = data.msg;
+				if(pagedata.length > 0 ){
+					 pagedata = pagedata.reverse();
+					 maxid = pagedata[0].id;
+					 var firstHtml = '';
+					 $.each(pagedata,function(index,value){
+						 if(value.type=='1') value.content = emojicore.emoToimg(value.content.toString());
+						 value.ismanager = XCV3Config.ismanager;
+						 firstHtml += wechatcore.tpl($("#msg-tpl"),value);
+					 });
+					 $(".zam-app-msglist").html(firstHtml);
+					 wechatcore.waitImgLoad(function(){
+						 Scroll.refresh(),Scroll.scrollTo(0,Scroll.maxScrollY,300);
+					 });
+				}else{
+					scrollhasmore = false;
+					$(".zam-pulldown-box .pulldownOver").html('<i class="mxc-infofill"></i>已加载全部');
+					$(".zam-pulldown-box .pulldownTxt").html('<i class="mxc-infofill"></i>已加载全部');
+				}
+			}else{
+				wechatcore.msg(data.msg);
+			}
+		}, function(){
+			  firstload = true;
+			  wechatcore.msg('加载历史数据失败，请稍后重试');
+		});
+		setTimeout(function(){
+			firstload = false;
+		},4e3);
+		wsConfig.onmessage = function(data){
+			if(data.type=='connected'){
+				appsocket.isclose = false;
+				wechatcore.connectsocket({clientid:data.clientid});
+				if(!firstload){
+					maxid = 0;
+					scrollhasmore = true;
+					$(".zam-pulldown-box").html('<div class="pulldownOver"><i class="mxc-roundcheck"></i>加载完成</div><div class="pulldownRefresh"><div class="pulldownRefresh-loading"></div></div><span class="pulldownTxt"><i class="mxc-refresharrow"></i>下拉加载，释放刷新</span>');
+					wechatcore.ajaxSubmit('/wechat/baping/loadhistory',{maxid:maxid},'正在加载历史消息...').then(function(data){
+						if(data.code==0){
+							var pagedata = data.msg;
+							if(pagedata.length > 0 ){
+								 pagedata = pagedata.reverse();
+								 maxid = pagedata[0].id;
+								 var firstHtml = '';
+								 $.each(pagedata,function(index,value){
+									 if(value.type=='1') value.content = emojicore.emoToimg(value.content.toString());
+									 value.ismanager = XCV3Config.ismanager;
+									 firstHtml += wechatcore.tpl($("#msg-tpl"),value);
+								 });
+								 $(".zam-app-msglist").html(firstHtml);
+								 wechatcore.waitImgLoad(function(){
+									 Scroll.refresh(),Scroll.scrollTo(0,Scroll.maxScrollY,300);
+								 });
+							}else{
+								scrollhasmore = false;
+								$(".zam-pulldown-box .pulldownOver").html('<i class="mxc-infofill"></i>已加载全部');
+								$(".zam-pulldown-box .pulldownTxt").html('<i class="mxc-infofill"></i>已加载全部');
+							}
+						}else{
+							wechatcore.msg(data.msg);
+						}
+					}, function(){
+						  wechatcore.msg('加载历史数据失败，请稍后重试');
+					});
+				}
+			}else{
+				if(data.type=='delbp'){
+					if(!$.isArray(data.msgid)){
+						$(".appmsg-"+data.msgid).remove();
+					}else{
+						$.each(data.msgid,function(index,val){
+							$(".appmsg-"+val).remove();
+						});
+					}
+				}else if(data.type=='bpreset' || (data.type=='screenresetdm' && data.fromtype=='2')){
+					$(".zam-app-msglist").empty();
+					Scroll.refresh();
+					scrollhasmore = false;
+					$(".zam-pulldown-box .pulldownOver").html('<i class="mxc-infofill"></i>已加载全部');
+					$(".zam-pulldown-box .pulldownTxt").html('<i class="mxc-infofill"></i>已加载全部');
+				}else if(data.type=='join'){
+					basicConfig.appjointip=='1' && wechatcore.newjoin(data.nickname);
+				}else if(data.type=='bpshenhe'){
+					var messages = data.messages;
+					if($.isArray(messages)&&messages.length>0){
+						$.each(messages,function(i, val){
+							if($(".appmsg-"+val.id).length<=0){
+								if(val.type=='1'){
+									val.content = emojicore.emoToimg(val.content);
+								}
+								val.ismanager = XCV3Config.ismanager;
+								$(".zam-app-msglist").append(wechatcore.tpl($("#msg-tpl"),val));
+							}
+						});
+						wechatcore.waitImgLoad(function(){
+							Scroll.refresh(),Scroll.scrollTo(0,Scroll.maxScrollY,300);
+						});
+					}
+				}else if(data.type=='addblack'){
+						data.userid==XCV3Config.userid&&wechatcore.closewxwindow();
+				}else if(data.type=='addmanager'){
+					data.userid==XCV3Config.userid&&wechatcore.reloadpage();
+				}else if(data.type=='addestoppel'){
+					if(data.userid==XCV3Config.userid) {
+						if(data.status=='1'){
+							addestoppel();
+						}else{
+							removeestoppel();
+						}
+					}
+				}else if(data.type=='bapingfullestoppel'){
+					if(data.status=='1'){
+						fulladdestoppel();
+					}else{
+						fullremoveestoppel();
+					}
+				}else if(data.type=='1'||data.type=='2'||data.type=='3'||data.type=='4'||data.type=='5'||data.type=='6'){
+					if(data.isreshow=='1' || $(".appmsg-"+data.id).length>0) return;
+					if(data.type=='1'){
+						data.content = emojicore.emoToimg(data.content);
+					}
+					data.ismanager = XCV3Config.ismanager;
+					$(".zam-app-msglist").append(wechatcore.tpl($("#msg-tpl"),data));
+					wechatcore.waitImgLoad(function(){
+						Scroll.refresh(),Scroll.scrollTo(0,Scroll.maxScrollY,300);
+					});
+				}else if(data.type=='sendchatmsg'){
+					if(data.hdid==XCV3Config.hdid && data.topenid==XCV3Config.openid){
+						wechatcore.ajaxSubmit('/wechat/baping/loadmyunread',{}).then(function(json){
+							if(json.code==0){
+								$(".jiaoyou-lefticon").length>0&&$(".jiaoyou-lefticon span").text(json.msg);
+							}
+						}, function(){
+						});
+					}
+				}else if(data.type=='goto'){
+					wechatcore.goto(data);
+				}else if(data.type=='luckeruserids'){
+					wechatcore.layerAsklucker(data);
+				}else if(data.type=='confirmwxtxopenid'){
+					if(data.userid==XCV3Config.userid){
+						wechatcore.msg('授权成功');
+						setTimeout(function(){
+							window.location.reload();
+						},1e3);
+					}
+				}
+			}
+		};
+		
+		appsocket.init(wsConfig);
+		if(basicConfig.shownotice=='1'){
+			marqueen.init('.zam-app-topNotice-txt');
+			$(".zam-app-topNotice-close i").on('click',function(){
+				var $this = $(this),$parentNode = $this.parent().parent();
+				marqueen.destory();
+				$parentNode.animate({
+				"margin-top":-$parentNode.height(),
+				},2e2,function(){
+					$this.remove();
+					$(".zam-app-msg-box .zam-app-msg-scroll").addClass('scrollnotop');
+					Scroll.refresh();
+				});
+			});
+		}
+		Scroll.on('pullingDown', function () {
+			if(!scrollhasmore) {
+				return Scroll.finishPullDown()&&Scroll.refresh();
+			}
+			$(".zam-pulldown-box .pulldownTxt").hide();
+			$(".zam-pulldown-box .pulldownRefresh").fadeIn();
+			wechatcore.ajaxSubmit('/wechat/baping/loadhistory',{maxid:maxid},false).then(function(data){
+				if(data.code==0){
+					var nextpagedata = data.msg;
+					setTimeout(function(){
+					 if(nextpagedata.length>0){
+						nextpagedata = nextpagedata.reverse();
+						maxid = nextpagedata[0].id;
+						var prevHtml = '';
+						$.each(nextpagedata,function(index,value){
+							 if(value.type=='1') value.content = emojicore.emoToimg(value.content.toString());
+							 value.ismanager = XCV3Config.ismanager;
+							 prevHtml += wechatcore.tpl($("#msg-tpl"),value);
+						});
+						$(".zam-app-msglist").prepend(prevHtml);
+					 }else{
+						scrollhasmore = false;
+						$(".zam-pulldown-box .pulldownOver").html('<i class="mxc-infofill"></i>已加载全部');
+						$(".zam-pulldown-box .pulldownTxt").html('<i class="mxc-infofill"></i>已加载全部');
+					 }
+					 $(".zam-pulldown-box .pulldownRefresh").hide();
+					 $(".zam-pulldown-box .pulldownOver").fadeIn();
+					 setTimeout(function(){
+						$(".zam-pulldown-box .pulldownOver").fadeOut(function(){
+							Scroll.finishPullDown(),Scroll.refresh();
+							setTimeout(function(){
+								$(".zam-pulldown-box .pulldownTxt").show();
+							},200);
+						});
+					 },1000);
+					},1000);
+				}else{
+					wechatcore.msg(data.msg);
+				}
+			}, function(){
+				wechatcore.msg('网络太差，请稍后重试');
+				$(".zam-pulldown-box .pulldownOver").fadeOut(function(){
+					Scroll.finishPullDown();
+					Scroll.refresh();
+					setTimeout(function(){
+						$(".zam-pulldown-box .pulldownTxt").show();
+					},200);
+				});
+			});
+		});
+		Scroll.on('scroll', function (pos) {
+			$(".zam-pulldown-box").css("top",Math.min(pos.y,10));
+		});
+		//目前已经发现ios17.2.1输入法没有缩回去无法点击发送按钮
+		if(wechatcore.ios12over() && !wechatcore.ios17over() && XCV3Config.clienttype=='1'){
+			$("body").on('blur','input,select,textarea', function () {
+				setTimeout(function () {
+					window.scrollTo(0, 0);
+				},300)
+			});
+			$(".bapingfooter-inputbox").on('focus', 'input', function(e){
+				setTimeout(function () {
+					$(document).scrollTop($("body").innerHeight()),this.scrollIntoView(true);
+				},300)
+			});
+		}
+		var zhutiswiper = null,bptimeswiper = null;
+		$(".zam-app-bapingfooter-navs .bp-lefticon").on('click',function(){
+			  $('.zam-app-facebox,.zam-app-controlbox').addClass('zam-app-displaynone');
+			  wechatcore.ajaxSubmit('/wechat/baping/ajaxbptheme',{},'加载数据中..').then(function(json){
+				if(json.code==0){
+					var freetimes = json.msg.freetimes,cardpay = json.msg.cardpay||'2';
+					var btnText = freetimes > 0 ? '免费霸屏('+freetimes+'次)' : '立即霸屏';
+					if(cardpay=='1'){
+						btnText = [
+							{'class':'btn-primary',txt:(freetimes > 0 ? '免费霸屏('+freetimes+'次)' : '微信支付'),type:'1'},
+							{'class':'btn-warning',txt:'券号支付',type:'2'},
+						];
+					}
+					wechatcore.oneSlideBox({
+						title:'霸屏',
+						classname:'bppopBox',
+						btnText:btnText,
+						btnType:'btn-primary',
+						html:wechatcore.tpl($("#bp-tpl"),{zhutiType:json.msg.bpzhuti,timeType:json.msg.bptimes}),
+						ready:function(){
+							var t = this;
+							zhutiswiper = new Swiper('.zhuti-slider',{
+								pagination: {
+									el: '.zhuti-page',
+								},
+								watchOverflow: true,
+							});
+							bptimeswiper = new Swiper('.bptime-slider',{
+								pagination: {
+									el: '.bptime-page',
+								},
+								watchOverflow: true,
+							});
+							t.popBoxfind(".bpZhutiBox .bpZhutiItem").bind('click',function(){
+									t.popBoxfind(".bpZhutiBox .bpZhutiItem").removeClass('sel');
+									var $this = $(this);
+									$this.addClass('sel');
+									t.popBoxfind(".bpTimeBox .bpTimeItem").removeClass('sel');
+									var themeonetimebox = $(".bpTimeBox .bpTimeItem").filter(function(o, i) {
+										return $(i).attr("data-time") >= $this.attr('data-mintime');
+									});
+									if(themeonetimebox.length > 0){
+										themeonetimebox.eq(0).trigger('click');
+									}
+							});
+							t.popBoxfind(".bpTimeBox .bpTimeItem").bind('click',function(){
+									var $this = $(this);
+									if(t.popBoxfind(".bpZhutiBox .sel").length<=0) return wechatcore.msg('请先选择霸屏主题');
+									var thistime = parseInt($this.attr('data-time'));
+									var minseconds = parseInt(t.popBoxfind(".bpZhutiBox .sel").attr('data-mintime'));
+									if(thistime<minseconds){
+										return wechatcore.msg(t.popBoxfind(".bpZhutiBox .sel .bpZhutiName").text()+'，霸屏时间至少是'+minseconds+'秒');
+									}
+									t.popBoxfind(".bpTimeBox .bpTimeItem").removeClass('sel');
+									t.popBoxfind('.bpcanimgnum span').text($this.attr('data-imgnum'));
+									$this.addClass('sel');
+									var maxup = parseInt($this.attr('data-imgnum'));
+									var imgNum = t.popBoxfind(".had-uploadimg").length;
+									if(imgNum<maxup){
+										t.popBoxfind(".bpImgBox .bpAddpicorvideo").removeClass('hidden');	
+									}else{
+										var gtdel =  maxup-1;
+										t.popBoxfind(".had-uploadimg:gt("+gtdel+")").remove();
+										t.popBoxfind(".bpImgBox .bpAddpicorvideo").addClass('hidden');
+									}
+									t.popBoxfind(".had-uploadvideo").length>0&&t.popBoxfind(".bpImgBox .bpAddpicorvideo").addClass('hidden');
+							});
+							t.popBoxfind(".bpZhutiBox .bpZhutiItem").eq(0).trigger('click');
+							t.popBoxfind(".bpAddpicorvideo").bind('click',function(){
+								if(t.popBoxfind(".bpTimeBox .sel").length<=0) return wechatcore.msg('请选择霸屏时间');
+								var maxup = parseInt(t.popBoxfind(".bpTimeBox .sel").attr('data-imgnum')),imgupcount = t.popBoxfind(".had-uploadimg").length;
+								if(imgupcount > 0){
+									var maxnum = maxup - imgupcount;
+									wechatcore.uploadImg({posturl:'/wechat/baping/upload',type:'baping',maxnum:maxnum,txt:'最多可上传'+maxnum+'张图片'},function(data){
+										if(data.code==0){
+											t.popBoxfind(".bpAddpicorvideo").before(wechatcore.tpl($("#upimg-tpl"),{img:data.msg.filesrc,filepath:data.msg.filepath}));
+											var imgNum = t.popBoxfind(".had-uploadimg").length;
+											if(imgNum >= maxup){
+												t.popBoxfind(".bpImgBox .bpAddpicorvideo").addClass('hidden');
+											}
+										}else{
+											wechatcore.msg(data.msg);
+										}
+									});
+								}else if(t.popBoxfind(".had-uploadvideo").length>0){
+									return wechatcore.msg('仅可上传一个小视频');
+								}else{
+									if(basicConfig.bpuploadvideo=='1'){
+										t.popBoxfind('.bpUploadBox .videoItem').each(function(i,v){
+											$(v).find('input').remove();
+											if(i==0){							
+												$(v).append('<input type="file" style="opacity: 0; position: absolute; top: 0px; left: 0px; width: 100%; height: 100%;" accept="video/*" capture="camcorder">');
+											}else{
+												$(v).append('<input type="file" style="opacity: 0; position: absolute; top: 0px; left: 0px; width: 100%; height: 100%;" accept="video/*">');
+											}
+										});
+										if(XCV3Config.isiframe){
+											$(".zam-app-sendBpBox").css('position','relative');
+											$(".zam-app-sendBpBox .bpUploadBox").css('position','absolute');
+										}
+										t.popBoxfind('.bpUploadBox').show();
+									}else{
+										wechatcore.uploadImg({posturl:'/wechat/baping/upload',type:'baping',maxnum:maxup,txt:'最多可上传'+maxup+'张图片'},function(data){
+											if(data.code==0){
+												t.popBoxfind(".bpAddpicorvideo").before(wechatcore.tpl($("#upimg-tpl"),{img:data.msg.filesrc,filepath:data.msg.filepath}));
+												var imgNum = t.popBoxfind(".had-uploadimg").length;
+												if(imgNum>=maxup){
+													t.popBoxfind(".bpImgBox .bpAddpicorvideo").addClass('hidden');
+												}
+											}else{
+												wechatcore.msg(data.msg);
+											}
+										});
+									}
+								}
+							});
+							t.popBoxfind('.typeItemCover').bind('click',function(e){
+								e.preventDefault();
+								e.stopPropagation();
+								t.popBoxfind('.bpUploadBox').hide();
+							});
+							t.popBoxfind('.bpUploadBox .picItem').bind('click',function(event){
+								if(appsocket.isclose) return;
+								var maxup = parseInt(t.popBoxfind(".bpTimeBox .sel").attr('data-imgnum')),imgupcount = t.popBoxfind(".had-uploadimg").length;;
+								t.popBoxfind('.typeItemCover').trigger('click');
+								var maxnum = maxup - imgupcount;
+								wechatcore.uploadImg({posturl:'/wechat/baping/upload',type:'baping',maxnum:maxnum,txt:'最多可上传'+maxnum+'张图片'},function(data){
+									if(data.code==0){
+										t.popBoxfind(".bpAddpicorvideo").before(wechatcore.tpl($("#upimg-tpl"),{img:data.msg.filesrc,filepath:data.msg.filepath}));
+										var imgNum = t.popBoxfind(".had-uploadimg").length;
+										if(imgNum>=maxup){
+											t.popBoxfind(".bpImgBox .bpAddpicorvideo").addClass('hidden');
+										}
+									}else{
+										wechatcore.msg(data.msg);
+									}
+								});
+							});
+							t.popBoxfind('.bpUploadBox .videoItem').on('change','input',function(event){
+								if(appsocket.isclose) return;
+								wechatcore.uploadVideo({files:this.files,posturl:'/wechat/baping/uploadvideo',type:'baping'},function(data){
+									if(data.code==0){
+										$(".bpAddpicorvideo").before(wechatcore.tpl($("#upimg-tpl"),{img:data.msg.filesrc+'.jpg',video:data.msg.filepath}));
+										$(".bpImgBox .bpAddpicorvideo").addClass('hidden');
+									}else{
+										wechatcore.msg(data.msg);
+									}
+								});
+							});
+							t.popBoxfind('.bpImgBox').on('click','.delupimg',function(event){
+								var $this = $(this);
+								var maxup = parseInt(t.popBoxfind(".bpTimeBox .sel").attr('data-imgnum'));
+								var type = $this.parent().parent().hasClass('had-uploadimg');
+								wechatcore.ask('警告','确定要删除此'+(type?'图片':'视频')+'么?',['确定','取消'],function(index){
+									wechatcore.close(index);
+									$this.parent().parent().remove();
+									if(type){
+										var imgNum = t.popBoxfind(".had-uploadimg").length;
+										if(t.popBoxfind(".bpTimeBox .sel").length>0&&imgNum<maxup&&t.popBoxfind(".bpImgBox .bpAddpicorvideo").hasClass('hidden')){
+											t.popBoxfind(".bpImgBox .bpAddpicorvideo").removeClass('hidden');	
+										}
+									}else{
+										t.popBoxfind(".bpImgBox .bpAddpicorvideo").removeClass('hidden');
+									}
+								});
+							});
+						},
+						click:function(clickType){
+							  var t = this,selzhuti = t.popBoxfind(".zhuti-slider .sel"),selbptime = t.popBoxfind(".bptime-slider .sel"),bptxt = t.popBoxfind("textarea").val(),bpimg = t.popBoxfind(".had-uploadimg"),bpvideo = t.popBoxfind(".had-uploadvideo");
+							  if(selzhuti.length<=0){
+								return wechatcore.msg('请选择霸屏主题');
+							  }
+							  if(selbptime.length<=0){
+								return wechatcore.msg('请选择霸屏时间');
+							  }
+							  if(bpimg.length<=0 && bpvideo.length<=0 && bptxt==''){
+								return wechatcore.msg('请设置霸屏文字或上传霸屏图片或视频');
+							  }
+							  var bpdata = {
+							  	bpid:selzhuti.attr('data-index'),
+							  	fee:selbptime.attr('data-fee'),
+							  	bptime: selbptime.attr('data-time'),
+							  	bptxt:bptxt,
+							  	iswxprogram:XCV3Config.isminiProgram,
+							  };
+							  var bpimgs = [];
+							  if(bpimg.length > 0 ){
+								bpimg.each(function(){
+									bpimgs.push($(this).find('img').attr('data-filepath'));
+								})
+							  }
+							  bpdata.bpimgs = bpimgs;
+							  if(bpvideo.length > 0 ){
+								bpdata.bpvideo = {
+									video:bpvideo.attr('data-video'),
+									pic:bpvideo.attr('data-video')+'.jpg',
+								};
+							  }
+							  if(clickType == '1'){
+								  	wechatcore.ajaxSubmit('/wechat/baping/sendbp',bpdata,'正在发起支付..').then(function(json){
+										if(json.code==0){
+										   wechatcore.showWxpay(json.msg,function(){
+												t.popBoxclose();
+												wechatcore.msg('支付成功');
+										   },function(){
+												wechatcore.msg('您已取消支付');
+										   });
+										}else if(json.code==1){
+											t.popBoxclose();
+											wechatcore.reloadpage(json.msg);
+										}else if(json.code==2){
+											t.popBoxclose();
+											wechatcore.msg('免费霸屏成功');
+										}else if(json.code==3){
+											t.popBoxclose();
+											(parent.wx||wx).miniProgram.navigateTo({'url':'/pages/minipay/index?orderdata=' + encodeURIComponent(JSON.stringify(json.msg))});
+										}else{
+											wechatcore.msg(json.msg);
+										}
+								  	}, function(){
+										wechatcore.msg('网络太差,霸屏失败');
+								  	});
+							}else{
+								swal({   
+									title: "请输入霸屏券号",
+								    text: "",
+									type: "input",   
+									showCancelButton: true,   
+									closeOnConfirm: false,
+									confirmButtonColor: "#00aeff",
+									inputPlaceholder: "请输入霸屏券号" 
+								}, function(inputValue){   
+									if (inputValue === false) return false;
+									if (inputValue === "") {
+										swal.showInputError("请输入霸屏券号!");     
+										return false;
+									}
+									inputValue = inputValue.replace(/\s/g,"");
+									if (inputValue === "") {
+										swal.showInputError("请输入霸屏券号!");     
+										return false;
+									}
+									$(".sweet-alert input").val(inputValue);
+									bpdata.payusetype = '2';
+									bpdata.cardno = inputValue;
+									wechatcore.ajaxSubmit('/wechat/baping/sendbp',bpdata,'正在发起券号支付..').then(function(json){
+										if(json.code==0){
+									  		swal.close();
+											t.popBoxclose();
+											wechatcore.msg('支付成功');
+										}else{
+											swal.showInputError(json.msg);
+										}
+									}, function(){
+										wechatcore.msg('网络太差,霸屏失败');
+									});
+								});
+							}
+						},
+						close:function(t){
+							if(zhutiswiper!=null){
+								zhutiswiper.destroy();
+								zhutiswiper = null;
+							}
+							if(bptimeswiper!=null){
+								bptimeswiper.destroy();
+								bptimeswiper = null;
+							}
+						},
+					});
+				}else{
+					wechatcore.msg(json.msg);
+				}
+			  }, function(){
+				wechatcore.msg('网络太差,加载数据失败');
+			  });
+		});	
+		$(".zam-app-bapingfooter .baping-iconBox").on('click',function(){
+			$(".zam-app-bapingfooter-navs .bp-lefticon").trigger('click');
+		});
+		$(".zam-app-bapingfooter-navs .hb-lefticon").on('click',function(){
+			  $('.zam-app-facebox,.zam-app-controlbox').addClass('zam-app-displaynone');
+			  wechatcore.ajaxSubmit('/wechat/baping/ajaxredpackinfo',{},'加载数据中..').then(function(json){
+				if(json.code==0){
+					var config = json.msg;
+					config.hbtype = '1';
+					wechatcore.oneSlideBox({
+						title:'红包',
+						btnText:'塞钱进红包',
+						btnType:'btn-primary',
+						classname:'hbpopBox',
+						html:wechatcore.tpl($("#redpack-tpl"),config),
+						ready:function(){
+							var t = this;
+							t.popBoxfind(".hbnum").bind('input propertychange',wechatcore.onlynum);
+							t.popBoxfind(".hbtotalmoney").bind('input propertychange',wechatcore.onlynumorpoint);
+							t.popBoxfind(".redpacktypes li").bind('click',function(){
+								$(this).addClass('seltype').siblings().removeClass('seltype');
+								if($(this).attr("data-type")=='1'){
+									t.popBoxfind('.liuyan').removeClass('hidden');
+									t.popBoxfind('.kouling').addClass('hidden');
+								}else{
+									t.popBoxfind('.liuyan').addClass('hidden');
+									t.popBoxfind('.kouling').removeClass('hidden');
+								}
+							})
+						},
+						click:function(e){
+						  var t = this,hbtype = t.popBoxfind(".redpacktypes .seltype").attr('data-type'),kouling = t.popBoxfind(".kouling input").val(),hbmoney = t.popBoxfind(".hbtotalmoney input").val(),hbnum = t.popBoxfind(".hbnum input").val(),liuyan = t.popBoxfind(".liuyan input").val();
+						  if(hbtype=='2'&&kouling==''){
+								return wechatcore.msg('请填写红包口令');
+						  }
+						  if(hbmoney=='' || hbmoney * 100 < config.min * 100){
+								return wechatcore.msg('总金额至少是'+config.min+'元');
+						  }
+						   if(hbmoney=='' || hbmoney * 100 > config.max * 100){
+								return wechatcore.msg('总金额至多是'+config.max+'元');
+						  }
+						  if(hbnum=='' || hbnum <1 ){
+								return wechatcore.msg('红包至少1个');
+						  }
+						  if(hbnum=='' || hbnum > 2000 ){
+								return wechatcore.msg('红包至多2000个');
+						  }
+						  if(hbmoney * 100 < hbnum * 100 * config.onemin){
+								return wechatcore.msg('单个红包最小'+config.onemin+'元，'+hbmoney+"元仅可发放"+Math.floor(hbmoney/config.onemin)+"个红包");
+						  }
+						  wechatcore.ajaxSubmit('/wechat/baping/sendhb',{hbtype:hbtype,hbmoney:hbmoney,hbnum:hbnum,hbtxt:liuyan,kouling:kouling,iswxprogram:XCV3Config.isminiProgram,},'正在发起支付..').then(function(json){
+							if(json.code==0){
+							   wechatcore.showWxpay(json.msg,function(){
+									t.popBoxclose();
+									wechatcore.msg('支付成功');
+							   },function(){
+									t.popBoxclose();
+									wechatcore.msg('您已取消支付');
+							   });
+							}else if(json.code==1){
+								t.popBoxclose();
+								 wechatcore.reloadpage(json.msg);
+							}else if(json.code==3){
+								t.popBoxclose();
+								(parent.wx||wx).miniProgram.navigateTo({'url':'/pages/minipay/index?orderdata=' + encodeURIComponent(JSON.stringify(json.msg))});
+							}else{
+								wechatcore.msg(json.msg);
+							}
+						  }, function(){
+							wechatcore.msg('网络太差，发放红包失败');
+						  });
+						},
+					});
+				}else{
+					wechatcore.msg(json.msg);
+				}
+			  }, function(){
+				wechatcore.msg('网络太差，加载数据失败');
+			  });
+		});
+		var dsuserswiper,dsgiftswiper;
+		$(".zam-app-bapingfooter-navs .ds-lefticon").on('click',function(e,groupid,artid){
+			$('.zam-app-facebox,.zam-app-controlbox').addClass('zam-app-displaynone');
+			wechatcore.ajaxSubmit('/wechat/baping/ajaxdsinfo',{},'加载数据中..').then(function(json){
+				if(json.code==0){
+					  var dsartists = json.msg.artists,dsgifts = json.msg.gifts,freetimes = json.msg.freetimes,cardpay = json.msg.cardpay||'2';
+					  var btnText = freetimes > 0 ? '免费打赏('+freetimes+'次)' : '立即打赏';
+					  if(cardpay=='1'){
+						btnText = [
+							{'class':'btn-primary',txt:(freetimes > 0 ? '免费打赏('+freetimes+'次)' : '微信支付'),type:'1'},
+							{'class':'btn-warning',txt:'券号支付',type:'2'},
+						];
+					  }
+					  wechatcore.oneSlideBox({
+						title:'打赏',
+						btnText:btnText,
+						btnType:'btn-primary',
+						classname:'dspopBox',
+						html:wechatcore.tpl($("#ds-tpl"),json.msg),
+						ready:function(){
+							var t = this;
+							dsuserswiper = new Swiper('.dsuser-swiper',{
+								centeredSlides: true,
+								slidesPerView:'auto',
+								slideToClickedSlide:true,
+							});
+							dsgiftswiper = new Swiper('.gift-swiper',{
+								pagination: {
+									el: '.ds-gift-pagination',
+								},
+								slidesPerView: 'auto',
+								autoplay:false,
+								observer:true,
+								observeParents:true,
+								watchOverflow: true,
+							});
+							t.popBoxfind(".dsusertype-item").bind('click',function(e,artid){
+								var typeindex = $(this).index(),typeartist = dsartists[typeindex].list;
+								if(typeartist==null) return;
+								if(dsuserswiper!=null){
+									dsuserswiper.destroy(false);
+								}
+								t.popBoxfind(".dsuserList").html(wechatcore.tpl($("#dsuser-tpl"),{artistone:typeartist}));
+								dsuserswiper = new Swiper('.dsuser-swiper',{
+									centeredSlides: true,
+									slidesPerView:'auto',
+									slideToClickedSlide:true,
+								});
+								$(this).addClass('active').siblings().removeClass('active');
+								if(groupid && artid){
+									{/*根据歌手id获取歌手所在slide的index值来切换至点歌所选打赏歌手slide*/}
+									setTimeout(function(){
+										dsuserswiper.slideTo($(".dsuser-"+artid).index(), 100, false);
+									},1e2);
+								}
+							});
+							t.popBoxfind(".giftbox .gift-item").bind('click',function(){
+								$('.giftbox .gift-item').removeClass('sel');
+								$(this).addClass('sel');
+							});
+							t.popBoxfind('.gift-box .gift-item').eq(0).trigger('click');
+							if(groupid && artid){
+								{/*根据歌手id获取歌手所在slide的index值来切换至点歌所选打赏歌手slide*/}
+								setTimeout(function(){
+									t.popBoxfind(".dsusergroup-"+groupid).trigger('click',artid);
+								},2e2);
+							}
+						},
+						click:function(clickType){
+							var t = this,dsclicked = false;
+							var dsuser = t.popBoxfind(".dsuserList .swiper-slide-active"),dsgift = t.popBoxfind(".gift-box .gift-item.sel"),txt = t.popBoxfind(".dstxt").val();
+							var obj = {};
+							if(dsuser.length<=0) return wechatcore.msg('请选择打赏艺人');
+							obj.artid = dsuser.attr("data-artid");
+							if(dsgift.length<=0) return wechatcore.msg('请选择打赏礼物');
+							obj.giftid = dsgift.attr("data-giftid");
+							obj.txt = txt;
+							obj.iswxprogram = XCV3Config.isminiProgram;
+							if(dsclicked) return;
+							dsclicked = true;
+							if(clickType == '1'){
+								wechatcore.ajaxSubmit('/wechat/baping/sendds',obj,'正在发起支付..').then(function(json){
+								if(json.code==0){
+									dsclicked = false;
+									wechatcore.showWxpay(json.msg,function(){
+										t.popBoxclose();
+										wechatcore.msg('支付成功');
+								    },function(){
+										t.popBoxclose();
+										wechatcore.msg('您已取消支付');
+								    });
+								   //t.popBoxclose();
+								}else if(json.code==1){
+									t.popBoxclose();
+									dsclicked = false;
+									wechatcore.reloadpage(json.msg);
+								}else if(json.code==2){
+									t.popBoxclose();
+									dsclicked = false;
+									wechatcore.msg('免费打赏成功');
+								}else if(json.code==3){
+									t.popBoxclose();
+									(parent.wx||wx).miniProgram.navigateTo({'url':'/pages/minipay/index?orderdata=' + encodeURIComponent(JSON.stringify(json.msg))});
+								}else{
+									dsclicked = false;
+									wechatcore.msg(json.msg);
+								}
+							  }, function(){
+								dsclicked = false;
+								wechatcore.msg('网络太差，打赏失败');
+							  });
+							}else{
+								swal({   
+									title: "请输入打赏券号",
+								    text: "",
+									type: "input",   
+									showCancelButton: true,   
+									closeOnConfirm: false,
+									confirmButtonColor: "#00aeff",
+									inputPlaceholder: "请输入打赏券号" 
+								}, function(inputValue){   
+									if (inputValue === false) return false;
+									if (inputValue === "") {
+										swal.showInputError("请输入打赏券号!");     
+										return false;
+									}
+									inputValue = inputValue.replace(/\s/g,"");
+									if (inputValue === "") {
+										swal.showInputError("请输入打赏券号!");     
+										return false;
+									}
+									$(".sweet-alert input").val(inputValue);
+									obj.payusetype = '2';
+									obj.cardno = inputValue;
+									wechatcore.ajaxSubmit('/wechat/baping/sendds',obj,'正在发起券号支付..').then(function(json){
+										if(json.code==0){
+									  		swal.close();
+											t.popBoxclose();
+											wechatcore.msg('支付成功');
+										}else{
+											swal.showInputError(json.msg);
+										}
+									}, function(){
+										wechatcore.msg('网络太差,打赏失败');
+									});
+								});
+							}
+						},
+						close:function(t){
+							if(dsuserswiper!=null){
+								dsuserswiper.destroy(true,true);
+							}
+							if(dsgiftswiper!=null){
+								dsgiftswiper.destroy(true,true);
+							}
+						},
+					});
+				}else{
+					wechatcore.msg(json.msg);
+				}
+			}, function(){
+					wechatcore.msg('网络太差，加载数据失败');
+			});
+		});
+		var songerswiper;
+		$(".zam-app-bapingfooter-navs .song-lefticon").on('click',function(){
+			wechatcore.ajaxSubmit('/wechat/baping/ajaxsonginfo',{},'加载数据中..').then(function(json){
+				if(json.code==0){
+					var isFlatBtn = false;
+					var songtimes = json.msg.songtimes||[];
+					var songartist = json.msg.singer||[];
+					var songlists = json.msg.song||[];
+					var freetimes = json.msg.freetimes||0;
+					var cardpay = json.msg.cardpay||'2';
+					var btnText = freetimes > 0 ? '免费点歌('+freetimes+'次)' : '立即点歌';
+					if(cardpay == '1'){
+						btnText = [
+							{class:'btn-primary',txt:(freetimes > 0 ? '免费点歌('+freetimes+'次)' : '微信支付'),type:'1'},
+							{class:'btn-warning',txt:'券号支付',type:'2'},
+						];
+					}
+					if(songtimes.length){
+						btnText = [
+							{class:'btn-warning',txt:'免费点歌',type:'3'},
+							{class:'btn-primary',txt:'付费置顶（200元）',type:'1'},
+						];
+						isFlatBtn = true;
+					}
+					if(!songartist.length) {
+						return wechatcore.msg('请到后台添加歌曲');
+					}
+					var tsongs = json.msg.song||[];
+					if(!tsongs.length) {
+						return wechatcore.msg('请到后台添加歌曲');
+					}
+					wechatcore.oneSlideBox({
+						title:'点歌',
+						isFlatBtn:isFlatBtn,
+						btnText:btnText,
+						btnType:'btn-primary',
+						classname:'songpopBox',
+						html:wechatcore.tpl($("#song-tpl"),json.msg),
+						ready:function(){
+							var t = this;
+							songerswiper = new Swiper('.songerlist',{
+								// 启用自动监视DOM变化并重新初始化swiper
+								observer: true,
+        						observeParents: true,
+								effect:'coverflow',
+								grabCursor: true,
+								centeredSlides: true,
+								slidesPerView:'auto',
+								slideToClickedSlide:true,
+								coverflow: {
+									rotate:0,
+									stretch:0,
+									depth:100,
+									modifier:0,
+									slideShadows : true
+								},
+								on: {
+									slideChange: function(){
+									    var activeIndex = this.activeIndex;
+										t.popBoxfind(".song-search input").val('').attr('placeholder', activeIndex > 0 ? '输入你想要搜索的歌曲名或原唱歌手' : '输入你想要搜索的歌曲名或艺人或原唱');
+									    setTimeout(function(){
+											var timeid = t.popBoxfind('.songtimesbox .active').attr('data-id') || '';
+									        var artid = t.popBoxfind(".songerlist .swiper-slide").eq(activeIndex).find(".dstosonger").attr('data-artid') || '';
+											if(+artid){
+    											var showSongs = songlists.filter(function(params){
+    												return params.artistid == artid;
+    											});
+    										}else{
+												//展示的全部歌曲
+												var showSongs = songlists;
+												//如果存在时间段则仅显示当前时间段的艺人的歌曲
+												if(timeid){
+													const timeone = songtimes.find(item => item.id == timeid);
+													const artids = timeone.artids||[];
+													showSongs = songlists.filter(function(params){
+														return artids.includes(`${params.artistid}`);
+													});
+													//按id排序
+													showSongs = showSongs.sort((a, b) => {
+														return artids.indexOf(`${a.artistid}`) - artids.indexOf(`${b.artistid}`);
+													});
+												}
+											}
+    										t.popBoxfind(".songlists").html(wechatcore.tpl($("#songlist-tpl"),{ 
+												songs : showSongs,
+												timeid:timeid
+											}));
+									    }, 50)
+									},
+								},
+							});
+							//切换今日艺人与已点歌曲菜单
+							t.popBoxfind('.songnavbox li').bind('click',function(){
+								var navindex = $(this).index();
+								navindex == 0 ? t.popBoxfind(".zam-app-bpopupFoot").removeClass('hidden') : t.popBoxfind('.zam-app-bpopupFoot').addClass('hidden');
+								$(this).addClass('active').siblings().removeClass('active');
+								t.popBoxfind(".songpopcontent > div").eq(navindex).removeClass('hidden').siblings().addClass('hidden');
+							});
+							//点选某歌曲
+							t.popBoxfind('.songlists').off('click').on('click','.songitem',function(){
+								$(this).addClass('active').siblings().removeClass('active');
+							});
+							t.popBoxfind('.songpopcontent').off('click').on('click','.dstosonger,.dstoartist',function(){
+								var $this = $(this);
+								t.popBoxfind('.zam-app-bpopupCloseBox').trigger('click');
+								setTimeout(function(){
+									$(".zam-app-bapingfooter-navs .ds-lefticon").trigger('click',[$this.attr("data-groupid"),$this.attr("data-artid")]);	
+								},1e2);
+							});
+							//搜索歌曲
+							t.popBoxfind(".search-btn").bind('click',function(){
+							  	var $this = $(this),songname = $this.prev().val(), activeslide = t.popBoxfind(".songerlist .swiper-slide-active"),isdefault = (activeslide.hasClass('default-slide') ? '1' : '2'),artid = activeslide.find(".dstosonger").attr('data-artid') || '';
+								var timeid = t.popBoxfind('.songtimesbox .active').attr('data-id') || '';
+							  	if(songname == '') {
+									return wechatcore.msg($this.prev().attr('placeholder'));
+							  	}
+							  	var postData = {
+									isdefault:isdefault, 
+									artid:artid, 
+									songname:songname,
+									timeid: timeid,
+								};
+							  	wechatcore.ajaxSubmit('/wechat/baping/searchsong',postData,false).then(function(data){
+									if(data.code == 0){
+										var searchsongs = data.msg;
+										var artid = t.popBoxfind(".songerlist .swiper-slide-active .dstosonger").attr('data-artid') || '';
+										if(!searchsongs.length){
+											if(+artid){
+												searchsongs = songlists.filter(function(params){
+													return params.artistid == artid;
+												});
+											}else{
+												searchsongs = songlists;
+												if(timeid){
+													const timeone = songtimes.find(item => item.id == timeid);
+													const artids = timeone.artids||[];
+													searchsongs = songlists.filter(function(params){
+														return artids.includes(`${params.artistid}`);
+													});
+													//按id排序
+													searchsongs = searchsongs.sort((a, b) => {
+														return artids.indexOf(`${a.artistid}`) - artids.indexOf(`${b.artistid}`);
+													});
+												}
+											}
+										}
+										t.popBoxfind(".songlists").html(wechatcore.tpl($("#songlist-tpl"),{
+											songs:searchsongs,
+											timeid:timeid
+										}));
+										if(!data.msg.length) {
+											return wechatcore.msg('未搜索到相关歌曲');
+										}
+									}else{
+										wechatcore.msg(data.msg);
+									}
+							  	}, function(){
+									wechatcore.msg('网络异常，请稍后重试');
+							  	});
+							});
+							//监听输入搜索内容
+							t.popBoxfind(".song-search input").bind('input propertychange',function(){
+								var $this = $(this),songname = $this.val();
+								if($.trim(songname) == ''){
+									var artid = t.popBoxfind(".songerlist .swiper-slide-active .dstosonger").attr('data-artid') || '';
+									var timeid = t.popBoxfind('.songtimesbox .active').attr('data-id')||'';
+									if(+artid){
+										var showSongs = songlists.filter(function(params){
+											return params.artistid == artid;
+										});
+									}else{
+										//展示的全部歌曲
+										var showSongs = songlists;
+										//如果存在时间段则仅显示当前时间段的艺人的歌曲
+										if(timeid){
+											const timeone = songtimes.find(item => item.id == timeid);
+											const artids = timeone.artids||[];
+											showSongs = songlists.filter(function(params){
+												return artids.includes(`${params.artistid}`);
+											});
+											//按id排序
+											showSongs = showSongs.sort((a, b) => {
+												return artids.indexOf(`${a.artistid}`) - artids.indexOf(`${b.artistid}`);
+											});
+										}
+									}
+									t.popBoxfind(".songlists").html(wechatcore.tpl($("#songlist-tpl"),{
+										songs : showSongs,
+										timeid : timeid
+									}));
+								}
+							});
+							var songtimeswiper = new Swiper('.songtimesbox', {
+								direction: 'horizontal',
+								grabCursor: true,
+								//centeredSlides: true,
+								slidesPerView:'auto',
+								slideToClickedSlide:true,
+								freeMode: true,
+								watchOverflow: true
+							});
+							t.popBoxfind('.songtimesbox li').bind('click',function(){
+								var navindex = $(this).index(),timeid = $(this).attr('data-id');
+								const timeone = songtimes.find(item => item.id == timeid);
+								const artids = timeone.artids||[];
+								$(this).addClass('active').siblings().removeClass('active');
+								//点击不同的时间段显示不同的歌手歌曲
+								var searchsingers = songartist.filter(function(params){
+									return artids.includes(`${params.id}`);
+								});
+								//按id排序
+								searchsingers = searchsingers.sort((a, b) => {
+									return artids.indexOf(`${a.id}`) - artids.indexOf(`${b.id}`);
+								});
+								t.popBoxfind(".songerlist .swiper-wrapper").html(wechatcore.tpl($("#songer-tpl"),{
+									singer : searchsingers
+								}));
+								songerswiper.slideTo(0);
+								//显示全部歌曲
+								setTimeout(function(){
+									var timeSongs = songlists.filter(function(params){
+										return artids.includes(`${params.artistid}`);
+									});
+									//按id排序
+									timeSongs = timeSongs.sort((a, b) => {
+										return artids.indexOf(`${a.artistid}`) - artids.indexOf(`${b.artistid}`);
+									});
+									t.popBoxfind(".songlists").html(wechatcore.tpl($("#songlist-tpl"),{ 
+										songs : timeSongs,
+										timeid : timeid
+									}));
+								}, 50)
+							});
+							t.popBoxfind('.songtimesbox li').eq(0).click();
+							if(wechatcore.ios12over() && !wechatcore.ios17over() && XCV3Config.clienttype=='1'){
+								t.popBoxfind('.inputBox').on('focus', 'input', function(e){
+									setTimeout(function () {
+										$(document).scrollTop($("body").innerHeight()),this.scrollIntoView(true);
+									},300)
+								});
+							}
+						},
+						click:function(clickType){
+							var t = this,songbox = t.popBoxfind(".songlists .active");
+							if(!songbox.length) {
+								return wechatcore.msg('请选择歌曲');
+							}
+							var timeid = '',deskno = '';
+							var songtimesbox = t.popBoxfind('.songtimesbox');
+							if(songtimesbox.length){
+								timeid = songtimesbox.find('li.active').attr('data-id')||'';
+								deskno = t.popBoxfind(".desknobox input").val()||'';
+							}
+							var songclicked = false;
+							if(songclicked) {
+								return;
+						    }
+						    songclicked = true;
+							var obj = {
+								timeid:timeid,
+								songid:songbox.attr("data-songid"),
+								txt:t.popBoxfind(".songtxt").val(),
+								deskno:deskno,
+								iswxprogram:XCV3Config.isminiProgram,
+							};
+						    if(clickType == '1'){
+								if(timeid && !deskno) {
+									return wechatcore.msg('请填写台号再点歌哦');
+								}
+							   	wechatcore.ajaxSubmit('/wechat/baping/sendsong',obj,'正在发起支付..').then(function(json){
+									if(json.code==0){
+										songclicked = false;
+										wechatcore.showWxpay(json.msg,function(){
+											t.popBoxclose();
+											wechatcore.msg('支付成功');
+										},function(){
+											t.popBoxclose();
+											wechatcore.msg('您已取消支付');
+										});
+										t.popBoxclose();
+									}else if(json.code==1){
+										t.popBoxclose();
+										songclicked = false;
+										wechatcore.reloadpage(json.msg);
+									}else if(json.code==2){
+										t.popBoxclose();
+										songclicked = false;
+										wechatcore.msg('免费点歌成功');
+									}else if(json.code==3){
+										t.popBoxclose();
+										(parent.wx||wx).miniProgram.navigateTo({'url':'/pages/minipay/index?orderdata=' + encodeURIComponent(JSON.stringify(json.msg))});
+									}else{
+										songclicked = false;
+										wechatcore.msg(json.msg);
+									}
+							  	}, function(){
+									songclicked = false;
+									wechatcore.msg('网络太差，点歌失败');
+							  	});
+							}else if(clickType == '2'){
+								swal({   
+									title: "请输入点歌券号",
+								    text: "",
+									type: "input",   
+									showCancelButton: true,   
+									closeOnConfirm: false,
+									confirmButtonColor: "#00aeff",
+									inputPlaceholder: "请输入点歌券号" 
+								}, function(inputValue){   
+									if (inputValue === false) return false;
+									if (inputValue === "") {
+										swal.showInputError("请输入点歌券号!");     
+										return false;
+									}
+									inputValue = inputValue.replace(/\s/g,"");
+									if (inputValue === "") {
+										swal.showInputError("请输入点歌券号!");     
+										return false;
+									}
+									$(".sweet-alert input").val(inputValue);
+									obj.payusetype = '2';
+									obj.cardno = inputValue;
+									wechatcore.ajaxSubmit('/wechat/baping/sendsong',obj,'正在发起券号支付..').then(function(json){
+										if(json.code==0){
+									  		swal.close();
+											t.popBoxclose();
+											wechatcore.msg('支付成功');
+										}else{
+											swal.showInputError(json.msg);
+										}
+									}, function(){
+										wechatcore.msg('网络太差,点歌失败');
+									});
+								});
+							}else{
+								wechatcore.ajaxSubmit('/wechat/baping/sendfreesong',obj,'正在提交..').then(function(json){
+									if(json.code == 0){
+										songclicked = false;
+										wechatcore.msg('点歌成功',3e3);
+										t.popBoxclose();
+									}else{
+										songclicked = false;
+										wechatcore.msg(json.msg);
+									}
+							  	}, function(){
+									songclicked = false;
+									wechatcore.msg('网络太差，点歌失败');
+							  	});
+							}
+						},
+						close:function(t){
+							if(songerswiper!=null){
+								songerswiper.destroy(true,true);
+							}
+						},
+					});
+				}else{
+					wechatcore.msg(json.msg);
+				}
+			  }, function(){
+				wechatcore.msg('网络太差，加载数据失败');
+			  });
+		});
+		
+		$(".waitsendInput").on('input propertychange',function(){
+			if(XCV3Config.buttonLocked) return;
+			if($(this).val()!=''){
+				$(".bapingfooter-inputbox .btn-sendmsg").text("发送").removeClass("btn-disabled").addClass("btn-primary");
+			}else{
+				$(".bapingfooter-inputbox .btn-sendmsg").text("发送").removeClass("btn-primary").addClass("btn-disabled");
+			}
+		});
+		$(".bapingfooter-inputbox .btn-sendmsg").on('click',function(){
+				if(appsocket.isclose) return;
+				var $this = $(this);
+				var txt = $(".waitsendInput").val();
+				if(txt!=''){
+				  $(".waitsendInput").val('');
+				  $this.addClass('btn-disabled');
+				  wechatcore.ajaxSubmit('/wechat/baping/send',{type:1,content:txt},false).then(function(data){
+					if(data.code==0){
+						$('.zam-app-facebox,.zam-app-controlbox').addClass('zam-app-displaynone');
+						if(XCV3Config.sendJgtime>0){
+							XCV3Config.buttonLocked = true;
+							$this.text(XCV3Config.sendJgtime+" s").removeClass("btn-primary");
+							wechatcore.coundown(XCV3Config.sendJgtime,function(t){
+								$this.text(t+" s");
+							},function(){
+								XCV3Config.buttonLocked = false;
+								$this.text("发送");
+								if($(".waitsendInput").val()!=''){
+									$this.text("发送").removeClass("btn-disabled").addClass("btn-primary");
+								}
+							})
+						}else{
+							$this.text("发送").removeClass("btn-primary");
+						}
+						wechatcore.msg('发送成功');
+					}else{
+						$this.text("发送").removeClass("btn-primary");
+						wechatcore.msg(data.msg);
+					}
+				  }, function(){
+					    $this.text("发送").removeClass("btn-primary");
+						wechatcore.msg('网络异常发送失败，请稍后重试');
+				  });
+				}
+		});
+		emojicore.init();
+		$(".zam-app-bapingfooter").on('click','.mxc-emojiBox',function(){
+				$(".zam-app-controlbox").addClass('zam-app-displaynone');
+				$('.zam-app-facebox').toggleClass('zam-app-displaynone');
+		});
+		$(".zam-app-bapingfooter").on('click','.mxc-roundaddBox',function(){
+				$(".zam-app-facebox").addClass('zam-app-displaynone');
+				$('.zam-app-controlbox').toggleClass('zam-app-displaynone');
+		});
+		$(".zam-app-facebox").on('click','.emo-list .normalemoji',function(){
+				var $thisid = $(this).attr("id");
+				if(!$thisid){
+					return;
+				}
+				$(".waitsendInput").val($(".waitsendInput").val() + $thisid);
+				if(XCV3Config.buttonLocked) return;
+				var inputWords = $(".waitsendInput").val();
+				if(inputWords==''){
+					$(".bapingfooter-inputbox .btn-sendmsg").text("发送").removeClass("btn-primary").addClass("btn-disabled");
+				}else{
+					$(".bapingfooter-inputbox .btn-sendmsg").text("发送").removeClass("btn-disabled").addClass("btn-primary");
+				}
+		});
+		$(".zam-app-facebox").on('click','.delemoji',function(){
+			var inputW = $(".waitsendInput").val();
+			var matchs = inputW.match(/\[[\u4e00-\u9fa5]+\]/g);
+			if($.isArray(matchs)&&matchs.length>0){
+				$(".waitsendInput").val(inputW.replace(matchs[(matchs.length-1)],''));
+			}
+			if(XCV3Config.buttonLocked) return;
+			var inputWords = $(".waitsendInput").val();
+			if(inputWords==''){
+				$(".bapingfooter-inputbox .btn-sendmsg").text("发送").removeClass("btn-primary").addClass("btn-disabled");
+			}
+		});
+		$(".zam-app-controlbox").on('click','.uploadImg',function(){
+			if(appsocket.isclose) return;
+			wechatcore.uploadImg({posturl:'/wechat/baping/upload',type:'baping'},function(data){
+				if(data.code==0){
+				  wechatcore.ajaxSubmit('/wechat/baping/send',{type:2,content:data.msg.filepath},false).then(function(json){
+					if(json.code==0){
+						wechatcore.msg('发送图片成功');
+						$(".zam-app-controlbox").addClass('zam-app-displaynone');
+					}else{
+						wechatcore.msg(json.msg);
+					}
+				  }, function(){
+						wechatcore.msg('网络异常发送失败，请稍后重试');
+				  });
+				}else{
+				  wechatcore.msg(data.msg);
+				}
+			});
+		});
+		$(".zam-app-msglist").on('click','.wechatImg',function(){
+			wechatcore.previewImage(this);
+		});
+		$(".zam-app-msglist").on('click','.bpimgone img',function(){
+			wechatcore.previewImages(this);
+		});
+		$(".zam-app-msglist").on('click','.delmsg',function(){
+			var msgid = $(this).parent().attr("data-msgid");
+			wechatcore.ask('警告','确定要删除此消息么?',['确定','取消'],function(index){
+				wechatcore.close(index);
+				wechatcore.ajaxSubmit('/wechat/baping/del',{msgid:msgid},'正在执行删除操作...').then(function(json){
+					if(json.code==0){
+						wechatcore.msg('删除成功');
+					}else{
+						wechatcore.msg(json.msg);
+					}
+				}, function(){
+					wechatcore.msg('网络太差，请稍后重试');
+				});
+			});
+		});
+		$(".zam-app-msglist").on('click','.addblack',function(){
+			var userid = $(this).parent().attr("data-userid");
+			wechatcore.ask('警告','确定要拉黑此用户么?',['确定','取消'],function(index){
+				wechatcore.close(index);
+				wechatcore.ajaxSubmit("/wechat/baping/addblack",{userid:userid},'正在执行拉黑操作...').then(function(json){
+					if(json.code==0){
+						wechatcore.msg('操作成功');
+					}else{
+						wechatcore.msg(json.msg);
+					}
+				}, function(){
+					wechatcore.msg('网络太差，请稍后重试');
+				});
+			});
+		});
+		$(".zam-app-msglist").on('click','.bpreshow',function(){
+			var msgid = $(this.parentNode).attr("data-msgid");
+			wechatcore.ask('警告','确定要将该消息大屏再显示一次么?',['确定','取消'],function(index){
+				wechatcore.close(index);
+				wechatcore.ajaxSubmit('/wechat/baping/reshowagain',{msgid:msgid},'正在执行操作...').then(function(json){
+					if(json.code==0){
+						wechatcore.msg('操作成功');
+					}else{
+						wechatcore.msg(json.msg);
+					}
+				}, function(){
+					wechatcore.msg('网络太差，请稍后重试');
+				});
+			});
+		});
+		$(".zam-app-msglist").click(function(e){
+			if (e.stopPropagation)  e.stopPropagation();  
+			$('.zam-app-facebox,.zam-app-controlbox').addClass('zam-app-displaynone');
+		});
+		$(".zam-app-msglist").on('click','.msg-videoicon',function(){
+			var $this = $(this),videosrc = $this.attr('data-video'),poster = $this.prev().attr('src');
+			 $("body").append('<div class="playbpvideo zam-app-flex-ajCenter2 "><div class="closevideo">点我关闭视频</div><video id="my-player" class="video-js vjs-default-skin vjs-big-play-centered vjs-fluid " controls preload="auto"  data-setup="{}" webkit-playsinline="true" x-webkit-airplay="true" playsinline="true"><source src="'+videosrc+'" ></source></video></div>');
+			var player = videojs('my-player',{
+				loop : true,
+				poster:poster,
+			}, function onPlayerReady() {
+			  this.play();
+			  this.on('error', function() {
+				    $(".playbpvideo .closevideo").unbind('click');
+					player.dispose();
+					$(".playbpvideo").remove();
+					wechatcore.msg('视频加载出错,请稍后重试');
+			  });
+			});
+			$(".playbpvideo .closevideo").bind('click',function(){
+				$(this).parent().remove();
+				player.dispose();
+			});
+		});
+		var openhbclicked = false;
+		$(".zam-app-msglist").on('click','.zam-app-msg-hb',function(){
+			var $this = $(this),hbid = $this.attr("data-hbid"),hbtype = $this.attr("data-hbtype"),hbnum = $this.attr("data-totalnum"),nickname = $this.parent().prev().find('.userName').text(),avatar = $this.parent().prev().find('img').attr("src"),txt = $this.find("span").text();
+			if(openhbclicked) return;
+			openhbclicked = true;
+			var layindex = wechatcore.loading('获取红包信息中..');
+			var hbInfo = {hbid:hbid,hbtype:hbtype,hbnum:hbnum,nickname:nickname,avatar:avatar,txt:txt};
+			var redpackbgImg = new Image();
+			redpackbgImg.onload = redpackbgImg.onerror = function () {
+				wechatcore.ajaxSubmit('/wechat/baping/getmyhbrecord',{hbid:hbid}).then(function(json){
+					wechatcore.close(layindex);
+					if(json.code==0){
+						$("body").append(wechatcore.tpl($("#redpackopened-tpl"),{hbtype:hbtype,hbnum:hbnum,nickname:nickname,avatar:avatar,mymoney:json.msg.mymoney,list:wechatcore.distinct(json.msg.list)}));
+					}else if(json.code==1){
+						$("body").append(wechatcore.tpl($("#redpackopen-tpl"),hbInfo));
+					}else{
+						wechatcore.msg(json.msg);
+					}
+					openhbclicked = false;
+				}, function(){
+					wechatcore.close(layindex);
+					wechatcore.msg('网络太差，请稍后重试');
+					openhbclicked = false;
+				});
+			}
+			redpackbgImg.src = "/static/images/wechat/baping/opening_bg.png";
+		});
+		var hbclicked = false;
+		$("body").on('click','.redBagBox .redBoxopenBtn',function(){
+			var $this = $(this),hbid = $this.attr("data-hbid"),hbtype = $this.attr("data-hbtype"),hbnum = $this.attr("data-hbnum"),kouling = $(".inputkl").val();
+			if(hbtype=='2' && kouling==''){ 
+				return wechatcore.msg('请输入红包口令');
+			}
+			if(hbclicked) return;
+			hbclicked = true;
+			var postdata = {hbid:hbid};
+			if(hbtype=='2') postdata.kl = kouling;
+			wechatcore.ajaxSubmit('/wechat/baping/openhb',postdata,'拼命拆红包中...').then(function(json){
+				if(json.code==0){
+					$("body").append(wechatcore.tpl($("#redpackopened-tpl"),{hbtype:hbtype,hbnum:hbnum,nickname:$this.prev().prev().find('p').text(),avatar:$this.prev().prev().find('img').attr('src'),mymoney:json.msg.mymoney,list:wechatcore.distinct(json.msg.list)}));
+				}else if(json.code==-2){
+				    {/*抖音强制调到微信小程序授权后才可以提现*/}
+					wechatcore.ask('温馨提醒','您需要同意微信授权后才可以参与抢红包',['马上去授权','拒绝授权'],function(index){
+						wechatcore.close(index);
+						window.location.href = json.msg;
+					},function(index){
+						wechatcore.close(index);
+						wechatcore.msg('您已拒绝授权，无法发起参与');
+					});
+				}else{
+					wechatcore.msg(json.msg);
+				}
+				hbclicked = false;
+			}, function(){
+				wechatcore.msg('网络太差，请稍后重试');
+				hbclicked = false;
+			});
+		});
+		$("body").on('click','.redBoxClose',function(){
+			$(".redBagBox").remove();
+		});
+		$('.zam-app-msglist').on('click','li .userAvatar',function(){
+			return false;
+			var chatopenid = $(this).attr('data-openid');
+			if(basicConfig.openchat==''||basicConfig.openchat=='2'||XCV3Config.openid==chatopenid) return;
+			wechatcore.reloadpage(basicConfig.chatUrl + '&chatopenid='+chatopenid);
+		});
+		$(".opengamemodule").on('click',function(){
+			$(".zam-app-menubox").trigger('click');
+		});
+		$(".zam-app-msglist").on('click','.addestoppel',function(){
+			var userid = $(this).parent().attr("data-userid");
+			wechatcore.ask('警告','确定要禁言此用户么?',['确定','取消'],function(index){
+				wechatcore.close(index);
+				wechatcore.ajaxSubmit("/wechat/baping/addestoppel",{userid:userid},'正在执行禁言操作...').then(function(json){
+					if(json.code==0){
+						wechatcore.msg('操作成功');
+					}else{
+						wechatcore.msg(json.msg);
+					}
+				}, function(){
+					wechatcore.msg('网络太差，请稍后重试');
+				});
+			});
+		});
+		function addestoppel(){
+			var footerbar = $(".zam-app-bapingfooter");
+			footerbar.find('input').val('').attr('placeholder','禁言中');
+			footerbar.addClass('isforbidden');
+			footerbar.find(".btn").text('禁言中');
+			XCV3Config.isestoppel = '1';
+		}
+		function removeestoppel(){
+			var footerbar = $(".zam-app-bapingfooter");
+			footerbar.removeClass('isforbidden');
+			footerbar.find(".btn").text('发送');
+			footerbar.find('input').attr('placeholder','请输入...');
+			XCV3Config.isestoppel = '2';
+			//看是否全局禁言
+			if(basicConfig.appestoppel=='1'){
+				fulladdestoppel();
+			}
+		}
+		function fulladdestoppel(){
+			basicConfig.appestoppel = '1';
+			var footerbar = $(".zam-app-bapingfooter");
+			if(XCV3Config.isestoppel=='1' || XCV3Config.ismanager=='1'){
+				return false;
+			}
+			footerbar.find('input').val('');
+			footerbar.addClass('isforbidden');
+			footerbar.find(".btn").text('禁言中');
+			footerbar.find('input').attr('placeholder','禁言中');
+		}
+		function fullremoveestoppel(){
+			basicConfig.appestoppel = '2';
+			var footerbar = $(".zam-app-bapingfooter");
+			if(XCV3Config.isestoppel=='1'){
+				return false;
+			}
+			footerbar.removeClass('isforbidden');
+			footerbar.find('input').attr('placeholder','请输入...');
+			footerbar.find(".btn").text('发送');
+		}
+		//先考虑是否用户被全局禁言
+		if(XCV3Config.isestoppel=='1'){
+			addestoppel();
+		}else{
+			//再考虑是否上墙开启了禁言 管理员则忽略
+			if(basicConfig.appestoppel=='1' && XCV3Config.ismanager=='2'){
+				fulladdestoppel();
+			}
+		}
+		//点赞
+		var heartstage,heartimages,heartloaded = false,zanimgs = {:json_encode($appconfig['zanconfig']['zanimgs'])};
+		function initbubblehearts(){
+			if(zanimgs.length > 0){
+				zanimgs.forEach(function(src, index) {
+					 zanimgs[index] = new Promise(function(resolve) {
+						 var img = new Image;
+						 img.onload = resolve.bind(null, img);
+						 img.src = src;
+					 });
+				});
+				Promise.all(zanimgs).then(function(images) {
+					 heartimages = images;
+					 heartloaded = true;
+					 heartstage = new BubbleHearts();
+					 var canvas = heartstage.canvas;
+					 var w = $(".zan-lefticon").width()*3,h = $(".zan-lefticon").height()*6;
+					 canvas.width = w;
+					 canvas.height = h;
+					 canvas.style['width'] = w+'px';
+					 canvas.style['height'] = h+'px';
+					 $(".zan-lefticon").append(canvas);
+				},function(error){
+					console.log(error);
+				});
+			}
+		}
+		if($(".zan-lefticon").length > 0){
+			initbubblehearts();
+			var clickzan = false;
+			$(".zam-app-bapingfooter-navs .zan-lefticon").on('click',function(){
+				if(clickzan){
+					return false;
+				}
+				clickzan = true;
+				wechatcore.ajaxSubmit("/wechat/baping/clickzan",{}).then(function(json){
+					if(json.code==0){
+						if(heartloaded) {
+							var img = heartimages[Math.floor(Math.random() * heartimages.length)];
+							heartstage.bubble(img);
+						}
+						$('.zan-lefticon span').text(json.msg);
+					}else{
+						wechatcore.msg(json.msg);
+					}
+					clickzan = false;
+				},function(){
+					clickzan = false;
+				});
+			});
+		}
+});
+</script>

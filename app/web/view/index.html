@@ -1,0 +1,204 @@
+{include file="$Wpath/common/header" /}
+<style type="text/css">
+.card{
+    margin-bottom:20px;webkit-box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);
+    box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);
+}
+.count-sys .img-avatar{color:#fff;background-color: rgba(255, 255, 255, 0.175)!important;}
+.icon-shake{
+    display: inline-block;
+    margin-right: 5px;
+    font-size: 24px;
+    animation: clockani 2s linear infinite; 
+}
+@keyframes clockani{ 
+    0%,90%,100%{ transform: rotate(0) scale(1);}
+    20%,40%{ transform: rotate(-15deg) scale(1.1);}
+    30%,50%{ transform: rotate(15deg) scale(1.1);}
+}
+</style>
+{if $checkversion}
+<div class="upgradebox">
+  <div class="alert alert-danger zam-flex zam-alignItems">
+    <span class="tipicon mdi mdi-bell icon-shake hidden"></span>
+    <span class="tip"><i class="mdi mdi-spin mdi-loading" style="margin-right: 10px;"></i>正在获取系统最新版版本信息，请耐心等待...</span>
+  </div>
+</div>
+{/if}
+<div class="row count-sys">
+  <div class="col-sm-6 col-lg-3">
+    <div class="card bg-primary">
+      <div class="card-body clearfix">
+        <div class="pull-right">
+          <p class="h6 text-white m-t-0 fa-1-5x">后台总用户</p>
+          <p class="h3 text-white m-b-0 fa-1x">{$usercount}<span class="m-l-5">人</span></p>
+        </div>
+        <div class="pull-left"> <span class="img-avatar img-avatar-48"><i class="mdi mdi-account fa-1-5x"></i></span> </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-3">
+    <div class="card bg-danger">
+      <div class="card-body clearfix">
+        <div class="pull-right">
+          <p class="h6 text-white m-t-0 fa-1-5x">系统总收入</p>
+          <p class="h3 text-white m-b-0 fa-1x">{$incomecount}<span class="m-l-5">元</span></p>
+        </div>
+        <div class="pull-left"> <span class="img-avatar img-avatar-48"><i class="mdi mdi-currency-cny fa-1-5x"></i></span> </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-3">
+    <div class="card bg-success">
+      <div class="card-body clearfix">
+        <div class="pull-right">
+          <p class="h6 text-white m-t-0 fa-1-5x">活动总量</p>
+          <p class="h3 text-white m-b-0 fa-1x">{$hdcount}<span class="m-l-5">个</span></p>
+        </div>
+        <div class="pull-left"> <span class="img-avatar img-avatar-48"><i class="mdi mdi-format-list-numbers fa-1-5x"></i></span> </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-3">
+    <div class="card bg-purple">
+      <div class="card-body clearfix">
+        <div class="pull-right">
+          <p class="h6 text-white m-t-0 fa-1-5x">活动用户总量</p>
+          <p class="h3 text-white m-b-0 fa-1x">{$wxusercount}<span class="m-l-5">人</span></p>
+        </div>
+        <div class="pull-left"> <span class="img-avatar img-avatar-48"><i class="mdi mdi-account fa-1-5x"></i></span> </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!--服务器信息-->
+<div class="row">
+<div class="col-xs-12">
+  <div class="card">
+    <div class="card-header"><h4>服务器信息</h4></div>
+    <div class="card-body clearfix">
+      <div class="col-xs-12 col-md-12 col-lg-12 m-t-5 m-b-5">服务器系统：{$info['os']}</div>
+      <div class="col-xs-6 col-md-6 col-lg-3 m-t-5 m-b-5">PHP版本：{$info['php']}</div>
+      <div class="col-xs-6 col-md-6 col-lg-3 m-t-5 m-b-5">PHP运行方式：{$info['sapi']}</div>
+      <div class="col-xs-6 col-md-6 col-lg-3 m-t-5 m-b-5">MySQL版本：{$info['mysql']['version']}</div>
+      <div class="col-xs-6 col-md-6 col-lg-3 m-t-5 m-b-5">系统数据尺寸：{$info['mysql']['size']}</div>
+      <div class="col-xs-6 col-md-6 col-lg-3 m-t-5 m-b-5">Redis版本：{$info['redis']}</div>
+      <div class="col-xs-6 col-md-6 col-lg-3 m-t-5 m-b-5">允许最大上传文件：{$info['uploadlimit']}</div>
+      <div class="col-xs-6 col-md-6 col-lg-3 m-t-5 m-b-5">系统当前时间：{$info['nowtime']}</div>
+      <div class="col-xs-6 col-md-6 col-lg-3 m-t-5 m-b-5">最大打开文件数：{$info['maxopenfiles']}</div>
+      <div class="col-xs-6 col-md-6 col-lg-3 m-t-5 m-b-5">event扩展：{$info['event']=='1'?'已安装':'未安装'}</div>
+      <div class="col-xs-6 col-md-6 col-lg-3 m-t-5 m-b-5">ffmpeg: {$info['ffmpeg']?'已安装':'未安装'}</div>
+      <div class="col-xs-6 col-md-6 col-lg-3 m-t-5 m-b-5">memory_limit：{$info['memory_limit']}</div>
+      <div class="col-xs-6 col-md-6 col-lg-3 m-t-5 m-b-5">upload_max_filesize: {$info['upload_max_filesize']}</div>
+      <div class="col-xs-6 col-md-6 col-lg-3 m-t-5 m-b-5">post_max_size: {$info['post_max_size']}</div>
+      <div class="col-xs-6 col-md-6 col-lg-3 m-t-5 m-b-5">server.max_package_size: {$info['max_package_size']}</div>
+      <div class="col-xs-6 col-md-6 col-lg-3 m-t-5 m-b-5">session.gc_maxlifetime: {$info['session']['gc_maxlifetime']}秒</div>
+      <div class="col-xs-6 col-md-6 col-lg-3 m-t-5 m-b-5">session.cookie_lifetime: {$info['session']['cookie_lifetime']}秒</div>
+      <div class="col-xs-6 col-md-6 col-lg-3 m-t-5 m-b-5">max_input_vars: {$info['max_input_vars']}</div>
+      <div class="card-bottom col-xs-12 col-md-12 col-lg-12 m-t-10 m-b-10">
+        <!-- <p class="m-t-5 m-b-5 text-danger">请注意最大上传文件由php73的配置文件内的upload_max_filesize，post_max_size，memory_limit，以及config/server.php内的max_package_size(单位是b)配置项目共同决定，这4个参数哪个最小就能决定最大上传文件大小</p> -->
+        <p class="m-t-5 m-b-5 text-danger">若后台上传文件或者导出数据时出现异常，可在宝塔后台软件商店里将php73的memory_limit值改大，默认是128M，改完后重启一下服务器，刷新当前页面memory_limit；如果未发生变化需再次重启一下服务器</p>
+        <p class="m-t-5 m-b-5 text-danger">session.gc_maxlifetime与session.cookie_lifetime共同决定用户session有效时长，当用户登录后台勾选了7天内自动登录则7天后才会需要重新登录</p>
+        <p class="m-t-5 m-b-5 text-danger">php73默认限制max_input_vars变量数为1000，即为系统内网页每次提交的变量数量上限为1000，若提交超过上限则无法提交，常见于游戏设置奖品添加超过几百个等情况，可通过宝塔后台软件商店里将php73的配置文件的max_input_vars的值改大来解决，可设置为10000</p>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+<!--快速启动服务-->
+<div class="row">
+  <div class="col-xs-12">
+    <div class="card">
+      <div class="card-header">
+        <h4>快速启动服务</h4>
+      </div>
+      <div class="card-body clearfix">
+        <h5>一般重启服务器后刷新下网页会立刻显示502，要等几分钟后系统才会启动，怎么能快速启动？<span class="text-danger">操作步骤如下:</span></h5>
+        <div class="card-bottom col-xs-12 col-md-12 col-lg-12 m-t-10 m-b-10">
+            <p class="m-t-5 m-b-5">第一步: 打开宝塔终端</p>
+            <p class="m-t-5 m-b-5">第二步: 重启web服务8787端口，点击复制下面的命令，到终端右键粘贴，按回车键即可<pre>/www/server/php/73/bin/php {$info['path']['base']}start.php restart -d <a class="btn btn-primary btn-xs zam-clip" data-text="/www/server/php/73/bin/php {$info['path']['base']}start.php restart -d" style="margin-left: 20px;">点我复制命令</a></pre></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!--目录信息-->
+<div class="row">
+<div class="col-xs-12">
+  <div class="card">
+    <div class="card-header"><h4>目录信息</h4></div>
+    <div class="card-body clearfix">
+      <div class="col-xs-12 col-md-12 col-lg-12 m-t-5 m-b-5">根目录: {$info['path']['base']}</div>
+      <div class="col-xs-12 col-md-12 col-lg-12 m-t-5 m-b-5">公共文件目录: {$info['path']['public']}</div>
+      <div class="card-bottom col-xs-12 col-md-12 col-lg-12 m-t-10 m-b-10">
+        <p class="m-t-5 m-b-5 text-danger">所有验证类文件均需上传到公共文件目录下，比如微信公众号设置与开发->账号设置->功能设置里设置业务域名，js接口安全域名，网页授权域名等均需上传一个MP_verify_开头的文件到服务器</p>
+        <p class="m-t-5 m-b-5 text-danger">所有验证类文件均需上传到公共文件目录下，比如微信开放平台的第三方平台->开发配置->开发资料->编辑公众号开发域名时同样会让您上传校验文件</p>
+      </div>
+      <div class="col-xs-12 col-md-12 col-lg-12 m-t-5 m-b-5">静态文件目录: {$info['path']['static']}</div>
+      <div class="col-xs-12 col-md-12 col-lg-12 m-t-5 m-b-5">本地附件目录: {$info['path']['attachment']}</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!--系统信息-->
+<div class="row{if $opensysinfo=='2'} hidden{/if}">
+<div class="col-xs-12">
+  <div class="card">
+    <div class="card-header"><h4>系统信息</h4></div>
+    <div class="card-body clearfix">
+      <div class="card-top m-t-10 m-b-10">
+        <div class="col-xs-12 col-md-12 col-lg-12">服务器系统：{$info['os']}</div>
+      </div>
+      <div class="card-top m-t-10 m-b-10">
+        <div class="col-xs-6 col-md-6 col-lg-3 m-t-5 m-b-5">当前版本：{$sys['verison']}</div>
+        <div class="col-xs-6 col-md-6 col-lg-3 m-t-5 m-b-5">授权类型：{$sys['auth']}</div>
+        <div class="col-xs-6 col-md-6 col-lg-3 m-t-5 m-b-5">系统官网：{$sys['host']}</div>
+        <div class="col-xs-6 col-md-6 col-lg-3 m-t-5 m-b-5">开发组：{$sys['developer']}</div>
+      </div>
+      <div class="card-bottom col-xs-12 col-md-12 col-lg-12 m-t-10 m-b-10">
+        <p class="m-t-5 m-b-5">本系统版权归株洲米波网络科技有限公司所有。</p>
+        <p class="m-t-5 m-b-5">未获商业授权之前，您不得将本软件用于任何用途。购买商业授权请手机号13975325125(微信同号)，手机号17373381662(微信同号)。</p>
+        <p class="m-t-5 m-b-5">获得商业授权之后，您可以将本软件应用于商业用途，同时请严格遵守软件协议中的规则，自购买时刻起，在技术支持期限内拥有通过指定的方式获得指定范围内的技术支持服务。反馈意见或建议请直接到售后微信群反馈，期待我们一起进步，共创辉煌。</p>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+<script type="text/javascript">
+  require(['webcore','zamnotice','clipboard'],function(webcore,zamnotice,Clipboard){
+    var clipboard = new Clipboard('.zam-clip', {
+      text: function(e) {
+        return $(e).data('text') ||'';
+      }
+    });
+    clipboard.on('success',function(e) {
+      zamnotice.showTips('success','复制成功',2e3);
+      return;
+    });
+    //获取版本信息
+    if($(".upgradebox").length){
+      webcore.ajaxSubmit("{:goweb('index')}",{}).then(function(json){
+        var tip = '获取最新版出现异常';
+        if(json.code==0){
+          if(json.msg == '1'){
+            $(".upgradebox .alert").removeClass('alert-danger').addClass('alert-warning');
+            tip = `系统检测到发布了新版本，为了更好的使用体验，建议您立即升级系统 <a class="btn btn-primary btn-sm m-l-10" href="{:goweb('authmanage/upgrade')}">立即升级</a>`;
+          }else if(json.msg == '2'){
+            tip = '当前已是最新版';
+          }else if(json.msg == '3'){
+            tip = `检测最新版信息出现异常，请核实访问域名或ip是否已经授权`;
+          }else{
+            tip = `系统检测到${json.msg}`;
+          } 
+        }
+        $(".upgradebox .tipicon").removeClass('hidden');
+        $(".upgradebox .tip").html(tip);
+      },function(){
+        $(".upgradebox .tipicon").removeClass('hidden');
+        $(".upgradebox .tip").html('获取最新版出现异常');
+      });
+    }
+  });
+</script>
+{include file="$Wpath/common/footer" /}

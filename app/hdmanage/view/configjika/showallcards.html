@@ -1,0 +1,66 @@
+<div class="col-lg-12 yautooverflow">
+<style type="text/css">
+.cardsBox-card img{max-height: 100px;}
+</style>
+<table class="table cardsBox" style="margin-bottom:0px;">
+<thead>
+  <tr>
+	<th style="width:15%;text-align:center;">碎片名</th>
+	<th style="width:30%;text-align:center;">未获得图</th>
+	<th style="width:30%;text-align:center;">碎片图</th>
+	<th style="width:25%;text-align:center;">操作</th>
+  </tr>
+</thead>
+<tbody class="cardsBox-card">
+	{volist name="list" id="client"}
+		<tr>
+			<td class="text-center">
+				{$client['cardname']}
+			</td>
+			<td class="text-center">
+				<img src="{:tomedia($client['waitcardimg'])}" />
+			</td>
+			<td class="text-center">
+				<img src="{:tomedia($client['cardimg'])}" />
+			</td>
+			<td class="text-center">
+				<a href="javascript:void(0)" data-cardid="{$client['id']}" data-cateid="{$cateid}" class="btn btn-primary btn-sm btn-editone">
+					<i class="mdi mdi-pencil"></i>
+				</a>
+				<a href="javascript:void(0)" data-cardid="{$client['id']}" data-cateid="{$cateid}" class="btn btn-danger btn-sm btn-delcard">
+					<i class="mdi mdi-close"></i>
+				</a>
+			</td>
+		</tr>
+	{/volist}
+</tbody>
+<tfoot>
+	<tr>
+		<td colspan='4' class="text-center">
+			<a href="javascript:;" data-cateid="{$cateid}" class="btn btn-primary btn-sm btn-addcard"><i class="mdi mdi-plus"></i> 新增碎片</a>
+		</td>
+	</tr>
+</tfoot>
+</table>
+</div>
+<script id="onecard-tpl" type="text/template">
+<tr>
+<td class="text-center">
+	<% d.cardname %>
+</td>
+<td class="text-center">
+	<img src="<% d.waitcardimg %>" />
+</td>
+<td class="text-center">
+	<img src="<% d.cardimg %>" />
+</td>
+<td class="text-center">
+	<a href="javascript:void(0)" data-cardid="<% d.id %>" data-cateid="{$cateid}" class="btn btn-primary btn-sm btn-editone">
+		<i class="mdi mdi-pencil"></i>
+	</a>
+	<a href="javascript:void(0)" data-cardid="<% d.id %>" data-cateid="{$cateid}" class="btn btn-danger btn-sm btn-delcard">
+		<i class="mdi mdi-close"></i>
+	</a>
+</td>
+</tr>
+</script>

@@ -1,0 +1,250 @@
+{include file='$Wpath/common/header'}
+<form id="formBox" class="zam-formvalidation form-horizontal" method="post">
+<div class="zam-titleBox">后台通用支付</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 微信支付状态</label>
+    <div class="col-lg-8">
+        {:tpl_switch('webwxpayopen',$config['webwxpayopen']??'1','webwxpayopen')}
+        <div class="help-block">开启则后台准许微信支付</div>
+    </div>
+</div>
+<div class="wxpaybox{if isset($config['webwxpayopen']) && $config['webwxpayopen']=='2'} hidden{/if}">
+  <div class="form-group">
+      <label class="col-lg-2 control-label">* 微信支付模板</label>
+      <div class="col-lg-6">
+        <select class="form-control js_select2 webtpl"  name="webtpl">
+          <option value="">请选择</option>
+          {volist name="tpls" id="tpl"}
+            {if $tpl['issys']=='1'}
+            <option value="{$tpl['id']}">{$tpl['tplname']}</option>
+            {/if}
+          {/volist}
+        </select>
+        <div class="help-block">发布活动、新增活动功能、充值红包账号、充值短信等后台支付</div>
+      </div>
+  </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 支付宝支付状态</label>
+    <div class="col-lg-8">
+        {:tpl_switch('alipay[open]',$config['alipay']['open']??'2','openalipay')}
+        <div class="help-block">开启则后台准许使用支付宝支付</div>
+    </div>
+</div>
+<div class="alipaybox{if !isset($config['alipay']['open']) || $config['alipay']['open']=='2'} hidden{/if}">
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 支付模板</label>
+        <div class="col-lg-6">
+            <select class="form-control js_select2 webalitpl"  name="alipay[tplid]">
+              <option value="">请选择支付宝模板</option>
+              {volist name="alitpls" id="alitpl"}
+                {if $alitpl['issys']=='1'}
+                <option value="{$alitpl['id']}">{$alitpl['tplname']}</option>
+                {/if}
+              {/volist}
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 支付宝作为默认支付</label>
+        <div class="col-lg-8">
+            {:tpl_switch('alipay[isdefault]',$config['alipay']['isdefault']??'2')}
+            <div class="help-block">开启则后台默认选择支付宝支付，反之则默认选择了微信支付</div>
+        </div>
+    </div>
+    <div class="form-group hidden">
+        <label class="col-lg-2 control-label">* 准许充值红包账户</label>
+        <div class="col-lg-8">
+            {:tpl_switch('alipay[payredpack]',$config['alipay']['payredpack']??'2')}
+            <span class="help-block">注:关闭则用户不可以通过支付宝充值红包账户，由于微信红包是从微信商户发放，开启此处如果用户通过支付宝充值了红包账户请务必自行及时充值微信商户</span>
+        </div>
+    </div>
+</div>
+<div class="zam-titleBox">微信端通用支付</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 微信支付模板</label>
+    <div class="col-lg-6">
+      <select class="form-control js_select2 wechattpl"  name="wechattpl">
+        <option value="">请选择</option>
+        {volist name="tpls" id="tpl"}
+          {if $tpl['issys']=='1'}
+          <option value="{$tpl['id']}">{$tpl['tplname']}</option>
+          {/if}
+        {/volist}
+      </select>
+      <div class="help-block">此模板适用于所有未自定义微信端支付模板的活动，发起付费参与互动，霸屏、打赏等微信支付</div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 微信小程序支付模板</label>
+    <div class="col-lg-6">
+      <select class="form-control js_select2 wechatminitpl"  name="wechatminitpl">
+        <option value="">请选择</option>
+        {volist name="tpls" id="minitpl"}
+          {if $minitpl['issys']=='1'}
+          <option value="{$minitpl['id']}">{$minitpl['tplname']}</option>
+          {/if}
+        {/volist}
+      </select>
+      <div class="help-block">一定要选择小程序支付模板，否则无法使用，微信小程序端支付模板的一般是在微信端发起付费参与互动游戏，霸屏、打赏等</div>
+    </div>
+</div>
+<div class="zam-titleBox">后台充值红包账户协议</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 状态</label>
+    <div class="col-lg-8">
+        {:tpl_switch('czhbxieyi[open]',$config['czhbxieyi']['open']??'2','openczhbxieyi')}
+        <div class="help-block">开启后用户充值红包账号必须先勾选同意代收代付协议才可以进行红包账号充值</div>
+    </div>
+</div>
+<div class="czhbxieyibox{if !isset($config['czhbxieyi']['open']) || $config['czhbxieyi']['open']=='2'} hidden{/if}">
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 协议名称</label>
+        <div class="col-lg-8">
+            <input class="form-control" type="text"  name="czhbxieyi[name]" value="{$config['czhbxieyi']['name']??''}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 代收代付协议内容</label>
+        <div class="col-lg-8">
+            {:tpl_ueditor('czhbxieyi[content]',$config['czhbxieyi']['content'])}
+            <span class="help-block"><span class="text-danger">这个服务条款一定要好好的完善下内容，防止用户违法导致平台方受到牵连</span></span>
+        </div>
+    </div>
+</div>
+<div class="zam-titleBox">后台充值红包账户短信验证</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 状态</label>
+    <div class="col-lg-8">
+        {:tpl_switch('czhbsmsyzopen',$config['czhbsmsyzopen']??'2')}
+        <div class="help-block">开启后用户每次发起红包账号充值必须先进行手机号(<span class="text-danger" style="font-size: 12px;">没绑定手机号的会跳过验证</span>)短信验证通过后才可以正常充值，短信模板请到短信设置里添加</div>
+    </div>
+</div>
+<div class="zam-titleBox">后台发起收入提现短信验证</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 状态</label>
+    <div class="col-lg-8">
+        {:tpl_switch('txapplysmsyzopen',$config['txapplysmsyzopen']??'2')}
+        <div class="help-block">开启后用户发起收入提现必须先进行手机号(<span class="text-danger" style="font-size: 12px;">没绑定手机号的会跳过验证</span>)短信验证后才可以正常发起提现，短信模板请到短信设置里添加</div>
+    </div>
+</div>
+<div class="{if !$dzsm}hidden{/if}">
+  <div class="zam-titleBox">后台用户微信实名认证<span class="text-danger" style="font-size: 12px;">(开启后用户充值红包账号或者后台收入提现均需实名认证后才能操作)</span></div>
+  <div class="form-group hidden{/if}">
+      <label class="col-lg-2 control-label">* 状态</label>
+      <div class="col-lg-8">
+          {:tpl_switch('czhbsm[open]',$config['czhbsm']['open']??'2','openczhbsm')}
+          <div class="help-block">开启后红包账号充值或者后台发起收入提现时均会自动检测当前登录用户是否已经完成实名认证，此接口必须去<a href="https://console.cloud.tencent.com/" target="__blank">腾讯云</a>开通人脸核身等官方审核通过才可以正常使用</div>
+      </div>
+  </div>
+  <div class="czhbsmbox{if !isset($config['czhbsm']['open']) || $config['czhbsm']['open']=='2'} hidden{/if}">
+      <div class="form-group">
+          <label class="col-lg-2 control-label">* 腾讯云SecretID</label>
+          <div class="col-lg-8">
+              <input class="form-control" type="text"  name="czhbsm[appkey]" value="{$config['czhbsm']['appkey']??''}">
+              <div class="help-block">腾讯云右上角->访问管理->访问秘钥->API密钥管理内的SecretID</div>
+          </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-2 control-label">* 腾讯云SecretKEY</label>
+        <div class="col-lg-8">
+              <input class="form-control" type="text"  name="czhbsm[appsecret]" value="{$config['czhbsm']['appsecret']??''}">
+              <div class="help-block">腾讯云右上角->访问管理->访问秘钥->API密钥管理内的SecretKEY</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-2 control-label">* 扫码充值红包账户核验实名</label>
+        <div class="col-lg-8">
+            {:tpl_switch('czhbsm[wxpaysm]',$config['czhbsm']['wxpaysm']??'2')}
+            <div class="help-block">开启后用户用微信扫充值二维码会再次校验微信号实名信息与后台用户实名信息是否一致</div>
+        </div>
+      </div>
+  </div>
+</div>
+{include file='$Wpath/common/savepanel'}
+</form>
+<script>
+require(['webcore','jconfirmBox','zamnotice','zvalidator'],function(webcore,jconfirmBox,zamnotice){
+  $(".webtpl").val("{$config['webtpl']}").trigger("change");
+  $(".wechattpl").val("{$config['wechattpl']}").trigger("change");
+  $(".webalitpl").val("{$config['alipay']['tplid']??'0'}").trigger("change");
+  $(".wechatminitpl").val("{$config['wechatminitpl']??'0'}").trigger("change");
+  $('#formBox').formValidation({
+      framework: 'bootstrap',
+      excluded: [':disabled'],
+      message: '您填写的内容无效',
+      fields: {}
+  }).on('success.form.fv', function(e) {
+    e.preventDefault();
+    var $form = $(e.target);
+    var postData = webcore.serializeObject($form);
+    var bload = $form.find(".zam-fixedbottom button").lyearloading({opacity: 0.2,spinnerSize: 'nm'});
+    $form.formValidation('disableSubmitButtons', true);
+    webcore.ajaxSubmit("{:goweb('paytpl/config')}",postData).then(function(json){
+      bload.hide();
+      if(json.code==0){
+          $form.formValidation('disableSubmitButtons', false);
+          zamnotice.showTips('success','操作成功',2e3,function(){
+            window.location.reload();
+          });
+        }else{
+          zamnotice.showTips('error',json.msg);
+          $form.formValidation('disableSubmitButtons', false);
+        }
+    }, function(json){
+      bload.hide();
+      zamnotice.showTips('error','网络差。操作失败');
+      $form.formValidation('disableSubmitButtons', false);
+    });
+  });
+});
+function openalipay(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".alipaybox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".alipaybox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function webwxpayopen(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".wxpaybox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".wxpaybox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openczhbxieyi(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".czhbxieyibox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".czhbxieyibox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openczhbsm(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".czhbsmbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".czhbsmbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+</script>
+{include file='$Wpath/common/footer'}

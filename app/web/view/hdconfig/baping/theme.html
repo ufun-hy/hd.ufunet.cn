@@ -1,0 +1,144 @@
+{include file='$Wpath/common/header'}
+<style>
+.zhuti-lists tr td span{display:block;text-align:center;}
+.zhuti-lists tr td span img{max-width:120px}
+</style>
+<div class="zam-inner-title mb20">系统霸屏主题</div>
+<div class="bgimgsBox">
+		<table class="table" style="margin-bottom:0px;">
+			<thead>
+			  <tr>
+			  	<th style="width:10%" class="hidden">id</th>
+			  	<th style="width:10%;">序号</th>
+			  	<th style="width:10%;">状态</th>
+				<th style="width:10%;">主题名</th>
+				<th style="width:20%;">缩略图</th>
+				<th style="width:20%;">微信角标</th>
+				<th style="width:20%;">大屏角标</th>
+				<th style="width:10%;">操作</th>
+			  </tr>
+			</thead>
+			<tbody class="bptheme-lists">
+				{foreach $themes as $themekey=>$theme}
+					<tr>
+						<td class="hidden">{$theme['id']}</td>
+						<td>
+						 <span>{$theme['displayorder']}</span>
+						</td>
+						<td data-id="{$theme['id']}">
+						 {:tpl_switch('',$theme['isshow'],'bpthemechange')}
+						</td>
+						<td>
+						 <span>{$theme['themeconfig']['bpname']}</span>
+						</td>
+						<td>
+						   <span><img src="{:tomedia($theme['themeconfig']['bpicon'])}" /></span>
+						</td>
+						<td>
+						   <span><img src="{:tomedia($theme['themeconfig']['bpappicon'])}" /></span>
+						</td>
+						<td>
+						   <span><img src="{:tomedia($theme['themeconfig']['bppcicon'])}" /></span>
+						</td>
+						<td>
+						  <a href="javascript:;" class="btn btn-primary btn-xs btn-edit" data-id="{$theme['id']}"><i class="mdi mdi-pencil"></i></a>
+						  <a href="javascript:;" class="btn btn-danger btn-xs btn-del" data-id="{$theme['id']}"><i class="mdi mdi-delete"></i></a>
+						</td>
+					</tr>
+				{/foreach}
+			</tbody>
+			<tfoot>
+				  <tr>
+					<td colspan="4">
+					  <a class="btn btn-primary btn-xs addbpzhutigroup" href="javascript:;"><i class="mdi mdi-plus"></i> 新增主题</a>
+					</td>
+				  </tr>
+			</tfoot>
+		</table>
+</div>
+<script>
+require(["webcore","zamnotice","layerBox","jconfirmBox"],function(webcore,zamnotice,layerBox,jconfirmBox){
+$(".addbpzhutigroup").on('click',function(){
+	var $this = $(this);
+	var confirmobj = jconfirmBox.ajaxconfirm("新增主题","{:goweb('hdconfig/bapingthemes')}",{},'html','col-lg-8 col-lg-offset-2',function(e){
+		var formdata = webcore.serializeObject(e.find('form')),postData = {
+			ishtml:'2',
+			data:formdata,
+		};
+		webcore.ajaxSubmit("{:goweb('hdconfig/bapingthemes')}",postData,'').then(function(json){
+			if(json.code==0){
+				zamnotice.showTips('success','新增成功',1e3,function(){
+					window.location.reload();
+				});
+				confirmobj.close();
+			}else{
+				zamnotice.showTips('error',json.msg);
+			}
+		}, function(json){
+			zamnotice.showTips('error','网络差。操作失败.');
+		});
+	});
+});
+$(".bptheme-lists").on('click','.btn-edit',function(){
+		var $this = $(this),themeid = $this.attr('data-id');
+		var confirmobj = jconfirmBox.ajaxconfirm("编辑主题","{:goweb('hdconfig/bapingthemes')}",{themeid:themeid},'html','col-lg-8 col-lg-offset-2',function(e){
+			var formdata = webcore.serializeObject(e.find('form')),postData = {
+				ishtml:'2',
+				data:formdata,
+			};
+			postData.themeid = themeid;
+			webcore.ajaxSubmit("{:goweb('hdconfig/bapingthemes')}",postData,'').then(function(json){
+				if(json.code==0){
+					zamnotice.showTips('success','修改成功',1e3,function(){
+						window.location.reload();
+					});
+					confirmobj.close();
+				}else{
+					zamnotice.showTips('error',json.msg);
+				}
+			}, function(json){
+				zamnotice.showTips('error','网络差。操作失败.');
+			});
+		});
+});
+$("table").on('click','.btn-del',function(){
+	var $this = $(this);
+	jconfirmBox.confirm('温馨提示','删除将无法恢复，您确定要删除么？',function(){
+		var themeid = $this.attr('data-id');
+		webcore.ajaxSubmit("{:goweb('hdconfig/bapingthemes')}",{isdel:'1',themeid:themeid},'').then(function(json){
+			if(json.code==0){
+				zamnotice.showTips('success','删除成功');
+				$this.parent().parent().remove();
+			}else{
+				zamnotice.showTips('error',json.msg);
+			}
+		}, function(json){
+			zamnotice.showTips('error','网络差。操作失败.');
+		});
+	});
+});
+});
+function bpthemechange(obj,status,url){
+	var themeid = obj.parent().parent().attr('data-id');
+	require(['webcore','zamnotice'],function(webcore,zamnotice){
+		webcore.ajaxSubmit("{:goweb('hdconfig/bapingthemes')}",{themeid:themeid,isswitch:'1',isshow:(status=='1'?"2":"1")}).then(function(json){
+            if(json.code==0){
+                if(status=='1'){
+			        obj.prev().val('2');
+			        obj.attr('data-status','2');
+			    }else{
+			        obj.prev().val('1');
+			        obj.attr('data-status','1');
+			    }
+			    obj.prev().prev().prop("checked",status=='1'?false:true);
+			    zamnotice.showTips('success','操作成功');
+            }else{
+                zamnotice.showTips('error',json.msg);
+            }
+        }, function(json){
+            zamnotice.showTips('error','网络差。操作失败');
+        });
+    });
+}
+</script>
+{include file='$Wpath/common/footer'}

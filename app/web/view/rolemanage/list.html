@@ -1,0 +1,177 @@
+{include file='$Wpath/common/header'}
+<div class="form-inline zam-inline-searchbar">
+    <div class="form-group">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">角色名</span>
+        <input type="text" class="form-control" value="" id="keyword"  placeholder="请输入角色名">
+      </div>
+    </div>
+    
+    <a class="btn btn-primary btn-sm btn-search" href="javascript:void(0)"><i class="mdi mdi-magnify"></i> 搜索</a>
+</div>
+{include file='$Wpath/common/tabletoolbar'}
+<table id="listtable" class="zam-btable"></table>
+<script>
+require(['webcore','webtable','jconfirmBox','zamnotice'],function(webcore,webtable,jconfirmBox,zamnotice){
+var initConfig = {
+	tableId:'#listtable',
+	url:"{:goweb('rolemanage/index')}",
+	columnoperate:{
+        btns:{
+            edit:true,
+            data:{title:'权限',icon:'mdi-home-assistant'},
+            del:true,
+        },
+	    func:{
+    	    edit:function(value, row, index){
+    	        var confirmObj = jconfirmBox.ajaxconfirm("编辑角色信息","{:goweb('rolemanage/edit')}",{type:'1',roleid:row.id},'html','col-lg-6 col-lg-offset-3',function(e){
+                    var postData = webcore.serializeObject(e.find('form'));
+                    postData.type = '2';
+                    postData.roleid = row.id;
+                    if(postData.rolename=='' || postData.roledes==''){
+                        zamnotice.showTips('error','角色名和角色简介必须填写');
+                        return false;
+                    }
+                    webcore.ajaxSubmit("{:goweb('rolemanage/edit')}",postData).then(function(json){
+                        if(json.code==0){
+							confirmObj.close();
+                            zamnotice.showTips('success','操作成功');
+                            webtable.refresh();
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差,操作失败');
+                    });
+                    
+                });
+    	    },
+    	    del:function(value, row, index){
+            	jconfirmBox.confirm('温馨提示','您确定要删除么？',function(){
+            			webcore.ajaxSubmit("{:goweb('rolemanage/del')}",{roleid:row.id}).then(function(json){
+            				if(json.code==0){
+            				    webtable.refresh();
+            				    zamnotice.showTips('success','删除成功');
+            			    }else{
+            			        zamnotice.showTips('error',json.msg);
+            			    }
+            			}, function(json){
+            				zamnotice.showTips('error','网络差。操作失败');
+            			});
+            	});
+    	    },
+    	    data:function(value, row, index){
+    	        var confirmObj = jconfirmBox.ajaxconfirm("编辑角色权限","{:goweb('rolemanage/edit')}",{type:'3',roleid:row.id},'html','col-lg-6 col-lg-offset-3',function(e){
+    	            var treeObj = $.fn.zTree.getZTreeObj("permisTree");
+    	            var nodes = treeObj.getCheckedNodes(true);
+                    var permisids = [];
+                    $.each(nodes,function(i,v){
+        				permisids.push(v.id);
+        			});
+                    if(permisids.length==0){
+                        zamnotice.showTips('error','请选择角色权限');
+        				return false;
+                    }
+        			webcore.ajaxSubmit("{:goweb('rolemanage/edit')}",{type:'4',roleid:row.id,field:'permission',fieldv:permisids}).then(function(json){
+            			if(json.code==0){
+            				zamnotice.showTips('success','操作成功');
+            				webtable.refresh();
+            			}else{
+            				zamnotice.showTips('error',json.msg);
+            			}
+            		}, function(json){
+            			zamnotice.showTips('error','网络差,操作失败');
+            		});
+        			confirmObj.close();
+        		});
+    	    },
+	    }
+	},
+	columns:[{
+		checkbox: true,
+		}, 
+		{
+		field: 'id',
+		title: 'id',
+		align: 'center',
+		visible: false
+		}, {
+        field: 'statushtml',
+        title: '状态',
+        align:'center',
+    },  {
+		field: 'rolename',
+		title: '角色名',
+		align: 'center',
+		},  {
+		field: 'roledes',
+		title: '简介',
+		align: 'center',
+		}
+	],
+	onload:function(){
+	    
+	},
+	searchParamas:[{'type':'1','id':'keyword'}],
+	toolbar:{
+	    add:function(ajaxurl){
+            var confirmobj = jconfirmBox.confirm('新增角色',webcore.tpl($("#addgroup-tpl"),{indemoney:'100',indereason:''}),function(e){
+            	var rolename = e.$content.find(".rolename").val();
+            	if(rolename=='') return zamnotice.showTips('error','请设置角色名');
+            	var roledes = e.$content.find(".roledes").val();
+            	if(roledes=='') return zamnotice.showTips('error','请设置角色简介');
+            	webcore.ajaxSubmit(ajaxurl,{rolename:rolename,roledes:roledes},'正在处理..').then(function(json){
+            		 if(json.code==0){
+            			confirmobj.close();
+            			zamnotice.showTips('success',json.msg);
+            			webtable.refresh();
+            		 }else{
+            			zamnotice.showTips('error',json.msg);
+            		 }
+            	})
+            },false,false,true,[{'hidden':false,'txt':'确定新增'},{'hidden':false,'txt':'取消'}]);
+	    },
+	    del:function(ajaxurl){
+	        var getSelects = webtable.getSelections();
+        	if(getSelects.length>0){
+        		jconfirmBox.confirm('温馨提示','您确定要删除选中的数据么？',function(){
+        			webcore.ajaxSubmit(ajaxurl,{roleid:getSelects}).then(function(json){
+        				if(json.code==0){
+        					webtable.refresh();
+        					zamnotice.showTips('success','删除成功');
+        				}else{
+        					zamnotice.showTips('error',json.msg);
+        				}
+        			}, function(json){
+        				zamnotice.showTips('error','网络差,操作失败');
+        			});
+        		});
+        	}else{
+        		zamnotice.showTips('info','请先选择您要操作的数据');
+        	}
+	    },
+	    
+	},
+};
+webtable.init(initConfig);
+});
+</script>
+<script id='addgroup-tpl' type="text/template">
+<div class="form-horizontal confirmbox-pop">
+  <form class="confirm-formbox" method="post">
+    <div class="form-group">
+      <label class="col-lg-3 control-label">* 角色名</label>
+      <div class="col-lg-7">
+        <input class="form-control rolename" type="text"  name="rolename" placeholder="请务必填写一个您觉得唯一的名称" value="">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-3 control-label">角色简介</label>
+      <div class="col-lg-7">
+        <textarea class="form-control roledes" name="roledes" rows="3"></textarea>
+      </div>
+    </div>
+  </form>
+</div>
+</script>
+{include file='$Wpath/common/footer'}

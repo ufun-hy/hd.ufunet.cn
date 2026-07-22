@@ -1,0 +1,178 @@
+.flipdown .rotor-group {
+    position: relative;
+    float: left;
+    padding-right: var(--rotor-group-pr);
+}
+
+.flipdown .rotor-group:last-child {
+    padding-right: 0;
+}
+
+.flipdown .rotor-group-heading:before {
+    display: block;
+    height: var(--heading-height);
+    line-height: var(--heading-height);
+    font-size: var(--heading-size);
+    text-align: center;
+}
+
+.flipdown .rotor-group:nth-child(1) .rotor-group-heading:before {
+    content: attr(data-before);
+}
+
+.flipdown .rotor-group:nth-child(2) .rotor-group-heading:before {
+    content: attr(data-before);
+}
+
+.flipdown .rotor-group:nth-child(3) .rotor-group-heading:before {
+    content: attr(data-before);
+}
+
+.flipdown .rotor-group:nth-child(4) .rotor-group-heading:before {
+    content: attr(data-before);
+}
+
+.flipdown .rotor-group:nth-child(1):before,
+.flipdown .rotor-group:nth-child(n+2):nth-child(-n+3):before {
+    content: '';
+    position: absolute;
+    bottom: calc(var(--rotor-height) / 3 - var(--dot-size) / 2);
+    left: calc(var(--rotor-width) * 2 + var(--rotor-group-pr) / 2 - var(--dot-size) / 2 + var(--rotor-margin));
+    width: var(--dot-size);
+    height: var(--dot-size);
+    border-radius: 50%;
+}
+
+.flipdown .rotor-group:nth-child(1):after,
+.flipdown .rotor-group:nth-child(n+2):nth-child(-n+3):after {
+    content: '';
+    position: absolute;
+    bottom: calc(var(--rotor-height) * (2 / 3) - var(--dot-size) / 2);
+    left: calc(var(--rotor-width) * 2 + var(--rotor-group-pr) / 2 - var(--dot-size) / 2 + var(--rotor-margin));
+    width: var(--dot-size);
+    height: var(--dot-size);
+    border-radius: 50%;
+}
+
+.flipdown .rotor {
+    position: relative;
+    float: left;
+    width: var(--rotor-width);
+    height: var(--rotor-height);
+    margin: 0px;
+    margin-right: var(--rotor-margin);
+    border-radius: var(--rotor-radius);
+    font-size: var(--rotor-font-size);
+    text-align: center;
+    perspective: var(--rotor-perspective);
+}
+
+.flipdown .rotor:last-child {
+    margin-right: 0;
+}
+
+.flipdown .rotor-top,
+.flipdown .rotor-bottom {
+    overflow: hidden;
+    position: absolute;
+    width: var(--rotor-width);
+    height: calc(var(--rotor-height) / 2);
+}
+
+.flipdown .rotor-leaf {
+    z-index: 1;
+    position: absolute;
+    width: var(--rotor-width);
+    height: var(--rotor-height);
+    transform-style: preserve-3d;
+    transition: transform 0s;
+}
+
+.flipdown .rotor-leaf.flipped {
+    transform: rotateX(-180deg);
+    transition: all 0.5s ease-in-out;
+}
+
+.flipdown .rotor-leaf-front,
+.flipdown .rotor-leaf-rear {
+    overflow: hidden;
+    position: absolute;
+    width: var(--rotor-width);
+    height: calc(var(--rotor-height) / 2);
+    margin: 0;
+    transform: rotateX(0deg);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+.flipdown .rotor-leaf-front {
+    line-height: var(--rotor-height);
+    border-radius: var(--rotor-radius) var(--rotor-radius) 0px 0px;
+}
+
+.flipdown .rotor-leaf-rear {
+    line-height: 0px;
+    border-radius: 0px 0px var(--rotor-radius) var(--rotor-radius);
+    transform: rotateX(-180deg);
+}
+
+.flipdown .rotor-top {
+    line-height: var(--rotor-height);
+    border-radius: var(--rotor-radius) var(--rotor-radius) 0px 0px;
+}
+
+.flipdown .rotor-bottom {
+    bottom: 0;
+    line-height: 0px;
+    border-radius: 0px 0px var(--rotor-radius) var(--rotor-radius);
+}
+
+.flipdown .rotor:after {
+    content: '';
+    z-index: 2;
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    width: var(--rotor-width);
+    height: calc(var(--rotor-height) / 2);
+    border-radius: 0px 0px var(--rotor-radius) var(--rotor-radius);
+}
+
+/* Font styles */
+.flipdown.flipdown__theme-light {
+    font-family: sans-serif;
+    font-weight: bold;
+}
+
+/* Rotor group headings */
+.flipdown.flipdown__theme-light .rotor-group-heading:before {
+    color: var(--heading-color);
+}
+
+/* 给天数后面加上冒号 */
+.flipdown .rotor-group:nth-child(1):before,
+.flipdown .rotor-group:nth-child(1):after,
+.flipdown.flipdown__theme-light .rotor-group:nth-child(n+2):nth-child(-n+3):before,
+.flipdown.flipdown__theme-light .rotor-group:nth-child(n+2):nth-child(-n+3):after {
+    background-color: var(--dot-color);
+}
+
+/* Rotor tops */
+.flipdown.flipdown__theme-light .rotor,
+.flipdown.flipdown__theme-light .rotor-top,
+.flipdown.flipdown__theme-light .rotor-leaf-front {
+    color: var(--rotor-color);
+    background-color: var(--rotor-bgcolor);
+}
+
+/* Rotor bottoms */
+.flipdown.flipdown__theme-light .rotor-bottom,
+.flipdown.flipdown__theme-light .rotor-leaf-rear {
+    color: var(--rotor-color);
+    background-color: var(--rotor-bgcolor);
+}
+
+/* Hinge */
+.flipdown.flipdown__theme-light .rotor:after {
+    border-top: var(--rotor-box-line-width) solid var(--rotor-box-line-color);
+}

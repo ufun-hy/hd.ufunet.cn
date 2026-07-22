@@ -1,0 +1,38 @@
+<table class="table table-bordered" style="margin-bottom:0px;">
+<thead>
+  <tr>
+	{if $mode=='1'}
+	<th style="width:50%;text-align:center;">奖品</th>
+	<th style="width:50%;text-align:center;">开奖状态</th>
+	{else /}
+	<th style="width:40%;text-align:center;">奖品</th>
+	<th style="width:20%;text-align:center;">开奖状态</th>
+	<th style="width:20%;text-align:center;">奖品数量</th>
+	<th style="width:20%;text-align:center;">选择人数</th>
+  	{/if}
+  </tr>
+</thead>
+<tbody class="prize-lists">
+	 {foreach $prizes as $prow}
+	  <tr>
+	  	<td class="text-center">
+			<div class="prizeInfo">
+				<img src="{:tomedia($prow['prizeimg'])}" style="max-width: 60px;">
+				<p class="mt10">{$prow['prizename']}</p>
+				{if $prow['prizetype']=='2'}
+					<p>(<span class="text-danger">{$prow['prizemoney']}元</span>)</p>
+				{/if}
+			</div>
+		</td>
+		<td class="text-center">
+			<label class="label label-{if $prow['opened']=='1'}primary{else /}danger{/if}">{if $prow['opened']=='1'}已{else /}待{/if}开奖</label>
+		</td>
+	  	{if $mode=='2'}
+			<td class="text-center">{$prow['prizenum']}个</td>
+			<td class="text-center">{$prow['selectnum']}人</td>
+		{/if}
+	 </tr>
+	{/foreach}
+</tbody>
+</table>
+

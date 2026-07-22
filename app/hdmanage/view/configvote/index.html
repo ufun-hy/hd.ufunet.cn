@@ -1,0 +1,166 @@
+{include file='$Wpath/common/header'}
+<form id="formBox" class="zam-formvalidation form-horizontal" method="post">
+    <div class="config-titlebox">
+        <span class="config-titlename">大屏设置</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#screenconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+    </div>
+    <div id="screenconfigbox" class="collapse in">
+        {include file="$Wpath/common/configscreencommon" /}
+        {include file="$Wpath/common/configscreenmusic" /}
+    </div>
+    <div class="config-titlebox">
+        <span class="config-titlename">微信设置</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#wechatconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+    </div>
+    <div id="wechatconfigbox" class="collapse in">
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 投票别名</label>
+            <div class="col-lg-8">
+                <input class="form-control" type="text"  name="votetxt" value="{$config['votetxt']??'投票'}">
+                <div class="help-block">一般是用户不想用投票字眼，比如可以是点赞等，仅大屏端和微信端有效</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 投票单位</label>
+            <div class="col-lg-8">
+                <input class="form-control" type="text"  name="voteunit" value="{$config['voteunit']??'票'}">
+                <div class="help-block">一般是用户不想用票字眼，比如可以是赞等，仅大屏端和微信端有效</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-2 control-label text-right">* 微信端底部菜单</label>
+            <div class="col-md-8">
+            {:tpl_switch('apppageconfig[openwxmenu]',$config['apppageconfig']['openwxmenu']??'1','openwxmenu')}
+            <span class="help-block">关闭后微信端不显示底部菜单</span>
+            </div>
+        </div>
+        <div class="wxmenubox{if isset($config['apppageconfig']['openwxmenu']) && $config['apppageconfig']['openwxmenu']=='2'} hidden{/if}">
+            <div class="form-group">
+                <label class="col-md-2 control-label text-right">* 微信端排行榜</label>
+                <div class="col-md-8">
+                {:tpl_switch('apppageconfig[openwxphb]',$config['apppageconfig']['openwxphb']??'1')}
+                <span class="help-block">关闭后微信端不显示排行榜</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-2 control-label text-right">* 微信端规则</label>
+                <div class="col-md-8">
+                {:tpl_switch('apppageconfig[openrule]',$config['apppageconfig']['openrule']??'1')}
+                <span class="help-block">关闭后微信端不显示规则</span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-2 control-label text-right">* 微信端搜索框</label>
+            <div class="col-md-8">
+            {:tpl_switch('apppageconfig[opensearch]',$config['apppageconfig']['opensearch']??'1')}
+            <span class="help-block">关闭后微信端不显示搜索框</span>
+            </div>
+        </div>
+    	<div class="form-group">
+			<label class="col-md-2 control-label text-right">* 背景主色</label>
+			<div class="col-md-8">
+			{:tpl_color('apppageconfig[bgcolor]',$config['apppageconfig']['bgcolor'])}
+			</div>
+		</div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 顶部背景</label>
+            <div class="col-lg-4">
+              {:tpl_image_one('apppageconfig[topbg]',$config['apppageconfig']['topbg'])}
+              <span class="help-block">规格:640*100px</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 底部背景</label>
+            <div class="col-lg-4">
+              {:tpl_image_one('apppageconfig[bottombg]',$config['apppageconfig']['bottombg'])}
+              <span class="help-block">规格:640*110px</span>
+            </div>
+        </div>
+		<div class="form-group">
+			<label class="col-md-2 control-label text-right">* 文字主色</label>
+			<div class="col-md-8">
+			{:tpl_color('apppageconfig[maincolor]',$config['apppageconfig']['maincolor'])}
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-md-2 control-label text-right">* 规则内容背景色</label>
+			<div class="col-md-8">
+			{:tpl_color('apppageconfig[gzcolor]',$config['apppageconfig']['gzcolor'])}
+			</div>
+		</div>
+        <div class="form-group">
+			<label class="col-md-2 control-label text-right">* 投票项目名称颜色</label>
+			<div class="col-md-8">
+			{:tpl_color('apppageconfig[votenamecolor]',$config['apppageconfig']['votenamecolor']??'#505050')}
+			</div>
+		</div>
+        <div class="form-group">
+			<label class="col-md-2 control-label text-right">* 投票项目数字角标背景色</label>
+			<div class="col-md-8">
+			{:tpl_color('apppageconfig[voteitembadgecolor]',$config['apppageconfig']['voteitembadgecolor']??'#00aeff')}
+			</div>
+		</div>
+        <div class="form-group">
+			<label class="col-md-2 control-label text-right">* 投票项目投票按钮背景色</label>
+			<div class="col-md-8">
+			{:tpl_color('apppageconfig[voteitembtncolor]',$config['apppageconfig']['voteitembtncolor']??'#00aeff')}
+			</div>
+		</div>
+    </div>
+    {include file='$Wpath/common/configsavepanel'}
+</form>
+<script>
+require(['webcore','jconfirmBox','zamnotice','layerBox','zvalidator'],function(webcore,jconfirmBox,zamnotice,layerBox){
+    $('#formBox').formValidation({
+        framework: 'bootstrap',
+        excluded: [':disabled'],
+        message: '您填写的内容无效',
+        fields: {
+            apptitle:{
+                message: '请输入网页标题',
+                validators: {
+                    notEmpty: {
+                        message: '请输入网页标题'
+                    },
+                }
+            },
+        }
+    }).on('success.form.fv', function(e) {
+        e.preventDefault();
+        var $form = $(e.target);
+        var postData = webcore.serializeObject($form);
+        var bload = $form.find(".zam-fixedbottom button").lyearloading({opacity: 0.2,spinnerSize: 'nm'});
+        $form.formValidation('disableSubmitButtons', true);
+        webcore.ajaxSubmit("{:gohdmanage('configvote/index',['hdid'=>$hdid])}",postData).then(function(json){
+            bload.hide();
+            if(json.code==0){
+                $form.formValidation('disableSubmitButtons', false);
+                zamnotice.showTips('success','操作成功',2e3,function(){
+                    window.location.reload();
+                });
+            }else{
+                zamnotice.showTips('error',json.msg);
+                $form.formValidation('disableSubmitButtons', false);
+            }
+        }, function(json){
+            bload.hide();
+            zamnotice.showTips('error','网络差。操作失败');
+            $form.formValidation('disableSubmitButtons', false);
+        });
+    });
+});
+function openwxmenu(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".wxmenubox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".wxmenubox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+</script>
+{include file='$Wpath/common/footer'}

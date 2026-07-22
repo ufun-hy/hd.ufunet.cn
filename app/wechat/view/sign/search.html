@@ -1,0 +1,70 @@
+{include file="common/header" /}
+<style>
+.sign-searchBox{width:86%;margin:0.2rem auto;margin-top: 4rem;}
+.sign-searchBox input{height:0.6rem!important;}
+.sign-searchBox .btn{height:0.6rem;line-height:0.6rem;}
+.sign-searchBox .btn.clicked{pointer-events: none;}
+
+.searchresult{width:86%;min-height: 1rem;margin: 0.32rem auto;}
+.searchresult .seachone{
+    border: 1px solid #d0d0d0;
+    border-radius: 5px;
+    margin-bottom: 0.42rem;
+}
+.searchresult div{
+    height: 1rem;
+    text-align: center;
+    font-size: 0.32rem;
+    color: #fff;
+    font-weight: 600;
+}
+</style>
+<section class="zam-app-search g-flexview">
+    <div class="sign-searchBox">
+        <div class="zam-input-box zam-app-flex-ajCenter2">
+            <input type="text" class="cell-input zam-app-cell-input" placeholder="请输入姓名" autocomplete="off">
+            <a href="javascript:;" class="btn btn-primary"><i class="mxc-3"></i></a>
+        </div>
+    </div>
+    <div class="searchresult"></div>
+</section>
+<script type="text/javascript">
+    var bddata = {:json_encode($appconfig['appbddata'])};
+    require(['wechatcore'],function(wechatcore){
+        $('.sign-searchBox .btn').click(function(){
+            var $this = $(this),search = $this.prev().val() || '';
+            if(search == ''){
+                return wechatcore.msg('请输入姓名');
+            }
+            $this.addClass('clicked');
+            wechatcore.ajaxSubmit("{:gowechat('sign/searchsigndata')}",{search:search},'搜索中...').then(function(json){
+                if(json.code==0){
+                    var html = '', list = json.msg;
+                    if(list.length){
+                        $.each(list,function(i,v){
+                            html += '<section class="seachone">';
+                            for (var k in v) {
+                                var field = bddata[k]||'';
+                                if(field != ''){
+                                    var fieldtitle = field.title||'',fieldval = v[k]||'';
+                                    html += `<div class="fielditem zam-app-flex-ajCenter2"><span>${fieldtitle}</span>：<span>${fieldval}</span></div>`;
+                                }
+                            }
+                            html += '</section>';
+                        })
+                    }else{
+                        html = '<div class="nottip zam-app-flex-ajCenter2">未搜索到结果</div>';
+                    }
+                    $('.searchresult').html(html);
+                }else{
+                    wechatcore.msg(json.msg);
+                }
+                $this.removeClass('clicked');
+            }, function(){
+                wechatcore.msg('网络太差，请稍后重试');
+                $this.removeClass('clicked');
+            });
+        });
+    });
+    </script>
+{include file="common/footer" /}

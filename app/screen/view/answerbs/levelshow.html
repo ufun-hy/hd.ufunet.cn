@@ -1,0 +1,264 @@
+{include file='common/header' /}
+<style>
+.header,.footer,.hdQrbox,.footer-controlBox{display: none!important;}
+table {border-collapse: collapse;}
+table td,table th {border: 1px rgb(109, 106, 106) solid;padding: 5px 30px;text-align: center;}
+table th {background-color: red;}
+table td {background-color: #fff;}
+.answerphb-mainbox{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+.level-box{
+    width: 50%;
+    height: 700px;
+    margin: 0 auto;
+    margin-top: 70px;
+}
+.level-table{
+    width: 100%;
+    
+}
+.level-table .dbdname{
+    width: 60%;
+}
+.level-table .status{
+    width: 40%;
+}
+
+.level-control{
+    width: 30%;
+}
+.control-title{margin-bottom: 10px;color: #fff;}
+.btn {
+    background-color: #4CAF50;
+    border: none;
+    color: #FFFFFF;
+    padding: 15px 32px;
+    text-align: center;	
+    margin: 16px 0 !important;
+    text-decoration: none;
+    font-size:16px;
+    font-weight: bold;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.btn1 {background-color: #4CAF50;} /* Green */
+.btn2 {background-color: #008CBA;} /* Blue */
+.btn3 {background-color: #f44336;} /* Red */ 
+.btn4 {background-color: #e7e7e7;color:black;} /* Grey */ 
+.btn5 {background-color: #555555;} /* Orange */
+
+.label {
+    display: inline;
+    padding: 3px 10px;
+    font-size: 12px;
+    font-weight: bold;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 3px;
+}
+.label-default {
+    background-color: #777
+}
+
+.label-default[href]:focus,.label-default[href]:hover {
+    background-color: #5e5e5e
+}
+
+.label-primary {
+    background-color: #337ab7
+}
+
+.label-primary[href]:focus,.label-primary[href]:hover {
+    background-color: #286090
+}
+
+.label-success {
+    background-color: #5cb85c
+}
+
+.label-success[href]:focus,.label-success[href]:hover {
+    background-color: #449d44
+}
+
+.label-info {
+    background-color: #5bc0de
+}
+
+.label-info[href]:focus,.label-info[href]:hover {
+    background-color: #31b0d5
+}
+
+.label-warning {
+    background-color: #f0ad4e
+}
+
+.label-warning[href]:focus,.label-warning[href]:hover {
+    background-color: #ec971f
+}
+
+.label-danger {
+    background-color: #d9534f
+}
+.isdanger{font-size: 12px;color: red;}
+.djstime{color: #fff;}
+.djstime.hidden{display:none}
+</style>
+<section class="answerphb-mainbox zam-app-flex-ajCenter2">
+    <div class="level-box">
+        <table class="level-table">
+            <thead>
+                <tr>
+                    <th class="dbdname">代表队名称</th>
+                    <th class="status">状态</th>
+                </tr>
+            </thead>
+            <tbody class="level-lists"></tbody>
+        </table>
+    </div>
+    <div class="level-control zam-app-flex-ajCenter">
+        <div class="control-title">控制台按钮组</div>
+        <div class="level-btns zam-app-flex-ajCenter">
+            <button type="button" class="btn btn1 btn-reselect">重新选档次</button>
+            <button type="button" class="btn btn2 btn-startdjs">开始倒计时</button>
+            <div class="djstime hidden">0秒</div>
+            <button type="button" class="btn btn2 btn-enddjs">结束倒计时</button>
+            <button type="button" class="btn btn3 btn-overtimedecscore">超时未选档扣分</button>
+            <div class="isdanger">(超时未选档扣分在每次选档倒计时完毕后才可点一次，请勿多次点击)</div>
+            <button type="button" class="btn btn3 btn-resetscore">重置所有得分</button>
+            <button type="button" class="btn btn4 btn-resetdata">清空选档数据</button>
+        </div>
+    </div>
+</section>
+<script>
+    require(['screencore','screensocket','template','layerBox'],function(screencore,screensocket,template,layerBox){
+        screensocket.init({
+			onmessage:function(data){
+				if(data.type=='connected'){
+					screensocket.isclose = false;
+					screencore.connectsocket({clientid:data.clientid});
+				}else if(data.type == 'answerbsleveldjs'){
+                    if(data.djs > 0){
+                        $(".djstime").removeClass('hidden').text(data.djs+'秒');
+                    }else{
+                        $(".djstime").addClass('hidden').text(data.djs+'秒');
+                    }
+                }
+			}
+		});
+        var answerbsphb = {
+            init:function(){
+                var self = this;
+                self.ajaxdata();
+            },
+            ajaxdata:function(){
+                var self = this;
+                screencore.ajaxSubmit("/screen/answerbs/ajaxleveldata",{}).then(function(data){
+                    var html = '';
+                    if(data.code == 0){
+                        $.each(data.msg,function(i,v){
+                            if(v.status == '1'){
+                                v.statushtml = '<span class="label label-success">已选择</span>';
+                                v.statushtml += '<span class="label label-'+(v.level=='1' ? 'success' : (v.level == '2' ? 'info' : 'danger'))+'" style="margin-left:10px">'+(v.level=='1' ? '低' : (v.level == '2' ? '中' : '高'))+'难度</span>';
+                            }else if(v.status == '2'){
+                                v.statushtml = '<span class="label label-danger">弃权</span>';
+                            }else if(v.status == '3'){
+                                v.statushtml = '<span class="label label-warning">未选择</span>';
+                            }else if(v.status == '4'){
+                                v.statushtml = '<span class="label label-info">异常</span>';
+                            }
+                            html += template("user-tpl",v);
+                        });
+                    }
+                    $(".level-lists").html(html);
+                    setTimeout(function(){
+                        self.ajaxdata();
+                    },2e3);
+				}, function(){
+					layerBox.showMsg('网络太差，请稍后重试');
+				});
+                
+            }
+        };
+        answerbsphb.init();
+        $(".btn-reselect").click(function(){
+            layerBox.showConfirm('警告','重新选档次会导致所有的答题端用户强制跳转到选择档次页面重选档次，您确定要这样操作么？',['确定','取消'],function(){
+                screencore.ajaxSubmit("/screen/answerbs/reselect",{}).then(function(data){
+                    if(data.code == 0){
+                        layerBox.showMsg('操作成功');
+                    }else{
+                        layerBox.showMsg(data.msg);
+                    }
+                });
+            });
+        });
+        $(".btn-startdjs").click(function(){
+            layerBox.showConfirm('警告','开启倒计时将会使处于选择档次页面的用户开始倒计时，请一定确保用户均进入了选择档次页面，您确定要这样操作么？',['确定','取消'],function(){
+                screencore.ajaxSubmit("/screen/answerbs/startdjs",{}).then(function(data){
+                    if(data.code == 0){
+                        layerBox.showMsg('操作成功');
+                    }else{
+                        layerBox.showMsg(data.msg);
+                    }
+                });
+            });
+        });
+        $(".btn-enddjs").click(function(){
+            layerBox.showConfirm('警告','结束倒计时只会将倒计时标记设置为结束，您确定要这样操作么？',['确定','取消'],function(){
+                screencore.ajaxSubmit("/screen/answerbs/enddjs",{}).then(function(data){
+                    if(data.code == 0){
+                        layerBox.showMsg('操作成功');
+                    }else{
+                        layerBox.showMsg(data.msg);
+                    }
+                });
+            });
+        });
+        $(".btn-resetscore").click(function(){
+            layerBox.showConfirm('警告','重置得分将导致当前活动所有用户答题得分记录被清空，您确定要这样操作么？',['确定','取消'],function(){
+                screencore.ajaxSubmit("/screen/answerbs/resetscore",{}).then(function(data){
+                    if(data.code == 0){
+                        layerBox.showMsg('操作成功');
+                    }else{
+                        layerBox.showMsg(data.msg);
+                    }
+                });
+            });
+        });
+        $(".btn-resetdata").click(function(){
+            layerBox.showConfirm('警告','清空选档数据将删除所有的已选档记录，您确定要这样操作么？',['确定','取消'],function(){
+                screencore.ajaxSubmit("/screen/answerbs/resetleveldata",{}).then(function(data){
+                    if(data.code == 0){
+                        layerBox.showMsg('操作成功');
+                    }else{
+                        layerBox.showMsg(data.msg);
+                    }
+                });
+            });
+        });
+        $(".btn-overtimedecscore").click(function(){
+            layerBox.showConfirm('警告','超时未选档扣分即为给所有20秒内没有选择档次的人扣一次分，您确定要这样操作么？',['确定','取消'],function(){
+                screencore.ajaxSubmit("/screen/answerbs/overtimedecscore",{}).then(function(data){
+                    if(data.code == 0){
+                        layerBox.showMsg('操作成功');
+                    }else{
+                        layerBox.showMsg(data.msg);
+                    }
+                });
+            });
+        });
+    });
+</script>
+<script id="user-tpl" type="html/javascript">
+    <tr>
+        <td>{{ nickname }}</td>
+        <td>{{ #statushtml }}</td>
+    </tr>
+</script>
+{include file='common/footer' /}

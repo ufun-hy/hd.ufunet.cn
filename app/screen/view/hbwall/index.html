@@ -1,0 +1,273 @@
+{include file="common/header" /}
+<style>
+.hbwall-mainbox{
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	padding: 0;
+}
+.hbwall-container{
+	width: 100%;
+	height: 100%;
+}
+.hbwall-box{
+	max-height: 90%;
+	padding: 30px;
+	box-sizing: border-box;
+	overflow: hidden;
+	overflow-y: auto;
+	display: grid;
+	grid-template-columns: repeat({$rotate['hboneconfig']['colnum']??'1'}, {$rotate['hboneconfig']['width']??'140'}px);
+	grid-gap:{$rotate['hboneconfig']['rowgap']??'20'}px {$rotate['hboneconfig']['colgap']??'20'}px;
+}
+.hbwall-box .hbwall-item{
+	position: relative;
+	-webkit-perspective: 1000;
+    perspective: 1000;
+   -webkit-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+    {if $rotate['openmode']=='1'}
+		cursor: pointer;
+	{else /}
+		pointer-events:none;
+	{/if}
+}
+.hbwall-box .hbwall-item.hasopen{
+	cursor: inherit;
+}
+.hbwall-box .hbwall-item .frontback{
+	position: relative;
+	width: {$rotate['hboneconfig']['width']??'140'}px;
+	height: {$rotate['hboneconfig']['height']??'193'}px;
+}
+.hbwall-box .hbwall-item .frontback .stars{
+    position: absolute;
+    bottom: 0;
+    left:0;
+    pointer-events: none;
+    z-index: 1;
+    background-image: url({if isset($pcconfig['styleconfig']['starsimg']) && !empty($pcconfig['styleconfig']['starsimg'])}{:tomedia($pcconfig['styleconfig']['starsimg'])}{else /}/{:SIMGURL}hbwall/stars.png{/if});
+    background-repeat:no-repeat;
+    background-size:cover;
+    width: {$rotate['hboneconfig']['width']??'140'}px;
+    height: calc({$rotate['hboneconfig']['width']??'140'}px / 0.6356);
+    {if isset($rotate['hboneconfig']['starani']) && $rotate['hboneconfig']['starani']=='2'}
+    display:none;
+    {/if}
+}
+.hbwall-box .hbwall-item .frontback .front{
+	position: relative;
+	width: 100%;
+	height: 100%;
+	background-image: url("{:tomedia($rotate['hboneconfig']['frontbg'])}");
+	background-repeat: no-repeat;
+	background-size: 100% 100%;
+	-webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-transition: all 1s cubic-bezier(0.68,-.55,.265,1.55);
+    transition: all 1s cubic-bezier(0.68,-.55,.265,1.55);
+    {if !isset($rotate['hboneconfig']['scaleani']) || $rotate['hboneconfig']['scaleani']=='1'}
+    animation: scaleani 2s linear infinite alternate;
+    {/if}
+}
+@keyframes scaleani {
+	0%{
+		transform: scaleX(1);
+	}
+	50%{
+		transform: scaleX(0.95);
+	}
+	100%{
+		transform: scaleX(1);
+	}
+}
+.hbwall-box .hbwall-item .frontback .front .front-name{
+	position: absolute;
+	left:0;
+	top: {$rotate['titleconfig']['margintop']??'80'}px;
+	width:100%;
+	padding:0 10px;
+	box-sizing:border-box;
+	text-align:center;
+	color: {$rotate['titleconfig']['color']??'#ff9800'};
+    font-size: {$rotate['titleconfig']['size']??'20'}px;
+    font-weight: 600;
+    {if $rotate['titleconfig']['open']=='2'}
+    display:none
+    {/if}
+}
+.hbwall-box .hbwall-item.hasopen .front {
+    -webkit-transform: rotateY(180deg);
+    transform: rotateY(180deg);
+}
+.hbwall-box .hbwall-item.hasopen .front.noanimation{
+	animation: none;
+}
+.hbwall-box .hbwall-item .back{
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	-webkit-transform: rotateY(180deg);
+    transform: rotateY(180deg);
+	-webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-transition: all 1s cubic-bezier(0.68,-.55,.265,1.55);
+    transition: all 1s cubic-bezier(0.68,-.55,.265,1.55);
+}
+.hbwall-box .hbwall-item.hasopen .back {
+    -webkit-transform: rotateY(0deg);
+    transform: rotateY(0deg);
+}
+.back{
+	background-image: url("{:tomedia($rotate['hboneconfig']['backbg'])}");
+	background-repeat: no-repeat;
+	background-size: 100% 100%;
+}
+.back .prizetitle{
+	color: {$rotate['backtitleconfig']['color']??'#ff9800'};
+    font-size: {$rotate['backtitleconfig']['size']??'20'}px;
+    margin-bottom: {$rotate['backtitleconfig']['marginbottom']??'20'}px;
+    {if $rotate['backtitleconfig']['open']=='2'}
+    	display:none
+    {/if}
+}
+.back .prizeimg{
+	width: {$rotate['awardconfig']['picsize']??'80'}px;
+    height: {$rotate['awardconfig']['picsize']??'80'}px;
+    {if $rotate['awardconfig']['open']=='2'}
+		display:none;
+	{/if}
+}
+.back .prizename{
+	width: 100%;
+    padding: 0 20px;
+    text-align: center;
+    box-sizing: border-box;
+	font-size: {$rotate['awardconfig']['size']??'20'}px;
+    margin-top: {$rotate['awardconfig']['margintop']??'20'}px;
+    color: {$rotate['awardconfig']['color']??'#ff9800'};
+    {if $rotate['awardconfig']['open']=='2'}
+		display:none;
+	{/if}
+}
+.hbwall-box .hbwall-item .xuhao{
+	text-align: center;
+	{if $rotate['openmode']=='1'}
+	    color: {$rotate['numberconfig']['color']??'#ff9800'};
+	    font-size: {$rotate['numberconfig']['size']??'20'}px;
+	    {if $rotate['numberconfig']['open']=='2'}
+    		display:none;
+    	{/if}
+	{else /}
+		color: {$rotate['joinconfig']['color']??'#ff9800'};
+	    font-size: {$rotate['joinconfig']['size']??'20'}px;
+	    {if $rotate['joinconfig']['open']=='2'}
+    		display:none;
+    	{/if}
+	{/if}
+    font-weight: 600;
+}
+.popbox{
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0,0,0,0.42);
+}
+.popbox.hidden{display: none}
+.popbox .lightbox{
+	position: relative;
+	-webkit-perspective: 1000;
+    perspective: 1000;
+   -webkit-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+}
+.popbox .lightbox.small{
+	position: absolute;
+}
+.popbox .lightbox:before {
+    content: " ";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-image: url("{:tomedia($pcconfig['styleconfig']['lightimg'])}");
+    animation: foreverrotate 20s linear infinite;
+    z-index: -1;
+}
+@keyframes foreverrotate {
+    0% {
+        transform: rotate(0)
+    }
+
+    to {
+        transform: rotate(-1turn)
+    }
+}
+.popbox .lightbox .back{
+	position: relative;
+}
+.popbox .lightbox .closebtn{
+	position: absolute;
+	bottom: -30px;
+	color: #fff;
+	font-size: 20px;
+	cursor: pointer;
+}
+.popbox .lightbox.small .closebtn{display: none}
+</style>
+<section class="hbwall-mainbox normal-box">
+	<div class="hbwall-container zam-app-flex-ajCenter">
+		<div class="hbwall-box">
+			{foreach $rotate['prizes'] as $pk=>$p}
+			<div class="hbwall-item hb{$p['id']}{if $p['opened']=='1'} hasopen{/if}" data-hbid="{$p['id']}">
+				<div class="frontback">
+					<div class="stars"></div>
+					<div class="front zam-app-flex-ajCenter{if $p['opened']=='1'} noanimation{/if}" {if $p['prizediy']=='1' && !empty($p['prizefrontbg'])}style="background-image: url({:tomedia($p['prizefrontbg'])});"{/if}>
+						<div class="front-name">{$p['prizetitle']}</div>
+					</div>
+					<div class="back zam-app-flex-ajCenter" {if $p['prizediy']=='1' && !empty($p['prizebackbg'])}style="background-image: url({:tomedia($p['prizebackbg'])});"{/if}>
+						<div class="prizetitle">{$p['prizetitle']}</div>
+						<img class="prizeimg" src="{:tomedia($p['prizeimg'])}">
+						<div class="prizename">{$p['prizename']}</div>
+					</div>
+				</div>
+				<div class="xuhao">
+					{if $rotate['openmode']=='1'}
+						{$rotate['numberconfig']['prevtxt']}{$pk+1}
+					{else /}
+						<span>0</span>人
+					{/if}
+				</div>
+			</div>
+			{/foreach}
+		</div>
+	</div>
+	<div class="emptybox zam-app-flex-ajCenter display-none">
+	    <img src="/{:SIMGURL}common/empty.png">
+	    <p style="padding:20px;">暂无可用轮次，请到后台添加</p>
+	</div>
+</section>
+<section class="popbox zam-app-flex-ajCenter hidden">
+	<div class="lightbox zam-app-flex-ajCenter"></div>
+</section>
+<script>
+require(['screenhbwall'],function(screenhbwall){
+	screenhbwall.init({
+		rotateid:"{$rotate['id']??'0'}",
+		mode:"{$rotate['openmode']??'1'}",
+		needpop:"{$rotate['awardconfig']['needpop']??'2'}",
+		popscale:parseFloat("{$rotate['awardconfig']['scale']??'1.4'}"),
+		speakText:"{$rotate['speaktext']??'2'}",
+	});
+})
+</script>
+{include file="common/footer" /}

@@ -1,0 +1,24 @@
+<style>
+.zam-app-vipbtn{
+    position: absolute;
+    right: 20px;
+    bottom: 50px;
+    width: 1rem;
+    height: 1rem;
+    background-image: url('/static/images/sys/vip/vip.gif');
+    background-repeat: no-repeat;
+    background-size: cover;
+    z-index: 9999;
+    cursor: pointer;
+}
+</style>
+<div class="zam-app-vipbtn hidden"></div>
+<script>
+    $(function(){
+        $('.zam-app-vipbtn').click(function(){
+            require(['wechatcore'],function(wechatcore){
+                wechatcore.towxminivippage();
+            })
+        })
+    })
+</script>

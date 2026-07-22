@@ -1,0 +1,76 @@
+<script>
+require(['wechatcore','appsocket'],function (wechatcore,appsocket) {	
+	var wsConfig = {};
+	wsConfig.onmessage = function(data){
+		if(data.type=='connected'){
+			appsocket.isclose = false;
+			{if !$pwclient}
+			wechatcore.connectsocket({clientid:data.clientid});
+			{else /}
+			wechatcore.ajaxSubmit("/wechat/livemarkpw/binduid",{clientid:data.clientid,module:XCV3Config.gametype}).then(function(data){
+				if(data.code!=0){
+					wechatcore.msg(data.msg);
+				}
+			}, function(){
+				wechatcore.msg('网络太差链接socket服务失败，请稍后重试');
+			});
+			{/if}
+		}else if(data.type=='goto'){
+			wechatcore.goto(data);
+		}else if(data.type=='rolllivemark'){
+			wechatcore.reloadpage("{:gowechat(!$pwclient?'livemark/index':'livemarkpw/index',['hdid'=>$hdinfo['hdid']])}");
+		}else if(data.type=='changeprevnextuser'){
+			var pfuserid = "{$pfuserid??''}";
+			if(pfuserid==data.pfuserid){
+				return false;
+			}
+			wechatcore.reloadpage("{:gowechat(!$pwclient?'livemark/pingfen':'livemarkpw/pingfen',['hdid'=>$hdinfo['hdid']])}&pfuserid="+data.pfuserid);
+		}else if(data.type=='addblack'){
+			data.userid==XCV3Config.userid&&WeixinJSBridge.call('closeWindow');
+		}else if(data.type=='luckeruserids'){
+			wechatcore.layerAsklucker(data);
+		}
+	};
+	appsocket.init(wsConfig);
+	$(".pwclientname").click(function(){
+		wechatcore.ask('提示','确定要退出当前评委登录么?',['确定','取消'],function(index){
+			wechatcore.close(index);
+			wechatcore.ajaxSubmit("{:gowechat('livemarkpw/pwloginout',['hdid'=>$hdinfo['hdid']])}",{},'正在执行退出操作...').then(function(json){
+				if(json.code==0){
+					wechatcore.msg('退出成功');
+					setTimeout(function(){
+						window.location.reload();
+					},1e3);
+				}else{
+					wechatcore.msg(json.msg);
+				}
+			}, function(){
+				wechatcore.msg('网络太差，请稍后重试');
+			});
+		});
+	});
+})
+</script>
+<style>
+.g-flexview{
+	min-width:100%;
+	max-width:100%;
+	{if empty($appconfig['appbgimg'])}background-color:#fff{/if}
+}
+.livemark-user-list *,.livemark-pf-dz *,.livemark-zan-list *,.livemark-phb-other *{color:{$rotate['maincolor']}}
+/*专业评委微信端顶部中间显示当前评委名称*/
+.pwclientname {
+    position: fixed;
+    left: 0;
+    top: 0;
+    padding: 0 2rem;
+    width: 100%;
+    height: .6rem;
+	line-height: .6rem;
+    color:{$rotate['maincolor']};
+    font-size: 0.36rem;
+    text-align:center;
+	z-index: 1;
+}
+</style>
+{include file="common/footermenu" /}

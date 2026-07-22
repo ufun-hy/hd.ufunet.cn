@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{$title}</title>
+    <meta content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0" name="viewport"/>
+    <meta content="yes" name="apple-mobile-web-app-capable"/>
+    <meta content="black" name="apple-mobile-web-app-status-bar-style"/>
+    <meta content="telephone=no" name="format-detection"/>
+    <link rel="stylesheet" href="__STATIC__/js/ydui/css/ydui.css"/>
+	<link rel="stylesheet" href="__STATIC__/css/wechat/style.css" />
+	<script src="__STATIC__/js/ydui/js/ydui.flexible.js"></script>
+</head>
+<body>
+<style type="text/css">
+.errorbox{position: relative;}
+.errorbox .errorbgimg{position: absolute;top: 0;left: 0;width: 100%;height: auto;z-index:0;margin-bottom: 0}
+.errorbox p{height:auto;padding:0 0.2rem;font-size: 0.32rem;line-height: normal;}
+</style>
+<section class="g-scrollview zam-app-flex-ajCenter errorbox" {if $type=='0'}style="background-color: #d0d0d0"{/if}>
+{if $type=='1' && isset($binddata['bgimg']) && !empty($binddata['bgimg'])}
+    {if isset($binddata['isfullbg']) && $binddata['isfullbg'] == '1'}
+        <style>
+            .errorbox{width: 100%;height: 100%;background-size:100% 100%;background-repeat:no-repeat;background-image: url({$binddata['bgimg']});}
+            .errorbox p{color: #fff;font-size: 0.32rem;}
+        </style>
+    {else /}
+        <img class="errorbgimg" src="{$binddata['bgimg']}" />
+    {/if}
+{/if}
+{if $type=='0'}
+    <img src="__STATIC__/images/screen/common/error.png">
+{/if}
+<p>{$errmsg}</p>
+{if $type=='0' && isset($gourl) && !empty($gourl)}
+   <a class="btn btn-primary" href="{$gourl}">返回首页</a>
+{/if}
+</section>
+</body>
+</html>
+

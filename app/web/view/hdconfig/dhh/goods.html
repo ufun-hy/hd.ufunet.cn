@@ -1,0 +1,144 @@
+{include file='$Wpath/common/header'}
+<style>
+.goods-lists tr td{text-align:center!important;}
+.userimgbox{width: 60px;height: 60px;margin: 0 auto}
+</style>
+<div class="alert alert-info">
+<i class="wi wi-bell"></i> 增加或删除商品均需保存才可生效
+</div>
+<div class="alert alert-info">此处设置的商品是默认轮次的商品，默认轮次其他信息由系统自动生成</div>
+
+<form id="itemForm" method="post" class="form-horizontal">
+<table class="we7-table table voteitemTable" style="margin-bottom:0px;">
+<thead>
+  <tr>
+  	<th style="width:20%;text-align:center;">商品名称</th>
+  	<th style="width:40%;text-align:center;">商品介绍</th>
+	<th style="width:10%;text-align:center;">商品单位</th>
+	<th style="width:10%;text-align:center;">单价</th>
+	<th style="width:20%;text-align:center;">操作</th>
+  </tr>
+</thead>
+<tbody class="goods-lists">
+	{volist name="goods" id="item"}
+		<tr>
+			<td>
+	           <div class="zam-flex-column-center">
+	           		<img src="{:tomedia($item['goodsimg'])}" width="80px" height="80px" />
+	           		<div class="m-t-10">{$item['goodsname']}</div>
+	           </div>
+	           <input type="hidden" name="goodsname[]" value="{$item['goodsname']}">
+	           <input type="hidden" name="goodsimg[]" value="{$item['goodsimg']}">
+	        </td>
+	        <td>
+	           {$item['goodsdes']??''}
+	           <input type="hidden" name="goodsdes[]" value="{$item['goodsdes']??''}">
+	        </td>
+			<td>
+	           {$item['goodsunit']}
+	           <input type="hidden" name="goodsunit[]" value="{$item['goodsunit']}">
+	        </td>
+			<td>
+			  <div>{$item['goodsprice']}元</div>
+			  <input type="hidden" name="goodsprice[]" value="{$item['goodsprice']}">
+			</td>
+			<td>
+			  <a href="javascript:;" class="btn btn-danger btn-xs btn-delprize">
+				  <i class="mdi mdi-close"></i>
+			  </a>
+			  <a href="javascript:;"  class="btn btn-default btn-sm mousemove zam-sortable" title="拖动排序"><i class="mdi mdi-arrow-all"></i></a>
+			</td>
+		</tr>
+	{/volist}
+</tbody>
+<tfoot>
+	  <tr>
+		<td colspan="4">
+		  <a  class="btn btn-success btn-sm m-r-10 additem" href="javascript:;"><i class="mdi mdi-plus"></i> 添加商品</a>
+		  <button type="submit" class="btn btn-primary btn-sm btn-save" /><i class="mdi mdi-content-save"></i> 保存商品</button>
+		</td>
+	  </tr>
+	</tfoot>
+</table>
+<form>
+<script id='goodsitem-tpl' type="text/template">
+	<tr>
+		<td>
+	        <div class="zam-flex-column-center">
+           		<img src="<% d.goodsimgprev %>" width="80px" height="80px" />
+           		<div class="m-t-10"><% d.goodsname %></div>
+           </div>
+           <input type="hidden" name="goodsname[]" value="<% d.goodsname %>">
+           <input type="hidden" name="goodsimg[]" value="<% d.goodsimg %>">
+	    </td>
+	    <td>
+	      <% d.goodsdes %>
+	      <input type="hidden" name="goodsdes[]" value="<% d.goodsdes %>">
+	    </td>
+		<td>
+	      <% d.goodsunit %>
+	      <input type="hidden" name="goodsunit[]" value="<% d.goodsunit %>">
+	    </td>
+		<td>
+		  <% d.goodsprice %>元
+	      <input type="hidden" name="goodsprice[]" value="<% d.goodsprice %>">
+		</td>
+		<td>  
+		  <a href="javascript:;" class="btn btn-danger btn-xs btn-delprize">
+			  <i class="mdi mdi-close"></i>
+		  </a>
+		  <a href="javascript:;"  class="btn btn-default btn-sm mousemove zam-sortable" title="拖动排序"><i class="mdi mdi-arrow-all"></i></a>
+		</td>
+   </tr>
+</script>
+<script>
+require(["zamnotice","layerBox","jconfirmBox","webcore","jquery.ui"],function(zamnotice,layerBox,jconfirmBox,webcore){
+	$('.goods-lists').sortable({handle: ".mousemove"});
+	$(".goods-lists").disableSelection();
+	$(".additem").on('click',function(){
+		var confirmObj = jconfirmBox.ajaxconfirm("新增商品","{:goweb('hdconfig/dhhgoods')}",{ishtml:'1'},'html','col-lg-8 col-lg-offset-2',function(e){
+			var goodsarr = webcore.serializeObject(e.find('form'));
+			goodsarr.goodsimgprev = e.find('img').attr("src");
+			if(goodsarr.goodsname=='') {
+				zamnotice.showTips('error','商品名必须设置');
+				return false;
+			}
+			if(goodsarr.goodsdes==''){
+				zamnotice.showTips('error','商品介绍必须设置');
+				return false;
+			}
+			if(goodsarr.goodsimg==''){
+				zamnotice.showTips('error','商品图必须设置');
+				return false;
+			}
+			if(goodsarr.goodsunit==''){
+				zamnotice.showTips('error','商品单位必须设置');
+				return false;
+			}
+			var html = webcore.tpl($("#goodsitem-tpl"),goodsarr);
+			$(".goods-lists").append(html);
+			confirmObj.close();
+		});
+	});
+	$(".goods-lists").on('click','.btn-delprize',function(){
+		$(this).parent().parent().remove();
+	});
+	$(".btn-save").on('click',function(e){
+		e.preventDefault();
+		var $form = $("#itemForm");
+		var postData = $form.serialize();
+		layerBox.showLoading("数据提交中..");
+		$.post(window.location.href+"?ishtml=2",postData, function(result) {
+			layerBox.closeLayer();
+			if(result.code==0){
+				zamnotice.showTips('success','保存成功',500,function(){
+					window.location.reload();
+				});	
+			}else{
+				zamnotice.showTips('error',result.msg);
+			}
+		}, 'json');
+	});
+});
+</script>
+{include file='$Wpath/common/footer'}

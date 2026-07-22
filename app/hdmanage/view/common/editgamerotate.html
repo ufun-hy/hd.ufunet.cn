@@ -1,0 +1,1675 @@
+<style>
+.prize-lists tr td,.failprize-lists tr td,.question-lists tr td,.team-lists tr td,.puzzle-lists tr td{text-align:center!important}
+.prize-lists tr td .prizeimg,.failprize-lists tr td .prizeimg,.team-lists tr td img{width:69px;height:69px;}
+.puzzle-lists tr td img{max-height:100px}
+.confirmbox-pop .zam-titleBox{font-weight: 600;padding:5px 0;}
+</style>
+<div class="form-horizontal confirmbox-pop">
+<form class="confirm-formbox" method="post">
+    <div class="text-center">
+        <div class="btn-group pop-btns" style="margin-bottom:10px;">
+          <a href="javascript:void(0)" class="btn btn-default btn-primary"><span>基础设置</span></a>
+          {if in_array($gametype,['answerbs','puzzle'])}
+          <a href="javascript:void(0)" class="btn btn-default"><span>{if $gametype=='answerbs'}题目{else /}关卡{/if}设置</span></a>
+          {/if}
+          <a href="javascript:void(0)" class="btn btn-default"><span>高级设置</span></a>
+          <a href="javascript:void(0)" class="btn btn-default"><span>排行榜</span></a>
+          <a href="javascript:void(0)" class="btn btn-default"><span>游戏奖品</span></a>
+        </div>
+    </div>
+    <div class="carditem">
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 轮次名</label>
+            <div class="col-lg-8">
+                <input class="form-control title" type="text"  name="title" value="{$rotate['title']}">
+            </div>
+        </div>
+        {if $gametype=='answerbs'}
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 答题时间</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec answertime" name="answertime" 
+                data-bts-min="5" data-bts-replacement-val="5"
+                data-bts-max="999"
+                data-bts-init-val=""
+                data-bts-step="1"
+                data-bts-postfix="秒"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$rotate['answertime']}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 自动换题</label>
+            <div class="col-lg-8">
+                {:tpl_switch('isauto',$rotate['isauto'],'isautoquestion')}
+                <span class="zam-help-block p-t-0">注:默认是自动换题模式，关闭后需要点击切换下一题按钮或者点击快捷键>键(大于号键)来切换至下一题</span>
+            </div>
+        </div>
+        <div class="form-group autoquestionbox{if $rotate['isauto']=='2'} hidden{/if}">
+            <label class="col-lg-3 control-label">* 自动换题间隔</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec autotime" name="autotime" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="999"
+                data-bts-init-val=""
+                data-bts-step="1"
+                data-bts-postfix="秒"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$rotate['autotime']}">
+                <span class="zam-help-block">注:必须大于0，小于等于999秒</span>
+            </div>
+        </div>
+        <div class="form-group handquestionbox{if $rotate['isauto']=='1'} hidden{/if}">
+            <label class="col-lg-3 control-label">* 自动公布答案</label>
+            <div class="col-lg-8">
+                {:tpl_switch('autoshowanswer',$rotate['autoshowanswer']??'1','isautoshowanswer')}
+                <span class="zam-help-block p-t-0">注:默认是自动公布题目正确选项，关闭后需要点击公布答案按钮或点击快捷键alt键来公布</span>
+            </div>
+        </div>
+        <div class="form-group answershowsecondsbox{if $rotate['isauto']=='2' && $rotate['autoshowanswer']=='2'} hidden{/if}">
+            <label class="col-lg-3 control-label">* 答案显示时间</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec answershowseconds" name="answershowseconds" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="60"
+                data-bts-init-val=""
+                data-bts-step="1"
+                data-bts-postfix="秒"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$rotate['answershowseconds']??'3'}">
+                <span class="zam-help-block">
+                    <div>注:至少1秒，最大为60秒，请酌情设置</div>
+                    <div>手动换题并开启了自动公布答案则仅最后一题有效</div>
+                </span>
+            </div>
+        </div>
+        {elseif $gametype=='jjb' /}
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 接到金币加分</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec coininc" name="coininc" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="999"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['coininc']}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 接到炸弹减分</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec boomdec" name="boomdec" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="999"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['boomdec']}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 游戏时间</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec gametime" name="gametime" 
+                data-bts-min="5" data-bts-replacement-val="5"
+                data-bts-max="999"
+                data-bts-init-val=""
+                data-bts-step="1"
+                data-bts-postfix="秒"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$rotate['gametime']}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 预估用户最大分数</label>
+            <div class="col-lg-6">
+                <input type="text" class="form-control numberincdec" name="maxcount" 
+                data-bts-min="5" data-bts-replacement-val="5"
+                data-bts-max="10000"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['maxcount']}">
+                <span class="help-block">请根据接金币得分数，接炸弹减去分数以及游戏时间等因素合理的设置此值，注:此值并不会限定死用户最大得分数</span>
+            </div>
+        </div>
+        {elseif $gametype=='cutfruit' /}
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 切苹果得分数</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec" name="applecut" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="999"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['applecut']}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 切香蕉得分数</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec" name="bananacut" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="999"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['bananacut']}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 切草莓得分数</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec" name="basahacut" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="999"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['basahacut']}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 切桃子得分数</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec" name="peachcut" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="999"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['peachcut']}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 切西瓜得分数</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec" name="sandiacut" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="999"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['sandiacut']}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 切炸弹减分数</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec" name="boomcut" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="999"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['boomcut']}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 游戏时间</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec gametime" name="gametime" 
+                data-bts-min="5" data-bts-replacement-val="5"
+                data-bts-max="999"
+                data-bts-init-val=""
+                data-bts-step="1"
+                data-bts-postfix="秒"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$rotate['gametime']}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 预估用户最大分数</label>
+            <div class="col-lg-6">
+                <input type="text" class="form-control numberincdec" name="maxcount" 
+                data-bts-min="5" data-bts-replacement-val="5"
+                data-bts-max="10000"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['maxcount']}">
+                <span class="help-block">请根据接金币得分数，接炸弹减去分数以及游戏时间等因素合理的设置此值，注:此值并不会限定死用户最大得分数</span>
+            </div>
+        </div>
+        {elseif $gametype=='tug' /}
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 游戏时间</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec gametime" name="gametime" 
+                data-bts-min="5" data-bts-replacement-val="5"
+                data-bts-max="999"
+                data-bts-init-val=""
+                data-bts-step="1"
+                data-bts-postfix="秒"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$rotate['gametime']}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 红队名称</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control" name="redname" value="{$rotate['redname']}" maxlength="20">
+            </div>
+        </div>
+        <div class="form-group">
+              <label class="col-lg-3 control-label">* 红队队标</label>
+              <div class="col-lg-8">
+                {:tpl_image_one('redlogo', $rotate['redlogo'])}
+                <span class="help-block">222*278px</span>
+              </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 蓝队名称</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control" name="bluename" value="{$rotate['bluename']}" maxlength="20">
+            </div>
+        </div>
+        <div class="form-group">
+              <label class="col-lg-3 control-label">* 蓝队队标</label>
+              <div class="col-lg-8">
+                {:tpl_image_one('bluelogo', $rotate['bluelogo'])}
+                <span class="help-block">222*278px</span>
+              </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 每个队伍可加入人数</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec" name="maxjoin" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="null"
+                data-bts-step="1"
+                value="{$rotate['maxjoin']}">
+                <span class="help-block">0为不限制队伍加入人数</span>
+            </div>
+        </div>
+        {elseif $gametype=='mouse' /}
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 打地鼠加分</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec tigerinc" name="tigerinc" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="999"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['tigerinc']}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 打其他动物减分</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec foxdec" name="foxdec" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="999"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['foxdec']}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 游戏时间</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec gametime" name="gametime" 
+                data-bts-min="5" data-bts-replacement-val="5"
+                data-bts-max="999"
+                data-bts-init-val=""
+                data-bts-step="1"
+                data-bts-postfix="秒"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$rotate['gametime']}">
+            </div>
+        </div>
+        <div class="form-group hidden">
+            <label class="col-lg-3 control-label">* 预估用户最大分数</label>
+            <div class="col-lg-6">
+                <input type="text" class="form-control numberincdec" name="maxcount" 
+                data-bts-min="5" data-bts-replacement-val="5"
+                data-bts-max="10000"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="30">
+                <span class="help-block">请根据打地鼠得分数，打其他动物减分数以及游戏时间等因素合理的设置此值，注:此值并不会限定死用户最大得分数</span>
+            </div>
+        </div>
+        {elseif $gametype=='jumprace' /}
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 跳中加分</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec jumpinc" name="jumpinc" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="999"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['jumpinc']}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 跳中正中间加分</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec jump2inc" name="jump2inc" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="999"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['jump2inc']}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 未跳中减分</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec faildec" name="faildec" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="999"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['faildec']}">
+                <span class="help-block">注:设置为0即为不减分</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 游戏时间</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec gametime" name="gametime" 
+                data-bts-min="5" data-bts-replacement-val="5"
+                data-bts-max="999"
+                data-bts-init-val=""
+                data-bts-step="1"
+                data-bts-postfix="秒"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$rotate['gametime']}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 预估用户最大分数</label>
+            <div class="col-lg-6">
+                <input type="text" class="form-control numberincdec" name="maxcount" 
+                data-bts-min="5" data-bts-replacement-val="5"
+                data-bts-max="10000"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['maxcount']}">
+                <span class="help-block">请根据跳中得分数，未跳中减去分数以及游戏时间等因素合理的设置此值，注:此值并不会限定死用户最大得分数</span>
+            </div>
+        </div>
+        {elseif $gametype=='clickrace' /}
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 吃箱子加分</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec coininc" name="coininc" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="999"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['coininc']}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 未避开障碍物减分</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec boomdec" name="boomdec" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="999"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['boomdec']}">
+                <span class="zam-help-block">注:设置0即为不减分</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 游戏时间</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec gametime" name="gametime" 
+                data-bts-min="5" data-bts-replacement-val="5"
+                data-bts-max="999"
+                data-bts-init-val=""
+                data-bts-step="1"
+                data-bts-postfix="秒"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$rotate['gametime']}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 预估用户最大分数</label>
+            <div class="col-lg-6">
+                <input type="text" class="form-control numberincdec" name="maxcount" 
+                data-bts-min="5" data-bts-replacement-val="5"
+                data-bts-max="10000"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['maxcount']}">
+                <span class="help-block">请根据吃箱子得分数，未躲避障碍物减去分数以及游戏时间等因素合理的设置此值，注:此值并不会限定死用户最大得分数</span>
+            </div>
+        </div>
+        {elseif $gametype=='puzzle' /}
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 游戏时间</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec gametime" name="gametime" 
+                data-bts-min="5" data-bts-replacement-val="5"
+                data-bts-max="999"
+                data-bts-init-val=""
+                data-bts-step="1"
+                data-bts-postfix="秒"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$rotate['gametime']}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 预估用户最大分数</label>
+            <div class="col-lg-6">
+                <input type="text" class="form-control numberincdec" name="maxcount" 
+                data-bts-min="5" data-bts-replacement-val="5"
+                data-bts-max="10000"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['maxcount']}">
+                <span class="help-block">请根据关卡的加分量以及游戏时间等因素合理的设置此值，注:此值并不会限定用户最大得分数</span>
+            </div>
+        </div>
+        {else}
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 游戏时间</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec gametime" name="gametime" 
+                data-bts-min="5" data-bts-replacement-val="5"
+                data-bts-max="999"
+                data-bts-init-val=""
+                data-bts-step="1"
+                data-bts-postfix="秒"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$rotate['gametime']}">
+                <span class="help-block">注:请酌情设置合理的时间</span>
+            </div>
+        </div>
+        {/if}
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 开始后准许加入</label>
+            <div class="col-lg-8">
+                {:tpl_switch('startedjoin',$rotate['startedjoin'])}
+                <span class="help-block p-t-0">注:开启后游戏开始后用户仍然可以扫码进入游戏</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 倒计时</label>
+            <div class="col-lg-8">
+                {:tpl_switch('opendjs',$rotate['opendjs'],'opendjs')}
+                <span class="help-block p-t-0">注:开启后大屏与微信端均会显示倒计时</span>
+            </div>
+        </div>
+        <div class="form-group djsbox{if $rotate['opendjs']=='2'} hidden{/if}">
+            <label class="col-lg-3 control-label">* 倒计时时间</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec djstime" name="djstime" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="60"
+                data-bts-init-val=""
+                data-bts-step="1"
+                data-bts-postfix="秒"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$rotate['djstime']}">
+                <span class="zam-help-block">注:必须是1-60之间的数字</span>
+            </div>
+        </div>
+        {if $gametype == 'answerbs' && dzanswerbsscore()}
+            <div class="form-group">
+                <label class="col-lg-3 control-label">* 分数</label>
+                <div class="col-lg-8">
+                    {:tpl_switch('scoreconfig[open]',$rotate['scoreconfig']['open']??'1','openanswerbsscorebox')}
+                    <span class="help-block p-t-0">注:本轮分数</span>
+                </div>
+            </div>
+            <div class="answerbsscorebox{if isset($rotate['scoreconfig']['open']) && $rotate['scoreconfig']['open']=='2'} hidden{/if}">
+                <div class="form-group">
+                    <label class="col-lg-3 control-label">* 分值</label>
+                    <div class="col-lg-3">
+                        <input type="text" class="form-control numberincdec" name="scoreconfig[score]" 
+                        data-bts-min="1" data-bts-replacement-val="1"
+                        data-bts-max="60"
+                        data-bts-init-val=""
+                        data-bts-step="1"
+                        data-bts-postfix="分"
+                        data-bts-postfix-extra-class="touchspin-postfix"
+                        value="{$rotate['scoreconfig']['score']??10}">
+                        <span class="zam-help-block">注:必须是1-60之间的数字</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-3 control-label">* 答对加分类型</label>
+                    <div class="col-lg-8">
+                        <label class="lyear-radio radio-inline radio-primary">
+                            <input type="radio" name="scoreconfig[inctype]" {if !isset($rotate['scoreconfig']['inctype']) || $rotate['scoreconfig']['inctype']=='1'}checked{/if} value="1"><span>答对就加分</span>
+                        </label>
+                        <label class="lyear-radio radio-inline radio-primary" >
+                            <input type="radio" name="scoreconfig[inctype]" {if isset($rotate['scoreconfig']['inctype']) && $rotate['scoreconfig']['inctype']=='2'}checked{/if} value="2"><span>前50%答对加分</span>
+                        </label>
+                        <span class="help-block">注:答对就加分即为在规定时间内完成答题就加分，前50%答对加分即为答对并且耗时在前50%的用户才会加分</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-3 control-label">* 答错或未提交扣分</label>
+                    <div class="col-lg-8">
+                        {:tpl_switch('scoreconfig[errordec]]',$rotate['scoreconfig']['errordec']??'2')}
+                        <span class="help-block p-t-0">注:开启后用户答错或未在规定时间内完成答题则扣分</span>
+                    </div>
+                </div>
+            </div>
+        {/if}
+    </div>
+    {if in_array($gametype,['answerbs','puzzle'])}
+    <div class="carditem hidden">
+        {if $gametype=='answerbs'}
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 不定项选择</label>
+            <div class="col-lg-8">
+                {:tpl_switch('isindefiniteterm',$rotate['isindefiniteterm']??'2')}
+                <span class="zam-help-block p-t-0">注:开启后微信端题目不会展示题目类型（单选或多选），用户只需选了至少一个选项就可提交</span>
+            </div>
+        </div>
+        {/if}
+        <div class="form-group">
+            <div class="col-lg-12 yautooverflow">
+                <table class="table" style="margin-bottom:0px;">
+                    <thead>
+                    <tr>
+                        <th style="width:20%;text-align:center;">类型</th>
+                        <th style="width:30%;text-align:center;">{if $gametype=='answerbs'}题目{else /}闯关图片{/if}</th>
+                        <th style="width:30%;text-align:center;">{if $gametype=='answerbs'}答案{else /}闯关分数{/if}</th>
+                        <th style="width:20%;text-align:center;">操作</th>
+                    </tr>
+                    </thead>
+                    {if $gametype=='answerbs'}
+                        <tbody class="question-lists">
+                            {volist name="rotate.questions" id="question"}
+                                <tr data-quesid="{$question['id']}">
+                                    <td><p><span class="label label-{if strexists($question['yesanswer'],',')}danger{else}primary{/if}">{if strexists($question['yesanswer'],',')}多选{else}单选{/if}题</span></p></td>
+                                    <td>{:$question['questitle']}</td>
+                                    <td>
+                                        <div>
+                                        {if strexists($question['yesanswer'],'A')}<div>A: {$question['answera']}</div>{/if}
+                                        {if strexists($question['yesanswer'],'B')}<div>B: {$question['answerb']}</div>{/if}
+                                        {if strexists($question['yesanswer'],'C')}<div>C: {$question['answerc']}</div>{/if}
+                                        {if strexists($question['yesanswer'],'D')}<div>D: {$question['answerd']}</div>{/if}
+                                        {if strexists($question['yesanswer'],'E')}<div>E: {$question['answere']??''}</div>{/if}
+                                        {if strexists($question['yesanswer'],'F')}<div>F: {$question['answerf']??''}</div>{/if}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <a href="javascript:;" data-quesid="{$question['id']}" class="btn btn-primary btn-xs btn-edit{if $rotate['status']!='1'} disabled{/if}"><i class="mdi mdi-pencil"></i></a>
+                                        <a href="javascript:;" data-quesid="{$question['id']}" class="btn btn-info btn-xs sortmove{if $rotate['status']!='1'} disabled{/if}" title="拖动排序"><i class="mdi mdi-arrow-all"></i></a>
+                                        <a href="javascript:;" data-quesid="{$question['id']}" class="btn btn-danger btn-xs btn-del{if $rotate['status']!='1'} disabled{/if}"><i class="mdi mdi-close"></i></a>
+                                    </td>
+                                </tr>
+                            {/volist}
+                        </tbody>
+                        <tfoot style="border: 1px solid #efefef;">
+                            <tr>
+                                <td colspan="4">
+                                    <a class="btn btn-primary btn-xs addquestion{if $rotate['status']!='1'} disabled{/if}" href="javascript:;"> <i class="mdi mdi-plus"></i>&nbsp;<span>添加题目</span></a>
+                                    <a class="btn btn-warning btn-xs importquestion{if $rotate['status']!='1'} disabled{/if}" href="javascript:;"> <i class="mdi mdi-plus"></i>&nbsp;<span>导入题目</span></a>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    {else /}
+                        <tbody class="puzzle-lists">
+                            {volist name="rotate.roundimages" id="roundimg"}
+                                <tr>
+                                    <td>
+                                    <p>
+                                        <span>{if $roundimg['prows']=='2'}4{elseif $roundimg['prows']=='3' /}9{else /}16{/if}宫格</span>
+                                        <input type="hidden" name="roundimages[prows][]" value="{$roundimg['prows']}">
+                                    </p>
+                                    </td>
+                                    <td>
+                                        <img src="{:tomedia($roundimg['pimg'])}">
+                                        <input type="hidden" name="roundimages[pimg][]" value="{$roundimg['pimg']??''}">
+                                    </td>
+                                    <td>
+                                        <span>{$roundimg['pscore']}分</span>
+                                        <input type="hidden" name="roundimages[pscore][]" value="{$roundimg['pscore']}">
+                                    </td>
+                                    <td>
+                                        <a href="javascript:;" class="btn btn-primary btn-xs btn-edit{if $rotate['status']!='1'} disabled{/if}">
+                                            <i class="mdi mdi-pencil"></i>
+                                        </a>
+                                        <a href="javascript:;" class="btn btn-danger btn-xs btn-del{if $rotate['status']!='1'} disabled{/if}">
+                                            <i class="mdi mdi-close"></i>
+                                        </a>
+                                        <a href="javascript:;"  class="btn btn-info btn-xs sortmove{if $rotate['status']!='1'} disabled{/if}" title="拖动排序"><i class="mdi mdi-arrow-all"></i></a>
+                                    </td>
+                                </tr>
+                            {/volist}
+                        </tbody>
+                        <tfoot style="border: 1px solid #efefef;">
+                            <tr>
+                                <td colspan="4">
+                                    <a class="btn btn-primary btn-xs addpuzzle{if $rotate['status']!='1'} disabled{/if}" href="javascript:;"> <i class="mdi mdi-plus"></i>&nbsp;<span>添加关卡</span></a>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    {/if}
+                </table>
+                {if $gametype=='answerbs'}<span class="zam-help-block">注:导入时注意，答案如果是多个，请以英文逗号隔开，如:A,B</span>{/if}
+            </div>
+        </div>
+    </div>
+    {/if}
+    <div class="carditem hidden">
+        {if $gametype=='tug'}
+        <div class="form-group">
+              <label class="col-lg-3 control-label">* 广告图</label>
+              <div class="col-lg-8">
+                {:tpl_image_one('topadv', $rotate['topadv'])}
+                <span class="help-block">800*200px</span>
+              </div>
+        </div>
+        {/if}
+        {if $gametype!='tug'}
+        <div class="form-group teamtypebox{if !dzgameteammode()} hidden{/if}">
+            <label class="col-lg-3 control-label">* 竞技模式</label>
+            <div class="col-lg-8">
+                <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.teamconfigbox').addClass('hidden'),$('.isteam2').removeClass('hidden'),$('.prize-lists .mc1 .rangeBox .m-b-10').addClass('hidden'),$('.prize-lists tr').filter(function(o, i) {return 'mc1' != $(i).attr('class')}).addClass('hidden');">
+                    <input type="radio" name="isteam" {if !isset($rotate['isteam']) || $rotate['isteam']=='2'}checked{/if} value="2"><span>个人竞技</span>
+                </label>
+                <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.teamconfigbox').removeClass('hidden'),$('.isteam2').addClass('hidden'),$('.prize-lists .mc1 .rangeBox .m-b-10').removeClass('hidden'),$('.prize-lists tr').filter(function(o, i) {return 'mc1' != $(i).attr('class')}).removeClass('hidden');">
+                    <input type="radio" name="isteam" {if isset($rotate['isteam']) && $rotate['isteam']=='1'}checked{/if} value="1"><span>团队竞技</span>
+                </label>
+            </div>
+        </div>
+        <div class="teamconfigbox{if !isset($rotate['isteam']) || $rotate['isteam']=='2'} hidden{/if}">
+            <div class="form-group">
+                <label class="col-lg-3 control-label">* 入队模式</label>
+                <div class="col-lg-8">
+                    <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.jointypebox3').addClass('hidden'),$('.btn-teamuser').addClass('hidden');">
+                        <input type="radio" name="teamconfig[jointype]" {if !isset($rotate['teamconfig']) || !isset($rotate['teamconfig']['jointype']) || (isset($rotate['teamconfig']['jointype']) && $rotate['teamconfig']['jointype']=='1')}checked{/if} value="1"><span>用户自选团队</span>
+                    </label>
+                    <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.jointypebox3').addClass('hidden'),$('.btn-teamuser').addClass('hidden');">
+                        <input type="radio" name="teamconfig[jointype]" {if isset($rotate['teamconfig']) && (isset($rotate['teamconfig']['jointype']) && $rotate['teamconfig']['jointype']=='2')}checked{/if} value="2"><span>系统随机分配团队</span>
+                    </label>
+                    <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.jointypebox3').removeClass('hidden'),$('.btn-teamuser').removeClass('hidden');">
+                        <input type="radio" name="teamconfig[jointype]" {if isset($rotate['teamconfig']) && (isset($rotate['teamconfig']['jointype']) && $rotate['teamconfig']['jointype']=='3')}checked{/if} value="3"><span>主办方分配团队</span>
+                    </label>
+                    <span class="help-block">
+                    <div>注:入队模式选择了主办方分配团队 需添加轮次成功后编辑轮次才可以新增团队成员</div>
+                    </span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-3 control-label">* 单个团队人数上限</label>
+                <div class="col-lg-2">
+                   <input type="text" class="form-control numberincdec" name="teamconfig[max]" 
+                    data-bts-min="1" data-bts-replacement-val="1"
+                    data-bts-max="null"
+                    data-bts-step="1"
+                    value="{$rotate['teamconfig']['max']??'10'}">
+                    <span class="zam-help-block">注:必须大于0</span>
+                </div>
+            </div>
+            {if $gametype!='answerbs'}
+            <div class="form-group">
+                <label class="col-lg-3 control-label">* 计分模式</label>
+                <div class="col-lg-8">
+                    <label class="lyear-radio radio-inline radio-primary">
+                        <input type="radio" name="teamconfig[scoretype]" {if !isset($rotate['teamconfig']) || !isset($rotate['teamconfig']['scoretype']) || (isset($rotate['teamconfig']['scoretype']) && $rotate['teamconfig']['scoretype']=='1')}checked{/if} value="1"><span>总分</span>
+                    </label>
+                    <label class="lyear-radio radio-inline radio-primary">
+                        <input type="radio" name="teamconfig[scoretype]" {if isset($rotate['teamconfig']) && (isset($rotate['teamconfig']['scoretype']) && $rotate['teamconfig']['scoretype']=='2')}checked{/if} value="2"><span>平均分</span>
+                    </label>
+                    <span class="help-block">
+                    <div>注:平均分即为团队总成绩除以团队总人数</div>
+                    </span>
+                </div>
+            </div>
+            {/if}
+            <div class="form-group jointypebox3{if isset($rotate['teamconfig']['jointype']) && $rotate['teamconfig']['jointype']=='3'}{else /} hidden{/if}">
+                <label class="col-lg-3 control-label">* 未分配团队的用户扫码提示语</label>
+                <div class="col-lg-8">
+                   <input class="form-control" type="text"  name="teamconfig[noteamword]" value="{$rotate['teamconfig']['noteamword']??'主办方暂未给您分配团队'}" maxlength="20">
+                   <span class="zam-help-block">注:此项仅限主办方分配团队时某些用户并未分配团队，用户扫码参与后显示的提示语</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-3 control-label">* 团队列表</label>
+                <div class="col-lg-9">
+                    <table class="table teams-table">
+                        <thead style="border: 1px solid #efefef;">
+                          <tr>
+                            <td colspan="3">
+                              <a  class="btn btn-primary btn-xs pull-left btn-addteam{if $rotate['status']!='1'} disabled{/if}" href="javascript:;"> <i class="mdi mdi-plus"></i>&nbsp;<span>新增团队</span></a>
+                              {if isset($rotate['id']) && isset($rotate['isteam']) && $rotate['isteam']=='1' && isset($rotate['teamconfig']) && !empty($rotate['teamconfig']) && $rotate['teamconfig']['jointype']=='3'}
+                              <a  class="btn btn-warning btn-xs pull-right btn-teamuser{if $rotate['status']!='1'} disabled{/if}" href="javascript:;"> <i class="mdi mdi-pencil"></i>&nbsp;<span>管理团队成员</span></a>
+                              {/if}
+                            </td>
+                          </tr>
+                        </thead>
+                        <thead>
+                          <tr>
+                            <th style="width:30%;text-align:center;">团队名称</th>
+                            <th style="width:30%;text-align:center;">团队队标</th>
+                            <th style="width:40%;text-align:center;">操作</th>
+                          </tr>
+                        </thead>
+                        <tbody class="team-lists">
+                            {foreach $teams as $team}
+                                <tr>
+                                    <td>
+                                       <p>{$team['teamname']}</p>
+                                       <input type="hidden" name="team[teamname][]" value="{$team['teamname']}">
+                                    </td>
+                                    <td>
+                                        <img class="" src="{:tomedia($team['teamlogo'])}">
+                                        <input type="hidden" name="team[teamlogo][]" value="{$team['teamlogo']}">
+                                    </td>
+                                    <td>
+                                      <a href="javascript:;" class="btn btn-primary btn-xs btn-edit{if $rotate['status']!='1'} disabled{/if}" data-teamid="{$team['id']}">
+                                          <i class="mdi mdi-pencil"></i>
+                                      </a>
+                                      <a href="javascript:;" class="btn btn-primary btn-xs btn-qr" data-teamid="{$team['id']}">
+                                          <i class="mdi mdi-qrcode"></i>
+                                      </a>
+                                      <a href="javascript:;" class="btn btn-danger btn-xs btn-del{if $rotate['status']!='1'} disabled{/if}" data-teamid="{$team['id']}">
+                                          <i class="mdi mdi-close"></i>
+                                      </a>
+                                    </td>
+                                </tr>
+                            {/foreach}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {/if}
+        {if $openpayjoin!='2'}
+            {php}
+            if($openpayjoin=='3'){
+                $rotate['needpayjoin'] = 1;
+            }
+            {/php}
+            <div class="form-group">
+                <label class="col-lg-3 control-label">* 付费参与游戏</label>
+                <div class="col-lg-8">
+                    {:tpl_switch('needpayjoin',$rotate['needpayjoin'],'openpayjoin')}
+                    <span class="zam-help-block p-t-0">注:开启后用户参与游戏需先支付一定费用才可参与游戏</span>
+                </div>
+            </div>
+            <div class="form-group joinfeebox{if $rotate['needpayjoin']=='2'} hidden{/if}">
+                <label class="col-lg-3 control-label">* 费用</label>
+                <div class="col-lg-3">
+                   <input type="text" class="form-control numberincdec" name="payfee" 
+                    data-bts-min="{if $openpayjoin=='3'}1{else /}0.01{/if}"
+                    data-bts-max="null"
+                    data-bts-decimals="2"
+                    data-bts-step="1"
+                    data-bts-force-step-divisibility="xstwo"
+                    value="{if $openpayjoin=='3' && $rotate['payfee'] < 1}1{else /}{$rotate['payfee']}{/if}">
+                    <span class="zam-help-block">注:参与费用必须大于{if $openpayjoin=='3'}1{else /}0{/if}元，可保留2位小数</span>
+                </div>
+            </div>
+        {/if}
+        <div class="form-group isteam2{if isset($rotate['isteam']) && $rotate['isteam']=='1'} hidden{/if}">
+            <label class="col-lg-3 control-label">* 游戏自动开始</label>
+            <div class="col-lg-8">
+                {:tpl_switch('autorun',$rotate['autorun'],'openautorun')}
+                <span class="zam-help-block p-t-0">注:开启后，在线人数达到基础人数就会自动开始，无需点击开始按钮</span>
+            </div>
+        </div>
+        <div class="form-group autorunbox{if $rotate['autorun']=='2'} hidden{/if}">
+            <label class="col-lg-3 control-label">* 基础人数</label>
+            <div class="col-lg-3">
+                <input type="text" class="form-control numberincdec autorunnum" name="autorunnum" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="10000"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['autorunnum']}">
+                <span class="zam-help-block">注:必须大于0</span>
+            </div>
+        </div>
+        {if dzgamend() && $gametype!='tug' && $gametype!='answerbs' && $gametype!='puzzle'}
+        <div class="form-group isteam2{if request()->opengamend=='2' || (isset($rotate['isteam']) && $rotate['isteam']=='1')} hidden{/if}" {if request()->opengamend=='2'}style="display:none!important"{/if}>
+            <label class="col-lg-3 control-label">* 特别用户</label>
+            <div class="col-lg-9 yautooverflow">
+                <table class="table" style="margin-bottom:0px;">
+                    <thead>
+                      <tr>
+                        <th style="width:50%;text-align:center;">用户</th>
+                        <th style="width:50%;text-align:center;">操作</th>
+                      </tr>
+                    </thead>
+                    <tbody class="nduser-lists">
+                        {volist name="rotate.ndids" id="nduser"}
+                            <tr>
+                                <td class="text-center">
+                                    <img class="userimg" src="{:tomedia($nduser['avatar']);}">
+                                    <p>{$nduser['nickname']}</p>
+                                    <input type="hidden" name="ndids[]" value="{$nduser['userid']}">
+                                </td>
+                                <td class="text-center">
+                                  <a href="javascript:;"  class="btn btn-danger btn-xs btn-del"><i class="mdi mdi-close"></i></a>
+                                </td>
+                            </tr>
+                        {/volist}
+                    </tbody>
+                    <tfoot style="border: 1px solid #efefef;">
+                      <tr>
+                        <td colspan="2">
+                          <a  class="btn btn-primary btn-xs adduser" href="javascript:;"> <i class="mdi mdi-plus"></i>&nbsp;<span>添加用户</span></a>
+                        </td>
+                      </tr>
+                    </tfoot>
+                </table>
+                <span class="zam-help-block">注:每个用户每轮可以内定一次，内定先后决定对应名次，第一个内定的即为第一名，以此类推</span>
+            </div>
+        </div>
+        {/if}
+        {if $gametype == 'dgshake' && $hasbindconfig == '1'}
+            <div class="bindconfig isteam2{if isset($rotate['isteam']) && $rotate['isteam']=='1'} hidden{/if}">
+                <div class="form-group">
+                    <label class="col-lg-3 control-label">* 关联答题轮次</label>
+                    <div class="col-lg-8">
+                        {:tpl_switch('bindconfig[open]',$rotate['bindconfig']['open']??'2','openbindconfig')}
+                        <span class="zam-help-block p-t-0">注:开启后须选择对应的答题轮次并设置答对题目数量</span>
+                    </div>
+                </div>
+                <div class="bindanswerbox{if !isset($rotate['bindconfig']['open']) || $rotate['bindconfig']['open'] != '1'} hidden{/if}">
+                    <div class="form-group">
+                        <label class="col-lg-3  control-label">选择轮次</label>
+                        <div class="col-lg-8">   
+                            <select name="bindconfig[rotateid]" class="bindrotateid form-control">
+                                {foreach $answerbsrotates as $r}
+                                <option value="{$r['id']}" {if isset($rotate['bindconfig']['rotateid']) && $r['id'] == $rotate['bindconfig']['rotateid']}selected="selected"{/if}>{$r['title']}</option>
+                                {/foreach}
+                            </select>
+                            <div class="help-block">注：必须选一个轮次</div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-3 control-label">* 至少答对多少题才可参与游戏</label>
+                        <div class="col-lg-6">
+                            <input type="text" class="form-control numberincdec" name="bindconfig[num]" 
+                            data-bts-min="1" data-bts-replacement-val="1"
+                            data-bts-max="null"
+                            data-bts-step="1"
+                            data-bts-postfix="题"
+                            data-bts-postfix-extra-class="touchspin-postfix"
+                            value="{$rotate['bindconfig']['num']??8}">
+                            <span class="help-block">至少是1题</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-3 control-label">* 答对题目数量不足无法参与游戏提示文案</label>
+                        <div class="col-lg-8">
+                            <input class="form-control title" type="text"  name="bindconfig[tip]" value="{$rotate['bindconfig']['tip']??'答对题目数量不足，无法参与游戏'}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {/if}
+    </div>
+    <div class="carditem hidden">
+        <div class="form-group{if $gametype=='tug'} hidden{/if}">
+            <label class="col-lg-3 control-label">* 结束时大屏排行榜展示个数</label>
+            <div class="col-lg-6">
+                <input type="text" class="form-control numberincdec endphb" name="endphb" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="{if $gametype!='cutfruit'}20{else /}10{/if}"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['endphb']}">
+                <span class="zam-help-block">注:必须大于0，小于等于{if $gametype!='cutfruit'}20{else /}10{/if}</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* {if $gametype=='tug'}队伍排名人数{else /}游戏总排名个数{/if}</label>
+            <div class="col-lg-6">
+                <input type="text" class="form-control numberincdec gamephb" name="gamephb" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="10000"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$rotate['gamephb']}">
+                <span class="help-block">注:对个人或团队总成绩降序排名，大屏幕点击排名或微信端点击排行榜按钮后可以展现出来</span>
+            </div>
+        </div>
+        {if $gametype!='tug'}
+        <div class="form-group isteam2{if (isset($rotate['isteam']) && $rotate['isteam']=='1') || $gametype=='tug'} hidden{/if}">
+            <label class="col-lg-3 control-label">* 大屏排行榜奖品信息</label>
+            <div class="col-lg-8">
+                {:tpl_switch('showphbaward',$rotate['showphbaward'])}
+                <span class="help-block p-t-0">注:轮次若未设置奖品，建议关闭{if dzgameteammode()}，团队竞技模式此项无效{/if}</span>
+            </div>
+        </div>
+        {/if}
+        <div class="form-group{if $gametype=='tug'} hidden{/if}">
+            <label class="col-lg-3 control-label">* 微信端排名按钮</label>
+            <div class="col-lg-8">
+                {:tpl_switch('appshowphbbtn',$rotate['appshowphbbtn'])}
+                <span class="help-block p-t-0">注:开启后微信用户点击排行榜按钮可以查看自己的成绩与排行榜信息</span>
+            </div>
+        </div>
+        {if $gametype=='answerbs' && dzanswerbs()}
+            <div class="form-group">
+                <label class="col-lg-3 control-label">* 团队模式</label>
+                <div class="col-lg-8">
+                    {:tpl_switch('groupconfig[open]',$rotate['groupconfig']['open']??'2','answerbsgroup')}
+                    <span class="help-block p-t-0">注:开启后大屏幕将展示团队排行榜以及答题分析按钮</span>
+                </div>
+            </div>
+            <div class="groupconfigbox{if !isset($rotate['groupconfig']) || $rotate['groupconfig']['open']=='2'} hidden{/if}">
+                <div class="form-group">
+                    <label class="col-lg-3 control-label">* 团队分组类型</label>
+                    <div class="col-lg-8">
+                        <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.selectitemsBox').addClass('hidden');">
+                           <input type="radio" name="groupconfig[type]" value="1" {if !isset($rotate['groupconfig']['type']) || $rotate['groupconfig']['type']=='1'}checked{/if}><span>自定义分组</span>
+                        </label>
+                         <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.selectitemsBox').removeClass('hidden');">
+                           <input type="radio" name="groupconfig[type]" value="2" {if isset($rotate['groupconfig']['type']) && $rotate['groupconfig']['type']=='2'}checked{/if}><span>签到分组</span>
+                        </label>
+                        <span class="help-block">注:默认自定义分组，需要通过签到验证实现微信用户自动分配自定义分组，如您在无法提前预知参与用户姓名或者手机号的情况下可通过签到下拉框分组来实现</span>
+                    </div>
+                </div>
+                <div class="form-group selectitemsBox{if !isset($rotate['groupconfig']['type']) || $rotate['groupconfig']['type']=='1'} hidden{/if}">
+                    <label class="col-lg-3 control-label">* 选择下拉框分组</label>
+                    <div class="col-lg-8">
+                        {if !empty($selectitems)}
+                        {foreach $selectitems as $item}
+                        <label class="lyear-radio radio-inline radio-primary">
+                           <input type="radio" name="groupconfig[selectzd]" value="{$item['zd']}" {if !isset($rotate['groupconfig']['selectzd']) || $rotate['groupconfig']['selectzd']==$item['zd']}checked{/if}><span>{$item['title']}</span>
+                        </label>
+                        {/foreach}
+                        {else /}
+                        <div class="form-control-static"><span class="text-danger">请先添加签到下拉框表单项</span></div>
+                        {/if}
+                        <span class="help-block">请选择某一个下拉框表单项作为团队分组</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-3 control-label">* 团队签到</label>
+                    <div class="col-lg-8">
+                        {:tpl_switch('groupconfig[sign]',$rotate['groupconfig']['sign']??'1')}
+                        <span class="help-block p-t-0">注:开启后可通过按键盘小于号键打开或关闭查看团队签到情况</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-3 control-label">* 团队排行</label>
+                    <div class="col-lg-8">
+                        {:tpl_switch('groupconfig[pm]',$rotate['groupconfig']['pm']??'1')}
+                        <span class="help-block p-t-0">注:开启则游戏结束会显示团队排行按钮，可以通过点击键盘up键打开或关闭团队排行页面</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-3 control-label">* 答题分析</label>
+                    <div class="col-lg-8">
+                        {:tpl_switch('groupconfig[analyse]',$rotate['groupconfig']['analyse']??'1')}
+                        <span class="help-block p-t-0">注:开启则游戏结束会显示答题分析按钮，可以通过点击键盘down键打开或关闭答题分析页面</span>
+                    </div>
+                </div>
+            </div>
+        {/if}
+    </div>
+    <div class="carditem hidden">
+        {include file="common/gameprize" /}
+    </div>
+</form>
+</div>
+<script id='newquestion-tpl' type="text/template">
+    <tr <%# if(d.id){ %>data-quesid="<% d.id %>"<%# } %>>
+        <td>
+           <p>
+            <span class="label label-<%# if(d.yesanswer&&d.yesanswer.indexOf(',')>-1){ %>danger<%# }else{ %>primary<%# } %>">
+            <%# if(d.yesanswer&&d.yesanswer.indexOf(',')>-1){ %>多选<%# }else{ %>单选<%# } %>题
+           </span>
+           </p>
+           <%# if(!d.id){ %>
+                <input type="hidden" name="yesanswer[]" value="<% d.yesanswer %>">
+           <%# } %>
+        </td>
+        <td>
+            <p><% d.questitle %></p>
+            <%# if(!d.id){ %>
+                <input type="hidden" name="questitle[]" value='<% d.questitle %>' />
+            <%# } %>
+        </td>
+        <td>
+           <p>
+            <%# if(d.yesanswer.indexOf('A')>-1){ %><div>A: <% d.answera %></div><%# } %>
+            <%# if(d.yesanswer.indexOf('B')>-1){ %><div>B: <% d.answerb %></div><%# } %>
+            <%# if(d.yesanswer.indexOf('C')>-1){ %><div>C: <% d.answerc %></div><%# } %>
+            <%# if(d.yesanswer.indexOf('D')>-1){ %><div>D: <% d.answerd %></div><%# } %>
+            <%# if(d.yesanswer.indexOf('E')>-1){ %><div>E: <% d.answere %></div><%# } %>
+            <%# if(d.yesanswer.indexOf('F')>-1){ %><div>F: <% d.answerf %></div><%# } %>
+           </p>
+           <%# if(!d.id){ %>
+                <input type="hidden" name="answera[]" value="<% d.answera %>">
+                <input type="hidden" name="answerb[]" value="<% d.answerb %>">
+                <input type="hidden" name="answerc[]" value="<% d.answerc %>">
+                <input type="hidden" name="answerd[]" value="<% d.answerd %>">
+                <input type="hidden" name="answere[]" value="<% d.answere %>">
+                <input type="hidden" name="answerf[]" value="<% d.answerf %>">
+           <%# } %>
+        </td>
+        <td>
+          <a href="javascript:;" <%# if(d.id){ %>data-quesid="<% d.id %>"<%# }else{ %>data-questitle='<% d.questitle %>' data-answera="<% d.answera %>" data-answerb="<% d.answerb %>" data-answerc="<% d.answerc %>" data-answerd="<% d.answerd %>" data-answere="<% d.answere %>" data-answerf="<% d.answerf %>"  data-yesanswer="<% d.yesanswer %>"<%# } %> class="btn btn-primary btn-xs btn-edit{if $rotate['status']!='1'} disabled{/if}"><i class="mdi mdi-pencil"></i></a>
+          <a href="javascript:;" <%# if(d.id){ %>data-quesid="<% d.id %>"<%# } %> class="btn btn-info btn-xs sortmove{if $rotate['status']!='1'} disabled{/if}" title="拖动排序"><i class="mdi mdi-arrow-all"></i></a>
+          <a href="javascript:;" <%# if(d.id){ %>data-quesid="<% d.id %>"<%# } %> class="btn btn-danger btn-xs btn-del{if $rotate['status']!='1'} disabled{/if}"><i class="mdi mdi-close"></i></a>
+        </td>
+    </tr>
+</script>
+<script id='newpuzzle-tpl' type="text/template">
+    <tr>
+        <td>
+        <p>
+            <span><%# if(d.prows == '2'){ %>4<%# }else if(d.prows == '3'){ %>9<%# }else{ %>16<%# } %>宫格</span>
+            <input type="hidden" name="roundimages[prows][]" value="<% d.prows %>">
+        </p>
+        </td>
+        <td>
+            <img src="<% d.pimgprev %>">
+            <input type="hidden" name="roundimages[pimg][]" value="<% d.pimg %>">
+        </td>
+        <td>
+            <span><% d.pscore %>分</span>
+            <input type="hidden" name="roundimages[pscore][]" value="<% d.pscore %>">
+        </td>
+        <td>
+            <a href="javascript:;" class="btn btn-primary btn-xs btn-edit"><i class="mdi mdi-pencil"></i></a>
+            <a href="javascript:;" class="btn btn-danger btn-xs btn-del"><i class="mdi mdi-close"></i></a>
+            <a href="javascript:;"  class="btn btn-info btn-xs sortmove" title="拖动排序"><i class="mdi mdi-arrow-all"></i></a>
+        </td>
+    </tr>
+</script>
+<script id='newteam-tpl' type="text/template">
+    <tr>
+        <td>
+           <p><% d.teamname %></p>
+           <input type="hidden" name="team[teamname][]" value="<% d.teamname %>">
+        </td>
+        <td>
+            <img class="" src="<% d.teamlogourl %>">
+            <input type="hidden" name="team[teamlogo][]" value="<% d.teamlogo %>">
+        </td>
+        <td>
+          <a href="javascript:;" class="btn btn-primary btn-xs btn-edit" <%# if(d.id){ %>data-teamid="<% d.id %>"<%# } %>>
+              <i class="mdi mdi-pencil"></i>
+          </a>
+          <%# if(d.id){ %>
+              <a href="javascript:;" class="btn btn-primary btn-xs btn-qr" <%# if(d.id){ %>data-teamid="<% d.id %>"<%# } %>>
+                  <i class="mdi mdi-qrcode"></i>
+              </a>
+          <%# } %>
+          <a href="javascript:;" class="btn btn-danger btn-xs btn-del" <%# if(d.id){ %>data-teamid="<% d.id %>"<%# } %>>
+              <i class="mdi mdi-close"></i>
+          </a>
+        </td>
+    </tr>
+</script>         
+<script>    
+require(['webcore','jconfirmBox','zamnotice','layerBox',"ueditor","bootstrap-touchspin","jquery.ui","select2-zhcn"],function(webcore,jconfirmBox,zamnotice,layerBox,UE){
+    {if $gametype == 'dgshake' && $hasbindconfig == '1'}
+        if($('.bindrotateid').length > 0){
+            $('.bindrotateid').select2({placeholder: '请选择'});
+            $(".bindrotateid").val("{$rotate['bindconfig']['rotateid']??0}").trigger("change");
+        }
+    {/if}
+    $('.puzzle-lists').sortable({handle: ".sortmove"}).disableSelection();
+    $(".confirmbox-pop .pop-btns a.btn").click(function(){
+        $(this).addClass('btn-primary').siblings().removeClass("btn-primary");
+        $(".confirmbox-pop .carditem").addClass('hidden').eq($(this).index()).removeClass('hidden');
+    });
+    tpl_switch();
+    $(".confirmbox-pop .numberincdec").TouchSpin().on("change", function(){
+        var $this = $(this),funcstr = $this.data('func');
+        var func = window[funcstr];
+        func && func();
+    });
+    var rotateid = "{if isset($rotate['id'])}{$rotate['id']}{else}{/if}";
+    $('.question-lists').sortable({
+        handle: ".sortmove",
+        scroll:false,
+        start: function(event, ui) {
+            var $this = $(this);
+            if(rotateid){
+                webcore.ajaxSubmit("{:gohdmanage('common/sortquestion',['hdid'=>$hdid])}",{type:'1',rotateid:rotateid}).then(function(json){
+                    if(json.code != 0){
+                        $this.sortable('cancel');
+                        layerBox.showMsg(json.msg||'排序出现异常');
+                    }
+                }, function(json){
+                    $this.sortable('cancel');
+                    layerBox.showMsg('排序出现异常');
+                });
+            }
+        },
+        update: function(event, ui) {
+            var $this = $(this),trs = $this.find('tr');
+            if(rotateid){
+                var ids = [];
+                trs.each(function(){
+                    ids.push($(this).attr('data-quesid'));
+                });
+                webcore.ajaxSubmit("{:gohdmanage('common/sortquestion',['hdid'=>$hdid])}",{type:'2',rotateid:rotateid,ids:ids}).then(function(json){
+                    if(json.code != 0){
+                        $this.sortable('cancel');
+                        layerBox.showMsg(json.msg||'排序出现异常');
+                    }
+                }, function(json){
+                    layerBox.showMsg('排序出现异常');
+                    $this.sortable('cancel');
+                });
+            }
+        }
+    }).disableSelection();
+    $(".addquestion").on('click',function(){
+        var confirmObj2 = jconfirmBox.ajaxconfirm("新增题目","{:gohdmanage('common/gamequestion',['hdid'=>$hdid])}",{},'html','col-lg-10 col-lg-offset-1',function(e){
+            var answera = e.find(".answera").val(),answerb = e.find(".answerb").val(),answerc = e.find(".answerc").val(),answerd = e.find(".answerd").val(),answere = e.find(".answere").val(),answerf = e.find(".answerf").val()||'';
+            var questitle = UE.getEditor('questitle').getContent();
+            if(questitle==''){
+                layerBox.showMsg('请设置题目');
+                return false;
+            }
+            if(questitle==''){
+                layerBox.showMsg('请设置题目');
+                return false;
+            }
+            if(answera==''||answerb==''){
+                layerBox.showMsg('请A与B选项必须设置');
+                return false;
+            }
+            var yesarr = ['A','B'];
+            if(answerc!=''){
+                yesarr.push('C');
+            }
+            if(answerd!=''){
+                yesarr.push('D');
+            }
+            if(answere!=''){
+                yesarr.push('E');
+            }
+            if(answerf!=''){
+                yesarr.push('F');
+            }
+            if(answerc==''&&answerd!=''){
+                layerBox.showMsg('选项C未填写内容');
+                return false;
+            }
+            if(answerd==''&&answere!=''){
+                layerBox.showMsg('选项D未填写内容');
+                return false;
+            }
+            if(answere==''&&answerf!=''){
+                layerBox.showMsg('选项E未填写内容');
+                return false;
+            }
+            var yesanswer = [];
+            var checkanswer = true;
+            e.find("input:checkbox").each(function(i){
+                if(this.checked){
+                    var oneanswer = $(this).val(),xxval = $(this).parent().parent().prev().val();
+                    if($.inArray(oneanswer,yesarr)==-1 || xxval.replace(/\s+/g, "")==''){
+                        checkanswer = false;
+                        return false;
+                    }
+                    yesanswer.push(oneanswer);
+                }
+            });
+            if(!checkanswer) {
+                layerBox.showMsg('作为正确答案的选项必须填写选择内容');
+                return false;
+            }
+            if(yesanswer.length==0){
+                layerBox.showMsg('请勾选题目正确答案');
+                return false;
+            }else{
+                yesanswer = yesanswer.join(',');
+            }
+            var questionArr = {
+                questitle:questitle,
+                answera:answera,
+                answerb:answerb,
+                answerc:answerc,
+                answerd:answerd,
+                answere:answere,
+                answerf:answerf,
+                yesanswer:yesanswer
+            };
+            if(rotateid!=''){
+                webcore.ajaxSubmit("{:gohdmanage('common/savequestion',['hdid'=>$hdid])}",{rotateid:rotateid,questionarr:questionArr}).then(function(json){
+                    if(json.code==0){
+                        confirmObj2.close();
+                        questionArr.id = json.msg;
+                        $(".question-lists").append(webcore.tpl($("#newquestion-tpl"),questionArr));
+                        zamnotice.showTips('success','新增成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差。操作失败');
+                });
+            }else{
+                if(questionArr.answerc=='') questionArr.answerc = " ";
+                if(questionArr.answerd=='') questionArr.answerd = " ";
+                if(questionArr.answere=='') questionArr.answere = " ";
+                if(questionArr.answerf=='') questionArr.answerf = " ";
+                $(".question-lists").append(webcore.tpl($("#newquestion-tpl"),questionArr));
+                confirmObj2.close();
+            }
+        });
+    });
+    $(".importquestion").on('click',function() {
+        webcore.importxls({title:'导入题目信息',url:"{:gohdmanage('configanswerbs/import',['hdid'=>$hdid])}&rotateid="+rotateid,moban:"/{:SYSIMGURL}excel/answerbs.xls?t=1",uptxt:"点击上传题目信息",xlstxt:"注:请务必严格按照模板内容制作xls文件"},function(data){
+            if(data.length > 0){
+                var html = '';
+                $.each(data,function(index,val){
+                    if(val.answerc=='') val.answerc = " ";
+                    if(val.answerd=='') val.answerd = " ";
+                    if(val.answere=='') val.answere = " ";
+                    if(val.answerf=='') val.answerf = " ";
+                    html += webcore.tpl($("#newquestion-tpl"),val);
+                });
+                $(".question-lists").append(html);
+            }
+        });
+    });
+    $(".question-lists").on('click','.btn-edit',function(){
+        var $this = $(this),fdom = $this.parent().parent(); 
+        var quesid = $this.attr('data-quesid');
+        var editquestionarr = '';
+        if(quesid==null){
+            editquestionarr = {
+                questitle:$this.attr('data-questitle'),
+                answera:$this.attr('data-answera'),
+                answerb:$this.attr('data-answerb'),
+                answerc:$this.attr('data-answerc'),
+                answerd:$this.attr('data-answerd'),
+                answere:$this.attr('data-answere'),
+                answerf:$this.attr('data-answerf'),
+                yesanswer:$this.attr('data-yesanswer'),
+            };
+        }
+        var confirmObj3 = jconfirmBox.ajaxconfirm("编辑题目","{:gohdmanage('common/gamequestion',['hdid'=>$hdid])}",{rotateid:rotateid,quesid:quesid,editquestionarr:editquestionarr},'html','col-lg-10 col-lg-offset-1',function(e){
+            var answera = e.find(".answera").val(),answerb = e.find(".answerb").val(),answerc = e.find(".answerc").val(),answerd = e.find(".answerd").val(),answere = e.find(".answere").val(),answerf = e.find(".answerf").val()||'';
+            var questitle = UE.getEditor('questitle').getContent();
+            if(questitle==''){
+                layerBox.showMsg('请设置题目');
+                return false;
+            }
+            if(answera==''||answerb==''){
+                layerBox.showMsg('请A与B选项必须设置');
+                return false;
+            }
+            var yesarr = ['A','B'];
+            if(answerc!=''){
+                yesarr.push('C');
+            }
+            if(answerd!=''){
+                yesarr.push('D');
+            }
+            if(answere!=''){
+                yesarr.push('E');
+            }
+            if(answerf!=''){
+                yesarr.push('F');
+            }
+            if(answerc==''&&answerd!=''){
+                layerBox.showMsg('选项C未填写内容');
+                return false;
+            }
+            if(answerd==''&&answere!=''){
+                layerBox.showMsg('选项D未填写内容');
+                return false;
+            }
+            if(answere==''&&answerf!=''){
+                layerBox.showMsg('选项E未填写内容');
+                return false;
+            }
+            var yesanswer = [];
+            var checkanswer = true;
+            e.find("input:checkbox").each(function(i){
+                if(this.checked){
+                    var oneanswer = $(this).val(),xxval = $(this).parent().parent().prev().val();
+                    if($.inArray(oneanswer,yesarr)==-1 || xxval.replace(/\s+/g, "")==''){
+                        checkanswer = false;
+                        return false;
+                    }
+                    yesanswer.push(oneanswer);
+                }
+            });
+            if(!checkanswer) {
+                layerBox.showMsg('作为正确答案的选项必须填写选择内容');
+                return false;
+            }
+            if(yesanswer.length==0){
+                layerBox.showMsg('请勾选题目正确答案');
+                return false;
+            }else{
+                yesanswer = yesanswer.join(',');
+            }
+            var questionArr = {
+                questitle:questitle,
+                answera:answera,
+                answerb:answerb,
+                answerc:answerc,
+                answerd:answerd,
+                answere:answere,
+                answerf:answerf,
+                yesanswer:yesanswer
+            };
+            if(quesid){
+                webcore.ajaxSubmit("{:gohdmanage('common/savequestion',['hdid'=>$hdid])}",{rotateid:rotateid,quesid:quesid,questionarr:questionArr}).then(function(json){
+                    if(json.code==0){
+                        confirmObj3.close();
+                        questionArr.id = quesid;
+                        fdom.html($(webcore.tpl($("#newquestion-tpl"),questionArr)).html());
+                        zamnotice.showTips('success','编辑成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差。操作失败');
+                });
+            }else{
+                fdom.html($(webcore.tpl($("#newquestion-tpl"),questionArr)).html());
+                confirmObj3.close();
+            }
+        });
+    });
+    $(".question-lists").on('click','.btn-del',function(){
+        var $this = $(this);
+        var quesid = $this.attr('data-quesid');
+        jconfirmBox.confirm('温馨提示','删除将无法恢复，您确定要删除么？',function(){
+            if(quesid){
+                webcore.ajaxSubmit("{:gohdmanage('common/delquestion',['hdid'=>$hdid])}",{rotateid:rotateid,quesid:quesid}).then(function(json){
+                    if(json.code==0){
+                        zamnotice.showTips('success','删除成功');
+                        $this.parent().parent().remove();
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差，操作失败');
+                });
+            }else{
+                $this.parent().parent().remove();
+            }
+        });
+    });
+    $(".addpuzzle").on('click',function(){
+        var confirmObjadd = jconfirmBox.ajaxconfirm("新增关卡","{:gohdmanage('common/puzzleimage',['hdid'=>$hdid])}",{},'html','col-lg-10 col-lg-offset-1',function(e){
+            var prows = e.find(".prows").find('input:radio:checked').val() || 2,pimg = e.find(".pimg input").val() || '',pimgprev = e.find(".pimg img").attr('src') || '',pscore = e.find(".pscore").val() || '';
+            if(pimg==''){
+                layerBox.showMsg('关卡拼图必须设置');
+                return false;
+            }
+            $(".puzzle-lists").append(webcore.tpl($("#newpuzzle-tpl"),{
+                prows:prows,
+                pimg:pimg,
+                pimgprev:pimgprev,
+                pscore:pscore,
+            }));
+            confirmObjadd.close();
+        });
+    });
+    $(".puzzle-lists").on('click','.btn-edit',function(){
+        var $this = $(this),fdom = $this.parent().parent();
+        var editpuzzle = {
+            prows:fdom.find('input').eq(0).val(),
+            pimg:fdom.find('input').eq(1).val(),
+            pscore:fdom.find('input').eq(2).val(),
+        }; 
+        var confirmObjedit = jconfirmBox.ajaxconfirm("编辑关卡","{:gohdmanage('common/puzzleimage',['hdid'=>$hdid])}",{editpuzzle:editpuzzle},'html','col-lg-10 col-lg-offset-1',function(e){
+            var prows = e.find(".prows").find('input:radio:checked').val() || 2,pimg = e.find(".pimg input").val() || '',pimgprev = e.find(".pimg img").attr('src') || '',pscore = e.find(".pscore").val() || '';
+            if(pimg==''){
+                layerBox.showMsg('关卡拼图必须设置');
+                return false;
+            }
+            fdom.html($(webcore.tpl($("#newpuzzle-tpl"),{
+                prows:prows,
+                pimg:pimg,
+                pimgprev:pimgprev,
+                pscore:pscore
+            })).html());
+            confirmObjedit.close();
+        });
+    });
+    $(".puzzle-lists").on('click','.btn-del',function(){
+        var $this = $(this);
+        jconfirmBox.confirm('温馨提示','删除将无法恢复，您确定要删除么？',function(){
+            $this.parent().parent().remove();
+        });
+    });
+    $(".adduser").click(function(){
+        var confirmObj4 = jconfirmBox.ajaxconfirm("内定用户","{:gohdmanage('common/searchuser',['hdid'=>$hdid])}",{ishtml:'1'},'html','col-lg-8 col-lg-offset-2',function(e){
+            var selectuser = e.find("input:checked");
+            if(selectuser.length>0){
+                var html = '',userids = [],nduserobj = $(".nduser-lists input");
+                nduserobj.each(function(){
+                    userids.push($(this).val());
+                });
+                selectuser.each(function(){
+                    var $this = $(this),$thisp = $this.parent().parent(),userid = $this.attr('data-id');
+                    if($.inArray(userid,userids) > -1) return true; 
+                    html += webcore.tpl($("#nduser-tpl"),{id:userid,avatar:$thisp.next().attr('src'),nickname:$thisp.next().next().text()});
+                });
+                $(".nduser-lists").append(html);
+                confirmObj4.close();
+            }else{
+                zamnotice.showTips('error','请选择需内定的用户');
+            }
+        });
+    });
+    $(".nduser-lists").on('click','.btn-del',function(){
+        var $this = $(this);
+        jconfirmBox.confirm('温馨提示','您确定要删除么？',function(){
+            $this.parent().parent().remove();
+            zamnotice.showTips('success','删除成功');
+        });
+    });
+    $(".btn-addteam").on('click',function(){
+        var confirmObj5 = jconfirmBox.ajaxconfirm("新增团队","{:gohdmanage('common/editgameteam',['hdid'=>$hdid])}",{gametype:"{$gametype}"},'html','col-lg-8 col-lg-offset-2',function(e){
+            var teamname = e.find(".teamname").val(),teamlogo = e.find(".teamlogo input").val();
+            if(teamname=='' || teamlogo=='' ){
+                zamnotice.showTips('error','团队名称，团队队标必须设置');
+                return false;
+            }
+            var teaminfo = {
+                teamname:teamname,
+                teamlogo:teamlogo,
+                teamlogourl:e.find("img").attr('src'),
+            };
+            if(rotateid!=''){
+                webcore.ajaxSubmit("{:gohdmanage('common/savegameteam',['hdid'=>$hdid])}",{gametype:"{$gametype}",rotateid:rotateid,teamname:teamname,teamlogo:teamlogo}).then(function(json){
+                    if(json.code==0){
+                        confirmObj5.close();
+                        teaminfo.id = json.msg;
+                        $(".team-lists").append(webcore.tpl($("#newteam-tpl"),teaminfo));
+                        zamnotice.showTips('success','新增团队成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差。操作失败');
+                });
+            }else{
+                $(".team-lists").append(webcore.tpl($("#newteam-tpl"),teaminfo));
+                confirmObj5.close();
+            }
+        });
+    });
+    $(".team-lists").on('click','.btn-edit',function(){
+        var $this = $(this),fdom = $this.parent().parent(); 
+        var teamid = $this.attr('data-teamid');
+        var teamname = fdom.find('input').eq(0).val();
+        var teamlogo = fdom.find('input').eq(1).val();
+        var confirmObj6 = jconfirmBox.ajaxconfirm("修改团队信息","{:gohdmanage('common/editgameteam',['hdid'=>$hdid])}",{gametype:"{$gametype}",rotateid:rotateid,teamid:teamid,teamname:teamname,teamlogo:teamlogo},'html','col-lg-10 col-lg-offset-1',function(e){
+            teamname = e.find(".teamname").val();
+            teamlogo = e.find(".teamlogo input").val();
+            if(teamname=='' || teamlogo=='' ){
+                zamnotice.showTips('error','团队名称，团队队标必须设置');
+                return false;
+            }
+            var teaminfo = {
+                teamname:teamname,
+                teamlogo:teamlogo,
+                teamlogourl:e.find("img").attr('src'),
+            };
+            if(teamid){
+                webcore.ajaxSubmit("{:gohdmanage('common/savegameteam',['hdid'=>$hdid])}",{gametype:"{$gametype}",rotateid:rotateid,teamid:teamid,teamname:teamname,teamlogo:teamlogo}).then(function(json){
+                    if(json.code==0){
+                        confirmObj6.close();
+                        teaminfo.id = teamid;
+                        fdom.html($(webcore.tpl($("#newteam-tpl"),teaminfo)).html());
+                        zamnotice.showTips('success','保存成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差。操作失败');
+                });
+            }else{
+                fdom.html($(webcore.tpl($("#newteam-tpl"),teaminfo)).html());
+                confirmObj6.close();
+            }
+        });
+    });
+    $(".team-lists").on('click','.btn-del',function(){
+        var $this = $(this);
+        var teamid = $this.attr('data-teamid');
+        jconfirmBox.confirm('温馨提示','删除将无法恢复，您确定要删除么？',function(){
+            if(teamid){
+                webcore.ajaxSubmit("{:gohdmanage('common/delgameteam',['hdid'=>$hdid])}",{gametype:"{$gametype}",rotateid:rotateid,teamid:teamid}).then(function(json){
+                    if(json.code==0){
+                        zamnotice.showTips('success','删除成功');
+                        $this.parent().parent().remove();
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差，操作失败');
+                });
+            }else{
+                $this.parent().parent().remove();
+            }
+        });
+    });
+    $(".teams-table").on('click','.btn-teamuser',function(){
+        var confirmobj = jconfirmBox.ajaxconfirm("本轮团队成员管理","{:gohdmanage('common/gameteamusers',['hdid'=>$hdid])}",{rotateid:rotateid,gametype:"{$gametype}"},'html','col-lg-10 col-lg-offset-1',function(e){},false,'2');
+    });
+    $(".team-lists").on('click','.btn-qr',function(){
+        var $this = $(this),teamid = $this.attr('data-teamid');
+        var confirmobj = jconfirmBox.ajaxconfirm("入队二维码与链接","{:gohdmanage('common/gameteamjointype',['hdid'=>$hdid])}",{rotateid:rotateid,gametype:"{$gametype}",teamid:teamid},'html','col-lg-10 col-lg-offset-1',function(e){},false,'2');
+    });
+});
+function opendjs(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".djsbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".djsbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function isautoquestion(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".autoquestionbox").addClass('hidden');
+        $(".handquestionbox").removeClass('hidden');
+        var autoshowanswer = $(".handquestionbox input[name='autoshowanswer']").val();
+        console.log(autoshowanswer)
+        if(autoshowanswer == '1'){
+            $(".answershowsecondsbox").removeClass('hidden');
+        }else{
+            $(".answershowsecondsbox").addClass('hidden');
+        }
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".autoquestionbox,.answershowsecondsbox").removeClass('hidden');
+        $(".handquestionbox").addClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function isautoshowanswer(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".answershowsecondsbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".answershowsecondsbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openautorun(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".autorunbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".autorunbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openpayjoin(obj,status,url){
+    require(['webcore','zamnotice'],function(webcore,zamnotice){
+        if(status=='1'){
+            var openpayjoin = "{$openpayjoin}";
+            if(openpayjoin=='3'){
+                return zamnotice.showTips('error','已开启强制付费参与游戏无法关闭');
+            }
+            obj.prev().val('2');
+            obj.attr('data-status','2');
+            $(".joinfeebox").addClass('hidden');
+        }else{
+            obj.prev().val('1');
+            obj.attr('data-status','1');
+            $(".joinfeebox").removeClass('hidden');
+        }
+        obj.prev().prev().prop("checked",status=='1'?false:true);
+    });
+}
+function answerbsgroup(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".groupconfigbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".groupconfigbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openanswerbsscorebox(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".answerbsscorebox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".answerbsscorebox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openbindconfig(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".bindanswerbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".bindanswerbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+</script>
+<script type="text/template" id="nduser-tpl">
+<tr>
+    <td class="text-center">
+        <img class="userimg" src="<% d.avatar %>">
+        <p><% d.nickname %></p>
+        <input type="hidden" name="ndids[]" value="<% d.id %>">
+    </td>
+    <td class="text-center">
+      <a href="javascript:;"  class="btn btn-danger btn-xs btn-del"><i class="mdi mdi-close"></i></a>
+    </td>
+</tr>
+</script>

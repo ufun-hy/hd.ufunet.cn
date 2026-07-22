@@ -1,0 +1,291 @@
+<div class="form-horizontal confirmbox-pop">
+<form class="confirm-formbox" method="post">
+    <div class="text-center">
+        <div class="btn-group pop-btns" style="margin-bottom:10px;">
+          <a href="javascript:void(0)" class="btn btn-default btn-primary"><span>基础设置</span></a>
+          <a href="javascript:void(0)" class="btn btn-default"><span>高级设置</span></a>
+          <a href="javascript:void(0)" class="btn btn-default"><span>排行榜</span></a>
+        </div>
+    </div>
+    <div class="carditem">
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 轮次名</label>
+            <div class="col-lg-8">
+                <input class="form-control" type="text"  name="title" value="{$rotate['title']}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 游戏时间</label>
+            <div class="col-lg-4">
+                <input type="text" class="form-control numberincdec" name="gametime" 
+                data-bts-min="5" data-bts-replacement-val="5"
+                data-bts-max="null"
+                data-bts-step="1"
+                data-bts-postfix="秒"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$rotate['gametime']}">
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 红包总金额</label>
+            <div class="col-lg-4">
+                <input type="text" class="form-control numberincdec" name="totalmoney" 
+                data-bts-min="{$sendhbmin}" data-bts-replacement-val="{$sendhbmin}"
+                data-bts-max="null"
+                data-bts-decimals="2"
+                data-bts-step="1"
+                data-bts-postfix="元"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                data-bts-force-step-divisibility="xstwo"
+                value="{$rotate['totalmoney']}" {if isset($rotate['id'])}disabled{/if}>
+                <div class="help-block m-0"><span class="text-danger">请必须保证您的红包账户余额充足，账户余额不足会导致中奖用户无法收到红包</span>，<a href="{:gomyhome('account/index')}" target="__blank">点击充值</a></div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 总红包个数</label>
+            <div class="col-lg-4">
+                <input type="text" class="form-control numberincdec" name="totalnum" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="null"
+                data-bts-step="1"
+                data-bts-postfix="个"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$rotate['totalnum']}" {if isset($rotate['id'])}disabled{/if}>
+                <div class="help-block m-0"><span class="text-danger">轮次创建成功后，此项不可更改</span></div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 红包最小金额</label>
+            <div class="col-lg-4">
+                <input type="text" class="form-control numberincdec" name="minmoney" 
+                data-bts-min="{$sendhbmin}" data-bts-replacement-val="{$sendhbmin}"
+                data-bts-max="null"
+                data-bts-decimals="2"
+                data-bts-step="1"
+                data-bts-postfix="元"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                data-bts-force-step-divisibility="xstwo"
+                value="{$rotate['minmoney']}" {if isset($rotate['id'])}disabled{/if}>
+                <span class="help-block m-0">注:最小可以是{$sendhbmin}元，<span class="text-danger">轮次创建成功后，此项不可更改</span></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 红包最大金额</label>
+            <div class="col-lg-4">
+                <input type="text" class="form-control numberincdec" name="maxmoney" 
+                data-bts-min="{$sendhbmin}" data-bts-replacement-val="{$sendhbmin}"
+                data-bts-max="null"
+                data-bts-decimals="2"
+                data-bts-step="1"
+                data-bts-postfix="元"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                data-bts-force-step-divisibility="xstwo"
+                value="{$rotate['maxmoney']}" {if isset($rotate['id'])}disabled{/if}>
+                <div class="help-block m-0"><span class="text-danger">轮次创建成功后，此项不可更改</span></div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 红包提供方</label>
+            <div class="col-lg-8">
+                <input class="form-control" type="text"  name="sender" value="{$rotate['sender']}">
+            </div>
+        </div>
+    </div>
+    <div class="carditem hidden">
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 单次抢到概率</label>
+            <div class="col-lg-4">
+                <input type="text" class="form-control numberincdec" name="getgl" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="100"
+                data-bts-step="1"
+                data-bts-postfix="%"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$rotate['getgl']}">
+                <span class="help-block">设置的越大，用户抢到的红包的概率就越大</span>
+            </div>
+
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 本轮每个用户最多可中红包</label>
+            <div class="col-lg-4">
+                <input type="text" class="form-control numberincdec" name="canget" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="{$defaultconfig['redpackmaxnum']??10}"
+                data-bts-step="1"
+                data-bts-postfix="个"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$rotate['canget']}">
+                <span class="help-block">最多可设置为{$defaultconfig['redpackmaxnum']??10}个</span>
+            </div>
+        </div>
+        {if isset($rotate['id'])}
+        <style type="text/css">
+            .gdboxswitch .lyear-switch span{
+                cursor: not-allowed;
+            }
+            .gd-lists .btn{cursor: not-allowed;pointer-events: none;}
+        </style>
+        {/if}
+        <div class="form-group gdboxswitch">
+            <label class="col-lg-3 control-label">* 开启固定包</label>
+            <div class="col-lg-8">
+                {:tpl_switch('hadgd',$rotate['hadgd'],'hadgd')}
+                <div class="help-block m-0"><span class="text-danger">轮次创建成功后，此项不可更改</span></div>
+            </div>
+        </div>
+        <div class="form-group hadgdbox{if $rotate['hadgd']=='2'} hidden{/if}">
+            <label class="col-lg-3 control-label">固定包列表</label>
+            <div class="col-lg-8">
+                <table class="table" style="margin-bottom:0px;">
+                    <thead>
+                      <tr>
+                        <th style="width:35%;text-align:center;">金额</th>
+                        <th style="width:35%;text-align:center;">数量</th>
+                        <th style="width:30%;text-align:center;">操作</th>
+                      </tr>
+                    </thead>
+                    <tbody class="gd-lists">
+                        {if isset($rotate['gddetail']) && !empty($rotate['gddetail'])}
+                            {foreach $rotate['gddetail'] as $one}
+                            <tr>
+                                <td class="text-center">
+                                    <input type="text" class="form-control numberincdec" name="gditem[]" 
+                                        data-bts-min="{$sendhbmin}" data-bts-replacement-val="{$sendhbmin}"
+                                        data-bts-max="null"
+                                        data-bts-decimals="2"
+                                        data-bts-step="1"
+                                        data-bts-force-step-divisibility="xstwo"
+                                        value="{$one['baomoney']??$sendhbmin}" {if isset($rotate['id'])}readonly{/if}>
+                                </td>
+                                <td class="text-center">
+                                    <input type="text" class="form-control numberincdec" name="gdnum[]" 
+                                        data-bts-min="1" data-bts-replacement-val="1"
+                                        data-bts-max="null"
+                                        data-bts-step="1"
+                                        value="{$one['baonum']??'1'}" {if isset($rotate['id'])}readonly{/if}>
+                                </td>
+                                <td class="text-center">
+                                  <a href="javascript:;"  class="btn btn-danger btn-sm btn-del{if isset($rotate['id'])} disabled{/if}">删除</a>
+                                </td>
+                            </tr>
+                            {/foreach}
+                        {/if}
+                    </tbody>
+                    <tfoot style="border: 1px solid #efefef;">
+                      <tr>
+                        <td colspan="3">
+                          <a  class="btn btn-primary btn-xs addgd{if isset($rotate['id'])} disabled{/if}" href="javascript:;"> <i class="mdi mdi-plus"></i>&nbsp;<span>添加固定包</span></a>
+                          <div style="font-size: 12px;" class="m-t-5">轮次创建成功后，不可添加或删除固定包</div>
+                        </td>
+                      </tr>
+                    </tfoot>
+                </table>
+                <span class="zam-help-block">注:固定包不仅占用总金额还占用总红包个数，请结合您设置的总金额以及总个数合理设置固定包金额与个数</span>
+            </div>
+        </div>
+    </div>
+    <div class="carditem hidden">
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 结束自动展示排行榜</label>
+            <div class="col-lg-8">
+                {:tpl_switch('openphb',$rotate['openphb']??'1')}
+                <div>关闭后本轮游戏结束大屏幕将不会自动展示排行榜，游戏结束后可通过键盘空格键来加载排行榜</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 排行榜模式</label>
+            <div class="col-lg-8">
+              <label class="lyear-radio radio-inline radio-primary">
+                <input type="radio" name="phbtype" value="1" {if $rotate['phbtype']=='1'}checked{/if}>
+                <span>按单个红包从大到小</span>
+              </label>
+              <label class="lyear-radio radio-inline radio-primary">
+                <input type="radio" name="phbtype" value="2" {if $rotate['phbtype']=='2'}checked{/if}>
+                <span>按单个用户抢到总金额从大到小</span>
+              </label>
+              <div class="help-block">按单个红包排名即为抢到的红包越大，你就排的越靠前<br>按总金额排名即为抢到的所有红包总金额越大，你才能排的越靠前</div>
+            </div>
+         </div>
+         <div class="form-group">
+            <label class="col-lg-3 control-label">* 排行榜数量</label>
+            <div class="col-lg-5">
+                <input type="text" class="form-control numberincdec" name="phbnum" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="2000"
+                data-bts-step="1"
+                data-bts-postfix="人"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$rotate['phbnum']??'300'}">
+                <div class="help-block">注意：最少是1，最大是2000，加载的数量越大消耗的时间越长会导致排行榜出现的时间越长，推荐500内</div>
+            </div>
+        </div>
+    </div>
+</form>
+</div>
+<script id="gd-tpl" type="text/template">
+    <tr>
+        <td class="text-center">
+            <input type="text" class="form-control numberincdec" name="gditem[]" 
+                data-bts-min="{$sendhbmin}" data-bts-replacement-val="{$sendhbmin}"
+                data-bts-max="null"
+                data-bts-decimals="2"
+                data-bts-step="1"
+                data-bts-postfix="元"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                data-bts-force-step-divisibility="xstwo"
+                value="<% d.money %>">
+        </td>
+        <td class="text-center">
+            <input type="text" class="form-control numberincdec" name="gdnum[]" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="null"
+                data-bts-step="1"
+                data-bts-postfix="个"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="1">
+        </td>
+        <td class="text-center">
+          <a href="javascript:;"  class="btn btn-danger btn-sm btn-del">删除</a>
+        </td>
+    </tr>
+</script>                
+<script>    
+require(['webcore','jconfirmBox',"bootstrap-touchspin"],function(webcore,jconfirmBox){
+    $(".confirmbox-pop .pop-btns a.btn").click(function(){
+        $(this).addClass('btn-primary').siblings().removeClass("btn-primary");
+        $(".confirmbox-pop .carditem").addClass('hidden').eq($(this).index()).removeClass('hidden');
+    });
+    tpl_switch();
+    $(".confirmbox-pop .numberincdec").TouchSpin();
+    $(".addgd").on('click',function(){
+        var html = webcore.tpl($("#gd-tpl"),{money:1});
+        $(".gd-lists").append(html);
+        $(".confirmbox-pop .numberincdec").TouchSpin();
+    });
+    $(".gd-lists").on('click','.btn-del',function(){
+        $(this).parent().parent().remove();
+    });
+});
+function hadgd(obj,status,url){
+    require(['zamnotice'],function(zamnotice){
+        {// 已添加了轮次无法点击}
+            {if isset($rotate['id'])}
+                zamnotice.showTips('error','轮次创建成功后，此项不可更改');
+                return false;
+            {/if}
+        {// 已添加了轮次无法点击}
+        if(status=='1'){
+            obj.prev().val('2');
+            obj.attr('data-status','2');
+            $(".hadgdbox").addClass('hidden');
+        }else{
+            obj.prev().val('1');
+            obj.attr('data-status','1');
+            $(".hadgdbox").removeClass('hidden');
+        }
+        obj.prev().prev().prop("checked",status=='1'?false:true);
+    });
+}
+</script>

@@ -1,0 +1,122 @@
+
+<div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 首次加载历史签到数据数量</label>
+    <div class="col-lg-2">
+        <input type="text" class="form-control numberincdec" name="pcstyle[box][hisnum]" 
+        data-bts-min="0" data-bts-replacement-val="0"
+        data-bts-max="null"
+        data-bts-step="1"
+        data-bts-postfix="条"
+        data-bts-postfix-extra-class="touchspin-postfix"
+        value="{$config['pcstyle']['box']['hisnum']}">
+        <span class="help-block">0即为加载全部历史签到数据</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 单个记录滚动时间</label>
+    <div class="col-lg-2">
+        <input type="text" class="form-control numberincdec" name="pcstyle[box][rolltime]" 
+        data-bts-min="1" data-bts-replacement-val="1"
+        data-bts-max="100"
+        data-bts-step="1"
+        data-bts-postfix="秒"
+        data-bts-postfix-extra-class="touchspin-postfix"
+        value="{$config['pcstyle']['box']['rolltime']}">
+        <span class="help-block">设置的时间越大滚动的越慢</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 滚动列表头像边界</label>
+    <div class="col-lg-8">
+        <div class="input-group">
+            <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
+            <div class="touchspin">
+            <input type="text" class="form-control numberincdec" name="pcstyle[box][imgbordersize]" 
+            data-bts-min="1" data-bts-replacement-val="1"
+            data-bts-max="40"
+            data-bts-step="1"
+            data-bts-postfix="px"
+            data-bts-postfix-extra-class="touchspin-postfix"
+            value="{$config['pcstyle']['box']['imgbordersize']}">
+            </div>
+            <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+            {:tpl_color('pcstyle[box][imgbordercolor]',$config['pcstyle']['box']['imgbordercolor'])}
+        </div>
+        <span class="help-block">请根据实际情况设置</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 滚动列表姓名</label>
+    <div class="col-lg-8">
+        <div class="input-group">
+            <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
+            <div class="touchspin">
+            <input type="text" class="form-control numberincdec" name="pcstyle[box][namesize]" 
+            data-bts-min="1" data-bts-replacement-val="1"
+            data-bts-max="40"
+            data-bts-step="1"
+            data-bts-postfix="px"
+            data-bts-postfix-extra-class="touchspin-postfix"
+            value="{$config['pcstyle']['box']['namesize']}">
+            </div>
+            <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+            {:tpl_color('pcstyle[box][namecolor]',$config['pcstyle']['box']['namecolor'])}
+        </div>
+        <span class="help-block">请根据实际情况设置</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 滚动列表祝福语</label>
+    <div class="col-lg-8">
+        <div class="input-group">
+            <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
+            <div class="touchspin">
+            <input type="text" class="form-control numberincdec" name="pcstyle[box][messagesize]" 
+            data-bts-min="1" data-bts-replacement-val="1"
+            data-bts-max="60"
+            data-bts-step="1"
+            data-bts-postfix="px"
+            data-bts-postfix-extra-class="touchspin-postfix"
+            value="{$config['pcstyle']['box']['messagesize']}">
+            </div>
+            <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+            {:tpl_color('pcstyle[box][messagecolor]',$config['pcstyle']['box']['messagecolor'])}
+        </div>
+        <span class="help-block">请根据实际情况设置</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 左侧背景</label>
+    <div class="col-lg-8">
+        {:tpl_image_one('pcstyle[box][leftbg]',$config['pcstyle']['box']['leftbg'])}
+        <span class="help-block">规格:49*620px</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 中间背景</label>
+    <div class="col-lg-8">
+        {:tpl_image_one('pcstyle[box][centerbg]',$config['pcstyle']['box']['centerbg'])}
+        <span class="help-block">规格:1143*620px</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 右侧背景</label>
+    <div class="col-lg-8">
+        {:tpl_image_one('pcstyle[box][rightbg]',$config['pcstyle']['box']['rightbg'])}
+        <span class="help-block">规格:221*620px</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 左上角背景</label>
+    <div class="col-lg-8">
+        {:tpl_image_one('pcstyle[box][leftcorner]',$config['pcstyle']['box']['leftcorner'])}
+        <span class="help-block">规格:314*200px</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 右下角背景</label>
+    <div class="col-lg-8">
+        {:tpl_image_one('pcstyle[box][rightcorner]',$config['pcstyle']['box']['rightcorner'])}
+        <span class="help-block">规格:246*200px</span>
+    </div>
+</div>

@@ -1,0 +1,173 @@
+{include file='$Wpath/common/header'}
+<style>
+.award-lists tr td{text-align:center!important;}
+</style>
+<div class="alert alert-info">
+<i class="wi wi-bell"></i> 增加或删除奖品均需保存才可生效
+</div>
+<form id="itemForm" method="post" class="form-horizontal">
+<table class="we7-table table voteitemTable" style="margin-bottom:0px;">
+<thead>
+  <tr>
+	<th style="width:10%;text-align:center;">来源</th>
+	<th style="width:15%;text-align:center;">奖项名</th>
+	<th style="width:15%;text-align:center;">奖品名</th>
+	<th style="width:20%;text-align:center;">奖品图</th>
+	<th style="width:10%;text-align:center;">数量</th>
+	<th style="width:10%;text-align:center;">抽取数量</th>
+	<th style="width:20%;text-align:center;">操作</th>
+  </tr>
+</thead>
+<tbody class="award-lists">
+	{volist name="awards" id="award"}
+		<tr>
+			<td>
+				<input type="hidden" name="phototype[]" value="{$award['phototype']??'1'}">
+				{if isset($award['phototype']) && $award['phototype'] == '2'}
+				上墙图片
+				{elseif isset($award['phototype']) && $award['phototype'] == '3'}
+				霸屏图片
+				{elseif isset($award['phototype']) && $award['phototype'] == '4'}
+				全部用户头像
+				{elseif isset($award['phototype']) && $award['phototype'] == '5'}
+				签到用户头像
+				{else /}
+				本地图片
+				{/if}
+			</td>
+		<td>
+			<input type="hidden" name="awardname[]" value="{$award['awardname']}">
+			{$award['awardname']}
+		</td>
+		<td>
+			<input type="hidden" name="prizename[]" value="{$award['prizename']}">
+			{$award['prizename']}
+		</td>
+		<td>
+			<input type="hidden" name="prizeimg[]" value="{$award['prizeimg']}">
+			<img src="{:tomedia($award['prizeimg'])}" width="100px"/>
+		</td>
+		<td>
+			<input type="hidden" name="prizenum[]" value="{$award['prizenum']}">
+			{$award['prizenum']}
+		</td>
+		<td>
+			<input type="hidden" name="onceout[]" value="{$award['onceout']}">
+			{$award['onceout']}
+		</td>
+		
+		<td>
+		   <a href="javascript:;"  class="btn btn-danger btn-sm delitem">
+			  <i class="mdi mdi-close"></i>
+		  </a>
+		  <a href="javascript:;"  class="btn btn-info btn-sm mousemove zam-sortable" lay-tips="拖动排序">
+			 <i class="mdi mdi-arrow-all"></i>
+		  </a>
+		</td>
+        </tr>
+	{/volist}
+</tbody>
+<tfoot>
+	  <tr>
+		<td colspan="4">
+		  <a  class="btn btn-success btn-sm m-r-10 additem" href="javascript:;"><i class="mdi mdi-plus"></i> 添加奖品</a>
+		  <button type="submit" class="btn btn-primary btn-sm btn-save" /><i class="mdi mdi-content-save"></i> 保存奖品</button>
+		</td>
+	  </tr>
+	</tfoot>
+</table>
+<form>
+<script id='awarditem-tpl' type="text/template">
+	<tr>
+		<td>
+			<input type="hidden" name="phototype[]" value="<% d.phototype %>">
+			<%# if(d.phototype=='2'){ %>
+				上墙图片
+			<%# }else if(d.phototype=='3'){ %>
+			霸屏图片
+			<%# }else if(d.phototype=='4'){ %>
+			全部用户头像
+			<%# }else if(d.phototype=='5'){ %>
+			签到用户头像
+			<%# }else{ %>
+			本地图片
+			<%# } %>
+		</td>
+		<td>
+			<input type="hidden" name="awardname[]" value="<% d.awardname %>">
+			<% d.awardname %>
+		</td>
+		<td>
+			<input type="hidden" name="prizename[]" value="<% d.prizename %>">
+			<% d.prizename %>
+		</td>
+		<td>
+			<input type="hidden" name="prizeimg[]" value="<% d.prizeimg %>">
+			<img src="<% d.prizeimgurl %>" width="100px"/>
+		</td>
+		<td>
+			<input type="hidden" name="prizenum[]" value="<% d.prizenum %>">
+			<% d.prizenum %>
+		</td>
+		<td>
+			<input type="hidden" name="onceout[]" value="<% d.onceout %>">
+			<% d.onceout %>
+		</td>
+		
+		<td>
+		  <a href="javascript:;"  class="btn btn-danger btn-sm delitem">
+			  <i class="mdi mdi-close"></i>
+		  </a>
+		  <a href="javascript:;"  class="btn btn-info btn-sm mousemove zam-sortable" lay-tips="拖动排序">
+			 <i class="mdi mdi-arrow-all"></i>
+		  </a>
+		</td>
+   </tr>
+</script>
+<script>
+require(["zamnotice","layerBox","jconfirmBox","webcore","jquery.ui"],function(zamnotice,layerBox,jconfirmBox,webcore){
+	$('.award-lists').sortable({handle: ".mousemove"});
+	$(".award-lists").disableSelection();
+	$(".additem").on('click',function(){
+		var confirmObj = jconfirmBox.ajaxconfirm("新增奖品","{:goweb('hdconfig/photocjaward')}",{ishtml:'1'},'html','col-lg-8 col-lg-offset-2',function(e){
+			var postData = webcore.serializeObject(e.find('form'));
+			if(postData.awardname==''){
+				zamnotice.showTips('error','奖项名必须填写');
+				return false;
+			}
+			if(postData.prizename==''){
+				zamnotice.showTips('error','奖品名必须填写');
+				return false;
+			}
+			if(postData.prizeimg==''){
+				zamnotice.showTips('error','奖品图必须设置');
+				return false;
+			}
+			postData.prizeimgurl = e.find('img').attr('src');
+			var html = webcore.tpl($("#awarditem-tpl"),postData);
+			$(".award-lists").append(html);
+			confirmObj.close();
+		});
+	});
+	$(".award-lists").on('click','.delitem',function(){
+		$(this).parent().parent().remove();
+	});
+	$(".btn-save").on('click',function(e){
+		e.preventDefault();
+		var $form = $("#itemForm");
+		var postData = $form.serialize();
+		layerBox.showLoading("数据提交中..");
+		$.post(window.location.href+"?ishtml=2",postData, function(result) {
+			layerBox.closeLayer();
+			if(result.code==0){
+				zamnotice.showTips('success','保存成功',500,function(){
+					window.location.reload();
+				});	
+			}else{
+				zamnotice.showTips('error',result.msg);
+			}
+		}, 'json');
+	});
+});
+</script>
+{include file='$Wpath/common/footer'}

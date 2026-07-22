@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>安全验证 - {$hdinfo['hdtitle']}</title>
+    <meta content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0" name="viewport"/>
+    <meta content="yes" name="apple-mobile-web-app-capable"/>
+    <meta content="black" name="apple-mobile-web-app-status-bar-style"/>
+    <meta content="telephone=no" name="format-detection"/>
+	<link rel="shortcut icon" href="" />
+    <link rel="stylesheet" href="__STATIC__/js/ydui/css/ydui.css"/>
+	<link rel="stylesheet" href="__STATIC__/css/zam-icon.css" media="all" />
+	<link rel="stylesheet" href="__STATIC__/css/mxc-icon.css" media="all" />
+	<link rel="stylesheet" href="__STATIC__/css/wechat/style.css" />
+	<link rel="stylesheet" href="__STATIC__/css/animate.css"/>
+	<script src="https://res.wx.qq.com/open/js/jweixin-1.6.0.js" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript" charset="utf-8">wx.config({:$jssdk});</script>
+    <script src="__STATIC__/js/ydui/js/ydui.flexible.js"></script>
+	<script src="__STATIC__/js/jquery.2.1.4.js"></script>
+	<script src="__STATIC__/js/jquery.extend.js"></script>
+	<script type="text/javascript"  src="__STATIC__/js/require.js"></script>
+	<script type="text/javascript">
+		var XCV3Config = {
+		  staticurl:"__STATIC__/",
+		  hdid:"{$hdinfo['hdid']}",
+		  clienttype:"{$clienttype??1}",
+		  isiframe:window.top!=window.self,
+		  amconfig:{:json_encode(amconfig())},
+		};
+		require.config({
+			baseUrl: XCV3Config.staticurl + "js",
+			urlArgs:'v=2',
+			waitSeconds:0,
+			paths: {
+				 css: "css.min",
+				 jquery:"jquery.2.1.4",
+				 fastclick:'wechatjs/fastclick',
+				 mobileselect:"mobileselect/mobileselect",
+				 ionrangeslider:'ionrangeslider/ionrangeslider',
+				 ydui: "ydui/js/ydui",
+				 template:"template/template",
+				 layer:"layer/mobile/layer",
+				 laytpl:"laytpl/laytpl",
+				 howler:"howler/howler.min",
+				 cropper:"cropper/cropper",
+				 "jquery.shake":'wechatjs/jquery.shake',
+				 jform:'jquery.form',
+				 touch:'wechatjs/touch',
+				 slideBox:'wechatjs/slideBox',
+				 wechatcore:"wechatjs/wechatcore",
+				 marqueen:"wechatjs/marqueen",
+				 bscroll:'wechatjs/bscroll/bscroll',
+				 swiper:'swiper/swiper.min',
+				 emojicore:"wechatjs/emojicore",
+				 appsocket:"wechatjs/appsocket",
+				 appmsg:"wechatjs/appmsg",
+				 appgame:"wechatjs/appgame",
+				 appdgshake:"wechatjs/appdgshake",
+				 appshuqian:"wechatjs/appshuqian",
+				 appmonkey:"wechatjs/appmonkey",
+				 appcar:"wechatjs/appcar",
+				 apphorse:"wechatjs/apphorse",
+				 appmls:"wechatjs/appmls",
+				 appbike:"wechatjs/appbike",
+				 appswim:"wechatjs/appswim",
+				 apptug:"wechatjs/apptug",
+				 appanswerbs:"wechatjs/appanswerbs",
+				 appjjb:"wechatjs/appjjb",
+				 appcutfruit:"wechatjs/appcutfruit",
+				 appdzqy:"wechatjs/appdzqy",
+				 videojs:'videojs/video',
+				 plupload:'plupload/plupload',
+				 uploader:'plupload/uploader',
+				 phaser:'wechatjs/phaser.min',
+				 dialog:'dialog/js/dialog',
+				 directoss:'directupload/aliyun',
+				 directqiniu:'directupload/qiniu',
+				 directcos:'directupload/cos',
+				 DouyinOpenJSBridge:'wechatjs/douyin.open',
+				 glightbox:'glightbox/glightbox.min',
+			},
+			shim:{
+				"ydui": {
+					exports:"YDUI"
+				},
+				'template':{
+					exports: 'template',
+				},
+				'layer':{
+					exports: 'layer',
+					deps: ['css!../js/layer/mobile/need/layer.css']
+				},
+				'mobileselect':{
+					exports:'MobileSelect',
+					deps: ['css!../js/mobileselect/mobileselect.css']
+				},
+				'ionrangeslider':{
+					deps:['css!../js/ionrangeslider/ionrangeslider.css'],
+				},
+				'wechatcore':{
+					exports:'wechatcore',
+				},
+				'marqueen':{
+					exports:'marqueen',
+				},
+				'laytpl':{
+					exports: 'laytpl',
+				},
+				'jquery.shake':{
+					exports: 'Shake',
+					deps: ['jquery']
+				},
+				'jform':{
+					deps: ['jquery']
+				},
+				'touch':{
+					exports:'touch',
+				},
+				'bscroll':{
+					exports:'BScroll',
+				},
+				'swiper':{
+					exports:'Swiper',
+					deps: ['css!../js/swiper/swiper.min.css']
+				},
+				'cropper':{
+					exports:'cropper',
+					deps: ['css!../js/cropper/cropper.css']
+				},
+				'glightbox':{
+					exports:'GLightbox',
+					deps: ['css!../js/glightbox/glightbox.min.css'],
+				},
+				'appsocket':{
+					exports:'appsocket',
+				},
+				'appgame':{
+					exports:'appgame',
+				},
+				'appdgshake':{
+					exports:'appdgshake',
+				},
+				'appshuqian':{
+					exports:'appshuqian',
+				},
+				'appmonkey':{
+					exports:'appmonkey',
+				},
+				'appcar':{
+					exports:'appcar',
+				},
+				'apphorse':{
+					exports:'apphorse',
+				},
+				'appmls':{
+					exports:'appmls',
+				},
+				'appbike':{
+					exports:'appbike',
+				},
+				'appswim':{
+					exports:'appswim',
+				},
+				'apptug':{
+					exports:'apptug',
+				},
+				'appanswerbs':{
+					exports:'appanswerbs',
+				},
+				'appdzqy':{
+					exports:'appdzqy',
+				},
+				'appjjb':{
+					exports:'appjjb',
+				},
+				'appcutfruit':{
+					exports:'appcutfruit',
+				},
+				'videojs':{
+					exports:'videojs',
+					deps:['css!../js/videojs/video.css'],
+				},
+				'plupload':{
+					exports:'plupload',
+				},
+				'uploader':{
+					exports:'uploader',
+					deps: ['jquery','plupload'],
+				},
+				'dialog':{
+					exports:'dialog',
+					deps:['css!../js/dialog/css/dialog.css'],
+				},
+			},
+		});
+		define("jquery", [], function () {
+			return jQuery;
+		});
+	</script>
+</head>
+<body>
+	<div class="m-keyboard"></div>
+</body>
+<script>
+(parent.wx||wx).ready(function () {
+	(parent.wx||wx).hideOptionMenu();
+});
+require(['wechatcore'],function (wechatcore) {
+	wechatcore.openKeyboard('.m-keyboard','请输入安全密码',"{:$fromurl}");
+});
+</script>
+</html>

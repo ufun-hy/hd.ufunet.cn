@@ -1,0 +1,116 @@
+{include file='$Wpath/common/header'}
+<form id="formBox" class="zam-formvalidation form-horizontal" method="post">
+    <div class="config-titlebox">
+        <span class="config-titlename">微信设置</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#wechatconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+    </div>
+    <div id="wechatconfigbox" class="collapse in">
+        {include file="$Wpath/common/configwechatcommon" /}
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 背景音效</label>
+            <div class="col-lg-3">
+                {:tpl_switch('appbgmusicoff',$config['appbgmusicoff'])}
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 背景音效</label>
+            <div class="col-lg-8">
+                {:tpl_audio('appbgmusic',$config['appbgmusic'])}
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 集卡记录按钮</label>
+            <div class="col-lg-8">
+                {:tpl_image_one('hiscardbtn',$config['hiscardbtn'])}
+                <span class="help-block">规格:1020*523px</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 规则按钮</label>
+            <div class="col-lg-8">
+                {:tpl_image_one('rulebtn',$config['rulebtn'])}
+                <span class="help-block">规格:835*513px</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 集卡规则内容</label>
+            <div class="col-lg-8">
+                {:tpl_ueditor('rulecontent',$config['rulecontent'])}
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label text-right">* 查看卡片按钮</label>
+            <div class="col-lg-5 yautooverflow">
+                <div class="input-group">
+                    <div class="input-group-btn not-allow"><a class="btn btn-default">背景色</a></div>
+                    {:tpl_color('mycardbtncolor',$config['mycardbtncolor'])}
+                    <div class="input-group-btn not-allow"><a class="btn btn-default">文字</a></div>
+                    <input type="text" class="form-control" name="mycardbtntxt" value="{$config['mycardbtntxt']}" />
+                    <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
+                    <div class="touchspin">
+                    <input type="text" class="form-control numberincdec" name="mycardbtnsize" 
+                    data-bts-min="0" data-bts-replacement-val="0"
+                    data-bts-max="999"
+                    data-bts-step="1"
+                    value="{$config['mycardbtnsize']}">
+                    </div>
+                </div>
+                <span class="help-block">请根据实际情况设置此值</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 用户每天可集卡数</label>
+            <div class="col-lg-2">
+                <input type="text" class="form-control numberincdec" name="daymaxcard" value="{$config['daymaxcard']}"
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="null"
+                data-bts-step="1"
+                >
+                <span class="zam-help-block">注:0为不限制个数</span>
+            </div>
+        </div>
+    </div>
+    {include file='$Wpath/common/configsavepanel'}
+</form>
+<script>
+require(['webcore','jconfirmBox','zamnotice','layerBox','zvalidator'],function(webcore,jconfirmBox,zamnotice,layerBox){
+    $('#formBox').formValidation({
+        framework: 'bootstrap',
+        excluded: [':disabled'],
+        message: '您填写的内容无效',
+        fields: {
+            apptitle:{
+                message: '请输入网页标题',
+                validators: {
+                    notEmpty: {
+                        message: '请输入网页标题'
+                    },
+                }
+            },
+        }
+    }).on('success.form.fv', function(e) {
+        e.preventDefault();
+        var $form = $(e.target);
+        var postData = webcore.serializeObject($form);
+        var bload = $form.find(".zam-fixedbottom button").lyearloading({opacity: 0.2,spinnerSize: 'nm'});
+        $form.formValidation('disableSubmitButtons', true);
+        webcore.ajaxSubmit("{:gohdmanage('config'.$gametype.'/index',['hdid'=>$hdid])}",postData).then(function(json){
+            bload.hide();
+            if(json.code==0){
+                $form.formValidation('disableSubmitButtons', false);
+                zamnotice.showTips('success','操作成功',2e3,function(){
+                    window.location.reload();
+                });
+            }else{
+                zamnotice.showTips('error',json.msg);
+                $form.formValidation('disableSubmitButtons', false);
+            }
+        }, function(json){
+            bload.hide();
+            zamnotice.showTips('error','网络差。操作失败');
+            $form.formValidation('disableSubmitButtons', false);
+        });
+    });
+});
+</script>
+{include file='$Wpath/common/footer'}

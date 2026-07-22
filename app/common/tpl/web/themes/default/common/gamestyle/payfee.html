@@ -1,0 +1,33 @@
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 付费</label>
+    <div class="col-lg-8">
+        {:tpl_switch('paytype',$config['paytype']??'2','openpayfee')}
+        <span class="zam-help-block">默认免费，付费需要设置具体的价格</span>
+    </div>
+</div>
+<div class="form-group payfeebox{if isset($config['paytype']) && $config['paytype']=='2'} hidden{/if}">
+  <label class="col-lg-2 control-label">* 风格费用</label>
+  <div class="col-lg-6">
+    <div class="input-group">
+      <input type="text" class="form-control" name="payfee" value="{$config['payfee']??'1'}">
+      <span class="input-group-btn"><a class="btn btn-default">元</a></span>
+    </div>
+    <span class="help-block">必须大于0</span>
+  </div>
+</div>
+<script>
+function openpayfee(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".payfeebox").addClass('hidden');
+    }else{
+        alert('暂无支持设置付费皮肤');
+        window.location.reload();
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".payfeebox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+</script>

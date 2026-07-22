@@ -1,0 +1,56 @@
+<div class="form-horizontal confirmbox-pop">
+<form class="confirm-formbox" method="post">
+<div class="form-group">
+	<label class="col-lg-3 control-label text-right">* 排序序号</label>
+	<div class="col-lg-6">
+	  <input type="text" class="form-control"  name="displayorder" value="{$config['displayorder']}">
+	  <div class="help-block">注意:排序按降序排序，序号越大越排在前面</div>
+	</div>
+</div>
+<div class="form-group">
+	<label class="col-lg-3 control-label text-right">* 歌曲名称</label>
+	<div class="col-lg-6">
+	  <input type="text" class="form-control"  name="songname" value="{$config['songname']}">
+	</div>
+</div>
+<div class="form-group">
+	<label class="col-lg-3 control-label text-right">* 艺人</label>
+	<div class="col-lg-6">
+		<select name="artistid" class="form-control js_select2 artistselect">
+	        {volist name="arts" id="art"}
+	         <option value="{$art['id']}" {if $art['id']==$config['artistid']}selected="selected"{/if}>{$art['artistname']}</option>
+	        {/volist}
+	    </select>
+	</div>
+</div>
+<div class="form-group">
+	<label class="col-lg-3 control-label text-right">* 歌曲原唱</label>
+	<div class="col-lg-6">
+	  <input type="text" class="form-control"  name="singer" value="{$config['singer']}">
+	</div>
+</div>
+<div class="form-group">
+	<label class="col-lg-3 control-label text-right">* 价格</label>
+	<div class="col-lg-6">
+		  <div class="input-group">
+			<input type="text" class="form-control" name="songprice" value="{$config['songprice']}">
+			<div class="input-group-addon">元</div>
+		</div>
+	</div>
+</div>
+<div class="form-group">
+	<label class="col-lg-3 control-label text-right">* 霸屏时间</label>
+	<div class="col-lg-6">
+		  <div class="input-group">
+			<input type="text" class="form-control" name="bptime" value="{$config['bptime']}">
+			<div class="input-group-addon">秒</div>
+		</div>
+	</div>
+</div>
+</form>
+</div>
+<script>
+require(['webcore','jconfirmBox','zamnotice','layerBox'],function(webcore,jconfirmBox,zamnotice,layerBox){
+    $('.artistselect').select2({width: 'resolve',placeholder: '请选择'});
+});
+</script>

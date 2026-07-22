@@ -1,0 +1,687 @@
+{include file='$Wpath/common/header'}
+<div class="confirmbox-pop">
+<div class="text-center">
+      <div class="btn-group pop-btns" style="margin-bottom:10px;">
+        <a href="javascript:void(0)" class="btn btn-default btn-primary"><span>基础设置</span></a>
+        <a href="javascript:void(0)" class="btn btn-default"><span>大屏欢迎页</span></a>
+        <a href="javascript:void(0)" class="btn btn-default"><span>大屏设置</span></a>
+        <a href="javascript:void(0)" class="btn btn-default"><span>排行榜</span></a>
+        <a href="javascript:void(0)" class="btn btn-default"><span>微信设置</span></a>
+        <a href="javascript:void(0)" class="btn btn-default"><span>自定义css</span></a>
+      </div>
+</div>
+<form id="formBox" class="zam-formvalidation form-horizontal" method="post">
+  <div class="carditem">
+    {include file='$Wpath/common/gamestyle/basic'}
+    {include file='$Wpath/common/gamestyle/bgmusic'}
+  </div>
+  <div class="carditem hidden">
+    {include file='$Wpath/common/gamestyle/welcome'}
+    <div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 在线用户数背景</label>
+    <div class="col-lg-8">
+      {:tpl_image_one('joinnumimg', $config['joinnumimg'])}
+      <span class="help-block">{$desconfig['joinnumimg']}</span>
+    </div>
+    </div>
+  </div>
+  <div class="carditem hidden">
+    <div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 冠军头衔图</label>
+    <div class="col-lg-8">
+      {:tpl_image_one('firstimg', $config['firstimg'])}
+      <span class="help-block">{$desconfig['firstimg']}</span>
+    </div>
+    </div>
+  <div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 亚军头衔图</label>
+    <div class="col-lg-8">
+      {:tpl_image_one('secondimg', $config['secondimg'])}
+      <span class="help-block">{$desconfig['secondimg']}</span>
+    </div>
+    </div>
+  <div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 季军头衔图</label>
+    <div class="col-lg-8">
+      {:tpl_image_one('thirdimg', $config['thirdimg'])}
+      <span class="help-block">{$desconfig['thirdimg']}</span>
+    </div>
+    </div>
+  <div class="zam-inner-highconfig zam-hdinfo-highconfig">
+      <div class="btn-group type-btns zam-flex-center mb20">
+        <a href="javascript:;" class="btn btn-primary">竖版</a>
+        <a href="javascript:;" class="btn btn-default">横版</a>
+      </div>
+      <div class="typeitem">
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 竖版顶图1</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('vusertop[]', $config['vusertop'][0])}
+        <span class="help-block">{$desconfig['vusertop']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 竖版顶图2</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('vusertop[]', $config['vusertop'][1])}
+        <span class="help-block">{$desconfig['vusertop']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 竖版顶图3</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('vusertop[]', $config['vusertop'][2])}
+        <span class="help-block">{$desconfig['vusertop']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 竖版顶图4</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('vusertop[]', $config['vusertop'][3])}
+        <span class="help-block">{$desconfig['vusertop']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 竖版顶图5</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('vusertop[]', $config['vusertop'][4])}
+        <span class="help-block">{$desconfig['vusertop']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 竖版顶图6</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('vusertop[]', $config['vusertop'][5])}
+        <span class="help-block">{$desconfig['vusertop']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 竖版顶图7</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('vusertop[]', $config['vusertop'][6])}
+        <span class="help-block">{$desconfig['vusertop']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 竖版顶图8</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('vusertop[]', $config['vusertop'][7])}
+        <span class="help-block">{$desconfig['vusertop']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 竖版顶图9</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('vusertop[]', $config['vusertop'][8])}
+        <span class="help-block">{$desconfig['vusertop']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 竖版顶图10</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('vusertop[]', $config['vusertop'][9])}
+        <span class="help-block">{$desconfig['vusertop']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-2 control-label text-right">* 竖版点阵1</label>
+        <div class="col-lg-8">
+          {:tpl_image_one('vuserimg[]', $config['vuserimg'][0])}
+          <span class="help-block">{$desconfig['vuserimg']}</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-2 control-label text-right">* 竖版点阵2</label>
+        <div class="col-lg-8">
+          {:tpl_image_one('vuserimg[]', $config['vuserimg'][1])}
+          <span class="help-block">{$desconfig['vuserimg']}</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-2 control-label text-right">* 竖版点阵3</label>
+        <div class="col-lg-8">
+          {:tpl_image_one('vuserimg[]', $config['vuserimg'][2])}
+          <span class="help-block">{$desconfig['vuserimg']}</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-2 control-label text-right">* 竖版点阵4</label>
+        <div class="col-lg-8">
+          {:tpl_image_one('vuserimg[]', $config['vuserimg'][3])}
+          <span class="help-block">{$desconfig['vuserimg']}</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-2 control-label text-right">* 竖版点阵5</label>
+        <div class="col-lg-8">
+          {:tpl_image_one('vuserimg[]', $config['vuserimg'][4])}
+          <span class="help-block">{$desconfig['vuserimg']}</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-2 control-label text-right">* 竖版点阵6</label>
+        <div class="col-lg-8">
+          {:tpl_image_one('vuserimg[]', $config['vuserimg'][5])}
+          <span class="help-block">{$desconfig['vuserimg']}</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-2 control-label text-right">* 竖版点阵7</label>
+        <div class="col-lg-8">
+          {:tpl_image_one('vuserimg[]', $config['vuserimg'][6])}
+          <span class="help-block">{$desconfig['vuserimg']}</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-2 control-label text-right">* 竖版点阵8</label>
+        <div class="col-lg-8">
+          {:tpl_image_one('vuserimg[]', $config['vuserimg'][7])}
+          <span class="help-block">{$desconfig['vuserimg']}</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-2 control-label text-right">* 竖版点阵9</label>
+        <div class="col-lg-8">
+          {:tpl_image_one('vuserimg[]', $config['vuserimg'][8])}
+          <span class="help-block">{$desconfig['vuserimg']}</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-2 control-label text-right">* 竖版点阵10</label>
+        <div class="col-lg-8">
+          {:tpl_image_one('vuserimg[]', $config['vuserimg'][9])}
+          <span class="help-block">{$desconfig['vuserimg']}</span>
+        </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 竖版底图1</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('vuserbottom[]', $config['vuserbottom'][0])}
+        <span class="help-block">{$desconfig['vuserbottom']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 竖版底图2</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('vuserbottom[]', $config['vuserbottom'][1])}
+        <span class="help-block">{$desconfig['vuserbottom']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 竖版底图3</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('vuserbottom[]', $config['vuserbottom'][2])}
+        <span class="help-block">{$desconfig['vuserbottom']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 竖版底图4</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('vuserbottom[]', $config['vuserbottom'][3])}
+        <span class="help-block">{$desconfig['vuserbottom']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 竖版底图5</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('vuserbottom[]', $config['vuserbottom'][4])}
+        <span class="help-block">{$desconfig['vuserbottom']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 竖版底图6</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('vuserbottom[]', $config['vuserbottom'][5])}
+        <span class="help-block">{$desconfig['vuserbottom']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 竖版底图7</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('vuserbottom[]', $config['vuserbottom'][6])}
+        <span class="help-block">{$desconfig['vuserbottom']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 竖版底图8</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('vuserbottom[]', $config['vuserbottom'][7])}
+        <span class="help-block">{$desconfig['vuserbottom']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 竖版底图9</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('vuserbottom[]', $config['vuserbottom'][8])}
+        <span class="help-block">{$desconfig['vuserbottom']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 竖版底图10</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('vuserbottom[]', $config['vuserbottom'][9])}
+        <span class="help-block">{$desconfig['vuserbottom']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 竖版箭头1</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('vuserarrow[]', $config['vuserarrow'][0])}
+        <span class="help-block">{$desconfig['vuserarrow']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 竖版箭头2</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('vuserarrow[]', $config['vuserarrow'][1])}
+        <span class="help-block">{$desconfig['vuserarrow']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 竖版箭头3</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('vuserarrow[]', $config['vuserarrow'][2])}
+        <span class="help-block">{$desconfig['vuserarrow']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 竖版箭头4</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('vuserarrow[]', $config['vuserarrow'][3])}
+        <span class="help-block">{$desconfig['vuserarrow']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 竖版箭头5</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('vuserarrow[]', $config['vuserarrow'][4])}
+        <span class="help-block">{$desconfig['vuserarrow']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 竖版箭头6</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('vuserarrow[]', $config['vuserarrow'][5])}
+        <span class="help-block">{$desconfig['vuserarrow']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 竖版箭头7</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('vuserarrow[]', $config['vuserarrow'][6])}
+        <span class="help-block">{$desconfig['vuserarrow']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 竖版箭头8</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('vuserarrow[]', $config['vuserarrow'][7])}
+        <span class="help-block">{$desconfig['vuserarrow']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 竖版箭头9</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('vuserarrow[]', $config['vuserarrow'][8])}
+        <span class="help-block">{$desconfig['vuserarrow']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 竖版箭头10</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('vuserarrow[]', $config['vuserarrow'][9])}
+        <span class="help-block">{$desconfig['vuserarrow']}</span>
+      </div>
+      </div>
+      </div>
+      <div class="typeitem hidden">
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 横版顶图1</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('husertop[]', $config['husertop'][0])}
+        <span class="help-block">{$desconfig['husertop']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 横版顶图2</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('husertop[]', $config['husertop'][1])}
+        <span class="help-block">{$desconfig['husertop']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 横版顶图3</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('husertop[]', $config['husertop'][2])}
+        <span class="help-block">{$desconfig['husertop']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 横版顶图4</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('husertop[]', $config['husertop'][3])}
+        <span class="help-block">{$desconfig['husertop']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 横版顶图5</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('husertop[]', $config['husertop'][4])}
+        <span class="help-block">{$desconfig['husertop']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 横版顶图6</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('husertop[]', $config['husertop'][5])}
+        <span class="help-block">{$desconfig['husertop']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 横版顶图7</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('husertop[]', $config['husertop'][6])}
+        <span class="help-block">{$desconfig['husertop']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 横版顶图8</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('husertop[]', $config['husertop'][7])}
+        <span class="help-block">{$desconfig['husertop']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 横版顶图9</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('husertop[]', $config['husertop'][8])}
+        <span class="help-block">{$desconfig['husertop']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 横版顶图10</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('husertop[]', $config['husertop'][9])}
+        <span class="help-block">{$desconfig['husertop']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-2 control-label text-right">* 横版点阵1</label>
+        <div class="col-lg-8">
+          {:tpl_image_one('huserimg[]', $config['huserimg'][0])}
+          <span class="help-block">{$desconfig['huserimg']}</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-2 control-label text-right">* 横版点阵2</label>
+        <div class="col-lg-8">
+          {:tpl_image_one('huserimg[]', $config['huserimg'][1])}
+          <span class="help-block">{$desconfig['huserimg']}</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-2 control-label text-right">* 横版点阵3</label>
+        <div class="col-lg-8">
+          {:tpl_image_one('huserimg[]', $config['huserimg'][2])}
+          <span class="help-block">{$desconfig['huserimg']}</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-2 control-label text-right">* 横版点阵4</label>
+        <div class="col-lg-8">
+          {:tpl_image_one('huserimg[]', $config['huserimg'][3])}
+          <span class="help-block">{$desconfig['huserimg']}</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-2 control-label text-right">* 横版点阵5</label>
+        <div class="col-lg-8">
+          {:tpl_image_one('huserimg[]', $config['huserimg'][4])}
+          <span class="help-block">{$desconfig['huserimg']}</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-2 control-label text-right">* 横版点阵6</label>
+        <div class="col-lg-8">
+          {:tpl_image_one('huserimg[]', $config['huserimg'][5])}
+          <span class="help-block">{$desconfig['huserimg']}</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-2 control-label text-right">* 横版点阵7</label>
+        <div class="col-lg-8">
+          {:tpl_image_one('huserimg[]', $config['huserimg'][6])}
+          <span class="help-block">{$desconfig['huserimg']}</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-2 control-label text-right">* 横版点阵8</label>
+        <div class="col-lg-8">
+          {:tpl_image_one('huserimg[]', $config['huserimg'][7])}
+          <span class="help-block">{$desconfig['huserimg']}</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-2 control-label text-right">* 横版点阵9</label>
+        <div class="col-lg-8">
+          {:tpl_image_one('huserimg[]', $config['huserimg'][8])}
+          <span class="help-block">{$desconfig['huserimg']}</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-2 control-label text-right">* 横版点阵10</label>
+        <div class="col-lg-8">
+          {:tpl_image_one('huserimg[]', $config['huserimg'][9])}
+          <span class="help-block">{$desconfig['huserimg']}</span>
+        </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 横版底图1</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('huserbottom[]', $config['huserbottom'][0])}
+        <span class="help-block">{$desconfig['huserbottom']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 横版底图2</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('huserbottom[]', $config['huserbottom'][1])}
+        <span class="help-block">{$desconfig['huserbottom']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 横版底图3</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('huserbottom[]', $config['huserbottom'][2])}
+        <span class="help-block">{$desconfig['huserbottom']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 横版底图4</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('huserbottom[]', $config['huserbottom'][3])}
+        <span class="help-block">{$desconfig['huserbottom']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 横版底图5</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('huserbottom[]', $config['huserbottom'][4])}
+        <span class="help-block">{$desconfig['huserbottom']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 横版底图6</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('huserbottom[]', $config['huserbottom'][5])}
+        <span class="help-block">{$desconfig['huserbottom']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 横版底图7</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('huserbottom[]', $config['huserbottom'][6])}
+        <span class="help-block">{$desconfig['huserbottom']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 横版底图8</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('huserbottom[]', $config['huserbottom'][7])}
+        <span class="help-block">{$desconfig['huserbottom']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 横版底图9</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('huserbottom[]', $config['huserbottom'][8])}
+        <span class="help-block">{$desconfig['huserbottom']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 横版底图10</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('huserbottom[]', $config['huserbottom'][9])}
+        <span class="help-block">{$desconfig['huserbottom']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 横版箭头1</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('huserarrow[]', $config['huserarrow'][0])}
+        <span class="help-block">{$desconfig['huserarrow']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 横版箭头2</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('huserarrow[]', $config['huserarrow'][1])}
+        <span class="help-block">{$desconfig['huserarrow']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 横版箭头3</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('huserarrow[]', $config['huserarrow'][2])}
+        <span class="help-block">{$desconfig['huserarrow']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 横版箭头4</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('huserarrow[]', $config['huserarrow'][3])}
+        <span class="help-block">{$desconfig['huserarrow']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 横版箭头5</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('huserarrow[]', $config['huserarrow'][4])}
+        <span class="help-block">{$desconfig['huserarrow']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 横版箭头6</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('huserarrow[]', $config['huserarrow'][5])}
+        <span class="help-block">{$desconfig['huserarrow']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 横版箭头7</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('huserarrow[]', $config['huserarrow'][6])}
+        <span class="help-block">{$desconfig['huserarrow']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 横版箭头8</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('huserarrow[]', $config['huserarrow'][7])}
+        <span class="help-block">{$desconfig['huserarrow']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 横版箭头9</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('huserarrow[]', $config['huserarrow'][8])}
+        <span class="help-block">{$desconfig['huserarrow']}</span>
+      </div>
+      </div>
+      <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 横版箭头10</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('huserarrow[]', $config['huserarrow'][9])}
+        <span class="help-block">{$desconfig['huserarrow']}</span>
+      </div>
+      </div>
+      </div>
+  </div>
+  </div>
+  <div class="carditem hidden">
+    {include file='$Wpath/common/gamestyle/phb'}
+  </div>
+  <div class="carditem hidden">
+    {include file='$Wpath/common/gamestyle/wechat'}
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 圆形外圈</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('appcenter', $config['appcenter'])}
+        <span class="help-block">{$desconfig['appcenter']}</span>
+      </div>
+     </div>
+     <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 圆盘中间手型图</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('apphand', $config['apphand'])}
+        <span class="help-block">{$desconfig['apphand']}</span>
+      </div>
+     </div>
+  </div>
+  <div class="carditem hidden">
+    {include file='$Wpath/common/gamestyle/diycss'}
+  </div>
+  {include file='$Wpath/common/cancelsavepanel'}
+</form>
+</div>
+<script type="text/javascript">
+require(['webcore','jconfirmBox','zamnotice','zvalidator'],function(webcore,jconfirmBox,zamnotice){
+  $(".confirmbox-pop .pop-btns a.btn").click(function(){
+      $(this).addClass('btn-primary').siblings().removeClass("btn-primary");
+      $(".confirmbox-pop .carditem").addClass('hidden').eq($(this).index()).removeClass('hidden');
+  });
+  $(".confirmbox-pop .type-btns a.btn").click(function(){
+      $(this).addClass('btn-primary').siblings().removeClass("btn-primary");
+      $(".confirmbox-pop .typeitem").addClass('hidden').eq($(this).index()).removeClass('hidden');
+  });
+  $('#formBox').formValidation({
+      framework: 'bootstrap',
+      excluded: [':disabled'],
+      message: '您填写的内容无效',
+      fields: {}
+  }).on('success.form.fv', function(e) {
+    e.preventDefault();
+    var $form = $(e.target);
+    var postData = webcore.serializeObject($form);
+    var bload = $form.find(".zam-fixedbottom button").lyearloading({opacity: 0.2,spinnerSize: 'nm'});
+    $form.formValidation('disableSubmitButtons', true);
+    webcore.ajaxSubmit("{:goweb('hdconfig/edit'.$gametype.'style')}",postData).then(function(json){
+      bload.hide();
+      if(json.code==0){
+          $form.formValidation('disableSubmitButtons', false);
+          zamnotice.showTips('success','操作成功',1e3,function(){
+            window.location.href = "{:goweb('hdconfig/'.$gametype.'style')}";
+          });
+        }else{
+            zamnotice.showTips('error',json.msg);
+            $form.formValidation('disableSubmitButtons', false);
+        }
+    }, function(json){
+      bload.hide();
+      zamnotice.showTips('error','网络差。操作失败');
+      $form.formValidation('disableSubmitButtons', false);
+    });
+  });
+});
+</script>
+{include file='$Wpath/common/footer'}

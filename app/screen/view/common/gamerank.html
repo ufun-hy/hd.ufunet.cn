@@ -1,0 +1,204 @@
+<style>
+/**排名样式**/
+.banglistBox{
+	position: absolute;
+	top:0;
+	left:0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0,0,0,.6);
+	color:#fff;
+	z-index: 9;
+}
+.banglistBox-main{
+	position:relative;
+	width:1150px;
+	border-radius:5px;
+	height:490px;
+	border: 1px solid rgba(255,255,255,.4);
+    -webkit-box-shadow: inset 0 0 5px rgba(255,255,255,.4), 0 0 5px rgba(0,0,0,.4);
+    -moz-box-shadow: inset 0 0 5px rgba(255,255,255,.4), 0 0 5px rgba(0,0,0,.4);
+    box-shadow: inset 0 0 5px rgba(255,255,255,.4), 0 0 5px rgba(0,0,0,.4);
+    background: -webkit-linear-gradient(235deg, rgba(255,255,255,.1) 60%, rgba(255,255,255,0) 60%);
+    background: -moz-linear-gradient(235deg, rgba(255,255,255,.1) 60%, rgba(255,255,255,0) 60%);
+    background: -o-linear-gradient(235deg, rgba(255,255,255,.1) 60%, rgba(255,255,255,0) 60%);
+}
+.banglist-top{
+	position:absolute;
+	top:-86px;
+	width:100%;
+	height:70px;
+	font-size:32px;
+	line-height:70px;
+	text-align:center;
+}
+.banglist-title{
+	width:100%;
+	height:60px;
+	font-size:30px;
+}
+
+.banglist-close{
+	position: absolute;
+    top: -50px;
+    right: -80px;
+	cursor:pointer;
+}
+.banglist-close i{
+	font-size:32px;
+	color:#fff;
+}
+.banglist{
+	width:100%;
+	height:420px;
+	overflow-x:hidden;
+	overflow-y:auto;
+	
+}
+
+.banglist .banglist-item {
+	width:100%;
+	height:70px;
+    border-top: 1px solid rgba(255,255,255,.4);
+}
+.banglist .banglist-item div{
+	height:100%;
+}
+.banglist .banglist-item .banglist-pm span {
+    display: inline-block;
+    text-align: center;
+    font-size: 21px;
+}
+.banglist .banglist-item .banglist-pm .banglist-tag {
+    width:40px;
+}
+.banglist .banglist-item .banglist-avatar img{
+    width: 45px;
+    height:45px;
+    border-radius: 100%;
+}
+.banglist .banglist-item .banglist-nickname p{
+    width: 100%;
+	font-size:25px;
+    white-space: nowrap;
+    overflow: hidden;
+	text-align:center;
+    text-overflow: ellipsis;
+}
+.banglist .banglist-item .banglist-score span {
+	display:inline-block;
+    color: yellow;
+	font-size:30px;
+	font-style:normal;
+}
+.banglist .banglist-item .banglist-jp span {
+	display:inline-block;
+	width: 100%;
+	padding: 0 3px;
+    color: yellow;
+	font-size:18px;
+	box-sizing: border-box;
+	text-align: center;
+}
+.banglistBox-btns{
+	width: 100%;
+    text-align: center;
+    position: absolute;
+    bottom: -80px;
+    left: 0;
+}
+.banglistBox-btns .banglistBox-btn{
+    display: inline-block;
+    border: 1px solid #fff;
+    padding: 10px 20px;
+    border-radius: 5px;
+	cursor:pointer;
+}
+.banglistBox-btns .banglistBox-btn:hover{
+	background-color:#fff;
+	color:#333;
+}
+</style>
+{if in_array($hdinfo['id'],['-1'])}
+<script id="pmshakeItem-tpl" type="html/javascript">
+<li class="banglist-item zam-app-flex">
+	<div class="banglist-pm zam-app-flex-ajCenter2" style="width:15%">
+		  {{ if key == 0 || key == 1 || key == 2 }}
+			<img src="/{:SIMGURL}common/rank/{{ key+1 }}.png" class="banglist-tag">
+		  {{ else }}
+			<span>{{ key+1 }}</span>
+		  {{ /if }}
+	</div>
+	<div class="banglist-avatar zam-app-flex-ajCenter2" style="width:10%">
+		<img  src="{{ avatar }}">
+	</div>
+	<div class="banglist-nickname zam-app-flex-ajCenter2" style="width:45%"><p>{{ nickname }}</p></div>
+	<div class="banglist-score zam-app-flex-ajCenter2" style="width:30%">
+		<span>{{ score }}</span>
+	</div>
+</li>
+</script>
+<script id="pmshakeHeader-tpl" type="html/javascript">
+	<div class="banglist-num zam-app-flex-ajCenter2" style="width:15%">Rank</div>
+	<div class="banglist-tx zam-app-flex-ajCenter2" style="width:10%">Avatar</div>
+	<div class="banglist-name zam-app-flex-ajCenter2" style="width:45%">Username</div>
+	<div class="banglist-cj zam-app-flex-ajCenter2" style="width:30%">Performance</div>
+</script>
+<div class="banglistBox zam-app-flex-ajCenter display-none">
+   <section class="banglistBox-main">
+		<div class="banglist-close"><i class="zam-icon-error"></i></div>
+		<div class="banglist-top">LEADERBOARD</div>
+		<section class="banglist-title zam-app-flex"></section>
+		<ul class="banglist"></ul>
+		<section class="banglistBox-btns">
+			<a class="banglistBox-btn banglistBox-btn-prev" style="margin-right: 200px;">PREV</a>
+			<a class="banglistBox-btn banglistBox-btn-next">NEXT</a>
+		</section>
+	</section>
+</div>
+{else /}
+<script id="pmshakeItem-tpl" type="html/javascript">
+<li class="banglist-item zam-app-flex">
+	<div class="banglist-pm zam-app-flex-ajCenter2" style="width:{{ if showphbaward=='1' }}10%{{ else }}15%{{ /if }}">
+			{{ if key == 0 || key == 1 || key == 2 }}
+			<img src="/{:SIMGURL}common/rank/{{ key+1 }}.png" class="banglist-tag">
+			{{ else }}
+			<span>{{ key+1 }}</span>
+			{{ /if }}
+	</div>
+	<div class="banglist-avatar zam-app-flex-ajCenter2" style="width:{{ if showphbaward=='1' }}12%{{ else }}15%{{ /if }}">
+		<img  src="{{ avatar }}">
+	</div>
+	<div class="banglist-nickname zam-app-flex-ajCenter2" style="width:{{ if showphbaward=='1' }}35%{{ else }}40%{{ /if }}"><p>{{ nickname }}</p></div>
+	<div class="banglist-score zam-app-flex-ajCenter2" style="width:{{ if showphbaward=='1' }}25%{{ else }}30%{{ /if }}">
+		<span>{{ score }}</span>
+	</div>
+	{{ if showphbaward=='1' }}
+	<div class="banglist-jp zam-app-flex-ajCenter2" style="width:18%;">
+		<span class="limitbox">{{ prizename }}</span>
+	</div>
+	{{ /if }}
+</li>
+</script>
+<script id="pmshakeHeader-tpl" type="html/javascript">
+	<div class="banglist-num zam-app-flex-ajCenter2" style="width:{{ if showphbaward=='1' }}10%{{ else }}15%{{ /if }}">{$pcconfig['style']['rankpmtitle']??'排名'}</div>
+	<div class="banglist-tx zam-app-flex-ajCenter2" style="width:{{ if showphbaward=='1' }}12%{{ else }}15%{{ /if }}">{{ if isteam=='1' }}{$pcconfig['style']['rankteamlogotitle']??'团队队标'}{{ else }}{$pcconfig['style']['rankavatartitle']??'头像'}{{ /if }}</div>
+	<div class="banglist-name zam-app-flex-ajCenter2" style="width:{{ if showphbaward=='1' }}35%{{ else }}40%{{ /if }}">{{ if isteam=='1' }}{$pcconfig['style']['rankteamnametitle']??'团队名称'}{{ else }}{$pcconfig['style']['ranknametitle']??'用户'}{{ /if }}</div>
+	<div class="banglist-cj zam-app-flex-ajCenter2" style="width:{{ if showphbaward=='1' }}25%{{ else }}30%{{ /if }}">{$pcconfig['style']['rankscoretitle']??'成绩'}</div>
+	{{ if showphbaward=='1' }}
+		<div class="banglist-award zam-app-flex-ajCenter2" style="width: 18%;">{$pcconfig['style']['rankawardtitle']??'奖品'}</div>
+	{{ /if }}
+</script>
+<div  class="banglistBox zam-app-flex-ajCenter display-none"> 
+	<section class="banglistBox-main">
+		<div class="banglist-close"><i class="zam-icon-error"></i></div>
+		<div class="banglist-top">{$pcconfig['style']['ranktitle']??'排行榜'}</div>
+		<section class="banglist-title zam-app-flex"></section>
+		<ul class="banglist"></ul>
+		<section class="banglistBox-btns">
+			<a class="banglistBox-btn banglistBox-btn-prev" style="margin-right: 200px;">{$pcconfig['style']['rankprevtitle']??'上一轮'}</a>
+			<a class="banglistBox-btn banglistBox-btn-next">{$pcconfig['style']['ranknexttitle']??'下一轮'}</a>
+		</section>
+	</section>
+</div>
+{/if}

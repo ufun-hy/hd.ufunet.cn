@@ -1,0 +1,39 @@
+<div class="form-horizontal confirmbox-pop">
+  <form class="confirm-formbox" method="post">
+    {if $signconfig['appuploadimg']=='1'}
+        <div class="form-group">
+          <label class="col-lg-3 control-label">* 头像</label>
+          <div class="col-lg-8">
+            {:tpl_image_one('uploadimg',(isset($user['uploadimg'])&&!empty($user['uploadimg'])?$user['uploadimg']:''))}
+            <span class="help-block">规格:100*100px</span>
+          </div>
+        </div>
+    {/if}
+    {volist name="signconfig.appbddata" id="bditem"}
+      <div class="form-group">
+        <label class="col-lg-3 control-label">* {$bditem['title']}</label>
+        <div class="col-lg-8">
+          {if !in_array($bditem['type'],['select','sex'])}
+            <input class="form-control" type="text"  name="{$bditem['zd']}" value="{if isset($user[$bditem['zd']])}{$user[$bditem['zd']]}{/if}">
+          {else}
+            {if $bditem['type']=='select'}
+              <select class="form-control" name="{$bditem['zd']}">
+                  <option value="" {if !isset($user[$bditem['zd']]) || empty($user[$bditem['zd']])}selected{/if}>-----请选择-----</option>
+                  {volist name="bditem.items" id="selectitem"}
+                      <option value="{$selectitem}" {if isset($user[$bditem['zd']])&&$user[$bditem['zd']]==$selectitem}selected{/if}>{$selectitem}</option>
+                  {/volist}
+              </select>
+            {else /}
+                <select class="form-control" name="sex">
+                    <option value="男" {if isset($user['sex']) && $user['sex']=='男'}selected{/if}>男</option>
+                    <option value="女" {if isset($user['sex']) && $user['sex']=='女'}selected{/if}>女</option>
+                </select>
+            {/if}
+          {/if}
+        </div>
+      </div>
+    {/volist}
+</form>
+</div>
+<script type="text/javascript">
+</script>

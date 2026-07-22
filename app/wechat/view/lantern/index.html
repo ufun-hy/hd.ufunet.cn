@@ -1,0 +1,303 @@
+{include file="common/header" /}
+<style>
+    .app-lantern{
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        
+    }
+    .lantern-select-box{
+        position: relative;
+        width: 100%;
+        height: 2.6rem;
+        padding: 0 1rem;
+        box-sizing: border-box;
+    }
+    .lantern-select-title{
+        margin-bottom: 0.52rem;
+        height: 1rem;
+        font-size: 0.42rem;
+        color: #fff;
+        font-weight: 700;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .lantern-swiper{
+        width: 72%;
+        height: 2.6rem;
+        overflow: hidden;
+    }
+    .lantern-swiper .swiper-slide{
+        height: 100%;
+    }
+    .lantern-swiper .swiper-slide .slide-imgbox{
+        height: 100%;
+        display: flex;
+        justify-content: center;
+    }
+    .lantern-swiper .swiper-slide .slide-imgbox img{
+        height: 100%
+    }
+    .swiper-next-prev {
+        position: absolute;
+        width: 0.95rem;
+        height: 1.51rem;
+        top: calc(50% - 0.75rem);
+        margin-top: 0;
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+        -webkit-tap-highlight-color:transparent;
+    }
+    .swiper-button-prev{
+        left: 24px;
+        background-image: url("{:tomedia($appconfig['appstyle']['prev'])}");
+    }
+    .swiper-button-next{
+        right: 24px;
+        background-image: url("{:tomedia($appconfig['appstyle']['next'])}");
+    }
+    .sendlantern{
+        position: absolute;
+        bottom: 1.2rem;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 3.98rem;
+        height: 1.61rem;
+        background-image: url("{:tomedia($appconfig['appstyle']['openbtn'])}");
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+        cursor: pointer;
+        -webkit-tap-highlight-color:transparent;
+    }
+    .lantern-pop{
+        position:fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+        background-color: rgba(0,0,0,0.62);
+    }
+    .pop-top{
+        width: 6rem;
+        height: 2.8rem;
+        background-image: url("{:tomedia($appconfig['appstyle']['poptop'])}");
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+    }
+    .pop-bottom{
+        width: 6rem;
+        height: 0.6rem;
+        background-image: url("{:tomedia($appconfig['appstyle']['popbottom'])}");
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+    }
+    .pop-center{
+        position: relative;
+        width: 6rem;
+        min-height: 2rem;
+        margin: -0.1rem 0;
+        background-image: url("{:tomedia($appconfig['appstyle']['popcenter'])}");
+        background-repeat: repeat-y;
+        background-size: 100% 100%;
+        padding: 0.1rem 0.32rem;
+        box-sizing: border-box;
+    }
+    .pop-center .textinput{
+        width: 100%;
+        border-radius: 0.1rem;
+        height: 2.5rem;
+        background-color: #fdeace;
+        border: 1px solid #fabab3;
+        box-sizing: border-box;
+        padding: 8px 12px;
+        line-height: 1.5;
+        font-size: 0.26rem;
+        font-family: inherit;
+        color: #000;
+        -webkit-tap-highlight-color:transparent;
+    }
+    
+    .pop-selectwords .word-title{
+        height: 0.9rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .pop-selectwords .word-title .txt{
+        color: #efab7d;
+        font-size: 0.32rem;
+        font-weight: 700;
+    }
+    .pop-selectwords .word-title .changebtn{
+        padding: 0.1rem;
+        border-radius: 0.3rem;
+        border: 1px solid #efab7d;
+        color: #efab7d;
+        cursor: pointer;
+        line-height: 1;
+        -webkit-tap-highlight-color:transparent;
+    }
+    .pop-selectwords .word-title .changebtn i{
+        margin-right: 0.1rem;
+    }
+    .pop-selectwords .word-list{
+        overflow: hidden scroll;
+        max-height: {if $appconfig['appselfinput'] == '1'}3.6{else /}4.6{/if}rem;
+    }
+    
+    .pop-selectwords .word-list li{
+        position: relative;
+        padding: 0.16rem 0.3rem;
+        border-radius: 0.1rem;
+        margin-bottom: 0.12rem;
+        background-color: #fdeace;
+        border: 1px solid #fabab3;
+        font-size: 0.24rem;
+        color: #000;
+        cursor: pointer;
+    }
+    .pop-selectwords .word-list li.selected{
+        border-color: #f1670a;
+        color: #f1670a;
+    }
+    .pop-selectwords .word-list li.selected span{
+        display: block;
+    }
+    .pop-selectwords .word-list li span{
+        position: absolute;
+        right: 2px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #f1670a;
+        font-size: 0.24rem;
+        font-weight: 700;
+        display: none;
+    }
+    .pop-center .confirm{
+        margin-top: 0.2rem;
+        width: 2.45rem;
+        height: 0.77rem;
+        align-self: center;
+        background-image: url("{:tomedia($appconfig['appstyle']['popbtn'])}");
+        background-repeat: no-repeat;
+        background-size: cover;
+    }
+    .pop-close{
+        margin-top: 0.2rem;
+        color: #fff;
+        font-size: 0.72rem;
+        cursor: pointer;
+    }
+</style>
+<div class="app-lantern">
+    <div class="lantern-select-box">
+        <div class="swiper-container lantern-swiper">
+            <div class="swiper-wrapper">
+                {foreach $appconfig['pcstyle']['lanterns'] as $one}
+                <div class="swiper-slide">
+                    <div class="slide-imgbox">
+                        <img data-src="{:tomedia($one)}" class="swiper-lazy" />
+                        <div class="swiper-lazy-preloader"></div>
+                    </div>
+                </div>
+                {/foreach}
+            </div>
+        </div>
+        <div class="swiper-next-prev swiper-button-prev"></div>
+        <div class="swiper-next-prev swiper-button-next"></div>
+    </div>
+    <div class="sendlantern"></div>
+</div>
+<div class="lantern-pop zam-app-flex-ajCenter hidden">
+    <div class="pop-top"></div>
+    <div class="pop-center zam-app-flex zam-app-directionColumn">
+        <textarea class="textinput{if $appconfig['appselfinput'] != '1'} hidden{/if}" oninput="this.value=this.value.trim()" placeholder="请输入祝福语{if $appconfig['appmaxlength'] > 0}，限字{$appconfig['appmaxlength']}内{/if}" {if $appconfig['appmaxlength'] > 0}maxlength="{$appconfig['appmaxlength']}"{/if}></textarea>
+        {if !empty($appconfig['appwords'])}
+        <div class="pop-selectwords">
+            <div class="word-title">
+                <div class="txt">选择祝福</div>
+                <div class="changebtn hidden"><i class="mxc-refresh"></i>换一批</div>
+            </div>
+            <div class="word-list">
+                <ul>
+                    {foreach $appconfig['appwords'] as $word}
+                    <li>{$word}<span class="mxc-check"></span></li>
+                    {/foreach}
+                </ul>
+            </div>
+        </div>
+        {/if}
+        {if $appconfig['appselfinput'] == '1' || !empty($appconfig['appwords'])}
+        <div class="confirm"></div>
+        {/if}
+    </div>
+    <div class="pop-bottom"></div>
+    <span class="pop-close mxc-roundclose"></span>
+</div>
+<script>
+    require(['wechatcore','swiper'],function(wechatcore,Swiper){
+        $('.app-lantern,.lantern-pop').height($('body').height());
+        var mymoduleSwiper = new Swiper('.lantern-swiper',{
+            loop:false,
+            lazy: {
+                loadPrevNext: true,
+            },
+            navigation: {
+                nextEl: ".swiper-button-next",
+                prevEl: ".swiper-button-prev",
+            },
+		});
+        $(".sendlantern").click(function(){
+            $(".lantern-pop").removeClass("hidden")
+        });
+        $(".pop-close").click(function(){
+            $(".lantern-pop").addClass("hidden")
+        });
+        $(".word-list").on('click','li',function(){
+            $(".textinput").val($(this).text());
+            if($(".textinput").is(":hidden")){
+                $(this).addClass("selected").siblings().removeClass('selected');
+            }
+        });
+        $(".confirm").click(function(){
+            var inputhidden = $(".textinput").is(":hidden"),content = $(".textinput").val() || '';
+            if(!inputhidden){
+                content = content.trim();
+                if(!content){
+                    return wechatcore.msg('请先输入心愿内容');
+                }
+            }else{
+                var selLi = $(".word-list li.selected");
+                if(!selLi.length){
+                    return wechatcore.msg('请先选择一条祝福语');
+                }
+                content = selLi.text();
+            }
+            wechatcore.ajaxSubmit('/wechat/lantern/sendlantern',{content:content,type:mymoduleSwiper.activeIndex + 1},'心愿发送中..').then(function(json){
+                if(json.code==0){
+                    if(!inputhidden){
+                        $(".textinput").val('');
+                    }else{
+                        $(".word-list li").removeClass('selected');
+                    }
+                    wechatcore.msg('发送成功');
+                    $(".pop-close").trigger('click');
+                }else{
+                    wechatcore.msg(json.msg);
+                }
+            }, function(){
+                wechatcore.msg('网络太差，提交失败');
+            });
+        });
+    });
+</script>
+{include file="common/footermenu" /}
+{include file="common/footer" /}

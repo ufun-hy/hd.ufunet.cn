@@ -1,0 +1,911 @@
+{include file='common/header' /}
+<style>
+.flex1{
+    flex: 1;
+	-webkit-flex: 1;
+}
+.header{
+    display: none;
+}
+.ui-icon-gripsmall-diagonal-se{
+    background-image: none;
+}
+.ui-resizable-resizing,.ui-draggable-dragging{
+    border:1px dashed #fff;
+}
+{if isset($pcconfig['screendrag']) && $pcconfig['screendrag']=='2'}
+.dragbox{
+    pointer-events: none;
+}
+{/if}
+.rankreport-full{
+    width: 100%;
+    height: 100%;
+}
+.rankreport-mainbox{
+    position: relative;
+    height: 100%;
+    width: {if !isset($pcconfig['screenwidthtype']) || $pcconfig['screenwidthtype']=='1'}1420px{else /}100%{/if};
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+.tjstatusbox{
+    position: absolute;
+    width: {$pcconfig['tjstatusconfig']['width']??90}px;
+    height: {$pcconfig['tjstatusconfig']['height']??32}px;
+    top: {$pcconfig['tjstatusconfig']['top']??10}px;
+    left: {$pcconfig['tjstatusconfig']['left']??10}px;
+    display:{if isset($pcconfig['tjstatusconfig']['open']) && $pcconfig['tjstatusconfig']['open'] == '1'}block{else /}none{/if}
+}
+.tjstatusbox.ui-resizable-resizing .tjstatus,.tjstatusbox.ui-draggable-dragging .tjstatus{
+    border:none;
+}
+.tjstatusbox .tjstatus{
+    width: 100%;
+    height: 100%;
+    border-radius: 5px;
+}
+.tjstatusbox .status1{
+    font-size: {$pcconfig['tjstatusconfig']['status1']['size']??42}px;
+    color: {$pcconfig['tjstatusconfig']['status1']['color']??'#fff'};
+    background-color: {$pcconfig['tjstatusconfig']['status1']['bgcolor']??'#03A9F4'};
+    border: {$pcconfig['tjstatusconfig']['status1']['bordersize']??1}px solid {$pcconfig['tjstatusconfig']['status1']['bordercolor']??'#ffdfa1'};
+}
+.tjstatusbox .status2{
+    font-size: {$pcconfig['tjstatusconfig']['status2']['size']??42}px;
+    color: {$pcconfig['tjstatusconfig']['status2']['color']??'#fff'};
+    background-color: {$pcconfig['tjstatusconfig']['status2']['bgcolor']??'#03A9F4'};
+    border: {$pcconfig['tjstatusconfig']['status2']['bordersize']??1}px solid {$pcconfig['tjstatusconfig']['status2']['bordercolor']??'#ffdfa1'};
+}
+.tjstatusbox .status3{
+    font-size: {$pcconfig['tjstatusconfig']['status3']['size']??42}px;
+    color: {$pcconfig['tjstatusconfig']['status3']['color']??'#fff'};
+    background-color: {$pcconfig['tjstatusconfig']['status3']['bgcolor']??'#03A9F4'};
+    border: {$pcconfig['tjstatusconfig']['status3']['bordersize']??1}px solid {$pcconfig['tjstatusconfig']['status3']['bordercolor']??'#ffdfa1'};
+}
+.toptitlebox{
+    position: absolute;
+    top: {$pcconfig['toptitleimg']['top']}px;
+    left: {$pcconfig['toptitleimg']['left']}px;
+    width:{$pcconfig['toptitleimg']['width']}px;
+}
+.toptitlebox img{
+    width: 100%;
+}
+/* 总计人数 */
+.personbox{
+    position: absolute;
+    font-weight: 500;
+    top: {$pcconfig['tongjiconfig']['person']['top']}px;
+    left: {$pcconfig['tongjiconfig']['person']['left']}px;
+    font-size: {$pcconfig['tongjiconfig']['person']['size']}px;
+    color: {$pcconfig['tongjiconfig']['person']['color']};
+}
+.personbox .title{
+    font-size: {$pcconfig['tongjiconfig']['person']['size']}px;
+}
+.personbox .unit{
+    font-size: {$pcconfig['tongjiconfig']['person']['size']}px;
+}
+.personbox .num{
+    padding:0 20px;
+    border-radius: 5px;
+    font-weight: 700;
+    margin: 0 10px;
+    font-size: {$pcconfig['tongjiconfig']['person']['numsize']}px;
+    color: {$pcconfig['tongjiconfig']['person']['numcolor']};
+    background-color: {$pcconfig['tongjiconfig']['person']['numbgcolor']};
+}
+
+/* 总计金额 */
+.moneybox{
+    position: absolute;
+    font-weight: 500;
+    top: {$pcconfig['tongjiconfig']['money']['top']}px;
+    left: {$pcconfig['tongjiconfig']['money']['left']}px;
+    font-size: {$pcconfig['tongjiconfig']['money']['size']}px;
+    color: {$pcconfig['tongjiconfig']['money']['color']};
+}
+.moneybox .title{
+    font-size: {$pcconfig['tongjiconfig']['money']['size']}px;
+}
+.moneybox .unit{
+    font-size: {$pcconfig['tongjiconfig']['money']['size']}px;
+}
+.moneybox .num{
+    padding:0 20px;
+    border-radius: 5px;
+    font-weight: 700;
+    margin: 0 10px;
+    font-size: {$pcconfig['tongjiconfig']['money']['numsize']}px;
+    color: {$pcconfig['tongjiconfig']['money']['numcolor']};
+    background-color: {$pcconfig['tongjiconfig']['money']['numbgcolor']};
+}
+/* 三种表的样式 */
+.JCLRgrip .rangeGrip{
+    display: none;
+}
+.JCLRgrip:hover .rangeGrip,.JCLRgrip.isdragging .rangeGrip{
+    display: block;
+}
+.tablebox{
+    position: absolute;
+    top: 0px;
+    height: 100%;
+    overflow: hidden;
+}
+.tablebox .titleimg{
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    margin: 0 auto;
+    margin-bottom: 20px;
+}
+.tablebox .titleimg img{
+    width: 100%;
+}
+.table{
+    width: 100%;
+    border-radius: 8px;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+.table table{
+    width: 100%;
+}
+
+.table table th,.table table td{
+   color:#fff;
+   text-align: center;
+}
+
+.table table td div{
+    width:100%;
+    white-space:normal;
+    word-wrap:break-word;
+    word-break:break-all;
+}
+.rangeGrip{
+	width:10px;
+	height:19px;
+	cursor:e-resize;
+	background-image: url("/static/images/screen/rankreport/slider.png");
+	z-index:8;
+}
+.rangeGrip, .rangeGrip:hover{
+	background-position:right;
+}
+.personrank{
+    position: absolute;
+    overflow: hidden;
+    top: {$pcconfig['personrankconfig']['top']}px;
+    left: {$pcconfig['personrankconfig']['left']}px;
+    height: {$pcconfig['personrankconfig']['height']}px;
+    width: {$pcconfig['personrankconfig']['width']}px;
+    display:{if $pcconfig['personrankconfig']['open'] == '1'}block{else /}none{/if};
+}
+.personrank .table{
+    border: {$pcconfig['personrankconfig']['borderoutsize']}px solid {$pcconfig['personrankconfig']['borderoutcolor']};
+}
+.personrank .table th,.personrank .table td{
+    height: {$pcconfig['personrankconfig']['lineheight']}px;
+    border-bottom:{$pcconfig['personrankconfig']['borderinnersize']}px solid {$pcconfig['personrankconfig']['borderinnercolor']};
+}
+
+.teamrank{
+    position: absolute;
+    overflow: hidden;
+    top: {$pcconfig['teamrankconfig']['top']}px;
+    left: {$pcconfig['teamrankconfig']['left']}px;
+    height: {$pcconfig['teamrankconfig']['height']}px;
+    width: {$pcconfig['teamrankconfig']['width']}px;
+    display:{if $pcconfig['teamrankconfig']['open'] == '1'}block{else /}none{/if};
+}
+
+.teamrank .table{
+    border: {$pcconfig['teamrankconfig']['borderoutsize']}px solid {$pcconfig['teamrankconfig']['borderoutcolor']};
+}
+
+.teamrank .table th,.teamrank .table td{
+    height: {$pcconfig['teamrankconfig']['lineheight']}px;
+    border-bottom:{$pcconfig['personrankconfig']['borderinnersize']}px solid {$pcconfig['personrankconfig']['borderinnercolor']};
+}
+
+.personlist{
+    position: absolute;
+    overflow: hidden;
+    top: {$pcconfig['personlistconfig']['top']}px;
+    left: {$pcconfig['personlistconfig']['left']}px;
+    height: {$pcconfig['personlistconfig']['height']}px;
+    width: {$pcconfig['personlistconfig']['width']}px;
+    display:{if $pcconfig['personlistconfig']['open'] == '1'}block{else /}none{/if};
+}
+.personlist .tablebox{
+    width: 100%;
+}
+.personlist .table{
+    overflow: hidden;
+    border: {$pcconfig['personlistconfig']['borderoutsize']}px solid {$pcconfig['personlistconfig']['borderoutcolor']};
+}
+.personlist .table table{
+    overflow: hidden;
+}
+.personlist .table .personlist-body{
+    overflow: hidden;
+}
+.personlist .table .personlist-body table{
+    margin-top: -{$pcconfig['personlistconfig']['lineheight']}px;
+}
+.personlist .table .personlist-body thead{
+    opacity: 0;
+}
+.personlist .table .personlist-body .JCLRgrips{
+    pointer-events: none;
+}
+.personlist .table th,.personlist .table td{
+    height: {$pcconfig['personlistconfig']['lineheight']}px;
+    border-bottom:{$pcconfig['personlistconfig']['borderinnersize']}px solid {$pcconfig['personlistconfig']['borderinnercolor']};
+}
+</style>
+<div class="rankreport-full">
+<div class="rankreport-mainbox">
+    {if $pcconfig['toptitleimg']['open'] == '1' && !empty($pcconfig['toptitleimg']['img'])}
+    <div class="toptitlebox dragbox" data-type="toptitlebox">
+        <img src="{:tomedia($pcconfig['toptitleimg']['img'])}" />
+    </div>
+    {/if}
+    <div class="tjstatusbox dragbox" data-type="tjstatus">
+        <div class="tjstatus zam-app-flex-ajCenter2 status{$pcconfig['tjstatus']??1}" data-status="{$pcconfig['tjstatus']??1}">
+            {if isset($pcconfig['tjstatus']) && $pcconfig['tjstatus']=='2'}
+            {$pcconfig['tjstatusconfig']['status2']['text']??'进行中'}
+            {elseif isset($pcconfig['tjstatus']) && $pcconfig['tjstatus']=='3'}
+            {$pcconfig['tjstatusconfig']['status3']['text']??'已结束'}
+            {else /}
+            {$pcconfig['tjstatusconfig']['status1']['text']??'未开始'}
+            {/if}
+        </div>
+    </div>
+    {if $pcconfig['tongjiconfig']['person']['open'] == '1'}
+    <div class="personbox dragbox zam-app-flex zam-app-alignCenter" data-type="personbox">
+        {if !empty($pcconfig['tongjiconfig']['person']['pretxt'])}
+        <div class="title">{$pcconfig['tongjiconfig']['person']['pretxt']}</div>
+        {/if}
+        <div class="num">0</div>
+        {if !empty($pcconfig['tongjiconfig']['person']['endtxt'])}
+        <div class="unit">{$pcconfig['tongjiconfig']['person']['endtxt']}</div>
+        {/if}
+    </div>
+    {/if}
+    {if $pcconfig['tongjiconfig']['money']['open'] == '1'}
+    <div class="moneybox dragbox zam-app-flex zam-app-alignCenter" data-type="moneybox">
+        {if !empty($pcconfig['tongjiconfig']['money']['pretxt'])}
+        <div class="title">{$pcconfig['tongjiconfig']['money']['pretxt']}</div>
+        {/if}
+        <div class="num">0</div>
+        {if !empty($pcconfig['tongjiconfig']['money']['endtxt'])}
+        <div class="unit">{$pcconfig['tongjiconfig']['money']['endtxt']}</div>
+        {/if}
+    </div>
+    {/if}
+    <div class="personrank dragbox" data-type="personrank">
+    </div>
+    <div class="teamrank dragbox" data-type="teamrank">
+    </div>
+    <div class="personlist dragbox" data-type="personlist">
+        <div class="tablebox zam-app-flex zam-app-directionColumn">
+            {if $pcconfig['personlistconfig']['topimg']['open'] == '1' && !empty($pcconfig['personlistconfig']['topimg']['img'])}
+            <div class="titleimg" style="width:{$pcconfig['personlistconfig']['topimg']['width']}%;margin-bottom: {$pcconfig['personlistconfig']['topimg']['margin']}px">
+                <img src="{:tomedia($pcconfig['personlistconfig']['topimg']['img'])}" />
+            </div>
+            {/if}
+            <div class="table flex1 zam-app-flex zam-app-directionColumn">
+                <div class="personlist-header">
+                    <div>
+                        <table data-type="personlist" cellpadding="0" cellspacing="0">
+                        <thead>
+                            <tr>
+                                {foreach $pcconfig['personlistconfig']['items'] as $pitem}
+                                <th style="width:{$pitem['width']}%;font-size:{$pitem['thsize']??16}px;color:{$pitem['thcolor']??'#fff'};background-color:{$pitem['thbgcolor']??'red'}">{$pitem['name']}</th>
+                                {/foreach}
+                            </tr>
+                        </thead>
+                        </table>
+                    </div>
+                </div>
+                <div class="personlist-body flex1">
+                    <table cellpadding="0" cellspacing="0">
+                        <thead>
+                            <tr>
+                                {foreach $pcconfig['personlistconfig']['items'] as $pitem}
+                                <th style="width:{$pitem['width']}%;font-size:{$pitem['thsize']??16}px;color:{$pitem['thcolor']??'#fff'};background-color:{$pitem['thbgcolor']??'red'}">{$pitem['name']}</th>
+                                {/foreach}
+                            </tr>
+                        </thead>
+                        <tbody class="personlist-content"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{include file="rankreport/pop"}
+</div>
+<script id="personrank-table-tpl" type="html/javascript">
+    <div class="tablebox zam-app-flex zam-app-directionColumn" style="width:{{# width}};left:{{# left}}">
+        {if $pcconfig['personrankconfig']['topimg']['open'] == '1' && !empty($pcconfig['personrankconfig']['topimg']['img'])}
+        <div class="titleimg" style="width:{$pcconfig['personrankconfig']['topimg']['width']}%;margin-bottom: {$pcconfig['personrankconfig']['topimg']['margin']}px">
+            <img src="{:tomedia($pcconfig['personrankconfig']['topimg']['img'])}" />
+        </div>
+        {/if}
+        <div class="table flex1">
+        <table data-type="personrank" class="table{{ index }}" cellpadding="0" cellspacing="0">
+            <thead>
+                <tr>
+                    {foreach $pcconfig['personrankconfig']['items'] as $pitem}
+                    <th style="width:{$pitem['width']}%;font-size:{$pitem['thsize']??16}px;color:{$pitem['thcolor']??'#fff'};background-color:{$pitem['thbgcolor']??'red'}">{$pitem['name']}</th>
+                    {/foreach}
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        </div>
+    </div>
+</script>
+<script id="personrank-item-tpl" type="html/javascript">
+    <tr>
+        {foreach $pcconfig['personrankconfig']['items'] as $pitem}
+        <td style="font-size:{$pitem['size']}px;color:{$pitem['color']}">{{ {$pitem['bdzd']} }}</td>
+        {/foreach}
+    </tr>	
+</script>
+<script id="teamrank-table-tpl" type="html/javascript">
+    <div class="tablebox zam-app-flex zam-app-directionColumn" style="width:{{# width}};left:{{# left}}">
+        {if $pcconfig['teamrankconfig']['topimg']['open'] == '1' && !empty($pcconfig['teamrankconfig']['topimg']['img'])}
+        <div class="titleimg" style="width:{$pcconfig['teamrankconfig']['topimg']['width']}%;margin-bottom: {$pcconfig['teamrankconfig']['topimg']['margin']}px">
+            <img src="{:tomedia($pcconfig['teamrankconfig']['topimg']['img'])}" />
+        </div>
+        {/if}
+        <div class="table flex1">
+        <table data-type="teamrank" class="table{{ index }}" cellpadding="0" cellspacing="0">
+            <thead>
+                <tr>
+                    {foreach $pcconfig['teamrankconfig']['items'] as $pitem}
+                    <th style="width:{$pitem['width']}%;font-size:{$pitem['thsize']??16}px;color:{$pitem['thcolor']??'#fff'};background-color:{$pitem['thbgcolor']??'red'}">{$pitem['name']}</th>
+                    {/foreach}
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        </div>
+    </div>
+</script>
+<script id="teamrank-item-tpl" type="html/javascript">
+    <tr>
+        {foreach $pcconfig['teamrankconfig']['items'] as $pitem}
+        <td style="font-size:{$pitem['size']}px;color:{$pitem['color']}">{{ {$pitem['bdzd']} }}</td>
+        {/foreach}
+    </tr>	
+</script>
+<script id="personlist-item-tpl" type="html/javascript"> 
+    <tr class="one-{{ id }}">
+        {foreach $pcconfig['personlistconfig']['items'] as $pitem}
+        <td class="f-{$pitem['field']}" style="font-size:{$pitem['size']}px;color:{$pitem['color']}">{{ {$pitem['bdzd']} }}</td>
+        {/foreach}
+    </tr>	
+</script>
+<script>
+var phtml = '',pcol = parseInt("{$pcconfig['personrankconfig']['col']}"),pmargin = parseInt("{$pcconfig['personrankconfig']['margin']}");
+var thtml = '',tcol = parseInt("{$pcconfig['teamrankconfig']['col']}"),tmargin = parseInt("{$pcconfig['teamrankconfig']['margin']}");
+var scrollspeed = parseInt("{$pcconfig['personlistconfig']['scrollspeed']}"),maxlen = parseInt("{$pcconfig['personlistconfig']['limit']}"),maxid = 0,personlistMsg = [],personlistWait = [];
+var ispop = false,waitpoplist = [],popseconds = parseInt("{$pcconfig['popconfig']['seconds']??6}");
+var tjstatuslay = "{$pcconfig['tjstatusconfig']['openlay']??1}";
+require(['screencore','screensocket','fulldm','template','layerBox','anime','colresizable','keyboard','jquery.ui2'],function(screencore,screensocket,fulldm,template,layerBox,anime,colResizable,keyboardJS){
+    screensocket.init({
+        onmessage:function(data){
+            if(data.type=='connected'){
+                screensocket.isclose = false;
+                screencore.connectsocket({clientid:data.clientid});
+            }else if(data.type=='screendm'){
+                var messages = data.messages;
+                if(messages){
+                    if($.isArray(messages)&&messages.length>0){
+                        $.each(messages,function(i, val){
+                            fulldm.addBullet(val);
+                        });
+                    }
+                }else{
+                    fulldm.addBullet(data);
+                }
+            }else if(data.type=='screendeldm'){
+                if(!$.isArray(data.msgid)){
+                    fulldm.delBullet(data.msgid);
+                }else{
+                    $.each(data.msgid,function(index,val){
+                        fulldm.delBullet(val);
+                    });
+                }
+            }else if(data.type=='screenresetdm'){
+                fulldm.resetBullet();
+            }else if(data.type == 'rankreportdatachange'){
+                var datas = data.data||{},did = datas.id||'',odata = datas.odata||'';
+                if(did && odata){
+                    var okeys = Object.keys(odata);
+                    var fdoms = $(`.one-${did}`);
+                    if(fdoms.length){
+                        fdoms.each(function(){
+                            var $this = $(this);
+                            okeys.forEach(function(v){
+                                $this.find(`.f-${v}`).html(odata[v]);
+                            })
+                        })
+                    }
+                    const oneMsg = personlistMsg.find(item  => item.id  === did); 
+                    if (oneMsg) { 
+                        oneMsg.odata  = odata; 
+                    } 
+                    const waitMsg = personlistWait.find(item  => item.id  === did); 
+                    if (waitMsg) { 
+                        waitMsg.odata  = odata; 
+                    } 
+                }
+            }else if(data.type == 'rankreportpop'){
+                var onepoptxt = data.poptxt||'';
+                if(onepoptxt){
+                    waitpoplist.push(onepoptxt);
+                }
+            }
+        }
+    });
+    for (let index = 0; index < pcol; index++) {
+        phtml += template('personrank-table-tpl',{
+            index:index,
+            width:(pcol > 1 ? `calc(${100 / pcol}% - ${pmargin}px)` : `100%`),
+            left: (pcol > 1 ? `calc(${index} * (${100 / pcol}% - ${pmargin}px) + ${index} * ${(pcol * pmargin) / (pcol - 1)}px)` : 0),
+        });
+    }
+    $('.personrank').html(phtml);
+    for (let index = 0; index < tcol; index++) {
+        thtml += template('teamrank-table-tpl',{
+            index:index,
+            width:(tcol > 1 ? `calc(${100 / tcol}% - ${tmargin}px)` : `100%`),
+            left: (tcol > 1 ? `calc(${index} * (${100 / tcol}% - ${tmargin}px) + ${index} * ${(tcol * tmargin) / (tcol - 1)}px)` : 0),
+        });
+    }
+    $('.teamrank').html(thtml);
+    $('.tjstatusbox').resizable({
+        resize: function (evt, ui) {
+            var zoomScale = (window.innerHeight / 800).toFixed(2);
+            var maxW = $('.rankreport-mainbox').width() - ui.position.left;
+            var maxH = $('.rankreport-mainbox').height() - ui.position.top;
+            var changeW = ui.size.width - ui.originalSize.width;
+            var width = Math.round(ui.originalSize.width + changeW / zoomScale);
+            if(width > maxW){
+                width = maxW;
+            }
+            ui.size.width = width;
+            var changeH = ui.size.height - ui.originalSize.height;
+            var height = Math.round(ui.originalSize.height + changeH / zoomScale);
+            if(height > maxH){
+                height = maxH;
+            }
+            ui.size.height = height;
+        },
+        stop:function(event, ui){
+            saveconfig({
+                type:'tjstatus',
+                width:ui.size.width,
+                height:ui.size.height,
+            });
+        }
+    });
+    $('.toptitlebox').resizable({
+        resize: function (evt, ui) {
+            var zoomScale = (window.innerHeight / 800).toFixed(2);
+            var maxW = $('.rankreport-mainbox').width() - ui.position.left;
+            var maxH = $('.rankreport-mainbox').height() - ui.position.top;
+            var changeW = ui.size.width - ui.originalSize.width;
+            var width = Math.round(ui.originalSize.width + changeW / zoomScale);
+            if(width > maxW){
+                width = maxW;
+            }
+            ui.size.width = width;
+            var changeH = ui.size.height - ui.originalSize.height;
+            var height = Math.round(ui.originalSize.height + changeH / zoomScale);
+            if(height > maxH){
+                height = maxH;
+            }
+            ui.size.height = height;
+        },
+        stop:function(event, ui){
+            saveconfig({
+                type:'toptitlebox',
+                width:ui.size.width,
+                height:ui.size.height,
+            });
+        }
+    });
+    $('.personbox').resizable({
+        resize: function (evt, ui) {
+            var zoomScale = (window.innerHeight / 800).toFixed(2);
+            var maxW = $('.rankreport-mainbox').width() - ui.position.left;
+            var maxH = $('.rankreport-mainbox').height() - ui.position.top;
+            var changeW = ui.size.width - ui.originalSize.width;
+            var width = Math.round(ui.originalSize.width + changeW / zoomScale);
+            if(width > maxW){
+                width = maxW;
+            }
+            ui.size.width = width;
+            var changeH = ui.size.height - ui.originalSize.height;
+            var height = Math.round(ui.originalSize.height + changeH / zoomScale);
+            if(height > maxH){
+                height = maxH;
+            }
+            ui.size.height = height;
+        },
+        stop:function(event, ui){
+            saveconfig({
+                type:'personbox',
+                width:ui.size.width,
+                height:ui.size.height,
+            });
+        }
+    });
+    $('.moneybox').resizable({
+        resize: function (evt, ui) {
+            var zoomScale = (window.innerHeight / 800).toFixed(2);
+            var maxW = $('.rankreport-mainbox').width() - ui.position.left;
+            var maxH = $('.rankreport-mainbox').height() - ui.position.top;
+            var changeW = ui.size.width - ui.originalSize.width;
+            var width = Math.round(ui.originalSize.width + changeW / zoomScale);
+            if(width > maxW){
+                width = maxW;
+            }
+            ui.size.width = width;
+            var changeH = ui.size.height - ui.originalSize.height;
+            var height = Math.round(ui.originalSize.height + changeH / zoomScale);
+            if(height > maxH){
+                height = maxH;
+            }
+            ui.size.height = height;
+        },
+        stop:function(event, ui){
+            saveconfig({
+                type:'moneybox',
+                width:ui.size.width,
+                height:ui.size.height,
+            });
+        }
+    });
+    //拖拽个人和团队榜单
+    setTimeout(function(){
+        $('.personlist').resizable({
+            resize: function (evt, ui) {
+                var zoomScale = (window.innerHeight / 800).toFixed(2);
+                var maxW = $('.rankreport-mainbox').width() - ui.position.left;
+                var maxH = $('.rankreport-mainbox').height() - ui.position.top;
+                var changeW = ui.size.width - ui.originalSize.width;
+                var width = Math.round(ui.originalSize.width + changeW / zoomScale);
+                if(width > maxW){
+                    width = maxW;
+                }
+                ui.size.width = width;
+                var changeH = ui.size.height - ui.originalSize.height;
+                var height = Math.round(ui.originalSize.height + changeH / zoomScale);
+                if(height > maxH){
+                    height = maxH;
+                }
+                ui.size.height = height;
+            },
+            stop:function(event, ui){
+                saveconfig({
+                    type:'personlist',
+                    width:ui.size.width,
+                    height:ui.size.height,
+                });
+            }
+        });
+        $('.personrank').resizable({
+            resize: function (evt, ui) {
+                var zoomScale = (window.innerHeight / 800).toFixed(2);
+                var maxW = $('.rankreport-mainbox').width() - ui.position.left;
+                var maxH = $('.rankreport-mainbox').height() - ui.position.top;
+                var changeW = ui.size.width - ui.originalSize.width;
+                var width = Math.round(ui.originalSize.width + changeW / zoomScale);
+                if(width > maxW){
+                    width = maxW;
+                }
+                ui.size.width = width;
+                var changeH = ui.size.height - ui.originalSize.height;
+                var height = Math.round(ui.originalSize.height + changeH / zoomScale);
+                if(height > maxH){
+                    height = maxH;
+                }
+                ui.size.height = height;
+            },
+            stop:function(event, ui){
+                saveconfig({
+                    type:'personrank',
+                    width:ui.size.width,
+                    height:ui.size.height,
+                });
+            }
+        });
+        $('.teamrank').resizable({
+            resize: function (evt, ui) {
+                var zoomScale = (window.innerHeight / 800).toFixed(2);
+                var maxW = $('.rankreport-mainbox').width() - ui.position.left;
+                var maxH = $('.rankreport-mainbox').height() - ui.position.top;
+                var changeW = ui.size.width - ui.originalSize.width;
+                var width = Math.round(ui.originalSize.width + changeW / zoomScale);
+                if(width > maxW){
+                    width = maxW;
+                }
+                ui.size.width = width;
+                var changeH = ui.size.height - ui.originalSize.height;
+                var height = Math.round(ui.originalSize.height + changeH / zoomScale);
+                if(height > maxH){
+                    height = maxH;
+                }
+                ui.size.height = height;
+                
+            },
+            stop:function(event, ui){
+                saveconfig({
+                    type:'teamrank',
+                    width:ui.size.width,
+                    height:ui.size.height,
+                });
+            }
+        });
+        $('.dragbox').mousedown(function (evt) {
+            if(evt.target.classList.value.includes('ui-resizable-handle')){
+                return false;
+            }
+            evt.preventDefault();
+            var $this = $(this);
+            var zoomScale = (window.innerHeight / 800).toFixed(2);
+            var distanceX = evt.clientX / zoomScale - $this[0].offsetLeft;
+            var distanceY = evt.clientY / zoomScale - $this[0].offsetTop;
+            var newL = 0;
+            var newT = 0;
+            $(document).bind('mousemove', function (ev) {
+                $this.addClass('ui-draggable-dragging');
+                var boxW = $this.width();
+                var boxH = $this.height();
+                var maxW = $('.rankreport-mainbox').width();
+                var maxH = $('.rankreport-mainbox').height();
+                newL = ev.clientX / zoomScale - distanceX;
+                newT = ev.clientY / zoomScale - distanceY;
+                if (newL < 0) newL = 0;
+                if (newL + boxW >= maxW) newL = maxW - boxW;
+                if (newT < 0) newT = 0;
+                if (newT + boxH >= maxH) newT = maxH - boxH;
+                $this.css({ left: newL + 'px', top: newT + 'px' });
+            });
+            $(document).bind('mouseup', function (ev) {
+                $(document).unbind('mousemove');
+                $this.removeClass('ui-draggable-dragging');
+                saveconfig({
+                    type:$this.attr('data-type'),
+                    left:newL,
+                    top:newT,
+                });
+            });
+        });
+        $("table").colResizable({
+            haszoom: true,
+            headerOnly:true,
+            liveDrag:true,
+            gripInnerHtml:"<div class='rangeGrip'></div>", 
+            draggingClass:"isdragging", 
+            resizeMode:'fit', 
+            postbackSafe:false,
+            partialRefresh:false,
+            minWidth:30,
+            onResize:function(e){
+                var target = $(e.currentTarget),columns = target.find("th"),ranges = [], total = 0, i, w;
+                for(i = 0; i<columns.length; i++){
+                    w = columns.eq(i).width() - 10 - (i == 0 ? 1 : 0);
+                    ranges.push(w);
+                    total += w;
+                }		 
+                for(i=0; i<columns.length; i++){
+                    var one = (ranges[i] / total).toFixed(4);
+                    one = (one * 100).toFixed(2);
+                    if(one < 0){
+                        one = 0;
+                    }
+                    ranges[i] = one;
+                }
+                var others = target.parent().parent().parent().find('table');
+                others.each(function() {
+                    $('th', this).each(function(i) {
+                        $(this).css('width', ranges[i]+'%');
+                    });
+                });
+                var ispersonlist = target.attr('data-type') === 'personlist';
+                if(ispersonlist){
+                    $(".personlist .table .personlist-body table").css({
+                        marginTop:-target.height(),
+                    })
+                }
+                //要改变模板tpl里的宽度 否则不刷新直接新增数据还是会使用旧的数据
+                saveconfig({
+                    type:target.attr('data-type'),
+                    stype: 'colwidth',
+                    ranges:ranges,
+                });
+            }
+        });
+    },1e2);
+    function saveconfig(data){
+        screencore.ajaxSubmit("/screen/rankreport/saveconfig",data).then(function(json){
+            console.log(json)
+        }, function(){
+            layerBox.showMsg('网络太差，请稍后重试');
+        });
+    }
+    ajaxdata('1');
+    setInterval(function(){
+        ajaxdata();
+    },3e3);
+    function ajaxdata(type){
+        screencore.ajaxSubmit("/screen/rankreport/ajaxdata",{'maxid':maxid}).then(function(json){
+            if(json.code != 0){
+                layerBox.showMsg(json.msg);
+            }else{
+                $(".personbox .num").text(json.msg.calc.count);
+                $(".moneybox .num").text(json.msg.calc.money);
+                //个人排名
+                var personRankLists = json.msg.personrank||[];
+                if(personRankLists.length){
+                    $.each(personRankLists,function(i,prlist){
+                        var tablehtml = '';
+                        $.each(prlist,function(j,v){
+                            tablehtml += template('personrank-item-tpl',v);
+                        });
+                        $(`.personrank .table${i} tbody`).html(tablehtml);
+                    });
+                }else{
+                    $(`.personrank tbody`).html('');
+                }
+                //团队排行
+                var teamRankLists = json.msg.teamrank||[];
+                if(teamRankLists.length){
+                    $.each(teamRankLists,function(i,trlist){
+                        var tablehtml = '';
+                        $.each(trlist,function(j,v){
+                            tablehtml += template('teamrank-item-tpl',v);
+                        });
+                        $(`.teamrank .table${i} tbody`).html(tablehtml);
+                    });
+                }else{
+                    $(`.teamrank tbody`).html('');
+                }
+                //实时订单
+                var personLists = json.msg.personlist||[];
+                if(personLists.length){
+                    maxid = personLists[0].id;
+                    if(type == '1'){
+                        personlistMsg = personLists.reverse();
+                        var listHtml = '';
+                        $.each(personlistMsg,function(i,v){
+                            listHtml += template('personlist-item-tpl',v);
+                        });
+                        $(".personlist .personlist-content").html(listHtml);
+                    }else{
+                        var list = personLists.reverse();
+                        personlistWait = personlistWait.concat(list);
+                        $.each(list,function(j,val){
+                            var poptxt = val.poptxt;
+                            if(poptxt){
+                                waitpoplist.push(poptxt);
+                            }
+                        });
+                    }
+                }
+            }
+        }, function(){
+            layerBox.showMsg('网络太差，请稍后重试');
+        });
+    }
+    //实时订单滚动
+    looprun();
+    function looprun(){
+        var contentsbox = $('.personlist-body');
+        var contentbox = $('.personlist-content');
+        var onemsg = null;
+        if (contentbox.outerHeight() > contentsbox.outerHeight()) {
+            if(personlistWait.length){
+                onemsg = personlistWait.shift();
+            }
+            if(!onemsg && personlistMsg.length){
+                onemsg = personlistMsg.shift();
+            }
+            if(onemsg){
+                contentbox.append(template('personlist-item-tpl',onemsg));
+                personlistMsg.push(onemsg);
+            }
+            var firstdom = contentbox.find('tr').first(), scrollH = firstdom.outerHeight(true);
+            anime({
+                targets: contentbox.get(0),
+                translateY: [0, -scrollH],
+                easing: 'linear',
+                duration: scrollspeed * 1e3,
+                delay:0,
+                complete: function () {
+                    firstdom.remove();
+                    looprun();
+                },
+            });
+        } else {
+            //从新数据内插入
+            if(personlistWait.length){
+                onemsg = personlistWait.shift();
+            }
+            if(onemsg){
+                contentbox.append(template('personlist-item-tpl',onemsg));
+                personlistMsg.push(onemsg);
+            }
+            contentbox.css({
+                transform: `translateY(0px)`
+            });
+            setTimeout(function () {
+                looprun();
+            }, 2e3);
+        }
+    }
+    setInterval(function () {
+        popshow();
+    }, 1e3);
+    function popshow() {
+        if (!ispop && waitpoplist.length > 0) {
+            ispop = true;
+            var poptxt = waitpoplist.shift();
+            setTimeout(function () {
+                $(".poptip").html(poptxt);
+                $(".rankreport-popBox").removeClass('maskclose').addClass('maskopen');
+                $(".yanhuabox").removeClass('hidden');
+                setTimeout(function () {
+                    $(".rankreport-popBox").removeClass('maskopen').addClass('maskclose');
+                    $(".yanhuabox").addClass('hidden');
+                    ispop = false;
+                }, popseconds * 1e3);
+            }, 1e2);
+        }
+    }
+    //重置
+    function resetMsg(){
+        if (personlistMsg.length > maxlen) {
+            personlistMsg = personlistMsg.sort((a, b) => b.id - a.id).slice(0, maxlen).reverse();
+        }
+    }
+    setInterval(function () {
+        resetMsg();
+    }, 60e3);
+    var sclicked = false;
+    keyboardJS.bind('space', function(e) {
+        if(sclicked){
+            return false;
+        }
+        sclicked = true;
+        var $this = $(".tjstatusbox .tjstatus"),tjstatus = $this.attr('data-status')||'1';
+        screencore.ajaxSubmit("/screen/rankreport/savetjstatus",{tjstatus:tjstatus}).then(function(json){
+            if(json.code == 0){
+                var statusname = json.msg.statusname || '';
+                $this.html(statusname).removeClass(`status${tjstatus}`).addClass(`status${json.msg.status}`).attr('data-status',json.msg.status||'1');
+                if(tjstatuslay == '1'){
+                    layerBox.showMsg(!statusname ? `切换成功` : `已切换至${statusname}`);
+                }
+            }else{
+                layerBox.showMsg(json.msg);
+            }
+            sclicked = false;
+        }, function(){
+            layerBox.showMsg('网络太差，请稍后重试');
+            sclicked = false;
+        });
+    });
+});
+</script>
+{include file='common/footer' /}

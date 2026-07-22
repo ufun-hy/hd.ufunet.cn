@@ -1,0 +1,463 @@
+{include file='$Wpath/common/header'}
+<style type="text/css">
+#mapbox > div{z-index: 1!important}
+.areamap{
+	padding: 20px 0;
+	height: 600px;
+}
+.areamap #mapbox{width: 100%;height: 100%}
+.areatable{
+	margin-top: 0;
+}
+</style>
+<div class="alert alert-danger">
+	操作流程: 选择地区 -> 保存 <br>
+	切换地图系统将重新自动生成标注点，点击保存地图数据才会保存地图标注点数据，若对系统自动生成的地图标注点位置不满意可点击标注点激活后拖动其位置
+</div>
+<div class="areabox">
+    <div class="form-inline">
+	    <div class="form-group m-l-5">
+	      <div class="input-group input-group-sm">
+	        <span class="input-group-addon">选择省或者直辖市</span>
+	          <select id="provincecode" class="form-control"></select>
+	        </div>
+	    </div>
+	    <div class="form-group m-l-5 cityselectbox hidden">
+	      <div class="input-group input-group-sm">
+	        <span class="input-group-addon">选择地级市</span>
+	          <select id="citycode" class="form-control"></select>
+	        </div>
+	    </div>
+	    <a class="btn btn-danger btn-sm btn-change" href="javascript:void(0)">确定切换地图</a>
+	    <a class="btn btn-primary btn-sm btn-confirm" href="javascript:void(0)">保存地图数据</a>
+	</div>
+</div>
+<div class="areamap">
+	<div id="mapbox"></div>
+</div>
+<script>
+var layindex;
+var areadata = {
+	ischina : "{$area['ischina']??'1'}",
+	provincecode : "{$area['provincecode']??''}",
+	citycode : "{$area['citycode']??''}",
+	markers:{:json_encode($districts)},
+};
+/*
+allresultList 存储省级 或者 市级 或者 县级 结果
+*/
+var map,district,provinceList = [],cityList = [],allresultList = [],allareacodeList = {};
+var polygons,markers,markergeometries = [],bounds = [],geometries = [];
+require(['webcore','jconfirmBox','zamnotice','layerBox','async!https://map.qq.com/api/gljs?v=1.exp&libraries=service,tools&key={$mapkey}'],function(webcore,jconfirmBox,zamnotice,layerBox){
+	district = new TMap.service.District({
+        polygon: 2,
+    });
+    //给省份选择框赋予值
+    layindex = layerBox.showLoading('地图加载中...');
+    district.getChildren().then((result) => {
+    	if (!result && !result.result) {
+    		zamnotice.showTips('error','获取全国省份数据出错');
+    		return false;
+    	}
+        provinceList = result.result[0],optionhtml = '<option value="">全国所有</option>';
+        provinceList.map((item, index) => {
+        	 var obj = {id:item.id,name:item.fullname};
+             optionhtml += webcore.tpl($("#province-tpl"),obj);
+        });
+        $("#provincecode").html(optionhtml);
+        //初始化选项和标注点
+        $('#provincecode').val(areadata.provincecode).trigger('change',{citycode:areadata.citycode});
+        var automarker = '1';
+        if(areadata.markers.length > 0){
+        	$.each(areadata.markers,function(index,item){
+	        	 markergeometries.push({ 
+	                "id": item.id+'',
+	                "styleId": "marker",
+	                "position": new TMap.LatLng(item.arealat,item.arealng),
+	                "properties":{
+	                	"areacode":item.areacode,
+	                	"areaname":item.areaname
+	                },
+	                "content":item.areatitle,
+	                "rank":item.displayorder,
+	            });
+	        });
+	        automarker = '2';
+        }
+        setTimeout(function(){
+        	initdata({
+    			'ischina':areadata.provincecode==''?'1':'2',
+    			'iscity':(areadata.citycode!=''?true:false),
+    			'provincecode':areadata.provincecode,
+    			'citycode':areadata.citycode,
+    			'automarker':automarker,
+    			'markergeometries':markergeometries
+    		});
+        },1e3);
+    });
+    var map = new TMap.Map(document.getElementById('mapbox'), {
+        zoom:6,
+        baseMap:null,
+        pitch: 0,
+        rotation: 0,
+        mapStyleId: 'style1',
+        doubleClickZoom:false,
+        showControl:true,
+    });
+    map.removeControl(TMap.constants.DEFAULT_CONTROL_ID.ROTATION);
+    map.getControl(TMap.constants.DEFAULT_CONTROL_ID.ZOOM).setNumVisible(true);
+    polygons = new TMap.MultiPolygon({
+      map: map,
+      geometries: [],
+      styles: {
+        'polygon': new TMap.PolygonStyle({
+            'color': '#3777FF',
+            'borderWidth':2,
+            'showBorder':true,
+            'borderColor': '#00FFFF'
+        }),
+        highlight: new TMap.PolygonStyle({
+          color: '#000',
+        }),
+      },
+    });
+    $("#provincecode").change(function(e,params){
+    	var provincecode = $(this).find('option:selected').val(),citycode = '';
+    	if(params && params.citycode!=''){
+    		citycode = params.citycode;
+    	}
+    	initselect({
+			'ischina':provincecode==''?'1':'2',
+			'provincecode':provincecode,
+			'citycode':citycode
+		});
+    });
+    $("#citycode").change(function(e){
+    	var citycode = $(this).find('option:selected').val(),provincecode = $('#provincecode').find('option:selected').val();
+		initselect({
+			'ischina':'2',
+			'iscity':(citycode!=''?true:false),
+			'provincecode':provincecode,
+			'citycode':citycode,
+		});
+    });
+    function initselect(params){
+    	var optionhtml = '<option value="">请选择</option>',directcitys = ['110000','120000','310000','500000','810000','820000'],ischina = params.ischina || '1',iscity = params.iscity || false,provincecode = params.provincecode || '', citycode = params.citycode || '',code = (iscity ? citycode : provincecode),i = 0;
+    	if(ischina!='1' && !iscity){
+	    	district.getChildren({id:code}).then((result) => {
+		        if (!result && !result.result) {
+		        	zamnotice.showTips('error','获取城市数据出错');
+		        	return false;
+		        }
+		        var resultcitys = result.result[0];
+		        resultcitys.map((item, index) => {
+					optionhtml += webcore.tpl($("#province-tpl"),{id:item.id,name:item.fullname});
+					i++;
+					if(i >= resultcitys.length){
+			            $("#citycode").html(optionhtml);
+			            if(citycode!=''){
+			            	$('#citycode').val(citycode);
+			            }
+		            }
+		        });
+		    });
+    	}
+    	if(ischina=='1' || $.inArray(code,directcitys) != -1){
+        	$(".cityselectbox").addClass('hidden');
+        }else{
+        	$(".cityselectbox").removeClass('hidden');
+        }
+    }
+    $(".btn-change").click(function(){
+   		var provincecode = $('#provincecode').find('option:selected').val(),citycode = $("#citycode").find('option:selected').val();
+   		jconfirmBox.confirm('温馨提示','切换地图将导致之前的标注点数据被清空并重新生成新的地图标注点，您确定要切换地图么？',function(){
+	        bounds = [];
+	        geometries = [];
+	    	polygons.remove(polygons.getGeometries().map((item) => item.id));
+	    	var prevgeos = markers ? markers.getGeometries() : [];
+	    	if(prevgeos.length > 0){
+	    		markers.remove(prevgeos.map((item) => item.id));
+	    	}
+	    	layindex = layerBox.showLoading('地图加载中...');
+	        setTimeout(function(){
+	        	var ischina = (provincecode==''?'1':(citycode==''?'2':'3')); 
+	        	var areainfo  = {
+	        		ischina:ischina,
+	        		provincecode:ischina=='1'?'':provincecode,
+	        		citycode:ischina=='1'?'':citycode,
+	        		iscity:ischina=='3'?true:false
+	        	};
+	        	initdata({
+	    			'ischina':areainfo.ischina,
+	    			'iscity':(areainfo.citycode!=''?true:false),
+	    			'provincecode':areainfo.provincecode,
+	    			'citycode':areainfo.citycode,
+	    			'markergeometries':[]
+	    		});
+	        },1e3);
+	    });
+   	});
+    $(".btn-confirm").click(function(){
+   		var provincecode = $('#provincecode').find('option:selected').val(),citycode = $("#citycode").find('option:selected').val();
+   		jconfirmBox.confirm('温馨提示','保存地图数据会删除之前的地图标注点数据并且重新生成标注点，您确定要更换么？',function(){
+   			var pointers = markers.getGeometries();
+            webcore.ajaxSubmit("{:goweb('hdconfig/mapqdarea')}",{provincecode:provincecode,citycode:citycode,markers:pointers}).then(function(json){
+                if(json.code==0){
+                    zamnotice.showTips('success','保存成功',2e3,function(){
+                    	window.location.reload(true);
+                    });
+                }else{
+                    zamnotice.showTips('error',json.msg);
+                }
+            }, function(json){
+                zamnotice.showTips('error','网络差。操作失败');
+            });
+        });
+   	});
+    function initdata(params){
+    	var i = 0,ischina = params.ischina || '1',iscity = params.iscity || false,provincecode = params.provincecode || '', citycode = params.citycode || '',automarker = params.automarker || '1',code = iscity ? citycode : provincecode;
+    	markergeometries = params.markergeometries || [];
+    	if(iscity && provincecode=='460000'){
+    		district.getChildren({id:provincecode}).then((result) => {
+    			if (result && result.result) {
+					cityList = result.result[0];
+					if(cityList.length > 0){
+			        	$.each(cityList,function(i,v){
+			        		if(v.id==citycode){
+			        			polygons.updateGeometries(drawPolygon(
+									v.id,
+									v.polygon
+								));
+			        			return false;
+			        		}
+			        	});
+		        	}
+		        }
+	        	district.getChildren({id:code}).then((result) => {
+			        if (!result && !result.result) {
+			        	zamnotice.showTips('error','获取城市数据出错');
+			        	return false;
+			        }
+			        allresultList = result.result[0];
+			        var obj = {};
+			        allresultList.map((item, index) => {
+			        	obj[item.id] = item; 	
+						if(item.id != "-1" && item.polygon){
+							
+							geometries.push.apply(geometries,drawPolygon(
+		                        item.id,
+		                        item.polygon,
+		                    ));
+						}
+						if(automarker=='1'){
+							markergeometries.push({ 
+				                "id": item.id + "_" + index,
+				                "position": item.location,
+				                "rank":0,
+				                "properties":{
+				                	'areacode':item.id,
+				                },
+				                "content":item.fullname,
+				                "styleId": "marker",
+				            });
+						}
+						i++;
+						if(i >= allresultList.length){
+		                	if(!iscity && citycode!=''){
+							}else{
+				                setTimeout(function(){
+				                    markers = new TMap.MultiMarker({
+				                        map: map,
+				                        styles: {
+				                            "marker": new TMap.MarkerStyle({
+				                                "width": 25,
+				                                "height": 35,
+				                                "anchor": { x: 16, y: 32 },
+				                                "offset":{x:0,y:3},
+				                                "direction":'bottom',
+				                                "color":'#fff',
+				                                "size":12
+				                            }),
+				                            "highlight": new TMap.MarkerStyle({
+				                                "width": 25,
+				                                "height": 35,
+				                                "anchor": { x: 16, y: 32 },
+				                                "src": "https://mapapi.qq.com/web/lbs/javascriptGL/demo/img/marker-pink.png",
+				                                "direction":'bottom'
+				                            })
+				                        },
+				                        enableCollision:false,
+				                        geometries: markergeometries
+				                    });
+			                        var editor = new TMap.tools.GeometryEditor({
+			                            map,
+			                            overlayList: [{
+			                              overlay: markers,
+			                              id: "marker",
+			                              selectedStyleId: "highlight"
+			                            }],
+			                            actionMode: TMap.tools.constants.EDITOR_ACTION.INTERACT,
+			                            activeOverlayId: "marker",
+			                            selectable: true,
+			                        });
+			                        editor.on('adjust_complete',function(e){
+			                            editor.select([]);
+			                        });
+				                },5e2);
+				            }
+				            if(geometries.length > 0){
+	                            polygons.updateGeometries(geometries);
+	                        }
+				            if(bounds.length > 0){
+				                bounds = bounds.reduce((a, b) => {
+				                    return fitBounds([
+				                      a.getNorthEast(),
+				                      a.getSouthWest(),
+				                      b.getNorthEast(),
+				                      b.getSouthWest(),
+				                    ]);
+				                });
+				                setTimeout(function(){
+				                	map.fitBounds(bounds);
+				                },5e2);
+			            	}
+			            	layerBox.close(layindex);
+			            }
+			        });
+					allareacodeList = obj;
+			    });
+	        });
+    	}else{
+			district.getChildren({id:code}).then((result) => {
+		        if (!result && !result.result) {
+		        	zamnotice.showTips('error','获取城市数据出错');
+		        	return false;
+		        }
+		        allresultList = result.result[0];
+		        var obj = {};
+		        allresultList.map((item, index) => {
+		        	obj[item.id] = item; 	
+					if(item.id != "-1" && item.polygon){
+						geometries.push.apply(geometries,drawPolygon(
+	                        item.id,
+	                        item.polygon,
+	                    ));
+					}
+					if(automarker=='1'){
+						markergeometries.push({ 
+			                "id": item.id + "_" + index,
+			                "position": item.location,
+			                "rank":0,
+			                "properties":{
+			                	'areacode':item.id,
+			                },
+			                "content":item.fullname,
+			                "styleId": "marker",
+			            });
+					}
+					i++;
+					if(i == allresultList.length){
+	                	if(!iscity && citycode!=''){
+						}else{
+			                setTimeout(function(){
+			                    markers = new TMap.MultiMarker({
+			                        map: map,
+			                        styles: {
+			                            "marker": new TMap.MarkerStyle({
+			                                "width": 25,
+			                                "height": 35,
+			                                "anchor": { x: 16, y: 32 },
+			                                "offset":{x:0,y:3},
+			                                "direction":'bottom',
+			                                "color":'#fff',
+			                                "size":12
+			                            }),
+			                            "highlight": new TMap.MarkerStyle({
+			                                "width": 25,
+			                                "height": 35,
+			                                "anchor": { x: 16, y: 32 },
+			                                "src": "https://mapapi.qq.com/web/lbs/javascriptGL/demo/img/marker-pink.png",
+			                                "direction":'bottom'
+			                            })
+			                        },
+			                        enableCollision:false,
+			                        geometries: markergeometries
+			                    });
+		                        var editor = new TMap.tools.GeometryEditor({
+		                            map,
+		                            overlayList: [{
+		                              overlay: markers,
+		                              id: "marker",
+		                              selectedStyleId: "highlight"
+		                            }],
+		                            actionMode: TMap.tools.constants.EDITOR_ACTION.INTERACT,
+		                            activeOverlayId: "marker",
+		                            selectable: true,
+		                        });
+		                        editor.on('adjust_complete',function(e){
+		                            editor.select([]);
+		                        });
+			                },5e2);
+			            }
+			            if(geometries.length > 0){
+                            polygons.updateGeometries(geometries);
+                        }
+			            if(bounds.length > 0){
+			                bounds = bounds.reduce((a, b) => {
+			                    return fitBounds([
+			                      a.getNorthEast(),
+			                      a.getSouthWest(),
+			                      b.getNorthEast(),
+			                      b.getSouthWest(),
+			                    ]);
+			                });
+			                setTimeout(function(){
+			                	map.fitBounds(bounds);
+			                },5e2);
+		            	}
+		            	layerBox.close(layindex);
+		            }
+		        });
+				allareacodeList = obj;
+		    });
+	    }
+    }
+    function drawPolygon(placeId, polygonArray) {
+      if(!polygonArray){
+      	 return false;
+      }
+      var newGeometries = polygonArray.map((polygon, index) => {
+        bounds.push(fitBounds(polygon));
+        return {
+          id: `${placeId}` + index,
+          paths: polygon,
+          styleId: 'polygon',
+        };
+      });
+      return newGeometries;
+    }
+    function fitBounds(latLngList) {
+      if (latLngList.length === 0) {
+        return null;
+      }
+      var boundsN = latLngList[0].getLat();
+      var boundsS = boundsN;
+      var boundsW = latLngList[0].getLng();
+      var boundsE = boundsW;
+      latLngList.forEach((point) => {
+        point.getLat() > boundsN && (boundsN = point.getLat());
+        point.getLat() < boundsS && (boundsS = point.getLat());
+        point.getLng() > boundsE && (boundsE = point.getLng());
+        point.getLng() < boundsW && (boundsW = point.getLng());
+      });
+      return new TMap.LatLngBounds(
+        new TMap.LatLng(boundsS, boundsW),
+        new TMap.LatLng(boundsN, boundsE)
+      );
+    }
+});
+</script>
+<script id='province-tpl' type="text/template">
+<option value="<% d.id %>"> <% d.name %> </option>
+</script>
+{include file='$Wpath/common/footer'}

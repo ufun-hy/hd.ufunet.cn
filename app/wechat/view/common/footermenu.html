@@ -1,0 +1,71 @@
+{if isset($hdinfo['mobileconfig']['showtmenu']) && $hdinfo['mobileconfig']['showtmenu']=='1'}
+<div class="zam-app-menubox" style="background-image:url({if isset($hdinfo['mobileconfig']['tmenuimg']) && !empty($hdinfo['mobileconfig']['tmenuimg'])}{:tomedia($hdinfo['mobileconfig']['tmenuimg'])}{else /}{:tomedia(SYSIMGURL.'appmenu.png')}{/if});"></div>
+{/if}
+<script id="menu-tpl" type="text/html">
+<div class="moduleInfoBox zam-app-common-menuBox">
+<div class="moduleInfoBox-main">
+	<div class="moduleInfoBox-title"><span>点击下方图标即可参与互动</span> <i class="mxc-unie631 closemenu"></i></div>
+	<ul class="zam-app-footermenu">
+		<div class="swiper-container modules-swiper">
+			<div class="swiper-wrapper">
+				{php}$mkey = 0;$mcount = count($menus);{/php}
+				{volist name="menus" id="menu"}
+				{if $menu['openstatus']=='1'}
+					{if $mkey%8 == 0}
+						<ul class="swiper-slide">
+						<li>
+						  <a href="javascript:;" class="zam-app-flex-ajCenter" data-module="{$menu['modulefield']}" data-href="{if $menu['ishandadd']=='2'}{:gowechat($menu['modulefield'].'/index',['hdid'=>$hdinfo['hdid']])}{else}{$menu['moduleurl']}{/if}">
+							<div class="iconbox zam-app-flex-ajCenter2" {if isset($menu['modulebgcolor']) && !empty($menu['modulebgcolor'])}style="background-color:{$menu['modulebgcolor']}"{/if}>
+								<img src="{:tomedia($menu['moduleimg'])}">
+							</div>
+							<span>{$menu['modulename']}</span>
+						  </a>
+						</li>
+						{if ($mkey+1) == $mcount }</ul>{/if}
+					{else /}
+						<li>
+						  <a href="javascript:;" class="zam-app-flex-ajCenter" data-module="{$menu['modulefield']}" data-href="{if $menu['ishandadd']=='2'}{:gowechat($menu['modulefield'].'/index',['hdid'=>$hdinfo['hdid']])}{else}{$menu['moduleurl']}{/if}">
+							<div class="iconbox zam-app-flex-ajCenter2" {if isset($menu['modulebgcolor']) && !empty($menu['modulebgcolor'])}style="background-color:{$menu['modulebgcolor']}"{/if}>
+								<img src="{:tomedia($menu['moduleimg'])}">
+							</div>
+							<span>{$menu['modulename']}</span>
+						  </a>
+						</li>
+						{if ($mkey+1)%8 == 0 || ($mkey+1) == $mcount }</ul>{/if}
+					{/if}
+					{php}$mkey++;{/php}
+				{/if}
+				{/volist}
+			</div>
+			<div class="swiper-pagination" style="bottom:-2px"></div>
+		</div>
+	</ul>
+</div>
+</div>
+</script>
+<script>
+require(['wechatcore','swiper'],function (wechatcore,Swiper) {	
+	$(".zam-app-menubox").click(function(){
+		var blayindex = wechatcore.bpopupbyhtml(
+			wechatcore.tpl($("#menu-tpl"),{}),
+			'position:fixed; bottom:0; left:0; width: 100%;border:none;border-radius:10px 10px 0 0;',
+			false,
+			function(){
+				setTimeout(()=>{
+					var mymoduleSwiper = new Swiper('.modules-swiper',{
+						watchOverflow: true,
+						pagination: {
+							el: '.swiper-pagination',
+						}
+					});
+					$("body .zam-app-common-menuBox .closemenu").on('click',function(){
+						wechatcore.close(blayindex);
+						mymoduleSwiper.destroy(true, true);
+					});
+				},1e2);
+			}
+		);
+		
+	})
+});
+</script>

@@ -1,0 +1,75 @@
+{extend name="diy/layout"}
+{block name="header"}
+<script>
+    var XCV3Config = {
+      staticurl:"__STATIC__/",
+      hdid:"{$hdinfo['hdid']??''}",
+      rhdid:"{$hdinfo['id']??''}",
+      wsAddress:"{$wssaddress??''}",
+      clienttype:"{$clienttype??'1'}",
+      gametype:"diyindex",
+      isiframe:window.top !== window.self,
+      douyinjssdk:{
+        client_key:"{$dyjssdk['client_key']??''}",
+        signature:"{$dyjssdk['signature']??''}",
+        timestamp:"{$dyjssdk['timestamp']??''}",
+        nonce_str:"{$dyjssdk['nonce_str']??''}",
+        url:"{$dyjssdk['url']??''}"
+      },
+      qrtype:"{$hdinfo['qrtype']??1}",
+      inminiprogram:"{$hdinfo['inminiprogram']??1}",
+      isminiProgram: "{if empty(request()->isminiProgram)}2{else /}{:request()->isminiProgram}{/if}",
+      hasvipbtn:"{$hasvipbtn??2}",
+      adv:{if isset($hdinfo['advconfig']['h5']) && !empty($hdinfo['advconfig']['h5'])}{:json_encode($hdinfo['advconfig']['h5'])}{else /}""{/if},
+      amconfig:{:json_encode(amconfig())},
+      pageid: "{$pageid}",
+      globalDatas:{:json_encode($globalDatas)},
+    },dysdkobj = null;
+</script>
+<style>
+    .base_countdown{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .colon {
+        color: #ee0a24;
+        margin: 0 2px;
+    }
+    .block {
+        width: 22px;
+        color: #fff;
+        font-size: 12px;
+        text-align: center;
+        background-color: #ee0a24;
+    }
+    </style>
+{/block}
+{block name="app"}
+<div class="page">
+    <div class="page-wrapper">
+        <div class="page-body">
+            <div class="page-diy-container d-flex flex-d-c" :style="parseCssValue(pageset)">
+                <div class="page-diy-modules" :style="{fontSize:this.calcPx2Rem(15)}">
+                    <div v-for="(item,index) in phoneComponents" :key="item.key" :class="item.component + '-wrap'">
+                        <div class="fix1px"></div>
+                        <component :is="item.component" :datas="item" :class="['module-box',item.component]"></component>
+                        <div class="fix1px"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <tipbox ref="tipbox"></tipbox>
+</div>
+{/block}
+{block name="footer"}
+<script src="__STATIC__/js/diy/utils/index.js?t={$timestamp}"></script>
+<script src="__STATIC__/js/diy/utils/mobileapp.js?t={$timestamp}"></script>
+<script src="__STATIC__/js/diy/utils/http.js?t={$timestamp}"></script>
+<script src="__STATIC__/js/diy/mixin/index.js?t={$timestamp}"></script>
+<script src="__STATIC__/js/diy/components/mobile/free/index.js?t={$timestamp}"></script>
+<script src="__STATIC__/js/diy/components/mobile/base/index.js?t={$timestamp}"></script>
+<script src="__STATIC__/js/diy/components/mobile/common/index.js?t={$timestamp}"></script>
+<script src="__STATIC__/js/diy/mobile.js?t={$timestamp}"></script>
+{/block}

@@ -1,0 +1,536 @@
+{include file='common/header' /}
+<style>
+.headerTitle{opacity:0;}
+.ydj-mainbox{
+	position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+	padding: 0;
+    overflow: hidden;
+	
+}
+.ydj-readmain{width: 100%;height:100%;}
+.ydj-readybox{
+	position:absolute;
+	top:0;
+	left:0;
+	width:100%;
+	height:100%;
+	background: url("{:tomedia($pcconfig['pcpageconfig']['readytopbg'])}") no-repeat center;
+    background-size: cover;
+}
+.ydj-readytop{
+	position:absolute;
+	top:0;
+	left:0;
+	z-index:1;
+}
+.ydj-readytop img{width:100%;}
+.ydj-cssquan{
+	position: absolute;
+	top:0;
+	left:0;
+    width: 100%;
+    height: 100%;
+}
+.ydj-cssquan .ydj-cssquanbox{
+    width: 1000px;
+    height: 1000px;
+    margin: 16% auto 0;
+    position: relative;
+}
+.ydj-cssquanbox img{
+	position: absolute;
+	top:0;
+	left:0;
+    width: 100%;
+    height: 100%;
+}
+.ydj-readycenter{
+	text-align: center;
+    position: absolute;
+    top:0;
+	left:0;
+    width: 100%;
+	height:100%;
+}
+.ydj-readyjoin-start{
+	position: relative;
+	width:60%;
+	-webkit-justify-content: space-between;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+}
+.ydj-readyjoin{
+	height:100px;color:#fff;font-size:40px;float:left;
+}
+.ydj-readyjoin span{
+	display:inline-block;font-weight:500;font-size:50px;color:yellow;margin:0 20px;
+}
+.ydj-startbtn{
+	background-image: url("{:tomedia($pcconfig['pcpageconfig']['start'])}");
+    background-size: 100% 100%;
+	width:308px;
+	height:100px;
+	float:right;
+	cursor:pointer;
+}
+
+.ydj-readybottom {
+    background: url("{:tomedia($pcconfig['pcpageconfig']['readybottombg'])}") no-repeat;
+    background-size: 100% 100%;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+}
+.ydj-rotatetitle{
+	position: absolute;
+	top: -40px;
+	right: 0;
+	color: #fff;
+	width: 308px;
+	text-align: center;
+}
+.ydj-rotatetitle.hidden{
+	display: none
+}
+/*抢红包页*/
+.ydj-shakebox{
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    overflow: hidden;
+	background-image: url("{:tomedia($pcconfig['pcpageconfig']['shakeingbg'])}");
+	background-size:cover;
+	background-repeat:no-repeat;
+	z-index:1;
+}
+.ydj-shaketop{
+	position: absolute;
+    top: 0;
+	left:0;
+	width: 100%;
+	height:356px;
+    background-image: url("{:tomedia($pcconfig['pcpageconfig']['shakeingtop'])}");
+	background-repeat:no-repeat;
+	background-position:top;
+	background-size:contain;
+	z-index:1;
+}
+.ydj-remainnum{
+	position:absolute;
+	top:32px;
+	left:0;
+	width:100%;
+	z-index:2;
+	text-align:center;
+	font-size:32px;
+	color:rgb(255, 226, 88);
+}
+.ydj-remainnum span{
+	display:inline-block;
+	margin:0 5px;
+	font-weight:bold;
+}
+.ydj-shakerain{
+	position: absolute;
+    top: 0;
+	left:0;
+	width: 100%;
+	height:100%;
+	background-color:rgba(0,0,0,0.3);
+}
+.ydj-shakelightBox{
+	position:absolute;
+	left:0;
+	top:0;
+	width: 100%;
+	height:100%;
+}
+.ydj-shakelight{
+	background-image: url("{:tomedia($pcconfig['pcpageconfig']['shakeinglight'])}");
+	background-size:cover;
+	background-repeat:no-repeat;
+    width: 800px;
+    height:800px;
+    -webkit-animation: light-spin 5s linear infinite;
+    animation: light-spin 5s linear infinite;
+}
+@-webkit-keyframes light-spin {
+	from {
+	-webkit-transform:rotate(0)
+}
+to {
+	-webkit-transform:rotate(360deg)
+}
+}
+@keyframes light-spin {
+	from {
+	transform:rotate(0)
+}
+to {
+	transform:rotate(360deg)
+}
+}
+.ydj-shakebottom{
+	position: absolute;
+    bottom: 0;
+	left:0;
+	width: 100%;
+	height:200px;
+	z-index:1;
+    background-image: url("{:tomedia($pcconfig['pcpageconfig']['shakeingbottom'])}");
+	background-repeat:no-repeat;
+	background-position:center center;
+	background-size:cover;
+}
+.ydj-shakeRank{
+	position: absolute;
+    bottom: 0;
+	left:0;
+	width: 100%;
+	height:100%;
+	z-index:2;
+}
+.ydj-leftbox {
+    background: url("{:tomedia($pcconfig['pcpageconfig']['rightrankbg'])}") no-repeat;
+    width: 382px;
+    height: 620px;
+    background-size: cover;
+    position: absolute;
+	top: 100px;
+    left:80px;
+    z-index:3;
+}
+.ydj-rightbox {
+    background: url("{:tomedia($pcconfig['pcpageconfig']['rightrankbg'])}") no-repeat;
+    width: 382px;
+    height: 620px;
+    background-size: cover;
+    position: absolute;
+    top: 100px;
+    right:80px;
+    z-index:3;
+}
+.ydj-title{
+    position: absolute;
+	top: -30px;
+	left:42px;
+}
+.ydj-title img{
+    width:300px;
+	height:70px;
+}
+.ydj-rankItems{
+	margin-top:40px;
+	height:calc(100% - 60px);
+	overflow-y: scroll;
+    overflow-x: hidden;
+}
+.tug-rankcell{
+	margin: 0px 15px 10px 15px;
+	background-color:rgba(140,0,0,0.4);
+	border-radius:8px;
+    font-size: 16px;
+	color: rgb(255, 226, 88);
+	display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+}
+.tug-rankcell{
+	height:60px;
+    line-height: 60px;
+}
+.tug-rankcol1{
+	width:50px;
+    font-size: 18px;
+	font-weight: bold;
+    text-align: center;
+}
+.tug-rankcol2{
+	width: 160px;
+    font-size: 14px;
+	display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+	-webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+}
+.tug-rankheader{
+    width:50px;
+    height:50px;
+	background-size: cover;
+	background-repeat:no-repeat;
+    border: 2px solid rgb(255, 226, 88);
+    border-radius: 50%;
+}
+.tug-rankheader img{
+    border-radius: 50%;
+    width: 100%;
+    height: 100%;
+}
+.tug-ranknickname{
+	width:calc(100% - 60px);
+	margin-left:8px;
+}
+.tug-rankcol3{
+	font-size: 14px;
+    width: 150px;
+    text-align: center;
+}
+.ydj-dropred{
+	position: absolute;
+	top:-300px;
+	background-image:url("{:tomedia($pcconfig['pcpageconfig']['dropredpack'])}");
+	background-size: cover;
+	background-position: center center;
+	background-repeat: no-repeat;
+}
+.ydj-dropred.drop0{
+	width:200px;
+	height:225px;
+}
+.ydj-dropred.drop1{
+	width:160px;
+	height:180px;
+}
+.ydj-dropred.drop2{
+	width:100px;
+	height:112px;
+}
+.ydj-dropred.drop3{
+	width:60px;
+	height:67px;
+}
+/*中奖弹窗*/
+.pop-paper{width:100%; height:100%; position:absolute;left:0; top:0;z-index:100;pointer-events: none;}
+.pop-paper .inner{position:relative;width:300px; height:292px; color:#fff;background-image:url("{:tomedia($pcconfig['pcpageconfig']['popbg'])}");background-repeat:no-repeat;background-size:cover;}
+.pop-paper .ava{position:absolute;top:6px;left:113px;width:77px; height:77px; border-radius:50%;overflow:hidden; border:1px solid #cf2829;}
+.pop-paper .ava img{ width:100%; height:100%; border-radius:50%;}
+.pop-paper .txt{position:absolute;top:170px;left:0px;width:100%; height:120px;font-size:24px; text-align:center; text-shadow:0 1px 2px rgba(0,0,0,0.5); }
+/*所有红包记录*/
+.redpack-recordallBox{
+	position:absolute;
+	top:0;
+	left:0;
+	width:100%;
+	height:100%;
+	background-color:rgba(0,0,0,0.5);
+	z-index:6;
+}
+.redpack-recordall{
+	width:1400px;
+	height:800px;
+}
+.redpack-recordall .redpack-recordwrapper{
+	position:relative;
+	width:1167px;
+	height:700px;
+	margin:50px auto;
+	background-image:url("{:tomedia($pcconfig['pcpageconfig']['phbbg'])}");
+	background-size:cover;
+	background-repeat:no-repeat;
+}
+.closerecord{
+	position:absolute;
+	right:40px;
+	top:30px;
+	color:#fff;
+	font-size:30px;
+	cursor:pointer;
+}
+.redpack-record-title{
+	width:437px;
+	height:77px;
+	margin-top:10px;
+	background-image:url("{:tomedia($pcconfig['pcpageconfig']['phbtopimg'])}");
+	background-size:cover;
+	background-repeat:no-repeat;
+}
+.redpack-record-list{
+	width:1100px;
+	margin:10px 0px;
+	height:590px;
+	overflow-y:auto;
+}
+.redpack-record-list li{
+	width:255px;
+	padding:10px;
+	float:left;
+	color:#fff;
+}
+.repack-record-wrapper{
+	height:100px;
+	background-color:rgba(0,0,0,0.3);
+}
+.record-avatar{
+	width:60px;
+	height:60px;
+	margin:20px 10px;
+	border-radius:50%;
+	float:left;
+}
+.record-avatar img{
+	width:100%;
+	height:100%;
+	border-radius:50%;
+	border: 2px solid #ff9500;
+    box-sizing: border-box;
+}
+.record-info{
+	height:100px;
+	width:148px;
+	float:left;
+}
+.record-num{
+	display: block;
+    float: left;
+    width: 25px;
+    height: 100px;
+    line-height: 100px;
+    font-size: 16px;
+    text-align: center;
+    color: #fff;
+    font-family: arial;
+    font-style: normal;
+    background-color:rgba(255,255,255,0.3);
+}
+.record-num1{
+	background-color:gold;
+}
+.record-num2{
+	background-color:rgba(233,233,216);
+}
+.record-num3{
+	background-color:rgba(186,110,64);
+}
+.record-name{
+	height:55px;
+	line-height:55px;
+	font-size:22px;
+	color: #ff9500;
+	font-weight:bold;
+	text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+.record-money{
+	height:45px;
+	line-height:20px;
+	font-size:14px;
+}
+
+</style>
+{if !empty($pcconfig['pcpageconfig']['diycss'])}<style>{$pcconfig['pcpageconfig']['diycss']}</style>{/if}
+<audio id="countaudio" src="/{:WIMGURL}shake/count.mp3"  preload="preload"  style="display:none"></audio>
+<audio id="overaudio" src="/{:SIMGURL}shake/over.mp3"  preload="preload"  style="display:none"></audio>
+<audio id="joinaudio" src="/{:SIMGURL}shake/join.mp3"  preload="preload" style="display:none"></audio>
+<div class="shake-mainbox ydj-mainbox normal-box">
+	<div class="ydj-readybox">
+		 <div class="emptybox zam-app-flex-ajCenter display-none">
+			<img src="/{:SIMGURL}common/empty.png">
+			<p style="padding:20px;">暂无可用轮次，请到后台添加</p>
+		</div>
+		<div class="ydj-readmain display-none">
+			<div class="ydj-readytop"><img src="{:tomedia($pcconfig['pcpageconfig']['readytop'])}"></div>
+			<div class="ydj-cssquan">
+				<div class="ydj-cssquanbox"></div>
+			</div>
+			<div class="ydj-readybottom"></div>
+			<div class="ydj-readycenter zam-app-flex-ajCenter">
+				<img src="{:tomedia($pcconfig['pcpageconfig']['centerimg'])}">
+				<div class="ydj-readyjoin-start zam-app-flex">
+					<div class="ydj-readyjoin zam-app-flex-ajCenter2">当前已加入<span>0</span>人</div><div class="ydj-startbtn"></div>
+					<div class="ydj-rotatetitle hidden"></div>
+				</div>
+			</div>
+			
+		</div>
+	</div>
+	<div class="ydj-shakebox display-none">
+		<div class="ydj-shaketop">
+			<div class="ydj-remainnum display-none">剩余<span>{$remainnum}</span>个<b>红包</b></div>
+		</div>
+		<div class="ydj-shakelightBox zam-app-flex-ajCenter">
+			<div class="ydj-shakelight"></div>
+		</div>
+		<div class="ydj-shakerain"></div>
+		<div class="ydj-shakebottom"></div>
+		<div class="ydj-shakeRank">
+			<div class="ydj-leftbox display-none">
+				<div class="ydj-title"><img src="/{:SIMGURL}ydj/ranklefttitle.png"></div>
+				<div class="ydj-rankItems ydj-leftrank"></div>
+            </div>
+			<div class="ydj-rightbox">
+				<div class="ydj-title"><img src="{:tomedia($pcconfig['pcpageconfig']['rightranktop'])}"></div>
+				<div class="ydj-rankItems ydj-rightrank">
+				</div>
+            </div>
+		</div>
+	</div>
+	<div class="redpack-recordallBox zam-app-flex-ajCenter2 display-none">
+			<div class="redpack-recordall">
+				<div class="redpack-recordwrapper zam-app-flex-ajCenter">
+					<i class="zam-icon-error closerecord"></i>
+					<div class="redpack-record-title"></div>
+					<ul class="redpack-record-list"></ul>
+				</div>
+			</div>
+	</div>
+</div><!--ydj-mainbox end -->
+{include file='common/gamedjs' /}
+<script id="tugrank-tpl" type="html/javascript">
+<div  class="tug-rankcell">
+	<div class="tug-rankcol1 limitbox">{{ num+1 }}</div> 
+	<div  class="tug-rankcol2">
+		<div  class="tug-rankheader zam-app-flex-ajCenter">
+			<img src="{{ avatar }}" class="tug-rankavatar">
+		</div> 
+		<div  class="tug-ranknickname limitbox">{{ nickname }}</div>
+	</div>
+	<div  class="tug-rankcol3 limitbox">{{ if prizetype=='2' }}{{ prizemoney }}元红包{{ else }} {{ prizename }} {{ /if }}</div>
+</div>
+</script>
+<script type="text/html" id="poplucker-tpl">
+	<div class="pop-paper zam-app-flex-ajCenter2">				
+		<div class="inner">			    
+			<div class="ava">
+				<img src="{{ avatar }}">
+			</div>			      
+			<div class="txt zam-app-flex-ajCenter">			       
+				<p>{{ nickname }}</p>
+				<div class="display-none"><img src="{{ prizeimg }}" /></div>
+				<p>{{ if prizetype=='2' }}获得{{ prizemoney }}元红包一个{{ else }} {{ prizename }} {{ /if }}</p>
+			</div>	
+		</div>			 
+	</div>
+</script>
+<script type="text/html" id="recordlucker-tpl">
+	<li class="repack-record-item">	
+		<div class="repack-record-wrapper">
+			<div class="record-num record-num{{ num }}">{{ num }}</div>
+			<div class="record-avatar">
+				<img src="{{ avatar }}">
+			</div>			      
+			<div class="record-info">			       
+				<p class="record-name">{{ nickname}}</p>
+				<p class="record-money">{{ if prizetype=='2' }}{{ prizemoney }}元红包{{ else }} {{ prizename }} {{ /if }}</p>
+			</div>	
+		</div>
+	</li>
+</script>
+<script>
+var bgquans = ["{:tomedia($pcconfig['pcpageconfig']['quan1'])}","{:tomedia($pcconfig['pcpageconfig']['quan2'])}","{:tomedia($pcconfig['pcpageconfig']['quan3'])}"];
+require(['screenydj'],function (screenydj) {
+	screenydj.init();
+});
+</script>
+{include file='common/footer' /}

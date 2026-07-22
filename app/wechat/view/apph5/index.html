@@ -1,0 +1,51 @@
+{include file="common/header" /}
+<style type="text/css">
+p img{margin:0 auto;}
+.g-scrollview:after{height:0!important;}
+</style>
+<section class="g-scrollview h5-pagebox">
+{:html_entity_decode($appconfig['content'])}
+</section>
+<script type="text/javascript">
+require(['wechatcore'],function(wechatcore){
+if(XCV3Config.isiframe && wechatcore.device(1)){
+  	var timeOutEvent;
+  	$(".h5-pagebox img").on({  
+        touchstart: function(e) {
+            e.stopPropagation();
+            var $this = $(this),msg = {
+				'module':'h5-touchimg',
+				'url':$this.attr('src'),
+				'top':$this.offset().top,
+				'left':$this.offset().left,
+				'width':$this.width(),
+				'height':$this.height(),
+			};
+            timeOutEvent = setTimeout(function() {  
+                timeOutEvent = 0;  
+                window.parent.postMessage({'msg':msg},'*');
+            }, 300);
+        },  
+        touchmove: function(e) {  
+        	e.stopPropagation();
+            clearTimeout(timeOutEvent);  
+            timeOutEvent = 0;  
+        },  
+        touchend: function(e) {  
+        	e.stopPropagation();
+            clearTimeout(timeOutEvent);  
+            if (timeOutEvent === 0) {  
+            	window.parent.postMessage({'msg':{'module':'h5-touchimg','url':''}}, '*');
+            }
+            return false;  
+        }  
+    })
+}
+if(!XCV3Config.isiframe){
+	$(".h5-pagebox img").click(function(){
+		wechatcore.previewImage(this);
+	});
+}
+});
+</script>
+{include file="common/footer" /}

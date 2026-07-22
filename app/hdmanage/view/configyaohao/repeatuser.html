@@ -1,0 +1,42 @@
+<table class="we7-table table" style="margin-bottom:0px;">
+<thead>
+  <tr>
+	<th style="width:5%;text-align:center;">id</th>
+	{foreach $fieldconfig as $yhkey=>$yhfield}
+	<th style="width:15%;text-align:center;">{$yhfield['fieldname']}</th>
+	{/foreach}
+	<th style="width:5%;text-align:center;">操作</th>
+  </tr>
+</thead>
+<tbody class="prize-lists">
+	 {volist name='users' id="samedata"}
+	  <tr>
+		<td class="text-center">
+			{$samedata['id']}
+		</td>
+		<td class="text-center">
+			<span {if $checkkey=='fieldone'}class="text-danger"{/if}>{$samedata['fieldone']}</span>
+		</td>
+		<td class="text-center">
+			<span {if $checkkey=='fieldtwo'}class="text-danger"{/if}>{$samedata['fieldtwo']}</span>
+		</td>
+		<td class="text-center">
+			<span {if $checkkey=='fieldthree'}class="text-danger"{/if}>{$samedata['fieldthree']}</span>
+		</td>
+		<td class="text-center">
+			<span {if $checkkey=='fieldfour'}class="text-danger"{/if}>{$samedata['fieldfour']}</span>
+		</td>
+		<td class="text-center">
+			<span {if $checkkey=='fieldfive'}class="text-danger"{/if}>{$samedata['fieldfive']}</span>
+		</td>
+		<td class="text-center">
+			<span {if $checkkey=='fieldsix'}class="text-danger"{/if}>{$samedata['fieldsix']}</span>
+		</td>
+		<td class="text-center">
+			<a class="btn btn-danger btn-sm btn-delsame" data-id="{$samedata['id']}">删除</a>
+		</td>
+	 </tr>
+	{/volist}
+</tbody>
+</table>
+

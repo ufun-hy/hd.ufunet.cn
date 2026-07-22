@@ -1,0 +1,160 @@
+{include file='$Wpath/common/header'}
+<div class="form-inline zam-inline-searchbar">
+    <div class="form-group" style="max-width: 220px;">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">活动</span>
+          <select id="hdid" class="form-control js_select2">
+            <option value="0">全部活动</option>
+            {foreach $hdtitles as $hkey=>$hdtitle } 
+            <option value="{$hdtitle['id']}">(id:{$hdtitle['id']}){$hdtitle['hdtitle']}</option>
+            {/foreach}
+          </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">支付方式</span>
+          <select id="paytype" class="form-control js_select2">
+            {foreach $paytypes as $pkey=>$pval } 
+            <option value="{$pkey}">{$pval}</option>
+            {/foreach}
+          </select>
+        </div>
+    </div>
+    <div class="form-group">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">订单来源</span>
+          <select id="fromtype" class="form-control js_select2">
+            {foreach $typelists as $tkey=>$tval } 
+            <option value="{$tkey}">{$tval}</option>
+            {/foreach}
+          </select>
+        </div>
+    </div>
+    <div class="form-group">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">订单状态</span>
+          <select id="orderstatus" class="form-control js_select2">
+            <option value="0">全部</option>
+            <option value="1">支付成功</option>
+            <option value="4">已退款</option>
+          </select>
+        </div>
+    </div>
+    <div class="form-group">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">昵称/姓名</span>
+        <input type="text" class="form-control" value="" id="username" placeholder="请输入昵称或者表单姓名">
+      </div>
+    </div>
+    <a class="btn btn-primary btn-sm btn-search" href="javascript:void(0)"><i class="mdi mdi-magnify"></i> 搜索</a>
+    <a class="btn btn-warning btn-sm btn-export" href="javascript:void(0)"><i class="mdi mdi-export"></i> 导出</a>
+    <a class="btn btn-warning btn-sm btn-exportall hidden" href="javascript:void(0)"><i class="mdi mdi-export"></i> 全部导出</a>
+</div>
+{include file='$Wpath/common/tabletoolbar'}
+<table id="listtable" class="zam-btable"></table>
+<script>
+require(['webcore','webtable','jconfirmBox','zamnotice'],function(webcore,webtable,jconfirmBox,zamnotice){
+var initConfig = {
+	tableId:'#listtable',
+	url:"{:gomyhome('account/income')}",
+	columnoperate:false,
+	columns:[{
+        checkbox: true,
+      }, 
+      {
+        field: 'id',
+        title: 'id',
+        align: 'center',
+        width:'5%',
+        visible: false
+      }, {
+          field: 'hdtitle',
+          title: '活动',
+          align:'center',
+          width:'20%',
+          formatter: function (value, row, index) {
+              if(row.huodong_id=='0') return '-';
+              var html = "<div><span>"+(value==null?"已删除":value)+"</span></div><div class='m-t-5'><span>id:"+row.huodong_id+"</span></div>";
+              return html;
+          },
+      }, {
+          field: 'userinfo',
+          title: '用户',
+          align:'center',
+          width:'10%',
+          formatter: function (value, row, index) {
+              var html = '<div class="zam-flex-column-center"><img class="avatarImg m-b-10" src="'+(value.wxheadimg?value.wxheadimg:value.avatar)+'" /><span>'+value.nickname+'</span></div>';
+              return html;
+          },
+      }, {
+          field: 'statusname',
+          title: '状态',
+          align:'center',
+          width:"10%",
+          formatter: function (value, row, index) {
+              var html = value;
+              return html;
+          },
+      },  {
+          field: 'fromtypename',
+          title: '来源',
+          align: 'center',
+          width:"10%",
+      }, {
+          field: 'payfee',
+          title: '支付金额(元)',
+          align:'center',
+          width:"5%",
+          formatter: function (value, row, index) {
+              var html = value;
+              if(row.fromtype == 'baping' && (row.fromstype=='2' || row.fromstype=='4')){
+                  html += "<div><span class='text-danger m-t-5 m-r-5'>艺人分成:</span>" + (row.splitfee / 100) +"元</div>";
+              }
+              return html;
+          },
+      },  {
+          field: 'payinfo',
+          title: '订单详情',
+          align: 'center',
+          width:"30%",
+          formatter: function (value, row, index) {
+              var html = '<div>'+ value.project +'</div>';
+              if(row.fromtype=='hdpayjoin'){
+                  html += '<div>'+ value.day +'天</div>'
+              }
+              if(row.paytype=='1' && row.status=='4'){
+                  html += "<div>退款单号:" + row.refund_id + "</div>";
+              }
+              return html;
+          },
+      },  {
+          field: 'create_time',
+          title: '下单时间',
+          align: 'center',
+          width:"10%",
+      }
+	],
+	searchParamas:[{'type':'2','id':'hdid'},{'type':'2','id':'paytype'},{'type':'2','id':'fromtype'},{'type':'2','id':'orderstatus'},{'type':'1','id':'username'}],
+	toolbar:{},
+};
+webtable.init(initConfig);
+$('.zam-inline-searchbar select').change(function(e) {
+     webtable.refresh();
+});
+$('.btn-export').on('click',function(){
+   var hdid = $("#hdid").find('option:selected').val()||'';
+   if(hdid=='') return zamnotice.showTips('info','请先选择一个活动');
+   webcore.ajaxSubmit("{:gomyhome('account/exportincome')}",{hdid:hdid}).then(function(json){
+        if(json.code!=0){
+            zamnotice.showTips('error',json.msg);
+        }else{
+            window.location.href = "{:gomyhome('account/exportincome')}?hdid="+hdid;
+        }
+    }, function(json){
+        zamnotice.showTips('error','网络差,操作失败');
+    });
+});
+});
+</script>
+{include file='$Wpath/common/footer'}

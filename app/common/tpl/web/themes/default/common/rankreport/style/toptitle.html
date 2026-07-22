@@ -1,0 +1,68 @@
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 显示</label>
+    <div class="col-lg-8">
+        {:tpl_switch('toptitleimg[open]',$config['toptitleimg']['open'],'opentoptitle')}
+        <span class="zam-help-block">关闭则不显示顶部图</span>
+    </div>
+</div>
+<div class="toptitleimgbox{if $config['toptitleimg']['open'] =='2'} hidden{/if}">
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 图片</label>
+        <div class="col-lg-8">
+            {:tpl_image_one('toptitleimg[img]',$config['toptitleimg']['img'])}
+            <span class="help-block">推荐尺寸:637*174px</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label text-right">* 宽度与位置</label>
+        <div class="col-lg-8">
+            <div class="input-group">
+                <div class="input-group-btn not-allow"><a class="btn btn-default">宽度</a></div>
+                <div class="touchspin">
+                <input type="text" class="form-control numberincdec" name="toptitleimg[width]" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="null"
+                data-bts-step="1"
+                data-bts-postfix="px"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['toptitleimg']['width']}">
+                </div>
+                <div class="input-group-btn not-allow"><a class="btn btn-default">距屏幕顶部距离</a></div>
+                <div class="touchspin">
+                <input type="text" class="form-control numberincdec" name="toptitleimg[top]" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="null"
+                data-bts-step="1"
+                data-bts-postfix="px"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['toptitleimg']['top']}">
+                </div>
+                <div class="input-group-btn not-allow"><a class="btn btn-default">距屏幕左侧距离</a></div>
+                <div class="touchspin">
+                <input type="text" class="form-control numberincdec" name="toptitleimg[left]" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="null"
+                data-bts-step="1"
+                data-bts-postfix="px"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['toptitleimg']['left']}">
+                </div>
+            </div>
+            <span class="help-block">注:位置和图片宽度可在大屏幕自行拖动缩放，高度自适应</span>
+        </div>
+    </div>
+</div>
+<script>
+    function opentoptitle(obj,status){
+        if(status=='1'){
+            obj.prev().val('2');
+            obj.attr('data-status','2');
+            $(".toptitleimgbox").addClass('hidden');
+        }else{
+            obj.prev().val('1');
+            obj.attr('data-status','1');
+            $(".toptitleimgbox").removeClass('hidden');
+        }
+        obj.prev().prev().prop("checked",status=='1'?false:true);
+    }
+</script>

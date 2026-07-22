@@ -1,0 +1,30 @@
+{include file="common/header" /}
+<style>
+.zam-app-rankreport{height:100%;}
+.zam-app-rankreport .tip{
+    color: {$appconfig['tip']['color']??'#fff'};
+    font-size:{$appconfig['tip']['size']??32}px;
+    margin-bottom:{$appconfig['tip']['margin']??32}px;
+}
+
+.backbtn img{
+    width: 4.2rem;
+}
+</style>
+<section class="zam-app-rankreport g-flexview zam-app-flex-ajCenter">
+    {if !empty($appconfig['tip']['txt'])}
+	<div class="tip">{:$appconfig['tip']['txt']}</div>
+    {/if}
+    {if !empty($appconfig['backbtn'])}
+    <a class="backbtn" href="{:gowechat('rankreport/index',['hdid'=>request()->get('hdid','')])}">
+        <img src="{:tomedia($appconfig['backbtn'])}" />
+    </a>
+    {/if}
+</section>
+<script>
+require(['wechatcore'],function (wechatcore) {
+	
+});
+</script>
+{include file="common/footermenu" /}
+{include file="common/footer" /}

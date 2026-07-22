@@ -1,0 +1,28 @@
+<li class="dropdown dropdown-profile">
+  <a href="javascript:void(0)" style="padding-right: 0" data-toggle="dropdown">
+    <img style="width:56px;height:56px;border-radius: 10px;border:1px solid #f4f6f9" class="m-r-10" src="{:tomedia($admin['user_avatar'])}" alt="{$admin['user_name']}" onerror="javascript:this.src='{:tomedia($siteinfo['siteavatar'])}';" />
+    {$admin['user_name']} <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu dropdown-menu-right">
+    {if $showwebmenu}
+    <li> <a href="{:goweb()}"><i class="mdi mdi-settings"></i> 后台管理</a> </li>
+    {/if}
+    <li> <a href="{:gomyhome()}"><i class="mdi mdi-account"></i> 个人信息</a> </li>
+    {if $admin['id']=='1'}
+    <li> <a href="{:goweb('syscache/index')}"><i class="mdi mdi-delete"></i> 清理缓存</a></li>
+    {/if}
+    <li class="divider"></li>
+    <li> <a class="logout" href="javascript:;"><i class="mdi mdi-logout-variant"></i> 退出登录</a> </li>
+  </ul>
+</li>
+<li><a class="zam-flex-center" href="{:gomyhd()}" style=""><i class="mdi mdi-format-list-numbers m-r-5"></i><span>我的活动</span></a></li>
+
+<ul class="nav navbar-nav diy-topnav">
+  {if ($siteinfo['topmenu']['open']??'2') == '1' && isset($siteinfo['topmenu']['toplinks']) && !empty($siteinfo['topmenu']['toplinks'])}
+  {foreach $siteinfo['topmenu']['toplinks'] as $toplink}
+    {if $toplink['linkstatus']=='1'}
+    <li class=""><a href="{$toplink['linkurl']??''}" target="__blank"><i class="mdi {$toplink['linkicon']??''} m-r-5"></i><span>{$toplink['linkname']??''}</span></a></li>
+    {/if}
+  {/foreach}
+  {/if}
+</ul>

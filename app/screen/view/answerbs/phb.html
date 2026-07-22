@@ -1,0 +1,95 @@
+{include file='common/header' /}
+<style>
+.header,.footer,.hdQrbox,.footer-controlBox{display: none!important;}
+table {border-collapse: collapse;}
+table td,table th {border: 1px rgb(109, 106, 106) solid;padding: 5px 30px;text-align: center;}
+table th {background-color: red;}
+table td {background-color: #fff;}
+.answerphb-mainbox{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+.phb-box{
+    width: 76%;
+    height: 700px;
+    margin: 0 auto;
+    margin-top: 70px;
+}
+.phb-table{
+    width: 100%;
+    
+}
+.phb-table .phb-lists{
+    font-size: 28px;
+    font-weight: bold;
+}
+.phb-table tr .dbdname{
+    text-align: center;
+    padding-right: 130px;
+}
+.phb-table .mingci{
+    width: 15%;
+}
+.phb-table .dbdname{
+    width: 60%;
+    
+}
+.phb-table .score{
+    width: 25%;
+}
+</style>
+<section class="answerphb-mainbox">
+    <div class="phb-box">
+        <table class="phb-table">
+            <thead>
+                <tr>
+                    <th class="mingci">名次</th>
+                    <th class="dbdname">代表队名称</th>
+                    <th class="score">分数</th>
+                </tr>
+            </thead>
+            <tbody class="phb-lists"></tbody>
+        </table>
+    </div>
+</section>
+<script>
+    require(['screencore','template','layerBox'],function(screencore,template,layerBox){
+        var answerbsphb = {
+            init:function(){
+                var self = this;
+                self.ajaxdata();
+            },
+            ajaxdata:function(){
+                var self = this;
+                screencore.ajaxSubmit("/screen/answerbs/ajaxscorephbdata",{}).then(function(data){
+                    var html = '';
+                    if(data.code == 0){
+                        $.each(data.msg,function(i,v){
+                            v.pm = i + 1;
+                            html += template("user-tpl",v);
+                        });
+                    }
+                    $(".phb-lists").html(html);
+                    setTimeout(function(){
+                        self.ajaxdata();
+                    },2e3);
+				}, function(){
+					layerBox.showMsg('网络太差，请稍后重试');
+				});
+                
+            }
+        };
+        answerbsphb.init();
+    });
+</script>
+<script id="user-tpl" type="html/javascript">
+    <tr>
+        <td class="mingci">{{ pm }}</td>
+        <td class="dbdname">{{ nickname }}</td>
+        <td class="score">{{ score }}</td>
+    </tr>
+</script>
+{include file='common/footer' /}

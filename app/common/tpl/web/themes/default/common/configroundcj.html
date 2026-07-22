@@ -1,0 +1,45 @@
+<div class="form-horizontal">
+    <div class="config-titlebox">
+        <span class="config-titlename">按轮次抽奖</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#cjroundbox" aria-expanded="false"><span>展开</span> <i class="mdi mdi-chevron-double-down"></i></span>
+    </div>
+    <div id="cjroundbox" class="collapse">
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 状态</label>
+            <div class="col-lg-8">
+                {:tpl_switch('isroundcj',$config['isroundcj']??'2', 'openroundcj')}
+                <span class="help-block">轮次抽奖适用于一次性抽取多个奖品的需求，开启后请到轮次管理菜单内添加抽奖轮次</span>
+                <span class="help-block"><span class="text-danger">开启或关闭轮次抽奖均会清空当前抽奖功能已产生的中奖数据，请谨慎操作！！！</span></span>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var isclickopenroundcj = false;
+    function openroundcj(obj,status,url){
+        require(['webcore','jconfirmBox','zamnotice'],function(webcore,jconfirmBox,zamnotice){
+            jconfirmBox.confirm('温馨提示',(status=='1' ? '关闭':'开启')+'轮次抽奖需要删除当前抽奖功能已产生的所有中奖数据并且无法恢复，确定要'+(status=='1' ? '关闭':'开启')+'轮次抽奖么？？？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('common/openroundcj',['hdid'=>$hdid,'gametype'=>$gametype])}",{isroundcj:(status=='1'?'2':'1')},'正在执行命令...').then(function(e){
+                    if(e.code==0){
+                        if(status=='1'){
+                            obj.prev().val('2');
+                            obj.attr('data-status','2');
+                        }else{
+                            obj.prev().val('1');
+                            obj.attr('data-status','1');
+                        }
+                        obj.prev().prev().prop("checked",status=='1'?false:true);
+                        zamnotice.showTips('success',(status=='1' ? '关闭':'开启')+'轮次抽奖成功');
+                        setTimeout(function(){
+                            window.location.reload();
+                        },2e3);
+                    }else{
+                        zamnotice.showTips('error',e.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','出现异常');
+                });
+            });
+        });
+    }
+</script>

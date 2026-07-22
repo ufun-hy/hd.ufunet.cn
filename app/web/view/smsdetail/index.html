@@ -1,0 +1,105 @@
+{include file='$Wpath/common/header'}
+<div class="alert alert-danger">
+	<i class="mdi mdi-information"></i> 仅统计活动内下发的短信记录，一般是手机验证码类短信
+</div>
+<section class="txrecords">
+	<div class="form-inline zam-inline-searchbar">
+		<div class="form-group">
+			<div class="input-group input-group-sm">
+			  <span class="input-group-addon">后台用户名</span>
+			  <input type="text" class="form-control" value="" id="username" placeholder="请输入后台用户名称">
+			</div>
+		</div>
+		<div class="form-group">
+			<div class="input-group input-group-sm">
+			  <span class="input-group-addon">活动主题</span>
+			  <input type="text" class="form-control" value="" id="hdtitle" placeholder="请输入活动主题">
+			</div>
+		</div>
+	    <div class="form-group">
+	      <div class="input-group input-group-sm">
+	        <span class="input-group-addon">下发类型</span>
+	          <select id="sendtype" class="form-control js_select2">
+	            {foreach $smstypes as $k=>$v} 
+	                <option value="{$k}">{$v}</option>
+	            {/foreach}
+	          </select>
+	        </div>
+	    </div>
+		<div class="form-group">
+			<div class="input-group input-group-sm">
+			  <span class="input-group-addon">用户昵称或openid</span>
+			  <input type="text" class="form-control" value="" id="nickname" placeholder="请输入用户昵称或openid">
+			</div>
+		</div>
+	    <a class="btn btn-primary btn-sm btn-search" href="javascript:void(0)"><i class="mdi mdi-magnify"></i> 搜索</a>
+	</div>
+	<table id="listtable" class="zam-btable"></table>
+</section>
+<script>
+require(['webcore','webtable','jconfirmBox','zamnotice'],function(webcore,webtable,jconfirmBox,zamnotice){
+	var initConfig = {
+	    tableId:'#listtable',
+	    url:"{:goweb('smsdetail/index')}",
+	    columnoperate:false,
+	    columns:[{
+	            checkbox: true,
+	        }, 
+	        {
+	            field: 'id',
+	            title: 'id',
+	            align: 'center',
+	            visible: false
+	        },{
+	            field: 'user_name',
+	            title: '用户',
+	            align: 'center',
+	            formatter:function(value,row,index){
+	                var html = "<div><span>"+(value==null?"已删除":value)+"</span></div><div class='m-t-5'><span>id:"+row.user_id+"</span></div>";
+                	return html;
+	            }
+	        },{
+	            field: 'hdtitle',
+	            title: '活动',
+	            align: 'center',
+	            formatter:function(value,row,index){
+	                var html = "<div><span>"+(value==null?"已删除":value)+"</span></div><div class='m-t-5'><span>id:"+row.huodong_id+"</span></div>";
+                	return html;
+	            }
+	        }, {
+	            field: 'statushtml',
+	            title: '状态',
+	            align: 'center',
+	        },{
+	            field: 'mobile',
+	            title: '手机号',
+	            align: 'center',
+	        },{
+	            field: 'smscontent',
+	            title: '短信内容',
+	            align: 'center',
+	        },{
+	            field: 'binduser',
+	            title: '用户',
+	            align: 'center',
+	            formatter: function (value, row, index) {
+	                var html = "<div><div>"+value.nickname+"</div></div><div class='m-t-5'><span>openid:"+value.openid+"</span></div>";
+	                return html;
+	            },
+	        },{
+	            field: 'create_time',
+	            title: '下发时间',
+	            align: 'center',
+	        }
+	    ],
+	    searchParamas:[{'type':'1','id':'username'},{'type':'1','id':'hdtitle'},{'type':'2','id':'sendtype'},{'type':'1','id':'nickname'}],
+	    toolbar:{
+	    },
+	};
+	webtable.init(initConfig);
+	$('.zam-inline-searchbar select').change(function(e) {
+		webtable.refresh();
+	});
+});
+</script>
+{include file='$Wpath/common/footer'}

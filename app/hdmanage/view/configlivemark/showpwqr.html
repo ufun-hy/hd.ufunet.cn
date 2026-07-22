@@ -1,0 +1,32 @@
+<div class="form-horizontal confirmbox-pop">
+    <div class="zam-flex-column-center">
+        <img src="{$qrcode}" width="200px" height="200px">
+        <a class="btn btn-primary m-t-15 btn-downqrcode" onclick="downloadpwQr(this)">下载二维码</a>
+        <div class="m-t-15">
+            <span>扫此二维码评委可免登录直接进入评分页</span>
+        </div>
+    </div>
+</div>
+<script>
+function downloadpwQr(obj){
+    var $this = $(obj);
+    var imgUrl = $this.prev().attr("src");
+    if (window.navigator.msSaveOrOpenBlob) {
+        var bstr = atob(imgUrl.split(',')[1]);
+        var n = bstr.length;
+        var u8arr = new Uint8Array(n);
+        while (n--) {
+        u8arr[n] = bstr.charCodeAt(n);
+        }
+        var blob = new Blob([u8arr]);
+        window.navigator.msSaveOrOpenBlob(blob, '{$pwname}.png');
+    } else {
+        var el = document.createElement('a');
+        el.href = imgUrl;
+        el.setAttribute('download', '{$pwname}.png');
+        el.setAttribute('target', '__blank');
+        el.click();
+    }
+}
+</script>
+    

@@ -1,0 +1,332 @@
+{include file="common/header" /}
+<style>
+body{position:fixed;width: 100%;height: 100%;top: 0;left: 0;overflow: hidden;}
+#sq-ban,#lizi-ban{background-color:transparent;position:fixed; display: block;cursor: crosshair;width: 100%;height: 100%;top: 0;left: 0;overflow: hidden;}
+.tools{position: fixed;left:0;bottom: 20px; width:100%;}
+.tools button{width:100px;background-color: rgba(255,255,255,0.7);border: 1px solid #eee;outline: none;cursor: pointer;box-sizing: border-box;text-align: center;color:#ccc;line-height: 50px;box-shadow:0 0 8px rgba(0,0,0,0.1); transition: 0.3s;margin:0 10px;font-size:0.42rem;border-radius:0.1rem}
+.tools button.active,.tools button:active{box-shadow: 0 0 15px #00CCFF; color:#00CCFF;}
+#clear{float:left;background-color:#fff;}
+#save{float:right;background-color:#4886ff;color:#fff}
+.color-group{position:fixed;width: 30px;left: 30px;top:50%;transform: translate(0,-150px)}
+.color-group ul{list-style: none;}
+.color-group ul li{width: 30px;height: 30px;margin: 10px 0;border-radius: 50%;box-sizing: border-box;border:3px solid white;box-shadow: 0 0 8px rgba(0,0,0,0.2);cursor: pointer;transition: 0.3s;}
+.color-group ul li.active{box-shadow:0 0 15px #00CCFF;}
+#range-wrap{position: fixed;top: 50%;right:30px;width: 30px;height: 150px;margin-top: -75px;}
+#range-wrap input{transform: rotate(-90deg);width: 150px;height: 20px;margin: 0;transform-origin: 75px 75px;    border-radius: 15px;-webkit-appearance: none;outline: none;position: relative;}
+#range-wrap input::after{display: block;content:"";width:0;height: 0;border:5px solid transparent;
+    border-right:150px solid #00CCFF;border-left-width:0;position: absolute;left: 0;top: 5px;border-radius:15px; z-index: 0; }
+#range-wrap input[type=range]::-webkit-slider-thumb,#range-wrap input[type=range]::-moz-range-thumb{-webkit-appearance: none;}
+#range-wrap input[type=range]::-webkit-slider-runnable-track,#range-wrap input[type=range]::-moz-range-track {height: 10px;border-radius: 10px;box-shadow: none;}
+#range-wrap input[type=range]::-webkit-slider-thumb{-webkit-appearance: none;height: 20px;width: 20px;margin-top: -1px;background: #ffffff;border-radius: 50%;box-shadow: 0 0 8px #00CCFF;position: relative;z-index: 999;}
+@media screen and (max-width: 768px) {
+    .tools{bottom:auto;top:0.12rem;}
+    .tools button{height:0.8rem;line-height:0.8rem;box-shadow:0 0 5px rgba(0,0,0,0.1)}
+    .tools button.active,.tools button:active{box-shadow: 0 0 5px #00CCFF;}
+    .color-group{left: 0;top:auto;bottom:0.1rem;display: flex;width:100%;justify-content: center;text-align: center;transform: translate(0,0)}
+    .color-group ul li{display: inline-block;margin:0 5px;}
+    .color-group ul li.active{box-shadow:0 0 10px #00CCFF;}
+    #range-wrap{right:auto;left: 20px;}
+}
+.closelayerimg{position:absolute;top:0.15rem;right:0.15rem;font-size:0.5rem;color:#333;}
+.flysqimg{
+	position:absolute;
+	width:100%;
+	height:auto;
+	top:0;
+	left:0;
+}
+</style>
+<div class="zam-app-ppqd">
+	<canvas id="lizi-ban"></canvas>
+	<canvas id="sq-ban"></canvas>
+    <div class="color-group">
+        <ul>
+            {if !isset($appconfig['applinecolortype']) || $appconfig['applinecolortype']=='2'}
+            <li id="black" class="color-item{if empty($appconfig['applinecolor'])||$appconfig['applinecolor']=='black'} active{/if}" style="background-color: black;"></li>
+            <li id="red" class="color-item{if $appconfig['applinecolor']=='red'} active{/if}" style="background-color: #FF3333;"></li>
+            <li id="blue" class="color-item{if $appconfig['applinecolor']=='blue'} active{/if}" style="background-color: #0066FF;"></li>
+            <li id="yellow" class="color-item{if $appconfig['applinecolor']=='yellow'} active{/if}" style="background-color: #FFFF33;"></li>
+            <li id="green" class="color-item{if $appconfig['applinecolor']=='green'} active{/if}" style="background-color: #33CC66;"></li>
+            <li id="gray" class="color-item{if $appconfig['applinecolor']=='gray'} active{/if}" style="background-color: gray;"></li>
+            {else /}
+                {if !empty($appconfig['applinecolors'])}
+                    {foreach $appconfig['applinecolors'] as $akey=>$acolor } 
+                        <li class="color-item{if $akey=='0'} active{/if}" style="background-color: {$acolor};"></li>
+                    {/foreach}
+                {/if}
+            {/if}
+        </ul>
+    </div>
+    <div id="range-wrap"><input type="range" id="range" min="1" max="10" value="{if empty($appconfig['applinewidth'])}5{else}{$appconfig['applinewidth']}{/if}" title="调整笔刷粗细"></div>
+    <div class="tools">
+        <button id="clear" title="清空">清空</button>
+        <button id="save" title="发送">发送</button>
+    </div>
+</div>
+<script>
+require(['wechatcore','appsocket'],function (wechatcore,appsocket) {
+appsocket.init({
+	onmessage:function(data){
+		if(data.type=='connected'){
+			appsocket.isclose = false;
+			wechatcore.ajaxSubmit("/wechat/ppqd/binduid",{clientid:data.clientid,module:XCV3Config.gametype}).then(function(data){
+				if(data.code!=0){
+					wechatcore.msg(data.msg);
+				}
+			}, function(){
+				wechatcore.msg('网络太差链接socket服务失败，请稍后重试');
+			});
+		}else if(data.type=='goto'){
+			wechatcore.goto(data);
+		}else if(data.type=='addblack'){
+			data.userid==XCV3Config.userid&&wechatcore.closewxwindow();
+		}else if(data.type=='luckopenids'){
+			wechatcore.layerAsklucker(data);
+		}
+	}
+});	
+var hadpaint = false;
+var ppcanvas = document.getElementById("sq-ban");
+var ppctx = ppcanvas.getContext("2d");
+var lzcanvas = document.getElementById("lizi-ban");
+var lzctx = lzcanvas.getContext("2d");
+var reSetppcanvas = document.getElementById("clear");
+var aColorBtn = document.getElementsByClassName("color-item");
+var save = document.getElementById("save");
+var range = document.getElementById("range");
+var clear = false;
+var activeColor = 'black';
+var lWidth = {if empty($appconfig['applinewidth'])}5{else}parseInt("{$appconfig['applinewidth']}"){/if};
+var fireani = {if empty($appconfig['applinefire'])}'2'{else}"{$appconfig['applinefire']}"{/if};
+var particles = [];
+autoSetSize(ppcanvas);
+listenToUser(ppcanvas);
+function autoSetSize(ppcanvas) {
+    ppcanvasSetSize();
+    function ppcanvasSetSize() {
+        var pageWidth = document.documentElement.clientWidth;
+        var pageHeight = document.documentElement.clientHeight;
+        ppcanvas.width = pageWidth;
+        ppcanvas.height = pageHeight;
+		//lizicanavs
+		lzcanvas.width = pageWidth;
+        lzcanvas.height = pageHeight;
+        getColor();
+    }
+    window.onresize = function () {
+        ppcanvasSetSize();
+    }
+	if(fireani=='1') animate();
+}
+function animate() {
+	setInterval(function () {
+		render();
+		area();
+	}, 1000 / 60)
+}
+function setppcanvasBg(color) {
+    ppctx.fillStyle = color;
+    ppctx.fillRect(0, 0, ppcanvas.width, ppcanvas.height);
+    ppctx.fillStyle = "black";
+}
+function listenToUser(ppcanvas) {
+    var painting = false;
+    var lastPoint = {x: undefined, y: undefined};
+	var supportTouch = "ontouchend" in document ? true : false;
+    if (supportTouch) {
+        ppcanvas.ontouchstart = function (e) {
+            painting = true;
+            var x = e.touches[0].clientX;
+            var y = e.touches[0].clientY;
+            lastPoint = {"x": x, "y": y};
+            ppctx.save();
+            drawCircle(x, y, 0);
+			if(fireani=='1') makefire(e, 3 * Math.random());
+        };
+        ppcanvas.ontouchmove = function (e) {
+            if (painting) {
+                var x = e.touches[0].clientX;
+                var y = e.touches[0].clientY;
+                var newPoint = {"x": x, "y": y};
+                drawLine(lastPoint.x, lastPoint.y, newPoint.x, newPoint.y);
+                lastPoint = newPoint;
+				hadpaint = true;
+				if(fireani=='1') makefire(e, 3);
+            }
+        };
+
+        ppcanvas.ontouchend = function () {
+            painting = false;
+        }
+    } else {
+        ppcanvas.onmousedown = function (e) {
+            painting = true;
+            var x = e.clientX;
+            var y = e.clientY;
+            lastPoint = {"x": x, "y": y};
+            ppctx.save();
+            drawCircle(x, y, 0);
+            if(fireani=='1') makefire(e, 3 * Math.random());
+        };
+        ppcanvas.onmousemove = function (e) {
+            if (painting) {
+                var x = e.clientX;
+                var y = e.clientY;
+                var newPoint = {"x": x, "y": y};
+                drawLine(lastPoint.x, lastPoint.y, newPoint.x, newPoint.y,clear);
+                lastPoint = newPoint;
+				hadpaint = true;
+				if(fireani=='1') makefire(e, 3);
+
+            }
+        };
+        ppcanvas.onmouseup = function () {
+            painting = false;
+        };
+        ppcanvas.mouseleave = function () {
+            painting = false;
+        }
+    }
+}
+function drawCircle(x, y, radius) {
+    ppctx.save();
+    ppctx.beginPath();
+    ppctx.arc(x, y, radius, 0, Math.PI * 2);
+    ppctx.fill();
+    if (clear) {
+        ppctx.clip();
+        ppctx.clearRect(0,0,ppcanvas.width,ppcanvas.height);
+        ppctx.restore();
+    }
+}
+
+function drawLine(x1, y1, x2, y2) {
+    ppctx.lineWidth = lWidth;
+    ppctx.lineCap = "round";
+    ppctx.lineJoin = "round";
+    if (clear) {
+        ppctx.save();
+        ppctx.globalCompositeOperation = "destination-out";
+        ppctx.moveTo(x1, y1);
+        ppctx.lineTo(x2, y2);
+        ppctx.stroke();
+        ppctx.closePath();
+        ppctx.clip();
+        ppctx.clearRect(0,0,ppcanvas.width,ppcanvas.height);
+        ppctx.restore();
+    }else{
+        ppctx.moveTo(x1, y1);
+        ppctx.lineTo(x2, y2);
+        ppctx.stroke();
+        ppctx.closePath();
+    }
+}
+range.onchange = function(){
+    lWidth = this.value;
+};
+reSetppcanvas.onclick = function () {
+    ppctx.clearRect(0, 0, ppcanvas.width, ppcanvas.height);
+	hadpaint = false;
+};
+save.onclick = function () {
+	if(!hadpaint) return wechatcore.msg('请先签名');
+    var imgUrl = ppcanvas.toDataURL("image/png");
+	wechatcore.ajaxSubmit('/wechat/ppqd/savesqimg',{base64img:imgUrl,fromtype:'ppqd'},'拼命保存中...').then(function(data){
+		if(data.code==0){
+			ppctx.clearRect(0, 0, ppcanvas.width, ppcanvas.height);
+			$("body").append('<img class="flysqimg" src="'+imgUrl+'" />');
+			$(".flysqimg").animate({top:"-500px"},8e2,'linear',function(){
+				$(".flysqimg").remove();
+			});
+			hadpaint = false;
+			wechatcore.msg('发送成功');
+		}else{
+			wechatcore.msg(data.msg);
+		}
+	}, function(){
+		wechatcore.msg('网络太差，请稍后重试');
+	});
+};
+function getColor(){
+	activeColor = $(".color-group .active").css('background-color');
+	ppctx.fillStyle = activeColor;
+    ppctx.strokeStyle = activeColor;
+    for (var i = 0; i < aColorBtn.length; i++) {
+        aColorBtn[i].onclick = function () {
+            for (var i = 0; i < aColorBtn.length; i++) {
+                aColorBtn[i].classList.remove("active");
+                this.classList.add("active");
+                activeColor = this.style.backgroundColor;
+                ppctx.fillStyle = activeColor;
+                ppctx.strokeStyle = activeColor;
+            }
+        }
+    }
+}
+function makefire(e, n) {
+	var x = e.clientX || e.touches[0].pageX;
+	var y = e.clientY || e.touches[0].pageY;
+	for (var i = 0; i < n; i++) {
+		spawn(x, y);
+	}
+}
+function spawn(x, y) {
+	var particle = new Particle();
+	particle.init(x, y);
+	particles.push(particle);
+}
+
+function render() {
+	lzctx.clearRect(0, 0, lzcanvas.width, lzcanvas.height);
+	for (var i = 0, len = particles.length; i < len; i++) {
+		particles[i].draw();
+		particles[i].update();
+	}
+}
+function area() {
+	var n = 0;
+	for (var i = 0, l = particles.length; i < l; i++) {
+		if (particles[i].r > 1) {
+			particles[n++] = particles[i]; 
+		}
+	}
+	while (particles.length > Math.min(700, n)) {
+		particles.pop();
+	}
+}
+function Particle(){}
+Particle.prototype = {
+	init: function (x, y) {
+		this.x = x || 0.0;
+		this.y = y || 0.0;
+		this.r = 2 * Math.random() + 3 || 40;
+		this.color = 'gold';
+		this.theta = Math.random() * 2 * Math.PI;
+		this.R = Math.random() * 4 + 2;
+		this.vx = Math.cos(this.theta) * this.R;
+		this.vy = Math.sin(this.theta) * this.R;
+	},
+	draw: function () {
+		lzctx.beginPath();
+		lzctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+		lzctx.fillStyle = this.color;
+		lzctx.fill();
+	},
+	update: function () {
+		this.x += this.vx;
+		this.y += this.vy;
+		this.vx += Math.cos(this.theta) * .1;
+		this.vy += Math.sin(this.theta) * .1;
+		this.vx *= .94;
+		this.vy *= .94;
+		this.r *= .92;
+		this.color ='gold';
+	}
+}
+document.addEventListener('touchmove', function(e) {
+    if(e.target.tagName.toLowerCase()!='input') e.preventDefault();
+},{passive: false});
+});
+</script>
+{include file="common/footermenu" /}
+{include file="common/footer" /}

@@ -1,0 +1,260 @@
+<style>
+.user-item{position:relative;width:100px;min-height:100px;}
+.user-item .zam-select{position:absolute;top:20px;left:0px;}
+.user-item img{width:50px;height:50px;border-radius:50%;}
+.hd-lists tr td{
+	text-align: center!important;
+}
+.hd-lists td td label{margin: 0;padding:0;}
+.lyear-checkbox{padding: 0;padding-right: 18px;}
+</style>
+<div id="formBox" class="zam-formvalidation form-horizontal">
+<div class="alert alert-danger">
+<div>1 补发红包尽量避开活动高峰期，如果有活动正在发红包，补发红包请尽量延后操作</div>
+<div>2 如果有待发放记录，不要急着去转成发放失败，一定要确保这些待发放记录确定发不出了才可以执行强制转成发放失败操作 <span class="text-success">(此操作的目的是将待发放的记录转成发放失败方便补发，一般是会自动将发放中的记录转成发放失败或者发放成功，不会出现超过一个小时以上的发放中状态的记录，如果出现了原因可能是: 服务器cpu满了 或者 内存满了 或者 redis链接出现异常，所以你要确定这些记录是肯定发不出了才去操作，要不然不要轻易去操作)</span></div>
+</div>
+<div class="form-group">
+	<div class="zam-confirmBox-right col-md-12">
+		<div class="input-group">
+			<input type="text" class="form-control hdid" name="hdid" placeholder="请输入活动标题或者活动id">
+			<div class="input-group-addon btn btn-primary searchone"><i class="mdi mdi-magnify"></i> 搜索</div>
+		</div>
+	</div>
+</div>
+<div class="form-group2">
+<table class="table table-bordered">
+<thead>
+  <tr>
+  	<th style="width:10%;text-align:center;">选择</th>
+    <th style="width:30%;text-align:center;">活动</th>
+    <th style="width:20%;text-align:center;">发放成功</th>
+    <th style="width:20%;text-align:center;">发放失败</th>
+    <th style="width:20%;text-align:center;">发放中</th>
+  </tr>
+</thead>
+<tbody class="hd-lists">
+</tbody>
+</table>
+</div>
+</div>
+<script id="one-tpl" type="text/template">
+<tr>
+	<td>
+	  <label class="lyear-checkbox checkbox-inline checkbox-primary">
+        <input type="checkbox" value="<% d.id %>" <%# if(d.failnum == 0){ %>disabled<%# } %>><span></span>
+      </label>
+  	</td>
+  	<td>
+		<% d.hdtitle %>
+		<div>id:<% d.id %></div>
+  	</td>
+  	<td>
+		<%# if(d.successmoney > 0){ %>
+			<div><span class="text-danger"><% d.successmoney %>元</span></div>
+		<%# }else{ %>
+			<div><% d.successmoney %>元</div>
+		<%# } %>
+		<%# if(d.successmoney > 0){ %></div>
+			<div><span class="text-danger"><% d.successnum %>个</span></div>
+		<%# }else{ %>
+			<div><% d.successnum %>个</div>
+		<%# } %>
+		<%# if(d.successmoney > 0){ %>
+			<div><a class="btn btn-primary btn-xs successtofail m-t-10" data-id="<% d.id %>">核实到账</a></div>
+		<%# } %>
+		<%# if(d.splitfailnum > 0){ %>
+			<div class="m-t-15">拆分红包发放失败</div>
+			<div><span class="text-danger"><% d.splitfailmoney %>元</span></div>
+			<div><span class="text-danger"><% d.splitfailnum %>个</span></div>
+			<div><a class="btn btn-primary btn-xs splittofail m-t-10" data-id="<% d.id %>">核实失败金额（推荐多次核实）</a></div>
+			<div><a class="btn btn-primary btn-xs splitbufa m-t-10" data-id="<% d.id %>">补发拆分红包</a></div>
+			<div><a class="btn btn-danger btn-xs forcejiedong m-t-10" data-id="<% d.id %>">解冻拆分红包</a></div>
+		<%# } %>	
+  	</td>
+  	<td>
+		<%# if(d.failmoney > 0){ %>
+			<div><span class="text-danger"><% d.failmoney %>元</span></div>
+		<%# }else{ %>
+			<div><% d.failmoney %>元</div>
+		<%# } %>
+		<%# if(d.failmoney > 0){ %></div>
+			<div><span class="text-danger"><% d.failnum %>个</span></div>
+		<%# }else{ %>
+			<div><% d.failnum %>个</div>
+		<%# } %>
+  	</td>
+  	<td>
+  		<%# if(d.waitmoney > 0){ %>
+			<div><span class="text-danger"><% d.waitmoney %>元</span></div>
+		<%# }else{ %>
+			<div><% d.waitmoney %>元</div>
+		<%# } %>
+		<%# if(d.waitmoney > 0){ %></div>
+			<div><span class="text-danger"><% d.waitnum %>个</span></div>
+		<%# }else{ %>
+			<div><% d.waitnum %>个</div>
+		<%# } %>
+		<%# if(d.waitmoney > 0){ %>
+			<div><a class="btn btn-danger btn-xs waittofail m-t-10" data-id="<% d.id %>" data-waitnum="<% d.waitnum %>">强制转成发放失败</a></div>
+		<%# } %>
+  	</td>
+</tr>
+</script>
+<script>
+require(["webcore","zamnotice","jconfirmBox"],function(webcore,zamnotice,jconfirmBox){
+	$(".searchone").on('click',function(){
+		var searchval = $(".hdid").val();
+		if(searchval=='') return zamnotice.showTips('error','请先输入搜索关键词');
+		webcore.ajaxSubmit("{:goweb('hbbufa/confirmsend')}",{type:'2',hdid:searchval},'正在拼命查找活动...').then(function(json){
+			if(json.code==0){
+				var html = '';
+				$.each(json.msg,function(i,v){
+					 html += webcore.tpl($("#one-tpl"),v);
+				});
+				$(".hd-lists").html(html);
+				if(html==''){
+					zamnotice.showTips('error','未搜索到相关活动');
+				}
+			}else{
+				$(".hd-lists").html('');
+				zamnotice.showTips('error',json.msg);
+			}
+		}, function(json){
+			zamnotice.showTips('error','网络差。操作失败');
+		});
+	});
+	$(".hd-lists").on('click','.waittofail',function(){
+		var $this = $(this);
+		jconfirmBox.confirm('温馨提示','这个操作有导致超发的风险，请务必确定当前活动没有正在发放红包才可以执行此操作，您确定要执行将待发放的记录全部转成发放失败么？',function(){
+			webcore.ajaxSubmit("{:goweb('hbbufa/confirmsend')}",{type:'4',hdid:$this.attr('data-id'),waitnum:$this.attr('data-waitnum')},'处理中..').then(function(json){
+				if(json.code==0){
+				    window.location.reload();
+				    zamnotice.showTips('success','操作成功');
+			    }else{
+			        zamnotice.showTips('error',json.msg);
+			    }
+			}, function(json){
+				zamnotice.showTips('error','网络差。操作失败');
+			});
+    	});
+	});
+	$(".hd-lists").on('click','.successtofail',function(){
+		var $this = $(this),hdid = $this.attr('data-id');
+		var confirmobj = jconfirmBox.ajaxconfirm("核实发放成功记录","{:goweb('hbbufa/confirmsend')}",{type:'5',hdid:hdid},'html','col-lg-8 col-lg-offset-2',function(e){
+			confirmobj.close();
+		},false,'2',[],true,function($ele){
+			$ele.find(".btn").click(function(){
+				var $this = $(this);
+				if($this.hasClass('active')){
+					return false;
+				}
+				$this.hasClass('active');
+				process(hdid,confirmobj);
+		  	});
+		});
+	});
+	$(".hd-lists").on('click','.splittofail',function(){
+		var $this = $(this),hdid = $this.attr('data-id');
+		var confirmobj = jconfirmBox.ajaxconfirm("核实发放成功金额内疑似部分未到账的金额","{:goweb('hbbufa/confirmsend')}",{type:'6',hdid:hdid},'html','col-lg-8 col-lg-offset-2',function(e){
+			confirmobj.close();
+		},false,'2',[],true,function($ele){
+			$ele.find(".btn").click(function(){
+				var $this = $(this);
+				if($this.hasClass('active')){
+					return false;
+				}
+				$this.hasClass('active');
+				splitprocess(hdid,confirmobj);
+		  	});
+		});
+	});
+	$(".hd-lists").on('click','.forcejiedong',function(){
+		var $this = $(this);
+		jconfirmBox.confirm('温馨提示','<span class="text-danger">强制解冻拆分红包发放失败的金额很可能会有超发的风险，请务必确定当前活动已结束超过了24小时再去解冻并且补发多次失败金额仍然没有减少的情况下才可以解冻</span>，解冻后该部分失败金额无法补发，您确定要解冻么？',function(){
+			webcore.ajaxSubmit("{:goweb('hbbufa/confirmsend')}",{type:'7',hdid:$this.attr('data-id')},'处理中..').then(function(json){
+				if(json.code==0){
+				    window.location.reload();
+				    zamnotice.showTips('success','操作成功');
+			    }else{
+			        zamnotice.showTips('error',json.msg);
+			    }
+			}, function(json){
+				zamnotice.showTips('error','网络差。操作失败');
+			});
+    	});
+	});
+	$(".hd-lists").on('click','.splitbufa',function(){
+		var $this = $(this);
+		jconfirmBox.confirm('温馨提示','<span class="text-danger">当前操作会对所有拆分红包未成功到账部分进行补发，耗时较长请至少10分钟后再来查询拆分红包失败金额是否有减少</span>，您确定要补发么？',function(){
+			webcore.ajaxSubmit("{:goweb('hbbufa/confirmsend')}",{type:'8',hdid:$this.attr('data-id')},'处理中..').then(function(json){
+				if(json.code==0){
+				    zamnotice.showTips('success','操作成功',2e3,function(){
+						window.location.reload();
+					});
+			    }else{
+			        zamnotice.showTips('error',json.msg);
+			    }
+			}, function(json){
+				zamnotice.showTips('error','网络差。操作失败');
+			});
+    	});
+	});
+	
+});
+function process(hdid,confirmobj) {
+    require(['webcore','jconfirmBox','zamnotice'],function(webcore,jconfirmBox,zamnotice){
+        webcore.ajaxSubmit("{:goweb('hbbufa/checkprogress')}",{hdid:hdid}).then(function(json){
+            if(json.code==0){
+            	var result = json.msg;
+            	if(result.status=='1'){
+                	var percent = ((result.success/result.total)*100);
+                	$(".progressbox .btn").text('正在核实中'+" ("+Math.floor(percent)+"%)");
+                	$("#process").html("已核实<span class='text-danger m-l-5 m-r-5'>"+result.success+"</span>个记录 / 共 "+result.total+" 个记录");
+                	process(hdid,confirmobj);
+            	}else{
+            		$(".progressbox .btn").addClass('hidden');
+            		$("#process").removeClass('hidden').html('<span class="text-danger">恭喜，已完成所有记录核实处理工作</span>');
+            		setTimeout(function(){
+            			confirmobj.close();
+            			$(".searchone").trigger('click');
+            		},2e3);
+            	}
+            }else{
+                $(".progressbox .btn").addClass('hidden');
+            	$("#process").text(json.msg);
+            }
+        }, function(json){
+            $(".progressbox .btn").addClass('hidden');
+            $("#process").text('网络异常，进程出错');
+        });
+    });
+}
+function splitprocess(hdid,confirmobj) {
+    require(['webcore','jconfirmBox','zamnotice'],function(webcore,jconfirmBox,zamnotice){
+        webcore.ajaxSubmit("{:goweb('hbbufa/checksplitprogress')}",{hdid:hdid}).then(function(json){
+            if(json.code==0){
+            	var result = json.msg;
+            	if(result.status=='1'){
+                	var percent = ((result.success/result.total)*100);
+                	$(".progressbox .btn").text('正在核实中'+" ("+Math.floor(percent)+"%)");
+                	$("#process").html("已核实<span class='text-danger m-l-5 m-r-5'>"+result.success+"</span>个记录 / 共 "+result.total+" 个记录");
+                	splitprocess(hdid,confirmobj);
+            	}else{
+            		$(".progressbox .btn").addClass('hidden');
+            		$("#process").removeClass('hidden').html('<span class="text-danger">恭喜，已完成所有记录核实处理工作</span>');
+            		setTimeout(function(){
+            			confirmobj.close();
+            			$(".searchone").trigger('click');
+            		},2e3);
+            	}
+            }else{
+                $(".progressbox .btn").addClass('hidden');
+            	$("#process").text(json.msg);
+            }
+        }, function(json){
+            $(".progressbox .btn").addClass('hidden');
+            $("#process").text('网络异常，进程出错');
+        });
+    });
+}
+</script>

@@ -1,0 +1,246 @@
+{include file='$Wpath/common/header'}
+<div class="form-inline zam-inline-searchbar">
+    <div class="form-group" style="max-width: 220px;">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">活动</span>
+          <select id="hdid" class="form-control js_select2">
+            <option value="0">全部活动</option>
+            {foreach $hdtitles as $hkey=>$hdtitle } 
+            <option value="{$hdtitle['id']}">(id:{$hdtitle['id']}){$hdtitle['hdtitle']}</option>
+            {/foreach}
+          </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">支付方式</span>
+          <select id="paytype" class="form-control js_select2">
+            {foreach $paytypes as $pkey=>$pval } 
+            <option value="{$pkey}">{$pval}</option>
+            {/foreach}
+          </select>
+        </div>
+    </div>
+    <div class="form-group">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">订单类型</span>
+          <select id="fromtype" class="form-control js_select2">
+            {foreach $typelists as $tkey=>$tval } 
+            <option value="{$tkey}">{$tval}</option>
+            {/foreach}
+          </select>
+        </div>
+    </div>
+    <div class="form-group">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">订单状态</span>
+          <select id="orderstatus" class="form-control js_select2">
+            {foreach $orderstatuss as $okey=>$oval } 
+            <option value="{$okey}">{$oval}</option>
+            {/foreach}
+          </select>
+        </div>
+    </div>
+    <a class="btn btn-primary btn-sm btn-search" href="javascript:void(0)"><i class="mdi mdi-magnify"></i> 搜索</a>
+    <a class="btn btn-warning btn-sm btn-export hidden" href="javascript:void(0)"><i class="mdi mdi-export"></i> 导出</a>
+    <a class="btn btn-warning btn-sm btn-exportall hidden" href="javascript:void(0)"><i class="mdi mdi-export"></i> 全部导出</a>
+</div>
+{include file='$Wpath/common/tabletoolbar'}
+<table id="listtable" class="zam-btable"></table>
+<script>
+require(['webcore','webtable','jconfirmBox','zamnotice'],function(webcore,webtable,jconfirmBox,zamnotice){
+var initConfig = {
+	tableId:'#listtable',
+	url:"{:gomyhome('account/order')}",
+	columnoperate:{
+        btns:{
+            edit:{
+                title:"支付",
+                icon:"mdi-gavel",
+                except:{
+                    'more':[
+                        {'field':'status','only':'2'},
+                        {'field':'canpay','only':'1'},
+                    ],
+                }
+            },
+            del:{
+                title:"关闭",
+                icon:"mdi-close",
+                except:{
+                    'more':[
+                        {'field':'status','only':'2'},
+                        {'field':'canpay','only':'1'},
+                    ],
+                }
+            },
+        },
+        func:{
+            edit:function(value, row, index){
+                var confirmobj2 = jconfirmBox.ajaxconfirm("微信扫码支付","{:gomyhome('account/gopay')}",{orderid:row.id},'html','col-lg-6 col-lg-offset-3',function(e){
+                    var payBox = e.find(".payInfoBox");
+                    if(payBox.length>0){
+                        var orderid = payBox.attr('data-id');
+                        webcore.ajaxSubmit("{:gomyhome('account/queryorder')}",{orderid:orderid}).then(function(json){
+                            if(json.code!=0){
+                                zamnotice.showNotice('提示',json.msg,2e3,false,'info','info');
+                            }else{
+                                confirmobj2.close();
+                                zamnotice.showTips('success','支付成功',500,function(){
+                                    window.location.reload();
+                                });
+                            }
+                        });
+                    }else{
+                        confirmobj2.close();
+                    }
+                },false,'1',[{'hidden':false,'txt':'已完成支付'},{'hidden':false,'txt':'取消'}]);
+            },
+            del:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','您确定要关闭该订单么？',function(){
+                    webcore.ajaxSubmit("{:gomyhome('account/closeorder')}",{orderid:row.id},'处理中..').then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','操作成功');
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                    });
+                });
+            },
+        },
+    },
+	columns:[{
+			checkbox: true,
+		}, 
+		{
+			field: 'id',
+			title: 'ID',
+			align: 'center',
+            width:'5%',
+			visible: false
+		}, {
+            field: 'user_name',
+            title: '用户',
+            align:'center',
+            width:'10%',
+            formatter: function (value, row, index) {
+                var html = "<div><span>"+(value==null?"已删除":value)+"</span></div><div class='m-t-5'><span>id:"+row.user_id+"</span></div>";
+                return html;
+            },
+        }, {
+            field: 'hdtitle',
+            title: '活动',
+            align:'center',
+            width:'20%',
+            formatter: function (value, row, index) {
+                if(row.huodong_id=='0') return '-';
+                var html = "<div><span>"+(value==null?"已删除":value)+"</span></div><div class='m-t-5'><span>id:"+row.huodong_id+"</span></div>";
+                return html;
+            },
+        }, {
+            field: 'statusname',
+            title: '状态',
+            align:'center',
+            width:'5%',
+            formatter: function (value, row, index) {
+                var html = value;
+                if(row.status=='1' && row.isforce=='1'){
+                    html += "<div class='m-t-5'><span class='text-danger'>手动支付</span></div>";
+                }
+                if(row.status=='2' && row.canpay=='2'){
+                    html += "<div class='m-t-5'>已逾期</div>";
+                }
+                return html;
+            },
+        },  {
+                field: 'fromtypename',
+                title: '来源',
+                align: 'center',
+                width:'5%',
+            },  {
+                field: 'paytypename',
+                title: '支付方式',
+                align: 'center',
+                width:'5%',
+            }, {
+                field: 'payfee',
+                title: '订单金额(元)',
+                align:'center',
+                width:'5%',
+            }, {
+                field: 'payinfo',
+                title: '订单详情',
+                align:'center',
+                width:'25%',
+                formatter: function (value, row, index) {
+                    var html = '';
+                    if(row.fromtype < 3 && row.addnums > 0 ){
+                        html += '<div class="bugperson">购买人数:'+row.addnums+'人</div>';
+                    }
+                    if(row.fromtype == '3'){
+                        if(row.isforce=='1'){
+                            if(row.payfee==0){
+                                if(row.addnums > 0 ){
+                                    html += '<div class="bughbnum">充值红包:'+row.addnums+'元</div>';
+                                    html += '<div class="bughbnum"><span class="text-danger">手动新增</span></div>';
+                                }else{
+                                    html += '<div class="bughbnum">充值红包:'+row.addnums+'元</div>';
+                                    html += '<div class="bughbnum"><span class="texy-danger">手动减去</span></div>';
+                                }
+                                html += "<div class='m-t-5'><span class='text-danger'>"+row.forceinfo.reason+"</span></div>";
+                            }else{
+                                html += '<div class="bughbnum">充值红包:'+row.addnums+'元</div>';
+                            }
+                        }else{
+                            html += '<div class="bughbnum">充值红包:'+row.addnums+'元</div>';
+                        }
+                    }
+                    if(row.fromtype == '4'){
+                        if(row.payfee==0){
+                            if(row.addnums > 0 ){
+                                html += '<div class="bughbnum">充值短信:'+row.addnums+'条</div>';
+                                html += '<div class="bughbnum"><span class="text-danger">手动新增</span></div>';
+                            }else{
+                                html += '<div class="bughbnum">充值短信:'+row.addnums+'条</div>';
+                                html += '<div class="bughbnum"><span class="text-danger">手动减去</span></div>';
+                            }
+                            html += "<div class='m-t-5'><span class='text-danger'>"+row.forceinfo.reason+"</span></div>";
+                        }else{
+                            html += '<div class="bugperson">充值短信:'+row.addnums+'条</div>';
+                        }
+                    }
+                    if(value.modules && value.modules.length > 0){
+                        html += '<div>购买功能:';
+                        $.each(value.modules,function(i,v){
+                            html += (i > 0 ?"+":"") + v.name;
+                        });
+                        html += '</div>';
+                    }
+                    if(row.isrenewal=='1'){
+                        html += "<div>活动续期:"+value.daynum+"天</div>";
+                    }
+                    if(row.paytype=='1' && row.status=='4'){
+                        html += "<div>退款单号:"+row.refund_id+"</div>";
+                    }
+                    return html;
+                },
+            },  {
+                field: 'create_time',
+                title: '下单时间',
+                align: 'center',
+                width:'10%',
+            }
+	],
+	searchParamas:[{'type':'2','id':'hdid'},{'type':'2','id':'paytype'},{'type':'2','id':'fromtype'},{'type':'2','id':'orderstatus'}],
+	toolbar:{},
+};
+webtable.init(initConfig);
+$('.zam-inline-searchbar select').change(function(e) {
+    webtable.refresh();
+});
+});
+</script>
+{include file='$Wpath/common/footer'}

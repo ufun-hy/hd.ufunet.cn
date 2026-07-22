@@ -1,0 +1,39 @@
+<div class="alert alert-danger">
+<i class="wi wi-bell"></i> 加减票数是在项目真实得票(微信用户投票)数量基础上直接加减票数，不会累加和累减
+</div>
+<div class="alert alert-info">投票项目:{$votename}，当前微信投票数:{$rnum}票，手动{if $anum<0}减{else}加{/if}票:{$anum}票，显示票数:{$num}票</div>
+<div class="form-horizontal confirmbox-pop rotate-pop">
+<form class="confirm-formbox" method="post">
+<div class="form-group">
+	<label class="col-lg-3 control-label text-right">类型</label>
+	<div class="col-lg-8">
+		<label class="lyear-radio radio-inline radio-primary">
+	        <input type="radio" name="type" value="1" checked><span>加票</span>
+	    </label>
+	    <label class="lyear-radio radio-inline radio-primary">
+	        <input type="radio" name="type" value="2"><span>减票</span>
+	    </label>
+	</div>
+</div>
+<div class="form-group">
+	<label class="col-lg-3 control-label text-right">* 真实票数上加减票数</label>
+	<div class="col-lg-6">
+	<input type="text" class="form-control numberincdec" name="num" 
+	data-bts-min="0" data-bts-replacement-val="0"
+	data-bts-max="null"
+	data-bts-step="1"
+	value="0">
+	<span class="zam-help-block">注:加减票数必须大于等于0，0即为不加不减票</span>
+</div>
+</div>
+</form>
+</div>
+<script type="text/javascript">
+require(['webcore',"bootstrap-touchspin"],function(webcore){
+    $(".confirmbox-pop .numberincdec").TouchSpin().on("change", function(){
+        var $this = $(this),funcstr = $this.data('func');
+        var func = window[funcstr];
+        func && func();
+    });
+});
+</script>

@@ -1,0 +1,382 @@
+{include file='$Wpath/common/header'}
+<form id="formBox" class="zam-formvalidation form-horizontal" method="post">
+	<div class="config-titlebox">
+        <span class="config-titlename">微信设置</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#wechatconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+    </div>
+    <div id="wechatconfigbox" class="collapse in">
+        <div class="form-group">
+		    <label class="col-lg-2 control-label">* 网页标题</label>
+		    <div class="col-lg-8">
+		        <input class="form-control" type="text"  name="apptitle" value="{$config['apptitle']}">
+		    </div>
+		</div>
+		<div class="form-group">
+		    <label class="col-lg-2 control-label">* 手机端模式</label>
+		    <div class="col-lg-8">
+		        <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.apph5box').removeClass('hidden'),$('.appmodebox').addClass('hidden');">
+		            <input type="radio" name="appmode" {if $config["appmode"]=="1"}checked{/if} value="1"><span>H5模式</span>
+		        </label>
+		        <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.apph5box').addClass('hidden'),$('.appmodebox').removeClass('hidden');">
+		            <input type="radio" name="appmode" {if $config["appmode"]=="2"}checked{/if} value="2" ><span>微信模式(需与签到功能配合)</span>
+		        </label>
+		        <span class="help-block">微信模式必须与签到功能结合使用，H5模式即为非微信浏览器均可打开签名端，并且用户可以手动签名</span>
+		    </div>
+		</div>
+		<div class="appmodebox{if $config['appmode']=='1'} hidden{/if}">
+			<div class="form-group">
+				<label class="col-lg-2 control-label text-right">* 微信模式下泡泡内部内容</label>
+				<div class="col-lg-8">
+					<label class="lyear-radio radio-inline radio-primary" onclick="ppconbox(this);">
+		            <input type="radio" name="ppcontype" {if $config["ppcontype"]=="1"}checked{/if} value="1"><span>头像</span>
+		        	</label>
+		        	<label class="lyear-radio radio-inline radio-primary" onclick="ppconbox(this);">
+		            <input type="radio" name="ppcontype" {if $config["ppcontype"]=="2"}checked{/if} value="2"><span>姓名或昵称</span>
+		        	</label>
+		        	<label class="lyear-radio radio-inline radio-primary" onclick="ppconbox(this);">
+		            <input type="radio" name="ppcontype" {if $config["ppcontype"]=="3"}checked{/if} value="3"><span>手机号</span>
+		        	</label>
+				</div>
+		    </div>
+			<div class="ppcontentbox{if $config['ppcontype']=='1'} hidden{/if}">
+					<div class="form-group">
+						<label class="col-lg-2 control-label text-right">* 泡泡内文字颜色</label>
+						<div class="col-lg-8">
+							<label class="lyear-radio radio-inline radio-primary" onclick="ppconcolor(this);">
+				            <input type="radio" name="ppconcolortype" {if $config["ppconcolortype"]=="1"}checked{/if} value="1"><span>固定色</span>
+				        	</label>
+				        	<label class="lyear-radio radio-inline radio-primary" onclick="ppconcolor(this);">
+				            <input type="radio" name="ppconcolortype" {if $config["ppconcolortype"]=="2"}checked{/if} value="2"><span>随机色</span>
+				        	</label>
+							<span class="help-block">泡泡内文字颜色类型</span>
+						</div>
+					</div>
+					<div class="form-group ppcolorbox{if $config['ppconcolortype']=='2'} hidden{/if}">
+						<label class="col-lg-2 control-label text-right">* 泡泡内文字颜色</label>
+						<div class="col-lg-8">
+						  {:tpl_color('ppconcolor',$config['ppconcolor']);}
+						</div>
+					</div>
+					<div class="form-group">
+							<label class="col-lg-2 control-label text-right">* 大屏泡泡内文字大小</label>
+							<div class="col-lg-8">
+							   <input type="text" class="form-control numberincdec" name="ppconsize" 
+									data-bts-min="1" data-bts-replacement-val="1"
+					                data-bts-max="null"
+					                data-bts-step="1"  value="{$config['ppconsize']}">
+								<span class="zam-help-block">注:必须是个大于0的整数，具体根据泡泡半径来设置</span>
+							</div>
+					</div>
+			</div>
+		</div>
+		<div class="apph5box{if $config['appmode']=='2'} hidden{/if}">
+			<div class="msgbgimg form-group">
+				<label class="col-lg-2 control-label text-right">* 手签背景图</label>
+				<div class="col-lg-8">
+					{:tpl_image_one('appbgimg', $config['appbgimg'])}
+					<span class="help-block">手机端尺寸:640*1240px，ipad端尺寸:2048*1480px</span>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-lg-2 control-label text-right">* 自定义笔触颜色</label>
+				<div class="col-lg-8">
+					{:tpl_switch('applinecolortype',(isset($config['applinecolortype'])?$config['applinecolortype']:"2"),'applinecolorchange')}
+				</div>
+			</div>
+			<div class="form-group defaultcolorbox{if isset($config['applinecolortype']) && $config['applinecolortype']=='1'} hidden{/if}">
+				<label class="col-lg-2 control-label text-right">* 手签笔触默认颜色</label>
+				<div class="col-lg-8">
+					<label class="lyear-radio radio-inline radio-primary" onclick="ppconbox(this);">
+		            <input type="radio" name="applinecolor" {if $config["applinecolor"]=="black"}checked{/if} value="black"><span>黑色</span>
+		        	</label>
+		        	<label class="lyear-radio radio-inline radio-primary" onclick="ppconbox(this);">
+		            <input type="radio" name="applinecolor" {if $config["applinecolor"]=="red"}checked{/if} value="red"><span>红色</span>
+		        	</label>
+		        	<label class="lyear-radio radio-inline radio-primary" onclick="ppconbox(this);">
+		            <input type="radio" name="applinecolor" {if $config["applinecolor"]=="blue"}checked{/if} value="blue"><span>蓝色</span>
+		        	</label>
+		        	<label class="lyear-radio radio-inline radio-primary" onclick="ppconbox(this);">
+		            <input type="radio" name="applinecolor" {if $config["applinecolor"]=="yellow"}checked{/if} value="yellow"><span>黄色</span>
+		        	</label>
+		        	<label class="lyear-radio radio-inline radio-primary" onclick="ppconbox(this);">
+		            <input type="radio" name="applinecolor" {if $config["applinecolor"]=="green"}checked{/if} value="green"><span>绿色</span>
+		        	</label>
+		        	<label class="lyear-radio radio-inline radio-primary" onclick="ppconbox(this);">
+		            <input type="radio" name="applinecolor" {if $config["applinecolor"]=="gray"}checked{/if} value="gray"><span>灰色</span>
+		        	</label>
+				</div>
+			</div>
+			<div class="form-group diycolorbox{if !isset($config['applinecolortype']) || $config['applinecolortype']=='2'} hidden{/if}">
+				<label class="col-lg-2 control-label text-right">* 笔触颜色自定义</label>
+				<div class="col-lg-6">
+					<table class="table table-bordered">
+                    <thead>
+                      <tr>
+                        <th style="width:50%;text-align:center;">颜色</th>
+                        <th style="width:50%;text-align:center;">操作</th>
+                      </tr>
+                    </thead>
+                    <tbody class="diycolor-lists">
+                    {volist name="config.applinecolors" id="onecolor"}
+                    <tr>
+                        <td class="text-center">
+                           <div class="zam-flex-center">{:tpl_color('applinecolors[]',$onecolor)}</div>
+                        </td>
+                        <td class="text-center">
+                        	<a class="btn btn-xs btn-primary zam-sortable btn-moveonecolor" href="javascript:void(0)"> <i class="mdi mdi-arrow-all"></i> </a>
+                            <a class="btn btn-xs btn-danger" href="javascript:void(0)" onclick="javascript:$(this).parents('tr').remove();"> <i class="mdi mdi-close"></i> </a>
+                        </td>
+                    </tr>
+                    {/volist}
+                    </tbody>
+                    <tfoot>
+                      <tr>
+                        <td colspan="2">
+                          <a class="btn btn-primary btn-xs adddiycolor" href="javascript:;" > <i class="mdi mdi-plus"></i> 新增一个颜色</a>
+                          <div class="help-block">注:第一个即为默认笔触色</div>
+                        </td>
+                      </tr>
+                    </tfoot>
+                	</table>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-lg-2 control-label text-right">* 手签笔触默认大小</label>
+				<div class="col-lg-8">
+						<input type="text" class="form-control numberincdec" name="applinewidth" 
+							data-bts-min="1" data-bts-replacement-val="1"
+			                data-bts-max="10"
+			                data-bts-step="1" value="{$config['applinewidth']}">
+					<span class="zam-help-block">注:必须是个大于0小于10的整数</span>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-lg-2 control-label text-right">* 手签火花效果</label>
+				<div class="col-lg-8">
+					{:tpl_switch('applinefire',$config['applinefire'])}
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-lg-2 control-label text-right">* 签名写入到用户数据</label>
+				<div class="col-lg-8">
+					{:tpl_switch('saveuser',$config['saveuser']??'2','opensavesign')}
+					<div class="help-block">一般不需要开启，仅在需要用签名图片参与大屏抽奖才开启</div>
+				</div>
+			</div>
+			<div class="form-group savesignbox{if isset($config['saveuser']) && $config['saveuser']=='1'}{else /} hidden{/if}">
+				<label class="col-lg-2 control-label text-right">* 签名写入到签到数据</label>
+				<div class="col-lg-8">
+					{:tpl_switch('savesign',$config['savesign']??'2')}
+					<div class="help-block">特别注意:上面2个开关都打开才可以写入到签到数据，一般是需要用签名图片展示在签到或者3d签到大屏展示才需要开启</div>
+				</div>
+			</div>
+		</div>
+    </div>
+    <div class="config-titlebox">
+        <span class="config-titlename">大屏设置</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#screenconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+    </div>
+    <div id="screenconfigbox" class="collapse in">
+        {include file="$Wpath/common/configscreencommon" /}
+        {include file="$Wpath/common/configscreenmusic" /}
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 隐藏签到人数</label>
+            <div class="col-lg-3">
+                {:tpl_switch('hidesignnum',$config['hidesignnum'])}
+                <span class="help-block">开启则大屏右上角不显示签到人数</span>
+            </div>
+        </div>
+        <div class="form-group">
+			<label class="col-xs-12 col-sm-3 col-lg-2 control-label">* 泡泡图片组</label>
+			<div class="col-sm-9">
+				{:tpl_image_multi('ppbgimgs', $config['ppbgimgs'])}
+				<span class="help-block">推荐上传正方形泡泡图，用户签到后将随机使用本组图片中的一张</span>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-lg-2 control-label text-right">* 泡泡半径范围</label>
+			<div class="col-lg-6">
+				<div class="input-group">
+					<div class="input-group-btn not-allow"><a class="btn btn-default">最小半径</a></div>
+					<div class="touchspin">
+					<input type="text" class="form-control numberincdec" name="minbj" 
+	                data-bts-min="1" data-bts-replacement-val="1"
+	                data-bts-max="999"
+	                data-bts-step="1"
+	                value="{$config['minbj']}">
+	            	</div>
+					<div class="input-group-btn not-allow"><a class="btn btn-default">px，最大半径</a></div>
+					<div class="touchspin">
+					<input type="text" class="form-control numberincdec" name="maxbj" 
+	                data-bts-min="1" data-bts-replacement-val="1"
+	                data-bts-max="999"
+	                data-bts-step="1"
+	                value="{$config['maxbj']}">
+	                </div>
+				</div>
+				<span class="help-block">请根据实际情况设置此值，尽量控制在70-100内，2个值设置一样即为泡泡大小一致</span>
+			</div>
+		</div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 泡泡碰撞改变背景</label>
+            <div class="col-lg-3">
+                {:tpl_switch('collchangecolor',$config['collchangecolor'])}
+                <span class="help-block">开启后泡泡之间碰撞会随机取一张泡泡背景图</span>
+            </div>
+        </div>
+        <div class="form-group">
+			<label class="col-lg-2 control-label text-right">* 大屏泡泡显示的总数量</label>
+			<div class="col-lg-8">
+				<input type="text" class="form-control numberincdec" name="maxballs" 
+	                data-bts-min="1" data-bts-replacement-val="1"
+	                data-bts-max="999"
+	                data-bts-step="1"
+	                value="{$config['maxballs']}">
+				<span class="zam-help-block">注:必须是个大于0的整数，具体根据泡泡半径以及大屏宽度来设置合理的数量。切不可贪多，导致泡泡拥挤</span>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-lg-2 control-label text-right">* 泡泡生成位置</label>
+			<div class="col-lg-8">
+				<label class="lyear-radio radio-inline radio-primary">
+	            <input type="radio" name="fromconner" {if $config["fromconner"]=="1"}checked{/if} value="1"><span>随机位置</span>
+	        	</label>
+	        	<label class="lyear-radio radio-inline radio-primary">
+	            <input type="radio" name="fromconner" {if $config["fromconner"]=="2"}checked{/if} value="2"><span>左上角</span>
+	        	</label>
+	        	<label class="lyear-radio radio-inline radio-primary">
+	            <input type="radio" name="fromconner" {if $config["fromconner"]=="3"}checked{/if} value="3"><span>右上角</span>
+	        	</label>
+	        	<label class="lyear-radio radio-inline radio-primary">
+	            <input type="radio" name="fromconner" {if $config["fromconner"]=="4"}checked{/if} value="4"><span>左下角</span>
+	        	</label>
+	        	<label class="lyear-radio radio-inline radio-primary">
+	            <input type="radio" name="fromconner" {if $config["fromconner"]=="5"}checked{/if} value="5"><span>右下角</span>
+	        	</label>
+	        	<label class="lyear-radio radio-inline radio-primary">
+	            <input type="radio" name="fromconner" {if $config["fromconner"]=="6"}checked{/if} value="6"><span>屏幕中间放大并缩小成泡泡</span>
+	        	</label>
+				<span class="help-block">改变的泡泡背景图即为泡泡背景中的随机一张图</span>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-lg-2 control-label text-right">* 泡泡运动速度</label>
+			<div class="col-lg-8">
+				<label class="lyear-radio radio-inline radio-primary">
+	            <input type="radio" name="speedtype" {if $config["speedtype"]=="1"}checked{/if} value="1"><span>一般</span>
+	        	</label>
+	        	<label class="lyear-radio radio-inline radio-primary">
+	            <input type="radio" name="speedtype" {if $config["speedtype"]=="2"}checked{/if} value="2"><span>快</span>
+	        	</label>
+	        	<label class="lyear-radio radio-inline radio-primary">
+	            <input type="radio" name="speedtype" {if $config["speedtype"]=="3"}checked{/if} value="3"><span>超快</span>
+	        	</label>
+				<span class="help-block">酌情设置速度</span>
+			</div>
+		</div>
+    </div>
+    {include file='$Wpath/common/configsavepanel'}
+</form>
+<script>
+require(['webcore','jconfirmBox','zamnotice','layerBox','zvalidator',"jquery.ui"],function(webcore,jconfirmBox,zamnotice,layerBox){
+	$('.diycolor-lists').sortable({handle: ".btn-moveonecolor"}).disableSelection();
+    $('#formBox').formValidation({
+        framework: 'bootstrap',
+        excluded: [':disabled'],
+        message: '您填写的内容无效',
+        fields: {
+            apptitle:{
+                message: '请输入网页标题',
+                validators: {
+                    notEmpty: {
+                        message: '请输入网页标题'
+                    },
+                }
+            },
+        }
+    }).on('success.form.fv', function(e) {
+        e.preventDefault();
+        var $form = $(e.target);
+        var postData = webcore.serializeObject($form);
+        var bload = $form.find(".zam-fixedbottom button").lyearloading({opacity: 0.2,spinnerSize: 'nm'});
+        $form.formValidation('disableSubmitButtons', true);
+        webcore.ajaxSubmit("{:gohdmanage('configppqd/index',['hdid'=>$hdid])}",postData).then(function(json){
+            bload.hide();
+            if(json.code==0){
+                $form.formValidation('disableSubmitButtons', false);
+                zamnotice.showTips('success','操作成功',2e3,function(){
+                    window.location.reload();
+                });
+            }else{
+                zamnotice.showTips('error',json.msg);
+                $form.formValidation('disableSubmitButtons', false);
+            }
+        }, function(json){
+            bload.hide();
+            zamnotice.showTips('error','网络差。操作失败');
+            $form.formValidation('disableSubmitButtons', false);
+        });
+    });
+    $(".adddiycolor").click(function(){
+        var whtml = $(webcore.tpl($("#adddiycolor"),{})).clone();
+        $(".diycolor-lists").append(whtml);
+        tpl_colorpicker();
+    });
+});
+function ppconbox(obj){
+	var appmodetype = $(obj).find('input').val();
+	if(appmodetype=='1'){
+		$(".ppcontentbox").addClass('hidden');
+	}else{
+		$(".ppcontentbox").removeClass('hidden');
+	}
+}
+function ppconcolor(obj){
+	var appmodetype = $(obj).find('input').val();
+	if(appmodetype=='1'){
+		$(".ppcolorbox").removeClass('hidden');
+	}else{
+		$(".ppcolorbox").addClass('hidden');
+	}
+}
+function applinecolorchange(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".diycolorbox").addClass('hidden');
+        $(".defaultcolorbox").removeClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".diycolorbox").removeClass('hidden');
+        $(".defaultcolorbox").addClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function opensavesign(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".savesignbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".savesignbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+</script>
+<script id='adddiycolor' type="text/template">
+<tr>
+<td class="text-center">
+    <div class="zam-flex-center">
+    {:tpl_color('applinecolors[]','#239bf0')}
+    </div>
+</td>
+<td class="text-center">
+	<a class="btn btn-xs btn-primary zam-sortable btn-moveonecolor" href="javascript:void(0)"> <i class="mdi mdi-arrow-all"></i> </a>
+    <a class="btn btn-xs btn-danger btn-del-button" href="javascript:void(0)" onclick="javascript:$(this).parents('tr').remove();"> <i class="mdi mdi-close"></i> </a>
+</td>
+</tr>
+</script>
+{include file='$Wpath/common/footer'}

@@ -1,0 +1,201 @@
+{php}
+$cjconfig = \app\common\service\web\moduleconfigService::getmoduleconfig($gametype);
+$isroundcj = $cjconfig['isroundcj']??'2';
+$cjrounds = [];
+if($isroundcj == '1'){
+    $cjrounds = \app\common\service\common\lotterymanageService::ajaxcjround($gametype);
+}
+$roundid = request()->input('roundid','');
+{/php}
+{include file='$Wpath/common/header'}
+<div class="form-inline zam-inline-searchbar">
+    {if $isroundcj == '1'}
+    <div class="form-group">
+        <div class="input-group input-group-sm">
+            <span class="input-group-addon">选择轮次</span>
+            <select id="roundid" class="form-control">
+                <option value="0" selected>全部</option>
+                {foreach $cjrounds as $rkey=>$round}
+                <option value="{$round['id']}" {if !empty($roundid) && $roundid == $round['id']}selected{/if}>{$round['roundtitle']}</option>
+                {/foreach}
+            </select>
+        </div>
+    </div>
+    {/if}
+    <div class="form-group">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">选择奖品</span>
+          <select id="prizeid" class="form-control">
+            <option value="0" selected>全部</option>
+            {foreach $prizes as $key=>$prize} 
+                <option value="{$prize['id']}" {if !empty($prizeid) && $prizeid == $prize['id']}selected{/if}>{$prize['prizename']}</option>
+            {/foreach}
+          </select>
+        </div>
+    </div>
+    <div class="form-group">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">核销状态</span>
+          <select id="hxtype" class="form-control">
+            {foreach $hxtypes as $hkey=>$hxtype} 
+                <option value="{$hkey}" {if $hkey == '0'}selected{/if}>{$hxtype}</option>
+            {/foreach}
+          </select>
+        </div>
+    </div>
+    <div class="form-group">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">红包发放状态</span>
+          <select id="sendtype" class="form-control">
+            {foreach $sendtypes as $skey=>$sendtype} 
+                <option value="{$skey}" {if $skey == '0'}selected{/if}>{$sendtype}</option>
+            {/foreach}
+          </select>
+        </div>
+    </div>
+    <div class="form-group">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">昵称或表单内容</span>
+        <input type="text" class="form-control" value="" id="keyword" placeholder="请输入用户昵称或表单内容">
+      </div>
+    </div>
+    <a class="btn btn-primary btn-sm btn-search" href="javascript:void(0)"><i class="mdi mdi-magnify"></i> 搜索</a>
+    <a class="btn btn-warning btn-sm btn-export" href="javascript:void(0)"><i class="mdi mdi-export"></i> 导出</a>
+</div>
+{include file='$Wpath/common/tabletoolbar'}
+<table id="listtable" class="zam-btable"></table>
+<script>    
+require(['webcore','webtable','jconfirmBox','zamnotice'],function(webcore,webtable,jconfirmBox,zamnotice){
+var initConfig = {
+    tableId:'#listtable',
+    url:"{:gohdmanage('common/lotterylucker',['hdid'=>$hdid,'gametype'=>$gametype])}",
+    columnoperate:{
+        btns:{
+            del:true,
+        },
+        func:{
+            del:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','删除用户中奖数据将无法恢复，您确定要删除么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('common/dellotterylucker',['hdid'=>$hdid])}",{gametype:"{$gametype}",recordid:row.id}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','删除成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差。操作失败');
+                });
+                });
+            }
+        }
+    },
+    columns:[{
+            checkbox: true,
+        }, 
+        {
+            field: 'id',
+            title: 'id',
+            align: 'center',
+            visible: false
+        },{
+            field: 'nicknamehtml',
+            title: '用户',
+            align: 'center',
+            width:'15',
+        },  {
+            field: 'prizetypetxt',
+            title: '类型',
+            align: 'center',
+        },  {
+            field: 'prizeinfohtml',
+            title: '奖品明细',
+            align: 'center',
+        },  {
+            field: 'hxsendmorehtml',
+            title: '核销/发放',
+            align: 'center',
+            width:'15%',
+        }
+        ,{
+            field: 'create_time',
+            title: '时间',
+            align: 'center',
+        }
+    ],
+    searchParamas:[{'type':'2','id':'roundid'},{'type':'2','id':'prizeid'},{'type':'2','id':'hxtype'},{'type':'2','id':'sendtype'},{'type':'1','id':'keyword'}],
+    toolbar:{
+        del:function(){
+            var getSelects = webtable.getSelections();
+            if(!getSelects.length){
+                return zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+            jconfirmBox.confirm('温馨提示','删除用户中奖数据将无法恢复，您确定要删除选中的中奖数据么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('common/dellotterylucker',['hdid'=>$hdid])}",{gametype:"{$gametype}",recordid:getSelects}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','删除成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+        },
+        reset:function(){
+            var prizeid = $("#prizeid option:selected").val()||'';
+            if(+prizeid < 1) {
+                return zamnotice.showTips('info','请选择奖品');
+            }
+            jconfirmBox.confirm('温馨提示','清空将删除当前奖品所有用户中奖数据并且无法恢复，您确定要清空么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('common/resetlotterylucker',['hdid'=>$hdid])}",{gametype:"{$gametype}",prizeid:prizeid}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','清空成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+        },
+        other:function(){
+            jconfirmBox.confirm('温馨提示','清空所有将删除所有奖品的中奖数据并且无法恢复，您确定要清空所有么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('common/resetlotteryalllucker',['hdid'=>$hdid])}",{gametype:"{$gametype}"}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','清空成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+        },
+    },
+};
+webtable.init(initConfig);
+$('.zam-inline-searchbar select').change(function(e) {
+     webtable.refresh();
+});
+$('.btn-export').on('click',function(){
+    var prizeid = $('#prizeid option:selected').val()||'';
+    // if(+prizeid < 1) {
+    //     return zamnotice.showTips('info','请选择奖品');
+    // }
+    webcore.ajaxSubmit("{:gohdmanage('common/lotteryluckerexport',['hdid'=>$hdid])}",{gametype:"{$gametype}",prizeid:prizeid}).then(function(json){
+        if(json.code!=0){
+            zamnotice.showTips('error',json.msg);
+        }else{
+            window.location.href = `{:gohdmanage('common/lotteryluckerexport',['hdid'=>$hdid])}&gametype={$gametype}&prizeid=${prizeid}`;
+        }
+    }, function(json){
+        zamnotice.showTips('error','网络差,操作失败');
+    });
+});
+});
+</script>
+{include file='$Wpath/common/footer'}

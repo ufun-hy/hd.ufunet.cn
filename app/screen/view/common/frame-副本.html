@@ -1,0 +1,641 @@
+<!doctype html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="google" content="notranslate" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="renderer" content="webkit">
+    <title></title>
+	<link rel="shortcut icon" href="{:globalico()}" />
+	<link rel="stylesheet" href="__STATIC__/css/zam-icon.css" media="all">
+	<link rel="stylesheet" href="__STATIC__/css/mxc-icon.css?t=5" media="all">
+	<link rel="stylesheet" href="__STATIC__/css/screen/style.css?t=20220102" media="all">
+	<link rel="stylesheet" href="__STATIC__/css/animate.css?t=0913"/>
+	<script src="__STATIC__/js/jquery.2.1.4.js"></script>
+	<script src="__STATIC__/js/jquery.extend.js"></script>
+	<script type="text/javascript" src="__STATIC__/js/require.js"></script>
+	<script type="text/javascript">
+		var XCV3Config = {
+		  staticurl:"__STATIC__/",
+		  cookie : {'pre': 'zam'},
+		  hdid:"{$hdinfo['hdid']??''}",
+		  rhdid:"{$hdinfo['id']??''}",
+		  wsAddress:"{$wssaddress}",
+		  loadtype:"{$hdinfo['loadtype']??'1'}",
+		  screenfollow:"{$hdinfo['specialconfig']['followchange']??'1'}",
+		};
+		require.config({
+			baseUrl: XCV3Config.staticurl + "js",
+			urlArgs:'v=2.6.71',//+Math.random(),
+			paths: {
+				 css: "css.min",
+				 jquery:"jquery.2.1.4",
+				 'jquery.ui': 'jquery.ui',
+				 jquerytrans:'screenjs/jquery.transit.min',
+				 velocity:'screenjs/velocity',
+				 zamnotice: 'zamnotice/zamnotice',
+				 jbox:'jbox/jBox',
+				 jboxnotice:'jbox/plugins/Notice/jBox.Notice.min',
+				 template:"template/template",
+				 swiper:'swiper/swiper.min',
+				 marqueen:"wechatjs/marqueen",
+				 screencore:'screenjs/screencore',
+				 layer:'layer/layer',
+				 layerBox:'layer/layerBox',
+				 layerExt:'layer/layer.ext',
+				 screensocket:'screenjs/screensocket',
+				 keyboard:'keyboard/keyboard.min',
+				 msgs:'screenjs/msgs',
+				 screenbp:'screenjs/screenbp',
+				 screenbpdata:'screenjs/screenbpdata',
+				 bgscreen:'screenjs/bgscreen',
+				 colorPicker:'jqcolorpicker',
+				 colors:'colors',
+				 ionrangeslider:'ionrangeslider/ionrangeslider',
+				 onoffswitch:'onoffswitch/on-off-switch',
+				 onoffswitchauto:'onoffswitch/on-off-switch-onload',
+				 videocontrol:'screenjs/videocontrol',
+				 slideranimate:'screenjs/slideranimate',
+				 rightboxslider:'screenjs/rightboxslider',
+				 signs:'screenjs/signs',
+				 screenvote:'screenjs/screenvote',
+				 screengame:'screenjs/screengame',
+				 screenredpack:'screenjs/screenredpack',
+				 screenydj:'screenjs/screenydj',
+				 screenshuqian:'screenjs/screenshuqian',
+				 screenmonkey:'screenjs/screenmonkey',
+				 screencar:'screenjs/screencar',
+				 screenhorse:'screenjs/screenhorse',
+				 screenmls:'screenjs/screenmls',
+				 screenbike:'screenjs/screenbike',
+				 screenswim:'screenjs/screenswim',
+				 screenthreed:'screenjs/screenthreed',
+				 screentug:'screenjs/screentug',
+				 screenanswerbs:'screenjs/screenanswerbs',
+				 screendzqy:'screenjs/screendzqy',
+				 screenliuyancj:'screenjs/screenliuyancj',
+				 screenbigcj:'screenjs/screenbigcj',
+				 screenlivemark:'screenjs/screenlivemark',
+				 screendgshake:'screenjs/screendgshake',
+				 screenjjb:'screenjs/screenjjb',
+				 screencutfruit:'screenjs/screencutfruit',
+				 screenmouse:'screenjs/screenmouse',
+				 screennormalcj:'screenjs/screennormalcj',
+				 screencubecj:'screenjs/screencubecj',
+				 screencjx:'screenjs/screencjx',
+				 screenzjd:'screenjs/screenzjd',
+				 screenshakestart:'screenjs/screenshakestart',
+				 screenphotocj:'screenjs/screenphotocj',
+				 screenimportcj:'screenjs/screenimportcj',
+				 screendzp:'screenjs/screendzp',
+				 screenyuyuedj:'screenjs/screenyuyuedj',
+				 dragqr:'screenjs/dragqr',
+				 fulldm:'screenjs/fulldm',
+				 danmuku:'screenjs/danmuku',
+				 autoscroll:'screenjs/autoscroll',
+				 snabbt:'screenjs/snabbt',
+				 screenlottery:'screenjs/screenlottery',
+				 videojs:'videojs/video',
+				 domtoimage:'domtoimg/domtoimage',
+				 filesaver:'domtoimg/filesaver',
+				 threejs:'threejs/three.min',
+				 tweenjs:'threejs/tween.min',
+				 css3drenderer:'threejs/css3drenderer',
+				 AMapLoader:'https://webapi.amap.com/loader',
+				 TagCloud:'screenjs/TagCloud',
+				 jqcloud:'jqcloud/jqcloud.min',
+				 luckycanvas:'wechatjs/luckycanvas',
+			},
+			shim:{
+				'zamnotice':{
+					deps: ['css!../js/zamnotice/zamnotice.css']
+				},
+				'jbox':{
+					deps: ['css!../js/jbox/jBox.css',]
+				},
+				'jboxnotice':{
+					deps: ['jbox','css!../js/jbox/plugins/Notice/jBox.Notice.css']
+				},
+				'template':{
+					exports: 'template',
+				},
+				'swiper':{
+					exports:'Swiper',
+					deps: ['css!../js/swiper/swiper.min.css']
+				},
+				'marqueen':{
+					exports:'marqueen',
+				},
+				'screencore':{
+					exports:'screencore'
+				},
+				'layer':{
+					exports: 'layer',
+					deps: ['css!../js/layer/theme/default/layer.css']
+				},
+				'layerBox':{
+					exports: 'layerBox',
+					deps: ['layer']
+				},
+				'layerExt':{
+					deps: ['layer']
+				},
+				'screensocket':{
+					exports:'screensocket',
+				},
+				'keyboard':{
+					exports:'keyboardJS',
+				},
+				'signs':{
+					exports:'signs',
+				},
+				'screenbp':{
+					exports:'screenbp',
+				},
+				'screenbpdata':{
+					exports:'screenbpdata',
+				},
+				'bgscreen':{
+					exports:'bgscreen',
+				},
+				'colorPicker': {
+					deps: [ 'jquery' ],
+					exports: 'jQuery.fn.colorPicker'
+				},
+				'colors':{
+					exports:'Colors'
+				},
+				'slideranimate':{
+					exports:'slideranimate',
+				},
+				'videocontrol':{
+					exports:'videocontrol',
+				},
+				'rightboxslider':{
+					exports:'rightboxslider',
+				},
+				'ionrangeslider':{
+					deps:['css!../js/ionrangeslider/ionrangeslider.css'],
+				},
+				'onoffswitchauto':{
+					deps: ['onoffswitch','css!../js/onoffswitch/on-off-switch.css']
+				},
+				'screenshuqian':{
+					exports:'screenshuqian',
+				},
+				'screenmonkey':{
+					exports:'screenmonkey',
+				},
+				'screencar':{
+					exports:'screencar',
+				},
+				'screenhorse':{
+					exports:'screenhorse',
+				},
+				'screenmls':{
+					exports:'screenmls',
+				},
+				'screenbike':{
+					exports:'screenbike',
+				},
+				'screenswim':{
+					exports:'screenswim',
+				},
+				'screenthreed':{
+					exports:'screenthreed',
+				},
+				'screentug':{
+					exports:'screentug',
+				},
+				'screenanswerbs':{
+					exports:'screenanswerbs',
+				},
+				'screendzqy':{
+					exports:'screendzqy'
+				},
+				'screenliuyancj':{
+					exports:'screenliuyancj',
+				},
+				'screenbigcj':{
+					exports:'screenbigcj',
+				},
+				'screenlivemark':{
+					exports:'screenlivemark',
+				},
+				'screendgshake':{
+					exports:'screendgshake',
+				},
+				'screenmouse':{
+					exports:'screenmouse',
+				},
+				'screencubecj':{
+					exports:'screencubecj',
+				},
+				'dragqr':{
+					exports:'dragqr',
+				},
+				'videojs':{
+					exports:'videojs',
+					deps:['css!../js/videojs/video.css'],
+				},
+				'domtoimage':{
+					exports:'domtoimage'
+				},
+				'threejs':{
+					exports:'THREE'
+				},
+				'tweenjs':{
+					exports:'TWEEN'
+				},
+				'jqcloud':{
+					deps:['css!../js/jqcloud/jqcloud.min.css'],
+				},
+			}
+		});
+		define("jquery", [], function () {
+			return jQuery
+		});
+		var modulepage=1,moduleallpage = 1,myresizeEvt = new Event('myresizeEvt', {"bubbles":true, "cancelable":true});
+		!function(t, i, e) {
+			var s = function() {
+				var zoom = (i.innerHeight / 800).toFixed(4),fullwidth = (i.innerWidth / zoom).toFixed(4);
+				$(".framefooterbox").css({"width" : `${fullwidth}px`,"zoom" : zoom});
+				setTimeout(function(){
+					var autowidth = fullwidth - $(".control-normal-list").outerWidth();
+					$(".control-module-list").css({"width":`${autowidth}px`});
+					modulepage = 1;
+					var activeobj = $(".control-module-list .icon-box.active");
+					if(activeobj.length){
+						modulepage = (activeobj[0].offsetTop - 5) / 65 + 1;
+						modulepage = parseInt(modulepage);
+					}
+					$(".control-module-list .wrap").css({"transform":`translateY(${-modulepage * 65 + 65}px)`});
+					moduleallpage = parseInt($(".control-module-list-items .wrapbox").height()/65);
+				},80);
+			};
+			t.addEventListener !== e && (i.addEventListener('resize', s, !1), i.addEventListener("myresizeEvt", s, !1), t.addEventListener("DOMContentLoaded", s, !1))
+		}(document, window);
+	</script>
+</head>
+<body>
+{php}
+$screenExtraQuery = '';
+if (request()->get('theme') == 'blue') {
+	$screenExtraQuery = 'theme=blue';
+} elseif (request()->get('livemark_theme') == 'blue') {
+	$screenExtraQuery = 'livemark_theme=blue';
+}
+$screenFrameUrl = $url;
+if ($screenExtraQuery !== '') {
+	$screenFrameUrl .= (strpos($screenFrameUrl, '?') === false ? '?' : '&') . $screenExtraQuery;
+}
+{/php}
+<iframe src="{$screenFrameUrl}" id="myframe" name="myframe" sandbox="allow-forms allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts allow-modals allow-top-navigation" scrolling="yes" frameborder="0" width="100%" height="100%" style="position: fixed;top: 0;left: 0;width: 100%;height: 100%;"></iframe>
+<div class="framefooterbox">
+	{include file='common/footer_menu' /}
+</div>
+</body>
+<script type="text/javascript">
+require(['screencore','template','layerBox','screensocket','fulldm','keyboard','dragqr'],function(screencore,template,layerBox,screensocket,fulldm,keyboardJS,dragqr){
+	var screenExtraQuery = "{$screenExtraQuery}";
+	function appendScreenExtraQuery(frameUrl){
+		if(!screenExtraQuery || frameUrl.indexOf(screenExtraQuery) !== -1){
+			return frameUrl;
+		}
+		return frameUrl + (frameUrl.indexOf('?') === -1 ? '?' : '&') + screenExtraQuery;
+	}
+	document.getElementById('myframe').addEventListener('load', function(){
+		$("title").text($("#myframe").contents().find("title").text() || "");
+	}, true);
+	$('.footer-controlBox').on('mouseover',function(){
+		$('.footer-controlBox').removeClass('down').addClass('up');
+		$(".menuArrowbox-icon-up").removeClass("menuArrowbox-icon-up").addClass("menuArrowbox-icon-down");
+	})
+	$('.footer-controlBox').on('mouseleave',function(){
+		$(".menutooltip").remove();
+		$('.footer-controlBox').removeClass('up').addClass('down');
+		$(".menuArrowbox-icon-down").removeClass("menuArrowbox-icon-down").addClass("menuArrowbox-icon-up");
+	});
+	$('.footer-controlBox .menuArrowbox').on('click',function(){
+		if($(".menuArrowbox-icon-down").length){
+			$(".menuArrowbox-icon-down").removeClass("menuArrowbox-icon-down").addClass("menuArrowbox-icon-up");
+			$('.footer-controlBox').removeClass('down').addClass('up');
+		}else{
+			$(".menuArrowbox-icon-up").removeClass("menuArrowbox-icon-up").addClass("menuArrowbox-icon-down");
+			$('.footer-controlBox').removeClass('up').addClass('down');
+		}		
+	});
+	$(".control-module-list .icon-box").on('click',function(){
+		var $this = $(this),iconmodule = $this.attr("data-module"),iconhref = $this.attr('data-href'),iconhand = $this.data('ishandadd');
+		$this.addClass('active').siblings().removeClass('active');
+		if(iconmodule=='msg'){
+			if($(".control-msg-list").hasClass('hidden')){
+				$(".control-msg-list").removeClass('hidden');
+				window.dispatchEvent(myresizeEvt);
+			}
+		}else{
+			if(!$(".control-msg-list").hasClass('hidden')){
+				$(".control-msg-list").addClass('hidden');
+				window.dispatchEvent(myresizeEvt);
+			}
+		}
+		if(XCV3Config.screenfollow=='1'){
+			screencore.ajaxSubmit('/screen/common/followurl',{module:iconmodule}).then(function(data){
+				if(data.code!=0){
+					layerBox.showMsg(data.msg);
+				}
+			}, function(){
+				layerBox.showMsg('网络太差，请稍后重试');
+			});
+		}
+		historyreplace(iconmodule);
+		$("#myframe").attr('src',appendScreenExtraQuery(iconhref + (iconhand=='2' ? "?hdid={$hdinfo['hdid']}":"")));
+	});
+	$(".control-module-list .icon-box").on('mouseenter',function(e) {
+		$(".menutooltip").remove();
+		var gamemodule = $(this).attr('data-module')||'';
+		var modulestyles = gamestyles[gamemodule]??[];
+		if($.isArray(modulestyles) && modulestyles.length){
+			var ParentOl = $(".control-module-list .wrapbox")[0].offsetLeft,plusW = 20;
+			$('.footer-controlBox').append(template('gamestyle-tpl',{
+				css:{
+					width: $(this).outerWidth(true) + plusW,
+					left: $(this)[0].offsetLeft + ((ParentOl - plusW) / 2),
+				},
+				styles: modulestyles
+			}));
+		}
+	});
+	$('.footer-controlBox').on('click','.menutooltip li',function(){
+		var $this = $(this),isactive = $this.hasClass('active')?'1':'2',iconmodule = $this.attr("data-module");
+		screencore.ajaxSubmit('/screen/common/changestyle',{module:iconmodule,styleid:$this.attr("data-styleid"),isactive:isactive,rotateid:$("#myframe").contents().find(".inputrotateid").val()}).then(function(data){
+			if(data.code==0){
+				$this.addClass('active').siblings().removeClass('active');
+				screensocket.isclose = false;
+				$("#myframe").attr('src',appendScreenExtraQuery(data.msg));
+				historyreplace(iconmodule);
+			}else{
+				layerBox.showMsg(data.msg);
+			}
+		}, function(){
+			console.log('网络太差，请稍后重试.');
+		});
+	});
+	$(".control-module-list .switch-next").on('click',function(){
+		$(".menutooltip").remove();
+		if(modulepage >= moduleallpage){
+			modulepage = 1;
+		}else{
+			modulepage++;
+		}
+		$(".control-module-list .wrap").css({"transform":`translateY(${-modulepage * 65 + 65}px)`});
+	});
+	$(".control-module-list .switch-prev").on('click',function(){
+		$(".menutooltip").remove();
+		if(modulepage==1){
+			modulepage = moduleallpage;
+		}else{
+			modulepage--;
+		}
+		$(".control-module-list .wrap").css({"transform":`translateY(${-modulepage * 65 + 65}px)`});
+	});
+	$(".control-normal-list .openqr").on('click',function(e,params){
+		var stopicon = $(this).find('.isstop'),hdQrbox = $("#myframe").contents().find(".hdQrbox");
+		if (hdQrbox.is(':hidden')) {
+			hdQrbox.fadeIn();
+			stopicon.hide();
+			params!='1' && window.localStorage.setItem("openqr"+XCV3Config.hdid,'1');
+		}else{
+			hdQrbox.fadeOut();
+			stopicon.show();
+			params!='1' && window.localStorage.setItem("openqr"+XCV3Config.hdid,'2');
+		}
+	});
+	$(".control-normal-list .openfull").on('click',function(){
+		if ($(this).attr('data-open')=='2') {
+			screencore.fullScreen();
+			$(this).attr('data-open','1');
+		}else{
+			screencore.exitFullScreen();
+			$(this).attr('data-open','2');
+		}
+	});
+	$(".control-normal-list .openmusic").on('click',function(){
+		var $this = $(this),stopicon = $this.find('.isstop'),bgmusic = $("#myframe").contents().find("#bgmusic"),videobgobj = $("#myframe").contents().find(".pcbgBox .videoBg");
+		if(bgmusic.length <= 0 ) return;
+		if ($this.attr('data-open')=='1') {
+			stopicon.removeClass('display-none');
+			bgmusic[0].pause();
+			$this.attr('data-open','2');
+		}else{
+			bgmusic[0].play().then(function(){
+           		stopicon.addClass('display-none');
+				$this.attr('data-open','1');
+	        }).catch(function(err){
+	        	$this.attr('data-open','2');
+	        	stopicon.removeClass('display-none');
+	            console.log('您的浏览器暂不支持自动播放音频，请通过点击右下角的音频按钮播放');
+	        });
+	        if(videobgobj.length > 0){
+				var videosrc = videobgobj.attr('data-src'),videosrcs = videosrc.split('.'),videotype = videosrcs[videosrcs.length-1] || '';
+				if(videotype.indexOf('m3u8')!=-1){
+					videobgobj[0].volume = 1;
+					videobgobj[0].play();
+				}
+			}
+		}
+	});
+	$(".control-normal-list .opendm").on('click',function(){
+		var fmstatus = $("#myframe").contents().find(".inputfulldm").val();
+		if (fmstatus=='2') {
+			document.getElementById('myframe').contentWindow.postMessage(JSON.stringify({'type':'fulldmopen'}),'*');
+			window.localStorage.setItem("openfulldm"+XCV3Config.hdid,'1');
+		}else{
+			document.getElementById('myframe').contentWindow.postMessage(JSON.stringify({'type':'fulldmclose'}),'*');
+			window.localStorage.setItem("openfulldm"+XCV3Config.hdid,'2');
+		}
+	});
+	var hdhidefootermenu = "{$hdinfo['screenconfig']['hidemenu']??'2'}";
+	if(hdhidefootermenu=='1'){
+		$('.footer-controlBox').trigger('mouseleave');
+	}
+	window.addEventListener('message',function(e){
+		if(typeof e.data.msg != 'undefined' && e.data.msg.type){
+			var ctype = e.data.msg.type;
+			if(ctype=='fulldmopen'){
+				$(".control-normal-list .fulldm-icon-box .isstop").hide();
+			}else if(ctype=='fulldmclose'){
+				$(".control-normal-list .fulldm-icon-box .isstop").show();
+			}else if(ctype=='bgmusicopen'){
+				var openbox = $(".control-normal-list .openmusic"),bgmusic = $("#myframe").contents().find("#bgmusic");
+				if(openbox.attr('data-open')=='2'){
+					$(".control-normal-list .openmusic").trigger('click');
+				}else{
+					if(bgmusic.length > 0){
+						var stopicon = openbox.find('.isstop');
+						bgmusic[0].play().then(function(){
+			           		stopicon.addClass('display-none');
+							openbox.attr('data-open','1');
+				        }).catch(function(err){
+				        	openbox.attr('data-open','2');
+				        	stopicon.removeClass('display-none');
+				            console.log('您的浏览器暂不支持自动播放音频，请通过点击右下角的音频按钮播放');
+				        });
+					}else{
+						openbox.attr('data-open','2');
+				        stopicon.removeClass('display-none');
+					}
+				}
+			}else if(ctype=='bgmusicclose'){
+				var openbox = $(".control-normal-list .openmusic"),stopicon = openbox.find('.isstop'),bgmusic = $("#myframe").contents().find("#bgmusic");
+				openbox.attr('data-open','2');
+				stopicon.removeClass('display-none');
+			}else if(ctype=='controllboxhide'){
+				var footercontrolbox = $('.footer-controlBox');
+				if(!footercontrolbox.hasClass('down')){
+					footercontrolbox.trigger('mouseleave');
+				}
+			}else if(ctype=='qrboxopen'){
+				if($("#myframe").contents().find(".hdQrbox").is(':hidden')){
+					$(".control-normal-list .openqr").trigger('click');
+				}
+			}else if(ctype=='qrboxclose'){
+				if(!$("#myframe").contents().find(".hdQrbox").is(':hidden')){
+					$(".control-normal-list .openqr").trigger('click',['1']);
+				}else{
+					$(".control-normal-list .openqr .isstop").show();
+				}
+			}else if(ctype=='msgmenuopen'){
+				if($(".control-msg-list").hasClass('hidden')){
+					$(".control-msg-list").removeClass('hidden');
+					window.dispatchEvent(myresizeEvt);
+				}
+			}else if(ctype=='dzpchangeurl'){
+				historyreplace('dzp',e.data.msg.rotateid);
+			}else if(ctype=='hbwallchangeurl'){
+				historyreplace('hbwall',e.data.msg.rotateid);
+			}else if(ctype=='dhhchangeurl'){
+				historyreplace('dhh',e.data.msg.rotateid);
+			}else if(ctype=='pageerror'){
+				window.location.href = e.data.msg.url;
+			}else if(ctype=='keyboardjs'){
+				var keycode = e.data.msg.keycode;
+				if(keycode=='1'){
+					$(".control-normal-list .openmusic").trigger('click');
+				}else if(keycode=='2'){
+					$(".control-normal-list .opendm").trigger('click');
+				}else if(keycode=='3'){
+					$(".control-normal-list .openqr").trigger('click');
+				}else if(keycode=='4'){
+					$(".control-normal-list .openfull").trigger('click');
+				}else if(keycode=='5'){
+					document.getElementById('myframe').contentWindow.postMessage(JSON.stringify({'type':'resetqrbox'}),'*');
+				}else{
+					$(".control-module-list .icon-box[data-module='"+keycode+"']").trigger('click');
+				}
+			}
+		}
+	});
+	$('.to-firstpage').on('click', function(e) {
+		document.getElementById('myframe').contentWindow.postMessage(JSON.stringify({'type':'firstpage'}),'*');
+	});
+	$('.to-prevpage').on('click', function(e) {
+		document.getElementById('myframe').contentWindow.postMessage(JSON.stringify({'type':'prevpage'}),'*');
+	});
+	$('.to-nextpage').on('click', function(e) {
+		document.getElementById('myframe').contentWindow.postMessage(JSON.stringify({'type':'nextpage'}),'*');
+	});
+	$('.to-lastpage').on('click', function(e) {
+		document.getElementById('myframe').contentWindow.postMessage(JSON.stringify({'type':'lastpage'}),'*');
+	});
+	$('.pause-start-page').on('click', function(e) {
+		e.preventDefault();
+		if ($(this).find(".mxc-stop").length>0) {
+			$(this).find(".mxc-stop").removeClass('mxc-stop').addClass('mxc-playfill');
+			document.getElementById('myframe').contentWindow.postMessage(JSON.stringify({'type':'pausenext'}),'*');
+		} else {
+			$(this).find(".mxc-playfill").removeClass('mxc-playfill').addClass('mxc-stop');
+			document.getElementById('myframe').contentWindow.postMessage(JSON.stringify({'type':'startnext'}),'*');
+		}
+	});
+	keyboardJS.bind('1', function(e) {
+		$(".control-normal-list .openmusic").trigger('click');
+	});
+	keyboardJS.bind('2', function(e) {
+		$(".control-normal-list .opendm").trigger('click');
+	});
+	keyboardJS.bind('3', function(e) {
+		$(".control-normal-list .openqr").trigger('click');
+	});
+	keyboardJS.bind('4', function(e) {
+		$(".control-normal-list .openfull").trigger('click');
+	});
+	keyboardJS.bind('5', function(e) {
+		document.getElementById('myframe').contentWindow.postMessage(JSON.stringify({'type':'resetqrbox'}),'*');
+	});
+	{/*初始化模块快捷键*/}
+	{foreach $menus as $menu}
+		{if $menu['modulefield'] != 'fulldm' && !empty($menu['modulekjj'])}
+			keyboardJS.bind('{$menu['modulekjj']}', function(e) {
+				$(".control-module-list .icon-box[data-module='{$menu['modulefield']}']").trigger('click');
+			});
+		{/if}
+	{/foreach}
+	{// 父页面键盘事件传递到子页面 }
+	keyboardJS.bind('space', function(e) {
+		document.getElementById('myframe').contentWindow.postMessage(JSON.stringify({'type':'fkeyboardjs','keycode':'space'}),'*');
+	});
+	keyboardJS.bind('left', function(e) {
+		document.getElementById('myframe').contentWindow.postMessage(JSON.stringify({'type':'fkeyboardjs','keycode':'left'}),'*');
+	});
+	keyboardJS.bind('right', function(e) {
+		document.getElementById('myframe').contentWindow.postMessage(JSON.stringify({'type':'fkeyboardjs','keycode':'right'}),'*');
+	});
+	keyboardJS.bind('up', function(e) {
+		document.getElementById('myframe').contentWindow.postMessage(JSON.stringify({'type':'fkeyboardjs','keycode':'up'}),'*');
+	});
+	keyboardJS.bind('down', function(e) {
+		document.getElementById('myframe').contentWindow.postMessage(JSON.stringify({'type':'fkeyboardjs','keycode':'down'}),'*');
+	});
+	keyboardJS.bind('shift', function(e) {
+		document.getElementById('myframe').contentWindow.postMessage(JSON.stringify({'type':'fkeyboardjs','keycode':'shift'}),'*');
+	});
+	keyboardJS.bind('/', function(e) {
+		document.getElementById('myframe').contentWindow.postMessage(JSON.stringify({'type':'fkeyboardjs','keycode':'/'}),'*');
+	});
+	keyboardJS.bind('.', function(e) {
+		document.getElementById('myframe').contentWindow.postMessage(JSON.stringify({'type':'fkeyboardjs','keycode':'.'}),'*');
+	});
+	keyboardJS.bind(',', function(e) {
+		document.getElementById('myframe').contentWindow.postMessage(JSON.stringify({'type':'fkeyboardjs','keycode':','}),'*');
+	});
+	keyboardJS.bind('enter', function(e) {
+		document.getElementById('myframe').contentWindow.postMessage(JSON.stringify({'type':'fkeyboardjs','keycode':'enter'}),'*');
+	});
+	keyboardJS.bind('esc', function(e) {
+		document.getElementById('myframe').contentWindow.postMessage(JSON.stringify({'type':'fkeyboardjs','keycode':'esc'}),'*');
+	});
+	function historyreplace(cmodule,rotateid){
+		var url = window.location,searchArr = url.search.substring(1).split('&');
+		searchArr[1] = 'module='+cmodule;
+		var rotateidmodules = ['dzp','hbwall','dhh'];
+		if($.inArray(cmodule,rotateidmodules)==-1){
+			if(url.search.indexOf('rotateid=')!=-1){
+				searchArr.pop();
+			}
+		}else{
+			if(rotateid){
+				searchArr[2] = 'rotateid='+rotateid;
+			}
+		}
+		var searchStr = `?${searchArr.join('&')}`;
+		screencore.historyReplaceUrl(url.origin + url.pathname + searchStr);
+	}
+});
+</script>
+{if isset($hdinfo['screenconfig']['hidemenu']) &&  $hdinfo['screenconfig']['hidemenu']== '3'}
+<style type="text/css">.footer-controlBox{display: none}</style>
+{/if}
+{:globalcss()}
+</html>

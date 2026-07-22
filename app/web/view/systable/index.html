@@ -1,0 +1,79 @@
+{include file='$Wpath/common/header'}
+<div class="alert alert-success hidden">
+    系统会在每周三早上3点20分会自动执行清理所有数据碎片的任务
+</div>
+<div class="alert alert-danger">
+    数据表优化存在丢失数据的风险，清理碎片前务必做好数据备份
+</div>
+<div class="alert alert-danger">
+    数据表优化可以去除数据文件中的碎片, 使记录排列更加紧密, 提高数据库的读写性能
+</div>
+<div class="alert alert-success">
+    推荐定期清理一次数据表碎片，因为清理数据碎片会重新组织表中的数据，是一个非常消耗服务器资源的操作，所以一定要选择一个没有活动的时间去清理
+</div>
+{if empty($list)}
+<div class="alert alert-warning">
+    <i class="mdi mdi-bell"></i> 系统暂未发现可清理的碎片数据
+</div>
+{else /}
+<div class="mb20">
+<a href="javascript:;" class="btn btn-danger btn-optimize">清理所有碎片</a>
+</div>
+<div>
+    <table class="table" style="margin-bottom:0px;">
+        <thead>
+            <tr>
+            <th style="width:20%">表名称</th>
+            <th style="width:10%;">表引擎</th>
+            <th style="width:20%;">记录数</th>
+            <th style="width:20%;">数据尺寸</th>
+            <th style="width:20%;">索引尺寸</th>
+            <th style="width:20%;">碎片尺寸</th>
+            </tr>
+        </thead>
+        <tbody>
+            {foreach $list as $l}
+                <tr>
+                    <td>
+                        <span>{$l['title']}</span>
+                    </td>
+                    <td>
+                        <span>{$l['type']}</span>
+                    </td>
+                    <td>
+                        <span>{$l['rows']}条</span>
+                    </td>
+                    <td>
+                        <span>{$l['data']}</span>
+                    </td>
+                    <td>
+                        <span>{$l['index']}</span>
+                    </td>
+                    <td>
+                        <span class="text-danger">{$l['free']}</span>
+                    </td>
+                </tr>
+            {/foreach}
+        </tbody>
+    </table>
+</div>
+<script>
+    var tablenames = {:json_encode(array_column($list,'title'))};
+    require(['webcore','jconfirmBox','zamnotice'],function(webcore,jconfirmBox,zamnotice){
+        $(".btn-optimize").click(function(){
+            jconfirmBox.confirm('温馨提示','确定要删除所有的数据碎片么？',function(){
+                webcore.ajaxSubmit("{:goweb('systable/index')}",{tablenames:tablenames},'正在处理...').then(function(json){
+                    if(json.code==0){
+                        zamnotice.showTips('success','操作成功',1e3,function(){
+                            window.location.reload();
+                        });
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                })
+            });
+        });
+    })
+</script>
+{/if}
+{include file='$Wpath/common/footer'}

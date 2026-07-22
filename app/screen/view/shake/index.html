@@ -1,0 +1,187 @@
+{include file='common/header' /}
+<style>
+.shake-mainbox{
+	width: 100%;
+    height: 100%;
+    padding: 0;
+    overflow: hidden;
+}
+.shake-lists{
+	position:relative;
+	height:620px;
+	width:84%;
+	margin: 0 auto;
+	overflow:hidden;
+	z-index:1;
+	display:none;
+	opacity:0;
+}
+.shakelineBox{
+	height: 100%;
+	background-color:{$pcconfig['style']['gdcolor']};
+    position: relative;
+}
+.shakelineBox li{
+	overflow: hidden;
+    height: 10%;
+    width: 100%;
+}
+.shakelineBox li:nth-child(even) {
+    background-color: rgba(255,255,255,0.15);
+}
+.shakelineBox .startline {
+    background: url({:tomedia($pcconfig['style']['startline'])}) repeat-y left center;
+    background-size: 10px auto;
+    width: 10px;
+    height: 100%;
+    position: absolute;
+    left: 60px;
+    top: 0;
+    opacity: 0.5;
+}
+.shakelineBox .endline{
+	background: url({:tomedia($pcconfig['style']['endline'])}) no-repeat center center;
+    background-size: cover;
+    width: 40px;
+    height: 100%;
+    position: absolute;
+    right: 60px;
+    top: 0;
+    opacity: 0.5;
+}
+.shakelineBoxItem .shakelineGuidao{
+	height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+.shakelineBoxItem .shakelineGuidao .numberBox{
+    position: absolute;
+    left: 69px;
+	top: 0;
+	width:50px;
+	height: 100%;
+}
+.shakelineBoxItem .shakelineGuidao .numberBox i{
+    font-size: 35px;
+    text-align: center;
+    color: rgba(255,255,255,0.9);
+    font-style: normal;
+	opacity: 0.5;
+    -webkit-transform: rotate(90deg);
+	transform: rotate(90deg);
+}
+.shakelineBoxItem .shakelineGuidao .shakeuser{ 
+	background-image: url({:tomedia($pcconfig['style']['roleimgs'][0])});
+	background-repeat:no-repeat;
+	background-position:right center;
+	background-size: 60px 60px; 
+	width: 60px;
+	height:100%;
+	display: block;
+	position: absolute; 
+	right:100%;
+}
+.shakelineBoxItem .shakelineGuidao .shakeuser div{
+	position:absolute;
+	right:60px;
+	height:100%;
+	width:60px;
+}
+.shakelineBoxItem .shakelineGuidao .shakeuser div img{
+	width: 42px;
+    height: 42px;
+    border-radius: 100%;
+    border: 2px solid #ffffff;
+}
+
+.shakelineGuidao .shakeuser  span.shakename{
+	position:absolute;
+	right:130px;
+    height:100%;
+    font-size:20px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #FFF;
+    text-align: right;
+}
+
+.leftfadein { 
+	-webkit-animation: leftfadein-keyframes .5s .2s ease both; 
+	-moz-animation: fadeInLeft-keyframes .5s .2s ease both 
+}
+@-webkit-keyframes leftfadein-keyframes { 
+0 {
+opacity:0;
+-webkit-transform:translateX(-100px)
+}
+60% {
+opacity:1;
+-webkit-transform:translateX(0)
+}
+80% {
+-webkit-transform:translateX(-10px)
+}
+100% {
+-webkit-transform:translateX(0)
+}
+}
+@-moz-keyframes leftfadein-keyframes { 
+0 {
+opacity:0;
+-moz-transform:translateX(-100px)
+}
+60% {
+opacity:1;
+-moz-transform:translateX(0)
+}
+80% {
+-moz-transform:translateX(-10px)
+}
+100% {
+-moz-transform:translateX(0)
+}
+}
+</style>
+<audio id="countaudio" src="/{:WIMGURL}shake/count.mp3"  preload="preload"  style="display:none"></audio>
+<audio id="overaudio" src="/{:SIMGURL}shake/over.mp3"  preload="preload"  style="display:none"></audio>
+<audio id="joinaudio" src="/{:SIMGURL}shake/join.mp3"  preload="preload" style="display:none"></audio>
+<section class="shake-mainbox normal-box zam-app-flex-ajCenter2">
+    <div class="emptybox zam-app-flex-ajCenter display-none">
+		<img src="/{:SIMGURL}common/empty.png">
+		<p style="padding:20px;">请到后台添加游戏轮次</p>
+	</div>
+	<div class="shake-lists">
+		<ul class="shakelineBox">
+			<div class="startline"></div>
+			<div class="endline"></div>
+		</ul>
+	</div>
+</section>
+<style>
+.start-btn{
+	width:260px;
+	height:85px;
+}
+</style>
+{include file='common/gamewelcome' /}
+<script id="shakeItem-tpl" type="html/javascript">
+<li class="shakelineBoxItem">
+	<div class="shakelineGuidao">
+		<div class="numberBox zam-app-flex-ajCenter"><i>{{# i+1}}</i></div>
+		<span class="shakeuser" style="background-image:url('{{carImg}}">
+			<span class="shakename zam-app-flex-ajCenter2">虚伪以待</span>
+			<div class="zam-app-flex-ajCenter2"><img src="{:tomedia($pcconfig['style']['userdefaultimg'])}" /></div>
+		</span>
+	</div>
+</li>
+</script>
+{include file='common/gamecommon' /}
+<script>
+var carImgs = {:json_encode($pcconfig['style']['roleimgs'])},defaultImg = "{:tomedia($pcconfig['style']['userdefaultimg'])}";
+var defaultName = "{$pcconfig['style']['userdefaultname']??'虚位以待'}";
+require(['screengame'],function (screengame) {
+	screengame.init();
+});
+</script>
+{include file='common/footer' /}

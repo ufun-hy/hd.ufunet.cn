@@ -1,0 +1,23 @@
+<style type="text/css">
+.loginbm{position: fixed;bottom: 0;width: 100%;padding: 10px;color:#fff;font-size: 14px;text-align:center;}
+@media screen and (max-width:768px) {
+  .loginbm {
+      position:relative;
+      padding-top: 42px;
+  }
+}
+.loginbm span{display: inline-block;}
+.loginbm span img{margin-right: 5px;}
+.loginbm a{margin-left: 5px;color:#fff;font-size: 13px;}
+.loginbm a:hover{color:#48b0f7;}
+</style>
+<div class="loginbm">
+	<span>{:$config['common']['copyright']}</span> 
+    {if isset($config['common']['beianhao']) && !empty($config['common']['beianhao'])}
+    <span>备案号:<a style="font-size:14px; font-weight:normal" href="https://beian.miit.gov.cn/"  target="__blank">{:$config['common']['beianhao']}</a></span>
+    {/if}
+    {if isset($config['common']['gnbeianhao']) && !empty($config['common']['gnbeianhao']) && !empty($config['common']['gnname'])}
+    <span><img src="/{:SYSIMGURL;}gongan.png"><a href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode={$config['common']['gnbeianhao']}" target="__blank">{:$config['common']['gnname']}公网安备:{:$config['common']['gnbeianhao']}号</a></span>
+    {/if}
+</div>
+{:globalcss()}

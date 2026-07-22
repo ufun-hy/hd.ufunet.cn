@@ -1,0 +1,46 @@
+{include file="common/header_base" /}
+{if isset($pcconfig['gametype']) && ($pcconfig['gametype']=='baping'||$pcconfig['gametype']=='shakestart')}
+<style>
+.loading-box{position:fixed;top:0;left:0;width:100%;height:100%;z-index:91;background-color:#fff;opacity:1}.load-wait{height:60px;line-height:60px;font-size:20px;font-weight:bold;color:gray}.load-percent{height:40px;line-height:40px;font-size:20px;font-weight:bold;color:gray}.load-progress{width:260px;height:15px;background:#282828;border:4px solid #282828;border-radius:20px;-moz-border-radius:20px;-webkit-border-radius:20px;box-shadow:0 5px 17px rgb(40 40 40 / 50%);margin-bottom:30px}.load-bar{display:block;height:30px;height:15px;border-radius:12px;-moz-border-radius:12px;-webkit-border-radius:10px;background-color:CornflowerBlue;box-shadow:inset 0 0 6px 2px rgba(255,255,255,.3);width:0}.load-barfill{width:100%;height:15px;border-radius:20px;-webkit-animation:progress 1s linear infinite;-moz-animation:progress 1s linear infinite;animation:progress 1s linear infinite;background-repeat:repeat-x;background-size:30px 30px;background-image:-webkit-linear-gradient(-45deg,rgba(255,255,255,0.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,0.15) 50%,rgba(255,255,255,0.15) 75%,transparent 75%,transparent);background-image:linear-gradient(-45deg,rgba(255,255,255,0.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,0.15) 50%,rgba(255,255,255,0.15) 75%,transparent 75%,transparent)}@-webkit-keyframes progress{to{background-position:30px 0}}@-moz-keyframes progress{to{background-position:30px 0}}@keyframes progress{to{background-position:30px 0}}
+</style>
+<link href="__STATIC__/css/loading.css" rel="stylesheet">
+<div class="loading-box zam-app-flex-ajCenter">
+	<div class="la-square-jelly-box la-dark">
+		<div></div>
+		<div></div>
+	</div>
+	<div class="load-wait">正在加载图片视频等资源，马上开始</div>
+	<div class="load-percent">0%</div>
+	<div class=""><span class="css3"></span></div>
+	<div class="load-progress">
+		<span class="load-bar">
+			<div class="load-barfill"></div>
+		</span>
+	</div>
+</div>
+{/if}
+<div class="pc-box">
+		<div class="full-main">
+		  <div class="main-box">
+			  <header class="header {$pcconfig['gametype']??'common'}-header zam-app-flex">
+			  	{if isset($pcconfig['gametype']) && $pcconfig['gametype']=='baping'}
+			  	{else /}
+			    <div class="headerLogo zam-app-flex-ajCenter2">
+					{if isset($hdinfo['copyright']['logo']) && !empty($hdinfo['copyright']['logo'])}
+					<img src="{:tomedia($hdinfo['copyright']['logo'])}" />
+					{/if}
+				</div>
+				<ul class="headerTitle">
+					{if isset($hdinfo['screenconfig']['opennotice']) && $hdinfo['screenconfig']['opennotice']=='1' && isset($hdinfo['screenconfig']['notice']) && !empty($hdinfo['screenconfig']['notice'])}
+						{php}$topnotices = explode('#',$hdinfo['screenconfig']['notice']);{/php}
+						{volist name="topnotices" id="notice"}
+						<li class="title-item" style="font-size:{$hdinfo['screenconfig']['noticesize']}px;color: {$hdinfo['screenconfig']['noticecolor']}">{$notice}</li>
+						{/volist}
+					</ul>
+					{/if}
+				</ul>
+				<div class="headerTips zam-app-flex-ajCenter2">
+					<div class="joinPeople"></div>
+				</div>
+				{/if}
+			  </header>	

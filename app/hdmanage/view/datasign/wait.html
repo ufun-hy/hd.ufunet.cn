@@ -1,0 +1,252 @@
+{include file='$Wpath/common/header'}
+<div class="form-inline zam-inline-searchbar">
+    <div class="form-group">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">昵称</span>
+        <input type="text" class="form-control" value="" id="keyword" placeholder="请输入用户昵称">
+      </div>
+    </div>
+    {if $signconfig['appopenbd']=='1'}
+    <div class="form-group">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">表单内容</span>
+        <input type="text" class="form-control" value="" id="bdkeyword" placeholder="请输入表单内容">
+      </div>
+    </div>
+    {/if}
+    <div class="form-group">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">是否审核</span>
+          <select id="status" class="form-control js_select2">
+            {foreach $bmstatus as $k=>$v } 
+            <option value="{$k}" {if $k == '0'}selected{/if}>{$v}</option>
+            {/foreach}
+          </select>
+        </div>
+    </div>
+    <a class="btn btn-primary btn-sm btn-search" href="javascript:void(0)"><i class="mdi mdi-magnify"></i> 搜索</a>
+    <a class="btn btn-warning btn-sm btn-export" href="javascript:void(0)"><i class="mdi mdi-export"></i> 导出</a>
+</div>
+{include file='$Wpath/common/tabletoolbar'}
+<table id="listtable" class="zam-btable"></table>
+<script id='binddata-tpl' type="text/template">
+    <ul class="bddataUl">
+    <%#  $.each(d.bd, function(index, item){ %>
+        <li class="m-t-5">
+          <span class="text-primary"><% item.title %>:</span>
+          <span>
+            <%#  if(d.list){ %>
+            <%#  if(index === 'uploadimg'){ %>
+                <%#  if(d.list[index]){ %>
+                <img class="cursor" style="max-width:120px;" onclick="prevshowattachs(this,1);"  src="<% d.list[index] %>"  />
+                <%#  }else{ %>
+                    -
+                <%# } %>
+            <%#  }else{ %>
+                <%#  if(d.list[index]){ %>
+                    <%#  if(item.type=='file'){ %>
+                        <%#  if(item.isimg=='1'){ %>
+                            <img class="cursor" style="max-width:120px;" onclick="prevshowattachs(this,1);"  src="<% XCV3Config .amconfig.host + d.list[index] %>"  />
+                        <%#  }else{ %>
+                        <span class="bpdetailbox" >
+                            <div class="bpvideobox"><img src="<% XCV3Config .amconfig.host + d.list[index]+'.jpg' %>" class="uploadImg"><i class="mxc-video_light playicon" onclick="prevshowattachs(this,3)" src="<% XCV3Config .amconfig.host + d.list[index] %>"></i></div>
+                        </span>
+                        <%# } %>
+                    <%# }else{ %>
+                        <% d.list[index] %>
+                    <%# } %>
+                <%#  }else{ %>
+                    -
+                <%# } %>
+            <%#  } %> 
+            <%#  } %> 
+          </span>
+       </li>
+    <%#  }); %>
+    </ul>
+</script>
+<script>
+var zdconfig = {:json_encode($zd2title)};    
+require(['webcore','webtable','jconfirmBox','zamnotice'],function(webcore,webtable,jconfirmBox,zamnotice){
+var initConfig = {
+    tableId:'#listtable',
+    url:"{:gohdmanage('datasign/wait',['hdid'=>$hdid])}",
+    columnoperate:{
+        btns:{
+            edit:{
+                title:"编辑",
+                except:{
+                    'more':[
+                        {'field':'status','only':'2'},
+                        {'field':'neeedit','only':'1'},
+                    ],
+                }
+            },
+            shenhe:{title:"审核",icon:"mdi-gavel",'except':{'field':'status','only':'2'}},
+            del:true,
+        },
+        func:{
+            edit:function(value, row, index){
+                var confirmObj = jconfirmBox.ajaxconfirm("编辑签到报名数据","{:gohdmanage('datasign/savewait',['hdid'=>$hdid])}",{ishtml:'1',userid:row.id},'html','col-lg-6 col-lg-offset-3',function(e){
+                    var postData = webcore.serializeObject(e.find('form'));
+                    postData.userid = row.id;
+                    webcore.ajaxSubmit("{:gohdmanage('datasign/savewait',['hdid'=>$hdid])}",postData).then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','保存成功');
+                            confirmObj.close();
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                             return false;
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                         return false;
+                    });
+                });
+            },
+            del:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','您确定要删除么？',function(){
+                    webcore.ajaxSubmit("{:gohdmanage('datasign/delwait',['hdid'=>$hdid])}",{userid:row.id}).then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','删除成功');
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                    });
+                });
+            },
+            shenhe:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','您确定要审核通过当前用户么？',function(){
+                    webcore.ajaxSubmit("{:gohdmanage('datasign/shenhe',['hdid'=>$hdid])}",{userid:row.id}).then(function(json){
+                        webtable.refresh();
+                        zamnotice.showTips('success','审核成功');
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                    });
+                });
+            },
+        }
+    },
+    columns:[{
+            checkbox: true,
+             width:'10',
+        }, 
+        {
+            field: 'id',
+            title: 'id',
+            align: 'center',
+            visible: false,
+
+        },{
+            field: 'statushtml',
+            title: '状态',
+            align: 'center',
+            width:'10',
+        },{
+            field: 'nickname',
+            title: '用户',
+            align: 'center',
+            width:'15',
+            formatter:function(value,row,index){
+                var html = `
+                <div class='zam-flex-column-center'>
+                    <img src="${ row.avatar }" class="avatarImg" />
+                    <span>${ value || '已删除' }</span>
+                </div>
+                `;
+                return html;
+            }
+        }
+        {if $signconfig['appopenbd']=='1'}
+        ,{
+            field: 'bddata',
+            title: '表单内容',
+            align: 'center',
+            formatter: function(value, row, index){
+                 if(value=='') return ''; 
+                 return $.isEmptyObject(zdconfig)?'-':webcore.tpl($("#binddata-tpl"),{list:value,bd:zdconfig});
+            },
+            width:'40',
+        }
+        {/if}
+        ,{
+            field: 'create_time',
+            title: '报名时间',
+            align: 'center',
+             width:'12',
+        }
+    ],
+    searchParamas:[{'type':'1','id':'keyword'},{'type':'1','id':'bdkeyword'},{'type':'2','id':'status'}],
+    toolbar:{
+        del:function(){
+            var getSelects = webtable.getSelections();
+            if(!getSelects.length){
+                return zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+            jconfirmBox.confirm('温馨提示','您确定要删除选中的数据么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('datasign/delwait',['hdid'=>$hdid])}",{userid:getSelects}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','删除成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+        },
+        reset:function(){
+            jconfirmBox.confirm('温馨提示','清空将删除活动所有的签到报名数据并且无法恢复，您确定要清空所有么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('datasign/resetwait',['hdid'=>$hdid])}",{}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','清空成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+        },
+        shenhe:function(){
+            var getSelects = webtable.getSelections();
+            if(!getSelects.length){
+                return zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+            jconfirmBox.confirm('温馨提示','您确定要审核通过选中的用户么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('datasign/shenhe',['hdid'=>$hdid])}",{userid:getSelects}).then(function(json){
+                    webtable.refresh();
+                    zamnotice.showTips('success','审核成功');
+                }, function(json){
+                    zamnotice.showTips('error','网络差。操作失败');
+                });
+            });
+        },
+        
+    },
+};
+webtable.init(initConfig);
+$('.zam-inline-searchbar select').change(function(e) {
+    webtable.refresh();
+});
+$('.btn-export').on('click',function(){
+    var status = $("#signstatus").find('option:selected').val();
+    webcore.ajaxSubmit("{:gohdmanage('datasign/exportwait',['hdid'=>$hdid])}",{}).then(function(json){
+        if(json.code!=0){
+            zamnotice.showTips('error',json.msg);
+        }else{
+            window.location.href = "{:gohdmanage('datasign/exportwait',['hdid'=>$hdid])}";
+        }
+    }, function(json){
+        zamnotice.showTips('error','网络差,操作失败');
+    });
+});
+});
+</script>
+{include file='$Wpath/common/footer'}

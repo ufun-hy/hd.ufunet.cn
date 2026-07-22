@@ -1,0 +1,33 @@
+{extend name="./../../common/tpl/web/themes/default/common/diylayout"}
+{block name="title"}<title>{$config['diydata']['pageset']['name']??$config['diydata']['pageset']['title']} - 页面装修</title>{/block}
+{block name="header"}
+<script>
+    var XCV3Config = {
+        wsAddress:"{if isset($wssaddress)}{$wssaddress}{/if}",
+        staticurl:"__STATIC__/",
+        amconfig:{:json_encode(amconfig())},
+        hdid:"{$hdid??''}",
+        rhdid:"{:request()->realhdid}",
+        pageid: "{$config['id']}",
+        previewUrl: "{:gowechat('microsite/index',['hdid'=>$hdid,'pageid'=>$config['id']],'1')}",
+    };
+</script>
+{/block}
+{block name="header-buttons"}
+{if request()->hdinfo['hdmode']=='1'}
+    <el-button type="primary" icon="el-icon-mobile" size="medium" @click="openQr">预览</el-button>
+{/if}
+<el-button type="primary" icon="el-icon-baocun" size="medium" :loading="issaving" @click="saveDiydata">保存</el-button>
+{/block}
+{block name="footer"}
+<script src="__STATIC__/js/diy/utils/index.js?t={$timestamp}"></script>
+<script src="__STATIC__/js/diy/utils/http.js?t={$timestamp}"></script>
+<script src="__STATIC__/js/diy/mixin/index.js?t={$timestamp}"></script>
+<script src="__STATIC__/js/diy/components/web/common/index.js?t={$timestamp}"></script>
+<script src="__STATIC__/js/diy/components/web/free/index.js?t={$timestamp}"></script>
+<script src="__STATIC__/js/diy/components/web/free/style.js?t={$timestamp}"></script>
+<script src="__STATIC__/js/diy/components/web/base/index.js?t={$timestamp}"></script>
+<script src="__STATIC__/js/diy/components/web/base/style.js?t={$timestamp}"></script>
+<script src="__STATIC__/js/diy/components/web/config.js?t={$timestamp}"></script>
+<script src="__STATIC__/js/diy/index.js?t={$timestamp}"></script>
+{/block}

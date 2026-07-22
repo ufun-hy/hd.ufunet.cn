@@ -1,0 +1,343 @@
+{if !empty($dmconfig)}
+<style>
+.fulldmBox {
+	position: relative;
+	width: 100%;
+	height: {if $dmconfig['dmpos']=='1'}100{else}50{/if}%;
+	top: {if $dmconfig['dmpos']=='3'}200px{elseif $dmconfig['dmpos']=='4'}400px{else /}0{/if};
+	left:0;
+	overflow: hidden;
+	pointer-events: none;
+	z-index:11;
+	-webkit-perspective: 1000;
+    perspective: 1000;
+    -webkit-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+     webkit-transform: translate3d(0,0,0);
+	-moz-transform: translate3d(0,0,0);
+	-ms-transform: translate3d(0,0,0);
+	-o-transform: translate3d(0,0,0);
+	transform: translate3d(0,0,0);
+}
+.fulldmBox-item{
+	display: -webkit-box!important;
+	display: -webkit-flex!important;
+	display: -ms-flexbox!important;
+	display: flex!important;
+	position: absolute;
+	will-change: transform;
+	-webkit-backface-visibility: hidden;
+   -moz-backface-visibility: hidden;
+   -ms-backface-visibility: hidden;
+   backface-visibility: hidden;
+   -webkit-perspective: 1000;
+   -moz-perspective: 1000;
+   -ms-perspective: 1000;
+   perspective: 1000;
+	{if $dmconfig['dmrolltype'] < 3}
+		height:100px;
+		padding:10px 0;
+	{else /}
+		width:{$dmconfig['vwidth']??'270'}px;
+		padding:0 5px;
+	{/if}
+	{if $dmconfig['dmrolltype'] != '3'}
+		top:0;
+	{else /}
+		bottom:0;
+	{/if}
+	border:0;
+	border-radius:5px;
+	box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	{if $dmconfig['clickdel']=='2' && $dmconfig['hoverstop']=='2'}
+		pointer-events: none!important;
+	{/if}
+}
+.fulldmBox-item.active{
+	z-index: 999999;
+}
+.fulldmBox-one{
+	display: -webkit-box!important;
+	display: -webkit-flex!important;
+	display: -ms-flexbox!important;
+	display: flex!important;
+	border-radius:8px;
+}
+.fulldmBox-one.fulldmBox-one2{
+	min-height: 80px;
+	
+}
+.fulldmBox-one .fulldmBox-avatar {
+	height: 80px;
+	padding:0 15px;
+	display: -webkit-box!important;
+	display: -webkit-flex!important;
+	display: -ms-flexbox!important;
+	display: flex!important;
+	-webkit-box-pack: center;
+	-webkit-justify-content: center;
+	-ms-flex-pack: center;
+	justify-content: center;
+	-webkit-box-align: center;
+	-webkit-align-items: center;
+	-ms-flex-align: center;
+	align-items: center;
+}
+.fulldmBox-one .fulldmBox-avatar.fulldmBox-avatar2{
+	position: absolute;
+	top: 0;
+	width: 70px;
+	height: 80px;
+	padding: 0;
+}
+.fulldmBox-one .fulldmBox-avatar img {
+	width: 60px;
+	height: 60px;
+	display:inline-block;
+	border-radius: 50%;
+}
+.fulldmBox-one .fulldmBox-info{
+	position: relative;
+	display: -webkit-box!important;
+	display: -webkit-flex!important;
+	display: -ms-flexbox!important;
+	display: flex!important;
+	-webkit-box-pack: center;
+	-webkit-justify-content: center;
+	-ms-flex-pack: center;
+	justify-content: center;
+	-webkit-box-align: center;
+	-webkit-align-items: center;
+	-ms-flex-align: center;
+	align-items: center;
+	border-radius: 10px;
+	{if $dmconfig['dmrolltype'] < 3}
+		padding-right:20px;
+		{if $dmconfig['dmrolltype']=='1' && (($dmconfig['needavatar']!='1' && $dmconfig['neednickname']!='1') || ($dmconfig['needavatar']!='1' && $dmconfig['neednickname']=='1'))}
+			padding-left:20px;
+		{/if}
+	{else /}
+		width:100%;
+	{/if}
+}
+
+.fulldmBox-one .fulldmBox-info span.qipao{display: none}
+.fulldmBox-one .fulldmBox-info div{
+	{if $dmconfig['dmrolltype'] < 3}
+		height:80px;
+		line-height:80px;
+		white-space: nowrap;
+	{else /}
+		width:100%;
+	{/if}
+	color:{$dmconfig['fontcolor']};
+	font-size:{$dmconfig['fontsize']}px;
+	font-weight:bold;
+}
+.fulldmBox-one .fulldmBox-info.fulldmBox-info2 .fulldmBox-nickname{
+}
+.fulldmBox-one .fulldmBox-info .fulldmBox-nickname {
+	{if $dmconfig['dmrolltype']=='1'}
+		margin-right:10px;
+	{elseif $dmconfig['dmrolltype']=='2' /}
+		margin-left:10px;
+	{/if}
+}
+{if $dmconfig['dmrolltype']=='2'}
+.fulldmBox-one .fulldmBox-info .fulldmBox-msg {
+	margin-left:20px;
+}
+{/if}
+.fulldmBox-one .fulldmBox-info.fulldmBox-info2  .fulldmBox-msg{
+	width:100%;
+	{if $dmconfig['dmrolltype'] < 3}
+		padding: 10px 0;
+	{else /}
+		padding:10px;
+		word-break: break-all;
+	{/if}
+	text-align: left;
+	box-sizing: border-box;
+}
+.fulldmBox-one .fulldmBox-info .fulldmBox-msg .faceImg{
+	width:{$dmconfig['fontsize']}px;
+	height:{$dmconfig['fontsize']}px;
+	vertical-align:middle
+}
+/*风格一 普通弹幕*/
+.fulldmBox-one.style1 .fulldmBox-avatar,.fulldmBox-one.style1 .fulldmBox-info{
+	{if $dmconfig['bgcolortype']=='1'}
+		background-color:{if $dmconfig['needbg']=='1'}{$dmconfig['bgcolor']}{else}transparent{/if};
+	{/if}
+}
+.fulldmBox-one.style1 .fulldmBox-avatar{
+	{if $dmconfig['dmrolltype'] > 2}
+		z-index:1;
+		background-color:transparent!important;
+	{/if}
+}
+.fulldmBox-one.style1 .fulldmBox-avatar{
+	{if $dmconfig['dmrolltype']=='1'}
+		border-radius: 10px;
+		border-top-right-radius: 0;
+		border-bottom-right-radius: 0;
+	{elseif $dmconfig['dmrolltype']=='2'}
+		border-radius: 10px;
+		border-top-left-radius: 0;
+		border-bottom-left-radius: 0;
+	{else /}
+		border-radius:0
+	{/if}
+}
+.fulldmBox-one.style1 .fulldmBox-info{
+	{if $dmconfig['dmrolltype']=='1'}
+		{if $dmconfig['needavatar']=='1'}
+		border-top-left-radius: 0;
+		border-bottom-left-radius: 0;
+		{/if}
+	{elseif $dmconfig['dmrolltype']=='2'}
+		{if $dmconfig['needavatar']=='1'}
+			border-top-right-radius: 0;
+			border-bottom-right-radius: 0;
+		{/if}
+	{/if}
+}
+.fulldmBox-one.style1 .fulldmBox-info.fulldmBox-info2{
+	{if $dmconfig['needavatar']=='1'}padding-left: 70px;box-sizing: border-box;{/if}
+}
+/*气泡弹幕*/
+.fulldmBox-one.style2 .fulldmBox-info.fulldmBox-info2{
+	{if $dmconfig['needavatar']=='1'}margin-left: 76px;{/if}
+}
+.fulldmBox-one.style2 .fulldmBox-avatar{background:none;}
+.fulldmBox-one.style2 .fulldmBox-avatar img{
+	width: 60px;
+	height:60px;
+	border:4px solid {if $dmconfig['needbg']=='1'}{$dmconfig['bgcolor']}{else}transparent{/if};
+}
+.fulldmBox-one.style2 .fulldmBox-info span.qipao{
+	display: inline-block;
+	border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+	position: absolute;
+	top: 18px;
+	{if $dmconfig['dmrolltype']!='2'}
+		border-right: 10px solid {if $dmconfig['needbg']=='1'}{$dmconfig['bgcolor']}{else}transparent{/if};
+		left: -10px;
+	{else /}
+		right:-10px;
+		border-left: 10px solid {if $dmconfig['needbg']=='1'}{$dmconfig['bgcolor']}{else}transparent{/if};
+	{/if}
+}
+.fulldmBox-one.style2 .fulldmBox-info{
+	{if $dmconfig['dmrolltype']=='1'}
+		padding-left:20px;
+	{elseif $dmconfig['dmrolltype']=='2' /}
+		padding-right:20px;
+	{/if}
+	background-color: {if $dmconfig['needbg']=='1'}{$dmconfig['bgcolor']}{else}transparent{/if};}
+.fulldmBox-imgbox{
+	width: 100%;
+	overflow: hidden;
+	border-radius: 10px;
+	{if $dmconfig['bgcolortype']=='1'}
+		background-color:{if $dmconfig['needbg']=='1'}{$dmconfig['bgcolor']}{else}transparent{/if};
+	{/if}
+}
+.fulldmBox-img{
+	width: 100%;
+	margin-top: 8px;
+}
+.fulldmBox-img img{
+	max-width: 80%;
+	border-radius: 5px;
+}
+.fulldmBox-user{
+	width:100%;
+	padding: 5px;
+	box-sizing: border-box;
+}
+.fulldmBox-userimg{
+	width: 70px;
+	height: 66px;
+}
+.fulldmBox-userimg img{
+	width: 60px;
+	height: 60px;
+	display:inline-block;
+	border-radius: 50%;
+}
+.fulldmBox-username{
+	max-width: calc(100% - 70px);
+	color:{$dmconfig['fontcolor']};
+	font-size:{$dmconfig['fontsize']}px;
+}
+</style>
+<div class="fulldmBox"></div>
+<script type="text/html" id="fulldm-tpl">
+<div class="fulldmBox-one style{$dmconfig['dmtype']??1}{if $dmconfig['dmrolltype'] > 2} fulldmBox-one2{/if}">
+	{if $dmconfig['dmrolltype']!='2'}
+		{if $dmconfig['dmrolltype']=='1'}
+			{{ if showavatar=='1'}}
+			<div class="fulldmBox-avatar">
+				<img src="{{ data.avatar }}" class="imgavatar">
+			</div>
+			{{ /if }}
+			<div class="fulldmBox-info">
+				<span class="qipao"></span>
+			    {{ if showname=='1'}}
+				<div class="fulldmBox-son fulldmBox-nickname">{{ data.nickname }}：</div>
+				{{ /if }}
+				<div class="fulldmBox-son fulldmBox-msg">{{# data.content }}</div>
+			</div>
+		{else /}
+			{{ if data.type=='1' || data.type=='screendm'}}
+				{{ if showavatar=='1'}}
+					<div class="fulldmBox-avatar fulldmBox-avatar2">
+						<img src="{{ data.avatar }}" class="imgavatar">
+					</div>
+				{{ /if }}
+				<div class="fulldmBox-info fulldmBox-info2">
+					<span class="qipao"></span>
+					<div class="fulldmBox-son fulldmBox-msg">{{ if showname=='1'}}{{ data.nickname }}：{{ /if }}{{# data.content }}</div>
+				</div>
+			{{ else }}
+				<div class="fulldmBox-imgbox zam-app-flex-ajCenter">
+					<div class="fulldmBox-img zam-app-flex-ajCenter">
+						<img src="{{ data.content }}" />
+					</div>
+					{{ if showavatar=='1' || showname=='1'}}
+						<div class="fulldmBox-user zam-app-flex">
+							{{ if showavatar=='1'}}
+								<div class="fulldmBox-userimg zam-app-flex-ajCenter2">
+									<img src="{{ data.avatar }}" class="imgavatar">
+								</div>
+							{{ /if }}
+							{{ if showname=='1'}}
+								<div class="fulldmBox-username zam-app-flex-ajCenter2">
+									{{ data.nickname }}
+								</div>
+							{{ /if }}
+						</div>
+					{{ /if }}
+				</div>
+			{{ /if }}
+		{/if}
+	{else /}
+		<div class="fulldmBox-info">
+			<span class="qipao"></span>
+			<div class="fulldmBox-son fulldmBox-msg">{{# data.content }}</div>
+		    {{ if showname=='1'}}
+			<div class="fulldmBox-son fulldmBox-nickname">：{{ data.nickname }}</div>
+			{{ /if }}
+		</div>
+		{{ if showavatar=='1'}}
+			<div class="fulldmBox-avatar">
+				<img src="{{ data.avatar }}" class="imgavatar">
+			</div>
+		{{ /if }}
+	{/if}
+</div>
+</script>
+{/if}

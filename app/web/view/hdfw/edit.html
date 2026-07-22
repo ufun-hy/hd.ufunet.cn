@@ -1,0 +1,68 @@
+<div class="form-horizontal confirmbox-pop">
+<form class="confirm-formbox" method="post">
+    <div class="text-center">
+        <div class="btn-group pop-btns" style="margin-bottom:10px;">
+          <a href="javascript:void(0)" class="btn btn-default btn-primary"><span>基础设置</span></a>
+          <a href="javascript:void(0)" class="btn btn-default"><span>其他设置</span></a>
+        </div>
+    </div>
+    <div class="carditem">
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 排序序号</label>
+            <div class="col-lg-8">
+                <input class="form-control" type="text"  name="fworder" value="{$config['fworder']}">
+                <span class="zam-help-block">注:升序排序，序号越小越排前面</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 服务名称</label>
+            <div class="col-lg-8">
+                <input class="form-control" type="text"  name="fwname" value="{$config['fwname']}">
+            </div>
+        </div>
+        <div class="form-group filetypes">
+            <label class="col-lg-3 control-label">* 服务类型</label>
+            <div class="col-lg-8">
+                {foreach $fwtypes as $k=>$v}
+                <label class="lyear-radio radio-inline radio-primary">
+                    <input type="radio" name="fwtype" value="{$k}" {if $config['fwtype'] == $k}checked{/if}><span>{$v}</span>
+                </label>
+                {/foreach}
+                <div class="help-block">注意:弹幕桌面软件类型只能添加一个，弹幕软件类型服务不可随意删除，更加不可以随便切换其他服务类型为弹幕桌面软件服务</div>
+            </div>
+        </div>
+    </div>
+    <div class="carditem hidden">
+        <div class="form-group">
+            <label class="col-lg-3 control-label">服务售价</label>
+            <div class="col-lg-7">
+                  <div class="input-group">
+                      <input type="text" class="form-control" name="fwprice" value="{$config['fwprice']}">
+                      <div class="input-group-addon">元</div>
+                  </div>
+                  <span class="help-block">用户组中可差异化设置当前服务价格</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 服务图标(69*69px)</label>
+            <div class="col-lg-8">
+               {:tpl_image_one('fwicon',$config['fwicon'])}
+            </div>
+         </div>
+         <div class="form-group">
+            <label class="col-lg-3 control-label">* 服务预览图(180*101px)</label>
+            <div class="col-lg-8">
+               {:tpl_image_one('fwimg',$config['fwimg'])}
+            </div>
+         </div>
+    </div>
+</form>
+</div>                     
+<script>    
+require(['webcore','jconfirmBox','zamnotice','layerBox'],function(webcore,jconfirmBox,zamnotice,layerBox){
+    $(".confirmbox-pop .pop-btns a.btn").click(function(){
+        $(this).addClass('btn-primary').siblings().removeClass("btn-primary");
+        $(".confirmbox-pop .carditem").addClass('hidden').eq($(this).index()).removeClass('hidden');
+    });
+});
+</script>

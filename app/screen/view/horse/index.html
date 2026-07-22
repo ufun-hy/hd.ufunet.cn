@@ -1,0 +1,171 @@
+{include file='common/header' /}
+<style>
+.shake-mainbox{
+	width: 100%;
+    height: 100%;
+    padding: 0;
+    overflow: hidden;
+}
+.car-mainbox .shake-lists{
+	position:relative;
+	height:100%;
+	width:100%;
+	margin: 0 auto;
+	overflow:hidden;
+	z-index:1;
+}
+.car-topbg{
+    position: absolute;
+	top:0;
+	left:0;
+	height: 50%;
+    width: 100%;
+	background-image: url("{:tomedia($pcconfig['style']['topbg'])}");
+    background-size: 1920px 100%;
+}
+.car-topbg.runbg {
+	-webkit-animation: runbg 60s infinite linear normal none
+}
+{if !empty($pcconfig['style']['topbg2'])}
+.car-topbg2{
+    position: absolute;
+	top:0;
+	left:0;
+	height: 50%;
+    width: 100%;
+	background-image: url("{:tomedia($pcconfig['style']['topbg2'])}");
+    background-size: 1920px 100%;
+}
+.car-topbg2.runbg {
+	-webkit-animation: runbg {if empty($pcconfig['style']['topbgspeed'])}20{else}{$pcconfig['style']['topbgspeed']}{/if}s infinite linear normal none
+}
+{/if}
+.car-track .shakelineBox{
+    position: absolute;
+    bottom: 0;
+	left:0;
+    height: 50%;
+    width: 100%;
+	background-image: url("{:tomedia($pcconfig['style']['trackimg'])}");
+	background-size: 1920px 100%;
+}
+.car-track .shakelineBox.runbg {
+	-webkit-animation: runbg {if empty($pcconfig['style']['trackimgspeed'])}20{else}{$pcconfig['style']['trackimgspeed']}{/if}s infinite linear normal none
+}
+{if !empty($pcconfig['style']['trackimgbg'])}
+	.car-track .shakelineBoxbg{
+		position: absolute;
+		bottom: 0;
+		left:0;
+		height: 50%;
+		width: 100%;
+		background-image: url("{:tomedia($pcconfig['style']['trackimgbg'])}");
+		background-size: 1920px 100%;
+	}
+	.car-track .shakelineBoxbg.runbg {
+		-webkit-animation: runbg  {if empty($pcconfig['style']['trackimgspeed'])}20{else}{$pcconfig['style']['trackimgspeed']}{/if}s infinite linear normal none
+	}
+{/if}
+@-webkit-keyframes runbg {
+	0% {
+		background-position: 0 100%
+	}
+
+	100% {
+		background-position: -1920px 100%
+	}
+}
+.car-track .shakelineBox li{
+	height:300px;
+	width:300px;
+    background-size: 100% 100%;
+    position: absolute;
+	left:-300px;
+    transition: left 1s linear 0s;
+}
+.player{
+	width:60px;
+    height:60px;
+    position: absolute;
+    top: 120px;
+    right:250px;
+    transform: rotate(20deg);
+    transform-origin: right center;
+}
+.player:before {
+    content: "————";
+    color: rgb(255, 255, 255);
+    position: absolute;
+    right: -50px;
+    height: 50px;
+    line-height:50px;
+}
+.player img {
+    width: 100%;
+    height: 100%;
+    border-radius: 100%;
+    position: absolute;
+    border: 1px solid #fff;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+}
+.player .nickname {
+    position: absolute;
+    color: #FFF;
+    right:100px;
+    top: 50%;
+    transform: translateY(-50%);
+    text-shadow: 2px 2px 1px #000;
+    max-width: 240px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    text-align: end;
+    font-size: 24px;
+    font-weight: 700;
+}
+</style>
+<audio id="countaudio" src="/{:WIMGURL}shake/count.mp3"  preload="preload"  style="display:none"></audio>
+<audio id="overaudio" src="/{:SIMGURL}shake/over.mp3"  preload="preload"  style="display:none"></audio>
+<audio id="joinaudio" src="/{:SIMGURL}shake/join.mp3"  preload="preload" style="display:none"></audio>
+<section class="shake-mainbox car-mainbox normal-box zam-app-flex-ajCenter2">
+    <div class="emptybox zam-app-flex-ajCenter display-none">
+		<img src="/{:SIMGURL}common/empty.png">
+		<p style="padding:20px;">暂无可用轮次，请到后台添加</p>
+	</div>
+	<div class="shake-lists car-track">
+		<div class="car-topbg bgneedrun"></div>
+		{if !empty($pcconfig['style']['topbg2'])}
+		<div class="car-topbg2 bgneedrun"></div>
+		{/if}
+		<ul class="shakelineBox bgneedrun"></ul>
+		{if !empty($pcconfig['style']['trackimgbg'])}
+		<div class="shakelineBoxbg bgneedrun"></div>
+		{/if}
+	</div>
+</section>
+<style>
+.start-btn{
+	width:296px;
+	height:94px;
+}
+</style>
+{include file='common/gamewelcome' /}
+<script id="shakeItem-tpl" type="html/javascript">
+<li class="carBoxItem" style="top:{{-160 + (i-1)*38 }}px;background-image:url('{{carImg}}')">
+	<div class="player">
+		<img src="" class="display-none">
+		<span class="nickname">{$pcconfig['style']['userdefaultname']??'虚位以待'}</span>
+	</div>
+</li>
+</script>
+{include file='common/gamecommon' /}
+<script>
+var carImgs = {:json_encode($pcconfig['style']['roleimgs'])},defaultImg = "{:tomedia($pcconfig['style']['userdefaultimg'])}";
+var defaultName = "{$pcconfig['style']['userdefaultname']??'虚位以待'}";
+require(['screenhorse'],function (screenhorse) {
+	screenhorse.init();
+});
+</script>
+{include file='common/footer' /}

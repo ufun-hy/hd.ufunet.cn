@@ -1,0 +1,143 @@
+{include file='common/header' /}
+<style>
+.header,.footer,.hdQrbox,.footer-controlBox{display: none!important;}
+table {border-collapse: collapse;}
+table td,table th {border: none;padding: 5px 30px;text-align: center;}
+
+.answerphb-mainbox{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+.level-box{
+    width: 80%;
+    height: 700px;
+    margin: 0 auto;
+    margin-top: 50px;
+    color: #fff;
+}
+.level-title{
+    font-size: 36px;
+    font-weight: bold;
+    text-align: center;
+}
+.level-content{
+    margin-top: 20px;
+    width: 100%;
+}
+.level-content .level-top{
+    font-size: 32px;
+    font-weight: bold;
+}
+.level-content .level-top div{
+    width: 25%;
+    text-align: center;
+}
+.level-content .level-body{
+    margin-top: 18px;
+    font-size: 32px;
+    font-weight: bold;
+}
+.level-content .level-body div{
+    width: 25%;
+    text-align: center;
+}
+.level-content .level-footer{
+    margin-top: 28px;
+}
+.level-content .level-footer ul{
+    width: 25%;
+    text-align: center;
+    font-size: 24px;
+}
+.level-content .level-footer ul li{
+    margin-top: 5px;
+}
+</style>
+<section class="answerphb-mainbox">
+    <div class="level-box">
+        <div class="level-title">团队风险题选择</div>
+        <div class="level-content">
+            <div class="level-top zam-app-flex">
+                <div>低难度题</div>
+                <div>中难度题</div>
+                <div>高难度题</div>
+                <div>超时未选择</div>
+                <div>弃权团队</div>
+            </div>
+            <div class="level-body zam-app-flex">
+                <div class="lowernum">0</div>
+                <div class="zhongnum">0</div>
+                <div class="highnum">0</div>
+                <div class="overnum">0</div>
+                <div class="giveupnum">0</div>
+            </div>
+            <div class="level-footer zam-app-flex">
+                <ul class="lowerlists"></ul>
+                <ul class="zhonglists"></ul>
+                <ul class="highlists"></ul>
+                <ul class="overlists"></ul>
+                <ul class="giveuplists"></ul>
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+    require(['screencore','layerBox'],function(screencore,layerBox){
+        var answerbsphb = {
+            init:function(){
+                var self = this;
+                self.ajaxdata();
+            },
+            ajaxdata:function(){
+                var self = this;
+                screencore.ajaxSubmit("/screen/answerbs/ajaxleveldetail",{}).then(function(json){
+                    var lowerhtml = '',zhonghtml = '',highhtml = '',overhtml = '',giveuphtml = '',lowernum = 0,zhongnum = 0,highnum = 0,overnum = 0,giveupnum = 0;
+                    if(json.code == 0){
+                        lowernum = json.msg.lowerlists.length;
+                        $.each(json.msg.lowerlists,function(i,v){
+                            lowerhtml += '<li>' + v +'</li>';
+                        });
+                        zhongnum = json.msg.zhonglists.length;
+                        $.each(json.msg.zhonglists,function(i,v){
+                            zhonghtml += '<li>' + v +'</li>';
+                        });
+                        highnum = json.msg.highlists.length;
+                        $.each(json.msg.highlists,function(i,v){
+                            highhtml += '<li>' + v +'</li>';
+                        });
+                        overnum = json.msg.overlists.length;
+                        $.each(json.msg.overlists,function(i,v){
+                            overhtml += '<li>' + v +'</li>';
+                        });
+                        giveupnum = json.msg.giveuplists.length;
+                        $.each(json.msg.giveuplists,function(i,v){
+                            giveuphtml += '<li>' + v +'</li>';
+                        });
+                    }
+                    $(".lowernum").html(lowernum);
+                    $(".zhongnum").html(zhongnum);
+                    $(".highnum").html(highnum);
+                    $(".overnum").html(overnum);
+                    $(".giveupnum").html(giveupnum);
+
+                    $(".lowerlists").html(lowerhtml);
+                    $(".zhonglists").html(zhonghtml);
+                    $(".highlists").html(highhtml);
+                    $(".overlists").html(overhtml);
+                    $(".giveuplists").html(giveuphtml);
+                    setTimeout(function(){
+                        self.ajaxdata();
+                    },2e3);
+				}, function(){
+					layerBox.showMsg('网络太差，请稍后重试');
+				});
+                
+            }
+        };
+        answerbsphb.init();
+    });
+</script>
+{include file='common/footer' /}

@@ -1,0 +1,1006 @@
+{include file='common/header' /}
+<style>
+.tug-mainbox{
+	position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+	padding: 0;
+    overflow: hidden;
+}
+.tug-title{
+	position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100px;
+    text-align: center;
+    font-size: 24px;
+    line-height: 100px;
+    color: #fff;
+    z-index: 1;
+}
+.tug-bgbox{
+	position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+.tug-topbg{	
+	position: relative;
+    width: 100%;
+	height: 390px;
+    overflow: hidden;
+	display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+	-webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+	-webkit-box-pack: center;
+    -webkit-justify-content: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+}
+.tug-topbg>div{
+	height: 100%;
+    overflow: hidden;
+}
+.tug-topbg .tug-leftside{
+	width: calc((100% - 1406px) / 2);
+    background: url("{:tomedia($pcconfig['style']['topleft'])}") 0% 0% / 200px 100% repeat-x;
+    transform: rotate3d(0, 1, 0, 180deg) translateX(-1px);
+}
+.tug-topcenter{
+	width: 1406px;
+	position: relative;
+    background-position: 50%;
+    background-image: url("{:tomedia($pcconfig['style']['topcenter'])}");
+	display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+	-webkit-box-pack: center;
+    -webkit-justify-content: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+}
+.tug-topcenter-ad{
+	position: absolute;
+    width: 432px;
+    height: 109px;
+    top: 114px;
+    left: calc((100% - 432px) / 2);
+	background-image: url("");
+    background-size: cover;
+    background-position: 50%;
+}
+.tug-rightside{
+	width: calc((100% - 1406px) / 2);
+    background: url("{:tomedia($pcconfig['style']['topleft'])}") 0% 0% / 200px 100% repeat-x;
+    transform: translateX(-2px);
+}
+/*bottombg*/
+.tug-bottombg{
+	width: 100%;
+    position: relative;
+	transform: translateY(-6px);
+    height: 416px;
+}
+
+.tug-personbox{
+	position: absolute;
+    z-index: 10;
+	display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+	-webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+	-webkit-box-pack: center;
+    -webkit-justify-content: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+	color: #fff;
+}
+.tug-leftperson{
+	width: 78px;
+    height: 40px;
+    top: -90px;
+    left: calc(((100% - 78px) / 2) - 190px);
+    background-color: rgb(250 159 19);
+    border: 1px solid #fff;
+    border-radius: 2px;
+    font-size: 20px;
+}
+.tug-rightperson{
+	width: 78px;
+    height: 40px;
+    top: -90px;
+    left: calc(((100% - 78px) / 2) + 190px);
+    background-color: rgb(250 159 19);
+    border: 1px solid #fff;
+    border-radius: 2px;
+    font-size: 20px;
+}
+.tug-teamflag{
+	position: absolute;
+    background-repeat: no-repeat,no-repeat;
+    z-index: 5;
+}
+.tug-leftflag{
+	width: 112px;
+    height: 233px;
+    top: -210px;
+    left: calc(((100% - 112px) / 2) - 310px);
+    background-image: url("{:tomedia($pcconfig['style']['redflag'])}");
+    background-size: 112px 233px, 78px 98px;
+    background-position: 0px 0px, 23px 53px;
+}
+.tug-rightflag{
+	width: 112px;
+    height: 233px;
+    top: -210px;
+    left: calc(((100% - 112px) / 2) + 313px);
+    background-image: url("{:tomedia($pcconfig['style']['blueflag'])}");
+    background-size: 112px 233px, 78px 98px;
+    background-position: 0px 0px, 10px 53px;
+}
+.tug-teamname{
+	background-position: 50%;
+    position: absolute;
+    z-index: 6;
+	display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+	-webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+	-webkit-box-pack: center;
+    -webkit-justify-content: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+}
+.tug-leftname{
+	width: 276px;
+    height: 86px;
+    top: 328px;
+    left: calc(((100% - 276px) / 2) - 374px);
+    background-image: url("{:tomedia($pcconfig['style']['teamnamebg'])}");
+    font-size: 24px;
+    color: rgb(255, 232, 84);
+}
+.tug-rightname{
+	width: 276px;
+    height: 86px;
+    top: 328px;
+    left: calc(((100% - 276px) / 2) + 374px);
+    background-image: url("{:tomedia($pcconfig['style']['teamnamebg'])}");
+    font-size: 24px;
+    color: rgb(255, 232, 84);
+}
+.tug-bottombgimg{
+	width: 100%;
+    background-position: top;
+    background-repeat: no-repeat;
+	height: 493px;
+    transform: translateY(-77px);
+    background-image: url("{:tomedia($pcconfig['style']['bottombg'])}");
+}
+/*准备层*/
+.tug-readybox{
+	width: 100%;
+    height: 100%;
+}
+.tug-readytop {
+	width: 100%;
+    position: relative;
+	height:390px;
+	display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+	-webkit-box-pack: center;
+    -webkit-justify-content: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+}
+.tug-timebox{
+	position: absolute;
+    font-family: sans-serif;;
+    font-weight: 620;
+	top: 265px;
+    left: calc((100% - 180px) / 2);
+    width: 189px;
+    height: 72px;
+    color: #fff;
+    font-size: 64px;
+	display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+	-webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+	-webkit-box-pack: justify;
+    -webkit-justify-content: space-between;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+}
+.tug-timebox span{
+	height: 100%;
+	width:60px;
+	display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+	-webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+	-webkit-box-pack: center;
+    -webkit-justify-content: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+}
+.tug-readybottom{
+	width: 100%;
+    position: relative;
+	transform: translateY(-6px);
+    height: 416px;
+	display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+	-webkit-box-pack: center;
+    -webkit-justify-content: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+}
+.tug-readyteam1{
+	position:absolute;
+	top: 155px;
+    left: calc(((100% - 351px) / 2) - 330px);
+	display: inline-block;
+    width: 351px;
+    height: 133px;
+}
+.tug-readyteam2{
+	position:absolute;
+	top: 155px;
+    left: calc(((100% - 351px) / 2) + 330px);
+	display: inline-block;
+    width: 351px;
+    height: 133px;
+}
+.tug-start{
+	position:absolute;
+	display: inline-block;
+    cursor: pointer;
+	top: 172px;
+    left: calc((100% - 166px) / 2);
+    width: 172px;
+    height: 60px;
+}
+.tug-rope{
+	position:absolute;
+	top: 300px;
+    left: calc((100% - 1166px) / 2);
+    width: 1185px;
+    height: 60px;
+    background-image: url("{:tomedia($pcconfig['style']['rope'])}");
+}
+/*结束层*/
+.tug-endbox{
+	position: relative;
+    width: 100%;
+    height: 100%;
+	display:none
+}
+.tug-endtop {
+	width: 100%;
+    position: relative;
+	height:390px;
+	display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+	-webkit-box-pack: center;
+    -webkit-justify-content: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+}
+.tug-endleftrole{
+	display: inline-block;
+    width: 80px;
+    height: 130px;
+    position: absolute;
+	top: 230px;
+    left: calc((((100% - 80px) / 2) - 114px) - 40px);
+}
+.tug-endtimebox{
+	position: absolute;
+    font-family: Arial;
+    font-weight: 700;
+	top: 264px;
+    left: calc((100% - 189px) / 2);
+    width: 189px;
+    height: 72px;
+    color: rgb(255, 255, 255);
+    font-size: 60px;
+	display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+	-webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+	-webkit-box-pack: justify;
+    -webkit-justify-content: space-between;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+}
+.tug-endtimebox span{
+	height: 100%;
+	width:60px;
+	display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+	-webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+	-webkit-box-pack: center;
+    -webkit-justify-content: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+}
+.tug-endrightrole{
+	display: inline-block;
+    width: 80px;
+    height: 130px;
+    position: absolute;
+	top: 230px;
+    left: calc((((100% - 80px) / 2) + 114px) + 40px);
+}
+.tug-endbottom{
+	width: 100%;
+    position: relative;
+	transform: translateY(-6px);
+    height: 416px;
+	display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+	-webkit-box-pack: center;
+    -webkit-justify-content: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+}
+.tug-endbottom *{
+	position:absolute;
+}
+.endrope{
+	top: 300px;
+    left: calc((100% - 1166px) / 2);
+    width: 1185px;
+    height: 60px;
+    background-image: url("{:tomedia($pcconfig['style']['rope'])}");
+}
+.tug-rteamwin .endleftteam{
+	width: 442px;
+    height: 310px;
+    top: 35px;
+    left: calc(((100% - 442px) / 2) - 360px);
+}
+.tug-rteamwin .endrightteam{
+	width: 270px;
+    height: 237px;
+    top: 90px;
+    left: calc(((100% - 351px) / 2) + 330px);
+}
+.tug-bteamwin .endleftteam{
+	width: 270px;
+    height: 237px;
+    top: 90px;
+    left: calc(((100% - 442px) / 2) - 180px);
+}
+.tug-bteamwin .endrightteam{
+	width: 442px;
+    height: 310px;
+    top: 35px;
+    left: calc(((100% - 351px) / 2) + 330px);
+}
+.endnextbtn{
+	display: inline-block;
+    cursor: pointer;
+	top: 172px;
+    left: calc((100% - 166px) / 2);
+    width: 172px;
+    height: 60px;
+}
+.endrankbtn{
+	display: inline-block;
+    cursor: pointer;
+	top: 237px;
+    left: calc((100% - 166px) / 2);
+    width: 172px;
+    height: 60px;
+}
+/*draw 平局*/
+.drawleftteam{
+	width: 390px;
+    height: 133px;
+    top: 160px;
+    left: calc(((100% - 390px) / 2) - 330px);
+}
+.drawrightteam{
+	width: 390px;
+    height: 133px;
+    top: 160px;
+    left: calc(((100% - 390px) / 2) + 330px);
+}
+.drawlogo{
+	top: -10px;
+    left: calc((100% - 214px) / 2);
+    width: 214px;
+    height: 169px;
+}
+.restart{
+	top: 202px;
+    left: calc((100% - 166px) / 2);
+    width: 172px;
+    height: 60px;
+}
+.tug-drawbox .endrankbtn{
+	top: 277px;
+}
+/*排名*/
+.tug-rankbox{
+	position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 99;
+    overflow: hidden;
+	background: url("{:tomedia($pcconfig['style']['rankbg'])}") center center / 733px 515px no-repeat rgba(0, 0, 0, 0.6);
+	display:none;
+}
+.tug-closerank{
+	position: absolute;
+    width: 30px;
+    height: 30px;
+    top: 145px;
+    left: calc(50% + 383px);
+    cursor: pointer;
+    z-index: 100;
+	background: #fff;
+    line-height: 30px;
+    text-align: center;
+    border-radius: 50%;
+}
+.tug-rankmain{
+	position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+	width: 687px;
+    height: 458px;
+	display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+	-webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+	-webkit-box-pack: justify;
+    -webkit-justify-content: space-between;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+}
+.tug-rankteam{
+	margin-top: 50px;
+    width: 50%;
+    height: 450px;
+}
+.tug-ranktitle{
+	width: 330px;
+    height: 80px;
+	padding-left:0;
+	display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+	-webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+	-webkit-box-pack: justify;
+    -webkit-justify-content: space-between;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+}
+.tug-wincpu{
+	width: 88px;
+    height: 74px;
+    background: url("{:tomedia($pcconfig['style']['rankcpu'])}") center center no-repeat;
+	margin-top:-20px;
+}
+.tug-rankname{
+	margin-top: 20px;
+    font-size: 18px;
+	color: #fff;
+}
+.tug-ranklogo{
+	width: 78px;
+    height: 77px;
+}
+.tug-ranklogo.winlogo{
+ background: url("{:tomedia($pcconfig['style']['winlogo'])}") center center no-repeat;
+}
+.tug-ranklogo.faillogo{
+ background: url("{:tomedia($pcconfig['style']['faillogo'])}") center center no-repeat;
+}
+.tug-ranklist{
+	width: 100%;
+    height: 350px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+	margin-right: 0px;
+}
+.leftlist{
+	margin-right: 0px;
+    width: 100%;
+}
+.rightlist{
+	margin-right: 20px;
+	width: calc(100% - 20px);
+}
+.tug-rankcell{
+	padding: 0 20px;
+    font-size: 16px;
+	color:#fff;
+	display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+	-webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+	-webkit-box-pack: justify;
+    -webkit-justify-content: space-between;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+}
+.tug-rankcell.hasavatar{
+	height: 40px;
+    line-height: 40px;
+    margin-top: 7px;
+}
+.tug-rankcell.hasavatar>div {
+    height: 100%;
+}
+.tug-rankcol1{
+	width: 40px;
+    font-size: 18px;
+    font-weight: 500;
+    text-align: center;
+}
+.tug-rankcol2{
+	width: 145px;
+    font-size: 14px;
+	display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+	-webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+}
+.tug-rankheader{
+	position: relative;
+    overflow: hidden;
+    width: 40px;
+    height: 40px;
+    -webkit-flex-shrink: 0;
+    -ms-flex-negative: 0;
+    flex-shrink: 0;
+}
+.tug-rankheader img{
+	display: inline-block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+}
+.tug-rankavatar{
+	height: 38px;
+    width: 38px;
+    z-index: 2;
+}
+.tug-ranknickname{
+	margin-left: 10px;
+}
+.tug-rankcol3{
+	font-size: 14px;
+    width: 40px;
+    text-align: center;
+}
+.tug-rankf16{
+	font-size: 16px;
+}
+/*拔河过程中*/
+.tug-usering{
+	width: 1280px; 
+	height: 300px; 
+	position:absolute;
+	top: 154px; 
+	left: calc((100% - 1285px) / 2);
+	transition: left 0.8s linear;
+	-webkit-transition: left 0.8s linear;
+	-moz-transition: left 0.8s linear;
+	-o-transition: left 0.8s linear;
+	-ms-transition: left 0.8s linear;
+	display:none;
+}
+.play-box-left{
+	position: absolute;
+	left:0px;
+	top:0px;
+}
+.play-box-right{
+	position: absolute;
+	right:0;
+	left:0;
+}
+.play-box-left .player-icon{
+	background-image:url("{:tomedia($pcconfig['style']['leftgif'])}");
+}
+.play-box-right .player-icon{
+	background-image:url("{:tomedia($pcconfig['style']['rightgif'])}");
+}
+.player{
+	width: 65px;
+	height: 114px;
+	position: absolute;
+	z-index: 1;
+}
+.player .player-icon{
+	position:absolute;
+	width: 65px;
+	height: 114px;
+	background-repeat: no-repeat;
+}
+.play-box-left .player .player-user{
+	position:relative;
+	margin-top:-60px;
+	width:50px;
+	height:50px;
+	border-radius:50%;
+	background-image:url(/{:SIMGURL}tug/avatarbg.png);
+	background-size:cover;
+	background-repeat: no-repeat;
+	visibility:hidden;
+}
+.play-box-right .player .player-user{
+	position:relative;
+	margin-top:-60px;
+	margin-left:10px;
+	width:50px;
+	height:50px;
+	border-radius:50%;
+	background-image:url(/{:SIMGURL}tug/avatarbg.png);
+	background-size:cover;
+	background-repeat: no-repeat;
+	visibility:hidden;
+}
+.play-box-left .player .player-user .player-nickname {
+	position:absolute;
+	top:-110px;
+	left:-156px;
+	height: 40px;
+	line-height: 40px;
+	color: #fff;
+	text-align:right;
+	font-size: 20px;
+	transform: rotate(50deg);
+	width:200px;
+}
+.play-box-right .player .player-user .player-nickname {
+	position:absolute;
+	top:-110px;
+	left:5px;
+	height: 40px;
+	line-height: 40px;
+	color: #fff;
+	font-size: 20px;
+	transform: rotate(-50deg);
+	width:200px;
+}
+.tug-ropeing{
+	position:absolute;
+	top:46px;
+	left: calc((100% - 1266px) / 2);
+	width: 1280px;
+	height: 67px;
+	background-image: url("{:tomedia($pcconfig['style']['rope2'])}");
+	background-size: cover;
+	background-repeat: no-repeat;
+	z-index:-1;
+}
+</style>
+{if !empty($pcconfig['style']['diycss'])}<style>{$pcconfig['style']['diycss']}</style>{/if}
+<audio id="countaudio" src="/{:WIMGURL}shake/count.mp3"  preload="preload"  style="display:none"></audio>
+<audio id="overaudio" src="/{:SIMGURL}shake/over.mp3"  preload="preload"  style="display:none"></audio>
+<audio id="joinaudio" src="/{:SIMGURL}shake/join.mp3"  preload="preload" style="display:none"></audio>
+<div class="shake-mainbox tug-mainbox normal-box">
+   <div class="emptybox zam-app-flex-ajCenter display-none">
+				<img src="/{:SIMGURL}common/empty.png">
+				<p style="padding:20px;">暂无可用轮次，请到后台添加</p>
+	</div>
+   <div class="tug-title" style="line-height: 100px;"></div> 
+   <div class="tug-bgbox">
+		<div  class="tug-topbg">
+			 <div class="tug-leftside"></div> 
+			 <div  class="tug-topcenter">
+				<div  class="tug-topcenter-ad"></div>
+			 </div> 
+			 <div class="tug-rightside"></div>
+		</div> 
+		<div  class="tug-bottombg">
+			 <div  class="tug-personbox tug-leftperson"><span>{$onlineinfo['r']}</span>人</div>
+			 <div  class="tug-personbox tug-rightperson"><span>{$onlineinfo['b']}</span>人</div> 
+			 <div  class="tug-teamflag tug-leftflag"></div>
+			 <div  class="tug-teamflag tug-rightflag"></div> 
+			 <div  class="tug-teamname tug-leftname">xxxx</div>
+			 <div  class="tug-teamname tug-rightname">xxxxx</div> 
+			<div  class="tug-bottombgimg"></div>
+		</div>
+   </div><!--tug-bgbox end -->
+   <div class="tug-readybox">
+		<div class="tug-readytop">
+			 <div  class="tug-timebox">
+				  <span>0</span>
+				  <span>0</span>
+				  <span>0</span>
+			 </div> 
+		</div> 
+		<div class="tug-readybottom"> 
+			<div class="tug-readyinfo"><!--游戏准备中显示-->
+				 <img  src="{:tomedia($pcconfig['style']['readyleftteam'])}" class="tug-readyteam1"  /> 
+				 <img  src="{:tomedia($pcconfig['style']['readyrightteam'])}" class="tug-readyteam2"  /> 
+				 <img  src="{:tomedia($pcconfig['style']['startbtn'])}" class="tug-start" /> 
+				 <div  class="tug-rope"></div>
+			</div>
+			<div  class="tug-usering"><!--游戏开始后显示-->
+				<div class="play-box-left">
+					<div class="player" style="left:60px; ">
+						<div class="player-icon" >
+							<div class="player-user">
+								<div  class="player-nickname limitbox">赞木</div>
+							</div>
+						</div> 
+					</div>
+					<div class="player" style="left:120px;">
+						<div class="player-icon" >
+							<div class="player-user">
+								<div  class="player-nickname limitbox">赞木</div>
+							</div>
+						</div> 
+					</div>
+					<div class="player" style="left:180px;">
+						<div class="player-icon" >
+							<div class="player-user">
+								<div  class="player-nickname limitbox">赞木</div>
+							</div>
+						</div>
+					</div>
+					<div class="player" style="left:240px;">
+						<div class="player-icon" >
+							<div class="player-user">
+								<div  class="player-nickname limitbox">赞木</div>
+							</div>
+						</div> 
+					</div>
+					<div class="player" style="left:300px;">
+						<div class="player-icon" >
+							<div class="player-user">
+								<div  class="player-nickname limitbox">赞木</div>
+							</div>
+						</div> 
+					</div>
+					<div class="player" style="left: 360px;">
+						<div class="player-icon" >
+							<div class="player-user">
+								<div  class="player-nickname limitbox">赞木</div>
+							</div>
+						</div>
+					</div>
+					<div class="player" style="left:420px;">
+						<div class="player-icon" >
+							<div class="player-user">
+								<div  class="player-nickname limitbox">赞木</div>
+							</div>
+						</div> 
+					</div>
+					<div class="player" style="left:480px; ">
+						<div class="player-icon" >
+							<div class="player-user">
+								<div  class="player-nickname limitbox">赞木</div>
+							</div>
+						</div> 
+					</div>
+					
+				</div>
+				<div  class="play-box-right">
+					<div class="player" style="right:40px;">
+						<div class="player-icon" >
+							<div class="player-user">
+								<div  class="player-nickname limitbox">赞木</div>
+							</div>
+						</div>
+					</div>
+					<div class="player" style="right:100px;">
+						<div class="player-icon" >
+							<div class="player-user">
+								<div  class="player-nickname limitbox">赞木</div>
+							</div>
+						</div>
+					</div>
+					<div class="player" style="right:160px;">
+						<div class="player-icon" >
+							<div class="player-user">
+								<div  class="player-nickname limitbox">赞木</div>
+							</div>
+						</div>
+					</div>
+					<div class="player" style="right: 220px;">
+						<div class="player-icon" >
+							<div class="player-user">
+								<div  class="player-nickname limitbox">赞木</div>
+							</div>
+						</div>
+					</div>
+					<div class="player" style="right:280px;">
+						<div class="player-icon" >
+							<div class="player-user">
+								<div  class="player-nickname limitbox">赞木</div>
+							</div>
+						</div>
+					</div>
+					<div class="player" style="right:340px;">
+						<div class="player-icon" >
+							<div class="player-user">
+								<div  class="player-nickname limitbox">赞木</div>
+							</div>
+						</div>
+					</div>
+					<div class="player" style="right:400px;">
+						<div class="player-icon" >
+							<div class="player-user">
+								<div  class="player-nickname limitbox">赞木</div>
+							</div>
+						</div> 
+					</div>
+					<div class="player" style="right: 460px">
+						<div class="player-icon" >
+							<div class="player-user">
+								<div  class="player-nickname limitbox">赞木</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="tug-ropeing"></div>
+			</div><!--tug-usering end -->
+		</div>
+   </div><!-- tug-readybox end -->
+   <div class="tug-endbox"><!--游戏结束后显示 红赢 蓝赢 或平局-->
+		<div  class="tug-endtop">
+			<img src="{:tomedia($pcconfig['style']['endleftuser'])}" class="tug-endleftrole">
+			<div class="tug-endtimebox">
+				<span>0</span>
+				<span>0</span>
+				<span>0</span>
+			</div>
+			<img  src="{:tomedia($pcconfig['style']['endrightuser'])}" class="tug-endrightrole">
+		</div> 
+		<div  class="tug-endbottom">
+				<div  class="endrope"></div> 
+				<div class="tug-winbox display-none">
+					<div class="tug-rteamwin display-none">
+						<img  src="{:tomedia($pcconfig['style']['redwin'])}" class="endleftteam" > 
+						<img  src="{:tomedia($pcconfig['style']['bluefail'])}" class="endrightteam"> 
+					</div>
+					<div class="tug-bteamwin display-none">
+						<img  src="{:tomedia($pcconfig['style']['redfail'])}" class="endleftteam" > 
+						<img  src="{:tomedia($pcconfig['style']['bluewin'])}" class="endrightteam"> 
+					</div>
+					<img  src="{:tomedia($pcconfig['style']['nextbtn'])}" class="endnextbtn"> 
+					<img  src="{:tomedia($pcconfig['style']['rankbtn'])}" class="endrankbtn">
+				</div>
+				<div class="tug-drawbox display-none">
+					<img  src="{:tomedia($pcconfig['style']['drawleftteam'])}" class="drawleftteam" > 
+					<img  src="{:tomedia($pcconfig['style']['drawrightteam'])}" class="drawrightteam"> 
+					<img  src="{:tomedia($pcconfig['style']['drawimg'])}" class="drawlogo"> 
+					<img  src="{:tomedia($pcconfig['style']['nextbtn'])}" class="restart">
+					<img  src="{:tomedia($pcconfig['style']['rankbtn'])}" class="endrankbtn">
+				</div>
+		</div>
+		<div class="tug-rankbox"><!--点击排名，排名结果-->
+			<div  class="tug-closerank"><i class="mxc-close"></i></div> 
+			<div  class="tug-rankmain">
+				 <div  class="tug-rankteam tug-rrank">
+						<div  class="tug-ranktitle">
+							<div  class="tug-wincpu display-none"></div>
+							<div  class="tug-rankname">红队</div>
+							<div  class="tug-ranklogo"></div>
+						</div> 
+						<div  class="tug-ranklist leftlist">
+							<div  class="tug-rankcell tug-rankcell-title">
+								<div  class="tug-rankcol1 tug-rankf16">排名</div>
+								<div  class="tug-rankcol2 tug-rankf16">头像昵称</div> 
+								<div  class="tug-rankcol3 tug-rankf16">分数</div>
+							</div>
+					   </div>
+				 </div>
+				 <div  class="tug-rankteam tug-brank">
+						<div  class="tug-ranktitle" style="padding-left: 20px;width: 310px;">
+							<div  class="tug-wincpu display-none"></div>
+							<div  class="tug-rankname" style="color: rgb(255, 255, 255);">蓝队</div> 
+							<div  class="tug-ranklogo"></div>
+						</div> 
+						<div  class="tug-ranklist rightlist" style="margin-right: 0px; width: 100%;">
+							<div  class="tug-rankcell tug-rankcell-title">
+								<div  class="tug-rankcol1 tug-rankf16">排名</div> 
+								<div  class="tug-rankcol2 tug-rankf16">头像昵称</div>
+								<div  class="tug-rankcol3 tug-rankf16">分数</div>
+							</div>
+						</div>
+				</div>
+		 </div><!--rankbox end-->
+   </div><!--tug-endbox end -->
+</div><!--tug-mainbox end -->
+{include file='common/gamedjs' /}
+<script id="tugrank-tpl" type="html/javascript">
+<div  class="tug-rankcell hasavatar">
+	<div class="tug-rankcol1" {{ if num<=2 }}style="background: url({{ rankimg }}) center center no-repeat;" {{ /if }}>{{ if num>2 }}{{ num+1 }}{{ /if }}</div> 
+	<div  class="tug-rankcol2">
+		<div  class="tug-rankheader">
+			<img src="{{ avatar }}" class="tug-rankavatar">
+		</div> 
+		<div  class="tug-ranknickname limitbox">{{ nickname }}</div>
+	</div>
+	<div  class="tug-rankcol3">{{ score }}</div>
+</div>
+</script>
+<script>
+var rankimgs = ['/{:SIMGURL}tug/1.png','/{:SIMGURL}tug/2.png','/{:SIMGURL}tug/3.png'],teamflags = {'redflag':"{:tomedia($pcconfig['style']['redflag'])}",'blueflag':"{:tomedia($pcconfig['style']['blueflag'])}"};
+require(['screentug'],function (screentug) {
+	screentug.init();
+});
+</script>
+{include file='common/footer' /}
+

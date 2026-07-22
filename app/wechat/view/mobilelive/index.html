@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no">
+    <title>{$appconfig['apptitle']}</title>
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="msapplication-tap-highlight" content="no">
+    <script type="text/javascript" src="__STATIC__/js/jquery.2.1.4.js"></script>
+    <link rel="stylesheet" href="__STATIC__/js/ydui/css/ydui.css"/>
+    <link rel="stylesheet" href="__STATIC__/css/mxc-icon.css" media="all" />
+    <link rel="stylesheet" href="__STATIC__/css/wechat/style.css?t=2.7.1" />
+    <script src="__STATIC__/js/ydui/js/ydui.flexible.js"></script>
+	<script type="text/javascript"  src="__STATIC__/js/require.js"></script>
+	<script type="text/javascript">
+		var XCV3Config = {
+		  staticurl:"__STATIC__/",
+		  amconfig:{:json_encode(amconfig())},
+		  hdid:"{$hdinfo['hdid']}",
+		  rhdid:"{$hdinfo['id']}",
+		  clienttype:"{if isset($clienttype)}{$clienttype}{else}1{/if}",
+		  userid:"{if isset($wxuser['id'])}{$wxuser['id']}{else}{/if}",
+		  ismanager:"{if isset($wxuser['ismanager'])}{$wxuser['ismanager']}{else}2{/if}",
+		  openid:"{if isset($wxuser['openid'])}{$wxuser['openid']}{else}{/if}",
+		  nickname:"{if isset($wxuser['nickname'])}{$wxuser['nickname']}{else}{/if}",
+		  avatar:"{if isset($wxuser['avatar'])}{:tomedia($wxuser['avatar'])}{else}{/if}",
+		  wsAddress:"{:wssaddress()}",
+		  sendJgtime:"{if isset($chatconfig['appsendtime'])}{$chatconfig['appsendtime']}{else}10{/if}",
+		  gametype:"{if isset($appconfig['gametype'])}{$appconfig['gametype']}{else}common{/if}",
+		  isiframe:false
+		};
+		require.config({
+			baseUrl: XCV3Config.staticurl + "js",
+			urlArgs:'v=2.2.591',//+(new Date()).getTime(),
+			waitSeconds:0,
+			paths: {
+				 css: "css.min",
+				 jquery:"jquery.2.1.4",
+				 jquerytrans:'screenjs/jquery.transit.min',
+				 ydui: "ydui/js/ydui",
+				 template:"template/template",
+				 layer:'layer/layer',
+				 layerBox:'layer/layerBox',
+				 laytpl:"laytpl/laytpl",
+				 keyboard:'keyboard/keyboard.min',
+				 mobilecore:"wechatjs/mobilecore",
+				 marqueen:"wechatjs/marqueen",
+				 bscroll:'wechatjs/bscroll/bscroll',
+				 swiper:'swiper/swiper.min',
+				 emojicore:"wechatjs/emojicore",
+				 appsocket:"wechatjs/appsocket",
+				 videojs:'videojs/video',
+				 TcPlayer:'videojs/TcPlayer-2.4.1/TcPlayer-2.4.1',
+				 TXLivePlayer:'videojs/TcPlayer-2.4.1/TXLivePlayer.min',
+				 hls:'videojs/TcPlayer-2.4.1/hls.min',
+				 qnrtplayer:'videojs/qiniu/qn-web',
+				 domtoimage:'domtoimg/domtoimage',
+				 html2canvas:"wechatjs/html2canvas",
+				 danmuku:'screenjs/danmuku',
+				 fulldm:'wechatjs/fulldm',
+				 dialog:'dialog/js/dialog',
+				 glightbox:'glightbox/glightbox.min',
+			},
+			shim:{
+				"ydui": {
+					exports:"YDUI"
+				},
+				'template':{
+					exports: 'template',
+				},
+				'layer':{
+					exports: 'layer',
+					deps: ['css!../js/layer/theme/default/layer.css']
+				},
+				'bscroll':{
+					exports:'BScroll',
+				},
+				'swiper':{
+					exports:'Swiper',
+					deps: ['css!../js/swiper/swiper.min.css']
+				},
+				'appsocket':{
+					exports:'appsocket',
+				},
+				'videojs':{
+					exports:'videojs',
+					deps:['css!../js/videojs/video.css'],
+				},
+				'domtoimage':{
+					exports:'domtoimage'
+				},
+				'dialog':{
+					exports:'dialog',
+					deps:['css!../js/dialog/css/dialog.css'],
+				},
+				'glightbox':{
+					exports:'GLightbox',
+					deps: ['css!../js/glightbox/glightbox.min.css'],
+				},
+			},
+		});
+		define("jquery", [], function () {
+			return jQuery;
+		});
+	</script>
+    <style>
+    	html, body, div, span,  h1, h2, h3, h4, h5, h6, p, a, em, img,small, tt, b, i, ul, li, label, nav, section, audio, video {
+		    margin: 0;
+		    padding: 0;
+		    border: 0;
+		    font-size: 100px;
+		    font: inherit;
+		    vertical-align: baseline;
+		}
+		input {
+		    outline: none;
+		    border: none;
+		    background: transparent;
+		}
+		::-webkit-scrollbar,.bscroll-vertical-scrollbar{
+		    width: .1rem!important;
+		}
+		::-webkit-scrollbar-track {
+		    -webkit-box-shadow: inset0.06remrgba(0, 0, 0, .3);
+		    border-radius: .1rem
+		}
+		::-webkit-scrollbar-thumb,.bscroll-indicator{
+			border-radius: .1rem!important;
+		    background: rgba(0, 0, 0, .1)!important;
+		    -webkit-box-shadow: inset0.06remrgba(0, 0, 0, .5)!important;
+		}		
+		.hidden{display:none!important;}
+		.layui-layer{
+			font-size: 0.16rem;
+		}
+		.zam-app-flex{
+		  display: -webkit-box;
+		  display: -webkit-flex;
+		  display: -ms-flexbox;
+		  display: flex;
+		}
+		.zam-app-alignCenter{
+		  -webkit-box-align: center;
+		  -webkit-align-items: center;
+		  -ms-flex-align: center;
+		  align-items: center;
+		}
+		.zam-app-justifyCenter{
+		  -webkit-box-pack: center;
+		  -webkit-justify-content: center;
+		  -ms-flex-pack: center;
+		  justify-content: center;
+		}
+		.zam-app-directionColumn{
+		  -webkit-box-orient: vertical;
+		  -webkit-box-direction: normal;
+		  -webkit-flex-direction: column;
+		  -ms-flex-direction: column;
+		  flex-direction: column;
+		}
+		.zam-app-flex-wrap{flex-wrap:wrap;-webkit-flex-wrap:wrap;}
+		.zam-app-flex-alignCenter{
+		  display: -webkit-box;
+		  display: -webkit-flex;
+		  display: -ms-flexbox;
+		  display: flex;
+		  -webkit-box-align: center;
+		  -webkit-align-items: center;
+		  -ms-flex-align: center;
+		  align-items: center;
+		}
+		.zam-app-flex-justifyCenter{
+		  display: -webkit-box;
+		  display: -webkit-flex;
+		  display: -ms-flexbox;
+		  display: flex;
+		  -webkit-box-orient: vertical;
+		  -webkit-box-direction: normal;
+		  -webkit-flex-direction: column;
+		  -ms-flex-direction: column;
+		  flex-direction: column;
+		}
+		.zam-app-flex-ajCenter{
+		  display: -webkit-box;
+		  display: -webkit-flex;
+		  display: -ms-flexbox;
+		  display: flex;
+		  -webkit-box-orient: vertical;
+		  -webkit-box-direction: normal;
+		  -webkit-flex-direction: column;
+		  -ms-flex-direction: column;
+		  flex-direction: column;
+		  -webkit-box-pack: center;
+		  -webkit-justify-content: center;
+		  -ms-flex-pack: center;
+		  justify-content: center;
+		  -webkit-box-align: center;
+		  -webkit-align-items: center;
+		  -ms-flex-align: center;
+		  align-items: center;
+		}
+		.zam-app-flex-ajCenter2{
+		  display: -webkit-box;
+		  display: -webkit-flex;
+		  display: -ms-flexbox;
+		  display: flex;
+		  -webkit-box-pack: center;
+		  -webkit-justify-content: center;
+		  -ms-flex-pack: center;
+		  justify-content: center;
+		  -webkit-box-align: center;
+		  -webkit-align-items: center;
+		  -ms-flex-align: center;
+		  align-items: center;
+		}
+		.zam-app-justifyspacearound{
+		  justify-content: space-around;
+		  -webkit-justify-content: space-around;
+		    -ms-flex-pack: space-around;
+		}
+		.zam-app-justifyspacebetween{
+		  justify-content: space-between;
+		  -webkit-justify-content: space-between;
+		    -ms-flex-pack: space-between;
+		}
+		.flex1{
+		    -webkit-box-flex: 1;
+		    -webkit-flex: 1;
+		    -ms-flex: 1;
+		    flex: 1;
+		}
+		.flex2{
+		    -webkit-box-flex: 2;
+		    -webkit-flex: 2;
+		    -ms-flex: 2;
+		    flex: 2;
+		}
+		.flex3{
+		    -webkit-box-flex: 3;
+		    -webkit-flex: 3;
+		    -ms-flex: 3;
+		    flex: 3;
+		}
+		.flex4{
+		    -webkit-box-flex: 4;
+		    -webkit-flex: 4;
+		    -ms-flex: 4;
+		    flex: 4;
+		}
+		.flex5{
+		    -webkit-box-flex: 5;
+		    -webkit-flex: 5;
+		    -ms-flex: 5;
+		    flex: 5;
+		}
+		.flex6{
+		    -webkit-box-flex: 6;
+		    -webkit-flex: 6;
+		    -ms-flex: 6;
+		    flex: 6;
+		}
+		.flex7{
+		    -webkit-box-flex: 7;
+		    -webkit-flex: 7;
+		    -ms-flex: 7;
+		    flex: 7;
+		}
+		.flex8{
+		    -webkit-box-flex: 8;
+		    -webkit-flex: 8;
+		    -ms-flex: 8;
+		    flex: 8;
+		}
+		.flex9{
+		    -webkit-box-flex: 9;
+		    -webkit-flex: 9;
+		    -ms-flex: 9;
+		    flex: 9;
+		}
+		.text-center{
+		  text-align:center;
+		}
+		/**wechat  通用样式**/
+		.zam-app-wechatlive{
+			width: 100%;
+			height: 100%;
+			overflow: hidden;
+		    --page-bg-color: #f6f6f6;
+		    --block-bg-color: #fff;
+		    --border-color: hsla(0,0%,93.7%,0.1);
+		    --font-color: #202124;
+		    --font-active-color: #006cff;
+		    --title-color: #202124;
+		    --info-color: #919499;
+		    --tab-font-color: #303133;
+		    --tab-font-active-color: #006cff;
+		    --tab-line-color: #f5f6f7;
+		    --rank-name-color: #202124;
+		    --chat-item-bg-color: rgba(0,108,255,0.06);
+		    --chat-item-color: #202124;
+		    --chat-time-color: #999;
+		    --chat-item-reply-color: #747474;
+		    --chat-item-name-color: #919499;
+		    --fullrich-text-color: #000;
+		    --input-box-color: #202124;
+		    --input-box-bg-color: #fafafb;
+		    --input-box-border-color: #efefef;
+		    --input-box-placeholder-color: #999;
+		    --input-box-icon-color: #919499;
+		    --input-box-icon-active-color: #006cff;
+		    --ranking-tabs-bg-color: #f5f6f7;
+		    --ranking-tab-color: #919499;
+		    --ranking-active-tab-color: #fff;
+		    --ranking-active-tab-bg-color: linear-gradient(270deg,#0084ff,#00baff);
+		}
+		.video_wrap {
+		    overflow: hidden;
+		    height: 56.25vw;
+		    width: 100%;
+		}
+		.video_wrap.outpage{
+			position:absolute;
+			top:45px;
+			left:0;
+			width:{$appconfig['smallconfig']['width']}px;
+			height:{$appconfig['smallconfig']['width']*9/16}px;
+			z-index:1;
+		}
+		.video_wrap .waitendbox{
+			position: relative;
+			width: 100%;
+			height:100%;
+			background-image: url({:tomedia($appconfig['liveconfig']['poster'])});
+			background-size:cover;
+			background-repeat:no-repeat;
+		}
+		.video_wrap .waitendbox .waitendtip{position: absolute;bottom: 0;left: 0;width: 100%;height:0.8rem;line-height: 0.8rem;background-color: rgba(0,0,0,0.3);color:#fff;font-size: 0.32rem;padding: 0 0.2rem;box-sizing: border-box;}
+		.video_wrap .vcp-timeline {
+		    left: 0.2rem;
+		    width: calc(100% - 0.4rem);
+		}
+		.video_wrap iframe{
+			width: 100%!important;
+			height: 100%!important;
+		}
+		.video_wrap .erroriframetxt{
+			width: 100%;
+			height: 100%;
+			background: rgba(0,0,0,0.45);
+			text-align: center;
+			color: red;
+			font-size: 0.32rem;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
+		.vcp-controls-panel{font-size:14px;}
+		.marker{
+		    position: absolute;
+		    top: 0.16rem;
+		    left: 0.2rem;
+		    pointer-events: none;
+		 	font-size: 0.2rem;
+		}
+		.marker img{
+		    max-height: 0.6rem;
+		}
+		.marker .playjoinbox{margin-left: 0.16rem;}
+		.marker .playjoined {
+			margin-left: 0.12rem;
+		    padding: 0.1rem 0.2rem;
+		    border-radius: 20px;
+		    background: rgba(0,0,0,.3);
+		    color: #fff;
+		}
+		.marker .playjoined i{
+			font-size: 0.26rem;
+		}
+		.marker .playjoined span{
+			margin-left: 0.1rem;
+		}
+		.vcp-bigplay{height:100%!important;opacity: 1;}
+		.vcp-bigplay .bigicon{
+			z-index: 65;
+		    position: absolute;
+		    top: 50%;
+		    left: 50%;
+		    width: 1.2rem;
+		    height: 1.2rem;
+		    cursor: pointer;
+		    transform: translate(-50%,-50%);
+		    background-size: cover;
+		    background-repeat: no-repeat;
+		    background-image:url("/{:WIMGURL}wechatlive/playicon3.png");
+		}
+		.vcp-panel-bg{background: linear-gradient(80deg,transparent,rgba(0,0,0,.8))!important;}
+		.vcp-dm-toggle{
+			position: relative;
+			width: 3em;
+		    height: 3em;
+		    float: right;
+		    cursor: pointer;
+		    z-index: 1001;
+		    color: #fff;
+		}
+		.vcp-dm-toggle i{font-size:2em;}
+		
+		.timerremain-box {
+			font-size: 0.36rem;
+		    color: #fff;
+		    padding: 0.32rem;
+		    background: rgba(0,0,0,.4);
+		    border-radius: 5px;
+			margin:0 auto;
+			width:100%;
+			text-align:center;
+		}
+		.timeremain strong{border:#CCC 1px solid;background:#FFF;color:#333;line-height:40px;font-size:14px;padding:5px;margin:0 5px;border-radius:3px;box-shadow:1px 1px 1px rgba(0,0,0,0.1);}
+		.timeremain .timeremain-title{line-height:35px;color:#fff;font-size:16px;}
+		.vcp-error-tips{font-size:0.3rem;color:#fff!important;}
+		/*七牛封面*/
+		.qiniucover{
+			position:absolute;
+			top:0;
+			left:0;
+			z-index:999;
+			width: 100%;
+			height: 100%;
+			background-image: url({:tomedia($appconfig['liveconfig']['poster'])});
+			background-size:cover;
+			color:#fff;
+		}
+		.qiniucover span{font-size: 1.52rem;}
+		/*20230619 新增*/
+		.vcp-poster.hidden{
+			display: none!important;
+		}
+		.vcp-qn-playtoggle {
+		    cursor: pointer;
+		    position: relative;
+		    z-index: 1001;
+		    width: 3em;
+		    height: 100%;
+		    float: left;
+		    background-image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB2aWV3Qm94PSIwIDAgMzYgMzYiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+DQogICAgPHBhdGggZD0iTTExLDEwIEwxOCwxMy43NCAxOCwyMi4yOCAxMSwyNiBNMTgsMTMuNzQgTDI2LDE4IDI2LDE4IDE4LDIyLjI4IiBmaWxsPSIjZmZmIj48L3BhdGg+DQo8L3N2Zz4=);
+		    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAQAAAD9CzEMAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAAmJLR0QAAKqNIzIAAAAJcEhZcwAAAFoAAABaAHAjuH0AAAAHdElNRQfgBRQSOydLEdPXAAABmUlEQVRYw+2Wu0oDQRhGz2oIEhAtBEHRQpIIXtAH0M7Kd7DQQl/BV/BlFEEsBO9IUAmI8X5Bi6RQoqgYJYr5LMISE5LdmZhyT7mzO9/8Z3b/WQgICAjwxak9JLPbfGiqfwGNCBhkmj4cECqryJyQ52iMWeIccsI9eVfav4tyEZrSjwpKaUHj6lKLHFnXEvIZd3CI080k6yyRJGdryi8AIEyYdtoYZJ9NEnzYyDIJKM7VQw8DROnnmGseihJNY6oiNKWCyvnRq5Y1o6jaFXJ3xMuaaQUuTbQywSgXLLLGXeMU/ZUVoZcOOhljj23OXVnVVdkHFIkwwgBDxEhwRpq3OuaougeV5HWsefXX3ge/XmQiOezloV5FAN+cssEB52QaH/DBNanSJjcyQHySrXxNa39stgEF3tlimR2yvJs8YBfwRIJ1klzyWLro3SpMA0SaG5LssMuL2dTmAV/kyJS3a/MG5xcg4IpVVrjlmbz9uekdkOOILRKkikemuRgjhIY1p7ia7Q/KEn7/RY6t80r8elF9yw4ICAiw4xcxfsNvJiWE7gAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAxNi0wNS0yMFQxODo1OToxOCswODowMJKBy7cAAAAldEVYdGRhdGU6bW9kaWZ5ADIwMTYtMDUtMjBUMTg6NTk6MzkrMDg6MDAHjn/CAAAAPHRFWHRzdmc6YmFzZS11cmkAZmlsZTovLy9EOi9zcGFjZS92Y19wbGF5ZXIvc3JjL2ltZy9wbGF5X2J0bi5zdmedrkudAAAAAElFTkSuQmCC)\0;
+		}
+		.vcp-playing .vcp-qn-playtoggle {
+		    background-image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB2aWV3Qm94PSIwIDAgMzYgMzYiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+DQogICAgPHBhdGggZD0iTTExLDEwIEwxNywxMCAxNywyNiAxMSwyNiBNMjAsMTAgTDI2LDEwIDI2LDI2IDIwLDI2IiBmaWxsPSIjZmZmIj48L3BhdGg+DQo8L3N2Zz4=);
+		    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAQAAAD9CzEMAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAAmJLR0QAAKqNIzIAAAAJcEhZcwAAAFoAAABaAHAjuH0AAAAHdElNRQfgBRQTADNsu4KlAAAAfklEQVRYw+2WsQ2AMAwEPyiZimloWIqOhjHYg1VAMi1Ejo2l0P2VH/kvnQ0QQohLaj9Jl6ocnBInDwpGzI+qgh0LxMhjCGSSN5skaeY6g+m4qn+dTh4WdIACCiiggAIKfEGulntxcrXC4sBaLXc7V/DuosDZolf9fngRQsgHbrk8P6SPYKxbAAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDE2LTA1LTIwVDE5OjAwOjI0KzA4OjAwi3r4LQAAACV0RVh0ZGF0ZTptb2RpZnkAMjAxNi0wNS0yMFQxOTowMDo1MSswODowMKLaZi8AAAA8dEVYdHN2ZzpiYXNlLXVyaQBmaWxlOi8vL0Q6L3NwYWNlL3ZjX3BsYXllci9zcmMvaW1nL3N0b3BfYnRuLnN2Z0xvOgsAAAAASUVORK5CYII=)\0;
+		}
+		/*广告*/
+		.loadadvbox{
+			position: fixed;
+			top: 0;
+			left: 0;
+			height: 100%;
+			width: 100%;
+			background-color: #fff;
+			z-index: 10;
+		}
+		.loadadvbox .loadadv-main{
+			width: 30px;
+			height: 30px;
+		}
+		.loadadvbox .loadadv-icon{
+			width: 100%;
+		    height: 100%;
+		    margin: 0 auto;
+		    border: 2px solid #999;
+		    border-radius: 50%;
+		    border-left-color: transparent;
+		    border-right-color: transparent;
+		    animation: cssload-spin .4s infinite linear;
+		    -webkit-animation: cssload-spin .4s infinite linear;
+		}
+		@keyframes cssload-spin{100%{transform:rotate(360deg);transform:rotate(360deg)}}
+		.advbox{
+			position: fixed;
+			top: 0;
+			left: 0;
+			z-index: 10;
+		}
+		.advdjsbox{
+			position: absolute;
+			top: 0.52rem;
+			right: 0;
+			height: 0.72rem;
+			line-height: 0.72rem;
+			background-color: rgba(0,0,0,0.5);
+			color: #fff;
+			border-top-left-radius:8px;
+			border-bottom-left-radius:8px;
+			padding: 0 0.2rem;
+			font-size: 0.32rem;
+		}
+		.advdjsbox span{margin:0 0.1rem;}
+		.advimg{
+			position: absolute;
+		    top: 0;
+		    left: 0;
+		    width: 100%;
+		    height: auto;
+		    z-index: 0;
+		    margin-bottom: 0;
+		}
+		.h5-touchimg{
+			position: fixed;
+			opacity: 0;
+			z-index: -1;
+			display: none;
+			user-drag:none;
+			-webkit-user-drag: none;
+		}
+		
+		.limitbox{
+		  white-space: nowrap;
+		    word-break: break-all;
+		    text-overflow: ellipsis;
+		    overflow: hidden;
+		}
+		/*直播底部内容*/
+		.main-live {
+		   height: calc(100vh - 56.25vw);
+		   display: flex;
+		   flex-direction: column;
+		   position: relative;
+		   background: var(--block-bg-color);
+		   overflow: hidden;
+		   width: 100%;
+		}
+		.main-live .tab-content{
+			position: relative;
+			height:calc(100% - 0.78rem);
+			width: 100%;
+			overflow: hidden;
+		}
+		.tab-menu {
+		    width: 100%;
+		    box-sizing: border-box;
+		    display: flex;
+		    overflow-x: auto;
+		    overflow-y: hidden;
+		    border-bottom: 1px solid var(--tab-line-color);
+		    justify-content: space-evenly;
+		}
+		.tab-menu-item {
+		    display: inline-block;
+		    white-space: nowrap;
+		    cursor: pointer;
+		    position: relative;
+		    padding: .2rem;
+		    font-size: .26rem;
+		    color: var(--tab-font-color)
+		}
+		.tab-menu-item.active {
+		    color: var(--tab-font-active-color)
+		}
+		.tab-menu-item.active:after {
+		    width: 100%
+		}
+		.tab-menu-item:after {
+		    content: "";
+		    display: inline-block;
+		    position: absolute;
+		    bottom: 0;
+		    left: 50%;
+		    transform: translateX(-50%);
+		    height: 2px;
+		    width: 0;
+		    background-color: var(--font-active-color);
+		    transition: all .2s
+		}
+		
+		{/*邀请榜*/}
+		.zam-app-invite-box{
+		    display: flex;
+		    flex-direction: column;
+		    width: 100%;
+		    height: 100%;
+		    overflow: auto;
+		}
+		.zam-app-invite-box.hidden{display: none!important}
+		.zam-app-nodata img{
+			width: 3.62rem;
+		}
+		.zam-app-invite-main {
+		    flex: 1;
+		    padding: 0.32rem 0.4rem 0 0.5rem;
+		}
+		.zam-app-invite-item {
+			display:flex;
+			align-items:center;
+			margin-bottom:.32rem;
+		}
+		.zam-app-invite-item-number {
+			width:0.6rem;
+			margin-right:0.6rem;
+			text-align:center
+		}
+		.zam-app-invite-item-number>img {
+			width:100%;
+			height:100%
+		}
+		.zam-app-invite-item-number>span {
+			display:inline-block;
+			width:0.6rem;
+			height:0.6rem;
+			background:#f5f6f7;
+			border-radius:50%;
+			line-height:0.6rem;
+			font-size:.32rem;
+			font-weight:800;
+			color:#60646b
+		}
+		.zam-app-invite-item-avatar {
+			width:0.94rem;
+			height:0.94rem;
+			border-radius:50%;
+			margin-right:0.6rem
+		}
+		.zam-app-invite-item-info {
+			display:flex;
+			flex-direction:column;
+			justify-content:space-between;
+			height:100%;
+			width: calc(100% - 2.74rem);
+		}
+		.zam-app-invite-item-info .invite-nickname {
+			margin-bottom:.1rem;
+			font-size:.32rem;
+			font-weight:400;
+		}
+		.zam-app-invite-item-info .invite-person{font-size: 0.26rem;margin-bottom: 0.1rem}
+		.zam-app-invite-item-info .invite-person span {
+			margin:0 0.1rem;
+			color:{$appconfig['menuconfig']['activecolor']};
+		}
+		{/*聊天互动*/}
+		.zam-app-msg-box{height: 100%;width: 100%;overflow: hidden;}
+		.zam-app-msg-box .zam-app-msg-scroll{width:100%;overflow:hidden;position:relative;}
+		.zam-app-msg-scroll:before {
+		    content: '';
+		    display: block;
+		    width: 100%;
+		    height: 40px;
+		}
+		.zam-pulldown-box{width:100%;height:40px;position:absolute;left:0;top:-40px;text-align:center}
+		.zam-pulldown-box .pulldownRefresh{display:none;width:30px;height:30px}
+		.zam-pulldown-box .pulldownRefresh .pulldownRefresh-loading{width:20px;height:20px;margin:0 auto;border:2px solid #333;border-radius:50%;border-left-color:transparent;border-right-color:transparent;animation:cssload-spin .4s infinite linear;-webkit-animation:cssload-spin .4s infinite linear}
+		@keyframes cssload-spin{100%{transform:rotate(360deg);transform:rotate(360deg)}}
+		.zam-pulldown-box .pulldownOver{font-size:14px;position:relative;display:none}
+		.zam-pulldown-box .pulldownOver i{font-size:15px;position:absolute;top:-1px;left:-25px}
+		.zam-pulldown-box .pulldownTxt{font-size:14px;position:relative}
+		.zam-pulldown-box .pulldownTxt i{font-size:16px;position:absolute;top:-1px;left:-25px}
+		.zam-app-msglist{padding:.4rem .3rem 0.8rem .3rem;width:100%;position:relative;min-height:100.5%}
+		.zam-app-msglist .zam-app-msg-item{
+			position: relative;
+		    max-width: 100%;
+		    margin: 0.2rem 0 0.4rem;
+		}
+		.zam-app-msglist .zam-app-msg-user{width: 100%;}
+		.zam-app-msglist .zam-app-msg-user .userAvatar{width:.68rem;height:.68rem;border-radius:100%}
+		.zam-app-msglist .zam-app-msg-user .userName{
+			margin-left: 0.12rem;
+		    max-width: 2.6rem;
+		    height: 0.42rem;
+		    font-size: 0.24rem;
+		}
+		.zam-app-msglist .zam-app-msg-text{
+			max-width: 72%;
+		    margin-top: -0.28rem;
+		    margin-left: 0.82rem;
+		    border-radius: 0.02rem 0.06rem 0.06rem 0.06rem;
+		    padding: 0.06rem 0.1rem;
+		    word-break: break-all;
+		    color: var(--chat-item-color);
+		}
+		.zam-app-msglist .msgTime{width:100%;height:.42rem;line-height:.42rem;position:absolute;text-align:center;top:-.42rem;left:0;color:var(--chat-time-color);font-size:.24rem}
+		.zam-app-msglist .zam-app-msg-text .msgtxt{background: var(--chat-item-bg-color);padding:0.1rem .18rem;font-size:.26rem;box-sizing: content-box;}
+		.zam-app-msglist .zam-app-msg-text .faceImg{width:0.26rem;height:0.26rem;display:inline-block;vertical-align:middle}
+		.zam-app-msglist .zam-app-msg-text .msgtxt.bptopbg{padding-right:.72rem;background-image:url(/static/images/wechat/baping/bptopbg.png);background-size:100% 100%}
+		.zam-app-msglist .zam-app-msg-text .msgtxt.bptopbg .app-bptheme-name{display:inline-block;margin-right:.2rem}
+		.zam-app-msglist .zam-app-msg-text .msgtxt.dstopbg{padding-right:.72rem;background-image:url(/static/images/wechat/baping/dstopbg.png);background-size:100% 100%}
+		.zam-app-msglist .zam-app-msg-text .msgtxt.songtopbg{padding-right:.72rem;background-image:url(/static/images/wechat/baping/songtopbg.png);background-size:100% 100%}
+		.zam-app-msglist .zam-app-msg-text .msgtxt.bptxt{height:auto;line-height:normal}
+		.zam-app-msglist .zam-app-msg-text .msgtxt.songinfotxt{height:auto;line-height:normal;padding:.1rem}
+		.zam-app-msglist .zam-app-msg-text .msgtxt.isrelative{position:relative;left:0;top:0}
+		.zam-app-msglist .zam-app-msg-text .msgtxt .txt-Icon{position:absolute;right:-.17rem;top:-.05rem;z-index:1;width:.8rem;height:.8rem;border:1px solid #f8b551;background-color:#4f1f13;border-radius:50%;background-size:cover}
+		.zam-app-msglist .zam-app-msg-text .msgtxt .txt-Icon.txt-bpIcon{background-image:url(/static/images/wechat/baping/appbpicon.png)}
+		.zam-app-msglist .zam-app-msg-text .msgtxt .txt-Icon.txt-dsIcon{background-image:url(/static/images/wechat/baping/ds/appdsicon.png)}
+		.zam-app-msglist .zam-app-msg-text .msgtxt .txt-Icon.txt-songIcon{background-image:url(/static/images/wechat/baping/song/appsongicon.png)}
+		.zam-app-msglist .zam-app-msg-text img{max-width:100%;vertical-align:middle;margin:0 auto}
+		.zam-app-msglist .zam-app-msg-text .bpimgs{width:4.6rem}
+		.zam-app-msg-hb{position:relative;display:inline-block;width:3rem;height:3.8rem}
+		.zam-app-msg-hb-cover{position:absolute;width:100%;height:100%;left:0;top:0}
+		.zam-app-msg-hb-txt{width:100%;padding:0 10px;margin-top:.8rem;box-sizing:border-box;position:relative}
+		.zam-app-msg-hb-txt span{color:#fff;font-size:.32rem;font-weight:700;text-align:center}
+		.zam-app-msglist .zam-app-msg-text .bpimgone{width:2.26rem;height:2.26rem;margin:.02rem;overflow:hidden}
+		.zam-app-msglist .zam-app-msg-text .bpimgone img{vertical-align:middle;width:100%}
+		.zam-app-msglist .zam-app-msg-text .bpvideoBox{position:relative;top:0;left:0}
+		.zam-app-msglist .zam-app-msg-text .bpvideoBox i.msg-videoicon{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:1.02rem;cursor:pointer}
+		.playbpvideo{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0);z-index:5}
+		.closevideo{position:absolute;top:20px;left:0;height:40px;line-height:40px;text-align:center;width:100%;color:#fff;font-size:.4rem margin:0 auto;z-index:1}
+		.zam-app-msg-box .zam-app-msg-footerbar{
+			position: fixed;
+		    bottom: 0;
+		    left: 0;
+			padding:0;
+			z-index:2;
+			border:0;
+			background-color: #f8f8f8!important;
+		    color: #333;
+			width: 100%;
+		    display: -webkit-box;
+		    display: -webkit-flex;
+		    display: -ms-flexbox;
+		    display: flex;
+		    -webkit-box-align: center;
+		    -webkit-align-items: center;
+		    -ms-flex-align: center;
+		    align-items: center;
+		}
+		.zam-app-msg-box .zam-app-msg-footerbar:after{
+			border:0;
+		}
+		.zam-app-msg-box .zam-app-msg-footerbar .zam-app-msg-inputbox{
+			margin:0px;
+		}
+
+		.zam-app-msg-box .zam-app-msg-footerbar .zam-app-msg-inputbox .zam-input-box{
+			background:none;
+			border-radius:0;
+			border:0;
+			padding-right:0;
+		}
+		.zam-app-msg-box .zam-app-msg-footerbar .zam-app-msg-inputbox input{
+			height:0.8rem;
+			color:#333;
+			margin:0;
+			background-color:#fff;
+			border-radius:6px;
+			text-indent:5px;
+			border: 1px solid #d8d8d8;
+		}
+		.zam-app-msg-box .zam-app-msg-footerbar .zam-app-msg-inputbox .zam-btn-send{
+			display:inline-block;
+		    font-size: 0.32rem;
+			width: 1.3rem;
+		    margin: 0 10px 0 0;
+		    height: 0.68rem;
+			line-height: 0.68rem;
+		    text-align: center;
+			background-color: #00aeff;
+		    color: #fff;
+			border-radius:3px;
+			-webkit-user-select:none;
+		    user-select:none;
+		}
+		.zam-btn-disabled{
+			background-color: #ccc!important;
+		    color: #F0F0F0!important;
+		    pointer-events: none;
+			-webkit-user-select:none;
+		    user-select:none;
+		}
+		.zam-app-msg-faceicon {
+		    width: 0.6rem;
+		    margin: 0 5px;
+		    height: 0.75rem;
+		}
+		.zam-app-msg-faceicon i {
+		    font-size: 0.6rem;
+		}
+		.zam-app-facebox{
+			position:relative;
+			width:100%;
+			z-index:1;
+		}
+		.zam-app-facebox .emo-list {
+		    padding-top:2px;
+		    padding-bottom: 15px;
+		}
+		
+		.zam-app-facebox .emo-list li {
+		    cursor: pointer;
+		    float: left;
+		    text-align: Center;
+		    list-style: none;
+		    width: 14.2%;
+		    margin: .1rem 0;
+			-webkit-user-select:none;
+		    user-select:none;
+		}
+		.zam-app-facebox .emo-list li.delemojili{
+			margin:0;
+		}
+		.zam-app-facebox .emo-list li img {
+		    cursor: pointer;
+		    width: 24px;
+		    height: 24px;
+		}
+		.zam-app-facebox .emo-list li  img.delemoji{
+			width:38px;
+			height:38px;
+		}
+		.zam-app-facebox .emo-page{bottom:-5px!important;pointer-events: none;}
+		.newjoin-enter{
+		    height:0.52rem;
+		  	line-height: 0.52rem;
+		    position: absolute;
+		    top:0.52rem;
+		    left: 100%;
+		    background: url("/static/images/wechat/msg/newjoin.png") no-repeat;
+		    background-size: 100% 100%;
+		    font-size: 0.24rem;
+		    color: #fff;
+		    transition: all 0.4s;
+		    -moz-transition: all 0.4s;
+		    -webkit-transition: all 0.4s;
+		    -o-transition: all 0.4s;
+		    opacity: 0;
+		}
+		.newjoin-enter.movein {
+			left: 0;opacity: 1;
+		}
+		.newjoin-enter.moveout {
+			left: -100%;opacity: 0;
+		}
+		.newjoin-enter .name {
+			max-width:2.3rem;padding-left: 0.06rem;
+		}
+		.newjoin-enter .text {
+			width:0.8rem;
+			padding-left: 0.1rem;
+		}
+		{volist name="bpthemes" id="bptheme"}
+		.zam-app-msglist .zam-app-msg-text .msgtxt.app-bptheme-{$bptheme['id']}{background-image: url("{:tomedia($bptheme['themeconfig']['apptopbg'])}");}
+		.zam-app-msglist .zam-app-msg-text .msgtxt.app-bptheme-{$bptheme['id']} .txt-bpIcon{background-image: url("{:tomedia($bptheme['themeconfig']['bpappicon'])}");}
+		{/volist}
+		/*打赏礼物样式*/
+		{volist name="dsgifts" id="dsgift"}
+		.zam-app-msglist .zam-app-msg-text .msgtxt.app-dstheme-{$dsgift['id']}{background-image: url("{:tomedia($dsgift['giftconfig']['gifttopbg'])}");}
+		.zam-app-msglist .zam-app-msg-text .msgtxt.app-dstheme-{$dsgift['id']} .txt-dsIcon{background-image: url("{:tomedia($dsgift['giftconfig']['giftappicon'])}");}
+		{/volist}
+</style>
+</head>
+<body>
+<section class="zam-app-wechatlive">
+<div class="video_wrap" id="videoLive">
+	{if $appconfig['liveconfig']['status']=='1' || $appconfig['liveconfig']['status']=='3'}
+	<div class="waitendbox zam-app-flex-ajCenter">
+		{if $appconfig['liveconfig']['status']=='1' && $djs['status']=='1'}
+			<div class="timeremain">
+				<div class="timerremain-box">
+					<div class="timeremain-title"><i class="mxc-unie6b2"></i> <span>距离直播开始时间</span></div>
+					<strong id="timeremain-day">0天</strong>
+					<strong id="timeremain-hour">0时</strong>
+					<strong id="timeremain-min">00分</strong>
+					<strong id="timeremain-sec">00秒</strong>
+				</div>
+			</div>
+		{/if}
+		<div class="waitendtip">{if $appconfig['liveconfig']['status']=='1'}{$appconfig['liveconfig']['nostart']}{else /}{$appconfig['liveconfig']['stoptxt']}{/if}</div>
+		{if $appconfig['liveconfig']['status']=='1' && !empty($sublivetplid) && $hadsublivetpl=='2'}
+			{include file="wechatlive/sublivebtn" /}
+		{/if}
+	</div>
+	{elseif $appconfig['liveconfig']['status']=='4' && isset($appconfig['liveconfig']['backurl']['urltype']) && $appconfig['liveconfig']['backurl']['urltype']=='2'}
+		{if isset($appconfig['liveconfig']['backurl']['iframe']) && !empty($appconfig['liveconfig']['backurl']['iframe'])}
+			{:$appconfig['liveconfig']['backurl']['iframe']}
+		{else /}
+			<p class="erroriframetxt">回放状态下未设置第三方视频分享代码块</p>
+		{/if}
+	{/if}
+</div>
+{if $appconfig['mobilelive']['menuconfig']['open']=='1' && $hasmenu}
+<div class="main-live">
+<ul class="tab-menu">
+{foreach $appconfig['mobilelive']['menuconfig']['menus'] as $pkey=>$pmenu}
+{if $pmenu['mobilemenustatus']=='1'}
+<li class="tab-menu-item" data-type="{$pmenu['mobilemenutype']}"{if $pmenu['mobilemenutype']=='2'} data-phbnum="{$pmenu['mobilephbnum']??'20'}"{/if}>{$pmenu['mobilemenuname']}</li>
+{/if}
+{/foreach}
+</ul>
+<section class="tab-content">
+<div class="zam-app-msg-box zam-app-flex hidden" data-type="1">
+	<div class="zam-app-msg-scroll">
+        <ul class="zam-app-msglist"></ul>
+		<!-- 顶部提示信息 -->
+		<div class="zam-pulldown-box zam-app-flex-ajCenter">
+			<div class="pulldownOver"><i class="mxc-roundcheck"></i>加载完成</div>
+			<div class="pulldownRefresh"><div class="pulldownRefresh-loading"></div></div>
+			<span class="pulldownTxt"><i class="mxc-refresharrow"></i>下拉加载，释放刷新</span>
+		</div>
+		<div class="newjoin-enter limitbox zam-app-flex">
+			<div class="name">...</div>
+			<div class="text">已加入</div>
+		</div>
+    </div>
+	<footer class="zam-app-msg-footerbar msgfooterbar">
+        <div class="zam-input-item zam-app-msg-inputbox">
+			<div class="zam-input-box zam-app-flex-ajCenter2">
+				<input type="text" name="content" class="cell-input zam-app-cell-input app-msg-txtInput" placeholder="说点什么吧~" autocomplete="off" maxlength="30">
+				<a href="javascript:;" class="zam-app-msg-faceicon zam-app-flex-ajCenter2"><i class="mxc-emoji"></i></a>
+				<span class="zam-btn-send btn-send-data zam-btn-disabled">发送</span>
+			</div>
+			<div class="zam-app-facebox zam-app-facewrapper hidden"></div>
+		</div>
+		<div class="stoplayer"></div>
+    </footer>
+</div>
+<div class="zam-app-invite-box hidden" data-type="2">
+	<div class="zam-app-invite-main"></div>
+	<div class="zam-app-nodata zam-app-flex-ajCenter flex1 hidden">
+		<img src="/static/images/sys/empty.png" />
+	</div>
+</div>
+</section>
+</div>
+{/if}
+</section>
+<script id="msg-tpl" type="text/html">
+	<li class="zam-app-msg-item appmsg-<% d.id %>" >
+		<p class="msgTime"><% d.create_time %></p>
+		<div class="zam-app-msg-user zam-app-flex">
+			<img class="userAvatar" src="<% d.avatar %>">
+			<div class="userName limitbox"><% d.nickname %></div>
+		</div>
+		<div class="zam-app-msg-text zam-app-flex<%#  if(d.type > 2){ %> zam-app-directionColumn<%#  } %>" <%#  if(d.type > 2){ %>style="padding:0"<%#  } %>>
+				<%#  if(d.type == '1'){ %>
+				<div class="msgtxt"><% d.content %></div>
+				<%#  }else if(d.type == '2'){ %>
+				<img class="wechatImg needwait" src="<% d.content %>" />
+				<%#  }else if(d.type == '3'){ %>
+					<div class="msgtxt isrelative bptopbg app-bptheme-<% d.themeid %>"><span class="app-bptheme-name"><% d.content.bpname %></span><span class="app-bptheme-seconds"><% d.content.bptime %>秒</span><div class="txt-Icon txt-bpIcon"></div></div>
+					<%#  if(d.content.bpimgs){ %>
+					<div class="bpimg<%# if(d.content.bpimgs.length>1){ %> bpimgs zam-app-flex zam-app-flex-wrap<%# } %>">
+						<%#  if(d.content.bpimgs.length>1){ %>
+							<%#  $.each(d.content.bpimgs, function(index, item){ %>
+								<div class="bpimgone zam-app-flex-ajCenter2">
+									<img class="needwait" src="<% item %>" />
+								</div>
+							<%# }) %>
+						<%#  }else{ %>
+							<img class="wechatImg needwait" src="<% d.content.bpimgs[0] %>" />
+					    <%# } %>
+					</div>
+					<%#  } %>
+					<%#  if(d.content.bpvideo){ %>
+						<div class="bpvideoBox">
+							<img class="needwait" src="<% d.content.bpvideo.video %>.jpg" />
+							<i class="mxc-videofill msg-videoicon" data-video="<% d.content.bpvideo.video %>"></i>
+						</div>
+					<%#  } %>
+					<%#  if(d.content.bptxt&&d.content.bptxt!=''){ %>
+						<div class="msgtxt bptxt"><% d.content.bptxt %></div>
+					<%#  } %>
+				<%#  }else if(d.type == '4'){ %>
+					<div class="msgtxt isrelative dstopbg app-dstheme-<% d.themeid %>">
+						打赏<span class="app-gift-name">[<% d.content.giftname %>]</span>给
+						<span class="app-artist-name">[<% d.content.artistname %>]</span>
+						<div class="txt-Icon txt-dsIcon"></div>
+					</div>
+					<%#  if(d.content.artistavatar){ %>
+					<div class="bpimg">
+						<img class="wechatImg needwait" src="<% d.content.artistavatar %>" />
+					</div>
+					<%#  } %>
+					<%#  if(d.content.dstxt&&d.content.dstxt!=''){ %>
+						<div class="msgtxt bptxt"><% d.content.dstxt %></div>
+					<%#  } %>
+				<%#  }else if(d.type == '5'){ %>
+					<span class="zam-app-msg-hb" data-hbid="<% d.id %>" data-hbtype="<% d.content.hbtype %>" data-totalnum="<% d.content.hbnum %>">
+						<img class="zam-app-msg-hb-cover needwait" src="/{:WIMGURL}baping/<%# if(d.content.hbtype=='2'){ %>ling.png<%#  }else{ %>ping.png<%#  } %>?t=1" />
+						<div class="zam-app-msg-hb-txt zam-app-flex zam-app-justifyCenter"><span><%# if(d.content.hbtype=='2'){ %><% d.content.kouling %><%#  }else{ %><% d.content.hbtxt %><%#  } %></span></div>
+					</span>
+				<%#  }else if(d.type == '6'){ %>
+					<div class="msgtxt isrelative songtopbg">
+						点歌1首<div class="txt-Icon txt-songIcon"></div>
+					</div>
+					<div class="msgtxt songinfotxt"><% d.content.songname %> - <% d.content.artistname %></div>
+					<%#  if(d.content.artistavatar){ %>
+					<div class="bpimg">
+						<img class="wechatImg needwait" src="<% d.content.artistavatar %>" />
+					</div>
+					<%#  } %>
+					<%#  if(d.content.songtxt&&d.content.songtxt!=''){ %>
+						<div class="msgtxt bptxt"><% d.content.songtxt %></div>
+					<%#  } %>
+				<%#  } %>
+		</div>
+		<%#  if(d.ismanager === '1'){ %>
+			<div class="zam-app-msg-control" data-msgid="<% d.id %>" data-userid="<% d.user_id %>"><span class="delmsg">删除</span><span class="addblack">拉黑</span><%# if(d.type > '2' && d.type!='5'){ %><span class="bpreshow">重新显示</span><%# } %></div>
+		<%#  } %>
+	</li>
+</script>
+<script id="yqb-tpl" type="text/html">
+	<%#  $.each(d.list, function(index, item){ %>
+		<div class="zam-app-invite-item">
+			<div class="zam-app-invite-item-number"><%#  if(index < 3){ %><img src="/{:SIMGURL}pclive/<% index+1 %>.png"><%#  }else{ %><span><% index+1 %></span><%#  } %></div>
+			<img class="zam-app-invite-item-avatar" src="<% item.avatar %>">
+			<div class="zam-app-invite-item-info">
+				<p class="invite-nickname limitbox"><% item.nickname %></p>
+				<span class="invite-person"><b>邀请了<span><% item.num %></span>人</b></span>
+			</div>
+		</div>
+	<%# }) %>
+	<div class="loadmore-btn hidden"><span style="cursor: pointer;">加载更多</span></div>
+</script>
+<script id="marker-tpl" type="text/html">
+<div class="fulldmBox"></div>
+<div class="marker">
+	<div class="playjoinbox zam-app-flex zam-app-alignCenter">
+		{if !empty($appconfig['liveconfig']['logo'])}
+		<img src="{:tomedia($appconfig['liveconfig']['logo'])}" >
+		{/if}
+		{if isset($appconfig['liveconfig']['showjoin']) && $appconfig['liveconfig']['showjoin']=='1'}
+		<div class="playjoined"><i class="mxc-attention"></i><span>{$joinednum}</span></div>
+		{/if}
+	</div>
+</div>
+{include file="mobilelive/fulldm" /}
+</script>
+<script type="text/javascript">
+	var playerstatus = "{$appconfig['liveconfig']['status']}",remainSec={if $djs['status']=='1'}parseInt("{$djs['remaintime']}"){else /}0{/if},showjoin = {if isset($appconfig['liveconfig']['showjoin']) && $appconfig['liveconfig']['showjoin']=='1'}true{else /}false{/if},chatmodule = "{$chatmodule}",appjointip = "{if isset($chatconfig['appjointip'])}{$chatconfig['appjointip']}{else /}{$chatconfig['appshowjoin']}{/if}",poster = "{:tomedia($appconfig['liveconfig']['poster'])}",dmconfig = {if !empty($appconfig['dmconfig'])}{:json_encode($appconfig['dmconfig'])}{else /}false{/if};
+	var platformtype = "{$appconfig['liveconfig']['liveurl']['platform']??'0'}",thirdtype = "{$appconfig['liveconfig']['liveurl']['thirdtype']??'1'}",liveurl = '',webrtcurl = '',backurltype = "{$appconfig['liveconfig']['backurl']['urltype']??'1'}";
+	if(playerstatus=='2' || (playerstatus=='4' && backurltype=='1')){
+		if(playerstatus=='2'){
+			liveurl = "{:$appconfig['liveconfig']['liveurl']['m3u8']??''}";
+			webrtcurl = "{:$appconfig['liveconfig']['liveurl']['webrtc']??''}";
+			if(platformtype=='1'){
+				liveurl = "{:$appconfig['liveconfig']['liveurl']['txm3u8']??''}";
+				var txopenwebrtc = "{$appconfig['liveconfig']['liveurl']['txopenwebrtc']??2}";
+				if(txopenwebrtc=='1'){
+					webrtcurl = "{:$appconfig['liveconfig']['liveurl']['txwebrtc']??''}";
+				}
+				thirdtype = '1';
+			}else if(platformtype=='2'){
+				liveurl = "{:$appconfig['liveconfig']['liveurl']['qinium3u8']??''}";
+				var qiniuopenwebrtc = "{$appconfig['liveconfig']['liveurl']['qiniuopenwebrtc']??2}";
+				if(qiniuopenwebrtc=='1'){
+					webrtcurl = "{:$appconfig['liveconfig']['liveurl']['qiniuwebrtc']??''}";
+				}
+				thirdtype = '2';
+			}
+		}else{
+			liveurl = "{:$appconfig['liveconfig']['backurl']['m3u8']??''}";
+		}
+	}
+	var vh = $(window).width() * 9 / 16;
+	$(".video_wrap").css('height',vh+'px');
+	$(".main-live").css('height','calc(100% - '+vh+'px)');
+	require(['mobilecore'],function(mobilecore){
+		mobilecore.init();
+	});
+	//阻止safari浏览器双击放大功能
+    let lastTouchEnd = 0  //更新手指弹起的时间
+    document.documentElement.addEventListener("touchstart", function (event) {
+        //多根手指同时按下屏幕，禁止默认行为
+        if (event.touches.length > 1) {
+          event.preventDefault();
+        }
+      });
+      document.documentElement.addEventListener("touchend", function (event) {
+        let now = (new Date()).getTime();
+        if (now - lastTouchEnd <= 300) {
+         //当两次手指弹起的时间小于300毫秒，认为双击屏幕行为
+          event.preventDefault();
+        }else{ // 否则重新手指弹起的时间
+          lastTouchEnd = now;
+        }
+      }, false);
+      //阻止双指放大页面
+      document.documentElement.addEventListener("gesturestart", function (event) {
+        event.preventDefault();
+      });
+</script>
+</body>
+</html>

@@ -1,0 +1,306 @@
+{include file='$Wpath/common/header'}
+<style type="text/css">
+.userprofile-table tbody tr td{
+  height: 60px;
+  font-size: 14px;
+  color: #4c4c4c;
+  white-space: normal;
+  overflow: hidden;
+  word-break: break-all;
+  vertical-align: middle;
+  padding: 14px 0;
+}
+.userprofile-table>tbody>tr>td img{
+  max-width: 100%;
+}
+.userprofile-table>tbody>tr>td:first-child{
+    padding-left: 14px;
+}
+.userprofile-table>tbody>tr:first-child>td{
+    border-top: 0;
+}
+</style>
+<table class="table table-hover userprofile-table">
+  <thead>
+    <th width="200px"></th>
+    <th></th>
+    <th width="120px"></th>
+  </thead>
+  <tbody>
+  <tr>
+    <td class="table-label">头像</td>
+    <td><img src="{:tomedia($user['user_avatar'])}" class="img-circle" width="65px" height="65px" onerror="javascript:this.src='{:tomedia($siteinfo['siteavatar'])}';"></td>
+    <td><div class="link-group"><a class="changeAvatar" href="javascript:;">修改</a></div></td>
+  </tr>
+  <tr>
+    <td class="table-label">用户名</td>
+    <td>
+      <div>{$user['user_name']}</div>
+      <div class="m-t-5">
+        <span>有效期至：</span>
+        {if !empty($user['loginlimittime'])}
+        <span class="text-danger">{:date('Y-m-d H:i:s',$user['loginlimittime'])}</span>
+        {else/}
+        <span class="text-gray">永久有效</span>
+        {/if}
+      </div>
+    </td>
+    <td><div class="link-group hidden"><a class="changeUsername" href="javascript:;">修改</a></div></td>
+  </tr>
+  {if !empty($usergroupinfo['groupname'])}
+  <tr>
+    <td class="table-label">{if dzversionlive()}当前版本{else /}用户组{/if}</td></td>
+    <td>
+        <div>{$usergroupinfo['groupname']}</div>
+        {if $usergroupinfo['isfree'] == '1'}
+          {if !empty($usergroupinfo['freeendtime'])}
+          <div class="m-t-5">
+            <span>有效期至：</span>
+            <span class="text-danger">{:date('Y-m-d H:i:s',$usergroupinfo['freeendtime'])}</span>
+          </div>
+          {/if}
+        {/if}
+    </td>
+    <td>{if dzversionlive()}<div class="link-group"><a href="https://qingzhan.yanhuayu.com/UyALN" target="__blank">查看版本区别</a></div>{/if}</td>
+  </tr>
+  {/if}
+  <tr>
+    <td class="table-label">密码</td>
+    <td>********</td>
+    <td><div class="link-group"><a class="changePassword" href="javascript:;">修改</a></div></td>
+  </tr>
+  <tr>
+    <td class="table-label">绑定手机号</td>
+    <td><span class="bind-wxname" style="display:inline-block;font-size:16px;">{if !empty($user['user_mobile'])}{:substr_replace($user['user_mobile'],'****',3,4)}{else}-{/if}</span></td>
+    <td><div class="link-group"><a class="bindmobile" href="javascript:;">{if !empty($user['user_mobile'])}修改{else /}立即绑定{/if}</a></div></td>
+  </tr>
+  <tr class="binduserwx" data-userid="{$user['id']}">
+    <td class="table-label">绑定登录微信</td>
+    <td><span class="bind-wxname" style="display:inline-block;font-size:16px;">{if !empty($user['user_openid'])}{:substr_replace($user['user_openid'],'**********',6,12)}{else}-{/if}</span></td>
+    <td><div class="link-group"><a class="bindwx" href="javascript:;">修改</a></div></td>
+  </tr>
+  {if $showsm=='1'}
+  <tr class="myshimingbox" data-userid="{$user['id']}">
+    <td class="table-label">实名认证</td>
+    <td>
+      {if empty($user['user_shiming'])}
+      <span class="text-danger">暂未实名认证</span>
+      {else /}
+      <span>
+        <span>{$user['user_shiming']['name']}</span>
+        <span class="m-l-5 m-r-5">/</span>
+        <span>{$user['user_shiming']['sfz']}</span>
+      </span>
+      {/if}
+    </td>
+    <td><div class="link-group">{if empty($user['user_shiming'])}<a class="sfzconfirm" href="javascript:;">立即实名</a>{else /}<span class="text-gray">已实名</span>{/if}</div></td>
+  </tr>
+  {/if}
+  <tr>
+    <td class="table-label">上次登录时间</td>
+    <td>{if !empty($user['last_login_time'])}{:date('Y-m-d H:i:s',$user['last_login_time'])}{else/}-{/if}</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td class="table-label">上次登录IP</td>
+    <td>
+      {if !empty($user['last_login_ip'])}
+      <div>{$user['last_login_ip']}</div>
+      {if !empty($user['ipinfo'])}
+      <div class="m-t-5">
+        {$user['ipinfo']['countryname']}-{$user['ipinfo']['provincename']}-{$user['ipinfo']['cityname']}-{$user['ipinfo']['telecom']}
+      </div>
+      {/if}
+      {else/}
+      -
+      {/if}
+    </td>
+    <td></td>
+  </tr>
+  <tr>
+    <td class="table-label">注册时间</td>
+    <td>{if !empty($user['create_time'])}{$user['create_time']}{else/}-{/if}</td>
+    <td></td>
+  </tr>
+</tbody>
+</table>
+<script>
+var needsm = "{$needsm}";
+require(['webcore','webtable','jconfirmBox','zamnotice'],function(webcore,webtable,jconfirmBox,zamnotice){
+  $(".changeAvatar").click(function(){
+    var $this = $(this);
+    tpl_image_one(this,function(src,path){
+      webcore.ajaxSubmit("{:gomyhome('profile/changemyinfo')}",{field:'user_avatar',fieldv:path},'正在处理..').then(function(json){
+           if(json.code==0){
+              zamnotice.showTips('success','更换成功');
+              setTimeout(function(){
+                window.location.reload();
+              },1e3);
+           }else{
+              zamnotice.showTips('error',json.msg);
+           }
+      })
+    });
+  });
+  $(".changePassword").click(function(){
+      var confirmobj = jconfirmBox.confirm('修改密码',webcore.tpl($("#password-tpl"),{}),function(e){
+          var oldpassword = e.$content.find(".oldpassword").val();
+          if(oldpassword=='') return zamnotice.showTips('error','请输入旧密码');
+          var password = e.$content.find(".password").val();
+          if(password=='') return zamnotice.showTips('error','请输入用户密码');
+          var repassword = e.$content.find(".repassword").val();
+          if(repassword=='') return zamnotice.showTips('error','请输入确认密码');
+          if(password != repassword) return zamnotice.showTips('error','2个密码不一致，请重新输入');
+          webcore.ajaxSubmit("{:gomyhome('profile/changemyinfo')}",{field:'user_password',fieldv:password,oldpassword:oldpassword},'正在处理..').then(function(json){
+               if(json.code==0){
+                  confirmobj.close();
+                  if(json.url){
+                    window.location.href = json.url;
+                  }else{
+                    window.location.reload();
+                  }
+               }else{
+                  zamnotice.showTips('error',json.msg);
+               }
+          })
+      },false,false,true,[{'hidden':false,'txt':'确定修改'},{'hidden':false,'txt':'取消'}]);
+  });
+  $(".bindmobile").click(function(){
+      var confirmobj = jconfirmBox.confirm('绑定手机号',webcore.tpl($("#mobile-tpl"),{}),function(e){
+          var mobile = e.$content.find(".mobile").val();
+          if(mobile=='') return zamnotice.showTips('error','请填写手机号');
+          var mobilecode = e.$content.find(".mobilecode").val();
+          if(mobilecode=='') return zamnotice.showTips('error','请填写手机验证码');
+          webcore.ajaxSubmit("{:gomyhome('profile/changemyinfo')}",{field:'user_mobile',fieldv:mobile,mobilecode:mobilecode},'正在处理..').then(function(json){
+               if(json.code==0){
+                  confirmobj.close();
+                  zamnotice.showTips('success','绑定成功');
+                  setTimeout(function(){
+                    window.location.reload();
+                  },1e3);
+               }else{
+                  zamnotice.showTips('error',json.msg);
+               }
+          })
+      },false,false,true,[{'hidden':false,'txt':'确定绑定'},{'hidden':false,'txt':'取消'}],function(){
+          var $_this = confirmobj.$content;
+          $_this.find(".sendmobilecode").click(function(){
+            var $this = $(this);
+            var mobile = $_this.find('.mobile').val();
+            if(mobile==''){
+              return zamnotice.showTips('error','请先填写手机号码');
+            }else{
+              if(!mobile.match(/^[1][3,4,5,6,7,8,9][0-9]{9}$/)) return zamnotice.showTips('error','请填写正确的手机号码');
+              $this.addClass('disabled');
+              webcore.ajaxSubmit("{:gomyhome('profile/sendcode')}",{mobile:mobile}).then(function(json){
+                if(json.code==0){
+                  zamnotice.showTips('success','手机验证码下发成功，请查收');
+                  $this.text('60s');
+                  webcore.countdown(60,function(t){
+                    $this.text(t+'s');
+                  },function(){
+                    $this.removeClass('disabled').text('发送验证码');
+                  },1e3);
+                }else{
+                  $this.removeClass('disabled').text('发送验证码');
+                  zamnotice.showTips('error',json.msg);
+                  return false;
+                }
+              }, function(json){
+                $this.removeClass('disabled').text('发送验证码');
+                zamnotice.showTips('error','网络差。操作失败');
+              });
+            }
+          });
+      });
+  });
+  $(".bindwx").click(function(){
+        var confirmobj = jconfirmBox.ajaxconfirm("绑定微信用户","{:gomyhome('profile/bindwxopenid')}",{},'html','col-lg-6 col-lg-offset-3',function(e){
+        },false,'2','',true,function(){
+            var timer = webcore.countdown(120,false,function(){
+                $(".bindwxBox .cover").removeClass('hidden');
+            });
+        });
+    });
+  $(".sfzconfirm").click(function(){
+      var confirmobj = jconfirmBox.confirm('填写实名认证信息',webcore.tpl($("#shiming-tpl"),{}),function(e){
+          var realname = e.$content.find(".realname").val();
+          if(realname=='') return zamnotice.showTips('error','请填写您的真实姓名');
+          var sfz = e.$content.find(".sfz").val();
+          if(sfz=='') return zamnotice.showTips('error','请填写您的真实身份证');
+          webcore.ajaxSubmit("{:gomyhome('profile/shimingconfirm')}",{realname:realname,sfz:sfz},'正在处理..').then(function(json){
+               if(json.code==0){
+                  confirmobj.close();
+                  var confirmobj2 = jconfirmBox.ajaxconfirm("微信扫一扫实名认证","{:gomyhome('profile/sfzconfirm')}",{'url':json.msg},'html','col-lg-6 col-lg-offset-3',function(e){
+                  },false,'2');
+               }else{
+                  zamnotice.showTips('error',json.msg);
+               }
+          })
+      },false,false,true,[{'hidden':false,'txt':'确定'},{'hidden':false,'txt':'取消'}]);
+  });
+  if(needsm=='1'){
+      {if empty($user['user_shiming'])}
+        $(".sfzconfirm").trigger('click');
+      {/if}
+  }
+});
+</script>
+<script id='password-tpl' type="text/template">
+<div class="form-horizontal">
+  <div class="form-group">
+    <label class="col-lg-3 control-label">* 原密码</label>
+    <div class="col-lg-8">
+      <input class="form-control oldpassword" type="text"  name="oldpassword" placeholder="请输入原密码">
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-lg-3 control-label">* 新密码</label>
+    <div class="col-lg-8">
+      <input class="form-control password" type="text"  name="password" placeholder="请输入新密码">
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-lg-3 control-label">* 确认密码</label>
+    <div class="col-lg-8">
+      <input class="form-control repassword" type="text"  name="repassword" placeholder="请再次输入新密码">
+    </div>
+  </div>
+</div>
+</script>
+<script id='mobile-tpl' type="text/template">
+<div class="form-horizontal">
+  <div class="form-group">
+    <label class="col-lg-3 control-label">* 新手机号</label>
+    <div class="col-lg-8">
+      <input class="form-control mobile" type="text"  name="mobile" placeholder="请输入手机号">
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-lg-3 control-label">* 验证码</label>
+    <div class="col-lg-8">
+      <div class="input-group"> 
+        <input type="text" name="mobilecode" class="form-control mobilecode" maxlength="4" placeholder="请输入手机短信验证码"> 
+        <span class="input-group-addon btn btn-primary sendmobilecode">发送验证码</span> 
+      </div>
+    </div>
+  </div>
+</div>
+</script>
+<script id='shiming-tpl' type="text/template">
+<div class="form-horizontal">
+  <div class="form-group">
+    <label class="col-lg-3 control-label">* 姓名</label>
+    <div class="col-lg-8">
+      <input class="form-control realname" type="text"  name="realname" placeholder="请输入您的真实姓名">
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-lg-3 control-label">* 身份证</label>
+    <div class="col-lg-8">
+      <input class="form-control sfz" type="text"  name="sfz" placeholder="请输入您的真实身份证号码" maxlength='18'>
+    </div>
+  </div>
+</div>
+</script>
+{include file='$Wpath/common/footer'}

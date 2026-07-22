@@ -1,0 +1,127 @@
+{include file='$Wpath/common/header'}
+<form id="formBox" class="zam-formvalidation form-horizontal" method="post">
+    <div class="config-titlebox">
+        <span class="config-titlename">微信设置</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#wechatconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+    </div>
+    <div id="wechatconfigbox" class="collapse in">
+        {include file="$Wpath/common/configwechatcommon" /}
+        <div class="form-group">
+            <label class="col-md-2 control-label text-right">* 评分排行榜</label>
+            <div class="col-md-8">
+            {:tpl_switch('openwxphb',$config['openwxphb'])}
+            <span class="help-block">关闭后微信端不可以查看参评用户得分排行</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 专业评委登录背景图</label>
+            <div class="col-lg-8">
+                {:tpl_image_one('pwloginbg',$config['pwloginbg'])}
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 评委复用</label>
+            <div class="col-lg-8">
+                {:tpl_switch('pwrepeat',$config['pwrepeat'])}
+                <span class="help-block">开启后专业评委可以多轮复用，如需开启评委复用建议第一轮就将所有的专业评委添加好</span>
+            </div>
+        </div>
+        <div class="form-group livemark-index-appphb{if request()->realhdid != '-1'} hidden{/if}">
+            <label class="col-lg-2 control-label">* 排行榜列表</label>
+            <div class="col-lg-8">
+                {:tpl_switch('openlistphb',$config['openlistphb']??2)}
+                <span class="help-block">开启则在微信评分列表页底部会显示已完成评分的用户得分排行榜</span>
+            </div>
+        </div>
+    </div>
+    <div class="config-titlebox">
+        <span class="config-titlename">大屏设置</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#screenconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+    </div>
+    <div id="screenconfigbox" class="collapse in">
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 网页标题</label>
+            <div class="col-lg-8">
+              <input type="text" class="form-control"  name="title"  value="{$config['title']}">
+            </div>
+        </div>
+        <div class="bgtypebox">
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 背景类型</label>
+                <div class="col-lg-8">
+                    <label class="lyear-radio radio-inline radio-primary" {if $canchangebg=='1'}onclick="javascript:$('.bgimgbox').removeClass('hidden'),$('.bgvideobox').addClass('hidden');"{/if}>
+                        <input type="radio" name="bgtype" {if $config["bgtype"]=="1"}checked{/if} value="1" {if $canchangebg=='2'}disabled{/if}><span>图片</span>
+                    </label>
+                    <label class="lyear-radio radio-inline radio-primary" {if $canchangebg=='1'}onclick="javascript:$('.bgimgbox').addClass('hidden'),$('.bgvideobox').removeClass('hidden');"{/if}>
+                        <input type="radio" name="bgtype" {if $config["bgtype"]=="2"}checked{/if} value="2" {if $canchangebg=='2'}disabled{/if}><span>视频</span>
+                    </label>
+                </div>
+            </div>
+            <div class="form-group bgimgbox{if $config["bgtype"]=="2"} hidden{/if}">
+                <label class="col-lg-2 control-label">* 背景图片</label>
+                <div class="col-lg-8">
+                    {:tpl_image_one('bgimg',$config['bgimg'],$canchangebg)}
+                    <span class="help-block">规格:1400*800px，具体尺寸需结合屏幕实际尺寸设计{if $canchangebg=='2'}<span class="help-block text-danger">当前活动还未发布，背景图不可更改</span>{/if}</span>
+                </div>
+            </div>
+            <div class="form-group bgvideobox{if $config["bgtype"]=="1"} hidden{/if}">
+                <label class="col-lg-2 control-label">* 背景视频</label>
+                <div class="col-lg-8">
+                    {:tpl_video('bgvideo',$config['bgvideo'])}
+                    <span class="help-block">{if $canchangebg=='2'}<span class="help-block text-danger">当前活动还未发布，背景视频不可更改</span>{/if}</span>
+                </div>
+            </div>
+        </div>
+        {include file="$Wpath/common/configscreenmusic" /}
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 显示评分人数与总评委数量</label>
+            <div class="col-lg-8">
+                {:tpl_switch('showpwnum',$config['showpwnum']??'1')}
+                <span class="help-block">开启后在未开启大众评委轮次里单个参评选手最终得分旁会显示已评分评委数量以及总评委数量，若开启了大众评委则在对应的评委类型下会显示对应的评分人数</span>
+            </div>
+        </div>
+    </div>
+    {include file='$Wpath/common/configsavepanel'}
+</form>
+<script>
+require(['webcore','jconfirmBox','zamnotice','layerBox','zvalidator'],function(webcore,jconfirmBox,zamnotice,layerBox){
+    $('#formBox').formValidation({
+        framework: 'bootstrap',
+        excluded: [':disabled'],
+        message: '您填写的内容无效',
+        fields: {
+            apptitle:{
+                message: '请输入网页标题',
+                validators: {
+                    notEmpty: {
+                        message: '请输入网页标题'
+                    },
+                }
+            },
+        }
+    }).on('success.form.fv', function(e) {
+        e.preventDefault();
+        var $form = $(e.target);
+        var postData = webcore.serializeObject($form);
+        var bload = $form.find(".zam-fixedbottom button").lyearloading({opacity: 0.2,spinnerSize: 'nm'});
+        $form.formValidation('disableSubmitButtons', true);
+        webcore.ajaxSubmit("{:gohdmanage('configlivemark/index',['hdid'=>$hdid])}",postData).then(function(json){
+            bload.hide();
+            if(json.code==0){
+                $form.formValidation('disableSubmitButtons', false);
+                zamnotice.showTips('success','操作成功',2e3,function(){
+                    window.location.reload();
+                });
+            }else{
+                zamnotice.showTips('error',json.msg);
+                $form.formValidation('disableSubmitButtons', false);
+            }
+        }, function(json){
+            bload.hide();
+            zamnotice.showTips('error','网络差。操作失败');
+            $form.formValidation('disableSubmitButtons', false);
+        });
+    });
+});
+</script>
+{include file='$Wpath/common/footer'}

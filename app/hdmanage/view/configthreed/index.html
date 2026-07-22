@@ -1,0 +1,693 @@
+{include file='$Wpath/common/header'}
+<style>
+.shapeTypes a.btn {
+    margin-left: 10px;
+    margin-bottom: 10px;
+}
+</style>
+<form id="formBox" class="zam-formvalidation form-horizontal" method="post">
+    <div class="config-titlebox">
+        <span class="config-titlename">大屏设置</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#screenconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+    </div>
+    <div id="screenconfigbox" class="collapse in">
+    {include file="$Wpath/common/configscreencommon" /}
+    {include file="$Wpath/common/configscreenmusic" /}
+    <div class="form-group">
+        <label class="col-lg-2 control-label text-right">* 图形列表</label>
+        <div class="col-lg-10">
+            <table class="table table-bordered" style="margin-bottom:0px;">
+                <thead>
+                  <tr>
+                    <th style="width:30%;text-align:center;">图形名</th>
+                    <th style="width:55%;text-align:center;">设置</th>
+                    <th style="width:15%;text-align:center;">操作</th>
+                  </tr>
+                </thead>
+                <tbody class="threed-lists">
+                    {volist name="config.shapes" id="shrow"}
+                            <tr>
+                                <td>
+                                   <input type="hidden" name="shape[]" value="{$shrow['shape']}">
+                                   {if $shrow['shape']=='text' }
+                                        <input type="text" class="form-control text-shape"  name="shapetext[]"  value="{$shrow['shapetext']}" maxlength="8" placeholder="请输入1-8个汉字" >
+                                        <input type="hidden" name="logo[]" value="0" >
+                                   {elseif $shrow['shape']=='logo' }
+                                        <div class="col-lg-12" style="padding:0">
+                                            <div class="input-group logo-input-group">
+                                                <input type="text" class="form-control file-value" name="logo[]" value="{$shrow['shapelogo']}" placeholder="图片地址">
+                                                <div class="input-group-btn">
+                                                  <button class="btn btn-default" type="button" onclick="tpl_image_one(this,imagetodots)">选择图片</button>
+                                                </div>
+                                            </div>
+                                            <div class="input-group image-one-detail">
+                                                <img src="{:tomedia($shrow['shapelogo'])}" style="max-width:150px;max-height:300px" onerror="javascript:this.src='/static/images/sys/nopic.jpg';this.title='暂无图片'">
+                                                <i class="mdi mdi-close" onclick="javascript:$(this).parent().parent().find('.logo-input-group input').val('');$(this).prev().attr('src','')" title="删除图片"></i>
+                                            </div>    
+                                            <span class="help-block">注意:请设置底色透明，轮廓清晰的png图片</span>
+                                        </div>
+                                        <input type="hidden" name="shapetext[]" value="0">
+                                  {else}
+                                        <input type="text" name="shapetext[]" class="form-control"  value="{$shrow['shapetext']}" readonly>
+                                        <input type="hidden" name="logo[]" value="0" >
+                                  {/if}
+                                </td>
+                                <td>
+                                    <div class="form-group">
+                                        <label class="col-lg-4 control-label">* 入场特效</label>
+                                        <div class="col-lg-6">
+                                            <select class="form-control input-sm" name="shapein[]" size="1">
+                                                <option value="1" {if !isset($shrow['shapein']) || $shrow['shapein']=='1'}selected{/if}>正面入场</option>
+                                                <option value="2" {if isset($shrow['shapein']) && $shrow['shapein']=='2'}selected{/if}>反面入场</option>
+                                                <option value="3" {if isset($shrow['shapein']) && $shrow['shapein']=='3'}selected{/if}>右侧入场</option>
+                                                <option value="4" {if isset($shrow['shapein']) && $shrow['shapein']=='4'}selected{/if}>左侧入场</option>
+                                                <option value="5" {if isset($shrow['shapein']) && $shrow['shapein']=='5'}selected{/if}>上方入场</option>
+                                                <option value="6" {if isset($shrow['shapein']) && $shrow['shapein']=='6'}selected{/if}>下方入场</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-lg-4 control-label">* 出场特效</label>
+                                        <div class="col-lg-6">
+                                            <select class="form-control input-sm" name="shapeout[]" size="1">
+                                                <option value="1" {if !isset($shrow['shapeout']) || $shrow['shapeout']=='1'}selected{/if}>正面出场</option>
+                                                <option value="2" {if isset($shrow['shapeout']) && $shrow['shapeout']=='2'}selected{/if}>反面出场</option>
+                                                <option value="3" {if isset($shrow['shapeout']) && $shrow['shapeout']=='3'}selected{/if}>右侧出场</option>
+                                                <option value="4" {if isset($shrow['shapeout']) && $shrow['shapeout']=='4'}selected{/if}>左侧出场</option>
+                                                <option value="5" {if isset($shrow['shapeout']) && $shrow['shapeout']=='5'}selected{/if}>上方出场</option>
+                                                <option value="6" {if isset($shrow['shapeout']) && $shrow['shapeout']=='6'}selected{/if}>下方出场</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-lg-4 control-label">* 展示时间</label>
+                                        <div class="col-lg-6">
+                                        <input type="text" class="form-control input-sm numberincdec" name="shapeseconds[]" 
+                                        data-bts-min="3" data-bts-replacement-val="15"
+                                        data-bts-max="null"
+                                        data-bts-step="1"
+                                        data-bts-postfix="秒"
+                                        data-bts-postfix-extra-class="touchspin-postfix" value="{$shrow['shapeseconds']??15}">
+                                        <span class="help-block mt0">注:至少是3秒，推荐15-30秒内</span>
+                                        </div>
+                                    </div>
+                                  {if in_array($shrow['shape'],['text','logo'])=='text'}
+                                        {if $shrow['shape']=='logo'}
+                                            <div class="form-group">
+                                                <label class="col-lg-4 control-label">* 原图展示</label>
+                                                <div class="col-lg-6">
+                                                    <label class="lyear-switch switch-primary normal-swith switch-solid" style="height:38px">
+                                                        <input type="checkbox" {if isset($shrow['shapestable']) && $shrow['shapestable']=='1'}checked{/if}>
+                                                        <input type="hidden" name="shapestable[]" value="{$shrow['shapestable']??2}">
+                                                        <span data-status="{$shrow['shapestable']??2}" data-func="openshapestable" class="normal-span has-func" data-ajax=""></span>
+                                                    </label>
+                                                    <span class="help-block mt0">注:开启原图展示的图形不会进行用头像拼图</span>
+                                                </div>
+                                            </div>
+                                        {else /}
+                                            <input type="hidden" name="shapestable[]" value="2">
+                                        {/if}
+                                        <div class="shapetypejdbox{if isset($shrow['shapestable']) && $shrow['shapestable']=='1'} hidden{/if}">
+                                            <div class="form-group">
+                                                <label class="col-lg-4 control-label">* 方格形态</label>
+                                                <div class="col-lg-6">
+                                                    <select class="form-control input-sm shapetypeselect" name="shapetype[]" size="1">
+                                                        <option value="1" {if !isset($shrow['shapetype']) || $shrow['shapetype']=='1'}selected{/if}>固定大小</option>
+                                                        <option value="2" {if isset($shrow['shapetype']) && $shrow['shapetype']=='2'}selected{/if}>随机大小</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group{if isset($shrow['shapetype']) && $shrow['shapetype']=='2'} hidden{/if}">
+                                                <label class="col-lg-4 control-label">* 方格像素</label>
+                                                <div class="col-lg-6">
+                                                <input type="text" class="form-control input-sm numberincdec" name="jd[]" 
+                                                data-bts-min="3" data-bts-replacement-val="14"
+                                                data-bts-max="20"
+                                                data-bts-step="1"
+                                                data-bts-postfix="px"
+                                                data-bts-postfix-extra-class="touchspin-postfix" value="{$shrow['jd']}">
+                                                <span class="help-block mt0">注:大小必须是3-20内的整数，方格越小越精细</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-lg-4 control-label">* 自动旋转</label>
+                                            <div class="col-lg-6">
+                                                <label class="lyear-switch switch-primary normal-swith switch-solid" style="height:38px">
+                                                    <input type="checkbox" {if !isset($shrow['shaperotate']) || $shrow['shaperotate']=='1'}checked{/if}>
+                                                    <input type="hidden" name="shaperotate[]" value="{$shrow['shaperotate']??1}">
+                                                    <span data-status="{$shrow['shaperotate']??1}" data-func="openshaperotate" class="normal-span has-func" data-ajax=""></span>
+                                                </label>
+                                                <span class="help-block mt0">注:开启则图形显示后将自动旋转</span>
+                                            </div>
+                                        </div>
+                                  {else}
+                                        <input type="hidden" name="jd[]" value="14">
+                                        <input type="hidden" name="shapestable[]" value="2">
+                                        <input type="hidden" name="shapetype[]" value="1">
+                                        <input type="hidden" name="shaperotate[]" value="1">
+                                  {/if}
+                                </td>
+                                <td class="text-center">
+                                  <a href="javascript:;"  class="btn btn-danger btn-sm btn-delshape">
+                                      <i class="mdi mdi-close"></i>
+                                  </a>
+                                  <a href="javascript:;"  class="btn btn-default btn-sm mousemove zam-sortable  m-l-10" title="拖动排序">
+                                     <i class="mdi mdi-arrow-all"></i>
+                                  </a>
+                                </td>
+                            </tr>
+                        {/volist}
+                </tbody>
+                <tfoot style="border: 1px solid #efefef;">
+                  <tr>
+                    <td colspan="4" style="white-space:normal">
+                        <div class="zam-titleBox">图形类型</div>
+                        <div class="shapeTypes">
+                            <a href="javascript:;" class="btn btn-primary" data-type="logo"><span>图片(png)</span></a> 
+                            <a href="javascript:;" class="btn btn-primary" data-type="text"><span>文字(8个字内)</span></a>
+                            <a href="javascript:;" class="btn btn-primary" data-type="sphere">3D旋转地球</a> 
+                            <a href="javascript:;" class="btn btn-primary" data-type="wall">3D单墙体旋转</a> 
+                            <a href="javascript:;" class="btn btn-primary" data-type="cube">3D多墙体旋转</a> 
+                            <a href="javascript:;" class="btn btn-primary" data-type="cube2">3D正方体旋转</a> 
+                            <a href="javascript:;" class="btn btn-primary" data-type="cylinder">3D旋转柱体(竖转)</a> 
+                            <a href="javascript:;" class="btn btn-primary" data-type="screw">3D旋转柱体(横转)</a> 
+                            <a href="javascript:;" class="btn btn-primary" data-type="tours">3D旋转柱体(左右转)</a> 
+                        </div>
+                    </td>
+                  </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 商家logo</label>
+        <div class="col-lg-8">
+            {:tpl_image_one('logoimg',$config['logoimg']??'')}
+            <span class="zam-help-block">注:此logo将展示在3D图形内，不设置将不显示logo图，推荐尺寸300px * 200px内</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 默认头像</label>
+        <div class="col-lg-8">
+            {:tpl_image_one('defaultimg',$config['defaultimg']??'')}
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 补足头像方式</label>
+        <div class="col-lg-8">
+          <label class="lyear-radio radio-inline radio-primary">
+           <input type="radio" name="repeattype" value="1" {if $config['repeattype']=='1'}checked{/if}><span>使用已签到用户头像</span>
+          </label>
+          <label class="lyear-radio radio-inline radio-primary">
+           <input type="radio" name="repeattype" value="2" {if $config['repeattype']=='2'}checked{/if}><span>使用默认头像</span>
+          </label>
+          <span class="help-block">补足头像方式:总签到用户数量少于图形方格总数量时，其他多余方格填充头像方式</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 开启倒计时</label>
+        <div class="col-lg-8">
+            {:tpl_switch('opendjs',$config['opendjs']??'2','opendjs')}
+             <span class="help-block">通过键盘空格键启动倒计时，倒计时结束后可再次按空格键可重新进入图形列表动画播放界面</span>
+        </div>
+    </div>
+    <div class="djsbox{if $config['opendjs']=='2'} hidden{/if}">
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 倒计时秒数</label>
+            <div class="col-lg-4">
+                <input type="text" class="form-control djsshape numberincdec" name="djstime" 
+                data-bts-min="1" data-bts-replacement-val="10"
+                data-bts-max="99"
+                data-bts-step="1" value="{$config['djstime']}">
+                <span class="zam-help-block">必须小于100</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 倒计时结束动画</label>
+            <div class="col-lg-8">
+              <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.djsendlogobox').addClass('hidden')">
+               <input type="radio" name="djsendlogo[ani]" value="1" {if !isset($config['djsendlogo']['ani']) || $config['djsendlogo']['ani']=='1'}checked{/if}><span>继续播放图形列表动画</span>
+              </label>
+              <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.djsendlogobox').removeClass('hidden')">
+               <input type="radio" name="djsendlogo[ani]" value="2" {if isset($config['djsendlogo']['ani']) && $config['djsendlogo']['ani']=='2'}checked{/if}><span>自定义logo动画</span>
+              </label>
+            </div>
+        </div>
+        <div class="djsendlogobox{if !isset($config['djsendlogo']['ani']) || $config['djsendlogo']['ani']=='1'} hidden{/if}">
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* logo</label>
+                <div class="col-lg-3">
+                <div class="input-group">
+                    <input type="text" class="form-control file-value" name="djsendlogo[shapelogo]" value="{$config['djsendlogo']['shapelogo']??''}" placeholder="图片地址">
+                    <div class="input-group-btn">
+                        <button class="btn btn-default" type="button" onclick="tpl_image_one(this,imagetodots)">选择图片</button>
+                    </div>
+                </div>
+                <div class="input-group image-one-detail">
+                        <img src="{:tomedia($config['djsendlogo']['shapelogo']??'')}" style="max-width:150px;max-height:300px" onerror="javascript:this.src='/static/images/sys/nopic.jpg';this.title='暂无图片'" title="暂无图片">
+                        <i class="mdi mdi-close" onclick="javascript:$(this).parent().prev().find('input').val('');$(this).prev().attr('src','')" title="删除图片"></i>
+                </div>                
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* logo入场特效</label>
+                <div class="col-lg-6">
+                    <select class="form-control" name="djsendlogo[shapein]">
+                        <option value="1" {if !isset($config['djsendlogo']['shapein']) || $config['djsendlogo']['shapein']=='1'}selected{/if}>正面入场</option>
+                        <option value="2" {if isset($config['djsendlogo']['shapein']) && $config['djsendlogo']['shapein']=='2'}selected{/if}>反面入场</option>
+                        <option value="3" {if isset($config['djsendlogo']['shapein']) && $config['djsendlogo']['shapein']=='3'}selected{/if}>右侧入场</option>
+                        <option value="4" {if isset($config['djsendlogo']['shapein']) && $config['djsendlogo']['shapein']=='4'}selected{/if}>左侧入场</option>
+                        <option value="5" {if isset($config['djsendlogo']['shapein']) && $config['djsendlogo']['shapein']=='5'}selected{/if}>上方入场</option>
+                        <option value="6" {if isset($config['djsendlogo']['shapein']) && $config['djsendlogo']['shapein']=='6'}selected{/if}>下方入场</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 原图展示</label>
+                <div class="col-lg-8">
+                    <label class="lyear-switch switch-primary normal-swith switch-solid" style="height:38px">
+                        <input type="checkbox" {if isset($config['djsendlogo']['shapestable']) && $config['djsendlogo']['shapestable']=='1'}checked{/if}>
+                        <input type="hidden" name="djsendlogo[shapestable]" value="{$config['djsendlogo']['shapestable']??2}">
+                        <span data-status="{$config['djsendlogo']['shapestable']??2}" data-func="openendlogostable" class="normal-span has-func" data-ajax=""></span>
+                    </label>
+                    <span class="help-block mt0">注:开启原图展示的logo不会进行头像拼logo</span>
+                </div>
+            </div>
+            <div class="endlogostablebox{if isset($config['djsendlogo']['shapestable']) && $config['djsendlogo']['shapestable']=='1'} hidden{/if}">
+                <div class="form-group">
+                    <label class="col-lg-2 control-label">* 方格形态</label>
+                    <div class="col-lg-6">
+                        <select class="form-control endlogotypeselect" name="djsendlogo[shapetype]">
+                            <option value="1" {if !isset($config['djsendlogo']['shapetype']) || $config['djsendlogo']['shapetype']=='1'}selected{/if}>固定大小</option>
+                            <option value="2" {if isset($config['djsendlogo']['shapetype']) && $config['djsendlogo']['shapetype']=='2'}selected{/if}>随机大小</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group endlogotypebox{if isset($config['djsendlogo']['shapetype']) && $config['djsendlogo']['shapetype']=='2'} hidden{/if}">
+                    <label class="col-lg-2 control-label">* 方格像素</label>
+                    <div class="col-lg-6">
+                    <input type="text" class="form-control numberincdec" name="djsendlogo[jd]" 
+                    data-bts-min="3" data-bts-replacement-val="12"
+                    data-bts-max="20"
+                    data-bts-step="1"
+                    data-bts-postfix="px"
+                    data-bts-postfix-extra-class="touchspin-postfix" value="{$config['djsendlogo']['jd']??12}">
+                    <span class="help-block mt0">注:大小必须是3-20内的整数，方格越小越精细</span>
+                    </div>
+                </div>
+            </div>
+          
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 播放音效</label>
+                <div class="col-lg-8">
+                    {:tpl_switch('djsendlogo[playendaudio]',$config['djsendlogo']['playendaudio']??'2','openendaudio')}
+                    <span class="help-block mt0">注:开启并设置下面的音频则在显示logo时播放音频</span>
+                </div>
+            </div>
+            <div class="form-group endaudiobox{if !isset($config['djsendlogo']['playendaudio']) || $config['djsendlogo']['playendaudio']=='2'} hidden{/if}">
+                <label class="col-lg-2 control-label">* 音频</label>
+                <div class="col-lg-8">
+                    {:tpl_audio('djsendlogo[endaudio]',$config['djsendlogo']['endaudio']??SIMGURL.'threed/djsend.mp3')}
+                </div>
+            </div>
+            <script type="text/javascript">
+            function openendaudio(obj,status,url){
+                if(status=='1'){
+                    obj.prev().val('2');
+                    obj.attr('data-status','2');
+                    $(".endaudiobox").addClass('hidden');
+                }else{
+                    obj.prev().val('1');
+                    obj.attr('data-status','1');
+                    $(".endaudiobox").removeClass('hidden');
+                }
+                obj.prev().prev().prop("checked",status=='1'?false:true);
+            }
+            </script>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 快捷进入logo</label>
+                <div class="col-lg-8">
+                    {:tpl_switch('djsendlogo[enterlogo]',$config['djsendlogo']['enterlogo']??'2')}
+                    <span class="help-block mt0">注:开启后可通过键盘enter键跳过倒计时直接显示logo，大屏如果正在倒计时此按键无效</span>
+                </div>
+            </div>
+        </div>
+     </div>
+     <div class="form-group">
+        <label class="col-lg-2 control-label">* 显示签到人数</label>
+        <div class="col-lg-8">
+            {:tpl_switch('showsignnum',$config['showsignnum']??'1')}
+            <span class="zam-help-block">关闭后大屏右上角将不显示签到人数</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 签到弹窗</label>
+        <div class="col-lg-8">
+          <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.allowpopbox').removeClass('hidden')">
+           <input type="radio" name="allowpop" value="1" {if !isset($config['allowpop']) || $config['allowpop']=='1'}checked{/if}><span>开启弹窗</span>
+          </label>
+          <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.allowpopbox').addClass('hidden')">
+           <input type="radio" name="allowpop" value="2" {if isset($config['allowpop']) && $config['allowpop']=='2'}checked{/if}><span>关闭弹窗</span>
+          </label>
+          <span class="help-block">关闭弹窗则采用静默式的替换图形方格内的头像</span>
+        </div>
+    </div>
+    <div class="form-group allowpopbox{if isset($config['allowpop']) && $config['allowpop']=='2'} hidden{/if}">
+        <label class="col-lg-2 control-label">* 弹窗纯图模式</label>
+        <div class="col-lg-8">
+            {:tpl_switch('isppqd',$config['isppqd']??'2')}
+             <span class="help-block">开启一般是需要解决泡泡签到或马赛克签到开启了写入签到数据引发的用户无昵称导致大屏显示有层黑色阴影的问题</span>
+        </div>
+    </div>
+    </div>
+    {include file='$Wpath/common/configsavepanel'}
+</form>
+<script>
+require(['webcore','jconfirmBox','zamnotice','layerBox','zvalidator',"bootstrap-touchspin","jquery.ui"],function(webcore,jconfirmBox,zamnotice,layerBox){
+    $('.threed-lists').sortable({handle: ".mousemove"});
+    $(".threed-lists").disableSelection();
+    $(".shapeTypes .btn").on('click',function(){
+        var lastshape = $(".threed-lists").children("tr:last-child").find('input[type="hidden"]').eq(0).val();
+        var lastval = $(".threed-lists").children("tr:last-child").find('input[type="text"]').val();
+        if(lastshape=='logo' && lastval==''){
+            return zamnotice.showTips('error','请先完善上一个logo图形');
+        }
+        if(lastshape=='text' && (lastval=='' || lastval.length > 8)){
+            return zamnotice.showTips('error','请先完善上一个文字图形并且文字图形最多只能输入8个字符');
+        }
+        var errmsg = '';
+        $(".threed-lists").children("tr").each(function(){
+            var shapetype = $(this).find('input[type="hidden"]').eq(0).val(),shapetxt = $(this).find('input[type="text"]').val();
+            if(shapetype=='logo' && shapetxt==''){
+                errmsg = '部分logo图形未上传图片';
+                return false;
+            }
+            if(shapetype=='text' && (shapetxt=='' || shapetxt.length > 8)){
+                errmsg = "部分文字图形未设置文字并且最多只能输入8个字符";
+                return false;
+            }
+        });
+        if(errmsg != '') {
+            return zamnotice.showTips('error',errmsg);
+        }
+        var type = $(this).attr('data-type');
+        var tplobj = {shape:type};
+        if(type!='text'&&type!='logo'){
+            tplobj.shapetext = $(this).text();
+        }   
+        $(".threed-lists").append(webcore.tpl($("#shapeitem-tpl"),tplobj));
+        $(".numberincdec").TouchSpin().on("change", function(){
+            var $this = $(this),funcstr = $this.data('func');
+            var func = window[funcstr];
+            func && func(this);
+        });
+        if(type=='text' || type == 'logo'){
+            tpl_switch();
+        }
+    });
+    $(".threed-lists").on('click','.btn-delshape',function(){
+        $(this).parent().parent().remove();
+    });
+    $(".threed-lists").on('blur','.text-shape',function(){
+        var text = $(this).val();
+        if(text=='' || text.length > 8 ){
+          $(this).next().val('');
+          return zamnotice.showTips('error',text==''?'至少输入一个字符':'最多可输入8个字符');
+        }
+    });
+    $(".threed-lists").on('input','.text-shape',function(){
+        var text = $(this).val();
+        if(text==''){
+           $(this).next().val('');
+           return false;
+        }
+    });
+    $('.threed-lists').on('change','.shapetypeselect',function(){
+        var typeval = $(this).val(),nextbox = $(this).parent().parent().next();
+        typeval == '1' ? nextbox.removeClass('hidden') : nextbox.addClass('hidden')
+    })
+    $('.endlogotypeselect').change(function(){
+        var typeval = $(this).val(),nextbox = $('.endlogotypebox');
+        typeval == '1' ? nextbox.removeClass('hidden') : nextbox.addClass('hidden')
+    })
+    $('#formBox').formValidation({
+        framework: 'bootstrap',
+        excluded: [":hidden",":disabled",":not(visible)"],
+        message: '您填写的内容无效',
+        fields: {
+            apptitle:{
+                message: '请输入网页标题',
+                validators: {
+                    notEmpty: {
+                        message: '请输入网页标题'
+                    },
+                }
+            },
+        }
+    }).on('success.form.fv', function(e) {
+        e.preventDefault();
+        var $form = $(e.target);
+        var shapetrs = $(".threed-lists").children("tr");
+        if(shapetrs.length <= 0) {
+            $form.formValidation('disableSubmitButtons', false);
+            return zamnotice.showTips('error','请先添加图形');
+        }
+        var iserror = '';
+        shapetrs.each(function(){
+            var shapetype = $(this).find('input[type="hidden"]').eq(0).val(),shapetxt = $(this).find('input[type="text"]').val();
+            if(shapetype=='logo' && shapetxt==''){
+                iserror = '部分logo图形未上传图片';
+                return false;
+            }
+            if(shapetype=='text' && (shapetxt=='' || shapetxt.length > 8)){
+                iserror = "部分文字图形未设置文字并且最多只能输入8个字符";
+                return false;
+            }
+        });
+        if(iserror != '') {
+            $form.formValidation('disableSubmitButtons', false);
+            zamnotice.showTips('error',iserror);
+            return false;
+        }
+
+        var postData = webcore.serializeObject($form);
+        var bload = $form.find(".zam-fixedbottom button").lyearloading({opacity: 0.2,spinnerSize: 'nm'});
+        $form.formValidation('disableSubmitButtons', true);
+        webcore.ajaxSubmit("{:gohdmanage('configthreed/index',['hdid'=>$hdid])}",postData).then(function(json){
+            bload.hide();
+            if(json.code==0){
+                $form.formValidation('disableSubmitButtons', false);
+                zamnotice.showTips('success','操作成功',2e3,function(){
+                    window.location.reload();
+                });
+            }else{
+                zamnotice.showTips('error',json.msg);
+                $form.formValidation('disableSubmitButtons', false);
+            }
+        }, function(json){
+            bload.hide();
+            zamnotice.showTips('error','网络差。操作失败');
+            $form.formValidation('disableSubmitButtons', false);
+        });
+    });
+});
+function imagetodots(imgurl,imgpath,obj){
+    var $this = $(obj);
+    require(['webcore','zamnotice'],function(webcore,zamnotice){    
+        webcore.ajaxSubmit("{:gohdmanage('configthreed/threedimg',['hdid'=>$hdid])}",{imgurl:imgurl},'正在拼命处理图片信息..').then(function(json){
+            if(json.code==0){
+                $this.parent().prev().val(json.msg.imgpath);
+                $this.parent().parent().parent().find('.image-one-detail').find("img").attr("src",json.msg.imgurl);
+            }else{
+                zamnotice.showTips('error',json.msg);
+            }
+        }, function(json){
+            zamnotice.showTips('error','网络差。操作失败.');
+        });
+    })
+}
+/*开关控件 关闭上传头像与表单*/
+function opendjs(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".djsbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".djsbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openshapestable(obj,status,url){
+    var shapetypejdbox = obj.parent().parent().parent().parent().find('.shapetypejdbox');
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        shapetypejdbox.removeClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        shapetypejdbox.addClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openshaperotate(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openendlogostable(obj,status,url){
+    var endlogostablebox = $('.endlogostablebox');
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        endlogostablebox.removeClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        endlogostablebox.addClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+</script>
+<script id='shapeitem-tpl' type="text/template">
+<tr>
+<td>
+   <input type="hidden" name="shape[]" value="<% d.shape %>">
+   <%# if(d.shape=='text'){ %>
+        <input type="text" class="form-control text-shape"  name="shapetext[]" value="" placeholder="请输入1-8个汉字"  maxlength="8">
+        <input type="hidden" name="logo[]" value="0" >
+   <%# }else if(d.shape=='logo'){ %>
+         <div class="col-lg-12" style="padding:0">
+            <div class="input-group logo-input-group">
+                <input type="text" class="form-control file-value" name="logo[]" value="" placeholder="图片地址">
+                <div class="input-group-btn">
+                  <button class="btn btn-default" type="button" onclick="tpl_image_one(this,imagetodots)">选择图片</button>
+                </div>
+            </div>
+            <div class="input-group image-one-detail">
+                <img src="" style="max-width:150px;max-height:300px" onerror="javascript:this.src='/static/images/sys/nopic.jpg';this.title='暂无图片'">
+                <i class="mdi mdi-close" onclick="javascript:$(this).parent().parent().find('.logo-input-group input').val('');$(this).prev().attr('src','')" title="删除图片"></i>
+            </div>    
+            <span class="help-block">注意:必须底色透明，轮廓清晰的图片</span>
+        </div>
+        <input type="hidden"  name="shapetext[]" value="0">
+   <%# }else{ %>
+        <input type="text" class="form-control" name="shapetext[]" value="<% d.shapetext %>" readonly>
+        <input type="hidden" name="logo[]" value="0">
+   <%# } %>
+</td>
+<td>
+    <div class="form-group">
+        <label class="col-lg-4 control-label">* 入场特效</label>
+        <div class="col-lg-6">
+            <select class="form-control" name="shapein[]" size="1">
+                <option value="1" selected>正面入场</option>
+                <option value="2">反面入场</option>
+                <option value="3">右侧入场</option>
+                <option value="4">左侧入场</option>
+                <option value="5">上方入场</option>
+                <option value="6">下方入场</option>
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-4 control-label">* 出场特效</label>
+        <div class="col-lg-6">
+            <select class="form-control" name="shapeout[]" size="1">
+                <option value="1" selected>正面出场</option>
+                <option value="2">反面出场</option>
+                <option value="3">右侧出场</option>
+                <option value="4">左侧出场</option>
+                <option value="5">上方出场</option>
+                <option value="6">下方出场</option>
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-4 control-label">* 展示时间</label>
+        <div class="col-lg-6">
+        <input type="text" class="form-control input-sm numberincdec" name="shapeseconds[]" 
+        data-bts-min="3" data-bts-replacement-val="15"
+        data-bts-max="null"
+        data-bts-step="1"
+        data-bts-postfix="秒"
+        data-bts-postfix-extra-class="touchspin-postfix" value="15">
+        <span class="help-block mt0">注:至少是3秒，推荐15-30秒内</span>
+        </div>
+    </div>
+ <%# if(d.shape=='text' || d.shape=='logo'){ %>
+    <%# if(d.shape=='logo'){ %>
+        <div class="form-group">
+            <label class="col-lg-4 control-label">* 原图展示</label>
+            <div class="col-lg-6">
+                <label class="lyear-switch switch-primary normal-swith switch-solid" style="height:38px">
+                    <input type="checkbox">
+                    <input type="hidden" name="shapestable[]" value="2">
+                    <span data-status="2" data-func="openshapestable" class="normal-span has-func" data-ajax=""></span>
+                </label>
+                <span class="help-block mt0">注:开启原图展示的图形不会进行用头像拼图</span>
+            </div>
+        </div>
+    <%# }else{ %>
+        <input type="hidden" name="shapestable[]" value="2">
+    <%# } %>
+    <div class="shapetypejdbox">
+        <div class="form-group">
+            <label class="col-lg-4 control-label">* 方格形态</label>
+            <div class="col-lg-6">
+                <select class="form-control shapetypeselect" name="shapetype[]" size="1">
+                    <option value="1" selected>固定大小</option>
+                    <option value="2">随机大小</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-4 control-label">* 方格像素</label>
+            <div class="col-lg-6">
+            <input type="text" class="form-control numberincdec" name="jd[]" 
+            data-bts-min="3" data-bts-replacement-val="14"
+            data-bts-max="20"
+            data-bts-step="1"
+            data-bts-postfix="px"
+            data-bts-postfix-extra-class="touchspin-postfix" value="14">
+            <span class="help-block mt0">注:大小必须是3-20内的整数，方格越小越精细</span>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-4 control-label">* 自动旋转</label>
+        <div class="col-lg-6">
+            <label class="lyear-switch switch-primary normal-swith switch-solid" style="height:38px">
+                <input type="checkbox" checked>
+                <input type="hidden" name="shaperotate[]" value="1">
+                <span data-status="1" data-func="openshaperotate" class="normal-span has-func" data-ajax=""></span>
+            </label>
+            <span class="help-block mt0">注:开启则图形显示后将自动旋转</span>
+        </div>
+    </div>
+  <%# }else{ %>
+    <input type="hidden" name="jd[]" value="14">
+    <input type="hidden" name="shapestable[]" value="2">
+    <input type="hidden" name="shapetype[]" value="1">
+    <input type="hidden" name="shaperotate[]" value="1">
+  <%# } %>
+</td>
+<td class="text-center">
+  <a href="javascript:;"  class="btn btn-danger btn-sm btn-delshape">
+      <i class="mdi mdi-close"></i>
+  </a>
+  <a href="javascript:;"  class="btn btn-default btn-sm mousemove zam-sortable m-l-10" title="拖动排序">
+     <i class="mdi mdi-arrow-all"></i>
+  </a>
+</td>
+</tr>
+</script>
+{include file='$Wpath/common/footer'}

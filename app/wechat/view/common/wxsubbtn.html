@@ -1,0 +1,46 @@
+<wx-open-subscribe style="position:absolute;top:10px;right:10px;z-index:1000;" template="{$subtplid}" id="subscribe-btn">
+	<script type="text/wxtag-template">
+		<a class="subscribe-btn">订阅中奖通知</a>
+	</script>
+	<script type="text/wxtag-template" slot="style">
+	<style>
+	  .subscribe-btn {
+	    text-align: center;
+	    border: none;
+	    pointer-events: auto;
+	    height:1rem;
+	    line-height: 1rem;
+	    font-size: 0.48rem;
+	    display: inline-block;
+	    padding: .4rem;
+	    border-radius: 3px;
+	    background-color: #00aeff;
+    	color: #FFF;
+	}
+	</style>
+	</script>
+</wx-open-subscribe>
+<script type="text/javascript">
+require(['wechatcore'],function(wechatcore){
+	var subbtn = document.getElementById('subscribe-btn');
+	subbtn.addEventListener('success', function (e) {
+	  if(e.detail.errMsg=='subscribe:ok'){
+	  	var isreject = false,subdetails = $.parseJSON(e.detail.subscribeDetails);
+	  	$.each(subdetails,function(i,v){
+	  		if(v.indexOf('reject')!=-1){
+	  			isreject = true;
+	  		}
+	  	});
+	  	if(isreject){
+	  		wechatcore.msg('取消订阅将无法收到中奖通知');
+	  	}else{
+	  		wechatcore.msg('订阅成功');
+	  		subbtn.style.display = 'none';
+	  	}
+	  }
+	});   
+	subbtn.addEventListener('error',function (e) {             
+	  wechatcore.msg(e.detail.errMsg);
+	});
+});
+</script>

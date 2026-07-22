@@ -1,0 +1,1434 @@
+{include file='$Wpath/common/header'}
+<style>
+  .main {
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 2px;
+    padding: 0 55px;
+    box-sizing: border-box;
+    border-radius:5px;
+  }
+
+  .title_group h1 {
+    font-size: 1.6em;
+    text-align: center;
+    margin-bottom: 0;
+    color: #333;
+  }
+
+  .title_group h3 {
+    font-size: 1.1em;
+    text-align: center;
+    color: #777;
+    font-weight: 400;
+    margin-top: 8px;
+    margin-bottom: 0;
+  }
+  .title_group h4 {
+    font-size: 0.8em;
+    text-align: center;
+    color: #777;
+    margin-bottom: 25px;
+    margin-top: 8px;
+  }
+  .conter_overflow {
+    position: relative;
+  }
+  .conter_tips {
+    font-size: 12px;
+    color: #444;
+    padding: 5px 30px;
+    border: 1px solid #d4c5c5;
+    overflow: auto;
+    height:700px;
+    border-radius:5px;
+  }
+
+  .conter_tips .row {
+    margin: 15px 0 5px 0;
+    font-size: 15px;
+  }
+
+  .conter_tips .line {
+    line-height: 19px;
+    color: #666;
+    font-size: 12.5px;
+    margin-bottom: 3px;
+  }
+  .conter_tips .line-content {
+    padding-left: 15px;
+  }
+  .select_ground {
+    display: inline-block;
+    cursor: pointer;
+    margin-left: 10px;
+    padding-top: 1px;
+    height: 25px;
+    line-height: 25px;
+  }
+
+  .conter_select {
+    margin-top: 10px;
+    padding-left: 10px;
+    text-align: left;
+    position: relative;
+  }
+
+  .select_ground span {
+    display: inline-block;
+    height: 22px;
+    width: 22px;
+    background-size: 30px;
+    transition: all 300ms;
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYAAACWBAMAAADOL2zRAAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAABVQTFRFAAAAAP//AKoAAP8AAL9ARLi4AIAAnTeV1QAAAAd0Uk5TAP8DAQTcAoo2H8IAAADSSURBVHic7drBDcIwDIXhBHWA+sIcjMIK7L8EqoCDm6QQ+yGE9L9jpH6yo6SXuBRC/jA2H5000oJUD6tha91TpzBldlF1uMVTS8ryhcV3a4vfsRTlm8yVZXYVWquuRddkb+2THFjNCX6b2ljPlfM0VcptYM2X1fm0hjbrESwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCystCV5+329b4fL+tJbuXQeQDmnoLSUcx1SSzm7opzPSRXWHEtdWdLZqDjWvXgxbHSH57XIb4qQn+cOjqvBxITIb7EAAAAASUVORK5CYII=");
+    background-size: 22px;
+    vertical-align: text-top;
+  }
+
+  .select_ground.pitch span {
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYAAACWBAMAAADOL2zRAAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAABhQTFRFAAAAAP//AKoAAP8AAL9AAP36AIAAAKoqfkySYwAAAAh0Uk5TAP8DAQSiAgYQ7pphAAACDklEQVR4nO2Zy23EIBCGTWQpV3NJ2kgL7iAtpIT0f4lWu1kb5sn8rPLQzNFiPn0DGDBeloyMPxh1POaRJFoQxcFKmLX1qKcwqta3WRVeokWtEKsVi/fWJdoeg1BtkZhWre8TWdu8EpsiuWeeUFhkBptRCOv25GUYtSwfAmtci0ktoc66RrKSlaxkJetfs+7JOGt/ncZaj2yYtR+tUdZ6SkdZ+6k5yFrP+SDrqnVrj7HuZ+4NZ+3zWM/fqAk1fjZaEKvTglidFsLqtRBWrwWwiBbAIlpxFtWKs6hWmMVohVmMlsUq0scMo2WxJMPKaBmsInxlFU7LYEldx2rprEKaa1o6SxpTXktlSd+lgpbK4jNELY1VhBRJy+XFlsIU7+ivLknU8oxj5WYkNyYqixOTtRzzvsuTtez3sWugaNnrRBUeMK+WwerFNC1zXe1yNS2T1YqpWvZ632SrWjbrLKZrOfahU76u5WAdYoaWZ3+sJISNzsGiN648yrVvO7VcrF5MQPnOEz4tH6sVk1DOc45Ly8k6i4ko7/nLo+VlWVN+hLU4tNwseqMeZ5GGCKuYWgPnaFNrgFUsrZHzvfm3YYBVrC+IAdZiaP22u7RkJStZyUJZ1rLHBU2tYTGaWaNizM5e0WDw0dgexEKL5IZjCgsrkr2WmaGFiQn3HzO0EDH1Dg9GRWHSOzxOiyxTGRk/Hl9Lt/Y6R3XV3AAAAABJRU5ErkJggg==");
+  }
+
+  .conter_select img {
+    width: 30px;
+    margin-right: 10px;
+  }
+
+  .conter_select > span {
+    display: inline-block;
+    height: 30px;
+    line-height: 30px;
+    color: #666;
+    font-size: 17px;
+    vertical-align: middle;
+  }
+
+  .conter_btns {
+    text-align: center;
+    padding: 10px 0;
+  }
+  .conter_btns .btn.disabled {
+    background-color: #cbcbcb;
+    border-color: #cbcbcb;
+    color: #fff;
+  }
+  .conter_btns .btn {
+    border: none;
+    font-size: 1.1em;
+    padding: 0.5em 4.6em;
+    background-color: #48b0f7;
+    outline: none;
+    color: #fff;
+    cursor: pointer;
+    transition: all 500ms;
+    border-radius: 2px;
+  }
+
+  .conter_btns .btn:hover {
+    background: #48b0f7;
+  }
+  .conter_shadow.shadow_top {
+    background: -webkit-linear-gradient(
+      bottom,
+      rgba(255, 255, 255, 0),
+      rgba(220, 220, 220, 0.5)
+    );
+    top: 0;
+  }
+  .conter_shadow.shadow_bottom {
+    background: -webkit-linear-gradient(
+      top,
+      rgba(255, 255, 255, 0),
+      rgba(220, 220, 220, 0.5)
+    );
+    bottom: 0;
+  }
+  .conter_shadow {
+    position: absolute;
+
+    height: 10px;
+    width: 100%;
+    left: 0;
+  }
+  .hide {
+    display: none !important;
+  }
+  .show {
+    display: block !important;
+  }
+  .select_tips {
+    display: none;
+    position: absolute;
+    line-height: 22px;
+    min-width: 12px;
+    padding: 5px 10px;
+    font-size: 12px;
+    border-radius: 2px;
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+    background-color: #000;
+    color: #fff;
+    left: 324px;
+    top: -40px;
+    background: #333;
+  }
+  .select_tips:after {
+    content: "";
+    display: inline-block;
+    width: 0;
+    height: 0;
+    border-right: 8px solid transparent;
+    border-left: 8px solid transparent;
+    border-top: 8px solid #333;
+    position: absolute;
+    bottom: -8px;
+    left: 10px;
+  }
+  .ubind_click {
+    cursor: pointer;
+  }
+  .conter_read_tips {
+    position: absolute;
+    right: 15px;
+    border: 1px solid #ececec;
+    font-size: 12px;
+    padding: 5px 10px;
+    background: #fff;
+    color: #555;
+    {if !empty($xieyi)}display:none{/if}
+  }
+  .conter_read_tips.active {
+    background: #48b0f7;
+    color: #fff;
+    border: none;
+  }
+  ::-webkit-scrollbar {
+    /*滚动条整体样式*/
+    width: 12px; /*高宽分别对应横竖滚动条的尺寸*/
+    height: 1px;
+    padding: 2px;
+  }
+  ::-webkit-scrollbar-thumb {
+    /*滚动条里面小方块*/
+    border-radius: 1px;
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
+    background: #bbb;
+  }
+  ::-webkit-scrollbar-track {
+    /*滚动条里面轨道*/
+    border-radius: 1px;
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
+    background: #ededed;
+  }
+</style>
+  <div class="main">
+    <div class="title_group">
+      <h1 class="title">欢迎您使用米波现场独立版软件</h1>
+      {if empty($xieyi)}
+      <h3 class="subhead_title">
+        阅读并同意《软件许可与维护协议》即可进入后台
+      </h3>
+      {/if}
+      <h4>协议最近更新时间：2021年11月19日</h4>
+    </div>
+    <div class="conter_overflow">
+      <div class="conter_shadow shadow_top hide"></div>
+      <div class="conter_read_tips">已阅读<span style="color:#48b0f7">0%</span></div>
+      <div class="conter_tips">
+            <p style="text-align: center">
+                <span style="font-size: 20px"><strong><span style="font-family: 宋体">软件许可与维护协议</span></strong></span>
+            </p>
+            <p style="text-indent: 28px">
+                <span style="font-size: 14px; font-family: 宋体">本软件许可与维护协议（<span style="font-size:14px;font-family:&#39;Arial&#39;,sans-serif">“<span style="font-size: 14px; font-family: 宋体">本<span style="font-size: 14px; font-family: 宋体">协议<span style="font-size:14px;font-family:&#39;Arial&#39;,sans-serif">”<span style="font-size: 14px; font-family: 宋体">）由株洲米波网络科技有限公司（<span style="font-size:14px;font-family:&#39;Arial&#39;,sans-serif">“<span style="font-size: 14px; font-family: 宋体">米波现场<span style="font-size:14px;font-family:&#39;Arial&#39;,sans-serif">”<span style="font-size: 14px; font-family: 宋体">）与客户（<span style="font-size:14px;font-family:&#39;Arial&#39;,sans-serif">“<span style="font-size: 14px; font-family: 宋体">您<span style="font-size:14px;font-family:&#39;Arial&#39;,sans-serif">”<span style="
+                                                  font-size: 14px;
+                                                  font-family: 宋体;
+                                                ">）签订。您一旦安装<span style="
+                                                    font-size: 14px;
+                                                    font-family: 宋体;
+                                                  ">部署<span style="
+                                                      font-size: 14px;
+                                                      font-family: 宋体;
+                                                    ">本软件产品“米波现场独立版”<span style="
+                                                                    font-size: 14px;
+                                                                    font-family: 宋体;
+                                                                  ">，以下简称“软件”<span style="
+                                                                      font-size: 14px;
+                                                                      font-family: 宋体;
+                                                                    ">），即表示同意接受协议各项条件的约束。如果您不同意本协议的条件，则无权使用本软件产品。本协议内容同时包括米波现场可能不时发布的关于软件的相关协议、业务规则等内容。上述内容一经正式发布，即为本协议不可分割的组成部分，您同样应当遵守。</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span>
+            </p>
+            <p style="text-indent: 28px">
+                <span style="font-size: 14px; font-family: 宋体">在您使用本软件产品之前，请务必阅读本协议，任何与本协议有关的软件、电子文档等都应是按本协议的条款而授予您的，同时本协议亦适用于任何有关本软件产品的后期<span style="font-size: 14px; font-family: 宋体">更新<span style="font-size: 14px; font-family: 宋体">和升级。您一旦安装<span style="font-size: 14px; font-family: 宋体">部署<span style="font-size: 14px; font-family: 宋体">本软件产品，即表示您同意接受本协议各项条款的约束。如您不同意本协议的条款，则米波现场<span style="font-size: 14px; font-family: 宋体">有权<span style="font-size: 14px; font-family: 宋体">不予将本软件产品的使用权授予您。在这种情况下，您不得使用、复制或传播本软件产品。</span></span></span></span></span></span></span>
+            </p>
+            <p style="text-indent: 28px">
+                <span style="font-size: 14px; font-family: 宋体"><br/></span>
+            </p>
+            <p style="
+                      margin-left: 0;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                      text-indent: 0;
+                    ">
+                <strong><span style="font-size:14px;font-family:&#39;Arial&#39;,sans-serif">1.<span style="font:9px &#39;Times New Roman&#39;">&nbsp;&nbsp;<strong><span style="
+                                text-decoration: underline;
+                                font-size: 14px;
+                                font-family: 宋体;
+                              ">许可条款<strong><span style="
+                                    text-decoration: underline;
+                                    font-size: 14px;
+                                    font-family: Arial, sans-serif;
+                                  ">.<span style="font-size:14px;font-family:&#39;Arial&#39;,sans-serif">&nbsp;&nbsp;</span></span></strong></span></strong></span></span></strong>
+            </p>
+            <p style="
+                      margin-left: 0;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                      text-indent: 0;
+                    ">
+                <span style="font-size: 14px; font-family: 宋体">软件是米波现场的财产并且是其专有商业秘密技术的具体体现。米波现场拥有软件的著作权、商业秘密以及其他相关的知识产权，包括与软件有关的各种文档资料。您支付的软件许可费仅使您有权按以下规定使用软件。</span>
+            </p>
+            <p style="text-align: justify; text-justify: inter-ideograph">
+                <span style="font-size: 14px; font-family: 宋体">米波现场授予您一项非排他并且不可转让的许可使用软件。您违反本协议、<span style="font-size: 14px; font-family: 宋体">米波现场可能不时发布的关于软件的相关协议、业务规则等<span style="font-size: 14px; font-family: 宋体">时本许可由米波现场书面通知您终止。本许可应遵守本协议的全部条款，包括以下所述条款：</span></span></span>
+            </p>
+            <p style="
+                      margin-left: 0;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                      text-indent: 0;
+                    ">
+                <span style="font-size: 15px">(a)<span style="font:9px &#39;Times New Roman&#39;">&nbsp; &nbsp;<span style="font-size: 14px; font-family: 宋体">您认可并同意，使用软件的许可是有限的，是以您支付的许可费的金额为基础的。您同意：<span style="font-size:14px;font-family:&#39;Arial&#39;,sans-serif">i)<span style="font-size: 14px; font-family: 宋体">仅使用有关许可费允许的产品模块和功能；<span style="font-size:14px;font-family:&#39;Arial&#39;,sans-serif">ii)<span style="font-size: 14px; font-family: 宋体">仅为支持您自己的业务使用软件；ⅲ）仅支持授权一个独立域名。您不得将软件再许可或转许可给第三方（包括但不限于您的关联方）。</span></span></span></span></span></span></span>
+            </p>
+            <p style="
+                      margin-left: 0;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                      text-indent: 0;
+                    ">
+                <span style="font-size: 15px">(b)<span style="font:9px &#39;Times New Roman&#39;">&nbsp;&nbsp;<span style="font-size: 14px; font-family: 宋体">您仅可以目标代码形式使用软件所包括的计算机程序。您不得逆向编译或反汇编程序或将程序转换为未编译或未汇编代码。</span></span></span>
+            </p>
+            <p style="
+                      margin-left: 0;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                      text-indent: 0;
+                    ">
+                <span style="font-size: 15px">(c)<span style="font:9px &#39;Times New Roman&#39;">&nbsp;&nbsp;<span style="font-size: 14px; font-family: 宋体">您可在必要时拷贝软件为备份之用。软件的全部副本或其任何一部分，无论是打印形式或机器可读形式，无论是否在储存介质上，均需遵守本许可的全部条款，备份副本必须包含软件中含有的所有著作权信息。</span></span></span>
+            </p>
+            <p style="
+                      margin-left: 0;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                      text-indent: 0;
+                    ">
+                <span style="font-size: 15px">(d)<span style="font:9px &#39;Times New Roman&#39;">&nbsp;&nbsp;<span style="font-size: 14px; font-family: 宋体">如果米波现场向您供应软件更新版本、校正、修改、新版本或新发行软件（统称为<span style="font-size:14px;font-family:&#39;Arial&#39;,sans-serif">“<span style="font-size: 14px; font-family: 宋体">更新版本<span style="font-size:14px;font-family:&#39;Arial&#39;,sans-serif">”<span style="font-size: 14px; font-family: 宋体">），该等更新版本应为软件的一部分，本许可的规定应适用于该等更新版本及由此被修改的软件。</span></span></span></span></span></span></span>
+            </p>
+            <p style="
+                      margin-left: 0;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                      text-indent: 0;
+                    ">
+                <span style="font-size: 15px">(e)<span style="font:9px &#39;Times New Roman&#39;">&nbsp;&nbsp;&nbsp;<span style="font-size: 14px; font-family: 宋体">本条及本协议其他条款未明示授权的其他一切权利仍由米波现场保留，您在行使这些权利时须另外取得米波现场的书面许可。米波现场如果未行使前述任何权利，并不构成对该权利的放弃。</span></span></span>
+            </p>
+            <p style="
+                      margin-left: 0;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                      text-indent: 0;
+                    ">
+                <span style="font-size: 14px; font-family: 宋体"><br/></span>
+            </p>
+            <p style="
+                      margin-left: 0;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                      text-indent: 0;
+                    ">
+                <strong><span style="font-size:14px;font-family:&#39;Arial&#39;,sans-serif">2.<span style="font:9px &#39;Times New Roman&#39;">&nbsp; &nbsp;<strong><span style="
+                              text-decoration: underline;
+                              font-size: 14px;
+                              font-family: 宋体;
+                            ">您的权利和义务<strong><span style="
+                                  text-decoration: underline;
+                                  font-size: 14px;
+                                  font-family: Arial, sans-serif;
+                                ">.<span style="font-size:14px;font-family: &#39;Arial&#39;,sans-serif">&nbsp;&nbsp;&nbsp;</span></span></strong></span></strong></span></span></strong>
+            </p>
+            <p style="
+                      margin-left: 0;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                      text-indent: 0;
+                    ">
+                <span style="font-size: 14px; font-family: 宋体">您同意：</span>
+            </p>
+            <p style="
+                      margin-left: 0;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                      text-indent: 0;
+                    ">
+                <span style="font-size: 15px">(a)<span style="font:9px &#39;Times New Roman&#39;">&nbsp;&nbsp;<span style="font-size: 14px; font-family: 宋体">您应：</span></span></span>
+            </p>
+            <ol class=" list-paddingleft-2" style="list-style-type: lower-roman;">
+                <li>
+                    <p style="margin-left: 29px; text-align: left">
+                        <span style="font-size: 14px; font-family: 宋体">采取一定安全措施保护服务器安全性确保软件代码不被他人复制和传播；</span>
+                    </p>
+                </li>
+                <li>
+                    <p style="margin-left: 29px; text-align: left">
+                        <span style="font-size: 14px; font-family: 宋体">在符合米波现场要求的安装环境中使用和操作软件；</span>
+                    </p>
+                </li>
+                <li>
+                    <p style="margin-left: 29px; text-align: left">
+                        <span style="font-family: 宋体; font-size: 14px">您可以在本协议规定的约束和限制范围内修改软件的源代码（如果被提供的话）或界面风格以适应您的网站要求，但是由此造成的损失和纠纷与米波现场无关，由您自行承担；</span>
+                    </p>
+                </li>
+                <li>
+                    <p style="margin-left: 29px; text-align: left">
+                        <span style="font-family: 宋体; font-size: 14px">您拥有使用米波现场构建的系统中全部资料及相关信息的所有权，并独立承担与内容相关的法律义务；</span>
+                    </p>
+                </li>
+                <li>
+                    <p style="text-align: left">
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span style="font-size:14px;font-family:&#39;Arial&#39;,sans-serif">&nbsp;<span style="
+                              font-variant-numeric: normal;
+                              font-variant-east-asian: normal;
+                              font-stretch: normal;
+                              font-size: 9px;
+                              line-height: normal;
+                              font-family: &#39;Times New Roman&#39;;
+                            ">&nbsp;<span style="font-size: 14px; font-family: 宋体">米波系统安装完成后，所有应用文件即会下载到您的服务器上，请自行保管和备份应用文件和应用数据，以后遇到问题或重装网站时请自行恢复备份；</span></span></span>
+                    </p>
+                </li>
+                <li>
+                    <p class="MsoListParagraph" style="text-align: left">
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span style="font-size:14px;font-family: &#39;Arial&#39;,sans-serif">&nbsp;<span style="font-family: 宋体; font-size: 14px">遵守米波现场不时更新的限价规定。</span></span>
+                    </p>
+                </li>
+            </ol>
+            <p style="
+                      margin-left: 0;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                      text-indent: 0;
+                    ">
+                <span style="font-size: 15px">(b)<span style="font:9px &#39;Times New Roman&#39;">&nbsp;&nbsp;&nbsp;<span style="font-size: 14px; font-family: 宋体">您不得且不得允许任何其他人：</span></span></span>
+            </p>
+            <ol class=" list-paddingleft-2" style="list-style-type: lower-roman;">
+                <li>
+                    <p style="
+                          margin-left: 29px;
+                          text-align: justify;
+                          text-justify: inter-ideograph;
+                        ">
+                        <span style="font-size:14px;font-family:&#39;Arial&#39;,sans-serif">&nbsp;<span style="font-family: 宋体; font-size: 14px">为获得源代码的目的或因任何其他原因，反汇编、反编译、实施反向工程或以任何其他方式破译软件；</span></span>
+                    </p>
+                </li>
+                <li>
+                    <p style="
+                          margin-left: 29px;
+                          text-align: justify;
+                          text-justify: inter-ideograph;
+                        ">
+                        <span style="
+                            font-variant-numeric: normal;
+                            font-variant-east-asian: normal;
+                            font-stretch: normal;
+                            font-size: 9px;
+                            line-height: normal;
+                            font-family: &#39;Times New Roman&#39;;
+                          ">&nbsp;<span style="font-size: 14px; font-family: 宋体">通过米波现场开展或者从事任何具有非法性、威胁性、危害性、诽谤性、侮辱性、暴力、淫秽、赌博、种族或民族歧视，或其他冒犯性的内容或者活动</span></span>
+                    </p>
+                </li>
+                <li>
+                    <p style="
+                          margin-left: 29px;
+                          text-align: justify;
+                          text-justify: inter-ideograph;
+                        ">
+                        <span style="font-family: 宋体; font-size: 14px">复制、转售米波现场授予您的使用权限；</span>
+                    </p>
+                </li>
+                <li>
+                    <p style="
+                          margin-left: 29px;
+                          text-align: justify;
+                          text-justify: inter-ideograph;
+                        ">
+                        <span style="font-family: 宋体; font-size: 14px">就软件或软件的更新申请软件著作权。</span>
+                    </p>
+                </li>
+            </ol>
+            <p style="
+                      margin-left: 0;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                      text-indent: 0;
+                    ">
+                <strong><span style="font-size:14px;font-family:&#39;Arial&#39;,sans-serif"><br/></span></strong>
+            </p>
+            <p style="
+                      margin-left: 0;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                      text-indent: 0;
+                    ">
+                <strong><span style="font-size:14px;font-family:&#39;Arial&#39;,sans-serif">3.<span style="font:9px &#39;Times New Roman&#39;">&nbsp;&nbsp;&nbsp;<strong><span style="
+                                text-decoration: underline;
+                                font-size: 14px;
+                                font-family: 宋体;
+                              ">米波现场的权利和义务<strong><span style="
+                                    text-decoration: underline;
+                                    font-size: 14px;
+                                    font-family: Arial, sans-serif;
+                                  ">.<span style="font-size:14px;font-family: &#39;Arial&#39;,sans-serif">&nbsp;&nbsp;&nbsp;</span></span></strong></span></strong></span></span></strong>
+            </p>
+            <p style="
+                      margin-left: 0;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                      text-indent: 0;
+                    ">
+                <span style="font-size: 14px; font-family: 宋体">米波现场应：</span>
+            </p>
+            <p style="
+                      margin-left: 29px;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                    ">
+                <span style="font-size: 15px">(a)<span style="font:9px &#39;Times New Roman&#39;">&nbsp;&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;<span style="font-size: 14px; font-family: 宋体">负责软件产品的维护和升级，保障软件的正常运行和使用；</span></span></span>
+            </p>
+            <p style="
+                      margin-left: 29px;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                    ">
+                <span style="font-size: 15px">(b)<span style="font:9px &#39;Times New Roman&#39;">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;<span style="font-size: 14px; font-family: 宋体">只提供软件产品服务，由于您在使用产品过程中造成的纠纷与米波现场无关；</span></span></span>
+            </p>
+            <p style="
+                      margin-left: 29px;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                    ">
+                <span style="font-size: 15px">(c)<span style="font:9px &#39;Times New Roman&#39;">&nbsp;&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;<span style="font-size: 14px; font-family: 宋体">享有软件的著作权；</span></span></span>
+            </p>
+            <p style="
+                      margin-left: 29px;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                    ">
+                <span style="font-size: 15px">(d)<span style="font:9px &#39;Times New Roman&#39;">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;<span style="font-size: 14px; font-family: 宋体">享有软件产品相关费用的定价权并在您购买产品前适时告知您；</span></span></span>
+            </p>
+            <p style="
+                      margin-left: 29px;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                    ">
+                <span style="font-size: 15px">(e)<span style="font:9px &#39;Times New Roman&#39;">&nbsp;&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;<span style="font-size: 14px; font-family: 宋体">有权自行调整软件的服务费价格，如果因您未及时支付服务费造成软件无法正常使用的，米波现场不承担任何责任；</span></span></span>
+            </p>
+            <p style="
+                      margin-left: 29px;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                    ">
+                <span style="font-size: 15px">(f)<span style="font:9px &#39;Times New Roman&#39;">&nbsp;&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;<span style="font-size: 14px; font-family: 宋体">若您后续过程中要求米波现场增加功能的，您应额外支付定制费用，且定制的产品跟其他产品一样遵循本协议以及米波现场的相关规定；</span></span></span>
+            </p>
+            <p style="
+                      margin-left: 29px;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                    ">
+                <span style="font-size: 15px">(g)<span style="font:9px &#39;Times New Roman&#39;">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;<span style="font-size: 14px; font-family: 宋体">有权自行决定软件功能的最低销售指导价。</span></span></span>
+            </p>
+            <p style="
+                      margin-left: 29px;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                    ">
+                <span style="font-size: 14px; font-family: 宋体"><br/></span>
+            </p>
+            <p style="
+                      margin-left: 0;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                      text-indent: 0;
+                    ">
+                <strong><span style="font-size:14px;font-family:&#39;Arial&#39;,sans-serif">4.<span style="font:9px &#39;Times New Roman&#39;">&nbsp;&nbsp;&nbsp;<strong><span style="
+                                text-decoration: underline;
+                                font-size: 14px;
+                                font-family: 宋体;
+                              ">保证的免责<strong><span style="
+                                    text-decoration: underline;
+                                    font-size: 14px;
+                                    font-family: Arial, sans-serif;
+                                  ">.<span style="font-size:14px;font-family: &#39;Arial&#39;,sans-serif">&nbsp;</span></span></strong></span></strong></span></span></strong>
+            </p>
+            <p style="
+                      margin-left: 0;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                      text-indent: 0;
+                    ">
+                <span style="font-size: 14px; font-family: 宋体">除明文规定以外，所有明示或暗示、法定或其它的保证和条件均在此被排除。</span>
+            </p>
+            <p style="
+                      margin-left: 0;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                      text-indent: 0;
+                    ">
+                <span style="font-size: 14px; font-family: 宋体"><br/></span>
+            </p>
+            <p style="
+                      margin-left: 0;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                      text-indent: 0;
+                    ">
+                <strong><span style="font-size:14px;font-family:&#39;Arial&#39;,sans-serif">5.<span style="font:9px &#39;Times New Roman&#39;">&nbsp;&nbsp;&nbsp;<strong><span style="
+                                text-decoration: underline;
+                                font-size: 14px;
+                                font-family: 宋体;
+                              ">责任的限制<strong><span style="
+                                    text-decoration: underline;
+                                    font-size: 14px;
+                                    font-family: Arial, sans-serif;
+                                  ">.<span style="font-size:14px;font-family: &#39;Arial&#39;,sans-serif">&nbsp;&nbsp;</span></span></strong></span></strong></span></span></strong>
+            </p>
+            <p style="
+                      margin-left: 0;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                      text-indent: 0;
+                    ">
+                <span style="font-size: 14px; font-family: 宋体">因米波现场违约您得到的唯一赔偿并且米波现场的唯一责任应为对本协议项下要求的修复、更新或维护。任何情况下米波现场均不应为以下情况承担责任：</span>
+            </p>
+            <p style="margin-left: 0; text-indent: 0">
+                <span style="font-size: 15px">&nbsp; &nbsp; (a)<span style="font:9px &#39;Times New Roman&#39;">&nbsp;&nbsp;<span style="font-size: 14px; font-family: 宋体">利润损失、数据丢失或其它偶然或间接损坏；</span></span></span>
+            </p>
+            <p style="margin-left: 0; text-indent: 0">
+                <span style="font-size: 15px">&nbsp; &nbsp; (b)<span style="font:9px &#39;Times New Roman&#39;">&nbsp;&nbsp;<span style="font-size: 14px; font-family: 宋体">由于您未能履行责任导致的损坏。</span></span></span>
+            </p>
+            <p style="text-align: justify; text-justify: inter-ideograph">
+                <span style="font-size: 14px; font-family: 宋体">&nbsp;无论本协议有任何其他规定，在任何情况下，米波现场对因本协议的履行或不履行所致的任何损失、损害或赔偿索赔的累计责任总额不得超过米波现场根据本协议实际收到的价款。</span>
+            </p>
+            <p style="text-align: justify; text-justify: inter-ideograph">
+                <span style="font-size: 14px; font-family: 宋体"><br/></span>
+            </p>
+            <p style="
+                      margin-left: 0;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                      text-indent: 0;
+                    ">
+                <strong><span style="font-size:14px;font-family:&#39;Arial&#39;,sans-serif">6.<span style="font:9px &#39;Times New Roman&#39;">&nbsp;&nbsp;&nbsp;&nbsp;<strong><span style="
+                                text-decoration: underline;
+                                font-size: 14px;
+                                font-family: 宋体;
+                              ">纳税<strong><span style="
+                                    text-decoration: underline;
+                                    font-size: 14px;
+                                    font-family: Arial, sans-serif;
+                                  ">.<strong><span style="font-size:14px;font-family:&#39;Arial&#39;,sans-serif">&nbsp;&nbsp;&nbsp;</span></strong></span></strong></span></strong></span></span></strong>
+            </p>
+            <p style="
+                      margin-left: 0;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                      text-indent: 0;
+                    ">
+                <span style="font-size: 14px; font-family: 宋体">您同意承担本协议项下产品、服务等相关的全部税款。</span>
+            </p>
+            <p style="
+                      margin-left: 0;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                      text-indent: 0;
+                    ">
+                <span style="font-size: 14px; font-family: 宋体"><br/></span>
+            </p>
+            <p style="
+                      margin-left: 0;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                      text-indent: 0;
+                    ">
+                <strong><span style="font-size:14px;font-family:&#39;Arial&#39;,sans-serif">7.<span style="font:9px &#39;Times New Roman&#39;">&nbsp;&nbsp;&nbsp;&nbsp;<strong><span style="
+                                text-decoration: underline;
+                                font-size: 14px;
+                                font-family: 宋体;
+                              ">软件维护的条款和条件<strong><span style="
+                                    text-decoration: underline;
+                                    font-size: 14px;
+                                    font-family: Arial, sans-serif;
+                                  ">.</span></strong></span></strong></span></span></strong>
+            </p>
+            <p style="
+                      margin-left: 37px;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                    ">
+                <strong><span style="font-size:14px;font-family:&#39;Arial&#39;,sans-serif">7.1<span style="font:9px &#39;Times New Roman&#39;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong><span style="
+                              text-decoration: underline;
+                              font-size: 14px;
+                              font-family: 宋体;
+                            ">服务覆盖区间</span></strong></span></span></strong>
+            </p>
+            <p>
+                <span style="font-family: 宋体, SimSun; font-size: 14px">&nbsp;&nbsp;&nbsp;&nbsp;米波现场同意从北京时间周一至周五上午9点至下午6点之间提供本协议所述的维护服务（国家公共假日除外），您可以直接通过在线即时通讯软件跟米波现场售后客服进行沟通或者打电话至米波现场技术支持中心。所有服务均远程提供。</span>
+            </p>
+            <p style="
+                      margin-left: 37px;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                    ">
+                <strong><span style="font-size:14px;font-family:&#39;Arial&#39;,sans-serif">7.2<span style="font:9px &#39;Times New Roman&#39;">&nbsp; &nbsp; &nbsp;<strong><span style="
+                              text-decoration: underline;
+                              font-size: 14px;
+                              font-family: 宋体;
+                            ">维护费用<span style="font-size:14px;font-family:&#39;Arial&#39;,sans-serif">&nbsp;&nbsp;</span></span></strong></span></span></strong>
+            </p>
+            <ol class=" list-paddingleft-2" style="list-style-type: lower-roman;">
+                <ol class=" list-paddingleft-2" style="list-style-type: upper-alpha;">
+                    <ol class=" list-paddingleft-2" style="list-style-type: upper-roman;">
+                        <li>
+                            <p style="margin-left: 29px">
+                                <span style="font-size: 15px">&nbsp;&nbsp;&nbsp;&nbsp;<span style="font-size: 14px; font-family: 宋体">您应按年支付软件维护费用。若您未按约定支付软件维护费用，米波现场有权不提供维护服务和升级服务以及售后服务。如果软件的开发者不再维护软件而您已付费的维护服务期限尚未到期的，您有权要求米波现场退还本年折合未使用的维护费用，米波现场将不再提供相关的升级服务和售后服务，软件许可费用和已发生的维护费用不予退还，本协议终止。</span></span>
+                            </p>
+                        </li>
+                        <li>
+                            <p style="margin-left: 29px">
+                                <span style="font-size: 14px; font-family: 宋体;">本协议不包括软件维护的现场支持。如果您要求现场支持解决特殊问题或您要求提供本协议范围之外的服务，您同意在年度维护费用之外再支付该服务当时有效的工时和材料费。您还同意支付米波现场员工必要的差旅费。</span>
+                            </p>
+                        </li>
+                    </ol>
+                </ol>
+            </ol>
+            <p style="
+                      margin-left: 37px;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                    ">
+                <strong><span style="font-size:14px;font-family:&#39;Arial&#39;,sans-serif">7.3<span style="font:9px &#39;Times New Roman&#39;">&nbsp;&nbsp;&nbsp;&nbsp;<strong><span style="
+                              text-decoration: underline;
+                              font-size: 14px;
+                              font-family: 宋体;
+                            ">软件或软件功能的增加<span style="font-size:14px;font-family:&#39;Arial&#39;,sans-serif">&nbsp;&nbsp;&nbsp;</span></span></strong></span></span></strong>
+            </p>
+            <p>
+                <span style="font-family: 宋体, SimSun; font-size: 14px">&nbsp;&nbsp;&nbsp;&nbsp;您可以要求在本协议中增加本协议所述之外的软件或软件功能。如果米波现场同意进行上述增加，您同意支付该增加的费用，并且任何该等增加同样适用本协议。</span>
+            </p>
+            <p style="
+                      margin-left: 37px;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                    ">
+                <strong><span style="font-size:14px;font-family:&#39;Arial&#39;,sans-serif">7.4<span style="font:9px &#39;Times New Roman&#39;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong><span style="
+                              text-decoration: underline;
+                              font-size: 14px;
+                              font-family: 宋体;
+                            ">维护的免责<span style="font-size:14px;font-family:&#39;Arial&#39;,sans-serif">&nbsp;&nbsp;</span></span></strong></span></span></strong>
+            </p>
+            <p style="
+                      margin-left: 37px;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                    ">
+                <span style="font-size: 14px; font-family: 宋体">&nbsp;维护服务不包括由下列原因导致的损坏的维护：</span>
+            </p>
+            <ol class=" list-paddingleft-2" style="list-style-type: lower-alpha;">
+                <ol class=" list-paddingleft-2" style="list-style-type: lower-roman;">
+                    <ol class=" list-paddingleft-2" style="list-style-type: upper-roman;">
+                        <li>
+                            <p>
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="font-family: 宋体, SimSun; font-size: 14px">软件外部的原因，包括但不限于电气作业、火灾、水灾、水、风、闪电或运输，或任何由于黑客攻击、计算机病毒侵入或发作、因政府管制而造成的暂时性关闭等影响网络正常经营等不可抗力事件；</span>
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="font-family: 宋体, SimSun; font-size: 14px">您未能连续提供相匹配的安装环境，包括但不限于服务器环境等；</span>
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="font-family: 宋体, SimSun; font-size: 14px">您对软件的不当使用；</span>
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="font-family: 宋体, SimSun; font-size: 14px">未经米波现场事先授权，您修复或修改软件；</span>
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="font-family: 宋体, SimSun; font-size: 14px">您为规定之外的目的使用软件；</span>
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="font-family: 宋体, SimSun; font-size: 14px">您个人电脑故障。</span>
+                            </p>
+                        </li>
+                    </ol>
+                </ol>
+            </ol>
+            <p style="
+                      margin-left: 37px;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                    ">
+                <strong><span style="font-size:14px;font-family:&#39;Arial&#39;,sans-serif">7.5<span style="font:9px &#39;Times New Roman&#39;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;<strong><span style="
+                              text-decoration: underline;
+                              font-size: 14px;
+                              font-family: 宋体;
+                            ">软件免责<strong><span style="
+                                  text-decoration: underline;
+                                  font-size: 14px;
+                                  font-family: Arial, sans-serif;
+                                ">.<span style="font-size:14px;font-family:&#39;Arial&#39;,sans-serif">&nbsp;&nbsp;</span></span></strong></span></strong></span></span></strong>
+            </p>
+            <p style="
+                      margin-left: 37px;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                    ">
+                <span style="font-size: 14px; font-family: 宋体">软件维护不包括：</span>
+            </p>
+            <ol class=" list-paddingleft-2" style="list-style-type: lower-roman;">
+                <ol class=" list-paddingleft-2" style="list-style-type: upper-alpha;">
+                    <ol class=" list-paddingleft-2" style="list-style-type: upper-roman;">
+                        <li>
+                            <p style="
+                              margin-left: 0;
+                              text-align: justify;
+                              text-justify: inter-ideograph;
+                              text-indent: 0;
+                              text-autospace: none;
+                            ">
+                                <span style="font-size: 14px; font-family: 宋体;">不由米波现场供应的应用程序和产品或软件的转换所需的服务；</span>
+                            </p>
+                        </li>
+                        <li>
+                            <p style="
+                              margin-left: 0;
+                              text-align: justify;
+                              text-justify: inter-ideograph;
+                              text-indent: 0;
+                              text-autospace: none;
+                            ">
+                                <span style="font-size: 14px; font-family: 宋体;">软件和您使用的其它应用之间的界面的增强或修改；</span>
+                            </p>
+                        </li>
+                        <li>
+                            <p style="
+                              margin-left: 0;
+                              text-align: justify;
+                              text-justify: inter-ideograph;
+                              text-indent: 0;
+                              text-autospace: none;
+                            ">
+                                <span style="font: 9px &quot;Times New Roman&quot;;">&nbsp;<span style="font-size: 14px; font-family: 宋体">软件进一步成形以备您使用所需的服务；</span></span>
+                            </p>
+                        </li>
+                        <li>
+                            <p style="
+                              margin-left: 0;
+                              text-align: justify;
+                              text-justify: inter-ideograph;
+                              text-indent: 0;
+                              text-autospace: none;
+                            ">
+                                <span style="font-size: 14px; font-family: 宋体;">电话培训用户或您人员；</span>
+                            </p>
+                        </li>
+                        <li>
+                            <p style="
+                              margin-left: 0;
+                              text-align: justify;
+                              text-justify: inter-ideograph;
+                              text-indent: 0;
+                              text-autospace: none;
+                            ">
+                                <span style="font-size: 14px; font-family: 宋体;">为实现软件升级所需的人力；</span>
+                            </p>
+                        </li>
+                        <li>
+                            <p style="
+                              margin-left: 0;
+                              text-align: justify;
+                              text-justify: inter-ideograph;
+                              text-indent: 0;
+                              text-autospace: none;
+                            ">
+                                <span style="font-size: 14px; font-family: 宋体;">软件重新安装；</span>
+                            </p>
+                        </li>
+                        <li>
+                            <p style="
+                              margin-left: 0;
+                              text-align: justify;
+                              text-justify: inter-ideograph;
+                              text-indent: 0;
+                              text-autospace: none;
+                            ">
+                                <span style="font-size: 14px; font-family: 宋体">还原备份。</span>
+                            </p>
+                        </li>
+                    </ol>
+                </ol>
+            </ol>
+            <p style="
+                      margin-left: 48px;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                    ">
+                <em><span style="font-size:14px;font-family:&#39;Arial&#39;,sans-serif">&nbsp;</span></em>
+            </p>
+            <p style="
+                      margin-left: 0;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                      text-indent: 0;
+                    ">
+                <strong><span style="font-size:14px;font-family:&#39;Arial&#39;,sans-serif">8.<span style="font:9px &#39;Times New Roman&#39;">&nbsp;&nbsp;&nbsp;<strong><span style="
+                                text-decoration: underline;
+                                font-size: 14px;
+                                font-family: 宋体;
+                              ">违约<strong><span style="
+                                    text-decoration: underline;
+                                    font-size: 14px;
+                                    font-family: Arial, sans-serif;
+                                  ">.&nbsp;</span></strong></span></strong></span></span></strong>
+            </p>
+            <p style="
+                      margin-left: 0;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                      text-indent: 0;
+                    ">
+                <span style="font-size: 14px; font-family: 宋体">如果您违反本协议或米波现场的其它规定并且未能在收到书面改正通知后<span style="font-size:14px;font-family:&#39;Arial&#39;,sans-serif">15<span style="font-size: 14px; font-family: 宋体">天内改正，则米波现场保留终止或中止维护服务、终止本协议的权利。此外，如果您破产、其全部或部分资产或业务被指定了破产财产管理人、财务管理人、遗产管理人或破产财产遗产管理人，或与其债权人作出和解或安排，或无力偿还其到期债务，则本协议终止，并且本协议项下所有收费立即到期并应予支付。</span></span></span>
+            </p>
+            <p style="
+                      margin-left: 0;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                      text-indent: 0;
+                    ">
+                <span style="font-size: 14px; font-family: 宋体"><br/></span>
+            </p>
+            <p style="
+                      margin-left: 0;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                      text-indent: 0;
+                    ">
+                <strong><span style="font-size:14px;font-family:&#39;Arial&#39;,sans-serif">9.<span style="font:9px &#39;Times New Roman&#39;">&nbsp;&nbsp;&nbsp;&nbsp;<strong><span style="
+                                text-decoration: underline;
+                                font-size: 14px;
+                                font-family: 宋体;
+                              ">特别约定<strong><span style="
+                                    text-decoration: underline;
+                                    font-size: 14px;
+                                    font-family: Arial, sans-serif;
+                                  ">.<strong> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<strong><span style="font-size: 14px; font-family: 宋体">双方确认并同意：</span></strong></strong></span></strong></span></strong></span></span></strong>
+            </p>
+            <p style="
+                      margin-left: 29px;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                    ">
+                <span style="font-size: 15px">(a)<span style="font:9px &#39;Times New Roman&#39;">&nbsp;&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;<span style="font-size: 14px; font-family: 宋体">所有应用和模板只对<span style="font-size:14px;font-family:&#39;Arial&#39;,sans-serif">Chrome<span style="font-size: 14px; font-family: 宋体">内核浏览器做兼容，<span style="font-size:14px;font-family: &#39;Arial&#39;,sans-serif">IE9<span style="font-size: 14px; font-family: 宋体">及以下不做兼容测试。</span></span></span></span></span></span></span>
+            </p>
+            <p style="
+                      margin-left: 29px;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                    ">
+                <span style="font-size: 15px">(b)<span style="font:9px &#39;Times New Roman&#39;">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;<span style="font-size: 14px; font-family: 宋体">米波现场的售后服务范围只限于处理米波现场检查自身<span style="font-size:14px;font-family:&#39;Arial&#39;,sans-serif">bug<span style="font-size: 14px; font-family: 宋体">、使用问题，不提供二次开发指导，也不免费处理服务器环境问题、域名类问题等。</span></span></span></span></span>
+            </p>
+            <p style="
+                      margin-left: 29px;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                    ">
+                <span style="font-size: 15px">(c)<span style="font:9px &#39;Times New Roman&#39;">&nbsp;&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;<span style="font-size: 14px; font-family: 宋体">任何软件都无法保证没有<span style="font-size:14px;font-family:&#39;Arial&#39;,sans-serif">bug<span style="font-size: 14px; font-family: 宋体">，本软件产品也不例外，但米波现场承诺只要接到您的反馈，一定会尽快进行修复。</span></span></span></span></span>
+            </p>
+            <p style="
+                      margin-left: 29px;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                    ">
+                <span style="font-size: 15px">(d)<span style="font:9px &#39;Times New Roman&#39;">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;<span style="font-size: 14px; font-family: 宋体">如果您的网站涉及到资金安全，请谨慎使用软件，并请自行保管好网站数据，米波现场不对因使用应用导致的任何损失承担任何责任。</span></span></span>
+            </p>
+            <p style="
+                      margin-left: 29px;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                    ">
+                <span style="font-size: 15px">(e)<span style="font:9px &#39;Times New Roman&#39;">&nbsp;&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;<span style="font-size: 14px; font-family: 宋体">只有在微擎应用商城购买的或者通过联系米波现场作者购买的正版软件才有售后服务，通过其他任何途径购买或安装的均为盗版，米波现场不提供任何服务。</span></span></span>
+            </p>
+            <!--
+            <p style="
+                      margin-left: 29px;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                    ">
+                <span style="font-size: 15px">(f)<span style="font:9px &#39;Times New Roman&#39;">&nbsp;&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;<span style="font-size: 14px; font-family: 宋体">您应严格遵守如下限价规则（定制功能除外，定制功能按<span style="font-size:14px;font-family:&#39;Arial&#39;,sans-serif">QQ<span style="font-size: 14px; font-family: 宋体">群里的告知的最低售价执行。）</span></span></span></span></span>
+            </p>
+            <p style="
+                      margin-left: 29px;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                    ">
+                <strong><span style="color: rgb(255, 0, 0); font-family: 宋体, SimSun;">单场限价规则:</span></strong>
+            </p>
+            <p style="
+                      margin-left: 29px;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                    ">
+                <span style="font-size: 14px; font-family: 宋体"></span>
+            </p>
+            <ol class=" list-paddingleft-2" style="list-style-type: upper-roman;">
+                <ol class="custom_num list-paddingleft-1" style="list-style-type: num;">
+                    <ol class="custom_num1 list-paddingleft-2" style="list-style-type: num1;">
+                        <ol class="custom_num2 list-paddingleft-2" style="list-style-type: num2;">
+                            <li class="list-num-3-1 list-num2-paddingleft-1">
+                                <p>
+                                    <span style="font-family: 宋体, SimSun; font-size: 14px">用户100人以内所有产品套餐最低售价 100元；</span>
+                                </p>
+                            </li>
+                            <li class="list-num-3-2 list-num2-paddingleft-1">
+                                <p>
+                                    <span style="font-family: 宋体, SimSun; font-size: 14px">用户101 - 300人以内所有产品套餐最低售价 200元；</span>
+                                </p>
+                            </li>
+                            <li class="list-num-3-3 list-num2-paddingleft-1">
+                                <p>
+                                    <span style="font-family: 宋体, SimSun; font-size: 14px">用户301 - 500人以内所有产品套餐最低售价 300元；</span>
+                                </p>
+                            </li>
+                            <li class="list-num-3-4 list-num2-paddingleft-1">
+                                <p>
+                                    <span style="font-family: 宋体, SimSun; font-size: 14px">用户501 - 800人以内所有产品套餐最低售价 400元；</span>
+                                </p>
+                            </li>
+                            <li class="list-num-3-5 list-num2-paddingleft-1">
+                                <p>
+                                    <span style="font-family: 宋体, SimSun; font-size: 14px">用户801 - 1000人以内所有产品套餐最低售价 500元。</span>
+                                </p>
+                            </li>
+                            <li class="list-num-3-5 list-num2-paddingleft-1">
+                                <p>
+                                    <span style="font-family: 宋体, SimSun; font-size: 14px">用户1001人以内所有产品套餐最低售价 600元。</span>
+                                </p>
+                            </li>
+                            <li class="list-num-3-6 list-num2-paddingleft-1">
+                                <p>
+                                    <span style="font-family: 宋体, SimSun; font-size: 14px">充值提现手续费最低5%，充值手续费1万以下5%，1万以上可以自己商定。</span>
+                                </p>
+                            </li>
+                            <li class="list-num-3-7 list-num2-paddingleft-1">
+                                <p>
+                                    <span style="font-family: 宋体, SimSun; font-size: 14px">定制功能：泡泡签到最低售价350元，摇一摇启动仪式最低售价500元，微信直播最低售价500元，弹珠抽奖最低售价800元<span style="font-family: 宋体, SimSun; font-size: 14px;">，其他定制请按照定制群内最低售价来定价。</span></span>
+                                </p>
+                            </li>
+                        </ol>
+                    </ol>
+                </ol>
+            </ol>
+            <p>
+                <strong><span style="text-align: justify; color: rgb(128, 128, 128); font-family: 微软雅黑, Tahoma, 宋体; font-size: 14px; font-variant-numeric: normal; font-variant-east-asian: normal; line-height: 22px; widows: 1; background-color: rgb(255, 255, 255);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></strong><span style="font-size: 14px; color: rgb(255, 0, 0);">注意</span><span style="font-size: 14px;">：以上单场次活动定价是基于<span style="font-size: 14px; color: rgb(255, 0, 0);">1天</span>的价格，客户活动需要<span style="font-size: 14px; color: rgb(255, 0, 0);">超过一天</span>的可以按<span style="font-size: 14px; color: rgb(255, 0, 0);">8折</span>计算费用，如果多天折后费用超过该档次包月价格的，直接按包月价格即可。</span>
+            </p>
+            <p style="
+                      margin-left: 29px;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                    ">
+                <strong><span style="text-align: justify; color: rgb(255, 0, 0); font-family: 宋体, SimSun;">包年包月</span></strong><span style="color: rgb(255, 0, 0); text-align: justify; font-weight: bold; font-family: 宋体, SimSun;">限价规则:</span>
+            </p>
+            <ol class=" list-paddingleft-2" style="list-style-type: upper-roman;">
+                <ol class="custom_num list-paddingleft-1" style="list-style-type: num;">
+                    <ol class="custom_num1 list-paddingleft-2" style="list-style-type: num1;">
+                        <ol class="custom_num2 list-paddingleft-2" style="list-style-type: num2;">
+                            <li class="list-num-3-1 list-num2-paddingleft-1">
+                                <p>
+                                    <span style="font-family: 宋体, SimSun; font-size: 14px;">100人以内<span style="font-family: 宋体, SimSun; font-size: 14px;">所有产品套餐最低售价</span> 包月500元 包年1280<span style="font-family: 宋体, SimSun; font-size: 14px;">元</span></span>
+                                </p>
+                            </li>
+                            <li class="list-num-3-2 list-num2-paddingleft-1">
+                                <p>
+                                    <span style="font-family: 宋体, SimSun; font-size: 14px;">200人以内<span style="font-family: 宋体, SimSun; font-size: 14px;">所有产品套餐最低售价</span> 包月800元&nbsp; 包年1480<span style="font-family: 宋体, SimSun; font-size: 14px;">元</span></span>
+                                </p>
+                            </li>
+                            <li class="list-num-3-3 list-num2-paddingleft-1">
+                                <p>
+                                    <span style="font-family: 宋体, SimSun; font-size: 14px;">500人以内<span style="font-family: 宋体, SimSun; font-size: 14px;">所有产品套餐最低售价</span> 包月1000元 包年 2080<span style="font-family: 宋体, SimSun; font-size: 14px;">元</span></span>
+                                </p>
+                            </li>
+                            <li class="list-num-3-4 list-num2-paddingleft-1">
+                                <p>
+                                    <span style="font-family: 宋体, SimSun; font-size: 14px;">800人以内<span style="font-family: 宋体, SimSun; font-size: 14px;">所有产品套餐最低售价</span> 包月1500元&nbsp; 包年2580<span style="font-family: 宋体, SimSun; font-size: 14px;">元</span></span>
+                                </p>
+                            </li>
+                            <li class="list-num-3-5 list-num2-paddingleft-1">
+                                <p>
+                                    <span style="font-family: 宋体, SimSun; font-size: 14px;">1000人以内<span style="font-family: 宋体, SimSun; font-size: 14px;">所有产品套餐最低售价</span> 包月 1800元&nbsp; 包年3080元</span>
+                                </p>
+                            </li>
+                            <li class="list-num-3-6 list-num2-paddingleft-1">
+                                <p>
+                                    <span style="font-family: 宋体, SimSun; font-size: 14px;">如果您的包年包月模式是：<span style="font-family: 宋体, SimSun; font-size: 14px; color: rgb(255, 0, 0);"><span style="font-family: 宋体, SimSun; font-size: 14px;">仅限一个</span>活动</span> ，多加一个包年包月活动可以7折，多加两个可以6折，多加三个可以5折。比如买了一个100人以下包年1580元，用户想多加一个包年 一共的费用就是1580<span style="font-family: 宋体, SimSun; font-size: 14px;">元&nbsp;</span>+（1580<span style="font-family: 宋体, SimSun; font-size: 14px;">元</span>*0.7）（<span style="font-family: 宋体, SimSun; font-size: 14px; color: rgb(255, 0, 0);"><strong>推荐此模式</strong></span>）</span>
+                                </p>
+                            </li>
+                            <li class="list-num-3-7 list-num2-paddingleft-1">
+                                <p>
+                                    <span style="font-family: 宋体, SimSun; font-size: 14px;">如果您的包年包月模式是：<span style="font-family: 宋体, SimSun; font-size: 14px; color: rgb(255, 0, 0);">不限制活动</span>，<span style="font-family: 宋体, SimSun; font-size: 14px; color: rgb(255, 0, 0);">务必跟客户签订合同，注明不得</span><span style="font-family: 宋体, SimSun; font-size: 14px; color: rgb(255, 0, 0);">干扰市场价格</span>，总之自己的客户自己负责。发现您的客户有存在低价转卖账号等影响软件限价协议正常运行的行为，<span style="font-family: 宋体, SimSun; font-size: 14px; color: rgb(255, 0, 0);">直接会导致<span style="color: rgb(255, 0, 0); font-family: 宋体, SimSun; font-size: 14px;">您系统的授权被</span>停用</span></span>
+                                </p>
+                            </li>
+                            <li class="list-num-3-8 list-num2-paddingleft-1">
+                                <p>
+                                    <span style="font-family: 宋体, SimSun; font-size: 14px;">重点 ：定制功能单加费用 比如买了一个500人以下的包年 2580<span style="font-family: 宋体, SimSun; font-size: 14px;">元</span>&nbsp; 又买了一个泡泡签到 一共就是2580<span style="font-family: 宋体, SimSun; font-size: 14px;">元</span>+350<span style="font-family: 宋体, SimSun; font-size: 14px;">元</span>&nbsp;&nbsp;</span>
+                                </p>
+                            </li>
+                            <li class="list-num-3-9 list-num2-paddingleft-1">
+                                <p>
+                                    <span style="font-family: 宋体, SimSun; font-size: 14px;">充值提现都是5%，充值手续费1万以下5%，1万以上自由发挥（500人以上包年充值和提现最低手续费可以2%）</span>
+                                </p>
+                            </li>
+                            <li class="list-num-3-10 list-num2-paddingleft-2">
+                                <p>
+                                    <span style="font-family: 宋体, SimSun; font-size: 14px;">定制功能：泡泡签到350<span style="font-family: 宋体, SimSun; font-size: 14px;">元</span>，摇一摇启动仪式500<span style="font-family: 宋体, SimSun; font-size: 14px;">元</span>，微信直播500<span style="font-family: 宋体, SimSun; font-size: 14px;">元</span>，弹珠抽奖800<span style="font-family: 宋体, SimSun; font-size: 14px;">元，其他定制请按照定制群内最低售价来定价。</span></span>
+                                </p>
+                            </li>
+                        </ol>
+                    </ol>
+                </ol>
+            </ol>
+            <p>
+                <strong><span style="font-family: 宋体; font-size: 14px; text-align: justify; color: rgb(255, 0, 0);">若您违反本条款上述规则的，米波现场有权停止系统授权。第一次违反的，停止系统授权一周；第二次违反的，停止系统授权一个月；第三次违反的，永久停止系统授权。</span></strong>
+            </p>
+          -->
+            <p style="text-align: justify; text-justify: inter-ideograph">
+                <br/>
+            </p>
+            <p style="
+                      margin-left: 0;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                      text-indent: 0;
+                    ">
+                <strong><span style="font-size:14px;font-family:&#39;Arial&#39;,sans-serif">10.<span style="font:9px &#39;Times New Roman&#39;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong><span style="
+                                text-decoration: underline;
+                                font-size: 14px;
+                                font-family: 宋体;
+                              ">一般规定<strong><span style="
+                                    text-decoration: underline;
+                                    font-size: 14px;
+                                    font-family: Arial, sans-serif;
+                                  ">.<strong><span style="font-size:14px;font-family: &#39;Arial&#39;,sans-serif">&nbsp;</span></strong></span></strong></span></strong></span></span></strong>
+            </p>
+            <p style="
+                      margin-left: 0;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                      text-indent: 0;
+                    ">
+                <span style="font-size: 15px">(a)<span style="font:9px &#39;Times New Roman&#39;">&nbsp;&nbsp;&nbsp; <span style="font-size: 14px; font-family: 宋体">本协议任何规定的无效或非法不应影响其它规定的有效性。双方努力保持未受影响的其余条款的全部效力。</span></span></span>
+            </p>
+            <p style="
+                      margin-left: 0;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                      text-indent: 0;
+                    ">
+                <span style="font-size: 15px">(b)<span style="font:9px &#39;Times New Roman&#39;">&nbsp;&nbsp; &nbsp;<span style="font-size: 14px; font-family: 宋体">未经米波现场事先书面同意，您不得转让本协议或软件许可，任何未经米波现场事先书面同意的所谓的转让应为无效。</span></span></span>
+            </p>
+            <p style="
+                      margin-left: 0;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                      text-indent: 0;
+                    ">
+                <span style="font-size: 15px">(c)<span style="font:9px &#39;Times New Roman&#39;">&nbsp;&nbsp;&nbsp; &nbsp;<span style="font-size: 14px; font-family: 宋体">任何一方对由其可以合理控制以外的原因造成的不能或延期履约均不承担责任，包括战争、罢工、火灾、水灾、风暴、任何由于黑客攻击、计算机病毒侵入或发作、因政府管制而造成的暂时性关闭等影响网络正常经营的不可抗力事件或其它不可抗力事件。任何由于不可抗力而造成的损失，米波现场不承担任何直接、间接或者连带的责任。双方同意采取最大努力将该等不能或延期履约所造成的影响降到最低。</span></span></span>
+            </p>
+            <p style="
+                      margin-left: 0;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                      text-indent: 0;
+                    ">
+                <span style="font-size: 15px">(d)<span style="font:9px &#39;Times New Roman&#39;">&nbsp;&nbsp; &nbsp;<span style="font-size: 14px; font-family: 宋体">您了解，软件出口可能需要出口许可证，您应承担获得该等许可证的全部责任。</span></span></span>
+            </p>
+            <p style="text-align: justify; text-justify: inter-ideograph">
+                <br/>
+            </p>
+            <p style="
+                      margin-left: 0;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                      text-indent: 0;
+                    ">
+                <strong><span style="font-size:14px;font-family:&#39;Arial&#39;,sans-serif">11.<span style="font:9px &#39;Times New Roman&#39;">&nbsp;&nbsp;&nbsp;<strong><span style="
+                                text-decoration: underline;
+                                font-size: 14px;
+                                font-family: 宋体;
+                              ">通知<strong><span style="
+                                    text-decoration: underline;
+                                    font-size: 14px;
+                                    font-family: Arial, sans-serif;
+                                  ">.</span></strong></span></strong></span></span></strong>
+            </p>
+            <p style="
+                      margin-left: 0;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                      text-indent: 0;
+                    ">
+                <span style="font-size: 15px">(a)<span style="font:9px &#39;Times New Roman&#39;">&nbsp; &nbsp; &nbsp;<span style="
+                          font-size: 14px;
+                          font-family: 宋体;
+                          color: #24292e;
+                          background: white;
+                        ">您应该向米波现场提供真实有效的联系方式（包括但不限于电子邮件地址、联系电话、联系地址等），对于联系方式发生变更的，您有义务及时更新有关信息，并保持可被联系的状态。<span style="
+                            font-size: 14px;
+                            font-family: 宋体;
+                            color: black;
+                            background: white;
+                          ">本协议签订或履行过程中，米波现场寄送<span style="font-size: 14px; font-family: 宋体">的书面通知，在交邮后第五个自然日即视为送达。书面通知形式还包括但不限于<span style="font-size:14px;font-family:&#39;Arial&#39;,sans-serif">QQ<span style="font-size: 14px; font-family: 宋体">群公告、电子邮件、微信消息、手机短信、<span style="font-size:14px;font-family:&#39;Arial&#39;,sans-serif">QQ<span style="font-size: 14px; font-family: 宋体">消息和传真等电子方式，在采用电子方式进行通知的情况下，发送或发布当日即视为送达。</span></span></span></span></span></span></span></span></span>
+            </p>
+            <p style="
+                      margin-left: 0;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                      text-indent: 0;
+                    ">
+                <span style="font-size: 15px">(b)<span style="font:9px &#39;Times New Roman&#39;">&nbsp; &nbsp; &nbsp;<span style="font-size: 14px; font-family: 宋体">您同意司法机关（包括但不限于人民法院）可以通过您提供的手机号码、电子邮箱联系方式、联系地址进行送达，司法机关向上述联系方式发出法律文书即视为送达。</span></span></span>
+            </p>
+            <p style="
+                      margin-left: 0;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                      text-indent: 0;
+                    ">
+                <span style="font-size: 15px">(c)<span style="font:9px &#39;Times New Roman&#39;">&nbsp;&nbsp;&nbsp; &nbsp;<span style="font-size: 14px; font-family: 宋体">您应当保证所提供的联系方式是准确、有效的，并进行实时更新。如果因提供的联系方式不正确，或不及时告知变更后的联系方式，使法律文书无法送达或未及时送达，由您自行承担由此可能产生的法律后果。</span></span></span>
+            </p>
+            <p style="text-align: justify; text-justify: inter-ideograph">
+                <span style="font-size:14px;font-family:&#39;Arial&#39;,sans-serif">&nbsp;</span>
+            </p>
+            <p style="
+                      margin-left: 0;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                      text-indent: 0;
+                    ">
+                <strong><span style="font-size:14px;font-family:&#39;Arial&#39;,sans-serif">12.<span style="font:9px &#39;Times New Roman&#39;">&nbsp;&nbsp;&nbsp;&nbsp;<strong><span style="
+                              text-decoration: underline;
+                              font-size: 14px;
+                              font-family: 宋体;
+                            ">争议解决<strong><span style="
+                                  text-decoration: underline;
+                                  font-size: 14px;
+                                  font-family: Arial, sans-serif;
+                                ">.<span style="font-size:14px;font-family:&#39;Arial&#39;,sans-serif">&nbsp;&nbsp;</span></span></strong></span></strong></span></span></strong>
+            </p>
+            <p style="
+                      margin-left: 0;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                      text-indent: 0;
+                    ">
+                <span style="font-size: 14px; font-family: 宋体">如果发生由本协议（或其违反、终止或无效）引起的或与之相关的任何争议、纠纷或者索赔，则任何一方可将该争议提交米波现场所在地的人民法院按照中华人民共和国（为本条款之目的，不包括香港、澳门、台湾地区）法律进行诉讼。</span>
+            </p>
+            <p style="text-align: justify; text-justify: inter-ideograph">
+                <span style="font-size:14px;font-family:&#39;Arial&#39;,sans-serif">&nbsp;</span>
+            </p>
+            <p style="
+                      margin-left: 0;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                      text-indent: 0;
+                    ">
+                <strong><span style="font-size:14px;font-family:&#39;Arial&#39;,sans-serif">13.<span style="font:9px &#39;Times New Roman&#39;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong><span style="
+                              text-decoration: underline;
+                              font-size: 14px;
+                              font-family: 宋体;
+                            ">协议期限<strong><span style="
+                                  text-decoration: underline;
+                                  font-size: 14px;
+                                  font-family: Arial, sans-serif;
+                                ">.<strong><span style="font-size:14px;font-family:&#39;Arial&#39;,sans-serif">&nbsp;&nbsp;</span></strong></span></strong></span></strong></span></span></strong>
+            </p>
+            <p style="
+                      margin-left: 0;
+                      text-align: justify;
+                      text-justify: inter-ideograph;
+                      text-indent: 0;
+                    ">
+                <span style="font-size: 14px; font-family: 宋体">本协议应自协议签订时生效，米波现场有权单方终止本协议，双方权利义务终止，米波现场不承担任何法律责任。</span>
+            </p>
+            <p>
+                <br/>
+            </p>
+      </div>
+      <div class="conter_shadow shadow_bottom"></div>
+    </div>
+    <div class="conter_select{if !empty($xieyi)} hidden{/if}">
+      <div class="select_tips">xxx</div>
+      <label class="ubind_click">
+        <div class="select_ground"><span></span></div>
+        <span>我已阅读并同意“《软件许可与维护协议》”</span>
+      </label>
+    </div>
+    <div class="conter_btns{if !empty($xieyi)} hidden{/if}">
+      <button class="btn btn_submit disabled" onclick="agreexieyi()">确定签署</button>
+    </div>
+    <div class="conter_btns text-danger{if empty($xieyi)} hidden{/if}">您已经签署协议</div>
+  </div>
+  <script type="text/javascript">
+    var is_scroll = false,
+      is_checked = false,
+      out_time = null;
+    var ubind_click = document.getElementsByClassName("ubind_click")[0],
+      _select_btn = document.getElementsByClassName("btn_submit")[0];
+    ubind_click.addEventListener("click",
+      function () {
+        if (!is_scroll) {
+          set_licenes({ msg: "请下拉滚动条并阅读‘《软件许可与维护协议》’" });
+          return false;
+        }
+        var select_ground = this.getElementsByClassName("select_ground")[0],
+          btn_submit = document.getElementsByClassName("btn_submit")[0];
+        if (hasClass(select_ground, "pitch")) {
+          removeClass(select_ground, "pitch");
+          addClass(btn_submit, "disabled");
+          is_checked = false;
+        } else {
+          addClass(select_ground, "pitch");
+          removeClass(btn_submit, "disabled");
+          is_checked = true;
+        }
+      },
+      false
+    );
+    document.getElementsByClassName("conter_tips")[0].onscroll = function (
+      e
+    ) {
+      var conter_shadow = document.getElementsByClassName("conter_shadow"),
+        conter_read_tips = document.getElementsByClassName(
+          "conter_read_tips"
+        )[0],
+        conter_text = conter_read_tips.getElementsByTagName("span")[0];
+      var scrollHeight = this.scrollHeight - this.clientHeight - 10;
+      if (this.scrollTop === 0) {
+        replaceClass(conter_shadow[0], "show", "hide");
+        replaceClass(conter_shadow[1], "hide", "show");
+      } else if (this.scrollTop > 0 && this.scrollTop < scrollHeight) {
+        replaceClass(conter_shadow[0], "hide", "show");
+        replaceClass(conter_shadow[1], "hide", "show");
+      } else if (this.scrollTop > scrollHeight) {
+        replaceClass(conter_shadow[0], "hide", "show");
+        replaceClass(conter_shadow[1], "show", "hide");
+        is_scroll = true;
+      }
+      if (!is_scroll) {
+        conter_text.innerText =
+          Math.round((this.scrollTop / scrollHeight) * 100) + "%";
+      } else {
+        addClass(conter_read_tips, "active");
+        conter_read_tips.innerText = "已完成阅读";
+      }
+    };
+    // 主视图自适应
+    function auto_mian() {
+      var win_height = window.innerHeight,
+        main = document.getElementsByClassName("main")[0];
+      conter_tips = main.getElementsByClassName("conter_tips")[0];
+      //main.style.cssText =
+        // "display:block;height:" + (win_height - 50) + "px;";
+      //conter_tips.style.height = win_height - 380 + "px";
+    }
+    //判断class是否存在
+    function hasClass(elem, cls) {
+      cls = cls || "";
+      if (cls.replace(/\s/g, "").length == 0) return false;
+      return new RegExp(" " + cls + " ").test(" " + elem.className + " ");
+    }
+
+    //添加class
+    function addClass(elem, cls) {
+      if (!hasClass(elem, cls)) {
+        elem.className =
+          elem.className == "" ? cls : elem.className + " " + cls;
+      }
+    }
+
+    //删除class
+    function removeClass(elem, cls) {
+      if (hasClass(elem, cls)) {
+        var newClass = " " + elem.className.replace(/[\t\r\n]/g, "") + " ";
+        while (newClass.indexOf(" " + cls + " ") >= 0) {
+          newClass = newClass.replace(" " + cls + " ", " ");
+        }
+        elem.className = newClass.replace(/^\s+|\s+$/g, "");
+      }
+    }
+
+    //替换class
+    function replaceClass(elem, cls, newCls) {
+      removeClass(elem, cls);
+      addClass(elem, newCls);
+    }
+    // 进入后台
+    function agreexieyi() {
+      if (!is_scroll) {
+        set_licenes({ msg: "请下拉滚动条并阅读‘《软件许可与维护协议》’" });
+        return false;
+      }
+      if (!is_checked) {
+        set_licenes({ msg: "请勾选已阅读并同意《软件许可与维护协议》选项" });
+        return false;
+      }
+      $.getJSON("{:goweb('xieyi/index')}",function(result){
+        if(result.code==0){
+            alert('签署成功');
+            window.location.href = "{:goweb('authmanage/upgrade')}";
+        }else{
+            alert('请稍后重试');
+        }
+      });
+    }
+    // 设置消息提示
+    function set_licenes(config) {
+      var select_tips = document.getElementsByClassName("select_tips")[0];
+      select_tips.innerText = config.msg;
+      select_tips.style.display = "block";
+  select_tips.style.left = ($(".select_ground span")[0].offsetLeft - $(".select_ground span").width()/2) + "px";
+      clearTimeout(out_time);
+      out_time = setTimeout(function () {
+        select_tips.style.display = "none";
+      }, config.time || 3000);
+    }
+
+    window.onresize = function () {
+      auto_mian();
+    };
+    window.onload = function () {
+      auto_mian();
+    };
+  </script>
+{include file='$Wpath/common/footer'}

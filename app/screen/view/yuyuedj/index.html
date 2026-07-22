@@ -1,0 +1,182 @@
+{include file="common/header" /}
+<style>
+.headerTitle{opacity: 0}
+.joinPeople{display: none}
+.sign-mainbox{
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	top:0;
+	left: 0;
+	padding: 0;
+}
+.sign-mainbox .title{
+	width: 100%;
+	height: 90px;
+	line-height: 90px;
+	text-align: center;
+	font-size: 46px;
+	font-weight: bold;
+	color:#fff;
+	letter-spacing: 5px;
+}
+.sign-mainbox .content{
+	display: flex;
+	justify-content: right;
+	margin-right: 40px;
+}
+.sign-mainbox .rightbox{
+	width: {$pcconfig['tongjiconfig']['width']??600}px;
+}
+.sign-mainbox .rightbox .yuyue-top{
+	border-radius: 10px;
+	background-color: rgba(255,255,255,0.42);
+}
+.sign-mainbox .rightbox .yuyue-top .bangtitle{
+	height: 50px;
+	line-height: 50px;
+	text-align: center;
+	color: red;
+	font-size: 34px;
+}
+.sign-mainbox .rightbox .yuyue-top .bangperson{
+	height: 60px;
+	line-height: 60px;
+	text-align: center;
+	font-size: 24px;
+	color: #333;
+	display: flex;
+	padding: 0 10px;
+	padding-left: 0;
+	width: 42%;
+}
+.sign-mainbox .rightbox .yuyue-top .bangperson div{
+	width: 50%;
+}
+.sign-mainbox .rightbox .yuyue-top .bangperson div span{
+	margin-right: 10px;
+	color: red;
+}
+.sign-mainbox .rightbox .yuyue-top .bangmoney{
+	height: 60px;
+	line-height: 60px;
+	font-size: 24px;
+	color: #333;
+	display: flex;
+	text-align: center;
+	padding: 0 10px;
+	width: 58%;
+}
+.sign-mainbox .rightbox .yuyue-top .bangmoney div{
+	width: 50%;
+}
+.sign-mainbox .rightbox .yuyue-top .bangmoney div span{
+	margin-right: 10px;
+	color: red;
+}
+.totalbox .bangperson,.totalbox .bangmoney{
+	font-size: 20px!important;
+}
+.sign-mainbox .rightbox .yuyue-list{
+	margin-top: 12px;
+	border-radius: 10px;
+	background-color: rgba(255,255,255,0.42);
+	padding-bottom: 10px;
+}
+.sign-mainbox .rightbox .yuyue-list .yuyue-title{
+	text-align: center;
+	height: 50px;
+	line-height: 50px;
+	font-size: 28px;
+	color: red;
+}
+.sign-mainbox .rightbox .yuyue-list ul{
+	
+}
+.sign-mainbox .rightbox .yuyue-list ul li{
+	display: flex;
+}
+.sign-mainbox .rightbox .yuyue-list ul li div{
+	flex:1;
+	text-align: center;
+	color: yellow;
+	font-size: 20px;
+	height: 38px;
+	line-height: 38px;
+	padding: 0 4px;
+}
+.sign-mainbox .rightbox .yuyue-list ul.yuyue-header li div{
+	font-size: 22px;
+	height: 38px;
+	line-height: 38px;
+}
+.yuyue-rollbox{
+	height: 380px;
+	overflow: hidden;
+}
+.yuyue-body{
+	overflow: hidden;
+}
+.yuyue-body2{
+	overflow: hidden;
+}
+</style>
+<section class="sign-mainbox normal-box">
+	<div class="title">{$pcconfig['title']}</div>
+	<div class="content">
+		<div class="rightbox">
+			<div class="yuyue-top">
+				<div class="bangtitle">预约榜</div>
+				<div class="todaybox zam-app-flex">
+					<div class="bangmoney">
+						<div style="width: 40%">今日:</div>
+						<div style="width: 60%"><span>0</span>{$pcconfig['tongjiconfig']['unit']??''}</div>
+					</div>
+					<div class="bangperson">
+						<div>预约客户:</div>
+						<div><span>0</span>人</div>
+					</div>
+				</div>
+				<div class="totalbox zam-app-flex">
+					<div class="bangmoney">
+						<div style="width: 40%">总预约:</div>
+						<div style="width: 60%"><span>0</span>{$pcconfig['tongjiconfig']['unit']??''}</div>
+					</div>
+					<div class="bangperson">
+						<div>总预约客户:</div>
+						<div><span>0</span>人</div>
+					</div>
+					
+				</div>
+			</div>
+			<div class="yuyue-list">
+				<div class="yuyue-title">最新预约订单</div>
+				<ul class="yuyue-header">
+					<li>
+						{foreach $pcconfig['phbconfig'] as $pitem}
+						<div>{$pitem['title']}</div>
+						{/foreach}
+					</li>
+				</ul>
+				<div class="yuyue-rollbox">
+					<ul class="yuyue-body"></ul>
+					<ul class="yuyue-body2"></ul>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+<script type="text/html" id="sign-tpl">
+	<li>
+		{foreach $pcconfig['phbconfig'] as $pitem}
+		<div>{{ {$pitem['zd']} }}{if $pitem['type']=='number'}{$pitem['unit']??''}{/if}</div>
+		{/foreach}
+	</li>
+</script>
+<script>
+var canroll = "{$pcconfig['tongjiconfig']['canroll']??1}",isdz = "{$isdz}";
+require(['screenyuyuedj','screencore'],function (screenyuyuedj,screencore) {
+	screenyuyuedj.init();
+});
+</script>
+{include file="common/footer" /}

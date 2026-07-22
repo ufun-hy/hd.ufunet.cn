@@ -1,0 +1,327 @@
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 开关</label>
+    <div class="col-lg-8">
+        {:tpl_switch('globconfig[openwebsite]', $config['globconfig']['openwebsite']??'2', 'openwebsitebox')}
+        <span class="zam-help-block">注:关闭后当前用户后台信息将展示系统管理->站点设置内的信息</span>
+    </div>
+</div>
+<div class="openwebsitebox{if !isset($config['globconfig']['openwebsite']) || $config['globconfig']['openwebsite']=='2'} hidden{/if}">
+    <div class="form-group">
+        <label class="col-lg-3 control-label">* 系统名称</label>
+        <div class="col-lg-8">
+            <input class="form-control" type="text" name="globconfig[sitetitle]"
+                value="{$config['globconfig']['sitetitle']??($siteinfo['sitetitle']??'')}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-3 control-label">* 系统网页icon</label>
+        <div class="col-lg-8">
+            {:tpl_image_one('globconfig[siteicon]',$config['globconfig']['siteicon']??($siteinfo['siteicon']??''))}
+            <span class="help-block">32*32px</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-3 control-label">* 左上角LOGO</label>
+        <div class="col-lg-7">
+            {:tpl_image_one('globconfig[sitelogo]',$config['globconfig']['sitelogo']??($siteinfo['sitelogo']??''))}
+            <span class="zam-help-block">尺寸控制在210*68px，后台登录页logo不生效，不设置则不显示</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-3 control-label">* 底部版权</label>
+        <div class="col-lg-7">
+            <input class="form-control" name="globconfig[sitecopyright]"
+                value="{$config['globconfig']['sitecopyright']??($siteinfo['sitecopyright']??'')}">
+            <span class="zam-help-block">注:后台登录页版权不生效，不设置则不显示底部版权信息</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-3 control-label">* 顶部菜单</label>
+        <div class="col-lg-8">
+            {:tpl_switch('globconfig[topmenu][open]',$config['globconfig']['topmenu']['open']??'2','openmenubox')}
+            <span class="zam-help-block">注:关闭则不展示顶部菜单</span>
+        </div>
+    </div>
+    <div
+        class="openmenubox{if !isset($config['globconfig']['topmenu']['open']) || $config['globconfig']['topmenu']['open']=='2'} hidden{/if}">
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 菜单列表</label>
+            <div class="col-lg-9">
+                <table class="table table-bordered" style="margin-bottom: 0;">
+                    <thead>
+                        <tr>
+                            <th style="width:10%;text-align:center;">图标</th>
+                            <th style="width:25%;text-align:center;">名称</th>
+                            <th style="width:30%;text-align:center;">链接</th>
+                            <th style="width:15%;text-align:center;">状态</th>
+                            <th style="width:20%;text-align:center;">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody class="toplinks-lists">
+                        {if isset($config['globconfig']['topmenu']['toplinks']) &&
+                        !empty($config['globconfig']['topmenu']['toplinks'])}
+                        {foreach $config['globconfig']['topmenu']['toplinks'] as $toplink}
+                        <tr>
+                            <td class="text-center">
+                                {:tpl_icon('globconfig[topmenu][toplinks][linkicon]',$toplink['linkicon'])}
+                            </td>
+                            <td class="text-center">
+                                <input class="form-control" name="globconfig[topmenu][toplinks][linkname]"
+                                    value="{$toplink['linkname']}">
+                            </td>
+                            <td class="text-center">
+                                <input class="form-control" name="globconfig[topmenu][toplinks][linkurl]"
+                                    value="{$toplink['linkurl']}">
+                            </td>
+                            <td class="text-center">
+                                {:tpl_switch('globconfig[topmenu][toplinks][linkstatus]',$toplink['linkstatus'])}
+                            </td>
+                            <td class="text-center">
+                                <a class="btn btn-danger btn-xs btn-del"><i class="mdi mdi-close"></i></a>
+                                <a class="btn btn-primary btn-xs mousemove zam-sortable"><i
+                                        class="mdi mdi-arrow-all"></i></a>
+                            </td>
+                        </tr>
+                        {/foreach}
+                        {/if}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="5">
+                                <a class="btn btn-primary btn-xs addtoplink" href="javascript:;"> <i
+                                        class="mdi mdi-plus"></i>新增菜单</a>
+                                <span class="help-block">注：菜单链接必须是完整的一个url地址</span>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-3 control-label">* 右侧客服</label>
+        <div class="col-lg-8">
+            {:tpl_switch('globconfig[kefu][open]',$config['globconfig']['kefu']['open']??'2','openkefubox')}
+            <span class="zam-help-block">注:关闭则不展示右侧客服</span>
+        </div>
+    </div>
+    <div
+        class="openkefubox{if !isset($config['globconfig']['kefu']['open']) || $config['globconfig']['kefu']['open']=='2'} hidden{/if}">
+        <div class="form-group">
+            <label class="col-lg-3 control-label">QQ客服</label>
+            <div class="col-lg-8">
+                {:tpl_switch('globconfig[kefu][openqq]',$config['globconfig']['kefu']['openqq']??'2','openqqkefu')}
+            </div>
+        </div>
+        <div class="qqkefubox{if ($config['globconfig']['kefu']['openqq']??'2') == '2'} hidden{/if}">
+            <div class="form-group">
+                <label class="col-lg-3 control-label">客服标题</label>
+                <div class="col-lg-8">
+                    <input class="form-control" name="globconfig[kefu][qqtitle]"
+                        value="{$config['globconfig']['kefu']['qqtitle']??'QQ客服'}">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-3 control-label">客服简介</label>
+                <div class="col-lg-8">
+                    <input class="form-control" name="globconfig[kefu][qqdes]"
+                        value="{$config['globconfig']['kefu']['qqdes']??'全天24小时在线'}">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-3 control-label">* QQ列表</label>
+                <div class="col-lg-8">
+                    <table class="table table-bordered" style="margin-bottom: 0;">
+                        <thead>
+                            <tr>
+                                <th style="width:40%;text-align:center;">客服名</th>
+                                <th style="width:40%;text-align:center;">QQ号</th>
+                                <th style="width:20%;text-align:center;">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody class="qq-lists">
+                            {if isset($config['globconfig']['kefu']['qqlist']) &&
+                            !empty($config['globconfig']['kefu']['qqlist'])}
+                            {foreach $config['globconfig']['kefu']['qqlist'] as $oneqq}
+                            <tr>
+                                <td class="text-center">
+                                    <input class="form-control" name="globconfig[kefu][qqlist][qqname]"
+                                        value="{$oneqq['qqname']}">
+                                </td>
+                                <td class="text-center">
+                                    <input class="form-control" name="globconfig[kefu][qqlist][qqnum]"
+                                        value="{$oneqq['qqnum']}">
+                                </td>
+                                <td class="text-center">
+                                    <a class="btn btn-danger btn-xs btn-del"><i class="mdi mdi-close"></i></a>
+                                    <a class="btn btn-primary btn-xs mousemove zam-sortable"><i
+                                            class="mdi mdi-arrow-all"></i></a>
+                                </td>
+                            </tr>
+                            {/foreach}
+                            {/if}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="5">
+                                    <a class="btn btn-primary btn-xs addqqkefu" href="javascript:;"> <i
+                                            class="mdi mdi-plus"></i>新增客服</a>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">电话客服</label>
+            <div class="col-lg-8">
+                {:tpl_switch('globconfig[kefu][openmobile]',$config['globconfig']['kefu']['openmobile']??'2','openmobilekefu')}
+            </div>
+        </div>
+        <div class="mobilekefubox{if ($config['globconfig']['kefu']['openmobile']??'2') == '2'} hidden{/if}">
+            <div class="form-group">
+                <label class="col-lg-3 control-label">客服号码与介绍</label>
+                <div class="col-lg-8">
+                    {:tpl_ueditor('globconfig[kefu][mobilecode]',$config['globconfig']['kefu']['mobilecode']??'')}
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-3 control-label">客服简介</label>
+                <div class="col-lg-8">
+                    <input class="form-control" name="globconfig[kefu][mobiletitle]"
+                        value="{$config['globconfig']['kefu']['mobiletitle']??'全天24小时随时联系'}">
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">微信客服</label>
+            <div class="col-lg-8">
+                {:tpl_switch('globconfig[kefu][openwx]',$config['globconfig']['kefu']['openwx']??'2','openwxkefu')}
+            </div>
+        </div>
+        <div class="wxkefubox{if ($config['globconfig']['kefu']['openwx']??'2') == '2'} hidden{/if}">
+            <div class="form-group">
+                <label class="col-lg-3 control-label">客服二维码</label>
+                <div class="col-lg-8">
+                    {:tpl_image_one('globconfig[kefu][wxqr]',$config['globconfig']['kefu']['wxqr']??'')}
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-3 control-label">客服简介</label>
+                <div class="col-lg-8">
+                    <input class="form-control" name="globconfig[kefu][wxtitle]"
+                        value="{$config['globconfig']['kefu']['wxtitle']??'扫码添加客服'}">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script id='addtoplink' type="text/template">
+<tr>
+    <td class="text-center">
+        {:tpl_icon('globconfig[topmenu][toplinks][linkicon]','mdi mdi-file')}
+    </td>
+    <td class="text-center">
+        <input class="form-control" name="globconfig[topmenu][toplinks][linkname]" value="">
+    </td>
+    <td class="text-center">
+        <input class="form-control" name="globconfig[topmenu][toplinks][linkurl]" value="">
+    </td>
+    <td class="text-center">
+        {:tpl_switch('globconfig[topmenu][toplinks][linkstatus]','1')}
+    </td>
+    <td class="text-center">
+        <a class="btn btn-danger btn-xs btn-del"><i class="mdi mdi-close"></i></a>
+        <a class="btn btn-primary btn-xs mousemove zam-sortable"><i class="mdi mdi-arrow-all"></i></a>
+    </td>
+</tr>
+</script>
+<script id='addqqkefu' type="text/template">
+<tr>
+    <td class="text-center">
+        <input class="form-control" name="globconfig[kefu][qqlist][qqname]" value="">
+    </td>
+    <td class="text-center">
+        <input class="form-control" name="globconfig[kefu][qqlist][qqnum]" value="">
+    </td>
+    <td class="text-center">
+        <a class="btn btn-danger btn-xs btn-del"><i class="mdi mdi-close"></i></a>
+        <a class="btn btn-primary btn-xs mousemove zam-sortable"><i class="mdi mdi-arrow-all"></i></a>
+    </td>
+</tr>
+</script>
+<script>
+    function openwebsitebox(obj, status, url) {
+        if (status == '1') {
+            obj.prev().val('2');
+            obj.attr('data-status', '2');
+            $(".openwebsitebox").addClass('hidden');
+        } else {
+            obj.prev().val('1');
+            obj.attr('data-status', '1');
+            $(".openwebsitebox").removeClass('hidden');
+        }
+        obj.prev().prev().prop("checked", status == '1' ? false : true);
+    }
+    function openmenubox(obj, status, url) {
+        if (status == '1') {
+            obj.prev().val('2');
+            obj.attr('data-status', '2');
+            $(".openmenubox").addClass('hidden');
+        } else {
+            obj.prev().val('1');
+            obj.attr('data-status', '1');
+            $(".openmenubox").removeClass('hidden');
+        }
+        obj.prev().prev().prop("checked", status == '1' ? false : true);
+    }
+    function openkefubox(obj, status, url) {
+        if (status == '1') {
+            obj.prev().val('2');
+            obj.attr('data-status', '2');
+            $(".openkefubox").addClass('hidden');
+        } else {
+            obj.prev().val('1');
+            obj.attr('data-status', '1');
+            $(".openkefubox").removeClass('hidden');
+        }
+        obj.prev().prev().prop("checked", status == '1' ? false : true);
+    }
+    function openqqkefu(obj, status, url) {
+        if (status == '1') {
+            obj.prev().val('2');
+            obj.attr('data-status', '2');
+            $(".qqkefubox").addClass('hidden');
+        } else {
+            obj.prev().val('1');
+            obj.attr('data-status', '1');
+            $(".qqkefubox").removeClass('hidden');
+        }
+        obj.prev().prev().prop("checked", status == '1' ? false : true);
+    }
+    function openmobilekefu(obj, status, url) {
+        if (status == '1') {
+            obj.prev().val('2');
+            obj.attr('data-status', '2');
+            $(".mobilekefubox").addClass('hidden');
+        } else {
+            obj.prev().val('1');
+            obj.attr('data-status', '1');
+            $(".mobilekefubox").removeClass('hidden');
+        }
+        obj.prev().prev().prop("checked", status == '1' ? false : true);
+    }
+    function openwxkefu(obj, status, url) {
+        if (status == '1') {
+            obj.prev().val('2');
+            obj.attr('data-status', '2');
+            $(".wxkefubox").addClass('hidden');
+        } else {
+            obj.prev().val('1');
+            obj.attr('data-status', '1');
+            $(".wxkefubox").removeClass('hidden');
+        }
+        obj.prev().prev().prop("checked", status == '1' ? false : true);
+    }
+</script>

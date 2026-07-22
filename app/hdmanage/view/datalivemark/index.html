@@ -1,0 +1,184 @@
+{include file='$Wpath/common/header'}
+<div class="form-inline zam-inline-searchbar">
+    <div class="form-group m-l-5">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">选择轮次</span>
+          <select id="rotateid" class="form-control">
+            {if empty($rotates)}
+                <option value="0">暂无轮次</option>
+            {/if}
+            {foreach $rotates as $k=>$v} 
+                <option value="{$v['id']}" {if $rotateid == $v['id']}selected{/if}>{$v['title']}</option>
+            {/foreach}
+          </select>
+        </div>
+    </div>
+    <a class="btn btn-primary btn-sm btn-search" href="javascript:void(0)"><i class="mdi mdi-magnify"></i> 搜索</a>
+    <a class="btn btn-info btn-sm btn-export3" href="javascript:void(0)"><i class="mdi mdi-export"></i> 导出参评用户成绩数据</a>
+    <a class="btn btn-warning btn-sm btn-export" href="javascript:void(0)"><i class="mdi mdi-export"></i> 导出专业评分数据</a>
+    <a class="btn btn-success btn-sm btn-export2" href="javascript:void(0)"><i class="mdi mdi-export"></i> 导出大众评分数据</a>
+    
+</div>
+{include file='$Wpath/common/tabletoolbar'}
+<table id="listtable" class="zam-btable"></table>
+<script>
+require(['webcore','webtable','jconfirmBox','zamnotice'],function(webcore,webtable,jconfirmBox,zamnotice){
+var initConfig = {
+    tableId:'#listtable',
+    url:"{:gohdmanage('datalivemark/index',['hdid'=>$hdid])}",
+    columnoperate:{
+        btns:{
+            data:true,
+            del:true,
+        },
+        func:{
+            del:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','您确定要删除该参评用户的所有评分数据么？',function(){
+                    webcore.ajaxSubmit("{:gohdmanage('datalivemark/delpfdata',['hdid'=>$hdid])}",{rotateid:row.rotate.id,pfuserid:row.id}).then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','删除成功');
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                    });
+                });
+            },
+            data:function(value, row, index){
+                var confirmobj = jconfirmBox.ajaxconfirm("评分明细","{:gohdmanage('datalivemark/pfdetail',['hdid'=>$hdid])}",{rotateid:row.rotate.id,pfuserid:row.id},'html','col-lg-8 col-lg-offset-2',function(e){
+                },false,'2');
+            },
+        }
+    },
+    columns:[
+        {
+            checkbox: true,
+        },{
+            field: 'id',
+            title: 'id',
+            align: 'center',
+            visible: false
+        },{
+            field: 'username',
+            title: '参评选手',
+            align: 'center',
+            formatter:function(value,row,index){
+                return `
+                <div class='zam-flex-column-center'>
+                    <img src="${row.userimg}" class="avatarImg" />
+                    <span>${value||'已删除'}</span>
+                </div>
+                `;
+            }
+        },{
+            field: 'scoredata',
+            title: '分数',
+            align: 'center',
+            formatter:function(value,row,index){
+                return `
+                    <div>模式：${row.rotate.scoretype == '1' ? '总分' : '平均分'}</div>
+                    ${row.rotate.pfmode == '2' ? `<div><span class="text-danger" style="font-size:10px;">(去掉一个最高和一个最低)</span></div>` : ''}
+                    ${value.score_pub ? `<div>大众评委：${(value.score_pub === false ? '无' : value.score_pub)}（占比${row.rotate.pubweight}%）</div>` : ''}
+                    ${(value.score_pub && value.score_pw) ? `<div>专业评委：${(value.score_pw === false ? '无' : value.score_pw)}（占比${(100 - row.rotate.pubweight)}%）</div>`:''}
+                    <div>最终得分：<span class="text-danger">${(value.score === false ? '无' : value.score)}</span></p>
+                    {if request()->host(true) == 'hd.shulehudong.com' && request()->realhdid == '1698'}
+                    <p>中间分：<span class="text-danger">${(value.zjscore === false ? '无' : value.zjscore)}</span></p>
+                    {/if}
+                `;
+            }
+        },{
+            field: 'pfnum',
+            title: '评分人数',
+            align: 'center',
+        }
+    ],
+    searchParamas:[{'type':'2','id':'rotateid'}],
+    toolbar:{
+        del:function(){
+            var getSelects = webtable.getSelections();
+            if(!getSelects.length){
+                return zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+            jconfirmBox.confirm('温馨提示','您确定要删除选中的参评用户的评分记录么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('datalivemark/delpfdata',['hdid'=>$hdid])}",{rotateid:$("#rotateid option:selected").val(),pfuserid:getSelects}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','删除成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+        },
+        reset:function(){
+            jconfirmBox.confirm('温馨提示','清空将删除所选轮次内的所有参评用户的评分记录并且无法恢复，您确定要清空么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('datalivemark/resetpfdata',['hdid'=>$hdid])}",{rotateid:$("#rotateid option:selected").val()}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','清空成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+        },
+    },
+};
+webtable.init(initConfig);
+$('#rotateid').change(function(e) {
+     webtable.refresh();
+});
+$('.btn-export').on('click',function(){
+    var rotateid = $("#rotateid option:selected").val()||'';
+    if(+rotateid < 1) {
+        return zamnotice.showTips('error','请先选择轮次');
+    }
+    webcore.ajaxSubmit("{:gohdmanage('datalivemark/exportpfdata',['hdid'=>$hdid])}",{rotateid:rotateid}).then(function(json){
+        if(json.code != 0){
+            zamnotice.showTips('error',json.msg);
+        }else{
+            window.location.href = `{:gohdmanage('datalivemark/exportpfdata',['hdid'=>$hdid])}&rotateid=${rotateid}`;
+        }
+    }, function(json){
+        zamnotice.showTips('error','网络差,操作失败');
+    });
+});
+$('.btn-export2').on('click',function(){
+    var rotateid = $("#rotateid option:selected").val()||'';
+    if(+rotateid < 1) {
+        return zamnotice.showTips('error','请先选择轮次');
+    }
+    webcore.ajaxSubmit("{:gohdmanage('datalivemark/exportpfdata',['hdid'=>$hdid,'pwtype'=>'2'])}",{rotateid:rotateid}).then(function(json){
+        if(json.code!=0){
+            zamnotice.showTips('error',json.msg);
+        }else{
+            window.location.href = `{:gohdmanage('datalivemark/exportpfdata',['hdid'=>$hdid,'pwtype'=>'2'])}&rotateid=${rotateid}`;
+        }
+    }, function(json){
+        zamnotice.showTips('error','网络差,操作失败');
+    });
+});
+$('.btn-export3').on('click',function(){
+    var rotateid = $("#rotateid option:selected").val()||'';
+    if(+rotateid < 1) {
+        return zamnotice.showTips('error','请先选择轮次');
+    }
+    webcore.ajaxSubmit("{:gohdmanage('datalivemark/exportpfalldata',['hdid'=>$hdid])}",{rotateid:rotateid}).then(function(json){
+        if(json.code!=0){
+            zamnotice.showTips('error',json.msg);
+        }else{
+            window.location.href = `{:gohdmanage('datalivemark/exportpfalldata',['hdid'=>$hdid])}&rotateid=${rotateid}`;
+        }
+    }, function(json){
+        zamnotice.showTips('error','网络差,操作失败');
+    });
+});
+});
+</script>
+{include file='$Wpath/common/footer'}

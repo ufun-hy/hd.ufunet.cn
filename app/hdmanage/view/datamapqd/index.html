@@ -1,0 +1,143 @@
+{include file='$Wpath/common/header'}
+<div class="form-inline zam-inline-searchbar">
+    <div class="form-group m-l-5">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">选择地区</span>
+          <select id="districtid" class="form-control">
+            <option value="0" selected>全部</option>
+            {if !empty($districts)}
+            {foreach $districts as $key=>$ro} 
+                <option value="{$ro['id']}">{$ro['areatitle']}</option>
+            {/foreach}
+            {/if}
+          </select>
+        </div>
+    </div>
+    <div class="form-group" style="max-width: 200px">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">昵称或表单内容</span>
+        <input type="text" class="form-control" value="" id="keyword" placeholder="请输入用户昵称或表单内容">
+      </div>
+    </div>
+    <a class="btn btn-primary btn-sm btn-search" href="javascript:void(0)"><i class="mdi mdi-magnify"></i> 搜索</a>
+    <a class="btn btn-warning btn-sm btn-export" href="javascript:void(0)"><i class="mdi mdi-export"></i> 导出</a>
+</div>
+{include file='$Wpath/common/tabletoolbar'}
+<table id="listtable" class="zam-btable"></table>
+<script>    
+var $districts = {:json_encode($districts)};
+require(['webcore','webtable','jconfirmBox','zamnotice'],function(webcore,webtable,jconfirmBox,zamnotice){
+var searchParamas = [{'type':'2','id':'districtid'},{'type':'1','id':'keyword'}];
+var initConfig = {
+    tableId:'#listtable',
+    url:"{:gohdmanage('datamapqd/index',['hdid'=>$hdid])}",
+    columnoperate:{
+        btns:{
+            del:true,
+        },
+        func:{
+            del:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','删除将无法恢复，您确定要删除么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('datamapqd/delrecord',['hdid'=>$hdid])}",{recordid:row.id}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','删除成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差。操作失败');
+                });
+                });
+            }
+        }
+    },
+    columns:[{
+            checkbox: true,
+        }, 
+        {
+            field: 'id',
+            title: 'id',
+            align: 'center',
+            visible: false
+        },{
+            field: 'nickname',
+            title: '用户',
+            align: 'center',
+            formatter:function(value,row,index){
+                return `
+                <div class='zam-flex-column-center'>
+                    <img src="${row.avatar}" class="avatarImg" />
+                    <span>${value||'已删除'}</span>
+                </div>
+                `;
+            }
+        },  {
+            field: 'areaname',
+            title: '地区',
+            align: 'center',
+        },  {
+            field: 'areatitle',
+            title: '标注点',
+            align: 'center',
+        }
+        ,{
+            field: 'create_time',
+            title: '签到时间',
+            align: 'center',
+        }
+    ],
+    searchParamas:searchParamas,
+    toolbar:{
+        del:function(){
+            var getSelects = webtable.getSelections();
+            if(!getSelects.length){
+                return zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+            jconfirmBox.confirm('温馨提示','删除数据将无法恢复，您确定要删除选中的记录数据么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('datamapqd/delrecord',['hdid'=>$hdid])}",{recordid:getSelects}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','删除成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+        },
+        reset:function(){
+            jconfirmBox.confirm('温馨提示','清空将删除所有用户的地图签到数据并且无法恢复，您确定要清空么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('datamapqd/resetrecord',['hdid'=>$hdid])}",{}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','清空成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+        },
+    },
+};
+webtable.init(initConfig);
+$('#districtid').change(function(e) {
+    webtable.refresh();
+});
+$('.btn-export').on('click',function(){
+    webcore.ajaxSubmit("{:gohdmanage('datamapqd/exportrecord',['hdid'=>$hdid])}",{}).then(function(json){
+        if(json.code!=0){
+            zamnotice.showTips('error',json.msg);
+        }else{
+            window.location.href = "{:gohdmanage('datamapqd/exportrecord',['hdid'=>$hdid])}";
+        }
+    }, function(json){
+        zamnotice.showTips('error','网络差,操作失败');
+    });
+});
+});
+</script>
+{include file='$Wpath/common/footer'}

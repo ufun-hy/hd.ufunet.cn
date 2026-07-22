@@ -1,0 +1,149 @@
+{include file="common/header" /}
+<style>
+.gamerule{
+	position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-color: rgba(0,0,0,.8);
+}
+.gamerule-main{
+    position: absolute;
+    top:0;
+    left:0;
+    width: 100%;
+	height:100%;
+}
+.gamerule-main .guide-txt{
+    color: #fff;
+    font-size: .32rem;
+    font-weight: 700;
+    text-align: center;
+    line-height: 2;
+    margin-bottom: .5rem;
+}
+.gamerule-main .guide-box {
+    background-image: url("/{:WIMGURL}cutfruit/images/tip.gif");
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    width: 5.4rem;
+    height:4.4rem;
+    position: relative;
+    margin: 0 auto;
+}
+.guide-close{margin-top:0.4rem;text-align:center;}
+
+.shake-banglist{
+	height:5.8rem;
+	overflow-x:hidden;
+	overflow-y:auto;
+}
+.shake-bangtitle{position:relative;font-size:0.32rem!important;text-align:center!important;}
+.shake-bangtitle i{position:absolute;right:0.3rem;font-size: 0.5rem;color:gray}
+.shake-banglist li {
+	height:1rem;
+    border-top: 1px solid #f0f0f0;
+}
+.shake-banglist li div{
+	height:100%;
+}
+.shake-banglist .banglist-tag {
+    width:0.6rem;
+}
+.shake-banglist .rolwnum {
+    display: inline-block;
+    width: 0.5rem;
+    text-align: center;
+    font-size: 0.32rem;
+	color:#666
+}
+.shake-banglist .banglist-avatar {
+    width: 0.7rem;
+    height: 0.7rem;
+    border-radius: 100%;
+}
+.shake-banglist .banglist-nickname {
+    width: 100%;
+	color:#666;
+	font-size:0.3rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.shake-banglist .banglist-number em {
+    color: #0084ff;
+	font-size: 0.4rem;
+}
+@font-face {
+    font-family: 'fruitfont';
+		src: url('/{:WIMGURL}cutfruit/images/fruitfont.eot');
+		src: url('/{:WIMGURL}cutfruit/images/fruitfont.eot?#iefix') format('embedded-opentype'),
+			 url('/{:WIMGURL}cutfruit/images/fruitfont.woff2') format('woff2'),
+			 url('/{:WIMGURL}cutfruit/images/fruitfont.woff') format('woff'),
+			 url('/{:WIMGURL}cutfruit/images/fruitfont.ttf') format('truetype'),
+			 url('/{:WIMGURL}cutfruit/images/fruitfont.svg#fruitfont') format('svg');
+		font-weight: normal;
+		font-style: normal;
+	}
+</style>
+{if !empty($appconfig['style']['diycss'])}<style>{$appconfig['style']['diycss']}</style>{/if}
+<audio id="djsaudio" src="/{:WIMGURL}shake/count.mp3"></audio>
+{if $appconfig['appbgmusicoff']=='1' && !empty($appconfig['appbgmusic'])}
+<audio id="bgm" src="{:tomedia($appconfig['appbgmusic'])}" loop="loop"></audio>
+{/if}
+<div class="zam-app-mainbox" id="zam-app-mainbox"></div>
+<div class="gamerule hidden">
+	<div class="gamerule-main zam-app-flex-ajCenter">
+		<div class="guide-txt">水果出现时手指划过水果参与游戏</span></div>
+		<div class="guide-box"><div class="moving-box"></div></div>
+		<div class="guide-close"><a class="btn btn-primary">知道了</a></div>
+	</div>
+</div>
+<div style="font-family:fruitfont;visibility:hidden;">.</div>
+<script>
+var game,sendscore = "{$appconfig['sendscore']}";
+var Gameconfig = {
+	gameW:750,
+	gameH:750 / window.innerWidth * window.innerHeight,
+	gameImgs:{
+		//gamebg:"{:tomedia($appconfig['appbgimg'])}",
+		titleimg:"{if empty($appconfig['apptopimg'])}{:tomedia($appconfig['style']['apptopimg'])}{else}{:tomedia($appconfig['apptopimg'])}{/if}",
+		apple:"{:tomedia($appconfig['style']['appleimg'][0])}",
+		apple1:"{:tomedia($appconfig['style']['appleimg'][1])}",
+		apple2:"{:tomedia($appconfig['style']['appleimg'][2])}",
+		banana:"{:tomedia($appconfig['style']['bananaimg'][0])}",
+		banana1:"{:tomedia($appconfig['style']['bananaimg'][1])}",
+		banana2:"{:tomedia($appconfig['style']['bananaimg'][2])}",
+		basaha:"{:tomedia($appconfig['style']['basahaimg'][0])}",
+		basaha1:"{:tomedia($appconfig['style']['basahaimg'][1])}",
+		basaha2:"{:tomedia($appconfig['style']['basahaimg'][2])}",
+		peach:"{:tomedia($appconfig['style']['peachimg'][0])}",
+		peach1:"{:tomedia($appconfig['style']['peachimg'][1])}",
+		peach2:"{:tomedia($appconfig['style']['peachimg'][2])}",
+		sandia:"{:tomedia($appconfig['style']['sandiaimg'][0])}",
+		sandia1:"{:tomedia($appconfig['style']['sandiaimg'][1])}",
+		sandia2:"{:tomedia($appconfig['style']['sandiaimg'][2])}",
+		bomb:"{:tomedia($appconfig['style']['bombimg'])}",
+		gameover:"{:tomedia($appconfig['style']['appoverbg'])}",
+		pmbtn:"{:tomedia($appconfig['style']['apppm'])}",
+		scorebox:"{:tomedia($appconfig['style']['appscorebg'])}",
+		timebox:"{:tomedia($appconfig['style']['apptimebg'])}",
+		fruitcut:'/{:WIMGURL}cutfruit/images/fruitcut.png',
+		boomcut:'/{:WIMGURL}cutfruit/images/boomcut.png',
+		boomv:"{:tomedia($appconfig['style']['boomvoice'])}",
+		cutv:"{:tomedia($appconfig['style']['cutvoice'])}",
+		overv:"{:tomedia($appconfig['style']['overvoice'])}",
+	},
+	showscorebox:"{$appconfig['appshowscore']}",
+};
+require(['wechatcore','appcutfruit'],function (wechatcore,appcutfruit) {	
+	appcutfruit.init();
+})
+</script>
+{if !empty($appconfig['style']['diycss'])}
+<style>{$appconfig['style']['diycss']}</style>
+{/if}
+{include file="common/gamecommon" /}
+{include file="common/footermenu" /}
+{include file="common/footer" /}

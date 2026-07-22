@@ -1,0 +1,33 @@
+<table class="we7-table table" style="margin-bottom:0px;">
+<thead>
+  <tr>
+	<th style="width:20%;text-align:center;">id</th>
+	<th style="width:20%;text-align:center;">券号</th>
+	<th style="width:20%;text-align:center;">功能</th>
+	<th style="width:20%;text-align:center;">生成时间</th>
+	<th style="width:20%;text-align:center;">操作</th>
+  </tr>
+</thead>
+<tbody class="prize-lists">
+	 {foreach $datas as $skey=>$samedata}
+	  <tr>
+		<td class="text-center">
+			{$samedata['id']}
+		</td>
+		<td class="text-center">
+			<span class="text-danger">{$samedata['cardno']}</span>
+		</td>
+		<td class="text-center">
+			<span>{$samedata['typehtml']}</span>
+		</td>
+		<td class="text-center">
+			<span>{$samedata['create_time']}</span>
+		</td>
+		<td class="text-center">
+			<a class="btn btn-danger btn-sm btn-delsame" data-id="{$samedata['id']}">删除</a>
+		</td>
+	 </tr>
+	{/foreach}
+</tbody>
+</table>
+

@@ -1,0 +1,368 @@
+<style>
+/**排名样式**/
+.rankBox{
+	position: absolute;
+	top:0;
+	left:0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0,0,0,.6);
+	z-index: 1;
+}
+.rankfirst-second-third{
+	width:720px;
+	height:278px;
+	margin:0 auto;
+	background-image:url({:tomedia($pcconfig['style']['rankbg'])});
+	background-repeat: no-repeat;
+	background-size:720px;
+	background-position:bottom;
+}
+.rank-item{
+	color: #fff;
+	width:240px;
+}
+.rank-item .avatar{
+	width: 100%;
+	height: 100%;
+	position:relative;
+}
+.rank-item .avatar img{
+	border-radius: 50%;
+}
+.rank-item-first .avatar {
+	bottom:39px;
+	left:0;
+}
+.rank-item-first .avatar img{
+	width: 140px;
+	height: 140px;
+	border: 5px solid #fed530;
+}
+.rank-item-second .avatar{
+	bottom:0;
+	left:30px;
+}
+.rank-item-second .avatar img {
+	width: 120px;
+	height:120px;
+	border: 5px solid #e8e8e8;
+}
+.rank-item-third .avatar {
+	bottom:-12px;
+	right:22px;
+}
+.rank-item-third .avatar img {
+	width: 120px;
+	height:120px;
+	border: 5px solid #ca9561;
+}
+.avatar p{
+	position:absolute;
+	bottom:0;
+	left:45px;
+	width:150px;
+	text-align:center;
+	white-space: nowrap;
+	word-break: break-all;
+	text-overflow: ellipsis;
+	overflow: hidden;
+}
+.rank-item-first p{
+	height: 40px;
+	line-height: 40px;
+	background-color:#fed530;
+	border-radius:20px;
+	font-size: 20px;
+	color: #56342b;
+}
+.rank-item-second p {
+	height: 40px;
+	line-height: 40px;
+	background-color:#e8e8e8;
+	border-radius:20px;
+	font-size: 18px;
+	color: #21295a;
+}
+.rank-item-third p {
+	height: 40px;
+	line-height: 40px;
+	background-color:#ca9561;
+	border-radius:20px;
+	font-size: 18px;
+	color: #512927;
+
+}
+.rank-item-first span{
+	display:inline-block;
+	position:absolute;
+	left: 70px;
+	top: -27px;
+	height: 50px;
+	width:50px;
+	background-image: url("/{:SIMGURL}shake/rank/guanjun.png");
+	background-repeat:no-repeat;
+	background-size:cover;
+}
+.rank-item-second span{
+	display:inline-block;
+	position:absolute;
+	left: 70px;
+	top: -16px;
+	height:50px;
+	width:50px;
+	background-image: url("/{:SIMGURL}shake/rank/yajun.png");
+	background-repeat:no-repeat;
+	background-size:cover;
+}
+.rank-item-third span{
+	display:inline-block;
+	position:absolute;
+	left: 70px;
+	top: -16px;
+	height: 50px;
+	width:50px;
+	background-image: url("/{:SIMGURL}shake/rank/jijun.png");
+	background-repeat:no-repeat;
+	background-size:cover;
+}
+.rank-others,.rank-others2{
+	width:100%;
+	margin-top:20px;
+}
+.rankBox li{
+	position: relative;
+	width:140px;
+	text-align: center;
+}
+.rankBox li .avatar{
+	width: 60px;
+	height: 60px;
+	padding: 3px;
+	border: 1px dashed #623713;
+	border-radius: 50%;
+	overflow: hidden;
+	box-shadow: 2px 3px 10px 2px rgba(0,0,0,.3);
+}
+.rankBox li .avatar img{
+	border-radius: 50%;
+	width: calc(100% - 6px);
+	height: calc(100% - 6px);
+}
+.rankBox li .nickname{
+	width:100%;
+	height:40px;
+	line-height:40px;
+	font-size:16px;
+	margin: 0;
+	color: #fff000;
+	white-space: nowrap;
+	word-break: break-all;
+	text-overflow: ellipsis;
+	overflow: hidden;
+}
+.rankBox .rank-other-icon{
+	position: absolute;
+	top: 1px;
+	left: 2px;
+	width:30px;
+	height:30px;
+	line-height:30px;
+	text-align: center;
+	color: #fff;
+	font-style: normal;
+	background-repeat: no-repeat;
+	background-size: contain;
+}
+.rankBox i.rank-4{
+	background-image: url("/{:SIMGURL}shake/rank/num/4.png");
+}
+.rankBox i.rank-5{
+	background-image: url("/{:SIMGURL}shake/rank/num/5.png");
+}
+.rankBox i.rank-6{
+	background-image: url("/{:SIMGURL}shake/rank/num/6.png");
+}
+.rankBox i.rank-7{
+	background-image: url("/{:SIMGURL}shake/rank/num/7.png");
+}
+.rankBox i.rank-8{
+	background-image: url("/{:SIMGURL}shake/rank/num/8.png");
+}
+.rankBox i.rank-9{
+	background-image: url("/{:SIMGURL}shake/rank/num/9.png");
+}
+.rankBox i.rank-10{
+	background-image: url("/{:SIMGURL}shake/rank/num/10.png");
+}
+.rankBox i.rank-11{
+	background-image: url("/{:SIMGURL}shake/rank/num/11.png");
+}
+.rankBox i.rank-12{
+	background-image: url("/{:SIMGURL}shake/rank/num/12.png");
+}
+.rankBox i.rank-13{
+	background-image: url("/{:SIMGURL}shake/rank/num/13.png");
+}
+.rankBox i.rank-14{
+	background-image: url("/{:SIMGURL}shake/rank/num/14.png");
+}
+.rankBox i.rank-15{
+	background-image: url("/{:SIMGURL}shake/rank/num/15.png");
+}
+.rankBox i.rank-16{
+	background-image: url("/{:SIMGURL}shake/rank/num/16.png");
+}
+.rankBox i.rank-17{
+	background-image: url("/{:SIMGURL}shake/rank/num/17.png");
+}
+.rankBox i.rank-18{
+	background-image: url("/{:SIMGURL}shake/rank/num/18.png");
+}
+.rankBox i.rank-19{
+	background-image: url("/{:SIMGURL}shake/rank/num/19.png");
+}
+.rankBox i.rank-20{
+	background-image: url("/{:SIMGURL}shake/rank/num/20.png");
+}
+.rankBox-btns{
+	width:100%;
+	margin-top:20px;
+}
+.rankBox-btns a.nextround{
+	margin-left:60px;
+}
+.rankBox-btns a img{
+	width: 120px;
+    height: 50px;
+}
+</style>
+<div class="rankBox zam-app-flex-ajCenter display-none"> 
+	<section class="rankfirst-second-third">
+		<div class="zam-app-flex">
+			<div  class="rank-item rank-item-second opacity-hide">
+				<div class="avatar zam-app-flex-ajCenter">
+					<img src="{:tomedia($pcconfig['style']['userdefaultimg'])}"> 
+					<p>{$pcconfig['style']['userdefaultname']??'虚位以待'}</p>
+					<span></span>
+				</div>
+			</div>
+			<div  class="rank-item rank-item-first opacity-hide">
+				<div class="avatar zam-app-flex-ajCenter">
+					<img src="{:tomedia($pcconfig['style']['userdefaultimg'])}"> 
+					<p>{$pcconfig['style']['userdefaultname']??'虚位以待'}</p>
+					<span></span>
+				</div>
+			</div>
+			<div  class="rank-item rank-item-third opacity-hide">
+				<div class="avatar zam-app-flex-ajCenter">
+					<img src="{:tomedia($pcconfig['style']['userdefaultimg'])}"> 
+					<p>{$pcconfig['style']['userdefaultname']??'虚位以待'}</p>
+					<span></span>
+				</div>
+			</div>
+		</div>
+	</section> 
+	<ul  class="rank-others zam-app-flex-ajCenter2 opacity-hide">
+		<li class="rank-others-item zam-app-flex-ajCenter">
+			<i  class="rank-other-icon rank-4" ></i>
+			<div  class="avatar zam-app-flex-ajCenter"><img src="{:tomedia($pcconfig['style']['userdefaultimg'])}"> </div> 
+			<p  class="nickname"><span>{$pcconfig['style']['userdefaultname']??'虚位以待'}</span></p>
+		</li>
+		<li class="rank-others-item zam-app-flex-ajCenter">
+			<i  class="rank-other-icon rank-5" ></i>
+			<div  class="avatar zam-app-flex-ajCenter"><img src="{:tomedia($pcconfig['style']['userdefaultimg'])}"> </div> 
+			<p  class="nickname"><span>{$pcconfig['style']['userdefaultname']??'虚位以待'}</span></p>
+		</li>
+		<li class="rank-others-item zam-app-flex-ajCenter">
+			<i  class="rank-other-icon rank-6" ></i>
+			<div  class="avatar zam-app-flex-ajCenter"><img src="{:tomedia($pcconfig['style']['userdefaultimg'])}"> </div> 
+			<p  class="nickname"><span>{$pcconfig['style']['userdefaultname']??'虚位以待'}</span></p>
+		</li>
+		<li class="rank-others-item zam-app-flex-ajCenter">
+			<i  class="rank-other-icon rank-7" ></i>
+			<div  class="avatar zam-app-flex-ajCenter"><img src="{:tomedia($pcconfig['style']['userdefaultimg'])}"> </div> 
+			<p  class="nickname"><span>{$pcconfig['style']['userdefaultname']??'虚位以待'}</span></p>
+		</li>
+		<li class="rank-others-item zam-app-flex-ajCenter">
+			<i  class="rank-other-icon rank-8" ></i>
+			<div  class="avatar zam-app-flex-ajCenter"><img src="{:tomedia($pcconfig['style']['userdefaultimg'])}"> </div> 
+			<p  class="nickname"><span>{$pcconfig['style']['userdefaultname']??'虚位以待'}</span></p>
+		</li>
+		<li class="rank-others-item zam-app-flex-ajCenter">
+			<i  class="rank-other-icon rank-9" ></i>
+			<div  class="avatar zam-app-flex-ajCenter"><img src="{:tomedia($pcconfig['style']['userdefaultimg'])}"> </div> 
+			<p  class="nickname"><span>{$pcconfig['style']['userdefaultname']??'虚位以待'}</span></p>
+		</li>
+		<li class="rank-others-item zam-app-flex-ajCenter">
+			<i  class="rank-other-icon rank-10" ></i>
+			<div  class="avatar zam-app-flex-ajCenter"><img src="{:tomedia($pcconfig['style']['userdefaultimg'])}"> </div> 
+			<p  class="nickname"><span>{$pcconfig['style']['userdefaultname']??'虚位以待'}</span></p>
+		</li>
+	</ul>
+	<ul  class="rank-others2 zam-app-flex-ajCenter2 opacity-hide">
+		<li class="rank-others-item zam-app-flex-ajCenter">
+			<i  class="rank-other-icon rank-11" ></i>
+			<div  class="avatar zam-app-flex-ajCenter"><img src="{:tomedia($pcconfig['style']['userdefaultimg'])}"> </div> 
+			<p  class="nickname"><span>{$pcconfig['style']['userdefaultname']??'虚位以待'}</span></p>
+		</li>
+		<li class="rank-others-item zam-app-flex-ajCenter">
+			<i  class="rank-other-icon rank-12" ></i>
+			<div  class="avatar zam-app-flex-ajCenter"><img src="{:tomedia($pcconfig['style']['userdefaultimg'])}"> </div> 
+			<p  class="nickname"><span>{$pcconfig['style']['userdefaultname']??'虚位以待'}</span></p>
+		</li>
+		<li class="rank-others-item zam-app-flex-ajCenter">
+			<i  class="rank-other-icon rank-13" ></i>
+			<div  class="avatar zam-app-flex-ajCenter"><img src="{:tomedia($pcconfig['style']['userdefaultimg'])}"> </div> 
+			<p  class="nickname"><span>{$pcconfig['style']['userdefaultname']??'虚位以待'}</span></p>
+		</li>
+		<li class="rank-others-item zam-app-flex-ajCenter">
+			<i  class="rank-other-icon rank-14" ></i>
+			<div  class="avatar zam-app-flex-ajCenter"><img src="{:tomedia($pcconfig['style']['userdefaultimg'])}"> </div> 
+			<p  class="nickname"><span>{$pcconfig['style']['userdefaultname']??'虚位以待'}</span></p>
+		</li>
+		<li class="rank-others-item zam-app-flex-ajCenter">
+			<i  class="rank-other-icon rank-15" ></i>
+			<div  class="avatar zam-app-flex-ajCenter"><img src="{:tomedia($pcconfig['style']['userdefaultimg'])}"> </div> 
+			<p  class="nickname"><span>{$pcconfig['style']['userdefaultname']??'虚位以待'}</span></p>
+		</li>
+		<li class="rank-others-item zam-app-flex-ajCenter">
+			<i  class="rank-other-icon rank-16" ></i>
+			<div  class="avatar zam-app-flex-ajCenter"><img src="{:tomedia($pcconfig['style']['userdefaultimg'])}"> </div> 
+			<p  class="nickname"><span>{$pcconfig['style']['userdefaultname']??'虚位以待'}</span></p>
+		</li>
+		<li class="rank-others-item zam-app-flex-ajCenter">
+			<i  class="rank-other-icon rank-17" ></i>
+			<div  class="avatar zam-app-flex-ajCenter"><img src="{:tomedia($pcconfig['style']['userdefaultimg'])}"> </div> 
+			<p  class="nickname"><span>{$pcconfig['style']['userdefaultname']??'虚位以待'}</span></p>
+		</li>
+		<li class="rank-others-item zam-app-flex-ajCenter">
+			<i  class="rank-other-icon rank-18" ></i>
+			<div  class="avatar zam-app-flex-ajCenter"><img src="{:tomedia($pcconfig['style']['userdefaultimg'])}"> </div> 
+			<p  class="nickname"><span>{$pcconfig['style']['userdefaultname']??'虚位以待'}</span></p>
+		</li>
+		<li class="rank-others-item zam-app-flex-ajCenter">
+			<i  class="rank-other-icon rank-19" ></i>
+			<div  class="avatar zam-app-flex-ajCenter"><img src="{:tomedia($pcconfig['style']['userdefaultimg'])}"> </div> 
+			<p  class="nickname"><span>{$pcconfig['style']['userdefaultname']??'虚位以待'}</span></p>
+		</li>
+		<li class="rank-others-item zam-app-flex-ajCenter">
+			<i  class="rank-other-icon rank-20" ></i>
+			<div  class="avatar zam-app-flex-ajCenter"><img src="{:tomedia($pcconfig['style']['userdefaultimg'])}"> </div> 
+			<p  class="nickname"><span>{$pcconfig['style']['userdefaultname']??'虚位以待'}</span></p>
+		</li>
+	</ul>
+	<div class="rankBox-btns zam-app-flex-ajCenter2 opacity-hide">
+		<a class="paiming" href="javascript:void(0)" title="全部排名"><img src="{:tomedia($pcconfig['style']['pmimg'])}" /></a>
+		{if isset($pcconfig['gametype']) && $pcconfig['gametype']=='answerbs'}
+		<style type="text/css">
+			.answerbs-btn{width: 130px;height: 45px;line-height: 45px;text-align: center;margin-left: 50px;margin-bottom:5px;background-color: #ffc107;border-radius: 5px;color: #b95c00;font-weight: bold;font-size: 18px;}
+			.answerbs-btn.hidden{display: none}
+		</style>
+		<a class="answerbs-btn grouppm hidden" href="javascript:void(0)" title="团队排行">团队排名</a>
+		<a class="answerbs-btn answerfx hidden" href="javascript:void(0)" title="答题分析">答题分析</a>
+		<a class="answerbs-btn groupsignuser hidden" href="javascript:void(0)" title="团队签到">团队签到</a>
+		{/if}
+		<a class="nextround" href="javascript:void(0)" title="下一轮"><img src="{:tomedia($pcconfig['style']['nextimg'])}" /></a> 
+	</div>
+</div>

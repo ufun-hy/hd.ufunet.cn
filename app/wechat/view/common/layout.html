@@ -1,0 +1,418 @@
+{php}$timestamp = '1.69';{/php}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    {block name="title"}<title>{$appconfig['apptitle']}</title>{/block}
+    <meta content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0" name="viewport"/>
+    <meta content="yes" name="apple-mobile-web-app-capable"/>
+    <meta content="black" name="apple-mobile-web-app-status-bar-style"/>
+    <meta content="telephone=no" name="format-detection"/>
+	<link rel="shortcut icon" href="{:globalico()}" />
+    <link rel="stylesheet" href="__STATIC__/js/ydui/css/ydui.css"/>
+	<link rel="stylesheet" href="__STATIC__/css/zam-icon.css" media="all" />
+	<link rel="stylesheet" href="__STATIC__/css/mxc-icon.css?t=18" media="all" />
+	<link rel="stylesheet" href="__STATIC__/css/wechat/style.css?t=5.0.0" />
+	<link rel="stylesheet" href="__STATIC__/css/animate.css"/>
+	<script src="https://res.wx.qq.com/open/js/jweixin-1.6.0.js" type="text/javascript" charset="utf-8"></script>
+	{if isset($clienttype) && $clienttype=='1'}
+	<script type="text/javascript" charset="utf-8">wx.config({:$jssdk});</script>
+    {/if}
+    <script src="__STATIC__/js/ydui/js/ydui.flexible.js"></script>
+	<script src="__STATIC__/js/jquery.2.1.4.js"></script>
+	<script src="__STATIC__/js/jquery.extend.js"></script>
+	<script type="text/javascript"  src="__STATIC__/js/require.js"></script>
+    {block name="xcv3config"}
+	<script type="text/javascript">
+		var XCV3Config = {
+		  staticurl:"__STATIC__/",
+		  hdid:"{$hdinfo['hdid']??''}",
+		  rhdid:"{$hdinfo['id']??''}",
+		  wsAddress:"{$wssaddress??''}",
+		  clienttype:"{$clienttype??'1'}",
+		  ismanager:"{$wxuser['ismanager']??'2'}",
+		  isestoppel:"{$wxuser['isestoppel']??'2'}",
+		  userid:"{$wxuser['id']??''}",
+		  onlysearch:"{$onlysearch??2}",
+		  openid:"{$wxuser['openid']??''}",
+		  nickname:"{$wxuser['nickname']??''}",
+		  avatar:"{:tomedia($wxuser['avatar']??'')}",
+		  sex:"{$wxuser['sex']??'1'}",
+		  sendJgtime:"{$appconfig['appsendtime']??'10'}",
+		  gametype:"{$appconfig['gametype']??'common'}",
+		  isiframe:window.top != window.self,
+		  isluckertxt:"{$hdinfo['mobileconfig']['forbiddenword']??'您已经中过奖了，把机会留给其他人吧！'}",
+		  douyinjssdk:{
+			client_key:"{$dyjssdk['client_key']??''}",
+			signature:"{$dyjssdk['signature']??''}",
+			timestamp:"{$dyjssdk['timestamp']??''}",
+			nonce_str:"{$dyjssdk['nonce_str']??''}",
+			url:"{$dyjssdk['url']??''}"
+		  },
+		  qrtype:"{$hdinfo['qrtype']??1}",
+		  inminiprogram:"{$hdinfo['inminiprogram']??1}",
+		  isminiProgram: "{if empty(request()->isminiProgram)}2{else /}{:request()->isminiProgram}{/if}",
+		  hasvipbtn:"{$hasvipbtn??2}",
+          amconfig:{:json_encode(amconfig())},
+		  adv:{if isset($hdinfo['advconfig']['h5']) && !empty($hdinfo['advconfig']['h5'])}{:json_encode($hdinfo['advconfig']['h5'])}{else /}""{/if},
+		},dysdkobj = null;
+    </script>
+    {/block}
+    {block name="require"}
+	<script type="text/javascript">
+		require.config({
+			baseUrl: XCV3Config.staticurl + "js",
+			urlArgs:"v={$timestamp}",
+			waitSeconds:0,
+			paths: {
+				 css: "css.min",
+				 jquery:"jquery.2.1.4",
+				 jquerytrans:'screenjs/jquery.transit.min',
+				 fastclick:'wechatjs/fastclick',
+				 mobileselect:"mobileselect/mobileselect",
+				 mobileselectAreas:"mobileselect/mobileselectareas",
+				 'q-select':"q-select/q-select",
+				 ionrangeslider:'ionrangeslider/ionrangeslider',
+				 ydui: "ydui/js/ydui",
+				 template:"template/template",
+				 layer:"layer/mobile/layer",
+				 laytpl:"laytpl/laytpl",
+				 howler:"howler/howler.min",
+				 cropper:"cropper/cropper",
+				 "jquery.shake":'wechatjs/jquery.shake',
+				 jform:'jquery.form',
+				 touch:'wechatjs/touch',
+				 slideBox:'wechatjs/slideBox',
+				 wechatcore:"wechatjs/wechatcore",
+				 marqueen:"wechatjs/marqueen",
+				 bscroll:'wechatjs/bscroll/bscroll',
+				 betterscroll:'wechatjs/bscroll/better-scroll.min',
+				 swiper:['https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/Swiper/4.3.3/js/swiper.min','swiper/swiper.min'],
+				 emojicore:"wechatjs/emojicore",
+				 appsocket:"wechatjs/appsocket",
+				 appmsg:"wechatjs/appmsg",
+				 appgame:"wechatjs/appgame",
+				 appredpack:"wechatjs/appredpack",
+				 appydj:"wechatjs/appydj",
+				 appdgshake:"wechatjs/appdgshake",
+				 appshuqian:"wechatjs/appshuqian",
+				 appmonkey:"wechatjs/appmonkey",
+				 appcar:"wechatjs/appcar",
+				 apphorse:"wechatjs/apphorse",
+				 appmls:"wechatjs/appmls",
+				 appbike:"wechatjs/appbike",
+				 appswim:"wechatjs/appswim",
+				 appswingsnake:"wechatjs/appswingsnake",
+				 apptug:"wechatjs/apptug",
+				 appanswerbs:"wechatjs/appanswerbs",
+				 appjjb:"wechatjs/appjjb",
+				 appjumprace:"wechatjs/appjumprace",
+				 appclickrace:"wechatjs/appclickrace",
+				 apppuzzle:"wechatjs/apppuzzle",
+				 appcutfruit:"wechatjs/appcutfruit",
+				 appdzqy:"wechatjs/appdzqy",
+				 appmouse:"wechatjs/appmouse",
+				 appshakestart:"wechatjs/appshakestart",
+				 appdzp:"wechatjs/appdzp",
+				 appdzpdz:"wechatjs/appdzpdz",
+				 videojs:'videojs/video',
+				 TcPlayer:'videojs/TcPlayer-2.4.1/TcPlayer-2.4.1',
+				 TcPlayer2:'videojs/TcPlayer-2.4.5/TcPlayer-2.4.5',
+				 TXLivePlayer:'videojs/TcPlayer-2.4.1/TXLivePlayer.min',
+				 hls:'videojs/TcPlayer-2.4.1/hls.min',
+				 qnrtplayer:'videojs/qiniu/qn-web',
+				 plupload:'plupload/plupload',
+				 uploader:'plupload/uploader',
+				 phaser:['https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-M/phaser/2.6.2/phaser.min','wechatjs/phaser.min'],
+				 domtoimage:'domtoimg/domtoimage',
+				 html2canvas:"wechatjs/html2canvas",
+				 danmuku:'screenjs/danmuku',
+				 fulldm:'wechatjs/fulldm',
+				 dialog:'dialog/js/dialog',
+				 sweetalert:'sweetalert/sweetalert',
+				 directoss:['https://gosspublic.alicdn.com/aliyun-oss-sdk-6.16.0.min','directupload/aliyun'],
+				 directqiniu:['https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/qiniu-js/2.5.5/qiniu.min','directupload/qiniu'],
+				 directcos:'directupload/cos',
+				 DouyinOpenJSBridge:'wechatjs/douyin.open',
+				 luckycanvas:'wechatjs/luckycanvas',
+				 bubbleHearts:'wechatjs/bubbleHearts',
+				 numkeyboard:'numkeyboard/numkeyboard',
+				 glightbox:'glightbox/glightbox.min',
+				 photoswipe:'photoswipe/photoswipe.umd.min',
+				 photoswipelightbox:'photoswipe/photoswipe-lightbox.umd.min',
+				 anime:'screenjs/anime',
+				 nosleep: ['https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/nosleep/0.12.0/NoSleep.min','noSleep/NoSleep'],
+			},
+			shim:{
+				"ydui": {
+					exports:"YDUI"
+				},
+				'template':{
+					exports: 'template',
+				},
+				'layer':{
+					exports: 'layer',
+					deps: ['css!../js/layer/mobile/need/layer.css']
+				},
+				'mobileselect':{
+					exports:'MobileSelect',
+					deps: ['mobileselectAreas','css!../js/mobileselect/mobileselect.css']
+				},
+				'sweetalert':{
+					exports:'Swal',
+					deps: ['css!../js/sweetalert/sweetalert.css']
+				},
+				'q-select':{
+					exports:'QSelect',
+					deps: ['css!../js/q-select/q-select.css']
+				},
+				'ionrangeslider':{
+					deps:['css!../js/ionrangeslider/ionrangeslider.css'],
+				},
+				'wechatcore':{
+					exports:'wechatcore',
+				},
+				'marqueen':{
+					exports:'marqueen',
+				},
+				'laytpl':{
+					exports: 'laytpl',
+				},
+				'jquery.shake':{
+					exports: 'Shake',
+					deps: ['jquery']
+				},
+				'jform':{
+					deps: ['jquery']
+				},
+				'touch':{
+					exports:'touch',
+				},
+				'bscroll':{
+					exports:'BScroll',
+				},
+				'swiper':{
+					exports:'Swiper',
+					deps: ['css!../js/swiper/swiper.min.css']
+				},
+				'cropper':{
+					exports:'Cropper',
+					deps: ['css!../js/cropper/cropper.css']
+				},
+				'glightbox':{
+					exports:'GLightbox',
+					deps: ['css!../js/glightbox/glightbox.min.css'],
+				},
+				'photoswipe':{
+					exports:'PhotoSwipe',
+					deps: ['css!../js/photoswipe/photoswipe.css'],
+				},
+				'appsocket':{
+					exports:'appsocket',
+				},
+				'appgame':{
+					exports:'appgame',
+				},
+				'appdgshake':{
+					exports:'appdgshake',
+				},
+				'appshuqian':{
+					exports:'appshuqian',
+				},
+				'appmonkey':{
+					exports:'appmonkey',
+				},
+				'appcar':{
+					exports:'appcar',
+				},
+				'apphorse':{
+					exports:'apphorse',
+				},
+				'appmls':{
+					exports:'appmls',
+				},
+				'appbike':{
+					exports:'appbike',
+				},
+				'appswim':{
+					exports:'appswim',
+				},
+				'apptug':{
+					exports:'apptug',
+				},
+				'appanswerbs':{
+					exports:'appanswerbs',
+				},
+				'appdzqy':{
+					exports:'appdzqy',
+				},
+				'appjjb':{
+					exports:'appjjb',
+				},
+				'appcutfruit':{
+					exports:'appcutfruit',
+				},
+				'videojs':{
+					exports:'videojs',
+					deps:['css!../js/videojs/video.css'],
+				},
+				'TcPlayer2':{
+					deps:['css!../js/videojs/TcPlayer-4.7.2/tcplayer.min.css'],
+				},
+				'plupload':{
+					exports:'plupload',
+				},
+				'uploader':{
+					exports:'uploader',
+					deps: ['jquery','plupload'],
+				},
+				'domtoimage':{
+					exports:'domtoimage'
+				},
+				'dialog':{
+					exports:'dialog',
+					deps:['css!../js/dialog/css/dialog.css'],
+				},
+				'numkeyboard':{
+					exports: 'numkeyboard',
+					deps: ['css!../js/numkeyboard/numkeyboard.css']
+				},
+			},
+		});
+		define("jquery", [], function () {
+			return jQuery;
+		});
+	</script>
+    {/block}
+</head>
+<body class="wechatbody">
+    {block name="bodybg"}
+    {if isset($appconfig['appbgimg']) && !empty($appconfig['appbgimg'])}
+    <div class="zam-app-bodyBg" style="background-image: url({:tomedia($appconfig['appbgimg'])})"></div>
+    {/if}
+    {/block}
+    {block name="bgmusic"}
+    {if isset($appconfig['appbgmusic']) && !empty($appconfig['appbgmusic']) && isset($appconfig['gametype']) && !in_array($appconfig['gametype'],['cutfruit','jjb'])}
+    <audio id="appbgmusic" src="{:tomedia($appconfig['appbgmusic'])}" loop="loop"></audio>
+    {/if}
+    {/block}
+    {block name="preventdefault"}
+    <script>
+    if(XCV3Config.clienttype < 0){
+        document.documentElement.addEventListener('touchstart', function (event) {
+            if (event.touches.length > 1) {
+                event.preventDefault();
+            }
+        }, {passive: false});
+        var lastTouchEnd = 0;
+        document.documentElement.addEventListener('touchend', function (event) {
+            var now = Date.now();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, {passive: false});
+    }
+    </script>
+    {/block}
+    {block name="socket"}
+    <script>
+        require(['wechatcore','appsocket'],function (wechatcore,appsocket) {
+            function checkUrlnosocket(){
+                var isin = false, localUrlpage = window.location.href, notsocketroutes = ['sign','apph5','yuyuedj','dzpdz','mosaicqd','submessage','subnotice'];
+                for (let i = 0; i < notsocketroutes.length; i++) {
+                    if (localUrlpage.indexOf('wechat/' + notsocketroutes[i]) !== -1) {
+                        isin = true;
+                        break;
+                    }
+                }
+                return isin;
+            }
+            if(!checkUrlnosocket() && XCV3Config.wsAddress != '' && XCV3Config.onlysearch != '1'){
+                appsocket.init({
+                    onmessage:function(data){
+                        if(data.type=='connected'){
+                            appsocket.isclose = false;
+                            wechatcore.connectsocket({clientid:data.clientid});
+                        }else if(data.type=='goto'){
+                            wechatcore.goto(data);
+                        }else if(data.type=='addblack'){
+                            data.userid==XCV3Config.userid&&wechatcore.closewxwindow();
+                        }else if(data.type=='luckeruserids'){
+                            wechatcore.layerAsklucker(data);
+                        }else if(data.type=='confirmwxtxopenid'){
+                            if(data.userid==XCV3Config.userid){
+                                wechatcore.msg('授权成功');
+                                setTimeout(function(){
+                                    window.location.reload();
+                                },1e3);
+                            }
+                        }else if(data.type == 'answerbsleveldjs'){
+                            if($(".answerbsleveltime").length){
+                                if(!$(".issellevel").length && !$(".isgiveup").length){
+                                    $(".levelbox .btn").removeClass('btn-disabled');
+                                    $(".levelbox .isdjsover").addClass('hidden');
+                                }
+                                $(".answerbsleveltime span").text(data.djs+'秒');
+                                $(".answerbsleveltime").removeClass('hidden');
+                                if(data.djs <= 0){
+                                    $(".answerbsleveltime span").text('时间到');
+                                    $(".levelbox .btn").addClass('btn-disabled');
+                                    if(!$(".issellevel").length && !$(".isgiveup").length){
+                                        $(".levelbox .isdjsover").removeClass('hidden');
+                                    }
+                                    setTimeout(function(){
+                                        window.location.reload();
+                                    },1e3);
+                                }
+                            }
+                        }else if(data.type == 'answerbslevelreselect'){
+                            var hdurl = data.url||'';
+                            if(hdurl != ''){
+                                window.location.href = hdurl;
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+    {/block}
+    {block name="vipbtn"}
+    <script>
+    function wxjsbridgeready() {
+        if(window.__wxjs_environment === 'miniprogram') {
+            XCV3Config.isminiProgram = '1';
+        }
+        if(XCV3Config.isminiProgram == '1'){
+            if(!XCV3Config.isiframe && XCV3Config.hasvipbtn == '1'){
+                $('.zam-app-vipbtn').removeClass('hidden');
+            }
+        }else{
+            if(XCV3Config.qrtype == '4' && XCV3Config.inminiprogram == '1'){
+                var mustmini = "{:mustInminiprogram()}";
+                if(mustmini == '1'){
+                    window.location.href = "{:gowechat('common/errorhappend',['hdid'=>$hdinfo['hdid'],'errmsg'=>'请通过微信小程序访问','title'=>'温馨提醒'])}";
+                }
+            }
+        }
+    }
+    if (!window.WeixinJSBridge || !WeixinJSBridge.invoke) {
+        document.addEventListener('WeixinJSBridgeReady', wxjsbridgeready, false);
+    } else {
+        wxjsbridgeready();
+    }
+    </script>
+    {/block}
+    {:globalcss()}
+    {if !empty($hdinfo['diycss'])}
+    <style type="text/css">{:$hdinfo['diycss']}</style>
+    {/if}
+    {if isset($appconfig['style']) && isset($appconfig['style']['diycss']) && !empty($appconfig['style']['diycss'])}
+    <style type="text/css">{:$appconfig['style']['diycss']}</style>
+    {/if}
+    {if !isset($appconfig['gametype']) || $appconfig['gametype'] != 'wechatlive'}
+    {include file="common/adv" /}
+    {/if}
+    {include file="common/vip" /}
+    {include file="common/footer_base" /}

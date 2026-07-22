@@ -1,0 +1,185 @@
+{include file='$Wpath/common/header'}
+<div class="form-inline zam-inline-searchbar">
+    <div class="form-group m-l-5">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">选择轮次</span>
+          <select id="rotateid" class="form-control">
+            {if empty($rotates)}
+                <option value="0">暂无轮次</option>
+            {/if}
+            {foreach $rotates as $k=>$r} 
+                <option value="{$r['id']}" {if $rotate['id'] == $r['id']}selected{/if}>{$r['title']}</option>
+            {/foreach}
+          </select>
+        </div>
+    </div>
+    <div class="form-group" style="max-width: 200px">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">昵称或表单内容</span>
+        <input type="text" class="form-control" value="" id="keyword" placeholder="请输入用户昵称或表单内容">
+      </div>
+    </div>
+    <a class="btn btn-primary btn-sm btn-search" href="javascript:void(0)"><i class="mdi mdi-magnify"></i> 搜索</a>
+    <a class="btn btn-warning btn-sm btn-export" href="javascript:void(0)"><i class="mdi mdi-export"></i> 导出</a>
+    <a class="btn btn-warning btn-sm btn-exportall" href="javascript:void(0)"><i class="mdi mdi-export"></i> 导出所有</a>
+</div>
+{include file='$Wpath/common/tabletoolbar'}
+<table id="listtable" class="zam-btable"></table>
+<script>    
+var $rotates = {:json_encode($rotates)};
+require(['webcore','webtable','jconfirmBox','zamnotice'],function(webcore,webtable,jconfirmBox,zamnotice){
+var searchParamas = [{'type':'2','id':'rotateid'},{'type':'2','id':'goodsid'},{'type':'2','id':'status'},{'type':'1','id':'keyword'}];
+var initConfig = {
+    tableId:'#listtable',
+    url:"{:gohdmanage('dataddp/index',['hdid'=>$hdid])}",
+    columnoperate:{
+        btns:{
+            del:true,
+        },
+        func:{
+            del:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','删除将无法恢复，您确定要删除么？',function(){
+                    webcore.ajaxSubmit("{:gohdmanage('dataddp/delrecord',['hdid'=>$hdid])}",{rotateid:$("#rotateid option:selected").val(),recordid:row.id}).then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','删除成功');
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                    });
+                });
+            },
+        }
+    },
+    columns:[{
+            checkbox: true,
+        }, 
+        {
+            field: 'id',
+            title: 'id',
+            align: 'center',
+            visible: false
+        },{
+            field: 'lnickname',
+            title: '左侧用户',
+            align: 'center',
+            formatter:function(value,row,index){
+                var html = `
+                <div class='zam-flex-column-center'>
+                    <img src="${ row.lavatar }" class="avatarImg m-b-5" />
+                    <div>${ value }</div>
+                    <div>${ row.lsex }</div>
+                </div>
+                `;
+                return html;
+            }
+        },{
+            field: 'rnickname',
+            title: '右侧用户',
+            align: 'center',
+            formatter:function(value,row,index){
+                var html = `
+                <div class='zam-flex-column-center'>
+                    <img src="${ row.ravatar }" class="avatarImg m-b-5" />
+                    <div>${ value }</div>
+                    <div>${ row.rsex }</div>
+                </div>
+                `;
+                return html;
+            }
+        }
+        ,{
+            field: 'create_time',
+            title: '匹配时间',
+            align: 'center',
+        }
+    ],
+    searchParamas:searchParamas,
+    toolbar:{
+        del:function(){
+            var getSelects = webtable.getSelections();
+            if(!getSelects.length){
+                return zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+            jconfirmBox.confirm('温馨提示','删除数据将无法恢复，您确定要删除选中的记录数据么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('dataddp/delrecord',['hdid'=>$hdid])}",{rotateid:$("#rotateid option:selected").val(),recordid:getSelects}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','删除成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+        },
+        reset:function(){
+            var rotateid = $("#rotateid option:selected").val()||'';
+            if(+rotateid < 1) {
+                return zamnotice.showTips('info','请选择轮次');
+            }
+            jconfirmBox.confirm('温馨提示','清空将删除本轮所有匹配数据并且无法恢复，您确定要清空么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('dataddp/resetrecord',['hdid'=>$hdid])}",{rotateid:rotateid}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','清空成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+        },
+        qkall:function(){
+            jconfirmBox.confirm('温馨提示','清空所有轮次将删除所有轮次内的匹配数据并且无法恢复，您确定要清空所有轮次么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('dataddp/resetallrecord',['hdid'=>$hdid])}",{}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','清空所有轮次成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+        },
+    },
+};
+webtable.init(initConfig);
+$('#rotateid').change(function(e) {
+    webtable.refresh();
+});
+$('.btn-export').on('click',function(){
+    var rotateid = $("#rotateid option:selected").val()||'';
+    if(+rotateid < 1) {
+        return zamnotice.showTips('info','请选择轮次');
+    }
+    webcore.ajaxSubmit("{:gohdmanage('dataddp/exportrecord',['hdid'=>$hdid])}",{rotateid:rotateid}).then(function(json){
+        if(json.code != 0){
+            zamnotice.showTips('error',json.msg);
+        }else{
+            window.location.href = `{:gohdmanage('dataddp/exportrecord',['hdid'=>$hdid])}&rotateid=${rotateid}`;
+        }
+    }, function(json){
+        zamnotice.showTips('error','网络差,操作失败');
+    });
+});
+$('.btn-exportall').on('click',function(){
+    webcore.ajaxSubmit("{:gohdmanage('dataddp/exportrecord',['hdid'=>$hdid])}",{type:'2'}).then(function(json){
+        if(json.code!=0){
+            zamnotice.showTips('error',json.msg);
+        }else{
+            window.location.href = "{:gohdmanage('dataddp/exportrecordall',['hdid'=>$hdid])}&type=2";
+        }
+    }, function(json){
+        zamnotice.showTips('error','网络差,操作失败');
+    });
+});
+});
+</script>
+{include file='$Wpath/common/footer'}

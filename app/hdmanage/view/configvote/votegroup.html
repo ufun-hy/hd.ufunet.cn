@@ -1,0 +1,103 @@
+<table class="table">
+<thead style="border: 1px solid #efefef;">
+  <tr>
+	<td colspan="2">
+	  <a  class="btn btn-primary btn-sm pull-left btn-addgroup" href="javascript:;"> <i class="mdi mdi-plus"></i>&nbsp;<span>添加分组</span></a>
+	</td>
+  </tr>
+</thead>
+<thead>
+  <tr>
+    <th style="width:50%;text-align:center;">分组名称</th>
+    <th style="width:50%;text-align:center;">操作</th>
+  </tr>
+</thead>
+<tbody class="votegroup-lists">
+    {foreach $groups as $group}
+     <tr>
+        <td>
+          {$group['groupname']}(id:{$group['id']})
+        </td>
+        <td data-groupid="{$group['id']}">
+          <a class="btn btn-xs btn-primary btn-editgroup m-r-5" href="javascript:void(0)"><i class="mdi mdi-pencil"></i></a>
+          <a class="btn btn-xs btn-danger btn-delgroup" href="javascript:void(0)"><i class="mdi mdi-close"></i></a>
+        </td>
+     </tr>
+    {/foreach}
+</tbody>
+</table>
+<script type="text/javascript">
+var vrotateid = "{$vrotateid}";
+require(['webcore','jconfirmBox','zamnotice','layerBox',"bootstrap-touchspin","bootstrap-daterangepicker"],function(webcore,jconfirmBox,zamnotice,layerBox){
+  function updatevotelists(){
+        webcore.ajaxSubmit("{:gohdmanage('configvote/ajaxvoteitems',['hdid'=>$hdid])}",{rotateid:vrotateid}).then(function(json){
+          if(json.code==0){
+            var html = '';
+            $.each(json.msg,function(i,v){
+               html += webcore.tpl($("#voteitem-tpl"),v);
+            });
+            $(".vote-lists").html(html);
+            setTimeout(function(){
+              tpl_switch();
+            },1e2);
+          }else{
+          }
+        }, function(json){
+            zamnotice.showTips('error','网络差。操作失败');
+        });
+  }
+  $(".btn-addgroup").click(function(){
+    if(vrotateid=='') zamnotice.showTips('error','请先添加好轮次，再添加分组');
+    var confirmObj = jconfirmBox.ajaxconfirm("新增分组","{:gohdmanage('configvote/editgroup',['hdid'=>$hdid])}",{ishtml:'1',rotateid:vrotateid},'html','col-lg-8 col-lg-offset-2',function(e){
+      var groupname = e.find('input').val();
+        webcore.ajaxSubmit("{:gohdmanage('configvote/editgroup',['hdid'=>$hdid])}",{rotateid:vrotateid,groupname:groupname},'保存中...').then(function(json){
+          if(json.code==0){
+            confirmObj.close();
+            $(".votegroup-lists").append('<tr><td>'+json.msg.groupname+'(id:'+json.msg.id+')</td><td data-groupid="'+json.msg.id+'"><a class="btn btn-xs btn-primary btn-editgroup m-r-5" href="javascript:void(0)"><i class="mdi mdi-pencil"></i></a><a class="btn btn-xs btn-danger btn-delgroup" href="javascript:void(0)"><i class="mdi mdi-close"></i></a></td></tr>');
+            zamnotice.showTips('success','新增成功');
+          }else{
+            zamnotice.showTips('error',json.msg);
+          }
+        }, function(json){
+          zamnotice.showTips('error','网络差。操作失败');
+        });
+    });
+  });
+  $(".votegroup-lists").on('click','.btn-editgroup',function(){
+    if(vrotateid=='') return zamnotice.showTips('error','请先添加好轮次，再编辑分组');
+    var $this = $(this),groupid = $this.parent().attr('data-groupid');
+    var confirmObj = jconfirmBox.ajaxconfirm("编辑分组","{:gohdmanage('configvote/editgroup',['hdid'=>$hdid])}",{ishtml:'1',rotateid:vrotateid,groupid:groupid},'html','col-lg-8 col-lg-offset-2',function(e){
+        var groupname = e.find('input').val();
+        webcore.ajaxSubmit("{:gohdmanage('configvote/editgroup',['hdid'=>$hdid])}",{rotateid:vrotateid,groupid:groupid,groupname:groupname},'保存中...').then(function(json){
+          if(json.code==0){
+            confirmObj.close();
+            $this.parent().parent().html('<td>'+json.msg.groupname+'(id:'+json.msg.id+')</td><td data-groupid="'+json.msg.id+'"><a class="btn btn-xs btn-primary btn-editgroup m-r-5" href="javascript:void(0)"><i class="mdi mdi-pencil"></i></a><a class="btn btn-xs btn-danger btn-delgroup" href="javascript:void(0)"><i class="mdi mdi-close"></i></a></td>');
+            zamnotice.showTips('success','编辑成功');
+            updatevotelists();
+          }else{
+            zamnotice.showTips('error',json.msg);
+          }
+        }, function(json){
+          zamnotice.showTips('error','网络差。操作失败');
+        });
+    });
+  });
+  $(".votegroup-lists").on('click','.btn-delgroup',function(){
+    if(vrotateid=='') return zamnotice.showTips('error','请先添加好轮次，再删除分组');
+    var $this = $(this),groupid = $this.parent().attr('data-groupid');
+    jconfirmBox.confirm('温馨提示','删除分组将无法恢复，您确定要删除么？',function(){
+      webcore.ajaxSubmit("{:gohdmanage('configvote/delgroup',['hdid'=>$hdid])}",{rotateid:vrotateid,groupid:groupid}).then(function(json){
+        if(json.code==0){
+          $this.parent().parent().remove();
+          zamnotice.showTips('success','删除成功');
+          updatevotelists();
+        }else{
+          zamnotice.showTips('error',json.msg);
+        }
+      }, function(json){
+        zamnotice.showTips('error','网络差。操作失败');
+      });
+    });
+  });
+});
+</script>

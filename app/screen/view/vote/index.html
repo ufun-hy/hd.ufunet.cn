@@ -1,0 +1,705 @@
+{include file='common/header' /}
+<style>
+.vote-mainbox{
+	top:90px;
+	bottom:40px;
+}
+.vote-mainbox .vote-wrapper{
+	width:calc(100% - 80px);
+	height:100%;
+	overflow:hidden;
+	background-color:rgba(0,0,0,0.4);
+	border-radius:5px;
+}
+.vote-info{
+	color: #fff;
+	height:40px;
+    font-size: 25px;
+    padding:20px 50px;
+    font-weight: 400;
+    position: relative;
+}
+.vote-info-right{
+	float:right
+}
+.votestatus{height:25px}
+.votestatus .endstatus {
+    background: url(/{:SIMGURL}/vote/ebtn.png) no-repeat;
+    width: 90px;
+    height: 35px;
+    display: block;
+    background-size: 90px auto;
+}
+.votestatus .startstatus {
+    background: url(/{:SIMGURL}/vote/sbtn.png) no-repeat;
+    width: 90px;
+    height: 35px;
+    display: block;
+    background-size: 90px auto;
+}
+.vote-info-right span{display:inline-block;font-size:20px;}
+.vote-info-right .djsbox{margin-right:10px;}
+.vote-info-right .djsbox.hidden{display: none;}
+.vote-info-right .votejoinbox{margin-left:10px;}
+.vote-info-right .votejoinbox.hidden{display: none;}
+.vote-info-right .votejoinbox span{margin-right:5px;}
+.vote-info-right .rankbtn{
+	position:relative;
+	left:20px;
+	font-size: 18px;
+    color: #fff;
+    cursor: pointer;
+    border: 1px solid hsla(0,0%,100%,.6);
+    border-radius:3px;
+    padding: 5px 8px;
+}
+.vote-lists{
+	width:100%;
+	height:500px;
+}
+/*竖排*/
+.vote-list{width:100%;height:100%;color:#fff;}
+.vote-list-wrapper{width:100%;height:100%;}
+.vote-item{width:10%;}
+.vote-item.hidden{display: none}
+.vote-item .vote-progress{ width:72px;padding:0; background:none; border:none; box-shadow:none; position:relative; margin:0 auto;margin-top:50px;height:325px;}
+.vote-item .vote-progress.noImg{height:385px;}
+.vote-item .vote-progress .votenumbox div{text-align: center;}
+.vote-item .vote-progress.vote-progress-auto{
+	height:auto;
+	margin-top:5px;
+}
+.vote-item .vote-progressbar{
+	width:100%;
+	height:0; 
+	border-radius:8px 8px 0 0px; 
+	position:absolute; 
+	left:0; 
+	bottom:0;
+	transition: all 1s linear 0s;
+	background-color:rgb(255, 220, 203);
+}
+.vote-item .vote-progressbar.vote-progressbar2{
+	position:inherit;
+	height: auto;
+	max-height: 325px;
+}
+.vote-item .vote-progressbar .votenumbox{ position:absolute; left:0; bottom:100%; width:100%; text-align:center; color:#fff; line-height:25px; text-shadow:2px 2px 5px rgba(0,0,0,0.2); font-size: 14px}
+
+.vote-avatar img{
+	width:72px;
+	height:72px;
+}
+/*项目编号*/
+.vote-avatar .votenumber{
+	position: absolute;
+	top: -14px;
+	left: -10px;
+	width: 30px;
+	height: 30px;
+	background-color: #48b0f7;
+	border-radius: 50%;
+	font-size: 10px;
+	color: #fff;
+	border: 2px solid #fff;
+}
+.vote-name{
+	height:46px;
+	overflow:hidden;
+	margin-top:5px;
+	font-size:16px;
+	text-align: center;
+}
+.vote-name-top{
+	width:80%;
+	margin:0 auto;
+	margin-top:0px;
+	margin-bottom:8px;
+	word-break: break-all;
+}
+.votescore{
+	display:inline-block;
+	margin:10px 0;
+	text-align:center
+}
+
+.vote-progress.cubetype2 .vote-progressbar{
+	-webkit-box-shadow: 0 0 15px #ff3e3e;
+	background: linear-gradient(45deg, #03a9f4, #f441a5, #ffeb3b, #03a9f4);
+	background-size: 400%;
+	animation: sun 5s infinite;
+}
+@keyframes sun {  
+	100% {filter: hue-rotate(0deg);} 
+	0% {filter: hue-rotate(360deg);}
+}
+.vote-progress.cubetype2 .vote-progressbar:after{
+	content:'';
+	position: absolute;
+	left: 0px;
+	right: 0px;
+	top: 0px;
+	bottom: 0px;
+	border-radius: 8px 8px 0 0px;
+	opacity: 0.3;
+	background: url(/static/images/screen/vote/qipao.png) 0 0;
+	-webkit-animation: sparkle 1500ms linear infinite; 
+}
+@keyframes sparkle { 
+	0% {background-position: 0 0;} 
+	100% {background-position: 0 -64px;}
+}
+
+.vote-progress.cubetype3{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+	margin-top: 0;
+	height: 375px;
+	color: #fff;
+	--li-w:42px;
+	--li-right-w: 15px;
+	--li-up-h: 9px;
+	--li-up-top: -8.6px;
+	--li-up-left: 8px;
+    --cube-item-bgcolor: 255, 255, 255;
+}
+.vote-item .vote-progress.cubetype3.noImg {
+    height: 425px;
+}
+.vote-progress.cubetype3 .cube-body{
+	position:relative;
+	width:var(--li-w);
+	height:calc(100% - 30px);
+	margin: 15px 15px 5px 0;
+}
+.vote-progress.cubetype3 .cube-item {
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+	height:100%;
+    transition: all 1s linear 0s;
+}
+.vote-progress.cubetype3 .cube-item .cube-front {
+    position: absolute;
+    width: var(--li-w);
+    height: 100%;
+    bottom: 0;
+    left: 0;
+    box-sizing: border-box;
+    background-color: rgba(var(--cube-item-bgcolor), 0.08);
+    z-index: 4;
+}
+.vote-progress.cubetype3 .cube-item .cube-right {
+    position: absolute;
+    left: var(--li-w);
+    top: calc(var(--li-right-w) * -0.3);
+    width: var(--li-right-w);
+    height: 100%;
+    transform: skewY(-30deg);
+    background-color: rgba(var(--cube-item-bgcolor), 0.12);
+    z-index: 5;
+}
+.vote-progress.cubetype3 .cube-item .cube-up {
+    position: absolute;
+    width: var(--li-w);
+    height: var(--li-up-h);
+    top: var(--li-up-top);
+    left: var(--li-up-left);
+    transform:skewX(-60deg);
+    background-color: rgba(var(--cube-item-bgcolor), 0.13);
+    z-index: 6;
+}
+.vote-progress.cubetype3 .cube-item.inner{height:0}
+.vote-progress.cubetype3 .cube-item.inner .cube-front {
+    opacity: 1;
+    z-index: 2;
+    background: linear-gradient(180deg,rgba(255,20,0,1), rgba(255,20,0,0.05));
+}
+.vote-progress.cubetype3 .cube-item.inner .cube-right {
+    opacity: 0.85;
+    z-index: 1;
+    background: linear-gradient(180deg,rgba(255,20,0,1), rgba(255,20,0,0.05));
+}
+.vote-progress.cubetype3 .cube-item.inner .cube-up {
+    background-color: rgba(255,20,0,1);
+    opacity: 0.7;
+    z-index: 3;
+}
+.vote-progress.cubetype3 .cube-item.inner .qipao {
+    background: url(/static/images/screen/vote/qipao2.png) no-repeat center bottom;
+    background-size: cover;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    overflow: hidden;
+}
+.vote-lists li:nth-child(10n+1) .vote-progress.cubetype3 .inner .cube-right, .vote-lists li:nth-child(10n+1) .vote-progress.cubetype3 .inner .cube-front { background: linear-gradient(180deg,rgba(255,20,0,1), rgba(255,20,0,0.05)); }
+.vote-lists li:nth-child(10n+1) .vote-progress.cubetype3 .inner .cube-up { background-color: rgba(255,20,0,1); }
+
+.vote-lists li:nth-child(10n+2) .vote-progress.cubetype3 .inner .cube-right, .vote-lists li:nth-child(10n+2) .vote-progress.cubetype3 .inner .cube-front { background: linear-gradient(180deg,rgba(255,80,0,1), rgba(255,80,0,0.05)); }
+.vote-lists li:nth-child(10n+2) .vote-progress.cubetype3 .inner .cube-up { background-color: rgba(255,80,0,1); }
+
+.vote-lists li:nth-child(10n+3) .vote-progress.cubetype3 .inner .cube-right, .vote-lists li:nth-child(10n+3) .vote-progress.cubetype3 .inner .cube-front { background: linear-gradient(180deg,rgba(255,200,0,1), rgba(255,200,0,0.05)); }
+.vote-lists li:nth-child(10n+3) .vote-progress.cubetype3 .inner .cube-up { background-color: rgba(255,200,0,1); }
+
+.vote-lists li:nth-child(10n+4) .vote-progress.cubetype3 .inner .cube-right, .vote-lists li:nth-child(10n+4) .vote-progress.cubetype3 .inner .cube-front { background: linear-gradient(180deg,rgba(0,250,0,1), rgba(0,250,0,0.05)); }
+.vote-lists li:nth-child(10n+4) .vote-progress.cubetype3 .inner .cube-up { background-color: rgba(0,250,0,1); }
+
+.vote-lists li:nth-child(10n+5) .vote-progress.cubetype3 .inner .cube-right, .vote-lists li:nth-child(10n+5) .vote-progress.cubetype3 .inner .cube-front { background: linear-gradient(180deg,rgba(0,220,255,1), rgba(0,220,255,0.05)); }
+.vote-lists li:nth-child(10n+5) .vote-progress.cubetype3 .inner .cube-up { background-color: rgba(0,220,255,1); }
+
+.vote-lists li:nth-child(10n+6) .vote-progress.cubetype3 .inner .cube-right, .vote-lists li:nth-child(10n+6) .vote-progress.cubetype3 .inner .cube-front { background: linear-gradient(180deg,rgba(0,20,255,1), rgba(0,20,255,0.05)); }
+.vote-lists li:nth-child(10n+6) .vote-progress.cubetype3 .inner .cube-up { background-color: rgba(0,20,255,1); }
+
+.vote-lists li:nth-child(10n+7) .vote-progress.cubetype3 .inner .cube-right, .vote-lists li:nth-child(10n+7) .vote-progress.cubetype3 .inner .cube-front { background: linear-gradient(180deg,rgba(200,0,255,1), rgba(200,0,255,0.05)); }
+.vote-lists li:nth-child(10n+7) .vote-progress.cubetype3 .inner .cube-up { background-color: rgba(200,0,255,1); }
+
+.vote-lists li:nth-child(10n+8) .vote-progress.cubetype3 .inner .cube-right, .vote-lists li:nth-child(10n+8) .vote-progress.cubetype3 .inner .cube-front { background: linear-gradient(180deg,rgba(250,0,200,1), rgba(250,0,200,0.05)); }
+.vote-lists li:nth-child(10n+8) .vote-progress.cubetype3 .inner .cube-up { background-color: rgba(250,0,200,1); }
+
+.vote-lists li:nth-child(10n+9) .vote-progress.cubetype3 .inner .cube-right, .vote-lists li:nth-child(10n+9) .vote-progress.cubetype3 .inner .cube-front { background: linear-gradient(180deg,rgba(254,100,255,1), rgba(254,100,255,0.05)); }
+.vote-lists li:nth-child(10n+9) .vote-progress.cubetype3 .inner .cube-up { background-color: rgba(254,100,255,1); }
+
+.vote-lists li:nth-child(10n+10) .vote-progress.cubetype3 .inner .cube-right, .vote-lists li:nth-child(10n+10) .vote-progress.cubetype3 .inner .cube-front { background: linear-gradient(180deg,rgba(255,0,100,1), rgba(255,0,100,0.05)); }
+.vote-lists li:nth-child(10n+10) .vote-progress.cubetype3 .inner .cube-up { background-color: rgba(255,0,100,1); }
+
+/*横排*/
+.circle-itemslide{
+	display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+	-webkit-flex-wrap: wrap;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+	-webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+	-webkit-justify-content: space-around;
+    -ms-flex-pack: distribute;
+    justify-content: space-around;
+}
+.circle-item{
+	position: relative;
+    width: 20%;
+    height: max-content;
+}
+.circle-item.hidden{display: none}
+.circle-itembox{
+	box-sizing: border-box;
+    width:auto;
+    height: 236px;
+    overflow: hidden;
+	-webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
+}
+.circle-header{
+	position: relative;
+    width: 148px;
+    height: 148px;
+    border-radius: 50%;
+    background: hsla(0,0%,100%,.3);
+    border: 1px solid hsla(0,0%,100%,.4);
+    margin-bottom: 10px;
+}
+.circle-avatar{
+	position: relative;
+    width: 142px;
+    height: 141px;
+    margin: 3px;
+    background-size: 140px;
+    background-position: 50%;
+    background-repeat: no-repeat;
+    border-radius: 50%;
+}
+.circle-avatar img {
+    display: inline-block;
+    width: 123px;
+    height: 123px;
+    border-radius: 50%;
+}
+.circle-count{
+	display: inline-block;
+    line-height: 1;
+    font-size: 18px;
+    height: 18px;
+    color: #ffcf0d;
+    margin-bottom: 8px;
+}
+.circle-bar{
+	width:60%;
+    height: 14px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    border: 1px solid hsla(0,0%,100%,.3);
+    background: hsla(0,0%,100%,.2);
+    padding: 0 3px;
+}
+.circle-bar span{
+	border-radius: 5px;
+    height: 9px;
+    background-color: rgb(255, 220, 203);
+}
+.circle-name{
+	width: 60%;
+	text-align:center;
+    line-height: 1;
+    height: 18px;
+    font-size: 16px;
+    color: #fff;
+}
+/*单排*/
+.single-itemslide{}
+.single-item{
+	width:960px;
+    height:440px;
+    background-color: hsla(0,0%,100%,.2);
+    border: 1px solid hsla(0,0%,100%,.3);
+    border-radius: 10px;
+	-webkit-box-pack: center;
+    -webkit-justify-content: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+}
+.single-box{
+	width: 940px;
+    height: 420px;
+    background:rgba(0,0,0,0.4);
+}
+.single-header{
+	width: 497px;
+    height: 100%;
+}
+.single-header img{
+	display: inline-block;
+    width: 100%;
+    height: 100%;
+    -o-object-position: center;
+    object-position: center;
+}
+.single-info{
+	-webkit-box-flex: 1;
+    -webkit-flex: 1;
+    -ms-flex: 1;
+    flex: 1;
+	-webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
+}
+.single-count{color: #ffc600;}
+.single-count .vote-count{
+	font-size: 100px;
+    line-height: 90px;
+}
+.single-count .ext{
+	font-size:48px;
+}
+.single-percent{
+	display: inline-block;
+    height: 80px;
+    color: #ffeba4;
+    font-size: 48px;
+}
+.single-name{
+	display: inline-block;
+    height: 80px;
+    color: #ffeba4;
+    font-size: 48px;width: 225px;
+    height: 71px;
+    background: url(/{:SIMGURL}/vote/namebg.png) no-repeat 50%;
+    text-shadow: 1px 2px 3px rgba(18,71,72,.25);
+    font-size: 34px;
+    color: #fff;
+    text-align: center;
+    line-height: 50px;
+    padding: 0 80px;
+    font-weight: 700;
+    margin-bottom: 30px;
+}
+.single-des{
+	width: calc(100% - 54px);
+    padding: 0 27px;
+    margin-left: 13px;
+    font-size: 18px;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    color: #fff;
+    line-height: 1.5;
+    max-height: 50px;
+}
+/*底部轮次*/
+.vote-rounds{
+	height:40px;
+	text-align:center;
+}
+.vote-rounds a{
+	display: inline-block;
+    padding: 5px 10px;
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.65);
+    margin-right: 10px;
+    border-radius: 10px;
+}
+.vote-rounds a.active,.vote-rounds a.active:hover {
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    background-color: rgb(255, 255, 255);
+    color: #000;
+}
+.vote-rounds a:hover {
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    background-color: rgba(255, 255, 255,0.5);
+    color: #000;
+}
+</style>
+<input type="hidden" class="voterotateid" value="0" />
+<section class="vote-mainbox normal-box zam-app-flex-ajCenter2">
+	<div class="emptybox zam-app-flex-ajCenter display-none">
+		<img src="/{:SIMGURL}/common/empty.png">
+		<p style="padding:20px;">暂无可用轮次，请到后台添加</p>
+	</div>
+	<section class="vote-wrapper display-none">
+		<section class="vote-info">
+			<span class="vote-info-left"></span>
+			<div class="vote-info-right">
+				<span class="djsbox hidden"></span>
+				<span class="votestatus"><div class="endstatus" data-state="2"></div></span>
+				<span class="votejoinbox hidden">
+					<span  id="joinPerson">0</span>人参与
+				</span>
+				<span  class="rankbtn" data-order='2'><i class="mxc-unie721"></i> <span>普通模式</span></span>
+			</div>
+		</section>
+		<section class="vote-lists">
+			<div class="swiper-container vote-list-wrapper zam-app-flex-ajCenter2" style="height:100%;text-align: center;">
+				<ul class="swiper-wrapper vote-list"></ul>
+				<div class="swiper-button-prev swiper-button-white swiper-change display-none"></div>
+				<div class="swiper-button-next swiper-button-white swiper-change display-none"></div>
+			</div>
+		</section>
+		<section class="vote-rounds"></section>
+	</section>
+</section>
+<script id="round-tpl" type="html/javascript">
+	<a href="javascript:;" data-rotateid="{{ id }}" id="round-{{ id }}" {{ if active=='1'}}class="active"{{ /if }}>第{{ num }}轮</a> 
+</script>
+<script id="voteItem-tpl" type="html/javascript">
+{if $hdinfo['id']=='boshengvote'}
+<li class="swiper-slide vote-item zam-app-flex zam-app-justifyflexend zam-app-directionColumn" id="vote-{{ id }}" style="margin-bottom: 50px;">
+	<p class="vote-name vote-name-top">{{# votename }}</p>
+	<div class="vote-avatar zam-app-flex-ajCenter2 {{ if voteimg=='' }}display-none{{ /if }}">
+		<div style="position:relative;">
+			<img src="{{ voteimg }}" />
+			<div class="votenumber zam-app-flex-ajCenter">{{ votenumber }}</div>
+		</div>
+	</div>
+	<div class="vote-progress{{ if voteimg=='' }} noImg{{ /if }} vote-progress-auto">
+		<div class="vote-progressbar vote-progressbar2" style="height:{{ 325*percent }}px"></div>
+	</div>
+	<span class="votescore">
+		{{ if shownum=='1' }}
+			<div class="votenum">{{ votenums }}{$pcconfig['voteunit']??'票'}</div>
+		{{ /if }}
+		{{ if showper=='1' }}
+			<div class="votepercent">{{ itempercent }}</div>
+		{{ /if }}
+	</span>
+</li>
+{else /}
+<li class="swiper-slide vote-item" id="vote-{{ id }}">
+	<div class="vote-progress cubetype{{ cubetype }}{{ if voteimg=='' }} noImg{{ /if }}">
+		{{ if cubetype!='3' }}
+			<div class="vote-progressbar" style="height:{{ voteper }};">
+				<div class="votenumbox">
+					{{ if shownum=='1' }}
+						<div class="votenum">{{ votenums }}{$pcconfig['voteunit']??'票'}</div>
+					{{ /if }}
+					{{ if showper=='1' }}
+						<div class="votepercent">{{ itempercent }}</div>
+					{{ /if }}
+				</div>
+			</div>
+		{{ else }}
+			<div class="votenumbox">
+				{{ if shownum=='1' }}
+					<div class="votenum">{{ votenums }}{$pcconfig['voteunit']??'票'}</div>
+				{{ /if }}
+				{{ if showper=='1' }}
+					<div class="votepercent">{{ itempercent }}</div>
+				{{ /if }}
+			</div>
+			<div class="cube-body">
+				  <div class="cube-item">
+						<div class="cube-front"></div>
+						<div class="cube-right"></div>
+						<div class="cube-up"></div>
+				  </div>
+				  <div class="cube-item inner" style="height: {{ voteper }};">
+						<div class="cube-front">
+						  <div class="qipao"></div>
+						</div>
+						<div class="cube-right"></div>
+						<div class="cube-up"></div>
+				  </div>
+			</div>
+		{{ /if }}
+	</div>
+	<div class="vote-avatar zam-app-flex-ajCenter2 {{ if voteimg=='' }}display-none{{ /if }}">
+		<img src="{{ voteimg }}">
+	</div>
+	<p class="vote-name">{{# votename }}</p>
+</li>
+{/if}
+</script>
+<script id="voteItem2-tpl" type="html/javascript">
+<div  class="circle-item" id="vote-{{ id }}">
+	<div class="circle-itembox zam-app-flex-ajCenter">
+		<div  class="circle-header {{ if voteimg==''}}display-none{{ /if }}">
+			<div  class="circle-avatar zam-app-flex-ajCenter2">
+				<img  src="{{ voteimg }}">
+			</div> 
+		</div> 
+		<div  class="circle-count">
+				{{ if shownum=='1' }}
+					{{ votenums }}{$pcconfig['voteunit']??'票'}
+				{{ /if }}
+				{{ if showper=='1' }}
+					{{ if shownum=='1' }}
+						({{ itempercent }})
+					{{ else }}
+						{{ itempercent }}
+					{{ /if }}
+				{{ /if }}
+		</div>
+		<div  class="circle-bar zam-app-flex-alignCenter">
+			<span  class="voternum" style="width:{{ voteper }}; border-radius: 6px;"></span>
+		</div>
+		<div  class="circle-name limit">{{# votename }}</div>
+	</div> 
+</div>
+</script>
+<script id="voteItem3-tpl" type="html/javascript">
+	<div  class="single-item zam-app-flex-alignCenter" id="vote-{{ id }}">
+		<div  class="single-box zam-app-flex">
+			<div class="single-header {{ if voteimg==''}}display-none{{ /if }}">
+				<img  src="{{ voteimg }}">
+			</div>
+			<div  class="single-info zam-app-flex-ajCenter">
+				<div  class="single-count">
+						<span  class="vote-count">{{ if shownum=='1' }}{{ votenums }}{{ /if }}</span>
+						<span  class="ext{{ if shownum!='1' }} display-none{{ /if }}">{$pcconfig['voteunit']??'票'}</span>
+				</div>
+				<div  class="single-percent">
+					{{ if showper=='1' }}
+						{{ itempercent }}
+					{{ /if }}
+					
+				</div>
+				<div  class="single-name limit">{{# votename }}</div>
+			</div>
+		</div>
+	</div>
+</script>
+<style type="text/css">
+/*分组内列表*/
+.group-itemslide{
+}
+.group-itemslide .group-item{
+	width: 50%;
+}
+.group-itemslide .group-item .groupnums{
+	width: 100%;
+	font-size: 24px;
+}
+.group-itemslide .group-item .groupname{
+	width: 100%;
+	font-size: 20px;
+}
+.group-itemslide .group-item .group-lists{
+	width: 100%;
+	min-height: 358px;
+	overflow: hidden;
+}
+.group-itemslide .group-item .group-lists .group-ul{
+	width: 100%;
+	height: 100%;
+}
+.group-itemslide .group-item .group-lists .group-ul .vote-item{
+	width: 20%;
+}
+.group-itemslide .group-item .group-lists .group-ul .vote-item .vote-progress{
+	height: 260px;
+}
+</style>
+<script id="group-tpl" type="html/javascript">
+	<div  class="group-item zam-app-flex-ajCenter" id="group-{{ id }}">
+		<div class="groupnums zam-app-flex-ajCenter2"><span class="gname">{{# votename }}</span>总票数:<span class="gnum">{{ votenums }}</span></div>
+		<div class="group-lists swiper-container group-lists-{{ id }}">
+			<ul class="swiper-wrapper group-ul{{ if items.length < 5 }} zam-app-flex-ajCenter2{{ /if }}">
+			{{ each items as v i }}
+		    	<li class="swiper-slide vote-item" id="vote-{{ v.id }}">
+					<div class="vote-progress cubetype{{ cubetype }}{{ if v.voteimg=='' }} noImg{{ /if }}">
+						{{ if cubetype!='3' }}
+							<div class="vote-progressbar" style="height:{{ v.voteper }};">
+								<div class="votenumbox">
+									{{ if shownum=='1' }}
+										<div class="votenum">{{ v.votenums }}{$pcconfig['voteunit']??'票'}</div>
+									{{ /if }}
+									{{ if showper=='1' }}
+										<div class="votepercent">{{ v.itempercent }}</div>
+									{{ /if }}
+								</div>
+							</div>
+						{{ else }}
+							<div class="votenumbox">
+								{{ if shownum=='1' }}
+									<div class="votenum">{{ v.votenums }}{$pcconfig['voteunit']??'票'}</div>
+								{{ /if }}
+								{{ if showper=='1' }}
+									<div class="votepercent">{{ v.itempercent }}</div>
+								{{ /if }}
+							</div>
+							<div class="cube-body">
+								  <div class="cube-item">
+										<div class="cube-front"></div>
+										<div class="cube-right"></div>
+										<div class="cube-up"></div>
+								  </div>
+								  <div class="cube-item inner" style="height: {{ v.voteper }};">
+										<div class="cube-front">
+										  <div class="qipao"></div>
+										</div>
+										<div class="cube-right"></div>
+										<div class="cube-up"></div>
+								  </div>
+							</div>
+						{{ /if }}
+					</div>
+					<div class="vote-avatar zam-app-flex-ajCenter2 {{ if v.voteimg=='' }}display-none{{ /if }}">
+						<img src="{{ v.voteimg }}">
+					</div>
+					<p class="vote-name">{{# v.votename }}</p>
+				</li>    
+		    {{ /each }}
+			</ul>
+		</div>
+		<div class="groupname zam-app-flex-ajCenter2">{{# votename }}</div>
+	</div>
+</script>
+<script>
+var votetxt = "{$pcconfig['votetxt']??'投票'}",voteunit = "{$pcconfig['voteunit']??'票'}";
+require(['screenvote'],function(screenvote){
+	screenvote.init();
+});
+</script>
+{include file='common/footer' /}

@@ -1,0 +1,922 @@
+<style>
+table tr td{text-align:center!important}
+.confirmbox-pop .zam-titleBox{font-weight: 600;padding:5px 0;}
+.userimgbox img{height:40px!important;}
+.edui-default .edui-toolbar .edui-for-fullscreen {
+    display: none!important
+}
+#edui_fixedlayer{z-index: 9999!important}
+</style>
+<div class="form-horizontal confirmbox-pop rotate-pop">
+<form class="confirm-formbox" method="post">
+    <div class="text-center">
+        <div class="btn-group pop-btns" style="margin-bottom:10px;">
+          <a href="javascript:void(0)" class="btn btn-default btn-primary"><span>基础设置</span></a>
+          <a href="javascript:void(0)" class="btn btn-default"><span>奖品管理</span></a>
+          <a href="javascript:void(0)" class="btn btn-default"><span>红包风格</span></a>
+        </div>
+    </div>
+    <div class="carditem">
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 轮次名</label>
+            <div class="col-lg-8">
+                <input class="form-control" type="text"  name="title" value="{$rotate['title']}">
+            </div>
+        </div>
+		<div class="form-group openmodebox" style="cursor: not-allowed;">
+			<label class="col-lg-3 control-label">* 开奖模式</label>
+			<div class="col-lg-8">
+				{foreach $openmodes as $k=>$v}
+				<label class="lyear-radio radio-inline radio-primary" style="pointer-events:none">
+                    <input type="radio" name="openmode" value="{$k}" {if $rotate['openmode'] == $k}checked{/if}><span>{$v}</span>
+                </label>
+				{/foreach}
+                <div class="help-block m-t-0"><span class="text-danger">开奖模式无法更改</span></div>
+			</div>
+		</div>
+		<div class="cjtypebox2{if $rotate['openmode']!='2'} hidden{/if}">
+			<div class="form-group">
+				<label class="col-lg-3 control-label text-right">* 游戏规则</label>
+				<div class="col-lg-8">
+					{:tpl_ueditor('ruledes', $rotate['ruledes'],['height'=>'100'])}
+				</div>
+			</div>
+	        <div class="form-group">
+	            <label class="col-lg-3 control-label">* 最多可选</label>
+				<div class="col-lg-4">
+					<input type="text" class="form-control numberincdec" name="maxselect" 
+	                data-bts-min="1" data-bts-replacement-val="1"
+	                data-bts-max="null"
+	                data-bts-step="1"
+	                data-bts-postfix="个红包"
+	                data-bts-postfix-extra-class="touchspin-postfix"
+	                value="{$rotate['maxselect']??'1'}">
+	                <div class="help-block m-t-0">用户扫码后最多可以选几个红包</div>
+				</div>
+			</div>
+	        <div class="form-group">
+	            <label class="col-lg-3 control-label">* 大屏开奖次数</label>
+	            <div class="col-lg-4">
+	                <input type="text" class="form-control numberincdec" name="opentimes" 
+	                data-bts-min="0" data-bts-replacement-val="0"
+	                data-bts-max="null"
+	                data-bts-step="1"
+	                data-bts-postfix="次"
+		            data-bts-postfix-extra-class="touchspin-postfix"
+	                value="{$rotate['opentimes']??'1'}">
+	            	<div class="help-block m-t-0">大屏幕从所有的红包中随机开几个红包，0为不限制开奖次数</div>
+	            </div>
+	        </div>
+		</div>
+		<div class="form-group">
+		    <label class="col-lg-3 control-label">* 大屏出结果时语音播报</label>
+		    <div class="col-lg-8">
+		        {:tpl_switch('speaktext',$rotate['speaktext']??'2')}
+		        <span class="help-block m-t-0">开启后大屏幕翻开红包将播报中奖奖品</span>
+		    </div>
+		</div>
+		
+	</div>
+    <div class="carditem hidden">
+		{if $rotate['openmode']=='1'}
+		<div class="form-group">
+		    <label class="col-lg-3 control-label">* 奖品随机排序</label>
+		    <div class="col-lg-8">
+		        {:tpl_switch('freeorder',$rotate['freeorder']??'2')}
+		        <span class="help-block m-t-0">开启后大屏幕上的红包会随机排序</span>
+		    </div>
+		</div>
+		{/if}
+        <div class="form-group col-lg-12" style="margin-right: 0;margin-left: 0">
+        	<table class="we7-table table table-bordered" style="margin-bottom:0px;">
+				<thead>
+				  <tr>
+				  	<th style="width:20%;text-align:center;">类型</th>
+					<th style="width:20%;text-align:center;">奖品</th>
+					<th style="width:20%;text-align:center;">个数</th>
+					<th style="width:20%;text-align:center;">自定义风格</th>
+					<th style="width:20%;text-align:center;">操作</th>
+				  </tr>
+				</thead>
+				<tbody class="prize-list">
+					{volist name="rotate.prizes" id="item"}
+						<tr>
+							<td>
+							   <input type="hidden" name="prizeid[]" value="{$item['id']}">
+					           <p>
+					            <span class="label label-{if $item['prizetype']=='1'}primary{elseif $item['prizetype']=='2'}warning{else /}danger{/if}">{if $item['prizetype']=='1'}实物{elseif $item['prizetype']=='2'}红包{else /}谢谢参与{/if}</span>
+					           </p>
+					           {if !empty($item['prizetitle'])}<div class="m-t-5">{$item['prizetitle']}</div>{/if}
+					           {if !isset($rotate['id'])}
+						           <input type="hidden" name="prizetype[]" value="{$item['prizetype']}">
+						           <input type="hidden" name="prizetitle[]" value="{$item['prizetitle']}">
+					           {/if}
+					        </td>
+							<td>
+							  {if !isset($rotate['id'])}
+								  <input type="hidden" name="prizeimg[]" value="{$item['prizeimg']}">
+								  <input type="hidden" name="prizename[]" value="{$item['prizename']}">
+								  <input type="hidden" name="prizemoney[]" value="{$item['prizemoney']}">
+							  {/if}
+							  <div class="userimgbox"><img src="{:tomedia($item['prizeimg']);}"></div>
+							  <div>{$item['prizename']}</div>
+							  {if $item['prizetype']=='2'}
+							  <div>{$item['prizemoney']}元</div>
+							  {/if}
+							</td>
+							<td>
+							  {if !isset($rotate['id'])}
+							  	<input type="hidden" name="prizenum[]" value="{$item['prizenum']}">
+							  {/if}
+							  <span>{$item['prizenum']}个</span>
+							</td>
+							<td>
+							  <span class="label label-{if $item['prizediy']=='1'}primary{else /}default{/if}">{if $item['prizediy']=='1'}是{else /}否{/if}</span>
+							  {if !isset($rotate['id'])}
+								  <input type="hidden" name="prizediy[]" value="{$item['prizediy']}">
+								  <input type="hidden" name="prizefrontbg[]" value="{$item['prizefrontbg']}">
+								  <input type="hidden" name="prizebackbg[]" value="{$item['prizebackbg']}">
+							  {/if}
+							</td>
+							<td>
+							  <a href="javascript:;" data-prizeid="{$item['id']}" class="btn btn-primary btn-xs btn-editprize">
+								  <i class="mdi mdi-pencil"></i>
+							  </a>
+							  <a href="javascript:;" data-prizeid="{$item['id']}" class="btn btn-danger btn-xs btn-delprize">
+								  <i class="mdi mdi-close"></i>
+							  </a>
+							  <a href="javascript:;"  class="btn btn-default btn-sm mousemove zam-sortable" title="拖动排序"><i class="mdi mdi-arrow-all"></i></a>
+							</td>
+						</tr>
+					{/volist}
+				</tbody>
+				<tfoot style="border: 1px solid #efefef;">
+				  <tr>
+					<td colspan="5">
+					  <div class="m-b-10">
+					  	<a  class="btn btn-primary btn-sm addprizeitem" href="javascript:;"> <i class="mdi mdi-plus"></i>&nbsp;<span>新增奖品</span></a>
+					  	<a  class="btn btn-warning btn-sm importprizeitem" href="javascript:;"> <i class="mdi mdi-plus"></i>&nbsp;<span>导入奖品</span></a>
+					  	<div>随机模式单次导入奖品数量不可超过50个</div>
+					  </div>
+					</td>
+				  </tr>
+				</tfoot>
+			</table>
+        </div>
+    </div>
+    <div class="carditem hidden">
+    	<div class="form-group">
+            <label class="col-lg-3 control-label">* 大屏单行红包个数</label>
+            <div class="col-lg-8">
+                <input type="text" class="form-control numberincdec" name="hboneconfig[colnum]" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="null"
+                data-bts-step="1"
+                data-bts-postfix="个"
+	            data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$rotate['hboneconfig']['colnum']}">
+            	<div class="help-block m-t-0">为了整体居中，若总红包个数小于5个，推荐此项等于总红包个数，具体请结合屏幕宽度以及红包正面图大小设置个数</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 大屏红包行列间距</label>
+			<div class="col-lg-8">
+				<div class="input-group">
+					<div class="input-group-btn not-allow"><a class="btn btn-default">行间距</a></div>
+					<div class="touchspin">
+						<input type="text" class="form-control numberincdec" name="hboneconfig[rowgap]" 
+		                data-bts-min="1" data-bts-replacement-val="1"
+		                data-bts-max="999"
+		                data-bts-step="1"
+		                data-bts-postfix="px"
+	                	data-bts-postfix-extra-class="touchspin-postfix"
+		                value="{$rotate['hboneconfig']['rowgap']}">
+	                </div>
+					<div class="input-group-btn not-allow"><a class="btn btn-default">，列间距</a></div>
+					<div class="touchspin">
+						<input type="text" class="form-control numberincdec" name="hboneconfig[colgap]" 
+		                data-bts-min="1" data-bts-replacement-val="1"
+		                data-bts-max="999"
+		                data-bts-step="1"
+		                data-bts-postfix="px"
+	                	data-bts-postfix-extra-class="touchspin-postfix"
+		                value="{$rotate['hboneconfig']['colgap']}">
+	                </div>
+	             </div>
+			</div>
+		</div>
+		<div class="form-group">
+            <label class="col-lg-3 control-label">* 大屏红包尺寸</label>
+			<div class="col-lg-8">
+				<div class="input-group">
+					<div class="input-group-btn not-allow"><a class="btn btn-default">宽</a></div>
+					<div class="touchspin">
+						<input type="text" class="form-control numberincdec" name="hboneconfig[width]" 
+		                data-bts-min="0" data-bts-replacement-val="0"
+		                data-bts-max="999"
+		                data-bts-step="1"
+		                data-bts-postfix="px"
+	                	data-bts-postfix-extra-class="touchspin-postfix"
+		                value="{$rotate['hboneconfig']['width']}">
+	                </div>
+					<div class="input-group-btn not-allow"><a class="btn btn-default">，高</a></div>
+					<div class="touchspin">
+						<input type="text" class="form-control numberincdec" name="hboneconfig[height]" 
+		                data-bts-min="0" data-bts-replacement-val="0"
+		                data-bts-max="800"
+		                data-bts-step="1"
+		                data-bts-postfix="px"
+	                	data-bts-postfix-extra-class="touchspin-postfix"
+		                value="{$rotate['hboneconfig']['height']}">
+	                </div>
+            	</div>
+                <div class="help-block m-t-0">宽和高请结合红包正面图宽高比设置</div>
+			</div>
+		</div>
+		<div class="apphbconfig{if $rotate['openmode']=='1'} hidden{/if}">
+			<div class="form-group">
+	            <label class="col-lg-3 control-label">* 微信红包尺寸</label>
+				<div class="col-lg-8">
+					<div class="input-group">
+						<div class="input-group-btn not-allow"><a class="btn btn-default">宽</a></div>
+						<div class="touchspin">
+							<input type="text" class="form-control numberincdec" name="hboneconfig[appwidth]" 
+			                data-bts-min="0" data-bts-replacement-val="0"
+			                data-bts-max="33"
+			                data-bts-step="1"
+			                data-bts-postfix="vw"
+	                		data-bts-postfix-extra-class="touchspin-postfix"
+			                value="{$rotate['hboneconfig']['appwidth']??'33'}">
+		                </div>
+						<div class="input-group-btn not-allow"><a class="btn btn-default">，高</a></div>
+						<div class="touchspin">
+							<input type="text" class="form-control numberincdec" name="hboneconfig[appheight]" 
+			                data-bts-min="1" data-bts-replacement-val="1"
+				            data-bts-max="999"
+				            data-bts-decimals="2"
+				            data-bts-step="1"
+				            data-bts-force-step-divisibility="xstwo"
+				            data-bts-postfix="vw"
+			            	data-bts-postfix-extra-class="touchspin-postfix"
+			                value="{$rotate['hboneconfig']['appheight']??'41.4'}">
+		                </div>
+	            	</div>
+	                <div class="help-block m-t-0">由于微信端红包一行是3个，所以单个红包宽最大是33vw，宽和高具体设置多少合适，请结合红包正面图尺寸的宽高比设置</div>
+				</div>
+			</div>
+		</div>
+    	<div class="form-group">
+	        <label class="col-lg-3 control-label">* 通用红包正面图</label>
+	        <div class="col-lg-8">
+	            {:tpl_image_one('hboneconfig[frontbg]',$rotate['hboneconfig']['frontbg'])}
+	            <span class="help-block m-t-0">默认规格：471 * 650px，此图可控制所有红包正面图，注:可在添加奖品的时候单独设置此图</span>
+	        </div>
+	    </div>
+	    <div class="form-group">
+	        <label class="col-lg-3 control-label">* 通用红包反面图</label>
+	        <div class="col-lg-8">
+	            {:tpl_image_one('hboneconfig[backbg]',$rotate['hboneconfig']['backbg'])}
+	            <span class="help-block m-t-0">默认规格：471 * 650px，此图可控制所有红包反面图，注:此图大小必须与红包正面图保持一致，可在添加奖品的时候单独设置此图</span>
+	        </div>
+	    </div>
+	    <div class="form-group">
+	        <label class="col-lg-3 control-label">* 星星效果(大屏端)</label>
+	        <div class="col-lg-8">
+	            {:tpl_switch('hboneconfig[starani]',$rotate['hboneconfig']['starani']??'1')}
+	            <span class="help-block m-t-0">注:开启后红包正反面均会有星星从底到顶部冒出</span>
+	        </div>
+	    </div>
+	    <div class="form-group">
+	        <label class="col-lg-3 control-label">* 红包正面左右翻转效果(大屏端)</label>
+	        <div class="col-lg-8">
+	            {:tpl_switch('hboneconfig[scaleani]',$rotate['hboneconfig']['scaleani']??'1')}
+	            <span class="help-block m-t-0">注:开启后红包正面图会小幅度左右翻转</span>
+	        </div>
+	    </div>
+    	<div class="form-group">
+	        <label class="col-lg-3 control-label">* 红包正面主题(大屏端)</label>
+	        <div class="col-lg-8">
+	            {:tpl_switch('titleconfig[open]',$rotate['titleconfig']['open'],'opentitlebox')}
+	            <span class="help-block m-t-0">注:开启则大屏里的红包上会显示红包主题名称，添加奖品的时候可设置</span>
+	        </div>
+	    </div>
+	    <div class="titleconfigbox{if $rotate['titleconfig']['open']=='2'} hidden{/if}">
+	    	<div class="form-group">
+			    <label class="col-lg-3 control-label">* 主题文字颜色</label>
+			    <div class="col-lg-8">
+			        {:tpl_color('titleconfig[color]',$rotate['titleconfig']['color'])}
+			    </div>
+			</div>
+			<div class="form-group">
+	            <label class="col-lg-3 control-label">* 主题文字大小</label>
+				<div class="col-lg-4">
+					<input type="text" class="form-control numberincdec" name="titleconfig[size]" 
+	                data-bts-min="10" data-bts-replacement-val="10"
+	                data-bts-max="null"
+	                data-bts-step="1"
+	                data-bts-postfix="px"
+	                data-bts-postfix-extra-class="touchspin-postfix"
+	                value="{$rotate['titleconfig']['size']}">
+				</div>
+			</div>
+			<div class="form-group">
+	            <label class="col-lg-3 control-label">* 主题文字与红包顶部距离</label>
+				<div class="col-lg-4">
+					<input type="text" class="form-control numberincdec" name="titleconfig[margintop]" 
+	                data-bts-min="1" data-bts-replacement-val="1"
+	                data-bts-max="null"
+	                data-bts-step="1"
+	                data-bts-postfix="px"
+	                data-bts-postfix-extra-class="touchspin-postfix"
+	                value="{$rotate['titleconfig']['margintop']??'80'}">
+	                <div class="help-block m-t-0"></div>
+				</div>
+			</div>
+	    </div>
+	    <div class="form-group{if $rotate['openmode']=='2'} hidden{/if}">
+	        <label class="col-lg-3 control-label">* 红包序号(大屏端)</label>
+	        <div class="col-lg-8">
+	            {:tpl_switch('numberconfig[open]',$rotate['numberconfig']['open'],'opennumberbox')}
+	            <span class="help-block m-t-0">开启则大屏红包底部会显示红包序号(按奖品添加顺序升序);序号作用:方便现场用户告知工作人员选了哪个序号的红包</span>
+	        </div>
+	    </div>
+	    <div class="numberconfigbox{if $rotate['openmode']=='2' || $rotate['numberconfig']['open']=='2'} hidden{/if}">
+	    	<div class="form-group">
+			    <label class="col-lg-3 control-label">* 序号颜色</label>
+			    <div class="col-lg-8">
+			        {:tpl_color('numberconfig[color]',$rotate['numberconfig']['color'])}
+			    </div>
+			</div>
+			<div class="form-group">
+	            <label class="col-lg-3 control-label">* 序号大小</label>
+				<div class="col-lg-4">
+					<input type="text" class="form-control numberincdec" name="numberconfig[size]" 
+	                data-bts-min="10" data-bts-replacement-val="10"
+	                data-bts-max="null"
+	                data-bts-step="1"
+	                data-bts-postfix="px"
+	                data-bts-postfix-extra-class="touchspin-postfix"
+	                value="{$rotate['numberconfig']['size']}">
+				</div>
+			</div>
+			<div class="form-group">
+	            <label class="col-lg-3 control-label">* 序号前缀</label>
+	            <div class="col-lg-8">
+	                <input class="form-control" type="text"  name="numberconfig[prevtxt]" value="{$rotate['numberconfig']['prevtxt']}">
+	                <div class="help-block m-t-0">非必填项，填写后红包序号将展示为前缀+序号数字，如NO.1，NO.2等</div>
+	            </div>
+	        </div>
+	    </div>
+	    <div class="form-group{if $rotate['openmode']=='1'} hidden{/if}">
+	        <label class="col-lg-3 control-label">* 已选人数(大屏端)</label>
+	        <div class="col-lg-8">
+	            {:tpl_switch('joinconfig[open]',$rotate['joinconfig']['open'],'openjoinbox')}
+	            <span class="help-block m-t-0">开启则大屏每个红包底部将展示有多少人选了当前红包</span>
+	        </div>
+	    </div>
+	    <div class="joinconfigbox{if $rotate['openmode']=='1' || $rotate['joinconfig']['open']=='2'} hidden{/if}">
+	    	<div class="form-group">
+			    <label class="col-lg-3 control-label">* 颜色</label>
+			    <div class="col-lg-8">
+			        {:tpl_color('joinconfig[color]',$rotate['joinconfig']['color'])}
+			    </div>
+			</div>
+			<div class="form-group">
+	            <label class="col-lg-3 control-label">* 大小</label>
+				<div class="col-lg-4">
+					<input type="text" class="form-control numberincdec" name="joinconfig[size]" 
+	                data-bts-min="10" data-bts-replacement-val="10"
+	                data-bts-max="null"
+	                data-bts-step="1"
+	                data-bts-postfix="px"
+	                data-bts-postfix-extra-class="touchspin-postfix"
+	                value="{$rotate['joinconfig']['size']}">
+				</div>
+			</div>
+	    </div>
+	    <div class="form-group">
+	        <label class="col-lg-3 control-label">* 红包反面主题(大屏端)</label>
+	        <div class="col-lg-8">
+	            {:tpl_switch('backtitleconfig[open]',$rotate['backtitleconfig']['open'],'openbacktitlebox')}
+	            <span class="help-block m-t-0">注:开启则大屏里的红包上会显示红包主题名称，添加奖品的时候可设置</span>
+	        </div>
+	    </div>
+	    <div class="backtitleconfigbox{if $rotate['backtitleconfig']['open']=='2'} hidden{/if}">
+	    	<div class="form-group">
+			    <label class="col-lg-3 control-label">* 主题文字颜色</label>
+			    <div class="col-lg-8">
+			        {:tpl_color('backtitleconfig[color]',$rotate['backtitleconfig']['color'])}
+			    </div>
+			</div>
+			<div class="form-group">
+	            <label class="col-lg-3 control-label">* 主题文字大小</label>
+				<div class="col-lg-4">
+					<input type="text" class="form-control numberincdec" name="backtitleconfig[size]" 
+	                data-bts-min="10" data-bts-replacement-val="10"
+	                data-bts-max="null"
+	                data-bts-step="1"
+	                data-bts-postfix="px"
+	                data-bts-postfix-extra-class="touchspin-postfix"
+	                value="{$rotate['backtitleconfig']['size']}">
+				</div>
+			</div>
+			<div class="form-group">
+	            <label class="col-lg-3 control-label">* 主题文字与奖品图间距</label>
+				<div class="col-lg-4">
+					<input type="text" class="form-control numberincdec" name="backtitleconfig[marginbottom]" 
+	                data-bts-min="1" data-bts-replacement-val="1"
+	                data-bts-max="null"
+	                data-bts-step="1"
+	                data-bts-postfix="px"
+	                data-bts-postfix-extra-class="touchspin-postfix"
+	                value="{$rotate['backtitleconfig']['marginbottom']??'20'}">
+	                <div class="help-block m-t-0">此项可控制红包反面主题名与奖品图的间隔距离</div>
+				</div>
+			</div>
+	    </div>
+	    <div class="form-group">
+	        <label class="col-lg-3 control-label">* 红包反面奖品(大屏端)</label>
+	        <div class="col-lg-8">
+	            {:tpl_switch('awardconfig[open]',$rotate['awardconfig']['open'],'openawardbox')}
+	            <span class="help-block m-t-0">一般是需要开启的，但是如果想把奖品信息做在红包背面图内可以关闭此项</span>
+	        </div>
+	    </div>
+	    <div class="awardconfigbox{if $rotate['awardconfig']['open']=='2'} hidden{/if}">
+	    	<div class="form-group">
+			    <label class="col-lg-3 control-label">* 奖品字颜色</label>
+			    <div class="col-lg-8">
+			        {:tpl_color('awardconfig[color]',$rotate['awardconfig']['color'])}
+			    </div>
+			</div>
+			<div class="form-group">
+	            <label class="col-lg-3 control-label">* 奖品名大小</label>
+				<div class="col-lg-4">
+					<input type="text" class="form-control numberincdec" name="awardconfig[size]" 
+	                data-bts-min="10" data-bts-replacement-val="10"
+	                data-bts-max="null"
+	                data-bts-step="1"
+	                data-bts-postfix="px"
+	                data-bts-postfix-extra-class="touchspin-postfix"
+	                value="{$rotate['awardconfig']['size']}">
+				</div>
+			</div>
+			<div class="form-group">
+	            <label class="col-lg-3 control-label">* 奖品图大小</label>
+				<div class="col-lg-4">
+					<input type="text" class="form-control numberincdec" name="awardconfig[picsize]" 
+	                data-bts-min="10" data-bts-replacement-val="10"
+	                data-bts-max="null"
+	                data-bts-step="1"
+	                data-bts-postfix="px"
+	                data-bts-postfix-extra-class="touchspin-postfix"
+	                value="{$rotate['awardconfig']['picsize']}">
+				</div>
+			</div>
+			<div class="form-group hidden">
+		        <label class="col-lg-3 control-label">* 奖品名在奖品图上方</label>
+		        <div class="col-lg-8">
+		            {:tpl_switch('awardconfig[awardup]',$rotate['awardconfig']['awardup'])}
+		            <span class="help-block m-t-0">注:开启则奖品名字展示在奖品图上方，默认是奖品图在奖品名称上方</span>
+		        </div>
+		    </div>
+			<div class="form-group">
+	            <label class="col-lg-3 control-label">* 奖品图与奖品名间距</label>
+				<div class="col-lg-4">
+					<input type="text" class="form-control numberincdec" name="awardconfig[margintop]" 
+	                data-bts-min="10" data-bts-replacement-val="10"
+	                data-bts-max="null"
+	                data-bts-step="1"
+	                data-bts-postfix="px"
+	                data-bts-postfix-extra-class="touchspin-postfix"
+	                value="{$rotate['awardconfig']['margintop']}">
+	                <div class="help-block m-t-0">此项可调整奖品名字与奖品图的之间的间距</div>
+				</div>
+			</div>
+			<div class="form-group">
+		        <label class="col-lg-3 control-label">* 翻开红包是否弹窗</label>
+		        <div class="col-lg-8">
+		            {:tpl_switch('awardconfig[needpop]',$rotate['awardconfig']['needpop']??'1','openawardpop')}
+		            <span class="help-block m-t-0">关闭则不会弹窗</span>
+		        </div>
+		    </div>
+		    <div class="form-group awardpopbox{if isset($config['awardconfig']['needpop']) && $config['awardconfig']['needpop']=='2'} hidden{/if}">
+			        <label class="col-lg-3 control-label">* 弹窗红包放大倍数</label>
+			        <div class="col-lg-4">
+			            <input type="text" class="form-control numberincdec" name="awardconfig[scale]" 
+			            data-bts-min="1" data-bts-replacement-val="1"
+			            data-bts-max="10"
+			            data-bts-decimals="2"
+			            data-bts-step="1"
+			            data-bts-force-step-divisibility="xstwo"
+			            data-bts-postfix="倍"
+			            data-bts-postfix-extra-class="touchspin-postfix"
+			            value="{$rotate['awardconfig']['scale']}">
+			            <div class="help-block m-t-0">可保留2位小数，酌情设置倍数，推荐在1-2之间的小数，填写1则不放大</div>
+			        </div>
+			</div>
+	    </div>
+	    <div class="apphbconfig2{if $rotate['openmode']=='1'} hidden{/if}">
+	    	<div class="form-group">
+		        <label class="col-lg-3 control-label">* 红包正面主题名(微信端)</label>
+		        <div class="col-lg-8">
+		            {:tpl_switch('apphbconfig[opentitle]',$rotate['apphbconfig']['opentitle'],'openapptitlebox')}
+		            <span class="help-block m-t-0">注:开启则微信里的红包上会显示红包主题名</span>
+		        </div>
+		    </div>
+		    <div class="apptitleconfigbox{if $rotate['apphbconfig']['opentitle']=='2'} hidden{/if}">
+		    	<div class="form-group">
+				    <label class="col-lg-3 control-label">* 主题文字颜色</label>
+				    <div class="col-lg-8">
+				        {:tpl_color('apphbconfig[titlecolor]',$rotate['apphbconfig']['titlecolor'])}
+				        <div class="help-block m-t-0">需要结合红包封面主色调来设置</div>
+				    </div>
+				</div>
+				<div class="form-group">
+		            <label class="col-lg-3 control-label">* 主题文字大小</label>
+					<div class="col-lg-4">
+						<input type="text" class="form-control numberincdec" name="apphbconfig[titlesize]" 
+		                data-bts-min="0" data-bts-replacement-val="0"
+			            data-bts-max="1"
+			            data-bts-decimals="2"
+			            data-bts-step="1"
+			            data-bts-force-step-divisibility="xstwo"
+			            data-bts-postfix="rem"
+		            	data-bts-postfix-extra-class="touchspin-postfix"
+		                value="{$rotate['apphbconfig']['titlesize']}">
+		                <div class="help-block m-t-0">单位是rem，可以保留2位小数，推荐0.28</div>
+					</div>
+				</div>
+				<div class="form-group">
+		            <label class="col-lg-3 control-label">* 主题文字距离红包顶部距离</label>
+					<div class="col-lg-4">
+						<input type="text" class="form-control numberincdec" name="apphbconfig[titletop]" 
+		                data-bts-min="0" data-bts-replacement-val="0"
+			            data-bts-max="60"
+			            data-bts-decimals="2"
+			            data-bts-step="1"
+			            data-bts-force-step-divisibility="xstwo"
+			            data-bts-postfix="vw"
+		            	data-bts-postfix-extra-class="touchspin-postfix"
+		                value="{$rotate['apphbconfig']['titletop']??''}">
+		                <div class="help-block m-t-0">单位是vw，请结合微信端红包高度来设置</div>
+					</div>
+				</div>
+		    </div>
+		    <div class="form-group">
+	            <label class="col-lg-3 control-label">* 选择红包按钮(微信端)</label>
+				<div class="col-lg-8">
+					<div class="input-group">
+						<div class="input-group-btn not-allow"><a class="btn btn-default">宽</a></div>
+						<div class="touchspin">
+							<input type="text" class="form-control numberincdec" name="apphbconfig[btnwidth]" 
+			                data-bts-min="0" data-bts-replacement-val="0"
+				            data-bts-max="4"
+				            data-bts-decimals="2"
+				            data-bts-step="1"
+				            data-bts-force-step-divisibility="xstwo"
+				            data-bts-postfix="rem"
+			            	data-bts-postfix-extra-class="touchspin-postfix"
+			                value="{$rotate['apphbconfig']['btnwidth']}">
+		                </div>
+						<div class="input-group-btn not-allow"><a class="btn btn-default">高</a></div>
+						<div class="touchspin">
+							<input type="text" class="form-control numberincdec" name="apphbconfig[btnheight]" 
+			                data-bts-min="0" data-bts-replacement-val="0"
+				            data-bts-max="4"
+				            data-bts-decimals="2"
+				            data-bts-step="1"
+				            data-bts-force-step-divisibility="xstwo"
+				            data-bts-postfix="rem"
+			            	data-bts-postfix-extra-class="touchspin-postfix"
+			                value="{$rotate['apphbconfig']['btnheight']}">
+			                
+		                </div>
+		             </div>
+		             <div class="help-block m-t-0">单位是rem，可以保留2位小数，高推荐0.6，宽推荐1.4，请结合微信端红包高度来设置</div>
+				</div>
+			</div>
+			<div class="form-group">
+	            <label class="col-lg-3 control-label">* 红包上按钮距离红包顶部距离</label>
+				<div class="col-lg-4">
+					<input type="text" class="form-control numberincdec" name="apphbconfig[btntop]" 
+	                data-bts-min="0" data-bts-replacement-val="0"
+		            data-bts-max="60"
+		            data-bts-decimals="2"
+		            data-bts-step="1"
+		            data-bts-force-step-divisibility="xstwo"
+		            data-bts-postfix="vw"
+	            	data-bts-postfix-extra-class="touchspin-postfix"
+	                value="{$rotate['apphbconfig']['btntop']}">
+	                <div class="help-block m-t-0">单位是vw，请结合微信端红包高度来设置</div>
+				</div>
+			</div>
+			<div class="form-group">
+			    <label class="col-lg-3 control-label">* 按钮背景颜色</label>
+			    <div class="col-lg-8">
+			        {:tpl_color('apphbconfig[btnbgcolor]',$rotate['apphbconfig']['btnbgcolor'])}
+			        <div class="help-block m-t-0">需要结合红包封面主色调来设置</div>
+			    </div>
+			</div>
+			<div class="form-group">
+			    <label class="col-lg-3 control-label">* 按钮上的文字</label>
+			    <div class="col-lg-8">
+			        <input class="form-control" type="text"  name="apphbconfig[btntxt]" value="{$rotate['apphbconfig']['btntxt']??'点击选择'}">
+			        <div class="help-block m-t-0">尽量简答，控制在5个字内</div>
+			    </div>
+			</div>
+			<div class="form-group">
+			    <label class="col-lg-3 control-label">* 按钮文字颜色</label>
+			    <div class="col-lg-8">
+			        {:tpl_color('apphbconfig[btncolor]',$rotate['apphbconfig']['btncolor'])}
+			    </div>
+			</div>
+			<div class="form-group">
+	            <label class="col-lg-3 control-label">* 按钮文字大小</label>
+				<div class="col-lg-4">
+					<input type="text" class="form-control numberincdec" name="apphbconfig[btnsize]" 
+	                data-bts-min="0" data-bts-replacement-val="0"
+		            data-bts-max="1"
+		            data-bts-decimals="2"
+		            data-bts-step="1"
+		            data-bts-force-step-divisibility="xstwo"
+		            data-bts-postfix="rem"
+	            	data-bts-postfix-extra-class="touchspin-postfix"
+	                value="{$rotate['apphbconfig']['btnsize']}">
+	                <div class="help-block m-t-0">单位是rem，可以保留2位小数，推荐0.2，具体得结合按钮高度来设置</div>
+				</div>
+			</div>
+	    </div>
+    </div>
+</form>
+</div> 
+<script id='oneprize-tpl' type="text/template">
+<tr>
+	<td>
+	   <input type="hidden" name="prizeid[]" value="<% d.id %>">
+       <p>
+        <span class="label label-<%# if(d.prizetype=='1'){ %>primary<%# }else{ %>danger<%# } %>"><%# if(d.prizetype=='1'){ %>实物<%# }else{ %>红包<%# } %></span>
+       </p>
+       <%# if(d.prizetitle!=''){ %><div class="m-t-5"><% d.prizetitle %></div><%# } %>
+       {if !isset($rotate['id'])}
+	       <input type="hidden" name="prizetype[]" value="<% d.prizetype %>">
+	       <input type="hidden" name="prizetitle[]" value="<% d.prizetitle %>">
+       {/if}
+    </td>
+	<td>
+	  {if !isset($rotate['id'])}
+		  <input type="hidden" name="prizeimg[]" value="<% d.prizeimg %>">
+		  <input type="hidden" name="prizename[]" value="<% d.prizename %>">
+		  <input type="hidden" name="prizemoney[]" value="<% d.prizemoney %>">
+	  {/if}
+	  <div class="userimgbox"><img src="<% d.prevprizeimg %>"></div>
+	  <div><% d.prizename %></div>
+	  <%# if(d.prizetype=='2'){ %>
+	  	<div><% d.prizemoney %>元</div>
+	  <%# } %>
+	</td>
+	<td>
+	  {if !isset($rotate['id'])}
+	  	<input type="hidden" name="prizenum[]" value="<% d.prizenum %>">
+	  {/if}
+	  <span><% d.prizenum %>个</span>
+	</td>
+	<td>
+	  <span class="label label-<%# if(d.prizediy=='1'){ %>primary<%# }else{ %>default<%# } %>"><%# if(d.prizediy=='1'){ %>是<%# }else{ %>否<%# } %></span>
+	  {if !isset($rotate['id'])}
+		  <input type="hidden" name="prizediy[]" value="<% d.prizediy %>">
+		  <input type="hidden" name="prizefrontbg[]" value="<% d.prizefrontbg %>">
+		  <input type="hidden" name="prizebackbg[]" value="<% d.prizebackbg %>">
+	  {/if}
+	</td>
+	<td>
+	  <a href="javascript:;" <%# if(d.id){ %>data-prizeid="<% d.id %>"<%# } %> class="btn btn-primary btn-xs btn-editprize">
+		  <i class="mdi mdi-pencil"></i>
+	  </a>
+	  <a href="javascript:;" <%# if(d.id){ %>data-prizeid="<% d.id %>"<%# } %> class="btn btn-danger btn-xs btn-delprize">
+		  <i class="mdi mdi-close"></i>
+	  </a>
+	  <a href="javascript:;"  class="btn btn-default btn-sm mousemove zam-sortable" title="拖动排序"><i class="mdi mdi-arrow-all"></i></a>
+	</td>
+</tr>
+</script>        
+<script>    
+require(['webcore','jconfirmBox','zamnotice','layerBox',"ueditor","bootstrap-touchspin","jquery.ui"],function(webcore,jconfirmBox,zamnotice,layerBox,UE){
+	tpl_switch();
+	$('.prize-list').sortable({handle: ".mousemove"}).disableSelection();
+    $(".prize-list").disableSelection();
+    $(".rotate-pop .pop-btns a.btn").click(function(){
+        $(this).addClass('btn-primary').siblings().removeClass("btn-primary");
+        $(".rotate-pop .carditem").addClass('hidden').eq($(this).index()).removeClass('hidden');
+    });
+    $(".confirmbox-pop .numberincdec").TouchSpin().on("change", function(){
+        var $this = $(this),funcstr = $this.data('func');
+        var func = window[funcstr];
+        func && func();
+    });
+    if($("#edui_fixedlayer").length > 0) UE.getEditor('ruledes').destroy();
+    $(function(){
+      $(".sp-container").remove();
+      $(".js-colorpicker").each(function(){
+            tpl_colorpicker(this);
+      });
+      tpl_ueditor(); 
+    })
+    var rotateid = "{if isset($rotate['id'])}{$rotate['id']}{else}{/if}";
+	$(".addprizeitem").on('click',function(){
+		var confirmObj = jconfirmBox.ajaxconfirm("新增奖品","{:gohdmanage('confighbwall/editprize',['hdid'=>$hdid])}",{rotateid:rotateid,openmode:$(".openmodebox input:radio:checked").val()},'html','col-lg-8 col-lg-offset-2',function(e){
+			var prizearr = webcore.serializeObject(e.find('form'));
+			prizearr.prevprizeimg = e.find('img').attr("src");
+			if(prizearr.prizename=='') {
+				zamnotice.showTips('error','奖品名必须设置');
+				return false;
+			}
+			if(prizearr.prizeimg==''){
+				zamnotice.showTips('error','奖品图必须设置');
+				return false;
+			}
+			if(rotateid!=''){
+				webcore.ajaxSubmit("{:gohdmanage('confighbwall/saveprize',['hdid'=>$hdid])}",{rotateid:rotateid,prizearr:prizearr}).then(function(json){
+					if(json.code==0){
+						confirmObj.close();
+						prizearr.id = json.msg;
+						$(".prize-list").append(webcore.tpl($("#oneprize-tpl"),prizearr));
+						zamnotice.showTips('success','新增成功');
+					}else{
+						zamnotice.showTips('error',json.msg);
+					}
+				}, function(json){
+					zamnotice.showTips('error','网络差。操作失败');
+				});
+			}else{
+				$(".prize-list").append(webcore.tpl($("#oneprize-tpl"),prizearr));
+				confirmObj.close();
+			}
+		},false,true,[{'hidden':false,'txt':'确定新增'},{'hidden':false,'txt':'取消'}],true,function(){
+				tpl_switch();
+		});
+	});
+	$(".importprizeitem").on('click',function(){
+		webcore.importxls({title:'导入奖品',url:"{:gohdmanage('confighbwall/importprize',['hdid'=>$hdid])}&rotateid="+rotateid+"&openmode="+$(".openmodebox input:radio:checked").val(),moban:"/{:SYSIMGURL}excel/hbwallprize.xls",uptxt:"点击上传奖品xls文件",xlstxt:"注:请务必严格按照模板内容制作xls文件"},function(data){
+			var html = '';
+			if(data.length > 0){
+				$.each(data,function(i,v){
+					html += webcore.tpl($("#oneprize-tpl"),v);
+				})
+			}
+			$(".prize-list").append(html);
+        });
+	});
+	$(".prize-list").on('click','.btn-editprize',function(){
+		var $this = $(this),fdom = $this.parent().parent();
+		var prizeid = $this.attr('data-prizeid');
+		var editprizearr = {};
+		if(!prizeid){
+			fdom.find("input").each(function(){
+				var $this = $(this),inputname = $this[0].name.replace("[]","");
+				editprizearr[inputname] = $this.val();
+			});
+		}
+		var confirmObj = jconfirmBox.ajaxconfirm("编辑奖品","{:gohdmanage('confighbwall/editprize',['hdid'=>$hdid])}",{rotateid:rotateid,openmode:$(".openmodebox input:radio:checked").val(),prizeid:prizeid,editprizearr:editprizearr},'html','col-lg-8 col-lg-offset-2',function(e){
+			var prizearr = webcore.serializeObject(e.find('form'));
+			prizearr.prevprizeimg = e.find('img').attr("src");
+			if(prizearr.prizename==''||prizearr.prizename=='') {
+				zamnotice.showTips('error','奖品名与奖品图必须设置');
+				return false;
+			}
+			if(prizearr.prizemoney==''){
+				prizearr.prizemoney = " ";
+			}
+			if(prizearr.prizemin==''){
+				prizearr.prizemin = " ";
+			}
+			if(prizearr.opengroup=='1' && prizearr.groupid=='0'){
+				zamnotice.showTips('error','指定用户组必须选择一个组');
+				return false;
+			}
+			if(prizeid){
+				webcore.ajaxSubmit("{:gohdmanage('confighbwall/saveprize',['hdid'=>$hdid])}",{rotateid:rotateid,prizeid:prizeid,prizearr:prizearr}).then(function(json){
+					if(json.code==0){
+						confirmObj.close();
+						prizearr.id = prizeid;
+						fdom.html($(webcore.tpl($("#oneprize-tpl"),prizearr)).html());
+						zamnotice.showTips('success','编辑成功');
+					}else{
+						zamnotice.showTips('error',json.msg);
+					}
+				}, function(json){
+					zamnotice.showTips('error','网络差。操作失败');
+				});
+			}else{
+				fdom.html($(webcore.tpl($("#oneprize-tpl"),prizearr)).html());
+				confirmObj.close();
+			}
+		},false,true,[{'hidden':false,'txt':'确定保存'},{'hidden':false,'txt':'取消'}],true,function(){
+				tpl_switch();
+		});
+	});
+	$(".prize-list").on('click','.btn-delprize',function(){
+		var $this = $(this);
+		var prizeid = $this.attr('data-prizeid');
+		jconfirmBox.confirm('温馨提示','删除将无法恢复，您确定要删除么？',function(){
+				if(prizeid){
+					webcore.ajaxSubmit("{:gohdmanage('confighbwall/delprize',['hdid'=>$hdid])}",{rotateid:rotateid,prizeid:prizeid}).then(function(json){
+						if(json.code==0){
+							zamnotice.showTips('success','删除成功');
+							$this.parent().parent().remove();
+						}else{
+							zamnotice.showTips('error',json.msg);
+						}
+					}, function(json){
+						zamnotice.showTips('error','网络差，操作失败');
+					});
+				}else{
+					$this.parent().parent().remove();
+				}
+		});
+	});
+});
+function opentitlebox(obj,status,url){
+	if(status=='1'){
+	    obj.prev().val('2');
+	    obj.attr('data-status','2');
+	    $(".titleconfigbox").addClass('hidden');
+	}else{
+	    obj.prev().val('1');
+	    obj.attr('data-status','1');
+	    $(".titleconfigbox").removeClass('hidden');
+	}
+	obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openbacktitlebox(obj,status,url){
+	if(status=='1'){
+	    obj.prev().val('2');
+	    obj.attr('data-status','2');
+	    $(".backtitleconfigbox").addClass('hidden');
+	}else{
+	    obj.prev().val('1');
+	    obj.attr('data-status','1');
+	    $(".backtitleconfigbox").removeClass('hidden');
+	}
+	obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function opennumberbox(obj,status,url){
+	if(status=='1'){
+	    obj.prev().val('2');
+	    obj.attr('data-status','2');
+	    $(".numberconfigbox").addClass('hidden');
+	}else{
+	    obj.prev().val('1');
+	    obj.attr('data-status','1');
+	    $(".numberconfigbox").removeClass('hidden');
+	}
+	obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openawardbox(obj,status,url){
+	if(status=='1'){
+	    obj.prev().val('2');
+	    obj.attr('data-status','2');
+	    $(".awardconfigbox").addClass('hidden');
+	}else{
+	    obj.prev().val('1');
+	    obj.attr('data-status','1');
+	    $(".awardconfigbox").removeClass('hidden');
+	}
+	obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openjoinbox(obj,status,url){
+	if(status=='1'){
+	    obj.prev().val('2');
+	    obj.attr('data-status','2');
+	    $(".joinconfigbox").addClass('hidden');
+	}else{
+	    obj.prev().val('1');
+	    obj.attr('data-status','1');
+	    $(".joinconfigbox").removeClass('hidden');
+	}
+	obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openawardpop(obj,status,url){
+	if(status=='1'){
+	    obj.prev().val('2');
+	    obj.attr('data-status','2');
+	    $(".awardpopbox").addClass('hidden');
+	}else{
+	    obj.prev().val('1');
+	    obj.attr('data-status','1');
+	    $(".awardpopbox").removeClass('hidden');
+	}
+	obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openapptitlebox(obj,status,url){
+	if(status=='1'){
+	    obj.prev().val('2');
+	    obj.attr('data-status','2');
+	    $(".apptitleconfigbox").addClass('hidden');
+	}else{
+	    obj.prev().val('1');
+	    obj.attr('data-status','1');
+	    $(".apptitleconfigbox").removeClass('hidden');
+	}
+	obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+</script>

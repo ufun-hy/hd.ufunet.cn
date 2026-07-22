@@ -1,0 +1,2246 @@
+{include file='$Wpath/common/header'}
+<style type="text/css">
+.itembgbox .bpbgone{
+	position:relative;
+	display:inline-block;
+	width:auto;
+	height:80px;
+	margin:0 10px 10px 0;
+	border: 1px solid #DCDFE6;
+	border-radius: 5px;
+}
+.imgbgboxs .bpbgone{height: 150px}
+.itembgbox .bpbgone img{
+	width:100%;
+	height:100%;
+}
+.itembgbox .bpbgone .playicon{
+	position: absolute;
+	top:50%;
+	left:50%;
+	transform:translate(-50%,-50%);
+	cursor:pointer;
+	font-size:40px;
+	color:#fff;
+}
+.delitembgbox{
+	position: absolute;
+	right:0px;
+	bottom:0px;
+	 width: 0;
+    height: 0;
+    border-bottom: 30px solid red;
+    border-left: 30px solid transparent;
+	display:none;
+}
+.itembgbox .bpbgone .delonebg{
+	position: absolute;
+    right: 2px;
+    bottom: -32px;
+	color:#fff;
+	cursor:pointer;
+	font-size:14px;
+}
+.itembgbox .bpbgone:hover .delitembgbox{
+	display:block;
+}
+.prevattach{position: absolute;right: -40px}
+table tr td,table tr th{text-align: center}
+table tr td img{max-height:60px;}
+table tr th{pointer-events: none}
+.artistgroup-lists tr{cursor: pointer;}
+/*微信端组件*/
+.ditshowitems .card .card-header{padding: 10px 20px;}
+.ditshowitems .card .card-body{padding: 14px;}
+.card-totalitems span{margin-bottom:10px;margin-right: 10px;}
+.normalitems span{
+    color: #333;
+    background: #e6f7ff;
+    border: 1px solid #91d5ff;
+}
+.bditems span{
+    color: #333;
+    background: #f9ebd6;
+    border: 1px solid #fdb538;
+}
+</style>
+{if !empty($config['id'])}
+<div class="form-horizontal wechatconfig hidden">
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 禁言状态</label>
+        <div class="col-lg-8">
+            {:tpl_switch('appestoppel',$config['appestoppel']??'2','openestoppel')}
+            <div class="help-block">注:开启禁言后普通用户(非管理员)无法发送普通文字或图片消息</div>
+        </div>
+    </div>
+</div>
+{/if}
+<form id="formBox" class="zam-formvalidation form-horizontal" method="post">
+    <div id="screenconfigbox" class="collapse in">
+        <div class="text-center">
+			<div class="btn-group zam-inner-highconfig-btns" style="margin:-5px 0 20px 0;">
+				<a href="javascript:void(0)" class="btn btn-default"><span>大屏设置</span></a>
+				<a href="javascript:void(0)" class="btn btn-default"><span>微信设置</span></a>
+				<a href="javascript:void(0)" class="btn btn-default"><span>霸屏设置</span></a>
+				<a href="javascript:void(0)" class="btn btn-default"><span>红包设置</span></a>
+				<a href="javascript:void(0)" class="btn btn-default"><span>艺人设置</span></a>
+				<a href="javascript:void(0)" class="btn btn-default"><span>打赏设置</span></a>
+				<a href="javascript:void(0)" class="btn btn-default"><span>点歌设置</span></a>
+				<a href="javascript:void(0)" class="btn btn-default"><span>点赞设置</span></a>
+			</div>
+		</div>
+		<div class="highconfig-item hidden">
+			<div class="form-group">
+				<label class="col-lg-2 control-label">* 网页标题</label>
+				<div class="col-lg-8">
+                    <input type="text" class="form-control" name="title" value="{$config['title']}">
+				</div>
+		    </div>
+		    <div class="form-group">
+				<label class="col-lg-2 control-label">logo图</label>
+				<div class="col-lg-6">
+                    {:tpl_image_one("barinfo[logo]",$config['barinfo']['logo'])}
+                  	<span class="zam-help-block">规格:200*200px</span>
+				</div>
+		    </div>
+		    <div class="form-group">
+				<label class="col-lg-2 control-label">主题名</label>
+				<div class="col-lg-8">
+                    <input type="text" class="form-control" name="barinfo[title]" value="{$config['barinfo']['title']}">
+                    <span class="zam-help-block">注意:此项在大屏幕设置内也可以更改，如果浏览器里改了此项，再到后台改可能会无效</span>
+				</div>
+		    </div>
+		    <div class="form-group">
+                <label class="col-lg-2 control-label">滚屏公告</label>
+                <div class="col-lg-8">
+                     <textarea class="form-control" name="barinfo[notices]" rows="4" placeholder="注:多条公告必须以#隔开">{$config['barinfo']['notices']}</textarea>
+                    <span class="zam-help-block">注:多条请以#隔开，否则视为仅一条</span>
+                </div>
+            </div>
+            <div class="form-group">
+			    <label class="col-lg-2 control-label">* 默认背景类型</label>
+			    <div class="col-lg-8">
+			        <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.bgimgbox').removeClass('hidden'),$('.bgitembgbox').addClass('hidden');">
+			            <input type="radio" name="bgtype" {if $config["bgtype"]=="1"}checked{/if} value="1"><span>图片背景</span>
+			        </label>
+			        <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.bgimgbox').addClass('hidden'),$('.bgitembgbox').removeClass('hidden');">
+			            <input type="radio" name="bgtype" {if $config["bgtype"]=="2"}checked{/if} value="2" ><span>视频背景</span>
+			        </label>
+			         <span class="zam-help-block">注:这里仅仅是设置默认背景类型，大屏幕设置菜单里可以随意切换背景类型，所以背景图片和背景视频都必须设置一下</span>
+			    </div>
+			</div>
+			<div class="bgimgbox{if $config["bgtype"]=="2"} hidden{/if}">
+				<div class="form-group">
+				    <label class="col-lg-2 control-label">* 背景图类型</label>
+				    <div class="col-lg-8">
+				      <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.bgimgtypebox2').removeClass('hidden'),$('.bgimgtypebox1').addClass('hidden')">
+				       <input type="radio" name="bgimgtype" value="1" {if $config['bgimgtype']=='1'}checked{/if}><span>系统内置背景图</span>
+				      </label>
+				      <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.bgimgtypebox2').addClass('hidden'),$('.bgimgtypebox1').removeClass('hidden')">
+				       <input type="radio" name="bgimgtype" value="2" {if $config['bgimgtype']=='2'}checked{/if}><span>自定义背景图</span>
+				      </label>
+				    </div>
+				</div>
+				<div class="form-group bgimgtypebox1{if $config["bgimgtype"]=="1"} hidden{/if}">
+				    <label class="col-lg-2 control-label">* 自定义背景图</label>
+				    <div class="col-lg-10">
+				        <div class="form-control-static itembgbox imgbgboxs">
+				    		{volist name="config.bgimgs" id="oneimg" } 
+				    		<div class="bpbgone">
+				    			<img src="{:tomedia($oneimg)}" />
+				    			<div class="delitembgbox"><i class="mdi mdi-delete delonebg" onclick="javascript:$(this).parent().parent().remove();"></i></div> 
+				    			<input type="hidden" name="bgimgs[]" value="{$oneimg}"> 
+				    		</div>
+				    		{/volist}
+				    		<div class="adddiybg" onclick="tpl_image_one(this,insertoneimage)"><a class="btn btn-primary btn-xs"><i class="mdi mdi-plus"></i> 新增图片</a></div>
+				    	</div>
+				        <span class="help-block">规格:1400*800px，具体尺寸需结合屏幕实际尺寸设计，最多可以上传10个图片</span>
+				    </div>
+				</div>
+				<div class="form-group bgimgtypebox2{if $config["bgimgtype"]=="2"} hidden{/if}">
+				    <label class="col-lg-2 control-label">* 系统背景图</label>
+				    <div class="col-lg-8">
+				        {foreach $sysbgimgs as $key=>$vo } 
+				            <label class="lyear-radio radio-inline radio-primary" style="margin-right: 50px;">
+						       <input type="radio" name="sysbgimgid" value="{$vo['id']}" {if (empty($config['sysbgimgid'])&&$key=='0') || $config['sysbgimgid']==$vo['id']}checked{/if}><span>{$vo['bgname']}</span><a class="label label-success prevattach" data-files={:json_encode($vo['bgimgs'])} href="javascript:void(0)">预览</a>
+						    </label>
+				        {/foreach}
+				    </div>
+				</div>
+			</div>
+			<div class="bgitembgbox{if $config["bgtype"]=="1"} hidden{/if}">
+				<div class="form-group">
+				    <label class="col-lg-2 control-label">* 背景视频类型</label>
+				    <div class="col-lg-8">
+				      <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.bgvideotypebox2').removeClass('hidden'),$('.bgvideotypebox1').addClass('hidden')">
+				       <input type="radio" name="bgvideotype" value="1" {if $config['bgvideotype']=='1'}checked{/if}><span>系统内置背景视频</span>
+				      </label>
+				      <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.bgvideotypebox2').addClass('hidden'),$('.bgvideotypebox1').removeClass('hidden')">
+				       <input type="radio" name="bgvideotype" value="2" {if $config['bgvideotype']=='2'}checked{/if}><span>自定义背景视频</span>
+				      </label>
+				    </div>
+				</div>
+				<div class="form-group bgvideotypebox1{if $config["bgvideotype"]=="1"} hidden{/if}">
+				    <label class="col-lg-2 control-label">* 自定义背景视频</label>
+				    <div class="col-lg-10">
+				    	<div class="form-control-static itembgbox videobgboxs">
+				    		{volist name="config.bgvideos" id="onevideo" } 
+				    		<div class="bpbgone">
+				    			<img src="{:tomedia($onevideo)}.jpg" />
+				    			<div class="delitembgbox"><i class="mdi mdi-delete delonebg" onclick="javascript:$(this).parent().parent().remove();"></i></div> 
+				    			<i class="mxc-video_light playicon" onclick="prevvideo(this);"  data-filesrc="{:tomedia($onevideo)}"></i> 
+				    			<input type="hidden" name="bgvideos[]" value="{$onevideo}"> 
+				    		</div>
+				    		{/volist}
+				    		<div class="adddiybg" onclick="tpl_video(this,insertonevideo)"><a class="btn btn-primary btn-xs"><i class="mdi mdi-plus"></i> 新增视频</a></div>
+				    	</div>
+				        <span class="help-block">最多可上传10个视频</span>
+				    </div>
+				</div>
+				<div class="form-group bgvideotypebox2{if $config["bgvideotype"]=="2"} hidden{/if}">
+				    <label class="col-lg-2 control-label">* 系统背景视频</label>
+				    <div class="col-lg-8">
+				        {foreach $sysbgvideos as $key2=>$vo2 } 
+				            <label class="lyear-radio radio-inline radio-primary" style="margin-right: 50px;">
+						       <input type="radio" name="sysbgvideoid" value="{$vo2['id']}" {if (empty($config['sysbgvideoid'])&&$key2=='0') || $config['sysbgvideoid']==$vo2['id']}checked{/if}><span>{$vo2['bgname']}</span><a class="label label-success prevattach" data-type='3' data-files={:json_encode($vo2['bgvideos'])}>预览</a>
+						    </label>
+			            {/foreach}
+				    </div>
+				</div>
+			</div>
+			{include file='$Wpath/common/configscreenmusic'}
+			<div class="form-group">
+				<label class="col-lg-2 control-label">* 轮播默认图</label>
+				<div class="col-lg-6">
+                    {:tpl_image_one("sliderbox[defaultimg]",$config['sliderbox']['defaultimg'])}
+                  	<span class="zam-help-block">规格:440*672px</span>
+				</div>
+		    </div>
+		    <div class="form-group">
+			    <label class="col-lg-2 control-label">* 轮播图片来源</label>
+			    <div class="col-lg-8">
+			      <label class="lyear-radio radio-inline radio-primary">
+			       <input type="radio" name="sliderbox[fromtype]" value="3" {if $config['sliderbox']['fromtype']=='3'}checked{/if}><span>仅图片消息图片</span>
+			      </label>
+			      <label class="lyear-radio radio-inline radio-primary">
+			       <input type="radio" name="sliderbox[fromtype]" value="2" {if $config['sliderbox']['fromtype']=='2'}checked{/if}><span>仅霸屏图片</span>
+			      </label>
+			      <label class="lyear-radio radio-inline radio-primary">
+			       <input type="radio" name="sliderbox[fromtype]" value="1" {if $config['sliderbox']['fromtype']=='1'}checked{/if}><span>2者均要</span>
+			      </label>
+			    </div>
+			</div>
+			<div class="form-group">
+				<label class="col-md-2 control-label text-right">* 大屏组件轮播</label>
+				<div class="col-md-10">
+					<table class="we7-table table" style="margin-bottom:0px;">
+						<thead>
+						  <tr>
+						    <th style="width:33%;text-align:center;">组件</th>
+							<th style="width:33%;text-align:center;">状态</th>
+							<th style="width:33%;text-align:center;">展示时间</th>
+						  </tr>
+						</thead>
+						<tbody class="widget-lists">
+							{foreach $config['widgets'] as $widget}
+							<tr>
+								<td>
+									<div class="form-inline">
+										<input type="hidden"  name="widget[widgetfield][]" value="{$widget['widgetfield']}"  />
+										<input type="text" class="form-control" name="widget[widgetname][]" value="{$widget['widgetname']}" readonly>
+									</div>
+								</td>
+								<td>
+									{if $widget['widgetfield']!='msg'}
+										{:tpl_switch('widget[widgetshow][]',$widget['widgetshow'])}
+									{else}
+										-
+										<input type="hidden"  name="widget[widgetshow][]" value="1"  />
+									{/if}
+								</td>
+								<td>
+								   <div class="form-inline">
+								   	<input type="text" class="form-control numberincdec" name="widget[widgettime][]" value="{$widget['widgettime']}"
+					                data-bts-min="10" data-bts-replacement-val="10"
+					                data-bts-max="null"
+					                data-bts-step="1"
+					                data-bts-postfix="秒"
+					                data-bts-postfix-extra-class="touchspin-postfix"
+					                >
+								   </div>
+								</td>
+							</tr>
+						   {/foreach}
+						</tbody>
+					</table>
+				</div>
+	  		</div>
+		</div>
+		<div class="highconfig-item hidden">
+			{include file='$Wpath/common/configwechatcommon'}
+	        <div class="form-group">
+	            <label class="col-lg-2 control-label">* 顶部公告</label>
+	            <div class="col-lg-8">
+	                {:tpl_switch('appshownotice',$config['appshownotice'],'opennotice')}
+	            </div>
+	        </div>
+	        <div class="appnoticebox{if $config['appshownotice']=='2'} hidden{/if}">
+	            <div class="form-group">
+	                <label class="col-lg-2 control-label">* 准许关闭公告</label>
+	                <div class="col-lg-8">
+	                    {:tpl_switch('appclosenotice',$config['appclosenotice'])}
+	                    <span class="help-block">注:准许则微信用户可以点击关闭按钮关闭通告</span>
+	                </div>
+	            </div>
+	            <div class="form-group">
+	                <label class="col-lg-2 control-label">* 公告内容</label>
+	                <div class="col-lg-8">
+	                     <textarea class="form-control" name="appnotices" rows="4" placeholder="注:多条公告必须以#隔开">{$config['appnotices']}</textarea>
+	                    <span class="help-block">注:多条公告请以#隔开，否则视为仅一条公告</span>
+	                </div>
+	            </div>
+	        </div>
+			<div class="form-group">
+	            <label class="col-lg-2 control-label">* 消息审核</label>
+	            <div class="col-lg-8">
+	                {:tpl_switch('appverify',$config['appverify'])}
+	                <div class="help-block">开启后用户发送的消息均需要审核通过后才可显示在大屏</div>
+	            </div>
+	        </div>
+			{if $admin['id']=='1'}
+			<div class="form-group">
+				<label class="col-lg-2 control-label">* 未审核通过消息直接退款</label>
+				<div class="col-lg-8">
+					{:tpl_switch('refuserefund',$config['refuserefund']??'2')}
+					<span class="zam-help-block">注:开启此项后活动所属用户审核不通过霸屏，打赏以及点歌消息时将同步进行微信支付退款操作，反之则不进行退款，<span class="text-danger">此项仅超级管理员可设置</span></span>
+					<span class="text-danger">此项请酌情选择是否开启，存在倒刷退款风险</span>
+				</div>
+			</div>
+			{/if}
+			<div class="form-group">
+				<label class="col-lg-2 control-label">* 每人发送文字消息数量限制</label>
+				<div class="col-lg-4">
+					<input type="text" class="form-control numberincdec" name="appsendtxtcount" value="{$config['appsendtxtcount']??0}"
+					data-bts-min="0" data-bts-replacement-val="0"
+					data-bts-max="100"
+					data-bts-step="1"
+					data-bts-postfix="条文字消息"
+					data-bts-postfix-extra-class="touchspin-postfix">
+					<span class="zam-help-block">注:必须是小于等于100的整数，0为不限制发送文字消息数量</span>
+				</div>
+			</div>
+	        <div class="form-group">
+	            <label class="col-lg-2 control-label">* 准许发送图片</label>
+	            <div class="col-lg-8">
+	                {:tpl_switch('appcanimg',$config['appcanimg'],'opencanimg')}
+	                <div class="help-block">关闭后微信用户将不可以直接发送图片消息</div>
+	            </div>
+	        </div>
+			<div class="form-group canimgbox{if $config['appcanimg'] == '2'} hidden{/if}">
+				<label class="col-lg-2 control-label">* 每人发送图片消息数量限制</label>
+				<div class="col-lg-4">
+					<input type="text" class="form-control numberincdec" name="appsendimgcount" value="{$config['appsendimgcount']??0}"
+					data-bts-min="0" data-bts-replacement-val="0"
+					data-bts-max="100"
+					data-bts-step="1"
+					data-bts-postfix="条图片消息"
+					data-bts-postfix-extra-class="touchspin-postfix">
+					<span class="zam-help-block">注:必须是小于等于100的整数，0为不限制发送图片消息数量</span>
+				</div>
+			</div>
+	        <div class="form-group">
+	            <label class="col-lg-2 control-label">* 消息最大长度</label>
+	            <div class="col-lg-4">
+	                <input type="text" class="form-control numberincdec" name="appmaxlength" value="{$config['appmaxlength']}"
+	                data-bts-min="1" data-bts-replacement-val="1"
+	                data-bts-max="null"
+	                data-bts-step="1"
+	                data-bts-postfix="个字符"
+	                data-bts-postfix-extra-class="touchspin-postfix"
+	                >
+	                <span class="help-block">注:必须是个大于0的整数</span>
+	            </div>
+	        </div>
+	        <div class="form-group">
+	            <label class="col-lg-2 control-label">* 发送消息时间间隔</label>
+	            <div class="col-lg-4">
+	                <input type="text" class="form-control numberincdec" name="appsendtime" value="{$config['appsendtime']}"
+	                data-bts-min="0" data-bts-replacement-val="0"
+	                data-bts-max="null"
+	                data-bts-step="1"
+	                data-bts-postfix="秒"
+	                data-bts-postfix-extra-class="touchspin-postfix"
+	                >
+	                <span class="help-block">用于防刷屏 注:必须是整数，0为不限制发送时间间隔</span>
+	            </div>
+	        </div>
+	        <div class="form-group">
+	            <label class="col-lg-2 control-label">* 消息文字大小</label>
+	            <div class="col-lg-4">
+	                <input type="text" class="form-control numberincdec" name="appmsg[size]" value="{$config['appmsg']['size']}"
+	                data-bts-min="12" data-bts-replacement-val="12"
+	                data-bts-max="null"
+	                data-bts-step="1"
+	                data-bts-postfix="px"
+	                data-bts-postfix-extra-class="touchspin-postfix"
+	                >
+	                <span class="help-block">注:必须是整数，至少是12px</span>
+	            </div>
+	        </div>
+	        <div class="form-group">
+	            <label class="col-lg-2 control-label">* 消息文字颜色</label>
+	            <div class="col-lg-4">
+	                {:tpl_color('appmsg[color]',$config['appmsg']['color'])}
+	            </div>
+	        </div>
+	        <div class="form-group">
+	            <label class="col-lg-2 control-label">* 消息背景色</label>
+	            <div class="col-lg-4">
+	                {:tpl_color('appmsg[bgcolor]',$config['appmsg']['bgcolor'])}
+	            </div>
+	        </div>
+	        <div class="form-group ditshowitems">
+	            <label class="col-lg-2 control-label"> 右侧菜单</label>
+	            <div class="col-lg-7">
+	                <table class="table table-bordered">
+	                    <thead>
+	                      <tr>
+	                        <th style="width:20%">组件</th>
+	                        <th style="width:20%">图标</th>
+	                        <th style="width:40%">url</th>
+	                        <th style="width:20%">操作</th>
+	                      </tr>
+	                    </thead>
+	                    <tbody class="appwidgets-lists ui-sortable">
+	                    {if !empty($config['appwidgets'])}
+	                    {foreach $config['appwidgets'] as $awidget}  
+	                    <tr>
+	                        <td class="text-center">
+	                            <input type="hidden" name="appwidget[iconfield][]" value="{$awidget['iconfield']}">
+	                            <input type="hidden" name="appwidget[isdiy][]" value="{$awidget['isdiy']}">
+	                            <input class="form-control" name="appwidget[iconname][]" type="text" value="{$awidget['iconname']}" readonly />
+	                        </td>
+	                        <td class="text-center">
+	                           <div class="">
+	                           	<img src="{:tomedia($awidget['iconimg'])}" onerror="javascript:this.src='/static/images/sys/nopic.jpg';this.title='点击上传图片'" title="点击上传图片" onclick="changeicon(this)" />
+	                             <input type="hidden" name="appwidget[iconimg][]" value="{$awidget['iconimg']}">
+	                           </div>
+	                        </td>
+	                        <td class="text-center">
+	                        	<input  class="form-control" name="appwidget[iconurl][]" value="{if $awidget['isdiy']=='2'}系统内置{else /}{$awidget['iconurl']}{/if}" {if $awidget['isdiy']=='2'}readonly{/if}  placeholder="请填写完整的url地址">
+	                        </td>
+	                        <td class="text-center">
+	                            <a class="btn btn-xs btn-primary btn-xs zam-sortable btn-moveitem" href="javascript:void(0)"> <i class="mdi mdi-arrow-all"></i> </a>
+	                            <a class="btn btn-xs btn-danger btn-xs btn-delshowitem" href="javascript:void(0)"> <i class="mdi mdi-delete"></i> </a>
+	                        </td>
+	                    </tr>
+	                    {/foreach}
+	                    {/if}
+	                    </tbody>
+	                </table>
+	                <div class="help-block">点击图标图片即可上传图片，url必须是带协议头的完整地址，例如https://baidu.com</div>
+	            </div>
+	            <div class="col-lg-3">
+	                <div class="card card-totalitems">
+	                    <div class="card-header">组件</div>
+	                    {php}
+	                    $selappwidgets = [];
+	                    if(!empty($config['appwidgets'])){
+	                    	$selappwidgets = array_column($config['appwidgets'],'iconfield');
+	                	}
+	                    {/php}
+	                    <div class="card-body normalitems">
+	                        <span class="btn btn-default btn-sm{if in_array('bp',$selappwidgets)} disabled{/if}" data-zd="bp" data-iconimg="{:WIMGURL}baping/skin/qingren/bp.png">霸屏</span>
+	                        <span class="btn btn-default btn-sm{if in_array('ds',$selappwidgets)} disabled{/if}" data-zd="ds" data-iconimg="{:WIMGURL}baping/skin/qingren/ds.png">打赏</span>
+	                        <span class="btn btn-default btn-sm{if in_array('hb',$selappwidgets)} disabled{/if}" data-zd="hb" data-iconimg="{:WIMGURL}baping/skin/qingren/hb.png">红包</span>
+	                        <span class="btn btn-default btn-sm{if in_array('song',$selappwidgets)} disabled{/if}" data-zd="song" data-iconimg="{:WIMGURL}baping/skin/qingren/song.png">点歌</span>
+	                        <span class="btn btn-default btn-sm{if in_array('zan',$selappwidgets)} disabled{/if}" data-zd="zan" data-iconimg="{:WIMGURL}baping/skin/qingren/zan.png">点赞</span>
+	                        <span class="btn btn-default btn-sm" data-zd="diy">自定义</span>
+	                    </div>
+	                </div>
+	            </div>
+	        </div>
+		</div>
+		<div class="highconfig-item hidden">
+			<div class="form-group">
+				<label class="col-lg-2 control-label">* 霸屏功能</label>
+				<div class="col-lg-2">
+					{:tpl_switch('bpconfig[open]',$config['bpconfig']['open'],'openbp')}
+				</div>
+			</div>
+			<div class="bpopenBox{if $config['bpconfig']['open']=='2'} hidden{/if}">
+			  <div class="form-group">
+				<label class="col-lg-2 control-label">* 霸屏准许上传小视频</label>
+				<div class="col-lg-8">
+					{:tpl_switch('bpconfig[uploadvideo]',$config['bpconfig']['uploadvideo'])}
+					<span class="help-block">关闭则霸屏不准许上传小视频</span>
+				 </div>
+			  </div>
+			  <div class="form-group">
+				<label class="col-lg-2 control-label">* 管理员免费霸屏</label>
+				<div class="col-lg-8">
+						{:tpl_switch('bpconfig[managerfree]',$config['bpconfig']['managerfree'],'openmanagerfree')}
+						<span class="help-block">开启后管理员可以免费霸屏</span>
+				 </div>
+			  </div>
+			  <div class="form-group bpfreetimebox{if $config['bpconfig']['managerfree']=='2'} hidden{/if}">
+					<label class="col-lg-2 control-label">* 每天免费次数</label>
+					<div class="col-lg-4">
+						<input type="text" class="form-control numberincdec" name="bpconfig[freecount]" value="{$config['bpconfig']['freecount']}"
+		                data-bts-min="1" data-bts-replacement-val="1"
+		                data-bts-max="null"
+		                data-bts-step="1"
+		                data-bts-postfix="次"
+		                data-bts-postfix-extra-class="touchspin-postfix"
+		                >
+	                	<span class="zam-help-block">注:必须是个大于0的整数，每天0点自动重置</span>
+					</div>
+			  </div>
+			  <div class="form-group">
+				<label class="col-lg-2 control-label">* 霸屏时间与价格</label>
+				<div class="col-lg-10">
+						<table class="table" style="margin-bottom:0px;">
+							<thead>
+							  <tr>
+								<th style="width:20%">霸屏时间</th>
+								<th style="width:20%">价格</th>
+								<th style="width:40%">图片数</th>
+								<th style="width:20%">操作</th>
+							  </tr>
+							</thead>
+							<tbody class="bptime-lists">
+								{volist name="config.bpconfig.bpitems" id="bpitem"}
+									<tr>
+										<td>
+											<div class="touchspin">
+							                    <input type="text" class="form-control numberincdec" name="bpconfig[bpseconds][]" 
+								                data-bts-min="1" data-bts-replacement-val="1"
+								                data-bts-max="null"
+								                data-bts-step="1"
+								                data-bts-postfix="秒"
+								                data-bts-postfix-extra-class="touchspin-postfix"
+								                value="{$bpitem['bpseconds']}" placeholder="霸屏时间">
+							                </div>
+										</td>
+										<td>
+										   <div class="touchspin">
+										   		<input type="text" class="form-control numberincdec" name="bpconfig[bpprice][]" 
+								                data-bts-min="0.01" data-bts-replacement-val="0.01"
+								                data-bts-max="null"
+								                data-bts-decimals="2"
+								                data-bts-step="1"
+								                data-bts-force-step-divisibility="xstwo"
+								                data-bts-postfix="元"
+								                data-bts-postfix-extra-class="touchspin-postfix"
+								                value="{$bpitem['bpprice']}" placeholder="价格，最低是0.01">
+							                </div>
+										</td>
+										<td>
+										   <div class="input-group ">
+										   		<div class="input-group-btn not-allow"><a class="btn btn-default">最多可上传</a></div>
+							                    <div class="touchspin">
+							                    <input type="text" class="form-control numberincdec" name="bpconfig[imgnum][]" 
+								                data-bts-min="1" data-bts-replacement-val="1"
+								                data-bts-max="null"
+								                data-bts-step="1"
+								                data-bts-postfix="张图片"
+								                data-bts-postfix-extra-class="touchspin-postfix"
+								                value="{$bpitem['imgnum']}" placeholder="最多可上传多少张图">
+							                </div>
+							                </div>
+										</td>
+										<td class="text-center">
+											<a href="javascript:;"  class="btn btn-danger btn-sm" onclick="javascript:$(this).parent().parent().remove()"><i class="mdi mdi-delete"></i></a>
+										</td>
+									</tr>
+								{/volist}
+							</tbody>
+							<tfoot>
+							  <tr>
+								<td colspan="4" style="text-align: left">
+								  <a  class="btn btn-primary btn-xs addnewitem" href="javascript:void(0)"> <i class="mdi mdi-plus"></i>&nbsp;<span>添加霸屏时间</span></a>
+								</td>
+							  </tr>
+							</tfoot>
+						</table>
+						<span class="zam-help-block"></span>
+				</div>
+			  </div>
+			  <div class="form-group">
+				<label class="col-lg-2 control-label">* 霸屏主题</label>
+				<div class="col-lg-10">
+						<table class="table" id="bpthemetable">
+							<thead>
+							  <tr>
+							  	<th style="width:10%" class="hidden">id</th>
+							  	<th style="width:10%;">序号</th>
+							  	<th style="width:10%;">状态</th>
+								<th style="width:10%;">主题名</th>
+								<th style="width:20%;">缩略图</th>
+								<th style="width:20%;">微信角标</th>
+								<th style="width:20%;">大屏角标</th>
+								<th style="width:10%;">操作</th>
+							  </tr>
+							</thead>
+							<tbody class="bptheme-lists">
+								{foreach $bpthemes as $ztkey=>$theme}
+									<tr>
+										<td class="hidden">{$theme['id']}</td>
+										<td>
+										 <span>{$theme['displayorder']}</span>
+										</td>
+										<td data-id="{$theme['id']}">
+										 {:tpl_switch('',$theme['isshow'],'bpthemechange')}
+										</td>
+										<td>
+										 <span>{$theme['themeconfig']['bpname']}</span>
+										</td>
+										<td>
+										   <span><img src="{:tomedia($theme['themeconfig']['bpicon'])}" /></span>
+										</td>
+										<td>
+										   <span><img src="{:tomedia($theme['themeconfig']['bpappicon'])}" /></span>
+										</td>
+										<td>
+										   <span><img src="{:tomedia($theme['themeconfig']['bppcicon'])}" /></span>
+										</td>
+										<td>
+										  <a href="javascript:;" class="btn btn-primary btn-xs btn-edit" data-id="{$theme['id']}"><i class="mdi mdi-pencil"></i></a>
+										  <a href="javascript:;" class="btn btn-danger btn-xs btn-del" data-id="{$theme['id']}"><i class="mdi mdi-delete"></i></a>
+										</td>
+									</tr>
+								{/foreach}
+							</tbody>
+							<tfoot>
+							  <tr>
+								<td colspan="8" style="text-align: left">
+								  <a  class="btn btn-primary btn-xs addzhutiitem" href="javascript:;"> <i class="mdi mdi-plus"></i>&nbsp;<span>自定义主题</span></a>
+								  <a  class="btn btn-info btn-xs addsyszhuti" href="javascript:;"> <i class="mdi mdi-plus"></i>&nbsp;<span>添加系统主题</span></a>
+								  <div class="help-block">注意:排序按序号降序排序，序号越大越排在前面，即为你想让某主题排在前面，你可以改大他的序号值</div>
+								</td>
+							  </tr>
+							</tfoot>
+						</table>
+				</div>
+			  </div>
+			  <div class="form-group cardpaybox{if !dzbapingcard()} hidden{/if}">
+				<label class="col-lg-2 control-label">* 券号支付</label>
+				<div class="col-lg-8">
+						{:tpl_switch('bpconfig[cardpay]',$config['bpconfig']['cardpay']??'2')}
+						<span class="help-block">开启后用户可通过券号来支付</span>
+				 </div>
+			  </div>
+			</div>
+		</div>
+		<div class="highconfig-item hidden">
+	        <div class="form-group">
+				<label class="col-lg-2 control-label">* 红包功能</label>
+				<div class="col-lg-8">
+					{:tpl_switch('redpackconfig[open]',$config['redpackconfig']['open'],'openhb')}
+					<span class="help-block">注:红包是直接到账，如24小时未领取完的红包将自动发起退款</span>
+				</div>
+			</div>
+			<div class="hbopenBox{if $config['redpackconfig']['open']=='2'} hidden{/if}">
+				<div class="form-group">
+		            <label class="col-lg-2 control-label">* 最小总金额</label>
+		            <div class="col-lg-4">
+		                <input type="text" class="form-control numberincdec" name="redpackconfig[min]" 
+		                data-bts-min="{$sendhbmin}" data-bts-replacement-val="{$sendhbmin}"
+		                data-bts-max="null"
+		                data-bts-decimals="2"
+		                data-bts-step="1"
+		                data-bts-force-step-divisibility="xstwo"
+		                data-bts-postfix="元"
+		                data-bts-postfix-extra-class="touchspin-postfix"
+		                value="{$config['redpackconfig']['min']}">
+		                <span class="help-block m-0">注:最小是{$sendhbmin}元</span>
+		            </div>
+		        </div>
+		        <div class="form-group">
+		            <label class="col-lg-2 control-label">* 最大总金额</label>
+		            <div class="col-lg-4">
+		                <input type="text" class="form-control numberincdec" name="redpackconfig[max]" 
+		                data-bts-min="1" data-bts-replacement-val="1"
+		                data-bts-max="null"
+		                data-bts-decimals="2"
+		                data-bts-step="1"
+		                data-bts-force-step-divisibility="xstwo"
+		                data-bts-postfix-extra-class="touchspin-postfix"
+		                data-bts-postfix="元"
+		                value="{$config['redpackconfig']['max']}">
+		                <span class="help-block m-0"></span>
+		            </div>
+		        </div>
+		        <div class="form-group">
+		            <label class="col-lg-2 control-label">* 单个红包最小金额</label>
+		            <div class="col-lg-4">
+		                <input type="text" class="form-control numberincdec" name="redpackconfig[onemin]" 
+		                data-bts-min="{$sendhbmin}" data-bts-replacement-val="{$sendhbmin}"
+		                data-bts-max="null"
+		                data-bts-decimals="2"
+		                data-bts-step="1"
+		                data-bts-force-step-divisibility="xstwo"
+		                data-bts-postfix="元"
+		                data-bts-postfix-extra-class="touchspin-postfix"
+		                value="{$config['redpackconfig']['onemin']}">
+		                <span class="help-block m-0">注:最小是{$sendhbmin}元</span>
+		            </div>
+		        </div>
+		        {if $managerhdrights['edit']=='1'}
+		        <div class="form-group">
+		            <label class="col-lg-2 control-label">* 红包费率</label>
+		            <div class="col-lg-4">
+		                <input type="text" class="form-control numberincdec" name="redpackconfig[fl]" 
+		                data-bts-min="0" data-bts-replacement-val="0"
+		                data-bts-max="100"
+		                data-bts-decimals="2"
+		                data-bts-step="1"
+		                data-bts-force-step-divisibility="xstwo"
+		                data-bts-postfix="%"
+		                data-bts-postfix-extra-class="touchspin-postfix"
+		                value="{$config['redpackconfig']['fl']}">
+		                <span class="help-block m-0">最小费率0</span>
+		                <span class="help-block"><span class="text-danger">此项仅管理员可设置，由于微信商户会对支付成功的订单直接扣手续费推荐此处费率设置大于商户费率</span>
+		            </div>
+		        </div>
+		        {/if}
+		        <div class="form-group">
+					<label class="col-lg-2 control-label">* 红包口令作为消息展示</label>
+					<div class="col-lg-8">
+						{:tpl_switch('redpackconfig[koulingismsg]',$config['redpackconfig']['koulingismsg']??'2')}
+						<span class="help-block">注:开启后用户抢到红包的口令将作为普通文字消息展示在聊天室，开启后有被口令刷屏的风险</span>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="highconfig-item hidden">
+	        <div class="form-group">
+	            <div class="col-lg-3" style="padding: 5px;">
+	            	<div class="card">
+	                    <div class="card-header" style="padding: 10px 24px;">艺人分组<a class="btn btn-xs btn-primary btn-xs pull-right btn-addartistgroup" href="javascript:void(0)"> <i class="mdi mdi-plus"></i> 新增分组</a></div>
+	                    <div class="card-body" style="padding: 5px;">
+			                <table class="table table-bordered" id="artistgroup">
+			                    <thead>
+			                      <tr>
+			                      	<th class="hidden">id</th>
+			                      	<th style="width:20%">序号</th>
+			                        <th style="width:50%">分组名</th>
+			                        <th style="width:30%">操作</th>
+			                      </tr>
+			                    </thead>
+			                    <tbody class="artistgroup-lists">
+			                    {foreach $artistgroups as $artkey=>$artistgroup}  
+			                    <tr>
+			                    	<td class="hidden">{$artistgroup['id']}</td>
+			                    	<td class="text-center" style="border-right-color:transparent">{$artistgroup['displayorder']}</td>
+			                        <td class="text-center" style="border-right-color:transparent">{$artistgroup['groupname']}</td>
+			                        <td class="text-center">
+			                            <a class="btn btn-xs btn-primary btn-xs btn-edit" data-id="{$artistgroup['id']}" href="javascript:void(0)"> <i class="mdi mdi-pencil"></i> </a>
+			                            <a class="btn btn-xs btn-danger btn-xs btn-del" data-id="{$artistgroup['id']}" href="javascript:void(0)"> <i class="mdi mdi-delete"></i> </a>
+			                        </td>
+			                    </tr>
+			                    {/foreach}
+			                    </tbody>
+			                </table>
+		            	</div>
+		        	</div>
+	                <div class="help-block"></div>
+	            </div>
+	            <div class="col-lg-9" style="padding: 5px;">
+	                <div class="card">
+	                    <div class="card-header" style="padding: 10px 24px;">艺人<a class="btn btn-xs btn-primary btn-xs pull-right btn-addartist" href="javascript:void(0)"> <i class="mdi mdi-plus"></i> 新增艺人</a></div>
+	                    <div class="card-body" style="padding: 5px;">
+		                    <table class="table table-bordered" id="artisttable">
+			                    <thead>
+			                      <tr>
+			                      	<th style="width:10%" class="hidden">id</th>
+							  		<th style="width:10%;">序号</th>
+			                      	<th style="width:10%">状态</th>
+			                        <th style="width:15%">艺人</th>
+			                        <th style="width:15%">类型</th>
+			                        <th style="width:20%">微信用户</th>
+			                        <th style="width:20%">分成</th>
+			                        <th style="width:10%">操作</th>
+			                      </tr>
+			                    </thead>
+			                    <tbody class="artist-lists"></tbody>
+		                	</table>
+	                		<div class="help-block"></div>
+	                    </div>
+	                </div>
+	            </div>
+	        </div>
+		</div>
+		<div class="highconfig-item hidden">
+			<div class="form-group">
+				<label class="col-lg-2 control-label">* 打赏功能</label>
+				<div class="col-lg-2">
+					{:tpl_switch('dsconfig[open]',$config['dsconfig']['open'],'opends')}
+				</div>
+			</div>
+			<div class="dsopenBox{if $config['dsconfig']['open']=='2'} hidden{/if}">
+			  <div class="form-group">
+				<label class="col-lg-2 control-label">* 管理员免费打赏</label>
+				<div class="col-lg-8">
+						{:tpl_switch('dsconfig[managerfree]',$config['dsconfig']['managerfree'],'opendsmanagerfree')}
+						<span class="help-block">开启后管理员可以免费打赏</span>
+				 </div>
+			  </div>
+			  <div class="form-group dsfreetimebox{if $config['dsconfig']['managerfree']=='2'} hidden{/if}">
+					<label class="col-lg-2 control-label">* 每天免费次数</label>
+					<div class="col-lg-4">
+						<input type="text" class="form-control numberincdec" name="dsconfig[freecount]" value="{$config['dsconfig']['freecount']}"
+		                data-bts-min="1" data-bts-replacement-val="1"
+		                data-bts-max="null"
+		                data-bts-step="1"
+		                data-bts-postfix="次"
+		                data-bts-postfix-extra-class="touchspin-postfix"
+		                >
+	                	<span class="zam-help-block">注:必须是个大于0的整数，每天0点自动重置</span>
+					</div>
+			  </div>
+			  <div class="form-group">
+				<label class="col-lg-2 control-label">* 礼物</label>
+				<div class="col-lg-10">
+						<table class="table" id="dsgifttable">
+							<thead>
+							  <tr>
+							  	<th style="width:10%" class="hidden">id</th>
+							  	<th style="width:10%;">序号</th>
+							  	<th style="width:10%;">状态</th>
+								<th style="width:10%;">礼物</th>
+								<th style="width:20%;">缩略图</th>
+								<th style="width:20%;">价格</th>
+								<th style="width:20%;">霸屏时间</th>
+								<th style="width:10%;">操作</th>
+							  </tr>
+							</thead>
+							<tbody class="dsgift-lists">
+								{foreach $dsgifts as $gkey=>$gval}
+									<tr>
+										<td class="hidden">{$gval['id']}</td>
+										<td>
+										 <span>{$gval['displayorder']}</span>
+										</td>
+										<td data-id="{$gval['id']}">
+										 {:tpl_switch('',$gval['isshow'],'dsgiftchange')}
+										</td>
+										<td>
+										 <span>{$gval['giftconfig']['giftname']}</span>
+										</td>
+										<td>
+										   <span><img src="{:tomedia($gval['giftconfig']['giftimg'])}" /></span>
+										</td>
+										<td>
+										  <span>{$gval['giftconfig']['giftprice']}元</span>
+										</td>
+										<td>
+										  <span>{$gval['giftconfig']['bptime']}秒</span>
+										</td>
+										<td>
+										  <a href="javascript:;" class="btn btn-primary btn-xs btn-edit" data-id="{$gval['id']}"><i class="mdi mdi-pencil"></i></a>
+										  <a href="javascript:;" class="btn btn-danger btn-xs btn-del" data-id="{$gval['id']}"><i class="mdi mdi-delete"></i></a>
+										</td>
+									</tr>
+								{/foreach}
+							</tbody>
+							<tfoot>
+							  <tr>
+								<td colspan="8" style="text-align: left">
+								  <a  class="btn btn-primary btn-xs adddsgift" href="javascript:;"> <i class="mdi mdi-plus"></i>&nbsp;<span>自定义礼物</span></a>
+								  <a  class="btn btn-info btn-xs addsysdsgift" href="javascript:;"> <i class="mdi mdi-plus"></i>&nbsp;<span>添加系统礼物</span></a>
+								  <div class="help-block">注意:排序按序号降序排序，序号越大越排在前面，即为你想让某主题排在前面，你可以改大他的序号值</div>
+								</td>
+							  </tr>
+							</tfoot>
+						</table>
+				</div>
+			  </div>
+			  <div class="form-group cardpaybox{if !dzbapingcard()} hidden{/if}">
+				<label class="col-lg-2 control-label">* 券号支付</label>
+				<div class="col-lg-8">
+						{:tpl_switch('dsconfig[cardpay]',$config['dsconfig']['cardpay']??'2')}
+						<span class="help-block">开启后用户可通过券号来支付</span>
+				 </div>
+			  </div>
+			</div>
+		</div>
+		<div class="highconfig-item hidden">
+	        <div class="form-group">
+				<label class="col-lg-2 control-label">* 点歌功能</label>
+				<div class="col-lg-2">
+					{:tpl_switch('songconfig[open]',$config['songconfig']['open'],'opensong')}
+				</div>
+			</div>
+			<div class="songopenBox{if !isset($config['songconfig']['open']) || $config['songconfig']['open']=='2'} hidden{/if}">
+				<div class="form-group">
+					<label class="col-lg-2 control-label">* 管理员免费点歌</label>
+					<div class="col-lg-8">
+						{:tpl_switch('songconfig[managerfree]',$config['songconfig']['managerfree'],'opensongmanagerfree')}
+						<span class="help-block">开启后管理员可以免费打赏</span>
+					</div>
+				</div>
+				<div class="form-group songfreetimebox{if !isset($config['songconfig']['managerfree']) || $config['songconfig']['managerfree']=='2'} hidden{/if}">
+					<label class="col-lg-2 control-label">* 每天免费次数</label>
+					<div class="col-lg-4">
+						<input type="text" class="form-control numberincdec" name="songconfig[freecount]" value="{$config['songconfig']['freecount']}"
+						data-bts-min="1" data-bts-replacement-val="1"
+						data-bts-max="null"
+						data-bts-step="1"
+						data-bts-postfix="次"
+						data-bts-postfix-extra-class="touchspin-postfix"
+						>
+						<span class="zam-help-block">注:必须是个大于0的整数，每天0点自动重置</span>
+					</div>
+				</div>
+				<div class="notimesbox{if !empty($songtimes)} hidden{/if}">
+					<div class="form-group">
+							<label class="col-lg-2 control-label">* 每天最多点歌次数</label>
+							<div class="col-lg-4">
+								<input type="text" class="form-control numberincdec" name="songconfig[maxcount]" value="{$config['songconfig']['maxcount']}"
+								data-bts-min="0" data-bts-replacement-val="0"
+								data-bts-max="null"
+								data-bts-step="1"
+								data-bts-postfix="次"
+								data-bts-postfix-extra-class="touchspin-postfix"
+								>
+								<span class="zam-help-block">注:0为不限制</span>
+							</div>
+					</div>
+					<div class="form-group">
+							<label class="col-lg-2 control-label">* 每首歌每天最多可点次数</label>
+							<div class="col-lg-4">
+								<input type="text" class="form-control numberincdec" name="songconfig[onemaxcount]" value="{$config['songconfig']['onemaxcount']}"
+								data-bts-min="0" data-bts-replacement-val="0"
+								data-bts-max="null"
+								data-bts-step="1"
+								data-bts-postfix="次"
+								data-bts-postfix-extra-class="touchspin-postfix"
+								>
+								<span class="zam-help-block">注:0为不限制</span>
+							</div>
+					</div>
+					<div class="form-group">
+							<label class="col-lg-2 control-label">* 每首歌2次点播间隔时间</label>
+							<div class="col-lg-4">
+								<input type="text" class="form-control numberincdec" name="songconfig[onenexttime]" value="{$config['songconfig']['onenexttime']}"
+								data-bts-min="0" data-bts-replacement-val="0"
+								data-bts-max="null"
+								data-bts-step="1"
+								data-bts-postfix="分钟"
+								data-bts-postfix-extra-class="touchspin-postfix"
+								>
+								<span class="zam-help-block">注:0为不限制</span>
+							</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-lg-2 control-label">* 歌曲列表</label>
+					<div class="col-lg-10">
+						<table class="table" id="songtable">
+							<thead>
+								<tr>
+								<th style="width:10%" class="hidden">id</th>
+								<th style="width:10%;">序号</th>
+								<th style="width:10%;">状态</th>
+								<th style="width:20%;">艺人</th>
+								<th style="width:20%;">歌曲与原唱</th>
+								<th style="width:20%;">价格与时间</th>
+								<th style="width:20%;">操作</th>
+								</tr>
+							</thead>
+							<tbody class="song-lists">
+								{foreach $songs as $song}
+									<tr>
+										<td class="hidden">{$song['id']}</td>
+										<td>
+											<span>{$song['displayorder']}</span>
+										</td>
+										<td data-id="{$song['id']}">
+											{:tpl_switch('',$song['isshow'],'songchange')}
+										</td>
+										<td><span>{$song['artistname']}</span></td>
+										<td>
+											<span>{$song['songconfig']['songname']}</span>/<span>{$song['songconfig']['singer']}</span>
+										</td>
+										<td>
+											<span>{$song['songconfig']['songprice']}元</span>/<span>{$song['songconfig']['bptime']}秒</span>
+										</td>
+										<td>
+											<a href="javascript:;" class="btn btn-primary btn-xs btn-edit" data-id="{$song['id']}"><i class="mdi mdi-pencil"></i></a>
+											<a href="javascript:;" class="btn btn-danger btn-xs btn-del" data-id="{$song['id']}"><i class="mdi mdi-delete"></i></a>
+										</td>
+									</tr>
+								{/foreach}
+							</tbody>
+							<tfoot>
+								<tr>
+								<td colspan="7" style="text-align: left">
+									<a class="btn btn-primary btn-xs btn-addsong" href="javascript:;"><i class="mdi mdi-plus"></i>添加歌曲</a>
+									<a class="btn btn-warning btn-xs btn-importsong" href="javascript:;"><i class="mdi mdi-plus"></i>导入歌曲</a>
+									<div class="help-block">注意:排序按序号降序排序，序号越大越排在前面，即为你想让某歌曲排在前面，你可以改大他的序号值</div>
+								</td>
+								</tr>
+							</tfoot>
+						</table>
+					</div>
+				</div>
+				<div class="form-group cardpaybox{if !dzbapingcard()} hidden{/if}">
+					<label class="col-lg-2 control-label">* 券号支付</label>
+					<div class="col-lg-8">
+						{:tpl_switch('songconfig[cardpay]',$config['songconfig']['cardpay']??'2')}
+						<span class="help-block">开启后用户可通过券号来支付</span>
+					</div>
+				</div>
+				<div class="form-group songtimesbox{if !dzbapingsongtime()} hidden{/if}">
+					<label class="col-lg-2 control-label">* 点歌营业时间</label>
+					<div class="col-lg-6">
+						<div class="input-group">
+							<div class="input-group-btn not-allow"><a class="btn btn-default">从</a></div>
+							<input type="text" name="songconfig[timestart]" class="form-control datetimepicker" placeholder="点击选择小时和分钟" value="{$config['songconfig']['timestart']??'00:00'}" readonly>
+							<div class="input-group-btn not-allow"><a class="btn btn-default">开始，到</a></div>
+							<select class="form-control" name="songconfig[timetype]">
+								<option value="1" {if !isset($config['songconfig']['timetype']) || $config['songconfig']['timetype'] == '1'}selected{/if}>当天</option>
+								<option value="2" {if isset($config['songconfig']['timetype']) && $config['songconfig']['timetype'] == '2'}selected{/if}>第二天</option>
+							</select>
+							<div class="input-group-btn not-allow"><a class="btn btn-default">的</a></div>
+							<input type="text" name="songconfig[timeend]" class="form-control datetimepicker" placeholder="点击选择小时和分钟" value="{$config['songconfig']['timeend']??'23:59'}" readonly>
+							<div class="input-group-btn not-allow"><a class="btn btn-default">结束</a></div>
+						</div>
+						<span class="help-block">一般点歌时间都是当天，比如晚上8点开始到晚上23点结束，如果是跨夜则可以设置晚上8点开始到第二天凌晨3点结束</span>
+					</div>
+				</div>
+				<div class="hastimesbox{if empty($songtimes)} hidden{/if}">
+					<div class="form-group">
+							<label class="col-lg-2 control-label">* 每个时间段最多付费点歌</label>
+							<div class="col-lg-4">
+								<input type="text" class="form-control numberincdec" name="songconfig[timeidsongmax]" value="{$config['songconfig']['timeidsongmax']??5}"
+								data-bts-min="0" data-bts-replacement-val="0"
+								data-bts-max="null"
+								data-bts-step="1"
+								data-bts-postfix="次"
+								data-bts-postfix-extra-class="touchspin-postfix"
+								>
+								<span class="zam-help-block">注:0为不限制</span>
+							</div>
+					</div>
+					<div class="form-group">
+							<label class="col-lg-2 control-label">* 每首歌每天最多付费点</label>
+							<div class="col-lg-4">
+								<input type="text" class="form-control numberincdec" name="songconfig[dayeverymaxcount]" value="{$config['songconfig']['dayeverymaxcount']??2}"
+								data-bts-min="0" data-bts-replacement-val="0"
+								data-bts-max="null"
+								data-bts-step="1"
+								data-bts-postfix="次"
+								data-bts-postfix-extra-class="touchspin-postfix"
+								>
+								<span class="zam-help-block">注:0为不限制</span>
+							</div>
+					</div>
+					<div class="form-group">
+						<label class="col-lg-2 control-label">* 每人每天最多免费点歌</label>
+						<div class="col-lg-4">
+							<input type="text" class="form-control numberincdec" name="songconfig[dayfreemaxcount]" value="{$config['songconfig']['dayfreemaxcount']??3}"
+							data-bts-min="0" data-bts-replacement-val="0"
+							data-bts-max="null"
+							data-bts-step="1"
+							data-bts-postfix="次"
+							data-bts-postfix-extra-class="touchspin-postfix"
+							>
+							<span class="zam-help-block">注:0为不限制</span>
+						</div>
+					</div>
+				</div>
+				<div class="form-group songtimesbox{if !dzbapingsongtime()} hidden{/if}">
+					<label class="col-lg-2 control-label">* 点歌时间段</label>
+					<div class="col-lg-10">
+						<table class="table" id="songtable">
+							<thead>
+								<tr>
+									<th style="width:20%;">名称</th>
+									<th style="width:20%;">时间段</th>
+									<th style="width:40%;">歌手</th>
+									<th style="width:20%;">操作</th>
+								</tr>
+							</thead>
+							<tbody class="songtime-lists">
+								{foreach $songtimes as $sitem}
+									<tr>
+										<td>
+											<span>{$sitem['timename']}</span>
+										</td>
+										<td>
+											<div>
+												<span>{$sitem['timestart']}</span>
+												 - 
+												{if $sitem['timetype'] == '1'}<span class="label label-default">当天</span>{else /}<span class="label label-info">第二天</span>{/if}
+												<span>{$sitem['timeend']}</span>
+											</div>
+										</td>
+										<td>
+											<div>
+												{foreach $sitem['artists'] as $art}
+													<span class="btn btn-default btn-sm not-allow m-b-5">{$art['artistname']}</span>
+												{/foreach}
+											</div>
+										</td>
+										<td>
+											<a href="javascript:;" class="btn btn-primary btn-xs btn-edit" data-id="{$sitem['id']}"><i class="mdi mdi-pencil"></i></a>
+											<a href="javascript:;" class="btn btn-danger btn-xs btn-del" data-id="{$sitem['id']}"><i class="mdi mdi-delete"></i></a>
+										</td>
+									</tr>
+								{/foreach}
+							</tbody>
+							<tfoot>
+								<tr>
+									<td colspan="4" style="text-align: left">
+										<a class="btn btn-primary btn-xs btn-addsongtime" href="javascript:;"> <i class="mdi mdi-plus"></i>&nbsp;<span>添加时间段</span></a>
+										<div class="help-block">注意:所有时间段不准许存在重叠情况</div>
+									</td>
+								</tr>
+							</tfoot>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="highconfig-item hidden">
+	        <div class="form-group">
+				<label class="col-lg-2 control-label">* 点赞功能</label>
+				<div class="col-lg-2">
+					{:tpl_switch('zanconfig[open]',$config['zanconfig']['open']??'2','openzan')}
+				</div>
+			</div>
+			<div class="zanopenBox{if !isset($config['zanconfig']['open']) || $config['zanconfig']['open']=='2'} hidden{/if}">
+			  <div class="form-group">
+				<label class="col-lg-2 control-label">* 显示赞数目</label>
+				<div class="col-lg-2">
+					{:tpl_switch('zanconfig[shownum]',$config['zanconfig']['shownum']??'1')}
+					<div class="help-block">关闭则不显示赞具体的数值，当总赞数量超10000会自动转成1万+</div>
+				</div>
+			  </div>
+			  <div class="form-group">
+					<label class="col-lg-2 control-label">* 基础赞数</label>
+					<div class="col-lg-4">
+						<input type="text" class="form-control numberincdec" name="zanconfig[basicnum]" value="{$config['zanconfig']['basicnum']??0}"
+		                data-bts-min="0" data-bts-replacement-val="0"
+		                data-bts-max="null"
+		                data-bts-step="1"
+		                data-bts-postfix="个"
+		                data-bts-postfix-extra-class="touchspin-postfix"
+		                >
+	                	<span class="zam-help-block">注:必须是个大于等于0的整数</span>
+					</div>
+			  </div>
+			  <div class="form-group">
+					<label class="col-lg-2 control-label">* 点赞一次增加多少赞</label>
+					<div class="col-lg-4">
+						<input type="text" class="form-control numberincdec" name="zanconfig[clickadd]" value="{$config['zanconfig']['clickadd']??1}"
+		                data-bts-min="1" data-bts-replacement-val="1"
+		                data-bts-max="null"
+		                data-bts-step="1"
+		                >
+	                	<span class="zam-help-block">注:必须是个大于等于1的整数</span>
+					</div>
+			  </div>
+			  <div class="form-group">
+					<label class="col-lg-2 control-label text-right">赞效果图</label>
+					<div class="col-lg-8">
+					  {:tpl_image_multi('zanconfig[zanimgs]',$config['zanconfig']['zanimgs']??[])}
+					  <span class="help-block">规格:60*60px 此处上传的图片必须统一相同的尺寸否则将会有图片变形的风险</span>
+					</div>
+			  </div>
+			</div>
+		</div>
+    </div>
+    {include file='$Wpath/common/configsavepanel'}
+</form>
+<script id='addvideobg-tpl' type="text/template">
+<div class="bpbgone">
+	<img src="<% d.filepreimg %>" />
+	 <div class="delitembgbox"><i class="mdi mdi-delete delonebg" onclick="javascript:$(this).parent().parent().remove();"></i></div> 
+	 <%# if(d.type=='2'){ %><i class="mxc-video_light playicon" onclick="prevvideo(this);" data-filesrc="<% d.filesrc %>"></i><%# } %>
+	 <input type="hidden" name="<%# if(d.type=='2'){ %>bgvideos[]<%# }else{ %>bgimgs[]<%# } %>" value="<% d.filepath %>"> 
+</div>
+</script>
+<script id='bptimeitem-tpl' type="text/template">
+<tr>
+<td>
+<div class="touchspin">
+    <input type="text" class="form-control numberincdec" name="bpconfig[bpseconds][]" 
+    data-bts-min="1" data-bts-replacement-val="1"
+    data-bts-max="null"
+    data-bts-step="1"
+    data-bts-postfix="秒"
+    data-bts-postfix-extra-class="touchspin-postfix"
+    value="10" placeholder="霸屏时间">
+</div>
+</td>
+<td>
+<div class="touchspin">
+	<input type="text" class="form-control numberincdec" name="bpconfig[bpprice][]" 
+    data-bts-min="0.01" data-bts-replacement-val="0.01"
+    data-bts-max="null"
+    data-bts-decimals="2"
+    data-bts-step="1"
+    data-bts-force-step-divisibility="xstwo"
+    data-bts-postfix="元"
+    data-bts-postfix-extra-class="touchspin-postfix"
+    value="1" placeholder="价格，最低是0.01">
+</div>
+</td>
+<td>
+<div class="input-group ">
+		<div class="input-group-btn not-allow"><a class="btn btn-default">最多可上传</a></div>
+    <div class="touchspin">
+    <input type="text" class="form-control numberincdec" name="bpconfig[imgnum][]" 
+    data-bts-min="1" data-bts-replacement-val="1"
+    data-bts-max="null"
+    data-bts-step="1"
+    data-bts-postfix="张图片"
+    data-bts-postfix-extra-class="touchspin-postfix"
+    value="1" placeholder="最多可上传多少张图">
+</div>
+</div>
+</td>
+<td class="text-center">
+	<a href="javascript:;"  class="btn btn-danger btn-sm" onclick="javascript:$(this).parent().parent().remove()"><i class="mdi mdi-delete"></i></a>
+</td>
+</tr>
+</script>
+<script id='bpthemeitem-tpl' type="text/template">
+<tr>
+	<td class="hidden"><% d.id %></td>
+	<td>
+	 <span><% d.displayorder %></span>
+	</td>
+	<td data-id="<% d.id %>">
+	 <label class="lyear-switch switch-primary normal-swith switch-solid" style="height:38px">
+        <input type="checkbox" <%# if(d.isshow=='1'){ %>checked="checked"<%# } %> >
+        <input type="hidden" name="" value="<% d.isshow %>">
+        <span data-status="<% d.isshow %>" data-func="bpthemechange" class="normal-span has-func" data-ajax=""></span>
+     </label>
+	</td>
+	<td>
+	 <span><% d.bpname %></span>
+	</td>
+	<td>
+	   <span><img src="<% d.bpicon %>" /></span>
+	</td>
+	<td>
+	   <span><img src="<% d.bpappicon %>" /></span>
+	</td>
+	<td>
+	   <span><img src="<% d.bppcicon %>" /></span>
+	</td>
+	<td>
+	  <a href="javascript:;" class="btn btn-primary btn-xs btn-edit" data-id="<% d.id %>"><i class="mdi mdi-pencil"></i></a>
+	  <a href="javascript:;" class="btn btn-danger btn-xs btn-del" data-id="<% d.id %>"><i class="mdi mdi-delete"></i></a>
+	</td>
+</tr>
+</script>
+<script id='artistgroup-tpl' type="text/template">
+<tr>
+	<td class="hidden"><% d.id %></td>
+	<td class="text-center" style="border-right-color:transparent"><% d.displayorder %></td>
+    <td class="text-center" style="border-right-color:transparent">
+        <% d.groupname %>
+    </td>
+    <td class="text-center">
+        <a class="btn btn-xs btn-primary btn-xs btn-edit" data-id="<% d.id %>" href="javascript:void(0)"> <i class="mdi mdi-pencil"></i> </a>
+        <a class="btn btn-xs btn-danger btn-xs btn-del" data-id="<% d.id %>" href="javascript:void(0)"> <i class="mdi mdi-delete"></i> </a>
+    </td>
+</tr>
+</script>
+<script id='artist-tpl' type="text/template">
+<tr>
+    <td class="hidden"><% d.id %></td>
+	<td>
+	 <span><% d.displayorder %></span>
+	</td>
+	<td data-id="<% d.id %>">
+	 <label class="lyear-switch switch-primary normal-swith switch-solid" style="height:38px">
+        <input type="checkbox" <%# if(d.isshow=='1'){ %>checked="checked"<%# } %> >
+        <input type="hidden" name="" value="<% d.isshow %>">
+        <span data-status="<% d.isshow %>" data-func="artistchange" class="normal-span has-func" data-ajax=""></span>
+     </label>
+	</td>
+    <td class="text-center">
+       <div>
+       		<img src="<% d.artistavatar %>"/>
+         	<p><% d.artistname %></p>
+			<div>id:<% d.id %></div>
+       </div>
+    </td>
+    <td class="text-center">
+    	<% d.artisttypename %>
+    </td>
+    <td class="text-center">
+    	<%# if(d.artisttype=='0'){ %>
+    		-
+    	<%# }else{ %>
+	       <div class="">
+	       		<img src="<% d.binduser.avatar %>"/>
+	         	<p><% d.binduser.nickname %></p>
+	       </div>
+	    <%# } %>
+    </td>
+    <td class="text-center">
+    	<%# if(d.artisttype=='0'){ %>
+    		-
+    	<%# }else{ %>
+    	<div>打赏分成:<% d.dsfcb %>%</div>
+    	<div>点歌分成:<% d.songfcb %>%</div>
+    	<%# } %>
+    </td>
+    <td class="text-center">
+        <a href="javascript:;" class="btn btn-primary btn-xs btn-edit" data-id="<% d.id %>"><i class="mdi mdi-pencil"></i></a>
+	    <a href="javascript:;" class="btn btn-danger btn-xs btn-del" data-id="<% d.id %>"><i class="mdi mdi-delete"></i></a>
+    </td>
+</tr>
+</script>
+<script id='dsgift-tpl' type="text/template">
+<tr>
+	<td class="hidden"><% d.id %></td>
+	<td>
+	 <span><% d.displayorder %></span>
+	</td>
+	<td data-id="<% d.id %>">
+	 <label class="lyear-switch switch-primary normal-swith switch-solid" style="height:38px">
+        <input type="checkbox" <%# if(d.isshow=='1'){ %>checked="checked"<%# } %> >
+        <input type="hidden" name="" value="<% d.isshow %>">
+        <span data-status="<% d.isshow %>" data-func="dsgiftchange" class="normal-span has-func" data-ajax=""></span>
+     </label>
+	</td>
+	<td>
+	 <span><% d.giftname %></span>
+	</td>
+	<td>
+	   <span><img src="<% d.giftimg %>" /></span>
+	</td>
+	<td>
+	  <span><% d.giftprice %>元</span>
+	</td>
+	<td>
+	  <span><% d.bptime %>秒</span>
+	</td>
+	<td>
+	  <a href="javascript:;" class="btn btn-primary btn-xs btn-edit" data-id="<% d.id %>"><i class="mdi mdi-pencil"></i></a>
+	  <a href="javascript:;" class="btn btn-danger btn-xs btn-del" data-id="<% d.id %>"><i class="mdi mdi-delete"></i></a>
+	</td>
+</tr>
+</script>
+<script id='song-tpl' type="text/template">
+<tr>
+	<td class="hidden"><% d.id %></td>
+	<td>
+	 <span><% d.displayorder %></span>
+	</td>
+	<td data-id="<% d.id %>">
+	 <label class="lyear-switch switch-primary normal-swith switch-solid" style="height:38px">
+        <input type="checkbox" <%# if(d.isshow=='1'){ %>checked="checked"<%# } %> >
+        <input type="hidden" name="" value="<% d.isshow %>">
+        <span data-status="<% d.isshow %>" data-func="songchange" class="normal-span has-func" data-ajax=""></span>
+     </label>
+	</td>
+	<td>
+	  <span><% d.artistname %></span>
+	</td>
+	<td>
+	 <span><% d.songname %></span>
+	 /
+	 <span><% d.singer %></span>
+	</td>
+	<td>
+	  <span><% d.songprice %>元</span>
+	  /
+	  <span><% d.bptime %>秒</span>
+	</td>
+	<td>
+	  <a href="javascript:;" class="btn btn-primary btn-xs btn-edit" data-id="<% d.id %>"><i class="mdi mdi-pencil"></i></a>
+	  <a href="javascript:;" class="btn btn-danger btn-xs btn-del" data-id="<% d.id %>"><i class="mdi mdi-delete"></i></a>
+	</td>
+</tr>
+</script>
+<script id='songtime-tpl' type="text/template">
+<tr>
+	<td>
+		<span><% d.timename %></span>
+	</td>
+	<td>
+		<div>
+			<span><% d.timestart %></span>
+			 - 
+			<%# if(d.timetype=='1'){ %>
+			<span class="label label-default">当天</span>
+			<%# }else{ %>
+			<span class="label label-info">第二天</span>		
+			<%# } %>
+			<span><% d.timeend %></span>
+		</div>
+	</td>
+	<td>
+		<div>
+			<%#  $.each(d.artists, function(index, item){ %>
+				<span class="btn btn-default btn-sm not-allow m-b-5"><% item.artistname %></span>
+			<%#  }); %>
+		</div>
+	</td>
+	<td>
+		<a href="javascript:;" class="btn btn-primary btn-xs btn-edit" data-id="<% d.id %>"><i class="mdi mdi-pencil"></i></a>
+		<a href="javascript:;" class="btn btn-danger btn-xs btn-del" data-id="<% d.id %>"><i class="mdi mdi-delete"></i></a>
+	</td>
+</tr>
+</script>
+<script>
+require(['webcore','jconfirmBox','zamnotice','layerBox','bootstrap-datetimepicker','zvalidator','tablesorter','jquery.ui'],function(webcore,jconfirmBox,zamnotice,layerBox){
+	$(".datetimepicker").datetimepicker({
+		format: 'HH:mm',
+        useCurrent: true,
+        collapse: true,
+        tooltips: {
+            today: 'Go to today',
+            clear: 'Clear selection',
+            close: 'Close the picker',
+            selectMonth: 'Select Month',
+            prevMonth: 'Previous Month',
+            nextMonth: 'Next Month',
+            selectYear: 'Select Year',
+            prevYear: 'Previous Year',
+            nextYear: 'Next Year',
+            selectDecade: 'Select Decade',
+            prevDecade: 'Previous Decade',
+            nextDecade: 'Next Decade',
+            prevCentury: 'Previous Century',
+            nextCentury: 'Next Century',
+            pickHour: 'Pick Hour',
+            incrementHour: 'Increment Hour',
+            decrementHour: 'Decrement Hour',
+            pickMinute: 'Pick Minute',
+            incrementMinute: 'Increment Minute',
+            decrementMinute: 'Decrement Minute',
+            pickSecond: 'Pick Second',
+            incrementSecond: 'Increment Second',
+            decrementSecond: 'Decrement Second',
+            togglePeriod: 'Toggle Period',
+            selectTime: 'Select Time'
+        },
+        showTodayButton: false,
+        showClear: false,
+        showClose: false,
+        ignoreReadonly: true,
+    });
+	$("#bpthemetable").tablesorter({sortList:[[1,1], [0,0]],headers:{2:{sorter:false},3:{sorter:false},4:{sorter:false},5:{sorter:false},6:{sorter:false},7:{sorter:false},8:{sorter:false}}});
+	$("#artistgroup").tablesorter({sortList:[[1,1], [0,0]],headers:{2:{sorter:false},3:{sorter:false}}});
+	$("#artisttable").tablesorter({sortList:[[1,1], [0,0]],headers:{2:{sorter:false},3:{sorter:false},4:{sorter:false},5:{sorter:false},6:{sorter:false},7:{sorter:false}}});
+	$("#dsgifttable").tablesorter({sortList:[[1,1], [0,0]],headers:{2:{sorter:false},3:{sorter:false},4:{sorter:false},5:{sorter:false},6:{sorter:false},7:{sorter:false}}});
+	$("#songtable").tablesorter({sortList:[[1,1], [0,0]],headers:{2:{sorter:false},3:{sorter:false},4:{sorter:false},5:{sorter:false},6:{sorter:false}}});
+	$('.appwidgets-lists').sortable({handle: ".btn-moveitem"}).disableSelection();
+	$("#screenconfigbox .zam-inner-highconfig-btns a.btn").click(function(){
+		localStorage.setItem("bpconfigindex{$hdid}",$(this).index());
+        $(this).addClass('btn-primary').siblings().removeClass("btn-primary");
+        $("#screenconfigbox .highconfig-item").addClass('hidden').eq($(this).index()).removeClass('hidden');
+        if($(this).index()==1){
+        	$(".wechatconfig").removeClass('hidden');
+        }else{
+        	$(".wechatconfig").addClass('hidden');
+        }
+    });
+    var storageindex = localStorage.getItem("bpconfigindex{$hdid}");
+	if (storageindex != null && storageindex != 'null') {
+		$("#screenconfigbox .zam-inner-highconfig-btns a.btn").eq(storageindex).trigger('click');
+	}else{
+		$("#screenconfigbox .zam-inner-highconfig-btns a.btn").eq(0).trigger('click');
+	}
+    $('#formBox').formValidation({
+        framework: 'bootstrap',
+        excluded: [':disabled'],
+        message: '您填写的内容无效',
+        fields: {}
+    }).on('success.form.fv', function(e) {
+        e.preventDefault();
+        var $form = $(e.target);
+        var postData = webcore.serializeObject($form);
+        var bload = $form.find(".zam-fixedbottom button").lyearloading({opacity: 0.2,spinnerSize: 'nm'});
+        $form.formValidation('disableSubmitButtons', true);
+        webcore.ajaxSubmit("{:gohdmanage('configbaping/index',['hdid'=>$hdid])}",postData).then(function(json){
+            bload.hide();
+            if(json.code==0){
+                $form.formValidation('disableSubmitButtons', false);
+                zamnotice.showTips('success','保存成功',1e3,function(){
+                    window.location.reload();
+                });
+            }else{
+                zamnotice.showTips('error',json.msg);
+                $form.formValidation('disableSubmitButtons', false);
+            }
+        }, function(json){
+            bload.hide();
+            zamnotice.showTips('error','网络差，操作失败');
+            $form.formValidation('disableSubmitButtons', false);
+        });
+    });
+    $(".addnewitem").click(function(){
+    	$(".bptime-lists").append(webcore.tpl($("#bptimeitem-tpl"),{}));
+    	$(".numberincdec").TouchSpin().on("change", function(){
+	        var $this = $(this),funcstr = $this.data('func');
+	        var func = window[funcstr];
+	        func && func(this);
+	    });
+    });
+    $(".addzhutiitem").click(function(){
+    	var $this = $(this),confirmobj = jconfirmBox.ajaxconfirm("新增主题","{:gohdmanage('configbaping/editbptheme',['hdid'=>$hdid])}",{},'html','col-lg-8 col-lg-offset-2',function(e){
+			var formdata = webcore.serializeObject(e.find('form')),postData = {
+				ishtml:'2',
+				data:formdata,
+			};
+			webcore.ajaxSubmit("{:gohdmanage('configbaping/editbptheme',['hdid'=>$hdid])}",postData,'').then(function(json){
+				if(json.code==0){
+					zamnotice.showTips('success','新增成功');
+					$(".bptheme-lists").append(webcore.tpl($("#bpthemeitem-tpl"),json.msg));
+					$('#bpthemetable').trigger('update', [true,function(){
+						tpl_switch();
+					}]);
+					confirmobj.close();
+				}else{
+					zamnotice.showTips('error',json.msg);
+				}
+			}, function(json){
+				zamnotice.showTips('error','网络差。操作失败.');
+			});
+		});
+    });
+    $(".addsyszhuti").on('click',function(){
+			var $this = $(this),confirmobj = jconfirmBox.ajaxconfirm("选取系统主题","{:gohdmanage('configbaping/editsysbptheme',['hdid'=>$hdid])}",{},'html','col-lg-6 col-lg-offset-3',function(e){
+				var selectzhuti = e.find("input:checked");
+				var selzhutiid = [];
+				if(selectzhuti){
+					selectzhuti.each(function(){
+						selzhutiid.push($(this).attr("data-id"));
+					});
+				}else{
+					zamnotice.showTips('error','请选择主题');
+					return false;
+				}
+				if(selzhutiid.length <= 0){
+					zamnotice.showTips('error','请选择主题');
+					return false;
+				}
+				if(selzhutiid.length > 5){
+					zamnotice.showTips('error','每次最多只能选择5个主题');
+					return false;
+				}
+				webcore.ajaxSubmit("{:gohdmanage('configbaping/editsysbptheme',['hdid'=>$hdid])}",{themeids:selzhutiid},'').then(function(json){
+					if(json.code==0){
+						$.each(json.msg,function(i,v){
+							$(".bptheme-lists").append(webcore.tpl($("#bpthemeitem-tpl"),v));
+						});
+						zamnotice.showTips('success','新增成功');
+						confirmobj.close();
+					}else{
+						zamnotice.showTips('error',json.msg);
+					}
+				}, function(json){
+					zamnotice.showTips('error','网络差。操作失败.');
+				});
+			});
+	});
+    $(".bptheme-lists").on('click','.btn-del',function(){
+    	var $this = $(this),themeid = $this.attr('data-id');
+		jconfirmBox.confirm('温馨提示','删除将无法恢复，您确定要删除么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('configbaping/delbptheme',['hdid'=>$hdid])}",{themeid:themeid}).then(function(json){
+                    if(json.code==0){
+                    	$this.parent().parent().remove();
+                        zamnotice.showTips('success','删除成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差。操作失败');
+                });
+        });
+    });
+    $(".bptheme-lists").on('click','.btn-edit',function(){
+    	var $this = $(this),themeid = $this.attr('data-id'),confirmobj = jconfirmBox.ajaxconfirm("编辑主题","{:gohdmanage('configbaping/editbptheme',['hdid'=>$hdid])}",{themeid:themeid},'html','col-lg-8 col-lg-offset-2',function(e){
+			var formdata = webcore.serializeObject(e.find('form')),postData = {
+				ishtml:'2',
+				data:formdata,
+			};
+			postData.themeid = themeid;
+			webcore.ajaxSubmit("{:gohdmanage('configbaping/editbptheme',['hdid'=>$hdid])}",postData,'').then(function(json){
+				if(json.code==0){
+					zamnotice.showTips('success','修改成功');
+					$this.parent().parent().html($(webcore.tpl($("#bpthemeitem-tpl"),json.msg)).html());
+					$('#bpthemetable').trigger('update', [true,function(){
+						tpl_switch();
+					}]);
+					confirmobj.close();
+				}else{
+					zamnotice.showTips('error',json.msg);
+				}
+			}, function(json){
+				zamnotice.showTips('error','网络差。操作失败.');
+			});
+		});
+    });
+    $('.prevattach').click(function(){
+    	var obj = $(this);
+    	prevshowattachs(JSON.parse($(obj).attr('data-files')),$(obj).attr('data-type')||'1');
+    });
+    $(".card-totalitems span").click(function(){
+        var $this = $(this),zd = $this.attr('data-zd'),iconname = $this.text();
+        if($this.hasClass('disabled')) return false;
+        var zdinfo = {
+            isdiy:zd=='diy'?'1':'2',
+            iconfield:zd=='diy'?webcore.random(8,1,1):zd,
+            iconname:iconname,
+            iconimg:$this.attr('data-iconimg')||'',
+            iconimgsrc:'/'+$this.attr('data-iconimg')||'',
+            iconurl:zd=='diy'?'':"系统内置",
+        };
+        $(".appwidgets-lists").append(webcore.tpl($("#addappwidget"),zdinfo));
+        if(zd!='diy') $this.addClass('disabled');
+    });
+    //删除微信菜單組件
+    $(".appwidgets-lists").on('click','.btn-delshowitem',function(){
+        var pnode = $(this).parents('tr'),zd = pnode.find('input').eq(0).val();
+        $(".card-totalitems span").filter(function(o, i) {
+            return $(i).attr("data-zd")==zd;
+        }).removeClass('disabled');
+        pnode.remove();
+    });
+	{/*艺人分组*/}
+    $(".btn-addartistgroup").click(function(){
+    	var $this = $(this),confirmobj = jconfirmBox.ajaxconfirm("新增分组","{:gohdmanage('configbaping/editartistgroup',['hdid'=>$hdid])}",{},'html','col-lg-8 col-lg-offset-2',function(e){
+			var formdata = webcore.serializeObject(e.find('form')),postData = {
+				ishtml:'2',
+				data:formdata,
+			};
+			webcore.ajaxSubmit("{:gohdmanage('configbaping/editartistgroup',['hdid'=>$hdid])}",postData,'').then(function(json){
+				if(json.code==0){
+					zamnotice.showTips('success','新增成功');
+					$(".artistgroup-lists").append(webcore.tpl($("#artistgroup-tpl"),json.msg));
+					confirmobj.close();
+					$(".artistgroup-lists tr:last-child").trigger('click');
+					$('#artistgroup').trigger('update', [true,function(){}]);
+				}else{
+					zamnotice.showTips('error',json.msg);
+				}
+			}, function(json){
+				zamnotice.showTips('error','网络差。操作失败.');
+			});
+		});
+    });
+    $(".artistgroup-lists").on('click','.btn-edit',function(e){
+    	e.stopPropagation();
+    	var $this = $(this),groupid = $this.attr('data-id'),confirmobj = jconfirmBox.ajaxconfirm("编辑分组","{:gohdmanage('configbaping/editartistgroup',['hdid'=>$hdid])}",{groupid:groupid},'html','col-lg-8 col-lg-offset-2',function(e){
+			var formdata = webcore.serializeObject(e.find('form')),postData = {
+				ishtml:'2',
+				data:formdata,
+			};
+			postData.groupid = groupid;
+			webcore.ajaxSubmit("{:gohdmanage('configbaping/editartistgroup',['hdid'=>$hdid])}",postData,'').then(function(json){
+				if(json.code==0){
+					zamnotice.showTips('success','修改成功');
+					$this.parent().parent().html($(webcore.tpl($("#artistgroup-tpl"),json.msg)).html());
+					confirmobj.close();
+					$('#artistgroup').trigger('update', [true,function(){}]);
+				}else{
+					zamnotice.showTips('error',json.msg);
+				}
+			}, function(json){
+				zamnotice.showTips('error','网络差。操作失败.');
+			});
+		});
+    });
+    $(".artistgroup-lists").on('click','.btn-del',function(e){
+    	e.stopPropagation();
+    	var $this = $(this),groupid = $this.attr('data-id');
+		jconfirmBox.confirm('温馨提示','删除将无法恢复，您确定要删除么？',function(){
+            webcore.ajaxSubmit("{:gohdmanage('configbaping/delartistgroup',['hdid'=>$hdid])}",{groupid:groupid}).then(function(json){
+                if(json.code==0){
+                	$this.parent().parent().remove();
+                    zamnotice.showTips('success','删除成功');
+                    if($(".artistgroup-lists tr").length >0) {
+                    	$(".artistgroup-lists tr").eq(0).trigger('click');
+                    }else{
+                    	$(".artist-lists").html('');
+                    }
+                }else{
+                    zamnotice.showTips('error',json.msg);
+                }
+            }, function(json){
+                zamnotice.showTips('error','网络差。操作失败');
+            });
+        });
+    });
+    $(".artistgroup-lists").on('click','tr',function(){
+    	//加载对应的分组艺人
+    	var $this = $(this);
+    	if($this.hasClass('active')) return false;
+    	$(".artistgroup-lists tr").removeClass('active');
+    	$this.addClass('active');
+    	webcore.ajaxSubmit("{:gohdmanage('configbaping/ajaxgroupartist',['hdid'=>$hdid])}",{groupid:$(".artistgroup-lists tr.active").find('a').attr('data-id')}).then(function(json){
+            if(json.code==0){
+            	var html = '';
+            	$.each(json.msg,function(i,v){
+            		html += webcore.tpl($("#artist-tpl"),v);
+            	});
+            	$(".artist-lists").html(html);
+            	tpl_switch();
+            }else{
+                zamnotice.showTips('error',json.msg);
+            }
+        }, function(json){
+            zamnotice.showTips('error','网络差。操作失败');
+        });
+    });
+    if($(".artistgroup-lists tr").length >0) $(".artistgroup-lists tr").eq(0).trigger('click');
+	{/*艺人*/}
+    $(".btn-addartist").click(function(){
+    	if($(".artistgroup-lists tr").length==0) return zamnotice.showTips('error','请先添加分组');
+    	var activegroup = $(".artistgroup-lists tr.active");
+    	if(activegroup.length==0) return zamnotice.showTips('error','请先选择分组');
+    	var $this = $(this),confirmobj = jconfirmBox.ajaxconfirm("新增艺人","{:gohdmanage('configbaping/editartist',['hdid'=>$hdid])}",{},'html','col-lg-8 col-lg-offset-2',function(e){
+			var formdata = webcore.serializeObject(e.find('form'));
+			formdata.ishtml = '2';
+			formdata.groupid = activegroup.find('a').attr('data-id');
+			webcore.ajaxSubmit("{:gohdmanage('configbaping/editartist',['hdid'=>$hdid])}",formdata,'').then(function(json){
+				if(json.code==0){
+					zamnotice.showTips('success','新增成功');
+					$(".artist-lists").append(webcore.tpl($("#artist-tpl"),json.msg));
+					confirmobj.close();
+					$('#artisttable').trigger('update', [true,function(){
+						tpl_switch();
+					}]);
+				}else{
+					zamnotice.showTips('error',json.msg);
+				}
+			}, function(json){
+				zamnotice.showTips('error','网络差。操作失败.');
+			});
+		});
+    });
+    $(".artist-lists").on('click','.btn-edit',function(){
+    	var $this = $(this),artid = $this.attr('data-id'),confirmobj = jconfirmBox.ajaxconfirm("编辑艺人信息","{:gohdmanage('configbaping/editartist',['hdid'=>$hdid])}",{artid:artid},'html','col-lg-8 col-lg-offset-2',function(e){
+			var formdata = webcore.serializeObject(e.find('form'));
+			formdata.ishtml = '2';
+			formdata.artid = artid;
+			webcore.ajaxSubmit("{:gohdmanage('configbaping/editartist',['hdid'=>$hdid])}",formdata,'').then(function(json){
+				if(json.code==0){
+					zamnotice.showTips('success','修改成功');
+					$this.parent().parent().html($(webcore.tpl($("#artist-tpl"),json.msg)).html());
+					confirmobj.close();
+					$('#artisttable').trigger('update', [true,function(){
+						tpl_switch();
+					}]);
+				}else{
+					zamnotice.showTips('error',json.msg);
+				}
+			}, function(json){
+				zamnotice.showTips('error','网络差。操作失败.');
+			});
+		});
+    });
+    $(".artist-lists").on('click','.btn-del',function(){
+    	var $this = $(this),artid = $this.attr('data-id');
+		jconfirmBox.confirm('温馨提示','删除将无法恢复，您确定要删除么？',function(){
+            webcore.ajaxSubmit("{:gohdmanage('configbaping/delartist',['hdid'=>$hdid])}",{artid:artid}).then(function(json){
+                if(json.code==0){
+                	$this.parent().parent().remove();
+                    zamnotice.showTips('success','删除成功');
+                }else{
+                    zamnotice.showTips('error',json.msg);
+                }
+            }, function(json){
+                zamnotice.showTips('error','网络差。操作失败');
+            });
+        });
+    });
+	{/*打赏礼物*/}
+    $(".adddsgift").click(function(){
+    	var $this = $(this),confirmobj = jconfirmBox.ajaxconfirm("新增礼物","{:gohdmanage('configbaping/editdsgift',['hdid'=>$hdid])}",{},'html','col-lg-8 col-lg-offset-2',function(e){
+			var formdata = webcore.serializeObject(e.find('form')),postData = {
+				ishtml:'2',
+				data:formdata,
+			};
+			webcore.ajaxSubmit("{:gohdmanage('configbaping/editdsgift',['hdid'=>$hdid])}",postData,'').then(function(json){
+				if(json.code==0){
+					zamnotice.showTips('success','新增成功');
+					$(".dsgift-lists").append(webcore.tpl($("#dsgift-tpl"),json.msg));
+					confirmobj.close();
+					$('#dsgifttable').trigger('update', [true,function(){
+						tpl_switch();
+					}]);
+				}else{
+					zamnotice.showTips('error',json.msg);
+				}
+			}, function(json){
+				zamnotice.showTips('error','网络差。操作失败.');
+			});
+		});
+    });
+    $(".dsgift-lists").on('click','.btn-edit',function(){
+    	var $this = $(this),giftid = $this.attr('data-id'),confirmobj = jconfirmBox.ajaxconfirm("编辑礼物信息","{:gohdmanage('configbaping/editdsgift',['hdid'=>$hdid])}",{giftid:giftid},'html','col-lg-8 col-lg-offset-2',function(e){
+			var formdata = webcore.serializeObject(e.find('form')),postData = {
+				ishtml:'2',
+				data:formdata,
+			};
+			postData.giftid = giftid;
+			webcore.ajaxSubmit("{:gohdmanage('configbaping/editdsgift',['hdid'=>$hdid])}",postData,'').then(function(json){
+				if(json.code==0){
+					zamnotice.showTips('success','修改成功');
+					$this.parent().parent().html($(webcore.tpl($("#dsgift-tpl"),json.msg)).html());
+					confirmobj.close();
+					$('#dsgifttable').trigger('update', [true,function(){
+						tpl_switch();
+					}]);
+				}else{
+					zamnotice.showTips('error',json.msg);
+				}
+			}, function(json){
+				zamnotice.showTips('error','网络差。操作失败.');
+			});
+		});
+    });
+    $(".dsgift-lists").on('click','.btn-del',function(e){
+    	var $this = $(this),giftid = $this.attr('data-id');
+		jconfirmBox.confirm('温馨提示','删除将无法恢复，您确定要删除么？',function(){
+            webcore.ajaxSubmit("{:gohdmanage('configbaping/deldsgift',['hdid'=>$hdid])}",{giftid:giftid}).then(function(json){
+                if(json.code==0){
+                	$this.parent().parent().remove();
+                    zamnotice.showTips('success','删除成功');
+                }else{
+                    zamnotice.showTips('error',json.msg);
+                }
+            }, function(json){
+                zamnotice.showTips('error','网络差。操作失败');
+            });
+        });
+    });
+    $(".addsysdsgift").on('click',function(){
+			var $this = $(this),confirmobj = jconfirmBox.ajaxconfirm("选取系统打赏礼物","{:gohdmanage('configbaping/editsysdsgift',['hdid'=>$hdid])}",{},'html','col-lg-6 col-lg-offset-3',function(e){
+				var selectgift = e.find("input:checked");
+				var giftids = [];
+				if(selectgift){
+					selectgift.each(function(){
+						giftids.push($(this).attr("data-id"));
+					});
+				}else{
+					zamnotice.showTips('error','请选择礼物');
+					return false;
+				}
+				if(giftids.length<=0){
+					zamnotice.showTips('error','请选择礼物');
+					return false;
+				}
+				webcore.ajaxSubmit("{:gohdmanage('configbaping/editsysdsgift',['hdid'=>$hdid])}",{giftids:giftids},'').then(function(json){
+					if(json.code==0){
+						$.each(json.msg,function(i,v){
+							$(".dsgift-lists").append(webcore.tpl($("#dsgift-tpl"),v));
+						});
+						zamnotice.showTips('success','新增成功');
+						confirmobj.close();
+					}else{
+						zamnotice.showTips('error',json.msg);
+					}
+				}, function(json){
+					zamnotice.showTips('error','网络差。操作失败.');
+				});
+			});
+	});
+    {/*歌曲*/}
+    $(".btn-addsong").click(function(){
+    	var $this = $(this),confirmobj = jconfirmBox.ajaxconfirm("新增歌曲","{:gohdmanage('configbaping/editsong',['hdid'=>$hdid])}",{},'html','col-lg-8 col-lg-offset-2',function(e){
+			var formdata = webcore.serializeObject(e.find('form')),postData = {
+				ishtml:'2',
+				data:formdata,
+			};
+			webcore.ajaxSubmit("{:gohdmanage('configbaping/editsong',['hdid'=>$hdid])}",postData,'').then(function(json){
+				if(json.code==0){
+					zamnotice.showTips('success','新增成功');
+					$(".song-lists").append(webcore.tpl($("#song-tpl"),json.msg));
+					confirmobj.close();
+					$('#songtable').trigger('update', [true,function(){
+						tpl_switch();
+					}]);
+				}else{
+					zamnotice.showTips('error',json.msg);
+				}
+			}, function(json){
+				zamnotice.showTips('error','网络差。操作失败.');
+			});
+		});
+    });
+	$(".btn-importsong").click(function(){
+    	webcore.importxls({title:'导入歌曲信息',url:"{:gohdmanage('configbaping/importsong',['hdid'=>$hdid])}",moban:"/{:SYSIMGURL}excel/bapingsong.xls",uptxt:"点击上传歌曲信息",xlstxt:"注:请务必严格按照模板内容制作xls文件"},function(){
+			window.location.reload();
+		});
+    });
+    $(".song-lists").on('click','.btn-edit',function(){
+    	var $this = $(this),songid = $this.attr('data-id'),confirmobj = jconfirmBox.ajaxconfirm("编辑歌曲信息","{:gohdmanage('configbaping/editsong',['hdid'=>$hdid])}",{songid:songid},'html','col-lg-8 col-lg-offset-2',function(e){
+			var formdata = webcore.serializeObject(e.find('form')),postData = {
+				ishtml:'2',
+				data:formdata,
+			};
+			postData.songid = songid;
+			webcore.ajaxSubmit("{:gohdmanage('configbaping/editsong',['hdid'=>$hdid])}",postData,'').then(function(json){
+				if(json.code==0){
+					zamnotice.showTips('success','修改成功');
+					$this.parent().parent().html($(webcore.tpl($("#song-tpl"),json.msg)).html());
+					confirmobj.close();
+					$('#songtable').trigger('update', [true,function(){
+						tpl_switch();
+					}]);
+				}else{
+					zamnotice.showTips('error',json.msg);
+				}
+			}, function(json){
+				zamnotice.showTips('error','网络差。操作失败.');
+			});
+		});
+    });
+    $(".song-lists").on('click','.btn-del',function(e){
+    	var $this = $(this),songid = $this.attr('data-id');
+		jconfirmBox.confirm('温馨提示','删除将无法恢复，您确定要删除么？',function(){
+            webcore.ajaxSubmit("{:gohdmanage('configbaping/delsong',['hdid'=>$hdid])}",{songid:songid}).then(function(json){
+                if(json.code==0){
+                	$this.parent().parent().remove();
+                    zamnotice.showTips('success','删除成功');
+                }else{
+                    zamnotice.showTips('error',json.msg);
+                }
+            }, function(json){
+                zamnotice.showTips('error','网络差。操作失败');
+            });
+        });
+    });
+	{/*点歌时间段*/}
+    $(".btn-addsongtime").click(function(){
+    	var $this = $(this),confirmobj = jconfirmBox.ajaxconfirm(
+			"新增点歌时间段",
+			"{:gohdmanage('configbaping/editsongtime',['hdid'=>$hdid])}",
+			{},
+			'html',
+			'col-lg-10 col-lg-offset-1',
+			function(e){
+			var formdata = webcore.serializeObject(e.find('form'));
+			formdata.ishtml = '2';
+			webcore.ajaxSubmit("{:gohdmanage('configbaping/editsongtime',['hdid'=>$hdid])}",formdata,'').then(function(json){
+				if(json.code==0){
+					zamnotice.showTips('success','新增成功');
+					$(".songtime-lists").append(webcore.tpl($("#songtime-tpl"),json.msg));
+					confirmobj.close();
+				}else{
+					zamnotice.showTips('error',json.msg);
+				}
+			}, function(json){
+				zamnotice.showTips('error','网络差。操作失败.');
+			});
+		});
+    });
+    $(".songtime-lists").on('click','.btn-edit',function(){
+    	var $this = $(this),timeid = $this.attr('data-id'),confirmobj = jconfirmBox.ajaxconfirm("编辑点歌时间段","{:gohdmanage('configbaping/editsongtime',['hdid'=>$hdid])}",{timeid:timeid},'html','col-lg-10 col-lg-offset-1',function(e){
+			var formdata = webcore.serializeObject(e.find('form'));
+			formdata.ishtml = '2';
+			formdata.timeid = timeid;
+			webcore.ajaxSubmit("{:gohdmanage('configbaping/editsongtime',['hdid'=>$hdid])}",formdata,'').then(function(json){
+				if(json.code==0){
+					zamnotice.showTips('success','修改成功');
+					$this.parent().parent().html($(webcore.tpl($("#songtime-tpl"),json.msg)).html());
+					confirmobj.close();
+				}else{
+					zamnotice.showTips('error',json.msg);
+				}
+			}, function(json){
+				zamnotice.showTips('error','网络差。操作失败.');
+			});
+		});
+    });
+    $(".songtime-lists").on('click','.btn-del',function(e){
+    	var $this = $(this),timeid = $this.attr('data-id');
+		jconfirmBox.confirm('温馨提示','删除将无法恢复，您确定要删除么？',function(){
+            webcore.ajaxSubmit("{:gohdmanage('configbaping/delsongtime',['hdid'=>$hdid])}",{timeid:timeid}).then(function(json){
+                if(json.code==0){
+                	$this.parent().parent().remove();
+                    zamnotice.showTips('success','删除成功');
+                }else{
+                    zamnotice.showTips('error',json.msg);
+                }
+            }, function(json){
+                zamnotice.showTips('error','网络差。操作失败');
+            });
+        });
+    });
+});
+function insertoneimage(previmg,filepath,obj){
+	require(['webcore','zamnotice'],function(webcore,zamnotice){
+		if($(".imgbgboxs .bpbgone").length >= 10) return zamnotice.showTips('info','最多可以设置10个图片');
+		$(".imgbgboxs .adddiybg").before(webcore.tpl($("#addvideobg-tpl"),{type:'1',filepreimg:previmg,filepath:filepath}));
+	});
+}
+function insertonevideo(videopic,filepath,filesrc,obj){
+	require(['webcore','zamnotice'],function(webcore,zamnotice){
+		if($(".videobgboxs .bpbgone").length >= 10) return zamnotice.showTips('info','最多可以设置10个视频');
+		$(".videobgboxs .adddiybg").before(webcore.tpl($("#addvideobg-tpl"),{type:'2',filepreimg:videopic,filepath:filepath,filesrc:filesrc}));
+	});
+}
+function prevvideo(obj){
+	prevshowattachs($(obj).attr('data-filesrc'),'3');
+}
+function opennotice(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".appnoticebox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".appnoticebox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openbp(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".bpopenBox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".bpopenBox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openmanagerfree(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".bpfreetimebox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".bpfreetimebox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function bpthemechange(obj,status,url){
+	var themeid = obj.parent().parent().attr('data-id');
+	require(['webcore','zamnotice'],function(webcore,zamnotice){
+		webcore.ajaxSubmit("{:gohdmanage('configbaping/updatebpthemeshow',['hdid'=>$hdid])}",{themeid:themeid,isshow:(status=='1'?"2":"1")}).then(function(json){
+            if(json.code==0){
+                if(status=='1'){
+			        obj.prev().val('2');
+			        obj.attr('data-status','2');
+			    }else{
+			        obj.prev().val('1');
+			        obj.attr('data-status','1');
+			    }
+			    obj.prev().prev().prop("checked",status=='1'?false:true);
+			    zamnotice.showTips('success','操作成功');
+            }else{
+                zamnotice.showTips('error',json.msg);
+            }
+        }, function(json){
+            zamnotice.showTips('error','网络差。操作失败');
+        });
+    });
+}
+function changeicon(obj){
+	tpl_image_one(obj,function(src,path){
+      	$(obj).attr('src',src);
+      	$(obj).next().val(path);
+    });
+}
+
+function artistchange(obj,status,url){
+	var artid = obj.parent().parent().attr('data-id');
+	require(['webcore','zamnotice'],function(webcore,zamnotice){
+		webcore.ajaxSubmit("{:gohdmanage('configbaping/updatebpartistshow',['hdid'=>$hdid])}",{artid:artid,isshow:(status=='1'?"2":"1")}).then(function(json){
+            if(json.code==0){
+                if(status=='1'){
+			        obj.prev().val('2');
+			        obj.attr('data-status','2');
+			    }else{
+			        obj.prev().val('1');
+			        obj.attr('data-status','1');
+			    }
+			    obj.prev().prev().prop("checked",status=='1'?false:true);
+			    zamnotice.showTips('success','操作成功');
+            }else{
+                zamnotice.showTips('error',json.msg);
+            }
+        }, function(json){
+            zamnotice.showTips('error','网络差。操作失败');
+        });
+    });
+}
+function opends(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".dsopenBox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".dsopenBox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function opendsmanagerfree(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".dsfreetimebox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".dsfreetimebox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function dsgiftchange(obj,status,url){
+	var giftid = obj.parent().parent().attr('data-id');
+	require(['webcore','zamnotice'],function(webcore,zamnotice){
+		webcore.ajaxSubmit("{:gohdmanage('configbaping/updatedsgiftshow',['hdid'=>$hdid])}",{giftid:giftid,isshow:(status=='1'?"2":"1")}).then(function(json){
+            if(json.code==0){
+                if(status=='1'){
+			        obj.prev().val('2');
+			        obj.attr('data-status','2');
+			    }else{
+			        obj.prev().val('1');
+			        obj.attr('data-status','1');
+			    }
+			    obj.prev().prev().prop("checked",status=='1'?false:true);
+			    zamnotice.showTips('success','操作成功');
+            }else{
+                zamnotice.showTips('error',json.msg);
+            }
+        }, function(json){
+            zamnotice.showTips('error','网络差。操作失败');
+        });
+    });
+}
+function openhb(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".hbopenBox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".hbopenBox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function opensong(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".songopenBox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".songopenBox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openzan(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".zanopenBox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".zanopenBox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function opensongmanagerfree(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".songfreetimebox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".songfreetimebox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function songchange(obj,status,url){
+	var songid = obj.parent().parent().attr('data-id');
+	require(['webcore','zamnotice'],function(webcore,zamnotice){
+		webcore.ajaxSubmit("{:gohdmanage('configbaping/updatesongshow',['hdid'=>$hdid])}",{songid:songid,isshow:(status=='1'?"2":"1")}).then(function(json){
+            if(json.code==0){
+                if(status=='1'){
+			        obj.prev().val('2');
+			        obj.attr('data-status','2');
+			    }else{
+			        obj.prev().val('1');
+			        obj.attr('data-status','1');
+			    }
+			    obj.prev().prev().prop("checked",status=='1'?false:true);
+			    zamnotice.showTips('success','操作成功');
+            }else{
+                zamnotice.showTips('error',json.msg);
+            }
+        }, function(json){
+            zamnotice.showTips('error','网络差。操作失败');
+        });
+    });
+}
+function openestoppel(obj,status,url){
+    require(['webcore','zamnotice'],function(webcore,zamnotice){
+        webcore.ajaxSubmit("{:gohdmanage('configbaping/openestoppel',['hdid'=>$hdid])}",{appestoppel:(status=='1'?'2':'1')},'正在执行命令...').then(function(json){
+            if(status=='1'){
+                obj.prev().val('2');
+                obj.attr('data-status','2');
+            }else{
+                obj.prev().val('1');
+                obj.attr('data-status','1');
+            }
+            obj.prev().prev().prop("checked",status=='1'?false:true);
+            zamnotice.showTips('success','操作成功');
+        }, function(json){
+            
+        });
+    });
+}
+function opencanimg(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".canimgbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".canimgbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+</script>
+<script id='addappwidget' type="text/template">
+<tr>
+    <td class="text-center">
+        <input type="hidden" name="appwidget[iconfield][]" value="<% d.iconfield %>">
+        <input type="hidden" name="appwidget[isdiy][]" value="<% d.isdiy %>">
+        <input class="form-control" name="appwidget[iconname][]" value="<% d.iconname %>" readonly />
+    </td>
+    <td class="text-center">
+       <div class="">
+       	<img src="<% d.iconimgsrc %>" onerror="javascript:this.src='/static/images/sys/nopic.jpg';this.title='点击上传图片'" title="点击上传图片" onclick="changeicon(this)"/>
+        <input type="hidden" name="appwidget[iconimg][]" value="<% d.iconimg %>">
+       </div>
+    </td>
+    <td class="text-center">
+       <input class="form-control" type="text" name="appwidget[iconurl][]" value="<%# if(d.isdiy=='1'){ %><% d.iconurl %><%# }else{ %>系统内置<%# } %>" <%# if(d.isdiy=='2'){ %>readonly<%# } %> placeholder="请填写完整的url地址">
+    </td>
+    <td class="text-center">
+        <a class="btn btn-xs btn-primary btn-xs zam-sortable btn-moveitem" href="javascript:void(0)"> <i class="mdi mdi-arrow-all"></i> </a>
+        <a class="btn btn-xs btn-danger btn-xs btn-delshowitem" href="javascript:void(0)"> <i class="mdi mdi-delete"></i> </a>
+    </td>
+</tr>
+</script>
+{include file='$Wpath/common/footer'}

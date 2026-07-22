@@ -1,0 +1,207 @@
+{include file='$Wpath/common/header'}
+<div class="form-inline zam-inline-searchbar">
+    <div class="form-group">
+    <div class="input-group input-group-sm">
+        <span class="input-group-addon">昵称或表单内容</span>
+        <input type="text" class="form-control" value="" id="keyword" placeholder="请输入用户昵称或表单内容">
+    </div>
+    </div>
+    <div class="form-group">
+    <div class="input-group input-group-sm">
+        <span class="input-group-addon">留言内容</span>
+        <input type="text" class="form-control" value="" id="pictxt" placeholder="请输入用户留言内容">
+    </div>
+    </div>
+    <div class="form-group m-l-5">
+    <div class="input-group input-group-sm">
+        <span class="input-group-addon">来源</span>
+        <select id="fromtype" class="form-control js_select2">
+            {foreach $fromtypes as $k => $v } 
+            <option value="{$k}" {if $k == "0"}selected{/if}>{$v}</option>
+            {/foreach}
+        </select>
+        </div>
+    </div>
+    <div class="form-group m-l-5">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">审核状态</span>
+          <select id="photostatus" class="form-control js_select2">
+            {foreach $allstatus as $k => $v } 
+            <option value="{$k}" {if $k == "0"}selected{/if}>{$v}</option>
+            {/foreach}
+          </select>
+        </div>
+    </div>
+    <a class="btn btn-primary btn-sm btn-search" href="javascript:void(0)"><i class="mdi mdi-magnify"></i> 搜索</a>
+    <a class="btn btn-warning btn-sm btn-export" href="javascript:void(0)"><i class="mdi mdi-export"></i> 导出</a>
+</div>
+{include file='$Wpath/common/tabletoolbar'}
+<table id="listtable" class="zam-btable"></table>
+<script>
+require(['webcore','webtable','jconfirmBox','zamnotice'],function(webcore,webtable,jconfirmBox,zamnotice){
+var initConfig = {
+    tableId:'#listtable',
+    url:"{:gohdmanage('dataphotowall/index',['hdid'=>$hdid])}",
+    columnoperate:{
+        btns:{
+            shenhe:{title:"审核",icon:"mdi-gavel",'except':{'only':'2'}},
+            del:true,
+        },
+        func:{
+            
+            del:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','删除将无法恢复，您确定要删除当前照片么？',function(){
+                    webcore.ajaxSubmit("{:gohdmanage('dataphotowall/del',['hdid'=>$hdid])}",{photoid:row.id}).then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','删除成功');
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                    });
+                });
+            },
+            shenhe:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','您确定要审核通过当前照片么？',function(){
+                    webcore.ajaxSubmit("{:gohdmanage('dataphotowall/shenhe',['hdid'=>$hdid])}",{photoid:row.id}).then(function(json){
+                        webtable.refresh();
+                        zamnotice.showTips('success','审核成功');
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                    });
+                });
+            },
+        }
+    },
+    columns:[{
+            checkbox: true,
+            width:'10',
+        }, 
+        {
+            field: 'id',
+            title: 'id',
+            align: 'center',
+            visible: false,
+            width:'10',
+        },  {
+            field: 'fromtypehtml',
+            title: '来源',
+            align: 'center',
+            width:'10',
+        },{
+            field: 'nickname',
+            title: '用户',
+            align: 'center',
+            width:'15',
+            formatter:function(value,row,index){
+                if(row.fromtype == '2'){
+                    return '-';
+                }
+                var html = `
+                <div class='zam-flex-column-center'>
+                    <img src="${row.avatar}" class="avatarImg" />
+                    <span>${value||'已删除'}</span>
+                </div>
+                `;
+                return html;
+            }
+        },  {
+            field: 'statushtml',
+            title: '审核状态',
+            align: 'center',
+            width:'10',
+        },{
+            field: 'img',
+            title: '照片',
+            align: 'center',
+            width:'20',
+            formatter:function(value,row,index){
+                return `
+                <div>
+                    <img style="max-width:120px;" onclick="prevshowattachs(this,1);" src="${value}" />
+                </div>
+                <div class="m-t-10">留言内容：${row.pictxt}</div>
+                `;
+            }
+        }
+        ,{
+            field: 'create_time',
+            title: '发布时间',
+            align: 'center',
+            width:'20',
+        }
+    ],
+    searchParamas:[{'type':'1','id':'keyword'},{'type':'1','id':'pictxt'},{'type':'2','id':'photostatus'},{'type':'2','id':'fromtype'}],
+    toolbar:{
+        add:function(){
+            var confirmobj = jconfirmBox.ajaxconfirm("上传照片","{:gohdmanage('dataphotowall/uploadphoto',['hdid'=>$hdid])}",{ishtml:'1'},'html','col-lg-8 col-lg-offset-2',function(e){},false,'2');
+        },
+        del:function(){
+            var getSelects = webtable.getSelections();
+            if(!getSelects.length){
+                return zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+            jconfirmBox.confirm('温馨提示','删除将无法恢复，您确定要删除选中的数据么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('dataphotowall/del',['hdid'=>$hdid])}",{photoid:getSelects}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','删除成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+        },
+        reset:function(){
+            jconfirmBox.confirm('温馨提示','清空将删除活动所有用户照片数据并且无法恢复，您确定要清空所有么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('dataphotowall/reset',['hdid'=>$hdid])}",{}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','清空成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+        },
+        shenhe:function(){
+            var getSelects = webtable.getSelections();
+            if(!getSelects.length){
+                return zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+            jconfirmBox.confirm('温馨提示','您确定要审核通过选中的照片数据么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('dataphotowall/shenhe',['hdid'=>$hdid])}",{photoid:getSelects}).then(function(json){
+                    webtable.refresh();
+                    zamnotice.showTips('success','审核成功');
+                }, function(json){
+                    zamnotice.showTips('error','网络差。操作失败');
+                });
+            });
+        },
+    },
+};
+webtable.init(initConfig);
+$('.zam-inline-searchbar select').change(function(e) {
+    webtable.refresh();
+});
+$('.btn-export').on('click',function(){
+    var status = $("#photostatus").find('option:selected').val() || '0';
+    webcore.ajaxSubmit("{:gohdmanage('dataphotowall/export',['hdid'=>$hdid])}",{status:status}).then(function(json){
+        if(json.code!=0){
+            zamnotice.showTips('error',json.msg);
+        }else{
+            window.location.href = "{:gohdmanage('dataphotowall/export',['hdid'=>$hdid])}&status="+status;
+        }
+    }, function(json){
+        zamnotice.showTips('error','网络差,操作失败');
+    });
+});
+});
+</script>
+{include file='$Wpath/common/footer'}

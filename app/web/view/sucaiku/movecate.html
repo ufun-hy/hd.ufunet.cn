@@ -1,0 +1,42 @@
+<div class="form-horizontal confirmbox-pop">
+<form class="confirm-formbox" method="post">
+    <div class="carditem">
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 一级分类</label>
+            <div class="col-lg-8">
+                <select id="cfcateid" name="fcateid" class="form-control">
+                    <option value="-1" selected data-children="[]">不分类</option>
+                    {foreach $cates as $fkey=>$fvo } 
+                    <option value="{$fvo['id']}" data-children='{$fvo["children"]|json_encode}'>{$fvo['catename']}</option>
+                    {/foreach}
+              </select>
+            </div>
+        </div>
+        <div class="form-group soncate hidden">
+            <label class="col-lg-3 control-label">* 二级分类</label>
+            <div class="col-lg-8">
+                <select id="cscateid" name="scateid" class="form-control"></select>
+            </div>
+        </div>
+    </div>
+</form>
+</div>                     
+<script>    
+require(['webcore','jconfirmBox','zamnotice','layerBox'],function(webcore,jconfirmBox,zamnotice,layerBox){
+    $("#cfcateid").on('change',function(){
+        var fval = $(this).find("option:selected").val(),schildren = $(this).find("option:selected").data('children');
+        var html = '';
+        if(schildren.length > 0){
+            $.each(schildren,function(i,v){
+                html += '<option value="'+v.id+'">'+v.catename+'</option>';
+            });
+        }
+        $("#cscateid").html(html);
+        if(html==''){
+            $('.soncate').addClass('hidden');
+        }else{
+            $('.soncate').removeClass('hidden');
+        }
+    });
+});
+</script>

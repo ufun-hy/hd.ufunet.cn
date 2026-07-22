@@ -1,0 +1,125 @@
+{include file="$Wpath/common/header" /}
+<style type="text/css">
+  .lyear-layout-content{overflow-y: auto;}
+  .card-hdmodule{border:1px solid #dfe6ec;border-radius: 10px;}
+  .card-hdmodule:hover{
+    box-shadow: 1px 3px 10px rgba(37,46,64,.2);
+  }
+  .card-hdmodule .hdmodule-switch{
+    position: absolute;
+    top: 5px;
+    right: 25px;
+  }
+  .card-hdmodule .hdmodule-edit{
+    position: absolute;
+    right: 30px;
+    bottom: 40px;
+  }
+</style>
+{volist name="cates" id="cate"}
+{if !empty($cate['catemodules'])}
+<div class="config-titlebox">
+<span class="config-titlename">{$cate['catename']}</span>
+<span class="btn btn-primary btn-xs m-l-10 btn-onoff" data-cateid="{$cate['id']}"><i class="mdi mdi-gavel m-r-5"></i>一键开关</span>
+</div>
+<div class="row">
+{volist name="cate.catemodules" id="module"}
+  <div class="col-sm-6 col-lg-4">
+    <div class="card card-hdmodule">
+      <div class="card-body clearfix">
+        <div class="pull-left"> <img class="img-avatar" src="{:tomedia($module['moduleimg'])}" /> </div>
+        <div class="pull-left m-l-15" style="width:calc(100% - 80px)">
+          <p class="h4 m-t-0 fa-1-5x">{$module['modulename']}</p>
+          <p class="h5 m-t-0" style="height:25px;overflow: hidden">
+            {$module['moduledes']}
+          </p>
+          <p class="h4 m-b-0">
+            <span>快捷键: <span class="text-primary">{$module['modulekjj']}</span></span>
+          </p>
+        </div>
+        {if $module['modulefield'] != 'fulldm'}
+        <div class="hdmodule-switch" data-module="{$module['modulefield']}">
+          {:tpl_switch('openstatus',$module['openstatus'],'moduleopenstatus')}
+        </div>
+        {/if}
+        <a class="hdmodule-edit cursor text-primary" href="{:gohdmanage('config'.$module['modulefield'].'/index',['hdid'=>$hdid])}">
+          <span><i class="mdi mdi-pencil"></i> 设置</span>
+        </a>
+      </div>
+    </div>
+  </div>
+{/volist}
+</div>
+{/if}
+{/volist}
+<script type="text/javascript">
+require(['webcore','zamnotice','jconfirmBox'],function(webcore,zamnotice,jconfirmBox){
+  $(".btn-onoff").click(function(){
+      var $this = $(this),cateid = $this.attr('data-cateid'),catemodules = [];
+      $this.parent().next().find('.hdmodule-switch').each(function(){
+          var onemodule = $(this).attr('data-module') || '';
+          if(onemodule!='') catemodules.push(onemodule);
+      });
+      if(catemodules.length == 0){
+          return false;
+      }
+      var confirmobj = jconfirmBox.confirm('一键开关所有功能',webcore.tpl($("#onoff-tpl"),{}),function(e){
+      },false,false,true,[{'hidden':true,'txt':'确定'},{'hidden':true,'txt':'取消'}],function(){
+          var $thiss = confirmobj.$content;
+          $thiss.find(".btn").click(function(){
+              var status = $(this).hasClass('btn-primary')?'1':'2';
+              webcore.ajaxSubmit("{:gohdmanage('hdmodule/onoffall',['hdid'=>$hdid])}",{status:status,modules:catemodules}).then(function(json){
+                if(json.code==0){
+                    $.each(json.msg,function(i,v){
+                       var mobj = $(`.hdmodule-switch[data-module=${v.module}]`);
+                       if(mobj.length > 0 && v.status != '3'){
+                          mobj.find('.lyear-switch input').eq(0).prop("checked",v.status=='1'?true:false);
+                          mobj.find('.lyear-switch input').eq(1).val(v.status);
+                          mobj.find('.lyear-switch span').attr('data-status',v.status);
+                       }
+                    });
+                    zamnotice.showTips('success','操作成功');
+                    confirmobj.close();
+                }else{
+                  zamnotice.showTips('error',json.msg);
+                }
+              });
+          });
+      });
+  });
+});
+function moduleopenstatus(obj,status){
+  require(['webcore','zamnotice'],function(webcore,zamnotice){
+        webcore.ajaxSubmit("{:gohdmanage('hdmodule/editstatus',['hdid'=>$hdid])}",{module:obj.parent().parent().attr('data-module'),status:(status=='1'?'2':'1')}).then(function(json){
+            if(json.code==0){
+              if(status=='1'){
+                  obj.prev().val('2');
+                  obj.attr('data-status','2');
+              }else{
+                  obj.prev().val('1');
+                  obj.attr('data-status','1');
+              }
+              obj.prev().prev().prop("checked",status == '1' ? false : true);
+              zamnotice.showTips('success','操作成功');
+            }else{
+              zamnotice.showTips('error',json.msg);
+            }
+        }, function(json){
+            zamnotice.showTips('error','网络差，操作失败');
+        });
+  });
+}
+</script>
+<script id='onoff-tpl' type="text/template">
+<div class="alert alert-danger">
+<div>启用分类所有模块即为将当前分类下的所有模块状态开启</div>
+<div class="m-t-5">关闭分类所有模块即为将当前分类下的所有模块状态关闭</div>
+</div>
+<div class="text-center">
+  <div class="btn-groups">
+    <a class="btn btn-primary btn-sm m-r-15">启用分类所有模块</a>
+    <a class="btn btn-danger btn-sm m-l-15">关闭分类所有模块</a>
+  </div>
+</div>
+</script>
+{include file="$Wpath/common/footer" /}

@@ -1,0 +1,310 @@
+{include file='$Wpath/common/header'}
+<div class="confirmbox-pop">
+<div class="text-center">
+      <div class="btn-group pop-btns" style="margin-bottom:10px;">
+        <a href="javascript:void(0)" class="btn btn-default btn-primary"><span>基础设置</span></a>
+        <a href="javascript:void(0)" class="btn btn-default"><span>大屏欢迎页</span></a>
+        <a href="javascript:void(0)" class="btn btn-default"><span>大屏设置</span></a>
+        <a href="javascript:void(0)" class="btn btn-default"><span>排行榜</span></a>
+        <a href="javascript:void(0)" class="btn btn-default"><span>微信设置</span></a>
+        <a href="javascript:void(0)" class="btn btn-default"><span>自定义css</span></a>
+      </div>
+</div>
+<form id="formBox" class="zam-formvalidation form-horizontal" method="post">
+  <div class="carditem">
+    {include file='$Wpath/common/gamestyle/basic'}
+    {include file='$Wpath/common/gamestyle/bgmusic'}
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 闯关成功得分音效</label>
+      <div class="col-lg-8">
+        {:tpl_audio('scorevoice', $config['scorevoice'])}
+        <span class="help-block">注意:必须控制在100KB内</span>
+      </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label text-right">* 通关音效</label>
+        <div class="col-lg-8">
+          {:tpl_audio('passvoice', $config['passvoice'])}
+          <span class="help-block">注意:必须控制在100KB内</span>
+        </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 游戏结束音效</label>
+      <div class="col-lg-8">
+        {:tpl_audio('overvoice', $config['overvoice'])}
+        <span class="help-block">注意:必须控制在100KB内</span>
+      </div>
+    </div>
+  </div>
+  <div class="carditem hidden">
+    {include file='$Wpath/common/gamestyle/welcome'}
+  </div>
+  <div class="carditem hidden">
+    <div class="form-group hidden">
+        <label class="col-md-2 control-label text-right">* 游戏顶部倒计时背景图</label>
+        <div class="col-md-8">
+            {:tpl_image_one('topbg', $config['topbg'])}
+            <span class="help-block">{$desconfig['topbg']}</span>
+        </div>
+    </div>
+    <div class="form-group">
+      <label class="col-md-2 control-label text-right">* 柱子上头像背景颜色</label>
+      <div class="col-md-8">
+        {:tpl_color('userbordercolor',$config['userbordercolor']??'#fbb600')}
+      </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-2 control-label text-right">* 冠军标志图</label>
+        <div class="col-md-8">
+            {:tpl_image_one('firsticon', $config['firsticon'])}
+            <span class="help-block">{$desconfig['gameicon']}</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-2 control-label text-right">* 亚军标志图</label>
+        <div class="col-md-8">
+            {:tpl_image_one('secondicon', $config['secondicon'])}
+            <span class="help-block">{$desconfig['gameicon']}</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-2 control-label text-right">* 季军标志图</label>
+        <div class="col-md-8">
+            {:tpl_image_one('thirdicon', $config['thirdicon'])}
+            <span class="help-block">{$desconfig['gameicon']}</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-2 control-label text-right">* 柱子内气泡图</label>
+        <div class="col-md-8">
+            {:tpl_image_one('ppimg', $config['ppimg']??SIMGURL.'puzzle/pp.png')}
+            <span class="help-block">{$desconfig['ppimg']}</span>
+            <div class="help-block">必须是正方形的小icon图，里面的元素可以任意，不设置此项柱子里就没有气泡向上飘</div>
+        </div>
+    </div>
+    <!--柱子渐变色-->
+    {foreach $config['showcolors'] as $sk=>$sv}
+    <div class="form-group">
+        <label class="col-lg-2 control-label text-right">* 第{$sk + 1}名柱子颜色</label>
+        <div class="col-lg-2">
+            <div class="input-group">
+                <div class="input-group-btn not-allow"><a class="btn btn-default">初始颜色</a></div>
+                {:tpl_color('showcolors[scolor][]',$sv['scolor'])}
+                <div class="input-group-btn not-allow"><a class="btn btn-default">结束颜色</a></div>
+                {:tpl_color('showcolors[ecolor][]',$sv['ecolor'])}
+            </div>
+            <div class="help-block">柱子的颜色从初始颜色渐变为结束颜色</div>
+        </div>
+    </div>
+    {/foreach}
+  </div>
+  <div class="carditem hidden">
+    {include file='$Wpath/common/gamestyle/phb'}
+  </div>
+  <div class="carditem hidden">
+    <div class="form-group">
+      <label class="col-md-2 control-label text-right">* 微信背景图</label>
+      <div class="col-md-8">
+        {:tpl_image_one('appbgimg', $config['appbgimg'])}
+        <span class="help-block">规格:640*1260px</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 顶部图</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('apptopimg', $config['apptopimg'])}
+        <span class="help-block">{$desconfig['apptopimg']}</span>
+      </div>
+     </div>
+     <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 规则按钮</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('apprulebtn', $config['apprulebtn'])}
+        <span class="help-block">{$desconfig['apprulebtn']}</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 游戏中顶部背景</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('apptopbg', $config['apptopbg'])}
+        <span class="help-block">{$desconfig['apptopbg']}</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 进度条背景</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('progressbar', $config['progressbar'])}
+        <span class="help-block">{$desconfig['progressbar']}</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 进度条图</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('progress', $config['progress'])}
+        <span class="help-block">{$desconfig['progress']}</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 查看原图按钮</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('appvoibtn', $config['appvoibtn'])}
+        <span class="help-block">{$desconfig['appvoibtn']}</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 游戏结束背景</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('appoverbg', $config['appoverbg'])}
+        <span class="help-block">{$desconfig['appoverbg']}</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 游戏结束排名按钮</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('apppmbtn', $config['apppmbtn'])}
+        <span class="help-block">{$desconfig['apppmbtn']}</span>
+      </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label text-right">* 拼图相关间距</label>
+        <div class="col-lg-3">
+            <div class="input-group">
+                <div class="input-group-btn not-allow"><a class="btn btn-default">碎片之间的间距</a></div>
+                <div class="touchspin">
+                <input type="text" class="form-control numberincdec" name="apppiececonfig[piecegap]" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="20"
+                data-bts-step="1"
+                value="{$config['apppiececonfig']['piecegap']}">
+                </div>
+                <div class="input-group-btn not-allow"><a class="btn btn-default">碎片与外框间距</a></div>
+                <div class="touchspin">
+                <input type="text" class="form-control numberincdec" name="apppiececonfig[kuanggap]" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="60"
+                data-bts-step="1"
+                value="{$config['apppiececonfig']['kuanggap']}">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label text-right">* 拼图体外框</label>
+        <div class="col-lg-3">
+            <div class="input-group">
+                <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+                {:tpl_color('apppiececonfig[kuangcolor]',$config['apppiececonfig']['kuangcolor'])}
+                <div class="input-group-btn not-allow"><a class="btn btn-default">宽</a></div>
+                <div class="touchspin">
+                <input type="text" class="form-control numberincdec" name="apppiececonfig[kuangwidth]" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="10"
+                data-bts-step="1"
+                value="{$config['apppiececonfig']['kuangwidth']}">
+                </div>
+            </div>
+            <span class="help-block">如果不要外框可以设置宽为0</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label text-right">* 拼图体外框阴影</label>
+        <div class="col-lg-3">
+            <div class="input-group">
+                <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+                {:tpl_color('apppiececonfig[kuangshadowcolor]',$config['apppiececonfig']['kuangshadowcolor'])}
+                <div class="input-group-btn not-allow"><a class="btn btn-default">宽</a></div>
+                <div class="touchspin">
+                <input type="text" class="form-control numberincdec" name="apppiececonfig[kuangshadowwith]" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="30"
+                data-bts-step="1"
+                value="{$config['apppiececonfig']['kuangshadowwith']}">
+                </div>
+            </div>
+            <span class="help-block">外框阴影即为外框线条底层的阴影，推荐设置与外框颜色差不多透明度低一点即可；如果不要外框阴影可以设置宽为0</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label text-right">* 拼图碎片警示线</label>
+        <div class="col-lg-3">
+            <div class="input-group">
+                <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+                {:tpl_color('apppiececonfig[warninglinecolor]',$config['apppiececonfig']['warninglinecolor'])}
+                <div class="input-group-btn not-allow"><a class="btn btn-default">宽</a></div>
+                <div class="touchspin">
+                <input type="text" class="form-control numberincdec" name="apppiececonfig[warninglinewidth]" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="20"
+                data-bts-step="1"
+                value="{$config['apppiececonfig']['warninglinewidth']}">
+                </div>
+            </div>
+            <span class="help-block">拼图碎片警示线：就是当某个碎片被拖动到了正确的位置后用户后面还是想去拖动这个碎片到别的位置时会出来这个警示线，仅限拼图基础设置开启了落点正确的碎片禁止拖动才生效</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label text-right">* 拼图闯关成功加分提示文字</label>
+        <div class="col-lg-3">
+            <div class="input-group">
+                <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+                {:tpl_color('apppiececonfig[scoretipcolor]',$config['apppiececonfig']['scoretipcolor'])}
+                <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
+                <div class="touchspin">
+                <input type="text" class="form-control numberincdec" name="apppiececonfig[scoretipsize]" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="100"
+                data-bts-step="1"
+                value="{$config['apppiececonfig']['scoretipsize']}">
+                </div>
+            </div>
+            <span class="help-block">在用户闯关成功后会提示对方本次加多少分</span>
+        </div>
+    </div>
+  </div>
+  <div class="carditem hidden">
+    {include file='$Wpath/common/gamestyle/diycss'}
+  </div>
+  {include file='$Wpath/common/cancelsavepanel'}
+</form>
+</div>
+<script type="text/javascript">
+require(['webcore','jconfirmBox','zamnotice','zvalidator'],function(webcore,jconfirmBox,zamnotice){
+  $(".confirmbox-pop .pop-btns a.btn").click(function(){
+      $(this).addClass('btn-primary').siblings().removeClass("btn-primary");
+      $(".confirmbox-pop .carditem").addClass('hidden').eq($(this).index()).removeClass('hidden');
+  });
+  $(".confirmbox-pop .type-btns a.btn").click(function(){
+      $(this).addClass('btn-primary').siblings().removeClass("btn-primary");
+      $(".confirmbox-pop .typeitem").addClass('hidden').eq($(this).index()).removeClass('hidden');
+  });
+  $('#formBox').formValidation({
+      framework: 'bootstrap',
+      excluded: [':disabled'],
+      message: '您填写的内容无效',
+      fields: {}
+  }).on('success.form.fv', function(e) {
+    e.preventDefault();
+    var $form = $(e.target);
+    var postData = webcore.serializeObject($form);
+    var bload = $form.find(".zam-fixedbottom button").lyearloading({opacity: 0.2,spinnerSize: 'nm'});
+    $form.formValidation('disableSubmitButtons', true);
+    webcore.ajaxSubmit("{:goweb('hdconfig/edit'.$gametype.'style')}",postData).then(function(json){
+      bload.hide();
+      if(json.code==0){
+          $form.formValidation('disableSubmitButtons', false);
+          zamnotice.showTips('success','操作成功',1e3,function(){
+            window.location.href = "{:goweb('hdconfig/'.$gametype.'style')}";
+          });
+        }else{
+            zamnotice.showTips('error',json.msg);
+            $form.formValidation('disableSubmitButtons', false);
+        }
+    }, function(json){
+      bload.hide();
+      zamnotice.showTips('error','网络差。操作失败');
+      $form.formValidation('disableSubmitButtons', false);
+    });
+  });
+});
+</script>
+{include file='$Wpath/common/footer'}

@@ -1,0 +1,47 @@
+{if !empty($phblists)}
+<style>
+    .livemark-hadpftitle{
+        margin: .28rem auto ;
+    }
+    .livemark-hadpf-item{
+        padding: 2vw 4vw;
+        width: 100%;
+        border-bottom: 1px solid hsla(0, 0%, 64.7%, .5);
+    }
+    .livemark-hadpf-item .sortnum{
+        font-size: .36rem;
+        width: 5vw;
+    }
+    .livemark-hadpf-item img{
+        margin: 0 3vw;
+        width: 14.4vw;
+        height: 14.4vw;
+        border-radius: 50%;
+        border: 2px solid {$rotate['maincolor']};
+    }
+    .livemark-hadpf-item .username{
+        width: 50vw;
+        white-space: nowrap;
+        word-break: break-all;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+    .livemark-hadpf-item .score{
+        width: 15.2vw;
+        text-align: right;
+    }
+</style>
+<div class="livemark-title livemark-hadpftitle">{$rotate['hadpftitle']??'已评分项目'}</div>
+<div class="livemark-hadpf-list">
+    {foreach $phblists as $k=>$item } 
+    <a class="livemark-hadpf-item zam-app-flex-ajCenter2" href="{:gowechat(!$pwclient?'livemark/oneuserscore':'livemarkpw/oneuserscore',['hdid'=>$hdinfo['hdid'],'pfuserid'=>$item['id']])}">
+        <div class="sortnum">
+            {$k + 1}
+        </div>
+        <img src="{:tomedia($item['userimg'])}"> 
+        <div class="username">{:$item['username']}</div>
+        <div class="score">{$item['score']??'暂无'}</div>
+    </a>
+    {/foreach}
+</div>
+{/if}

@@ -1,0 +1,187 @@
+{include file='$Wpath/common/header'}
+<div class="form-inline zam-inline-searchbar">
+    <div class="form-group">
+        <div class="input-group input-group-sm">
+            <span class="input-group-addon">轮次</span>
+            <select id="rotateid" class="form-control">
+                <option value="0" selected>全部轮次</option>
+                {foreach $rotates as $key=>$rotate} 
+                    <option value="{$rotate['id']}" >{$rotate['title']}</option>
+                {/foreach}
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="input-group input-group-sm">
+            <span class="input-group-addon">类型</span>
+            <select id="scoretype" class="form-control js_select2">
+                {foreach $scoretypes as $k=>$v } 
+                    <option value="{$k}" {if $k=="0"}selected{/if}>{$v}</option>
+                {/foreach}
+            </select>
+        </div>
+    </div>
+    <div class="form-group" style="max-width: 300px">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">代表队名称</span>
+        <input type="text" class="form-control" value="" id="keyword" placeholder="请输入代表队名称">
+      </div>
+    </div>
+    <a class="btn btn-primary btn-sm btn-search" href="javascript:void(0)"><i class="mdi mdi-magnify"></i> 搜索</a>
+    <a class="btn btn-warning btn-sm btn-export" href="javascript:void(0)"><i class="mdi mdi-export"></i> 导出</a>
+</div>
+{include file='$Wpath/common/tabletoolbar'}
+<table id="listtable" class="zam-btable"></table>
+<script>    
+var $rotates = {:json_encode($rotates)};
+require(['webcore','webtable','jconfirmBox','zamnotice'],function(webcore,webtable,jconfirmBox,zamnotice){
+var searchParamas = [{'type':'2','id':'rotateid'},{'type':'2','id':'scoretype'},{'type':'1','id':'keyword'}];
+var initConfig = {
+    tableId:'#listtable',
+    url:"{:gohdmanage('configanswerbs/scoredetail',['hdid'=>$hdid])}",
+    columnoperate:{
+        btns:{
+            del:true,
+        },
+        func:{
+            del:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','删除将无法恢复，您确定要删除么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('configanswerbs/delscoredetail',['hdid'=>$hdid])}",{recordid:row.id}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','删除成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差。操作失败');
+                });
+                });
+            }
+        }
+    },
+    columns:[{
+            checkbox: true,
+        }, 
+        {
+            field: 'id',
+            title: 'id',
+            align: 'center',
+            visible: false
+        },{
+            field: 'nickname',
+            title: '代表队',
+            align: 'center',
+            width:'10%',
+        },{
+            field: 'rotatetitle',
+            title: '轮次',
+            align: 'center',
+            width:'20%',
+        },{
+            field: 'fromtype',
+            title: '来源类型',
+            align: 'center',
+            width:'10%',
+            formatter:function(value,row,index){
+                return '<span class="label label-'+(value == '1' ? 'success' : 'danger')+'">'+(value == '1' ? '系统生成' : '手动新增')+'</span>';
+            }
+        },{
+            field: 'typehtml',
+            title: '加减分类型',
+            align: 'center',
+            width:'20%',
+        },{
+            field: 'score',
+            title: '加减分',
+            align: 'center',
+            width:'20%',
+            formatter:function(value,row,index){
+                return value + '分';
+            }
+        }
+        ,{
+            field: 'create_time',
+            title: '时间',
+            align: 'center',
+            width:'12%',
+        }
+    ],
+    searchParamas:searchParamas,
+    toolbar:{
+        add:function(){
+            var confirmObj = jconfirmBox.ajaxconfirm("新增加减分记录","{:gohdmanage('configanswerbs/addscoredetail',['hdid'=>$hdid])}",{},'html','col-lg-8 col-lg-offset-2',function(e){
+                var postData = webcore.serializeObject(e.find('form'));
+                if(postData.user_id == ''){
+                    return zamnotice.showTips('error','请选择代表队');
+                }
+                if(postData.rotate_id == ''){
+                    return zamnotice.showTips('error','请选择轮次');
+                }
+                webcore.ajaxSubmit("{:gohdmanage('configanswerbs/addscoredetail',['hdid'=>$hdid])}",{ishtml:'2',data:postData}).then(function(json){
+                    if(json.code==0){
+                        confirmObj.close();
+                        zamnotice.showTips('success','新增成功');
+                        webtable.refresh();
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+                
+            });
+        },
+        del:function(){
+            var getSelects = webtable.getSelections();
+            if(!getSelects.length){
+                return zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+            jconfirmBox.confirm('温馨提示','删除加减分记录将无法恢复，您确定要删除选中的数据么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('configanswerbs/delscoredetail',['hdid'=>$hdid])}",{recordid:getSelects}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','删除成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+        },
+        reset:function(){
+            jconfirmBox.confirm('温馨提示','清空将删除所有加减分记录并且无法恢复，您确定要清空么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('configanswerbs/resetscoredetail',['hdid'=>$hdid])}",{}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','清空成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+        },
+    },
+};
+webtable.init(initConfig);
+$('.zam-inline-searchbar select').change(function(e) {
+     webtable.refresh();
+});
+$('.btn-export').on('click',function(){
+   var rotateid = $("#rotateid").find('option:selected').val();
+   webcore.ajaxSubmit("{:gohdmanage('configanswerbs/exportscoredetail',['hdid'=>$hdid])}",{}).then(function(json){
+        if(json.code!=0){
+            zamnotice.showTips('error',json.msg);
+        }else{
+            window.location.href = "{:gohdmanage('configanswerbs/exportscoredetail',['hdid'=>$hdid])}";
+        }
+    }, function(json){
+        zamnotice.showTips('error','网络差,操作失败');
+    });
+});
+});
+</script>
+{include file='$Wpath/common/footer'}

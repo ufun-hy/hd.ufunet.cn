@@ -1,0 +1,359 @@
+{include file="common/header" /}
+<style type="text/css">
+.app-dzpbox{
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+.titlebox img{margin-bottom:14px;height: 1.14rem}
+.app-dzpbox .lucky-btn{
+	width: 1.6rem;
+    height: 1.8rem;
+    background-image: url("{:tomedia($appconfig['dzpstyle']['startbtn'])}");
+    cursor: pointer;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+	background-repeat: no-repeat;
+	background-size: cover;
+}
+.app-dzpbg{
+	position: relative;
+	width: 6.2rem;
+	height: 6.2rem;
+	border-radius: 50%;
+	background-image: url("{:tomedia($appconfig['dzpstyle']['dot1'])}");
+	background-repeat: no-repeat;
+	background-size: cover;
+	animation: bgani 500ms step-start infinite;
+	-webkit-animation: bgani 500ms step-start infinite;
+}
+.app-jggbg{
+	width: 5.98rem;
+	height: 6.2rem;
+	border-radius: 0;
+	background-image: url("{:tomedia($appconfig['jggstyle']['dot1'])}");
+	animation: bgani2 500ms step-start infinite;
+	-webkit-animation: bgani2 500ms step-start infinite;
+}
+.app-jggbg .lucky-btn{
+    width: 1.6rem;
+    height: 1.6rem;
+    background-image: url("{:tomedia($appconfig['jggstyle']['startbtn'])}");
+}
+@keyframes bgani {
+	0% {
+		background-image: url("{:tomedia($appconfig['dzpstyle']['dot1'])}");
+	}
+	50% {
+		background-image: url("{:tomedia($appconfig['dzpstyle']['dot2'])}");
+	}
+}
+@-webkit-keyframes bgani {
+	0% {
+		background-image: url("{:tomedia($appconfig['dzpstyle']['dot1'])}");
+	}
+	50% {
+		background-image: url("{:tomedia($appconfig['dzpstyle']['dot2'])}");
+	}
+}
+@keyframes bgani2 {
+	0% {
+		background-image: url("{:tomedia($appconfig['jggstyle']['dot1'])}");
+	}
+	50% {
+		background-image: url("{:tomedia($appconfig['jggstyle']['dot2'])}");
+	}
+}
+@-webkit-keyframes bgani2 {
+	0% {
+		background-image: url("{:tomedia($appconfig['jggstyle']['dot1'])}");
+	}
+	50% {
+		background-image: url("{:tomedia($appconfig['jggstyle']['dot2'])}");
+	}
+}
+.mytimes{margin:0.2rem auto 0.4rem auto;}
+.mytimes div{height:0.5rem;line-height:0.5rem;width: 3rem;background-color: rgba(0,0,0,0.42);color: #fff;text-align: center;border-radius: 0.25rem}
+.btns a{display:inline-block;width:3.05rem;height:0.78rem;line-height:0.78rem;text-align:center;color: #fff;font-size: 0.24rem;font-weight:600;background-repeat: no-repeat;background-size: cover;cursor: pointer;}
+.btns .btn-rule{
+	background-image: url("{:tomedia($appconfig['basicstyle']['apprulebtn'])}");
+	margin-right: 0.42rem
+}
+.btns .btn-myrecord{
+	background-image: url("{:tomedia($appconfig['basicstyle']['appmyrecordbtn'])}");
+}
+/*中奖记录弹窗*/
+.dzp-popbox{
+	position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+.dzp-popbox .popbg{
+	position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+	background-color: rgba(0,0,0,0.62);
+}
+.dzp-popbox .popbox{
+	position: relative;
+	width: 5.2rem;
+	height: 7rem;
+	background-image: url("{:tomedia($appconfig['basicstyle']['apppopbg'])}");
+	background-repeat: no-repeat;
+	background-size: cover;
+	color:#fff;
+	animation: inoutshow 0.5s ease 0s both;
+	-webkit-animation: inoutshow 0.5s ease 0s both;
+}
+@keyframes inoutshow {
+    0% {
+        transform: scale(0,0);
+        -webkit-transform: scale(0,0);
+    }
+    100% {
+        transform:scale(1,1);
+        -webkit-transform: scale(1,1);
+    }
+}
+@-webkit-keyframes inoutshow {
+    0% {
+        transform: scale(0,0);
+        -webkit-transform: scale(0,0);
+    }
+    100% {
+        transform:scale(1,1);
+        -webkit-transform: scale(1,1);
+    }
+}
+.dzp-popbox .popbox .tip{width:100%;text-align: center;font-size: 0.42rem;margin: 0 auto;}
+.dzp-popbox .popbox .prizeimg{height:2rem;margin:18px auto;}
+.dzp-popbox .popbox .awardname{width:100%;padding:0 0.4rem;box-sizing:border-box;text-align: center;font-size: 0.4rem;}
+.dzp-popbox .popbox .close-pop{
+	position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: -0.82rem;
+	width: 0.54rem;
+	height: 0.54rem;
+	background-image: url("{:tomedia($appconfig['basicstyle']['appclosebtn'])}");
+	background-repeat: no-repeat;
+	background-size: cover;
+	cursor: pointer;
+}
+/*抽奖规则*/
+.dzp-rulebox{
+	position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: rgba(0,0,0,0.62);
+}
+.dzp-rulebox .popbg{
+	position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+	background-color: rgba(0,0,0,0.62);
+}
+.dzp-rulebox .rulebox{
+	position: relative;
+	width: 5.2rem;
+	height: 7rem;
+	background-image: url("{:tomedia($appconfig['basicstyle']['apprulebox'])}");
+	background-repeat: no-repeat;
+	background-size: cover;
+	color:#fff;
+	opacity: 0;
+	animation: topbottomshow 0.4s ease 0s both;
+	-webkit-animation: topbottomshow 0.4s ease 0s both;
+}
+@keyframes topbottomshow {
+    0% {
+        transform: translateY(-15%);
+        -webkit-transform: translateY(-15%);
+    }
+    100% {
+    	opacity: 1;
+        transform:translateY(0);
+        -webkit-transform: translateY(0);
+    }
+}
+@-webkit-keyframes topbottomshow {
+    0% {
+        transform: translateY(-15%);
+        -webkit-transform: translateY(-15%);
+    }
+    100% {
+    	opacity: 1;
+        transform:translateY(0);
+        -webkit-transform: translateY(0);
+    }
+}
+.rule-title{
+	position: absolute;
+    top: 1rem;
+    width: 100%;
+    text-align: center;
+    font-size: 0.36rem;
+    font-weight: 600;
+}
+.rule-content{
+	width: 100%;
+    height: 100%;
+    padding: 1.6rem 0.42rem 0.48rem 0.42rem;
+    box-sizing: border-box;
+}
+.rule-content .rule-des{
+	height: 100%;
+	color: #fff;
+    font-size: 0.32rem;
+    line-height: 1.6;
+    word-wrap: break-word;
+    white-space: normal;
+     overflow: hidden;
+    overflow-y: scroll;
+}
+
+.dzp-rulebox .rulebox .close-pop{
+	position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: -0.82rem;
+	width: 0.54rem;
+	height: 0.54rem;
+	background-image: url("{:tomedia($appconfig['basicstyle']['appclosebtn'])}");
+	background-repeat: no-repeat;
+	background-size: cover;
+	cursor: pointer;
+}
+/*中奖用户滚动栏*/
+.lucker-rollbox{
+	position: relative;
+    width: 80%;
+    height: 0.72rem;
+    overflow: hidden;
+	box-sizing: border-box; 
+    -webkit-box-sizing: border-box; 
+    -moz-box-sizing: border-box;
+    color: #fff;
+    background-color: rgba(0,0,0,0.32);
+    border-radius: 5px;
+    margin-bottom: 0.24rem;
+}
+.noticeIcon{width: 0.72rem;height: 0.72rem;}
+.noticeIcon{font-size: 0.42rem;}
+.lucker-rolllist{
+	width: 100%;
+    height: 0.8rem;
+	overflow: hidden;
+}
+.lucker-rolllist li{
+	height: 0.72rem;
+	padding:0 0.1rem;
+	box-sizing: border-box; 
+    -webkit-box-sizing: border-box; 
+    -moz-box-sizing: border-box; 
+}
+.lucker-item-info{
+	width:100%;	
+}
+.lucker-item-onlytxt{
+	width: 100%;
+	height:0.72rem;
+	line-height:0.72rem;
+	font-size:0.24rem;
+}
+.sweet-alert .sa-input-error{top:22px;}
+input::-webkit-input-placeholder,textarea::-webkit-input-placeholder{ color:#666!important}
+</style>
+{if isset($appconfig['dzpstyle']['rotatemusic']) && !empty($appconfig['dzpstyle']['rotatemusic'])}
+<audio id="dzprotatemusic" src="{:tomedia($appconfig['dzpstyle']['rotatemusic'])}"  preload="preload"  style="display:none"></audio>
+{/if}
+{if isset($appconfig['dzpstyle']['successmusic']) && !empty($appconfig['dzpstyle']['successmusic'])}
+<audio id="dzpsumusic" src="{:tomedia($appconfig['dzpstyle']['successmusic'])}"  preload="preload"  style="display:none"></audio>
+{/if}
+{if isset($appconfig['jggstyle']['rotatemusic']) && !empty($appconfig['jggstyle']['rotatemusic'])}
+<audio id="jggrotatemusic" src="{:tomedia($appconfig['jggstyle']['rotatemusic'])}"  preload="preload"  style="display:none"></audio>
+{/if}
+{if isset($appconfig['jggstyle']['successmusic']) && !empty($appconfig['jggstyle']['successmusic'])}
+<audio id="jggsumusic" src="{:tomedia($appconfig['jggstyle']['successmusic'])}"  preload="preload"  style="display:none"></audio>
+{/if}
+<div class="app-dzpbox zam-app-flex-ajCenter">
+	{if !empty($appconfig['basicstyle']['apptitleimg'])}
+		<div class="titlebox"><img src="{:tomedia($appconfig['basicstyle']['apptitleimg'])}"></div>
+	{/if}
+	<div class="lucker-rollbox zam-app-flex">
+		<div class="noticeIcon zam-app-flex-ajCenter2"><i class="mxc-notification"></i></div>
+		<ul class="lucker-rolllist"></ul>
+	</div>
+	<div class="app-dzpbg zam-app-flex-ajCenter hidden">
+		<div id="my-lucky"></div>
+		<div class="lucky-btn"></div>
+	</div>
+	<div class="mytimes"><div>您还有<span>{$mytimes}</span>次抽奖机会</div></div>
+	<div class="btns">
+		<a href="javascript:;" class="btn-rule">抽奖规则</a>
+		<a href="{:gowechat('home/myrecord',['hdid'=>$hdinfo['hdid']])}" class="btn-myrecord">中奖记录</a>
+	</div>
+</div>
+<section class="dzp-popbox zam-app-flex-ajCenter hidden">
+	<div class="popbg"></div>
+	<div class="popbox zam-app-flex-ajCenter">
+		<div class="tip">{$appconfig['basicstyle']['topsuccesstxt']??'恭喜获得'}</div>
+		<img class="prizeimg" src="/static/images/sys/prizeimg.png">
+		<p class="awardname">测试奖品</p>
+		<span class="close-pop"></span>
+	</div>
+</section>
+<section class="dzp-rulebox zam-app-flex-ajCenter hidden">
+	<div class="popbg"></div>
+	<div class="rulebox zam-app-flex-ajCenter">
+		<div class="rule-title">抽奖规则</div>
+		<div class="rule-content">
+			<div class="rule-des">xxxxxx</div>
+		</div>
+		<span class="close-pop"></span>
+	</div>
+</section>
+<script>
+var rotateid = "{$rotateid}",successtip = "{$appconfig['basicstyle']['topsuccesstxt']??'恭喜获得'}",failtip = "{$appconfig['basicstyle']['topfailtxt']??'很遗憾'}";
+var bigwheelConfig = {
+	accelerationTime:{$appconfig['dzpstyle']['acctime']??'1'},
+	decelerationTime:{$appconfig['dzpstyle']['dcctime']??'1'},
+	fonts:{ top:'0.16rem',text: ''},
+	imgs:{	top:'0.6rem',width:'0.74rem',src:''},
+};
+var jggConfig = {
+	accelerationTime:{$appconfig['jggstyle']['acctime']??'1'},
+	decelerationTime:{$appconfig['jggstyle']['dcctime']??'1'},
+	fonts:{ top:'1.08rem',text: ''},
+	imgs:{	top:'0.16rem',width:'0.82rem',src:''},
+};
+require(['wechatcore','appdzp'],function(wechatcore,appdzp){
+	wechatcore.gameInit(function(){
+		if($("#appbgmusic").length > 0 ){
+			wechatcore.playAudio($("#appbgmusic")[0]);
+		}
+	});
+	appdzp.init();
+});
+</script>
+<script id="rollone-tpl" type="html/javascript">
+<li class="zam-app-flex">
+<div class="lucker-item-onlytxt limitbox"><% d.nickname %>抽中了<% d.prizename %></div>
+</li>
+</script>
+{include file="common/footermenu" /}
+{include file="common/footer" /}

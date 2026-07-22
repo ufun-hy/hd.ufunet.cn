@@ -1,0 +1,904 @@
+{include file='common/header' /}
+{if $hdinfo['id']=='bosheng'}
+<style>
+#cloud {
+	position:absolute;
+	top:0;
+	left:0;
+	width: 100%;
+	height: 100%;
+}
+/*这里只写了第1名到第6名的颜色与大小 你可以自己添加大小与颜色*/
+.font1{font-size:180px!important;color:#0166c2!important;opacity:1;font-weight:bold;}
+.font2{font-size:100px!important;color:#0166c2!important;opacity:0.9;}
+.font3{font-size:100px!important;color:#0166c2!important;opacity:0.9;}
+.font4{font-size:100px!important;color:#0166c2!important;opacity:0.9;}
+.font5{font-size:70px!important;color:#0166c2!important;opacity:0.8;}
+.font6{font-size:70px!important;color:#0166c2!important;opacity:0.8;}
+.font7{font-size:50px!important;color:#0166c2!important;opacity:0.8;}
+.font8{font-size:40px!important;color:#0166c2!important;opacity:0.8;}
+.font9,.font10,.font11,.font12,.font13,.font14,.font15,.font16,.font17,.font18,.font19,.font20{font-size:30px!important;color:#0166c2!important;opacity:0.6;}
+.font21,.font22,.font23,.font24,.font25,.font26,.font27,.font28,.font29,.font30,.font31,.font32,.font33,.font34,.font35,.font36,.font37,.font38,.font39,.font40,.font41,.font42,.font43,.font44,.font45,.font46,.font47,.font48,.font49,.font50,.font50,.font51,.font52,.font53,.font54,.font55,.font56,.font57,.font58,.font59,.font60,.font61,.font62{font-size:20px!important;color:#0166c2!important;opacity:0.4;}
+.font63,.font64,.font65,.font66,.font67,.font68,.font69,.font70,.font71,.font72,.font73,.font74,.font75,.font76,.font77,.font78,.font79,.font80,.font81,.font82,.font83,.font84,.font85,.font86,.font87,.font88,.font89,.font90,.font91,.font92,.font93,.font94,.font95,.font96,.font97,.font98,.font99,.font100,.font101,.font102,.font103,.font104,.font105,.font106,.font107,.font108,.font109,.font110,.font111,.font112,.font113,.font114,.font115,.font116,.font117,.font118,.font119,.font120,.font121,.font122,.font123,.font124,.font125,.font126,.font127,.font128,.font129,.font130{font-size:14px!important;color:#0166c2!important;opacity:0.1;}
+</style>
+<div id="cloud"></div>
+<script type="text/javascript">
+	require(['screensocket','screencore','layerBox','keyboard','jqcloud'],function(screensocket,screencore,layerBox,fulldm,keyboardJS) {
+		var wsConfig = {};
+		wsConfig.onmessage = function(data){
+			if(data.type=='connected'){
+				screensocket.isclose = false;
+				screencore.connectsocket({clientid:data.clientid});
+			}
+		};
+		screensocket.init(wsConfig);
+        $('#cloud').jQCloud([],{
+        	shape: 'elliptic',
+        	steps:300,
+        	autoResize:true,
+        });
+		/*每3秒加载一次前30名标签 按出现次数 与 id排序*/
+		var oldtexts = '',newtexts = '';
+		screencore.ajaxSubmit("/screen/msg/textrank",{}).then(function(data){
+			if(data.code==0){
+			    var newarr = data.msg;
+			    $.each(newarr,function(i,v){
+		        	v.weight = 1;
+		        	v.html = {'class':'font'+(i+1)};
+		        });
+			    newtexts = JSON.stringify(newarr);
+			    if(newtexts!=oldtexts){
+			        oldtexts = newtexts;
+			        $('#cloud').jQCloud('update', newarr);
+			    }else{
+			        console.log('一样的');
+			    }
+			}else{
+				console.log(data.msg);
+			}
+		},function(){
+			console.log('error');
+		});
+		setInterval(function() {
+			screencore.ajaxSubmit("/screen/msg/textrank",{}).then(function(data){
+				if(data.code==0){
+				    var newarr = data.msg;
+				    $.each(newarr,function(i,v){
+			        	v.weight = 1;
+			        	v.html = {'class':'font'+(i+1)};
+			        });
+		            
+				    newtexts = JSON.stringify(newarr);
+				    if(newtexts!=oldtexts){
+				        oldtexts = newtexts;
+				        $('#cloud').jQCloud('update', newarr);
+				    }else{
+				        console.log('一样的');
+				    }
+				}else{
+					console.log(data.msg);
+				}
+			},function(){
+				console.log('error');
+			});
+		}, 5e3);
+	});
+</script>
+{elseif $hdinfo['id']=='bosheng2'}
+<style>
+#cloud {
+	position:absolute;
+	top:0;
+	left:0;
+	width: 100%;
+	height: 100%;
+}
+/*这里只写了第1名到第6名的颜色与大小 你可以自己添加大小与颜色*/
+.font1{font-size:180px!important;color:#0166c2!important;opacity:1;font-weight:bold;}
+.font2{font-size:100px!important;color:#0166c2!important;opacity:0.9;}
+.font3{font-size:100px!important;color:#0166c2!important;opacity:0.9;}
+.font4{font-size:100px!important;color:#0166c2!important;opacity:0.9;}
+.font5{font-size:70px!important;color:#0166c2!important;opacity:0.8;}
+.font6{font-size:70px!important;color:#0166c2!important;opacity:0.8;}
+.font7{font-size:50px!important;color:#0166c2!important;opacity:0.8;}
+.font8{font-size:40px!important;color:#0166c2!important;opacity:0.8;}
+.font9,.font10,.font11,.font12,.font13,.font14,.font15,.font16,.font17,.font18,.font19,.font20{font-size:30px!important;color:#0166c2!important;opacity:0.6;}
+.font21,.font22,.font23,.font24,.font25,.font26,.font27,.font28,.font29,.font30,.font31,.font32,.font33,.font34,.font35,.font36,.font37,.font38,.font39,.font40,.font41,.font42,.font43,.font44,.font45,.font46,.font47,.font48,.font49,.font50,.font50,.font51,.font52,.font53,.font54,.font55,.font56,.font57,.font58,.font59,.font60,.font61,.font62{font-size:20px!important;color:#0166c2!important;opacity:0.4;}
+.font63,.font64,.font65,.font66,.font67,.font68,.font69,.font70,.font71,.font72,.font73,.font74,.font75,.font76,.font77,.font78,.font79,.font80,.font81,.font82,.font83,.font84,.font85,.font86,.font87,.font88,.font89,.font90,.font91,.font92,.font93,.font94,.font95,.font96,.font97,.font98,.font99,.font100,.font101,.font102,.font103,.font104,.font105,.font106,.font107,.font108,.font109,.font110,.font111,.font112,.font113,.font114,.font115,.font116,.font117,.font118,.font119,.font120,.font121,.font122,.font123,.font124,.font125,.font126,.font127,.font128,.font129,.font130{font-size:14px!important;color:#0166c2!important;opacity:0.1;}
+</style>
+<div id="cloud"></div>
+<script type="text/javascript">
+	require(['screensocket','screencore','layerBox','keyboard','jqcloud'],function(screensocket,screencore,layerBox,fulldm,keyboardJS) {
+		var wsConfig = {};
+		wsConfig.onmessage = function(data){
+			if(data.type=='connected'){
+				screensocket.isclose = false;
+				screencore.connectsocket({clientid:data.clientid});
+			}
+		};
+		screensocket.init(wsConfig);
+        $('#cloud').jQCloud([],{
+        	shape: 'elliptic',
+        	steps:300,
+        	autoResize:true,
+        });
+		/*每3秒加载一次前30名标签 按点赞次数次数 与 id排序*/
+		var oldtexts = '',newtexts = '';
+		screencore.ajaxSubmit("/screen/msg/textzanrank",{type:2}).then(function(data){
+			if(data.code==0){
+			    var newarr = data.msg;
+			    $.each(newarr,function(i,v){
+		        	v.weight = 1;
+		        	v.html = {'class':'font'+(i+1)};
+		        });
+			    newtexts = JSON.stringify(newarr);
+			    if(newtexts!=oldtexts){
+			        oldtexts = newtexts;
+			        $('#cloud').jQCloud('update', newarr);
+			    }else{
+			        console.log('一样的');
+			    }
+			}else{
+				console.log(data.msg);
+			}
+		},function(){
+			console.log('error');
+		});
+		setInterval(function() {
+			screencore.ajaxSubmit("/screen/msg/textzanrank",{type:2}).then(function(data){
+				if(data.code==0){
+				    var newarr = data.msg;
+				    $.each(newarr,function(i,v){
+			        	v.weight = 1;
+			        	v.html = {'class':'font'+(i+1)};
+			        });
+		            
+				    newtexts = JSON.stringify(newarr);
+				    if(newtexts!=oldtexts){
+				        oldtexts = newtexts;
+				        $('#cloud').jQCloud('update', newarr);
+				    }else{
+				        //加载的数据一样则按随机取
+				        screencore.ajaxSubmit("/screen/msg/textzanrank",{type:3}).then(function(data){
+							if(data.code==0){
+							    $.each(data.msg,function(i,v){
+						        	v.weight = 1;
+						        	v.html = {'class':'font'+(i+1)};
+						        });
+					            $('#cloud').jQCloud('update', data.msg);
+							}else{
+								console.log(data.msg);
+							}
+						},function(){
+							console.log('error');
+						});
+				    }
+				}else{
+					console.log(data.msg);
+				}
+			},function(){
+				console.log('error');
+			});
+		}, 5e3);
+	});
+</script>
+{elseif $hdinfo['id']=='bosheng3'}
+<style>
+#cloud {
+	position:absolute;
+	top:0;
+	left:0;
+	width: 100%;
+	height: 100%;
+}
+/*这里只写了第1名到第6名的颜色与大小 你可以自己添加大小与颜色*/
+.font1{font-size:180px!important;color:#0166c2!important;opacity:1;font-weight:bold;}
+.font2{font-size:100px!important;color:#0166c2!important;opacity:0.9;}
+.font3{font-size:100px!important;color:#0166c2!important;opacity:0.9;}
+.font4{font-size:100px!important;color:#0166c2!important;opacity:0.9;}
+.font5{font-size:70px!important;color:#0166c2!important;opacity:0.8;}
+.font6{font-size:70px!important;color:#0166c2!important;opacity:0.8;}
+.font7{font-size:50px!important;color:#0166c2!important;opacity:0.8;}
+.font8{font-size:40px!important;color:#0166c2!important;opacity:0.8;}
+.font9,.font10,.font11,.font12,.font13,.font14,.font15,.font16,.font17,.font18,.font19,.font20{font-size:30px!important;color:#0166c2!important;opacity:0.6;}
+.font21,.font22,.font23,.font24,.font25,.font26,.font27,.font28,.font29,.font30,.font31,.font32,.font33,.font34,.font35,.font36,.font37,.font38,.font39,.font40,.font41,.font42,.font43,.font44,.font45,.font46,.font47,.font48,.font49,.font50,.font50,.font51,.font52,.font53,.font54,.font55,.font56,.font57,.font58,.font59,.font60,.font61,.font62{font-size:20px!important;color:#0166c2!important;opacity:0.4;}
+.font63,.font64,.font65,.font66,.font67,.font68,.font69,.font70,.font71,.font72,.font73,.font74,.font75,.font76,.font77,.font78,.font79,.font80,.font81,.font82,.font83,.font84,.font85,.font86,.font87,.font88,.font89,.font90,.font91,.font92,.font93,.font94,.font95,.font96,.font97,.font98,.font99,.font100,.font101,.font102,.font103,.font104,.font105,.font106,.font107,.font108,.font109,.font110,.font111,.font112,.font113,.font114,.font115,.font116,.font117,.font118,.font119,.font120,.font121,.font122,.font123,.font124,.font125,.font126,.font127,.font128,.font129,.font130{font-size:14px!important;color:#0166c2!important;opacity:0.1;}
+</style>
+<div id="cloud"></div>
+<script type="text/javascript">
+	require(['screensocket','screencore','layerBox','keyboard','jqcloud'],function(screensocket,screencore,layerBox,fulldm,keyboardJS) {
+		var wsConfig = {};
+		wsConfig.onmessage = function(data){
+			if(data.type=='connected'){
+				screensocket.isclose = false;
+				screencore.connectsocket({clientid:data.clientid});
+			}
+		};
+		screensocket.init(wsConfig);
+        $('#cloud').jQCloud([],{
+        	shape: 'elliptic',
+        	steps:300,
+        	autoResize:true,
+        });
+		/*每3秒加载一次前30名标签 按出现次数 与 id排序*/
+		var oldtexts = '',newtexts = '';
+		screencore.ajaxSubmit("/screen/msg/texttimerank",{}).then(function(data){
+			if(data.code==0){
+			    var newarr = data.msg;
+			    $.each(newarr,function(i,v){
+		        	v.weight = 1;
+		        	v.html = {'class':'font'+(i+1)};
+		        });
+			    newtexts = JSON.stringify(newarr);
+			    if(newtexts!=oldtexts){
+			        oldtexts = newtexts;
+			        $('#cloud').jQCloud('update', newarr);
+			    }else{
+			        console.log('一样的');
+			    }
+			}else{
+				console.log(data.msg);
+			}
+		},function(){
+			console.log('error');
+		});
+		setInterval(function() {
+			screencore.ajaxSubmit("/screen/msg/texttimerank",{}).then(function(data){
+				if(data.code==0){
+				    var newarr = data.msg;
+				    $.each(newarr,function(i,v){
+			        	v.weight = 1;
+			        	v.html = {'class':'font'+(i+1)};
+			        });
+		            
+				    newtexts = JSON.stringify(newarr);
+				    if(newtexts!=oldtexts){
+				        oldtexts = newtexts;
+				        $('#cloud').jQCloud('update', newarr);
+				    }else{
+				        console.log('一样的');
+				    }
+				}else{
+					console.log(data.msg);
+				}
+			},function(){
+				console.log('error');
+			});
+		}, 5e3);
+	});
+</script>
+{else /}
+<style>
+.layui-layer-move{
+	z-index:6!important;
+}
+.layui-layer-photos{
+	z-index:8!important;
+}
+.layui-layer-shade{
+	z-index:7!important;
+}
+.wall-mainbox{
+	top:90px;
+	bottom:40px;
+}
+{if $pcconfig['onlydm']=='1'}.wall-mainbox{opacity:0}{/if}
+.msgwall-lists{
+	position:relative;
+	height:100%;
+	width:84%;
+	margin: 0 auto;
+	overflow:hidden;
+	z-index:1;
+	display:none;
+	opacity:0;
+}
+.wall-list {
+	height: 100%;
+	width:100%;
+	color:{if empty($pcconfig['pcfontcolor'])}#ffffff{else}{$pcconfig['pcfontcolor']}{/if};
+}
+.wall-list .wall-item.wallnum-4{
+	width:100%;
+	height:155px;
+	overflow: hidden;
+}
+.wall-list .wall-item.wallnum-4 .wall-item-box{
+	width:100%;
+	height:145px;
+	padding:5px 0;
+	position: relative;
+}
+.wall-item.wallnum-4 .wall-msg-box .wall-user {
+	height:100%;
+	width:220px
+}
+.wall-item.wallnum-4 .wall-msg-box .wall-user .wall-user-bg{
+    width: 173px;
+    height: 121px;
+    left:31.8px;
+    top:14px;
+}
+.wall-item.wallnum-4 .wall-msg-box .wall-user .wall-user-headerimg-box{
+	height:100px;
+	width:100px;
+	border-radius:50%;
+}
+.wall-item.wallnum-4 .wall-header-img{
+	height:100%;
+	width:100%;
+	border-radius:50%;
+}
+.wall-item .wall-msginfo.holdscreen{
+	color: #ffab00;
+    -webkit-text-stroke: #000 .5px;
+    font-weight: bolder;
+}
+.wall-item.wallnum-4 .wall-msginfo{
+	height:100%;
+	width:calc(100% - 320px);
+}
+.wall-item.wallnum-4 .wall-msginfo .wall-nickname{
+	line-height: 40px;
+    height: 40px;
+    font-size:24px;
+    padding:10px 0;
+}
+.wall-item.wallnum-4 .wall-content{
+	width: 100%;
+    height:85px;
+    font-size:36px;
+    line-height:36px;
+    overflow: hidden;
+    margin: 0;
+}
+.wall-item.wallnum-4 .wall-content .bpimgBox{
+	height: 100%;
+    max-width: 20%;
+    float: left;
+    display: -webkit-inline-box;
+    display: -webkit-inline-flex;
+    display: -ms-inline-flexbox;
+    display: inline-flex;
+    vertical-align: text-top;
+    -webkit-box-align: start;
+    -webkit-align-items: flex-start;
+    -ms-flex-align: start;
+    align-items: flex-start;
+    -webkit-box-pack: start;
+    -webkit-justify-content: flex-start;
+    -ms-flex-pack: start;
+    justify-content: flex-start;
+}
+.wall-item.wallnum-4 .wall-content .bpimgBox img{
+	width: 79px;
+    height: auto;
+    -o-object-fit: contain;
+    object-fit: contain;
+    -o-object-position: center;
+    object-position: center;
+	margin-right:10px;
+}
+.wall-item.wallnum-4 .wall-content .bptxtBox{
+	display: inline-block;
+    width: 80%;
+	color: #ffab00;
+    -webkit-text-stroke: #000 .5px;
+    font-weight: bolder;
+}
+.wall-item.wallnum-4 .wall-content .faceImg{
+	height:40px;
+	width:40px;
+	vertical-align: middle;
+}
+.wall-item.wallnum-4 .wall-content .msgImg{
+	height:79px;
+	width: auto;
+}
+/*3条*/
+.wall-list .wall-item.wallnum-3{
+	width:100%;
+	height:206.66;
+	overflow: hidden;
+}
+.wall-list .wall-item.wallnum-3 .wall-item-box{
+	width:100%;
+	height:186.66px;
+	padding:10px 0;
+	position: relative;
+}
+.wall-item.wallnum-3 .wall-msg-box .wall-user {
+	height:100%;
+	width:260px;
+	position: relative;
+}
+.wall-item.wallnum-3 .wall-msg-box .wall-user .wall-user-bg{
+    width: 223px;
+    height: 156px;
+    left:28px;
+    top:17px;
+}
+.wall-item.wallnum-3 .wall-msg-box .wall-user .wall-user-headerimg-box{
+	height:129px;
+	width:129px;
+	border-radius:50%;
+}
+.wall-item.wallnum-3 .wall-header-img{
+	height:100%;
+	width:100%;
+	border-radius:50%;
+}
+.wall-item.wallnum-3 .wall-msginfo{
+	height:100%;
+	width:calc(100% - 360px);
+}
+.wall-item.wallnum-3 .wall-msginfo .wall-nickname{
+	line-height:50px;
+    height: 50px;
+    font-size:34px;
+    padding:10px 0;
+}
+.wall-item.wallnum-3 .wall-content{
+	width: 100%;
+    height:116.66px;
+    font-size:48px;
+    line-height:52px;
+    overflow: hidden;
+    margin: 0;
+}
+.wall-item.wallnum-3 .wall-content .bpimgBox{
+	height: 100%;
+    max-width: 20%;
+    float: left;
+    display: -webkit-inline-box;
+    display: -webkit-inline-flex;
+    display: -ms-inline-flexbox;
+    display: inline-flex;
+    vertical-align: text-top;
+    -webkit-box-align: start;
+    -webkit-align-items: flex-start;
+    -ms-flex-align: start;
+    align-items: flex-start;
+    -webkit-box-pack: start;
+    -webkit-justify-content: flex-start;
+    -ms-flex-pack: start;
+    justify-content: flex-start;
+}
+.wall-item.wallnum-3 .wall-content .bpimgBox img{
+	width: 86px;
+    height: 86px;
+    -o-object-fit: contain;
+    object-fit: contain;
+    -o-object-position: center;
+    object-position: center;
+	margin-right:10px;
+}
+.wall-item.wallnum-3 .wall-content .bptxtBox{
+	display: inline-block;
+    width: 80%;
+	
+}
+.wall-item.wallnum-3 .wall-content .faceImg{
+	height:52px;
+	width:52px;
+	vertical-align: middle;
+}
+.wall-item.wallnum-3 .wall-content .msgImg{
+	height:100px;
+	width: auto;
+}
+/*1条*/
+.wall-list .wall-item.wallnum-1{
+	width:100%;
+	height:100%;
+	overflow: hidden;
+}
+.wall-list .wall-item.wallnum-1 .wall-item-box{
+	width:100%;
+	height:100%;
+	padding:5px 0;
+	position: relative;
+	box-sizing: border-box;
+}
+.wall-item.wallnum-1 .wall-msg-box .wall-user {
+	height:220px;
+	width:220px
+}
+.wall-item.wallnum-1 .wall-msg-box .wall-user .wall-user-bg{
+    width: 173px;
+    height: 121px;
+    left:31.8px;
+    top:50px;
+}
+.wall-item.wallnum-1 .wall-msg-box .wall-user .wall-user-headerimg-box{
+	height:100px;
+	width:100px;
+	border-radius:50%;
+}
+.wall-item.wallnum-1 .wall-header-img{
+	height:100%;
+	width:100%;
+	border-radius:50%;
+}
+.wall-item .wall-msginfo.holdscreen{
+	color: #ffab00;
+    -webkit-text-stroke: #000 .5px;
+    font-weight: bolder;
+}
+.wall-item.wallnum-1 .wall-msginfo{
+	height:100%;
+	width:calc(100% - 320px);
+	padding-top: 50px;
+	box-sizing: border-box;
+}
+.wall-item.wallnum-1 .wall-msginfo .wall-nickname{
+	line-height: 40px;
+    height: 40px;
+    font-size:24px;
+    padding:10px 0;
+}
+.wall-item.wallnum-1 .wall-content{
+	width: 100%;
+    height: calc( 100% - 100px);
+    font-size:36px;
+    line-height:36px;
+    overflow: hidden;
+    margin: 0;
+}
+.wall-item.wallnum-1 .wall-content .bpimgBox{
+	height: 100%;
+    max-width: 20%;
+    float: left;
+    display: -webkit-inline-box;
+    display: -webkit-inline-flex;
+    display: -ms-inline-flexbox;
+    display: inline-flex;
+    vertical-align: text-top;
+    -webkit-box-align: start;
+    -webkit-align-items: flex-start;
+    -ms-flex-align: start;
+    align-items: flex-start;
+    -webkit-box-pack: start;
+    -webkit-justify-content: flex-start;
+    -ms-flex-pack: start;
+    justify-content: flex-start;
+}
+.wall-item.wallnum-1 .wall-content .bpimgBox img{
+	width: 79px;
+    height: auto;
+    -o-object-fit: contain;
+    object-fit: contain;
+    -o-object-position: center;
+    object-position: center;
+	margin-right:10px;
+}
+.wall-item.wallnum-1 .wall-content .bptxtBox{
+	display: inline-block;
+    width: 80%;
+	color: #ffab00;
+    -webkit-text-stroke: #000 .5px;
+    font-weight: bolder;
+}
+.wall-item.wallnum-1 .wall-content .faceImg{
+	height:40px;
+	width:40px;
+	vertical-align: middle;
+}
+.wall-item.wallnum-1 .wall-content .msgImg{
+	height:79px;
+	width: auto;
+}
+.wall-list .wall-item-box .wall-item-bg {
+	position: absolute;
+	z-index:-1;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+}
+.wall-list .wall-item-box .wall-item-bg .wall-item-bg-warp{
+	width: 100%;
+	height: 100%;
+	border: {$pcconfig['pcbordersize']}px solid {$pcconfig['pcbordercolor']};
+    border-radius: 20px;
+    background-color: {$pcconfig['pcbgcolor']};
+    box-sizing: border-box;
+}
+
+.wall-list .wall-item-box .wall-item-showmore{
+	position: absolute;
+	top: 0;
+	right: 0;
+	width: 100px;
+	height: 100%;
+	text-align: center;
+	box-shadow: -6px 0 30px rgba(0,0,0,.4);
+	z-index:2;
+	cursor: pointer;
+	color:#fff
+}
+.wall-list .wall-item-box .wall-item-showmore i{
+	font-size: 30px;
+	display: inline-block;
+	cursor: pointer;
+}
+.wall-list .wall-item-box .wall-msg-box {
+	height: 100%;
+	width: 100%;
+	position: relative;
+}
+
+.wall-list .wall-item-box .wall-msg-box .wall-user-bg{
+	{if !empty($pcconfig['pcavatarbg'])}background: url({:tomedia($pcconfig['pcavatarbg'])}) no-repeat;{/if}
+    background-size: 100% auto;
+    position: absolute;
+    z-index: -1;
+}
+
+/*消息放大*/
+.wall-bigshow {
+	height: calc(100% - 10px);
+	border: 1px solid rgba(255,255,255,0.2);
+	background-color:rgba(255,255,255,0.2);
+	box-shadow: 0 3px 3px rgba(0,0,0,0.1);
+	border-radius:10px;
+	width:100%;
+	z-index: 1;
+	cursor:pointer;
+	display:none;
+	overflow:hidden;
+}
+.closemsgbig{
+	position:absolute;
+	display:inline-block;
+	font-size:36px;
+	color:#fff;
+	right:30px;
+	top:20px;
+}
+.wallbig-item {
+	position:relative;
+	height: 100%;
+	padding:20px;
+}
+.wallbig-item .wallbig-user{
+	height: 100px;
+	padding: 0 20px;
+}
+.wallbig-item .wallbig-user img{
+	  border-radius:50%;
+	  width:100px;
+	  height:100px;
+}
+.wallbig-item .wallbig-avatar{
+	margin-right:40px;
+}
+.wallbig-item .wallbig-nickname{
+	font-size:30px;
+	height: 100px;
+	line-height:100px;
+}
+.wallbig-item .wallbig-content{
+	height: calc(100% - 200px);
+	border-top:0.1px solid rgba(255, 255, 255, 0.5);
+	padding:20px;
+	margin-top:30px;
+	font-size:40px;
+	display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: start;
+    -webkit-align-items: flex-start;
+    -ms-flex-align: start;
+    align-items: flex-start;
+}
+.wallbig-content .msgImg{
+	width:auto;
+	height:100%;
+}
+.wallbig-content .faceImg{
+	height:50px;width:50px;vertical-align: middle;
+}
+.wallbig-content .bpimgBox{
+	max-width: 50%;
+	margin-right:10px;
+}
+.wallbig-content .bpimgBox img{
+	height:300px;
+}
+.wallbig-content .bptxtBox{
+	max-width: 50%;
+}
+.wall-bigshow .wallbig-item{
+	color:{if empty($pcconfig['pcfontcolor'])}#fff{else}{$pcconfig['pcfontcolor']}{/if};
+}
+.wall-bigshow .wallbig-item.isholdscreen{
+	color: #ffab00;
+    -webkit-text-stroke: #000 .5px;
+    font-weight: bolder;
+}
+{if isset($pcconfig['showjoinnum']) && $pcconfig['showjoinnum']=='2'}
+.header .joinPeople{opacity: 0;}
+{/if}
+</style>
+<section class="wall-mainbox normal-box">
+	<div class="msgwall-lists">
+		<div class="wall-list">
+		</div>
+		<div class="wall-bigshow"></div>
+	</div>
+</section>
+<script type="text/html" id="msg-tpl">
+		<div class="wall-item msg-{{ id }}" data-msgid="{{ id }}">
+		  <div class="wall-item-box">
+			<div class="wall-msg-box zam-app-flex">	
+				<div class="wall-item-bg">
+					<div class="wall-item-bg-warp"></div>
+				</div>
+				<div class="wall-item-showmore zam-app-flex-ajCenter2 display-none"><i class="zam-icon-arrow-circle-o-right"></i></div>
+				<div class="wall-user zam-app-flex-ajCenter2">
+					<div class="wall-user-bg"></div>
+					<div class="wall-user-headerimg-box">
+						<img class="wall-header-img" src="{{ avatar }}">
+					</div>
+				</div>	
+				<div class="wall-msginfo{{ if type=='3' }} holdscreen{{ /if }}">
+					<div class="wall-nickname limitbox">{{ nickname }}{if !isset($pcconfig['showmsgtime']) || $pcconfig['showmsgtime']=='1'} {{ create_time }}{/if}</div>
+				{{ if type=='1' }}
+					<div class="wall-content">{{#content}}</div>
+				{{ else if type=='2' }}
+					<div class="wall-content"><img data-msgid="msg-{{ id }}" data-hadshow="{{ if hadshow=='1' }}1{{ else }}0{{ /if }}" class="msgImg" src="{{ content }}" /></div>
+				{{ else if type=='3' }}
+					<div class="wall-content isholdscreen">
+						{{ if content.bpimg!='' }}<div class="bpimgBox"><img data-msgid="msg-{{ id }}" data-hadshow="{{ if hadshow=='1' }}1{{ else }}0{{ /if }}" class="msgImg" src="{{ content.bpimg }}" /></div>{{ /if }}<div class="bptxtBox"><div class="bptxt">(霸屏{{ content.bptime }}秒) {{ content.bptxt }}</div></div>
+					</div>
+				{{ /if }}
+				</div> 
+			</div>
+		  </div>
+		</div>
+</script>
+<script type="text/html" id="msgbig-tpl">
+	<div class="wallbig-item {{ if isholdscreen>0 }}isholdscreen{{ /if }}">
+			<i class="closemsgbig zam-icon-error"></i>
+			<div class="wallbig-user zam-app-flex">
+				<div class="wallbig-avatar"><img src="{{ avatar }}" /></div>
+				<div class="wallbig-nickname">{{ nickname }}</div>
+			</div>
+			<div class="wallbig-content">{{# content }}</div>
+	</div>
+</script>
+<script>
+require(['msgs','screensocket','screencore','layerBox','fulldm','keyboard'],function(msgs,screensocket,screencore,layerBox,fulldm,keyboardJS) {
+	msgs.init({:json_encode($pcconfig)});
+	var wsConfig = {};
+	wsConfig.onmessage = function(data){
+		if(data.type=='connected'){
+			screensocket.isclose = false;
+			screencore.connectsocket({clientid:data.clientid});
+		}else{
+			if(data.type=='del'){
+				if(!$.isArray(data.msgid)){
+					msgs.delOneMsgs(data.msgid);
+				}else{
+					$.each(data.msgid,function(index,val){
+						msgs.delOneMsgs(val);
+					});
+				}
+			}else if(data.type=='msgreset'){
+				msgs.resetMsg();
+			}else if(data.type=='msgshenhe'){
+				var messages = data.messages;
+				if($.isArray(messages)&&messages.length>0){
+					$.each(messages,function(i, val){
+						msgs.addOneMsgs(val);
+					});
+				}
+			}else if(data.type=='1'||data.type=='2'){
+				msgs.addOneMsgs(data);
+			}else if(data.type=='screendm'){
+				var messages = data.messages;
+				if(messages){
+					if($.isArray(messages)&&messages.length>0){
+						$.each(messages,function(i, val){
+							fulldm.addBullet(val);
+						});
+					}
+				}else{
+					fulldm.addBullet(data);
+				}
+			}else if(data.type=='screendeldm'){
+				if(!$.isArray(data.msgid)){
+					fulldm.delBullet(data.msgid);
+				}else{
+					$.each(data.msgid,function(index,val){
+						fulldm.delBullet(val);
+					});
+				}
+			}else if(data.type=='screenresetdm'){
+				if(data.fromtype=='1') msgs.resetMsg();
+				fulldm.resetBullet();
+			}
+		}
+	};
+	screensocket.init(wsConfig);
+	$('.to-firstpage').on('click', function(e) {
+		!$('.wall-bigshow').is(':hidden')&&($('.wall-bigshow').fadeOut(),$('.wall-list').fadeIn()),msgs.firstpage();
+	});
+	$('.to-prevpage').on('click', function(e) {
+		!$('.wall-bigshow').is(':hidden')&&($('.wall-bigshow').fadeOut(),$('.wall-list').fadeIn()),msgs.prevpage();
+	});
+	$('.to-nextpage').on('click', function(e) {
+		!$('.wall-bigshow').is(':hidden')&&($('.wall-bigshow').fadeOut(),$('.wall-list').fadeIn()),msgs.nextpage();
+	});
+	$('.to-lastpage').on('click', function(e) {
+		!$('.wall-bigshow').is(':hidden')&&($('.wall-bigshow').fadeOut(),$('.wall-list').fadeIn()),msgs.lastpage();
+	});
+	$('.pause-start-page').on('click', function(e) {
+		e.preventDefault();
+		if ($(this).find(".mxc-stop").length>0) {
+			$(this).find(".mxc-stop").removeClass('mxc-stop').addClass('mxc-playfill');
+			msgs.stopNext();//1为完全暂停 2为仅清除定时器
+		} else {
+			$(this).find(".mxc-playfill").removeClass('mxc-playfill').addClass('mxc-stop');
+			!$('.wall-bigshow').is(':hidden')&&($('.wall-bigshow').fadeOut(),$('.wall-list').fadeIn()),msgs.startNext();
+		}
+	});
+	$("body").on('mouseover','.wall-item',function(){
+		var showMoreBox = $(this).find(".wall-item-showmore");
+		showMoreBox.removeClass("display-none");
+	});
+	$('body').on('mouseleave','.wall-item',function(){
+		var showMoreBox = $(this).find(".wall-item-showmore");
+	    showMoreBox.addClass("display-none");
+	});
+	$('body').on('click','.wall-item-showmore',function(){
+		if(msgs.istransition) return;
+		var wallItem = $(this.parentNode.parentNode);
+		var html = msgs.msgBigRender({'nickname':wallItem.find(".wall-nickname").text(),'avatar':wallItem.find(".wall-header-img").attr('src'),'content':wallItem.find(".wall-content").html(),'isholdscreen':wallItem.find('.isholdscreen').length});
+		$('.wall-bigshow').html(html).fadeIn(),$('.wall-list').fadeOut(),$('.pause-start-page').trigger('click');
+	});
+	$("body").on('click','.closemsgbig',function(){
+		$('.wall-bigshow').fadeOut(),$('.wall-list').fadeIn(),$('.pause-start-page').trigger('click');
+	});
+	keyboardJS.bind('space', function(e) {
+		$('.pause-start-page').trigger('click');
+	});
+	keyboardJS.bind('right', function(e) {
+		$('.to-nextpage').trigger('click');
+	});
+	keyboardJS.bind('left', function(e) {
+		$('.to-prevpage').trigger('click');
+	});
+	keyboardJS.bind('up', function(e) {
+		$('.to-firstpage').trigger('click');
+	});
+	keyboardJS.bind('down', function(e) {
+		$('.to-lastpage').trigger('click');
+	});
+	screencore.sendMsg2frame({'type':'msgmenuopen'});
+	{if isset($hdinfo['loadtype']) && $hdinfo['loadtype']=='2'}
+		window.addEventListener('message', function(e){
+	        if (e.origin.indexOf(window.location.host)!=-1 && typeof e.data === 'string') {
+	            var fdata = JSON.parse(e.data);
+	            if(fdata.type=='firstpage'){
+	            	!$('.wall-bigshow').is(':hidden')&&($('.wall-bigshow').fadeOut(),$('.wall-list').fadeIn()),msgs.firstpage();
+	            }else if(fdata.type=='prevpage'){
+	            	!$('.wall-bigshow').is(':hidden')&&($('.wall-bigshow').fadeOut(),$('.wall-list').fadeIn()),msgs.prevpage();
+	            }else if(fdata.type=='nextpage'){
+	            	!$('.wall-bigshow').is(':hidden')&&($('.wall-bigshow').fadeOut(),$('.wall-list').fadeIn()),msgs.nextpage();
+	            }else if(fdata.type=='lastpage'){
+	            	!$('.wall-bigshow').is(':hidden')&&($('.wall-bigshow').fadeOut(),$('.wall-list').fadeIn()),msgs.lastpage();
+	            }else if(fdata.type=='pausenext'){
+	            	msgs.stopNext();
+	            }else if(fdata.type=='startnext'){
+	            	!$('.wall-bigshow').is(':hidden')&&($('.wall-bigshow').fadeOut(),$('.wall-list').fadeIn()),msgs.startNext();
+	            }
+	        }
+		});
+	{/if}
+});
+</script>
+{/if}
+{include file='common/footer' /}

@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{$guestconfig['title']??'登录参与活动'}</title>
+    <meta content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0" name="viewport"/>
+    <meta content="yes" name="apple-mobile-web-app-capable"/>
+    <meta content="black" name="apple-mobile-web-app-status-bar-style"/>
+    <meta content="telephone=no" name="format-detection"/>
+	<link rel="shortcut icon" href="" />
+    <link rel="stylesheet" href="__STATIC__/js/ydui/css/ydui.css"/>
+	<link rel="stylesheet" href="__STATIC__/css/wechat/style.css" />
+	<link rel="stylesheet" href="__STATIC__/css/zam-icon.css" media="all" />
+	<link rel="stylesheet" href="__STATIC__/css/mxc-icon.css" media="all" />
+	<script src="https://res.wx.qq.com/open/js/jweixin-1.6.0.js" type="text/javascript" charset="utf-8"></script>
+	<script src="__STATIC__/js/ydui/js/ydui.flexible.js"></script>
+	<script src="__STATIC__/js/jquery.2.1.4.js"></script>
+	<script src="__STATIC__/js/jquery.extend.js"></script>
+	<script type="text/javascript"  src="__STATIC__/js/require.js"></script>
+	<script type="text/javascript">
+		var XCV3Config = {
+		  staticurl:"__STATIC__/",
+		  hdid:"{$hdinfo['hdid']??''}",
+		  rhdid:"{$hdinfo['id']??''}",
+		  wsAddress:"{$wssaddress??''}",
+		  clienttype:"{$clienttype??'1'}",
+		  ismanager:"{$wxuser['ismanager']??'2'}",
+		  isestoppel:"{$wxuser['isestoppel']??'2'}",
+		  userid:"{$wxuser['id']??''}",
+		  openid:"{$wxuser['openid']??''}",
+		  nickname:"{$wxuser['nickname']??''}",
+		  avatar:"{if isset($wxuser['avatar'])}{:tomedia($wxuser['avatar'])}{else}{/if}",
+		  sex:"{$wxuser['sex']??'1'}",
+		  sendJgtime:"{$appconfig['appsendtime']??'10'}",
+		  gametype:"{$appconfig['gametype']??'common'}",
+		  isiframe:window.top!=window.self,
+		  isluckertxt:"{$hdinfo['mobileconfig']['forbiddenword']??'您已经中过奖了，把机会留给其他人吧！'}",
+		  douyinjssdk:{
+			client_key:"{$dyjssdk['client_key']??''}",
+			signature:"{$dyjssdk['signature']??''}",
+			timestamp:"{$dyjssdk['timestamp']??''}",
+			nonce_str:"{$dyjssdk['nonce_str']??''}",
+			url:"{$dyjssdk['url']??''}"
+		  },
+		  qrtype:"{$hdinfo['qrtype']??1}",
+		  inminiprogram:"{$hdinfo['inminiprogram']??1}",
+		  isminiProgram:'2',
+		  adv:{if isset($hdinfo['advconfig']['h5']) && !empty($hdinfo['advconfig']['h5'])}{:json_encode($hdinfo['advconfig']['h5'])}{else /}""{/if},
+		  amconfig:{:json_encode(amconfig())},
+		},dysdkobj = null;
+		require.config({
+			baseUrl: XCV3Config.staticurl + "js",
+			urlArgs:'v=2.8.68',//+(new Date()).getTime(),
+			waitSeconds:0,
+			paths: {
+				 css: "css.min",
+				 jquery:"jquery.2.1.4",
+				 jquerytrans:'screenjs/jquery.transit.min',
+				 fastclick:'wechatjs/fastclick',
+				 mobileselect:"mobileselect/mobileselect",
+				 mobileselectAreas:"mobileselect/mobileselectareas",
+				 'q-select':"q-select/q-select",
+				 ionrangeslider:'ionrangeslider/ionrangeslider',
+				 ydui: "ydui/js/ydui",
+				 template:"template/template",
+				 layer:"layer/mobile/layer",
+				 laytpl:"laytpl/laytpl",
+				 howler:"howler/howler.min",
+				 cropper:"cropper/cropper",
+				 "jquery.shake":'wechatjs/jquery.shake',
+				 jform:'jquery.form',
+				 touch:'wechatjs/touch',
+				 slideBox:'wechatjs/slideBox',
+				 wechatcore:"wechatjs/wechatcore",
+				 marqueen:"wechatjs/marqueen",
+				 bscroll:'wechatjs/bscroll/bscroll',
+				 swiper:'swiper/swiper.min',
+				 emojicore:"wechatjs/emojicore",
+				 appsocket:"wechatjs/appsocket",
+				 appmsg:"wechatjs/appmsg",
+				 appgame:"wechatjs/appgame",
+				 appredpack:"wechatjs/appredpack",
+				 appydj:"wechatjs/appydj",
+				 appdgshake:"wechatjs/appdgshake",
+				 appshuqian:"wechatjs/appshuqian",
+				 appmonkey:"wechatjs/appmonkey",
+				 appcar:"wechatjs/appcar",
+				 apphorse:"wechatjs/apphorse",
+				 appmls:"wechatjs/appmls",
+				 appbike:"wechatjs/appbike",
+				 appswim:"wechatjs/appswim",
+				 apptug:"wechatjs/apptug",
+				 appanswerbs:"wechatjs/appanswerbs",
+				 appjjb:"wechatjs/appjjb",
+				 appcutfruit:"wechatjs/appcutfruit",
+				 appdzqy:"wechatjs/appdzqy",
+				 appmouse:"wechatjs/appmouse",
+				 appshakestart:"wechatjs/appshakestart",
+				 appdzp:"wechatjs/appdzp",
+				 appdzpdz:"wechatjs/appdzpdz",
+				 videojs:'videojs/video',
+				 TcPlayer:'videojs/TcPlayer-2.4.1/TcPlayer-2.4.1',
+				 TcPlayer2:'videojs/TcPlayer-2.4.5/TcPlayer-2.4.5',
+				 TXLivePlayer:'videojs/TcPlayer-2.4.1/TXLivePlayer.min',
+				 hls:'videojs/TcPlayer-2.4.1/hls.min',
+				 qnrtplayer:'videojs/qiniu/qn-web',
+				 plupload:'plupload/plupload',
+				 uploader:'plupload/uploader',
+				 phaser:'wechatjs/phaser.min',
+				 domtoimage:'domtoimg/domtoimage',
+				 html2canvas:"wechatjs/html2canvas",
+				 danmuku:'screenjs/danmuku',
+				 fulldm:'wechatjs/fulldm',
+				 dialog:'dialog/js/dialog',
+				 sweetalert:"sweetalert/sweetalert",
+				 directoss:'directupload/aliyun',
+				 directqiniu:'directupload/qiniu',
+				 directcos:'directupload/cos',
+				 DouyinOpenJSBridge:'wechatjs/douyin.open',
+				 luckycanvas:'wechatjs/luckycanvas',
+				 bubbleHearts:'wechatjs/bubbleHearts',
+				 numkeyboard:'numkeyboard/numkeyboard',
+				 glightbox:'glightbox/glightbox.min',
+			},
+			shim:{
+				"ydui": {
+					exports:"YDUI"
+				},
+				'template':{
+					exports: 'template',
+				},
+				'layer':{
+					exports: 'layer',
+					deps: ['css!../js/layer/mobile/need/layer.css']
+				},
+				'mobileselect':{
+					exports:'MobileSelect',
+					deps: ['mobileselectAreas','css!../js/mobileselect/mobileselect.css']
+				},
+				'sweetalert':{
+					exports:'Swal',
+					deps: ['css!../js/sweetalert/sweetalert.css']
+				},
+				'q-select':{
+					exports:'QSelect',
+					deps: ['css!../js/q-select/q-select.css']
+				},
+				'ionrangeslider':{
+					deps:['css!../js/ionrangeslider/ionrangeslider.css'],
+				},
+				'wechatcore':{
+					exports:'wechatcore',
+				},
+				'marqueen':{
+					exports:'marqueen',
+				},
+				'laytpl':{
+					exports: 'laytpl',
+				},
+				'jquery.shake':{
+					exports: 'Shake',
+					deps: ['jquery']
+				},
+				'jform':{
+					deps: ['jquery']
+				},
+				'touch':{
+					exports:'touch',
+				},
+				'bscroll':{
+					exports:'BScroll',
+				},
+				'swiper':{
+					exports:'Swiper',
+					deps: ['css!../js/swiper/swiper.min.css']
+				},
+				'cropper':{
+					exports:'Cropper',
+					deps: ['css!../js/cropper/cropper.css']
+				},
+				'glightbox':{
+					exports:'GLightbox',
+					deps: ['css!../js/glightbox/glightbox.min.css'],
+				},
+				'appsocket':{
+					exports:'appsocket',
+				},
+				'appgame':{
+					exports:'appgame',
+				},
+				'appdgshake':{
+					exports:'appdgshake',
+				},
+				'appshuqian':{
+					exports:'appshuqian',
+				},
+				'appmonkey':{
+					exports:'appmonkey',
+				},
+				'appcar':{
+					exports:'appcar',
+				},
+				'apphorse':{
+					exports:'apphorse',
+				},
+				'appmls':{
+					exports:'appmls',
+				},
+				'appbike':{
+					exports:'appbike',
+				},
+				'appswim':{
+					exports:'appswim',
+				},
+				'apptug':{
+					exports:'apptug',
+				},
+				'appanswerbs':{
+					exports:'appanswerbs',
+				},
+				'appdzqy':{
+					exports:'appdzqy',
+				},
+				'appjjb':{
+					exports:'appjjb',
+				},
+				'appcutfruit':{
+					exports:'appcutfruit',
+				},
+				'videojs':{
+					exports:'videojs',
+					deps:['css!../js/videojs/video.css'],
+				},
+				'TcPlayer2':{
+					deps:['css!../js/videojs/TcPlayer-4.7.2/tcplayer.min.css'],
+				},
+				'plupload':{
+					exports:'plupload',
+				},
+				'uploader':{
+					exports:'uploader',
+					deps: ['jquery','plupload'],
+				},
+				'domtoimage':{
+					exports:'domtoimage'
+				},
+				'dialog':{
+					exports:'dialog',
+					deps:['css!../js/dialog/css/dialog.css'],
+				},
+				'numkeyboard':{
+					exports: 'numkeyboard',
+					deps: ['css!../js/numkeyboard/numkeyboard.css']
+				},
+			},
+		});
+		define("jquery", [], function () {
+			return jQuery;
+		});
+	</script>
+	<style type="text/css">
+	.zam-app-login{position: absolute;top:0;left:0;width: 100%;height: 100%;background: rgba(0,0,0,0.12);}
+	.zam-app-login-content{width:82%;padding: 40px 20px;border-radius: 14px;background-color: #fff;box-shadow: -3px 5px 15px #8c8c8c;}
+	.login-title{font-size: 16px;font-weight: bold;margin-bottom: 8px;}
+	
+	.zam-app-uploadimg{
+		position:relative;
+		margin: 0.2rem 0;
+	}
+	.upload-box{
+		width:1.6rem;
+		display: inline-block;
+	    border: 1px solid rgba(0,0,0,0.32);
+	    font-size: 30px;
+	    text-align: center;
+	    overflow: hidden;
+		height:1.6rem;
+		line-height:1.6rem;
+		border-radius: 50%;
+		margin: 0 auto;
+		cursor: pointer;
+	}
+	.upload-box i{
+		display: inline-block;
+	    font-family: Ionicons;
+	    speak: none;
+	    font-style: normal;
+	    font-weight: 400;
+	    font-variant: normal;
+	    text-transform: none;
+	    text-rendering: auto;
+	    line-height: 1;
+	    -webkit-font-smoothing: antialiased;
+	}
+	.upload-tip{text-align:center;padding:0.2rem 0;}
+	.upload-box .uploadavatarImg{
+		width:100%;
+		height:100%;
+		display:block;
+	}
+	.zam-input-box{background: none;border-color: rgba(0,0,0,0.32)}
+	.wx-login {
+	    width: 62vw;
+	    height: 40px;
+	    color: #fff;
+	    border-radius: 20px;
+	    cursor: pointer;
+	    margin-top: 0.24rem;
+	    background-color: {$guestconfig['loginbtn']['bgcolor']??'#48b0f7'};
+	}
+	.wx-login.disabled{
+		pointer-events: none;
+	}
+	.wx-login span {
+	    display: inline-block;
+	    font-size: {$guestconfig['loginbtn']['size']??16}px;
+	    color: {$guestconfig['loginbtn']['color']??'#fff'};
+	}
+	/*裁剪样式*/
+	.img-container{
+		position: absolute;
+	    left: 0;
+	    bottom: 0;
+	    width: 100%;
+	    height: 100%;
+		z-index:1;
+		background-color:#000;
+		overflow:hidden;
+	}
+	.img-container img{
+		display: block;
+		max-width:100%;
+	}
+	.t-image-crop-buttons-item{
+		position: absolute;
+	    bottom: 10px;
+	    padding: 5px 10px;
+	    color: #fff;
+	    border: 1px solid #fff;
+	    border-radius: 4px;
+	    text-shadow: 1px 1px 0 #000;
+	    box-shadow: 0 1px 10px #000;
+	    z-index: 1;
+	}
+	.t-image-crop-buttons-cancel {
+	    left: 10px;
+	}
+	.t-image-crop-buttons-rotate {
+	    left: 50%;
+	    transform: translateX(-50%);
+	}
+	.t-image-crop-buttons-ensure {
+	    right: 10px;
+	}
+	.zam-input-box .cell-select {
+		width: 100%;
+		height: 0.75rem;
+		margin: 0;
+		color: #555;
+	}
+	</style>
+</head>
+<body>
+<section class="zam-app-login zam-app-flex-ajCenter">
+<div class="zam-app-login-content zam-app-flex-ajCenter">
+	<p class="login-title">{$guestconfig['pagetitle']??'填写登录信息'}</p>
+	<div class="zam-app-uploadimg zam-app-flex zam-app-directionColumn">
+		<div class="upload-box zam-app-justifyCenter">
+			{if in_array(request()->host(true),['zam.miboxianchang.cn','hotbav3.hotba88.com']) && in_array($hdinfo['id'],['247','894','895','896','897','914','915','916','917','918','919','920','921'])}
+				<img class="uploadavatarImg" src="https://hotba.oss-cn-shenzhen.aliyuncs.com/shuiwu200px.png" data-filepath="https://hotba.oss-cn-shenzhen.aliyuncs.com/shuiwu200px.png" />
+			{else /}
+				{if !isset($guestconfig['avatar']) || empty($guestconfig['avatar'])}
+					<i class="mxc-cameraaddfill"></i>
+				{else /}
+					<img class="uploadavatarImg" src="{:tomedia($guestconfig['avatar'])}" data-filepath="{$guestconfig['avatar']}" />
+				{/if}
+			{/if}
+		</div>
+		<p class="upload-tip">{$guestconfig['uploadtip']??'点击上传头像'}</p>
+	</div>
+	<div class="zam-input-item">
+		<div class="zam-input-box zam-app-flex-ajCenter2">
+			{if in_array(request()->host(true),['zam.miboxianchang.cn','hotbav3.hotba88.com']) && in_array($hdinfo['id'],['247','894','895','896','897','914','915','916','917','918','919','920','921'])}
+				<select class="cell-select">
+					<option value="">请选择代表队名称</option>
+					<option value="乐东局">乐东局</option>
+					<option value="昌江局">昌江局</option>
+					<option value="定安局">定安局</option>
+					<option value="琼海局">琼海局</option>
+					<option value="文昌局">文昌局</option>
+					<option value="万宁局">万宁局</option>
+					<option value="东方局">东方局</option>
+					<option value="海口局">海口局</option>
+					<option value="五指山局">五指山局</option>
+					<option value="儋州局">儋州局</option>
+					<option value="三沙局">三沙局</option>
+					<option value="三亚局">三亚局</option>
+					<option value="临高局">临高局</option>
+					<option value="澄迈局">澄迈局</option>
+					<option value="白沙局">白沙局</option>
+					<option value="屯昌局">屯昌局</option>
+					<option value="琼中局">琼中局</option>
+					<option value="陵水局">陵水局</option>
+					<option value="保亭局">保亭局</option>
+				</select>
+			{else /}
+				<input type="text" class="cell-input zam-app-cell-input nickname" placeholder="{$guestconfig['nametip']??'请输入姓名'}" onkeyup="return trimSpace(this)" />
+			{/if}
+		</div>
+	</div>
+	<a class="wx-login zam-app-flex-ajCenter2" href="javascript:;" ><span>{$guestconfig['loginbtn']['txt']??'登录'}</span></a>
+</div>
+</section>
+<div class="img-container hidden">
+    <img src="" alt="">
+	<div class="t-image-crop-buttons" style="display: block;">
+		<a href="javascript:;" class="t-image-crop-buttons-item t-image-crop-buttons-cancel">取消</a>
+		<a href="javascript:;" class="t-image-crop-buttons-item t-image-crop-buttons-rotate">旋转90°</a>
+		<a href="javascript:;" class="t-image-crop-buttons-item t-image-crop-buttons-ensure">剪裁</a>
+	</div>
+</div>
+</body>
+<script>
+var $image = $('.img-container img'),cropperobj;
+require(['wechatcore','cropper'],function(wechatcore,Cropper){
+	if(!wechatcore.enableCookie()){
+		wechatcore.msg('Your browser has disabled cookies','0');
+		return false;
+	}
+	$(".zam-app-uploadimg").on('click','.upload-box',function(){
+		var $this = $(this);
+		wechatcore.getwximgbase64(function(data){
+			var loadLayer = wechatcore.loading('正在构建裁剪环境...');
+			$image.attr("src",data);
+			$image.unbind('load').bind("load", function() { 
+				wechatcore.close(loadLayer);
+				$('.img-container').removeClass('hidden');
+				cropperobj = new Cropper($image[0], {
+					background:false,
+					dragMode: 'move',
+					aspectRatio: 1,
+					restore: false,
+					viewMode: 1,
+					center: false,
+					cropBoxMovable: false,
+					cropBoxResizable: false,
+					toggleDragModeOnDblclick: false,
+					rotatable: true,
+					checkOrientation: true,
+				});
+			});	  
+		},{maxnum:1,sourcetype:'1'});
+	});
+	$(".img-container .t-image-crop-buttons-cancel").on('click',function(){
+		$('.img-container').addClass('hidden');
+		cropperobj.destroy();
+		$image.attr('src','');
+	});
+	$(".img-container .t-image-crop-buttons-rotate").on('click',function(){
+		cropperobj.rotate(90);
+	});
+	$(".img-container .t-image-crop-buttons-ensure").on('click',function(){
+		var croppersize = {w : 160,h : 160},canvas = cropperobj.getCroppedCanvas({width: croppersize.w,height:croppersize.h,imageSmoothingQuality: 'high'}),imgdata = canvas.toDataURL("image/png");
+		$('.img-container').addClass('hidden');
+		wechatcore.ajaxSubmit("{:gowechat('oauth/savecopper')}",{base64img:imgdata,fromtype:'logincopper'},'拼命裁剪中...').then(function(data){
+			if(data.code==0){
+				cropperobj.destroy();
+				$image.attr('src','');
+				$(".zam-app-uploadimg .upload-box").empty().append("<img class='uploadavatarImg' src="+data.msg.filesrc+" data-filepath="+data.msg.filepath+" />");
+			}else{
+				cropperobj.destroy();
+				wechatcore.msg(data.msg);
+			}
+		}, function(){
+			wechatcore.msg('网络太差，请稍后重试.');
+		});
+	});
+	$(".wx-login").click(function(){
+		var $this = $(this),nickname = $(".nickname").val() || '',avatar = $(".zam-app-uploadimg img").attr('data-filepath') || '',nicknameonly = $(".cell-select").length ? '1' : '2';
+		$this.addClass('disabled');
+		if($(".cell-select").length){
+			nickname = $(".cell-select").find('option:selected').val() || '';
+		}
+		if(nickname == '' || avatar == ''){
+			if(avatar=='') {
+				$this.removeClass('disabled');
+				return wechatcore.msg("{$guestconfig['avatarerrortip']??'请上传头像'}");
+			}
+			if(nickname=='') {
+				$this.removeClass('disabled');
+				return wechatcore.msg($(".cell-select").length ? '请选择代表队名称' : "{$guestconfig['nameerrortip']??'请输入姓名'}");
+			}
+		}
+		wechatcore.ajaxSubmit("{:gowechat('oauth/login')}",{nickname:nickname,avatar:avatar,nicknameonly:nicknameonly},'登录提交中...').then(function(data){
+			if(data.code==0){
+				//wechatcore.msg('登录成功');
+				setTimeout(function(){
+					window.location.href = "{$desturl}";
+				},1e3);
+			}else{
+				$this.removeClass('disabled');
+				wechatcore.msg(data.msg);
+			}
+		}, function(){
+			$this.removeClass('disabled');
+			wechatcore.msg('网络太差，请稍后重试');
+		});
+	});
+});
+function trimSpace(obj,type){
+    var type = type || '1',str = obj.value || '';
+    if(str!=''){
+        str = str.replace(/(^\s+)|(\s+$)/g,"");//首尾空格
+        if(type == '2'){
+            str = str.replace(/\s/g,"");
+        }
+    }
+    obj.value = str;
+    return true;
+}
+</script>
+{:globalcss()}
+{if !empty($hdinfo['diycss'])}
+<style type="text/css">{$hdinfo['diycss']}</style>
+{/if}
+</html>

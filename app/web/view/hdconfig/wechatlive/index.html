@@ -1,0 +1,695 @@
+{include file='$Wpath/common/header'}
+<style type="text/css">
+    .select2-container--default .select2-results__option[aria-selected=true]:after{
+        float: right;
+        margin-right: 10px;
+        content: "√";
+    }
+</style>
+<form id="formBox" class="zam-formvalidation form-horizontal" method="post">
+	<div class="config-titlebox">
+        <span class="config-titlename">基础设置</span>
+    </div>
+	<div class="form-group">
+        <label class="col-lg-2 control-label">* 微信端网页标题</label>
+        <div class="col-lg-8">
+            <input class="form-control" type="text"  name="apptitle" value="{$config['apptitle']}">
+            <span class="help-block"></span>
+        </div>
+    </div>
+    <div class="config-titlebox">
+        <span class="config-titlename">直播设置</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#screenconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+    </div>
+    <div id="screenconfigbox" class="collapse in">
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 直播封面图</label>
+            <div class="col-lg-8">
+                {:tpl_image_one('liveconfig[poster]',$config['liveconfig']['poster'])}
+                <span class="help-block">规格:640*360px</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 直播logo</label>
+            <div class="col-lg-8">
+                {:tpl_image_one('liveconfig[logo]',$config['liveconfig']['logo'])}
+                <span class="help-block">规格:120*36px，不需要logo可以不设置此项</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 展示历史观看人数</label>
+            <div class="col-lg-8">
+                {:tpl_switch('liveconfig[showjoin]',$config['liveconfig']['showjoin'],'showjoin')}
+                <span class="help-block">注:关闭后直播将不显示历史观看记录人数,当历史人数超过10000将以万为单位</span>
+            </div>
+        </div>
+        <div class="livebasicbox{if $config['liveconfig']['showjoin']=='2'} hidden{/if}">
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 基础人数</label>
+                <div class="col-lg-4">
+                  <input type="text" class="form-control numberincdec" name="liveconfig[basicperson]" value="{$config['liveconfig']['basicperson']}"
+                        data-bts-min="0" data-bts-replacement-val="0"
+                        data-bts-max="null"
+                        data-bts-step="1"
+                        data-bts-postfix="人"
+                        data-bts-postfix-extra-class="touchspin-postfix">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 进入一次增加多少人</label>
+                <div class="col-lg-4">
+                  <input type="text" class="form-control numberincdec" name="liveconfig[addperson]" value="{$config['liveconfig']['addperson']}"
+                        data-bts-min="0" data-bts-replacement-val="0"
+                        data-bts-max="null"
+                        data-bts-step="1"
+                        data-bts-postfix="人"
+                        data-bts-postfix-extra-class="touchspin-postfix">
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 直播状态</label>
+            <div class="col-lg-8">
+                <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.waitlivebox').removeClass('hidden'),$('.livingbox,.endlivebox,.backlivebox').addClass('hidden');">
+                    <input type="radio" name="liveconfig[status]" {if $config['liveconfig']["status"]=="1"}checked{/if} value="1"><span>未开始</span>
+                </label>
+                <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.waitlivebox,.endlivebox,.backlivebox').addClass('hidden'),$('.livingbox').removeClass('hidden');">
+                    <input type="radio" name="liveconfig[status]" {if $config['liveconfig']["status"]=="2"}checked{/if} value="2" ><span>直播中</span>
+                </label>
+                <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.waitlivebox,.livingbox,.backlivebox').addClass('hidden'),$('.endlivebox').removeClass('hidden');">
+                    <input type="radio" name="liveconfig[status]" {if $config['liveconfig']["status"]=="3"}checked{/if} value="3" ><span>已结束</span>
+                </label>
+                <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.waitlivebox,.livingbox,.endlivebox').addClass('hidden'),$('.backlivebox').removeClass('hidden');">
+                    <input type="radio" name="liveconfig[status]" {if $config['liveconfig']["status"]=="4"}checked{/if} value="4" ><span>回放中</span>
+                </label>
+                <span class="help-block">注意:快直播仅仅支持腾讯云平台</span>
+            </div>
+        </div>
+        <div class="form-group waitlivebox{if $config['liveconfig']['status']!='1'} hidden{/if}">
+            <label class="col-lg-2 control-label">* 未开始提示文字</label>
+            <div class="col-lg-8">
+              <input type="text" class="form-control"  name="liveconfig[nostart]"  value="{$config['liveconfig']['nostart']}">
+            </div>
+        </div>
+        <div class="livingbox{if $config['liveconfig']['status']!='2'} hidden{/if}">
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 快直播地址</label>
+                <div class="col-lg-8">
+                  <input type="text" class="form-control"  name="liveconfig[liveurl][webrtc]"  value="{$config['liveconfig']['liveurl']['webrtc']}">
+                  <span class="help-block">腾讯云快直播地址，如果没有可以不填写</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 直播地址</label>
+                <div class="col-lg-8">
+                  <input type="text" class="form-control"  name="liveconfig[liveurl][m3u8]"  value="{$config['liveconfig']['liveurl']['m3u8']}">
+                  <span class="help-block">一般是个m3u8地址</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 直播出现异常提示文字</label>
+                <div class="col-lg-8">
+                  <input type="text" class="form-control"  name="liveconfig[liveurl][errortxt]"  value="{$config['liveconfig']['liveurl']['errortxt']}">
+                </div>
+            </div>
+        </div>
+        <div class="form-group endlivebox{if $config['liveconfig']['status']!='3'} hidden{/if}">
+            <label class="col-lg-2 control-label">* 已结束提示文字</label>
+            <div class="col-lg-8">
+              <input type="text" class="form-control"  name="liveconfig[stoptxt]"  value="{$config['liveconfig']['stoptxt']}">
+            </div>
+        </div>
+        <div class="backlivebox{if $config['liveconfig']['status']!='4'} hidden{/if}">
+            <input type="hidden" name="liveconfig[backurl][urltype]"  value="{$config['liveconfig']['backurl']['urltype']??'1'}">
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 回放地址</label>
+                <div class="col-lg-8">
+                  <input type="text" class="form-control"  name="liveconfig[backurl][m3u8]"  value="{$config['liveconfig']['backurl']['m3u8']}">
+                  <span class="help-block">一般是个m3u8地址</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 回放出现异常提示文字</label>
+                <div class="col-lg-8">
+                  <input type="text" class="form-control"  name="liveconfig[backurl][errortxt]"  value="{$config['liveconfig']['backurl']['errortxt']}">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="config-titlebox">
+        <span class="config-titlename">菜单设置</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#menuconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+    </div>
+    <div id="menuconfigbox" class="collapse in">
+        <div class="form-group hidden">
+            <label class="col-lg-2 control-label">* 状态</label>
+            <div class="col-lg-8">
+                {:tpl_switch('menuconfig[open]',$config['menuconfig']['open'],'openmenu')}
+                <span class="help-block">注:关闭后直播将不显示菜单</span>
+            </div>
+        </div>
+        <div class="menulist{if $config['menuconfig']['open']=='2'} hidden{/if}">
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 菜单高度</label>
+                <div class="col-lg-4">
+                     <input type="text" class="form-control numberincdec" name="menuconfig[height]" value="{$config['menuconfig']['height']}"
+                    data-bts-min="1" data-bts-replacement-val="1"
+                    data-bts-max="null"
+                    data-bts-step="1"
+                    data-bts-postfix="px"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                    >
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 菜单文字大小</label>
+                <div class="col-lg-4">
+                    <input type="text" class="form-control numberincdec" name="menuconfig[fontsize]" value="{$config['menuconfig']['fontsize']}"
+                    data-bts-min="1" data-bts-replacement-val="1"
+                    data-bts-max="null"
+                    data-bts-step="1"
+                    data-bts-postfix="px"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                    >
+                    <span class="zam-help-block">注:必须是个大于0的整数</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 菜单背景颜色</label>
+                <div class="col-lg-3">
+                    {:tpl_color('menuconfig[bgcolor]',$config['menuconfig']['bgcolor'])}
+                    <span class="help-block">默认灰白色</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 菜单文字颜色</label>
+                <div class="col-lg-3">
+                    {:tpl_color('menuconfig[fontcolor]',$config['menuconfig']['fontcolor'])}
+                    <span class="help-block">默认黑色</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 激活菜单文字颜色</label>
+                <div class="col-lg-3">
+                    {:tpl_color('menuconfig[activecolor]',$config['menuconfig']['activecolor'])}
+                    <span class="help-block">默认红色</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 菜单列表</label>
+                <div class="col-lg-10">
+                    <table class="table table-bordered">
+                        <thead>
+                          <tr>
+                            <th style="width:20%;text-align:center;">名称</th>
+                            <th style="width:20%;text-align:center;">类型</th>
+                            <th style="width:40%;text-align:center;">内容</th>
+                            <th style="width:20%;text-align:center;">操作</th>
+                          </tr>
+                        </thead>
+                        <tbody class="menu-lists">
+                        {volist name="config.menuconfig.menus" id="amenu"}
+                            <tr>
+                                <td class="text-center">
+                                    <input class="form-control" name="mname[]" value="{$amenu['mname']}" readonly>
+                                </td>
+                                <td class="text-center">
+                                    {$amenu['typename']}
+                                    <input class="form-control" type="hidden" name="mtype[]" value="{$amenu['mtype']}">
+                                </td>
+                                <td class="text-center">
+                                    {$amenu['content']}
+                                    <input type="hidden" name="minurl[]" value="{$amenu['minurl']}">
+                                    <input type="hidden" name="mouturl[]" value="{$amenu['mouturl']}">
+                                    <input type="hidden" name="martid[]" value="{$amenu['martid']}">
+                                    <input type="hidden" name="phbnum[]" value="{$amenu['phbnum']??'20'}">
+                                    <input type="hidden" name="mstatus[]" value="{$amenu['mstatus']??'1'}">
+                                </td>
+                                <td class="text-center">
+                                    <a class="btn btn-primary btn-xs btn-editmenu"><i class="mdi mdi-pencil"></i></a>
+                                    <a class="btn btn-danger btn-xs btn-delmenu"><i class="mdi mdi-close"></i></a>
+                                    <a href="javascript:;"  class="btn btn-default btn-xs mousemove zam-sortable" title="拖动排序"><i class="mdi mdi-arrow-all"></i></a>
+                                </td>
+                            </tr>
+                        {/volist}
+                        </tbody>
+                        <tfoot>
+                            <tr colspan="4"><td><a href="javascript:void(0)" class="btn btn-primary btn-addmenu btn-xs"><i class="mdi mdi-plus"></i> 新增菜单</a><span class="help-block">建议菜单数量不要超过6个</span></td></tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="nomenulist hidden{if $config['menuconfig']['open']=='1'} hidden{/if}">
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 默认打开链接</label>
+                <div class="col-lg-8">
+                     <input type="text" class="form-control" name="menuconfig[defaulturl]" value="{$config['menuconfig']['defaulturl']}">
+                     <span class="help-block">注:当关闭了菜单，默认打开活动哪个页面，必须填写活动内部页面的链接</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="config-titlebox">
+        <span class="config-titlename">小屏设置</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#smallconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+    </div>
+    <div id="smallconfigbox" class="collapse in">
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 小屏宽</label>
+            <div class="col-lg-4">
+                <input type="text" class="form-control numberincdec" name="smallconfig[width]" value="{$config['smallconfig']['width']}"
+                    data-bts-min="200" data-bts-replacement-val="200"
+                    data-bts-max="null"
+                    data-bts-step="1"
+                    data-bts-postfix="px"
+                    data-bts-postfix-extra-class="touchspin-postfix">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 小屏顶部位置</label>
+            <div class="col-lg-4">
+              <input type="text" class="form-control numberincdec" name="smallconfig[top]" value="{$config['smallconfig']['top']}"
+                    data-bts-min="0" data-bts-replacement-val="0"
+                    data-bts-max="null"
+                    data-bts-step="1"
+                    data-bts-postfix="px"
+                    data-bts-postfix-extra-class="touchspin-postfix">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 小屏左侧位置</label>
+            <div class="col-lg-4">
+              <input type="text" class="form-control numberincdec" name="smallconfig[left]" value="{$config['smallconfig']['left']}"
+                    data-bts-min="0" data-bts-replacement-val="0"
+                    data-bts-max="null"
+                    data-bts-step="1"
+                    data-bts-postfix="px"
+                    data-bts-postfix-extra-class="touchspin-postfix">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 拖动状态</label>
+            <div class="col-lg-8">
+                {:tpl_switch('smallconfig[candrag]',$config['smallconfig']['candrag'])}
+                <span class="help-block">注:开启后可以拖到小屏位置</span>
+            </div>
+        </div>
+        <div class="form-group hidden">
+            <label class="col-lg-2 control-label">* 半屏播放模块</label>
+            <div class="col-lg-8">
+                <select class="form-control js_select2" name="smallconfig[modules]" multiple="multiple">
+                  <option value>请选择</option>
+                  <option value="msg"{if in_array('msg',$config['smallconfig']['modules'])} selected{/if}>潜水</option>
+                  <option value="shake"{if in_array('shake',$config['smallconfig']['modules'])} selected{/if}>摸鱼</option>
+                </select>
+                <span class="help-block">注:默认仅直播首页是半屏播放，其他模块内均为小屏播放，如果需要设置其他模块半屏播放，请请到此处设置</span>
+            </div>
+        </div>
+    </div>
+    <div class="config-titlebox">
+        <span class="config-titlename">弹幕设置</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#dmconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+    </div>
+    <div id="dmconfigbox" class="collapse in">
+          <div class="form-group">
+            <label class="col-lg-2 control-label text-right">* 开启弹幕</label>
+            <div class="col-lg-4">
+                {:tpl_switch('dmconfig[opendm]',$config['dmconfig']['opendm'])}
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-lg-2 control-label text-right">* 速度快慢</label>
+            <div class="col-lg-8">
+              <label class="lyear-radio radio-inline radio-primary">
+               <input type="radio" name="dmconfig[dmspeed]" value="1" {if $config['dmconfig']['dmspeed']=='1'}checked{/if}><span>慢</span>
+              </label>
+              <label class="lyear-radio radio-inline radio-primary">
+               <input type="radio" name="dmconfig[dmspeed]" value="2" {if $config['dmconfig']['dmspeed']=='2'}checked{/if}><span>一般</span>
+              </label>
+              <label class="lyear-radio radio-inline radio-primary">
+               <input type="radio" name="dmconfig[dmspeed]" value="3" {if $config['dmconfig']['dmspeed']=='3'}checked{/if}><span>快</span>
+              </label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-lg-2 control-label text-right">* 是否循环播放</label>
+            <div class="col-lg-5">
+                {:tpl_switch('dmconfig[isloop]',$config['dmconfig']['isloop'])}
+                <span class="help-block">关闭后同一条弹幕将播放一次不再继续播放</span>
+            </div>
+          </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label text-right">* 是否加载历史消息</label>
+                <div class="col-lg-5">
+                    {:tpl_switch('dmconfig[loadhistory]',$config['dmconfig']['loadhistory'],'nohistory')}
+                </div>
+            </div>
+            <div class="form-group loadhistory{if $config['dmconfig']['loadhistory']=='2'} hidden{/if}">
+                <label class="col-lg-2 control-label text-right">* 加载历史弹幕条数</label>
+                <div class="col-lg-2">
+                    <input type="text" class="form-control numberincdec" name="dmconfig[historynum]" value="{$config['dmconfig']['historynum']}"
+                    data-bts-min="0" data-bts-replacement-val="0"
+                    data-bts-max="null"
+                    data-bts-step="1"
+                    data-bts-postfix="条"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                    >
+                    <span class="zam-help-block">注:必须是个大于等于0的整数，0为加载所有消息</span>
+                </div>
+            </div>
+          <div class="form-group">
+            <label class="col-lg-2 control-label text-right">* 弹幕背景</label>
+            <div class="col-lg-5">
+                {:tpl_switch('dmconfig[needbg]',$config['dmconfig']['needbg'],'nodmbg')}
+            </div>
+          </div>
+          <div class="dmbgbox{if $config['dmconfig']['needbg']=='2'} hidden{/if}">
+          <div class="form-group">
+            <label class="col-lg-2 control-label text-right">* 背景色类型</label>
+            <div class="col-lg-5">
+              <label class="lyear-radio radio-inline radio-primary">
+               <input type="radio" name="dmconfig[bgcolortype]" value="1" {if $config['dmconfig']['bgcolortype']=='1'}checked{/if} onclick="changebgcolor(this);"><span>固定色</span>
+              </label>
+              <label class="lyear-radio radio-inline radio-primary">
+               <input type="radio" name="dmconfig[bgcolortype]" value="2" {if $config['dmconfig']['bgcolortype']=='2'}checked{/if} onclick="changebgcolor(this);"><span>随机色</span>
+              </label>
+            </div>
+          </div>
+          <div class="form-group bgcolortype {if $config['dmconfig']['bgcolortype']=='2'}hidden{/if}">
+            <label class="col-lg-2 control-label text-right">* 背景色</label>
+            <div class="col-lg-5">
+                {:tpl_color('dmconfig[bgcolor]',$config['dmconfig']['bgcolor'])}
+                <span class="help-block">默认黑色 rgba(0,0,0,0.5)</span>
+            </div>
+          </div>
+          </div>
+          <div class="form-group">
+            <label class="col-lg-2 control-label text-right">* 用户头像</label>
+            <div class="col-lg-5">
+                {:tpl_switch('dmconfig[needavatar]',$config['dmconfig']['needavatar'])}
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-lg-2 control-label text-right">* 用户昵称</label>
+            <div class="col-lg-5">
+                {:tpl_switch('dmconfig[neednickname]',$config['dmconfig']['neednickname'])}
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-lg-2 control-label text-right">* 文字颜色</label>
+            <div class="col-lg-5">
+                <label class="lyear-radio radio-inline radio-primary">
+                   <input type="radio" name="dmconfig[fontcolortype]" value="1" {if $config['dmconfig']['fontcolortype']=='1'}checked{/if} onclick="changefontcolor(this);"><span>固定色</span>
+                  </label>
+                <label class="lyear-radio radio-inline radio-primary">
+                   <input type="radio" name="dmconfig[fontcolortype]" value="2" {if $config['dmconfig']['fontcolortype']=='2'}checked{/if} onclick="changefontcolor(this);"><span>随机色</span>
+                </label>
+                <span class="help-block">如果背景色选择了随机色最好颜色文字选择固定为白色</span>
+            </div>
+          </div>
+          <div class="form-group fontcolortype{if $config['dmconfig']['fontcolortype']=='2'} hidden{/if}">
+            <label class="col-lg-2 control-label text-right">* 颜色</label>
+            <div class="col-lg-5">
+                {:tpl_color('dmconfig[fontcolor]',$config['dmconfig']['fontcolor'])}
+                <span class="help-block">默认白色</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-lg-2 control-label text-right">* 文字大小</label>
+            <div class="col-lg-2">
+                <input type="text" class="form-control numberincdec" name="dmconfig[fontsize]" value="{$config['dmconfig']['fontsize']}"
+                data-bts-min="10" data-bts-replacement-val="10"
+                data-bts-max="30"
+                data-bts-step="1"
+                data-bts-postfix="px"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                >
+                <span class="zam-help-block">注:必须是个大于10,小于60的数字</span>
+            </div>
+          </div>
+    </div>
+    {include file='$Wpath/common/liveshare'}
+    {include file='$Wpath/common/savepanel'}
+</form>
+<script>
+var menutypes = {:json_encode($menutypes)};
+require(['webcore','jconfirmBox','zamnotice','layerBox','zvalidator','jquery.ui'],function(webcore,jconfirmBox,zamnotice,layerBox){
+    $('.menu-lists').sortable({handle: ".mousemove"}).disableSelection();
+    $(".menu-lists").disableSelection();
+    $('#formBox').formValidation({
+        framework: 'bootstrap',
+        excluded: [':disabled'],
+        message: '您填写的内容无效',
+        fields: {}
+    }).on('success.form.fv', function(e) {
+        e.preventDefault();
+        var $form = $(e.target);
+        var postData = webcore.serializeObject($form);
+        var bload = $form.find(".zam-fixedbottom button").lyearloading({opacity: 0.2,spinnerSize: 'nm'});
+        $form.formValidation('disableSubmitButtons', true);
+        webcore.ajaxSubmit("{:goweb('hdconfig/wechatlive')}",postData).then(function(json){
+            bload.hide();
+            if(json.code==0){
+                $form.formValidation('disableSubmitButtons', false);
+                zamnotice.showTips('success','保存成功',2e3,function(){
+                    window.location.reload();
+                });
+            }else{
+                zamnotice.showTips('error',json.msg);
+                $form.formValidation('disableSubmitButtons', false);
+            }
+        }, function(json){
+            bload.hide();
+            zamnotice.showTips('error','网络差。操作失败');
+            $form.formValidation('disableSubmitButtons', false);
+        });
+    });
+    $(".btn-addmenu").click(function(){
+        var chatmodules = [];
+        $("input[name='minurl[]']").each(function(){
+            var url = $(this).val();
+            if(url.indexOf("msg")!=-1 || url.indexOf("baping")!=-1){
+                if(url.indexOf("msg")!=-1){
+                    chatmodules.push('msg');
+                }else{
+                    chatmodules.push('baping');
+                }
+            }
+        });
+        var confirmObj = jconfirmBox.ajaxconfirm("新增菜单","{:goweb('hdconfig/editwechatlivemenu')}",{},'html','col-lg-8 col-lg-offset-2',function(e){
+            var postData = webcore.serializeObject(e.find('form'));
+            if($.trim(postData.menuname)==""){
+                return zamnotice.showTips('error','请填写菜单名称');
+            }
+            
+            if(postData.menutype=='1'){
+                if($.trim(postData.menuinurl)==""){
+                    return zamnotice.showTips('error','请选择模块');
+                }
+                if(chatmodules.length > 0 && (postData.menuinurl.indexOf("msg")!=-1 || postData.menuinurl.indexOf("baping")!=-1)){
+                    return zamnotice.showTips('error','您已经添加过了上墙或者霸屏功能，严禁添加多个');
+                }
+            }
+            if(postData.menutype=='2' && $.trim(postData.menuouturl)==""){
+                return zamnotice.showTips('error','请填写外链链接');
+            }
+            if(postData.menutype=='3' && postData.menuartid==""){
+                return zamnotice.showTips('error','请选择文章');
+            }
+            if(postData.menuouturl==""){
+                postData.menuouturl = " ";
+            }
+            if(postData.menuinurl==""){
+                postData.menuinurl = " ";
+            }
+            if(postData.menuartid==""){
+                postData.menuartid = " ";
+            }
+            if(postData.menutype=='1'){
+                postData.content = postData.menuinurl;
+            }
+            if(postData.menutype=='2'){
+                postData.content = postData.menuouturl;
+            }
+            if(postData.menutype=='3'){
+                var selarttitle = e.find('form select').find("option:selected").text();
+                postData.content = "(id:"+postData.menuartid+")"+selarttitle;
+            }
+            if(postData.menutype=='4'){
+                postData.content = postData.phbnum+'人';
+            }
+            postData.typename = menutypes[postData.menutype];
+            $(".menu-lists").append(webcore.tpl($("#onemenu-tpl"),postData));
+            confirmObj.close();
+        });
+    });
+    $(".menu-lists").on('click','.btn-editmenu',function(){
+        var $this = $(this),$thisp = $this.parent().parent();
+        var chatcount = 0;
+        $("input[name='minurl[]']").each(function(){
+            var url = $(this).val();
+            if(url.indexOf("msg")!=-1 || url.indexOf("baping")!=-1){
+                chatcount++;
+            }
+        });
+        var $thistype = $thisp.find("input[name='mtype[]']").val(),$thisurl = $thisp.find("input[name='minurl[]']").val();
+        if($thistype=='1' && ($thisurl.indexOf("msg")!=-1 || $thisurl.indexOf("baping")!=-1)){
+            chatcount--;
+        }
+        var $this = $(this),$thisp = $this.parent().parent();
+        var menudata = {
+            menuname:$thisp.find('input').eq(0).val(),
+            type:$thisp.find('input').eq(1).val(),
+            inurl:$thisp.find('input').eq(2).val(),
+            outurl:$thisp.find('input').eq(3).val(),
+            artid:$thisp.find('input').eq(4).val(),
+            phbnum:$thisp.find('input').eq(5).val(),
+            mstatus:$thisp.find('input').eq(6).val(),
+        };
+        var confirmObj = jconfirmBox.ajaxconfirm("编辑菜单","{:goweb('hdconfig/editwechatlivemenu')}",{menudata:menudata},'html','col-lg-8 col-lg-offset-2',function(e){
+            var postData = webcore.serializeObject(e.find('form'));
+            if($.trim(postData.menuname)==""){
+                return zamnotice.showTips('error','请填写菜单名称');
+            }
+            if(postData.menutype=='1'){
+                if($.trim(postData.menuinurl)==""){
+                    return zamnotice.showTips('error','请选择模块');
+                }
+                if(chatcount > 0 && (postData.menuinurl.indexOf("msg")!=-1 || postData.menuinurl.indexOf("baping")!=-1)){
+                    return zamnotice.showTips('error','您已经添加过了上墙或者霸屏功能，严禁添加多个');
+                }
+            }
+            if(postData.menutype=='2' && $.trim(postData.menuouturl)==""){
+                return zamnotice.showTips('error','请填写外链链接');
+            }
+            if(postData.menutype=='3' && postData.menuartid==""){
+                return zamnotice.showTips('error','请选择文章');
+            }
+            if(postData.menuouturl==""){
+                postData.menuouturl = " ";
+            }
+            if(postData.menuinurl==""){
+                postData.menuinurl = " ";
+            }
+            if(postData.menuartid==""){
+                postData.menuartid = " ";
+            }
+            if(postData.menutype=='1'){
+                postData.content = postData.menuinurl;
+            }
+            if(postData.menutype=='2'){
+                postData.content = postData.menuouturl;
+            }
+            if(postData.menutype=='3'){
+                var selarttitle = e.find('form select').find("option:selected").text();
+                postData.content = "(id:"+postData.menuartid+")"+selarttitle;
+            }
+            if(postData.menutype=='4'){
+                postData.content = postData.phbnum+'人';
+            }
+            postData.typename = menutypes[postData.menutype];
+            $thisp.html($(webcore.tpl($("#onemenu-tpl"),postData)).html());
+            confirmObj.close();
+        });
+    });
+    $(".menu-lists").on('click','.btn-delmenu',function(){
+        var $this = $(this);
+        jconfirmBox.confirm('温馨提示','您确定要删除么？',function(){
+            $this.parent().parent().remove();
+        });
+    });
+});
+
+function showjoin(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".livebasicbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".livebasicbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openmenu(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".menulist").addClass('hidden');
+        $(".nomenulist").removeClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".menulist").removeClass('hidden');
+        $(".nomenulist").addClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function nohistory(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".loadhistory").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".loadhistory").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function nodmbg(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".dmbgbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".dmbgbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function changebgcolor(obj){
+    var type = $(obj).val();
+    if(type=='1'){
+        $(".bgcolortype").removeClass('hidden');
+    }else{
+        $(".bgcolortype").addClass('hidden');
+    }
+}
+function changefontcolor(obj){
+    var type = $(obj).val();
+    if(type=='1'){
+        $(".fontcolortype").removeClass('hidden');
+    }else{
+        $(".fontcolortype").addClass('hidden');
+    }
+}
+</script>
+<script id='onemenu-tpl' type="text/template">
+<tr>
+    <td class="text-center">
+        <input class="form-control" name="mname[]" value="<% d.menuname %>" readonly>
+    </td>
+    <td class="text-center">
+        <% d.typename %>
+        <input class="form-control" type="hidden" name="mtype[]" value="<% d.menutype %>">
+    </td>
+    <td class="text-center">
+        <% d.content %>
+        <input type="hidden" name="minurl[]" value="<% d.menuinurl %>">
+        <input type="hidden" name="mouturl[]" value="<% d.menuouturl %>">
+        <input type="hidden" name="martid[]" value="<% d.menuartid %>">
+        <input type="hidden" name="phbnum[]" value="<% d.phbnum %>">
+        <input type="hidden" name="mstatus[]" value="1">
+    </td>
+    <td class="text-center">
+        <a class="btn btn-primary btn-xs btn-editmenu"><i class="mdi mdi-pencil"></i></a>
+        <a class="btn btn-danger btn-xs btn-delmenu"><i class="mdi mdi-close"></i></a>
+        <a href="javascript:;"  class="btn btn-default btn-xs mousemove zam-sortable" title="拖动排序"><i class="mdi mdi-arrow-all"></i></a>
+    </td>
+</tr>
+</script>
+{include file='$Wpath/common/footer'}

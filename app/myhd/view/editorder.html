@@ -1,0 +1,94 @@
+<style>
+.ordermodules li{
+	text-align:center;
+	width:25%;
+	float:left;
+	padding:8px;
+	padding-left: 0;
+}
+.orderitems .orderinfo{
+	position:relative;
+	left:0px;
+	width:112px;
+	font-size:15px;
+	background-color:#fff;
+	cursor:pointer;
+	border:1px solid #dfe6ec;
+}
+.orderitems .orderinfo:hover{
+	box-shadow: -3px 5px 15px rgba(64,102,178,.3);
+}
+.orderitems .orderinfo .modulename{
+	display:inline-block;
+	text-align:center;
+	width: 100%;
+	height: 30px;
+	line-height: 30px;
+}
+.orderitems .zam-typeselected {
+	position: absolute;
+	top: -2px;
+	right: 3px;
+	display: none;
+	font-size: 12px;
+	color: #fff;
+	text-align: center;
+	transition: 0.3s;
+	-moz-transition: 0.3s;
+	-o-transition: 0.3s;
+	-webkit-transition: 0.3s;
+}
+.orderitems .zam-righttriangle{
+	position: absolute;
+	top: -1px;
+	right: -1px;
+	border-top: 25px solid #48b0f7;
+	border-left: 35px solid transparent;
+	display:none;
+}
+.orderinfo.active .zam-typeselected{
+	display:block
+}
+.orderinfo.active .zam-righttriangle{
+	display:block
+}
+</style>
+<div class="alert alert-danger">
+	注:当前订单所含模块可能仅占用活动所有功能的部分，可新增或者删除订单所含模块
+</div>
+<div class="form-horizontal">
+ <div class="form-group">
+	<label class="col-lg-2 control-label">* 订单模块</label>
+	<div class="col-lg-10">
+		{if !empty($order['payinfo']['modules'])}
+			<ul class="ordermodules clearfix">
+			{volist name="order.payinfo.modules" id="module"}
+				<li class="orderitems">
+					<div class="orderinfo text-primary active" data-id="{$module['id']}" data-modulefield="{$module['module']}" data-modulename="{$module['name']}" data-price="{$module['price']}">
+						<span class="zam-righttriangle"></span>
+						<i class="mdi mdi-close zam-typeselected"></i>
+						<span class="modulename">{$module['name']}</span>
+					</div>
+				</li>
+			{/volist}
+			<li class="orderitems addordermodule">
+				<div class="orderinfo text-primary">
+					<span class="modulename"><i class="mdi mdi-plus"></i></span>
+				</div>
+			</li>
+			</ul>
+		{else}
+			<span class="text-error">订单未购功能模块</span>
+		{/if}
+	</div>
+ </div>
+ <div class="form-group">
+	<label class="col-lg-2 control-label text-right">* 订单人数</label>
+	<div class="col-lg-4">
+		<div class="input-group">
+            <input type="text" class="form-control addnums" name="addnums" value="{$order['addnums']}">
+            <div class="input-group-addon">人</div>
+        </div>
+	</div>
+ </div>
+</div>

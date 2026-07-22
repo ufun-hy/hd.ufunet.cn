@@ -1,0 +1,170 @@
+{include file='$Wpath/common/header'}
+<div class="alert alert-danger" role="alert">
+  <i class="mdi mdi-alert-outline"></i> 
+  配置此内容前务必先到<a href="https://open.weixin.qq.com/" target="__blank">开放平台</a>创建(平台型)第三方平台
+</div>
+<form id="formBox" class="zam-formvalidation form-horizontal" method="post">
+<div class="zam-titleBox">开放平台设置{if $config['open']=='1' && !empty($config['app_id']) && !empty($config['secret'])}<a class="btn btn-primary btn-xs m-l-10 btn-openpushticket">启动票据推送服务</a>{/if}</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 是否开启授权接入公众号</label>
+    <div class="col-lg-8">
+        {:tpl_switch('open',$config['open'])}
+        <span class="help-block">开启后用户个人中心里我的公众号内才可以新增公众号，关闭后普通后台用户将无法扫码授权接入自己的公众号</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 第三方平台APPID</label>
+    <div class="col-lg-8">
+      <input class="form-control" type="text"  name="app_id" value="{$config['app_id']}" onkeyup="return trimSpace(this)">
+      <span class="help-block">在微信开放平台注册且审核通过后可以获取到AppId，此项是开放平台创建并且审核过后获取到的appid，不是系统公众号的appid</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 第三方平台APPSECRET</label>
+    <div class="col-lg-8">
+      <input class="form-control" type="text"  name="secret" value="{$config['secret']}" onkeyup="return trimSpace(this)">
+      <span class="help-block"> 在微信开放平台注册且审核通过后可以获取到APPSECRET，此项是开放平台创建并且审核过后获取到的appsecret，不是系统公众号的appsecret</span>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 授权事件接收配置</label>
+    <div class="col-lg-8">
+      <div class="input-group">
+       <input class="form-control" type="text"  name="receiveurl" value="{$config['receiveurl']}">
+        <div class="input-group-btn">
+          <button type="button" class="btn btn-default btn-primary zam-clip" >点击复制</button>
+        </div>
+      </div>
+      <span class="help-block">此值需要在创建第三方应用时候填写，注意前面的协议必须选择https</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 消息与事件接收配置</label>
+    <div class="col-lg-8">
+      <div class="input-group">
+       <input class="form-control" type="text"  name="messageurl" value="{$config['messageurl']}">
+        <div class="input-group-btn">
+          <button type="button" class="btn btn-default btn-primary zam-clip" >点击复制</button>
+        </div>
+      </div>
+      <span class="help-block">此值需要在创建第三方应用时候填写，注意前面的协议必须选择https</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 消息校验Token</label>
+    <div class="col-lg-8">
+      <div class="input-group">
+       <input class="form-control" type="text"  name="token" value="{$config['token']}" onkeyup="return trimSpace(this)">
+        <div class="input-group-btn">
+          <button type="button" class="btn btn-default btn-primary zam-clip" >点击复制</button>
+          <button type="button" class="btn btn-default btn-success" onclick="makenewval(this,'1')">生成新的</button>
+        </div>
+      </div>
+      <span class="help-block">此值需要在创建第三方应用时候填写</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 消息加解密Key</label>
+    <div class="col-lg-8">
+      <div class="input-group">
+       <input class="form-control" type="text"  name="aes_key" value="{$config['aes_key']}" onkeyup="return trimSpace(this)">
+        <div class="input-group-btn">
+          <button type="button" class="btn btn-default btn-primary zam-clip" >点击复制</button>
+          <button type="button" class="btn btn-default btn-success" onclick="makenewval(this,'2')">生成新的</button>
+        </div>
+      </div>
+      <span class="help-block">此值需要在创建第三方应用时候填写</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 授权发起页域名</label>
+    <div class="col-lg-8">
+      <div class="input-group">
+       <input class="form-control" type="text"  name="makeoauthurl" value="{$config['makeoauthurl']}">
+        <div class="input-group-btn">
+          <button type="button" class="btn btn-default btn-primary zam-clip">点击复制</button>
+        </div>
+      </div>
+      <span class="help-block">此值需要在创建第三方应用时候填写</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 公众号开发域名</label>
+    <div class="col-lg-8">
+      <div class="input-group">
+        <input class="form-control" type="text"  name="oauthurl" value="{$config['oauthurl']}">
+        <div class="input-group-btn">
+          <button type="button" class="btn btn-default btn-primary zam-clip" >点击复制</button>
+        </div>
+      </div>
+      <span class="help-block">此值需要在创建第三方应用时候填写，第三方平台在代公众号做网页授权、调用JS SDK等网页开发工作时所用的域名</span>
+    </div>
+</div>
+{include file='$Wpath/common/savepanel'}
+</form>
+<script>
+require(['webcore','jconfirmBox','zamnotice','clipboard','zvalidator'],function(webcore,jconfirmBox,zamnotice,Clipboard){
+    var clipboard = new Clipboard('.zam-clip', {
+      text: function(e) {
+        return $(e).parent().prev().val()
+      }
+    });
+    clipboard.on('success',function(e) {
+       zamnotice.showTips('success','复制成功',2e3);
+       return;
+    });
+    $('#formBox').formValidation({
+  			framework: 'bootstrap',
+  			excluded: [':disabled'],
+  			message: '您填写的内容无效',
+  			fields: {
+  			}
+  	}).on('success.form.fv', function(e) {
+  		e.preventDefault();
+  		var $form = $(e.target);
+  		var postData = webcore.serializeObject($form);
+  		var bload = $form.find(".zam-fixedbottom button").lyearloading({opacity: 0.2,spinnerSize: 'nm'});
+  		$form.formValidation('disableSubmitButtons', true);
+  		webcore.ajaxSubmit("{:goweb('openmanage/index')}",postData).then(function(json){
+  			bload.hide();
+  			if(json.code==0){
+  			    $form.formValidation('disableSubmitButtons', false);
+  			    zamnotice.showTips('success','操作成功',2e3,function(){
+  			    	window.location.reload();
+  			    });
+  		    }else{
+  		        zamnotice.showTips('error',json.msg);
+  		        $form.formValidation('disableSubmitButtons', false);
+  		    }
+  		}, function(json){
+  			bload.hide();
+  			zamnotice.showTips('error','网络差。操作失败');
+  			$form.formValidation('disableSubmitButtons', false);
+  		});
+  	});
+    var clickopen = false;
+    $(".btn-openpushticket").click(function(){
+        if(clickopen) return false;
+        clickopen = true;
+        webcore.ajaxSubmit("{:goweb('openmanage/startpushticket')}",{}).then(function(json){
+          if(json.code==0){
+              zamnotice.showTips('success','操作成功');
+          }else{
+              zamnotice.showTips('error',json.msg);
+          }
+          clickopen = false;
+        }, function(json){
+          clickopen = false;
+          zamnotice.showTips('error','网络差。操作失败');
+        });
+    });
+});
+function makenewval(obj,type){
+  require(['webcore'],function(webcore){
+    var num = type=='1'?32:43;
+    $(obj).parent().prev().val(webcore.random(num,true));
+  });
+}
+</script>
+{include file='$Wpath/common/footer'}

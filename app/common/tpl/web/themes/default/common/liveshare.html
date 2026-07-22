@@ -1,0 +1,61 @@
+<div class="config-titlebox">
+    <span class="config-titlename">微信分享设置</span>
+    <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#lievshareconfigbox"
+        aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+</div>
+<div id="lievshareconfigbox" class="collapse in">
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 分享类型</label>
+        <div class="col-lg-8">
+            <label class="lyear-radio radio-inline radio-primary">
+                <input type="radio" name="shareconfig[open]" value="1" {if !isset($config['shareconfig']['open'])  || $config['shareconfig']['open']=='1' }checked{/if}
+                    onclick="showshare('1')"><span>默认分享</span>
+            </label>
+            <label class="lyear-radio radio-inline radio-primary">
+                <input type="radio" name="shareconfig[open]" value="3" {if isset($config['shareconfig']['open']) && $config['shareconfig']['open']=='3' }checked{/if}
+                    onclick="showshare('3')"><span>自定义分享</span>
+            </label>
+            <label class="lyear-radio radio-inline radio-primary">
+                <input type="radio" name="shareconfig[open]" value="2" {if isset($config['shareconfig']['open']) && $config['shareconfig']['open']=='2' }checked{/if}
+                    onclick="showshare('2')"><span>禁止分享</span>
+            </label>
+            <div class="help-block">默认分享即为跟随活动信息内的分享设置</div>
+        </div>
+    </div>
+    <div class="sharebox{if !isset($config['shareconfig']['open']) || $config['shareconfig']['open'] !== '3'} hidden{/if}">
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 分享标题</label>
+            <div class="col-lg-8">
+                <input class="form-control inputneedmax" type="text" name="shareconfig[title]" maxlength="30"
+                    value="{$config['shareconfig']['title']}">
+                <div class="help-block">不填写标题内容则系统会自动调用活动主题内容作为分享标题</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 分享简介</label>
+            <div class="col-lg-8">
+                <input class="form-control inputneedmax" type="text" name="shareconfig[desc]" maxlength="50"
+                    value="{$config['shareconfig']['desc']}">
+                <div class="help-block">微信端分享页面时显示的分享简介内容</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 分享图标</label>
+            <div class="col-lg-8">
+                {:tpl_image_one("shareconfig[icon]",$config['shareconfig']['icon'])}
+                <span class="help-block"></span>
+                <div class="help-block">不设置图标则系统会自动调用直播封面图作为分享图标，推荐规格:64*64px</div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function showshare(type){
+        let sharebox = $('.sharebox');
+        if(type < 3){
+            sharebox.addClass('hidden');
+        }else{
+            sharebox.removeClass('hidden');
+        }
+    }
+</script>

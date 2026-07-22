@@ -1,0 +1,154 @@
+{include file='$Wpath/common/header'}
+<style>
+.award-lists tr td{text-align:center!important;}
+.userimgbox{width: 60px;height: 60px;margin: 0 auto}
+</style>
+<div class="alert alert-info">
+<i class="wi wi-bell"></i> 增加或删除奖品均需保存才可生效
+</div>
+<div class="alert alert-info">此处设置的奖品是默认轮次的奖品，默认轮次其他信息由系统自动生成</div>
+
+<form id="itemForm" method="post" class="form-horizontal">
+<table class="we7-table table voteitemTable" style="margin-bottom:0px;">
+<thead>
+  <tr>
+	<th style="width:20%;text-align:center;">类型</th>
+	<th style="width:20%;text-align:center;">奖品</th>
+	<th style="width:20%;text-align:center;">个数</th>
+	<th style="width:20%;text-align:center;">抽中概率</th>
+	<th style="width:20%;text-align:center;">操作</th>
+  </tr>
+</thead>
+<tbody class="award-lists">
+	{volist name="awards" id="item"}
+		<tr>
+			<td>
+	           <p>
+	            <span class="label label-{if $item['prizetype']=='1'}primary{elseif $item['prizetype']=='2'}warning{else /}danger{/if}">{if $item['prizetype']=='1'}实物{elseif $item['prizetype']=='2'}红包{else /}谢谢参与{/if}</span>
+	           </p>
+	           <input type="hidden" name="prizetype[]" value="{$item['prizetype']}">
+	        </td>
+			<td>
+			  <input type="hidden" name="prizeimg[]" value="{$item['prizeimg']}">
+			  <input type="hidden" name="prizename[]" value="{$item['prizename']}">
+			  <input type="hidden" name="prizemoney[]" value="{$item['prizemoney']}">
+			  <div class="userimgbox"><img src="{:tomedia($item['prizeimg']);}"></div>
+			  <div>{$item['prizename']}</div>
+			  {if $item['prizetype']=='2'}
+			  <div>{$item['prizemoney']}元</div>
+			  {/if}
+			</td>
+			<td>
+			  <input type="hidden" name="prizenum[]" value="{$item['prizenum']}">
+			  <span>{if $item['prizetype']!='3'}{$item['prizenum']}个{else /}不限量{/if}</span>
+			</td>
+			<td>
+			  <input type="hidden" name="prizegl[]" value="{$item['prizegl']}">
+			  <input type="hidden" name="saverecord[]" value="{$item['saverecord']}">
+			  <input type="hidden" name="canrepeat[]" value="{$item['canrepeat']}">
+			  <input type="hidden" name="fontcolor[]" value="{$item['fontcolor']}">
+			  <input type="hidden" name="bgcolor[]" value="{$item['bgcolor']}">
+			  <span>{$item['prizegl']}%</span>
+			</td>
+			
+			<td>
+			  <a href="javascript:;" class="btn btn-danger btn-xs btn-delprize">
+				  <i class="mdi mdi-close"></i>
+			  </a>
+			  <a href="javascript:;"  class="btn btn-default btn-sm mousemove zam-sortable" title="拖动排序"><i class="mdi mdi-arrow-all"></i></a>
+			</td>
+		</tr>
+	{/volist}
+</tbody>
+<tfoot>
+	  <tr>
+		<td colspan="4">
+		  <a  class="btn btn-success btn-sm m-r-10 additem" href="javascript:;"><i class="mdi mdi-plus"></i> 添加奖品</a>
+		  <button type="submit" class="btn btn-primary btn-sm btn-save" /><i class="mdi mdi-content-save"></i> 保存奖品</button>
+		</td>
+	  </tr>
+	</tfoot>
+</table>
+<form>
+<script id='awarditem-tpl' type="text/template">
+	<tr>
+		<td>
+	       <p>
+	        <span class="label label-<%# if(d.prizetype=='1'){ %>primary<%# }else if(d.prizetype=='2'){ %>warning<%# }else{ %>danger<%# } %>"><%# if(d.prizetype=='1'){ %>实物<%# }else if(d.prizetype=='2'){ %>红包<%# }else{ %>谢谢参与<%# } %></span>
+	       </p>
+	       <input type="hidden" name="prizetype[]" value="<% d.prizetype %>">
+	    </td>
+		<td>
+		  <input type="hidden" name="prizeimg[]" value="<% d.prizeimg %>">
+		  <input type="hidden" name="prizename[]" value="<% d.prizename %>">
+		  <input type="hidden" name="prizemoney[]" value="<% d.prizemoney %>">
+		  <div class="userimgbox"><img src="<% d.prevprizeimg %>"></div>
+		  <div><% d.prizename %></div>
+		  <%# if(d.prizetype=='2'){ %>
+		  <div><% d.prizemoney %>元</div>
+		  <%# } %>
+		</td>
+		<td>
+		  <input type="hidden" name="prizenum[]" value="<% d.prizenum %>">
+		  <span><%# if(d.prizetype!='3'){ %><% d.prizenum %>个<%# }else{ %>不限量<%# } %></span>
+		</td>
+		<td>
+		  <input type="hidden" name="prizegl[]" value="<% d.prizegl %>">
+		  <input type="hidden" name="saverecord[]" value="<% d.saverecord %>">
+		  <input type="hidden" name="canrepeat[]" value="<% d.canrepeat %>">
+		  <input type="hidden" name="fontcolor[]" value="<% d.fontcolor %>">
+		  <input type="hidden" name="bgcolor[]" value="<% d.bgcolor %>">
+		  <span><% d.prizegl %>%</span>
+		</td>
+		<td>
+		  
+		  <a href="javascript:;" class="btn btn-danger btn-xs btn-delprize">
+			  <i class="mdi mdi-close"></i>
+		  </a>
+		  <a href="javascript:;"  class="btn btn-default btn-sm mousemove zam-sortable" title="拖动排序"><i class="mdi mdi-arrow-all"></i></a>
+		</td>
+   </tr>
+</script>
+<script>
+require(["zamnotice","layerBox","jconfirmBox","webcore","jquery.ui"],function(zamnotice,layerBox,jconfirmBox,webcore){
+	$('.award-lists').sortable({handle: ".mousemove"});
+	$(".award-lists").disableSelection();
+	$(".additem").on('click',function(){
+		var confirmObj = jconfirmBox.ajaxconfirm("新增奖品","{:goweb('hdconfig/dzpaward')}",{ishtml:'1'},'html','col-lg-8 col-lg-offset-2',function(e){
+			var prizearr = webcore.serializeObject(e.find('form'));
+			prizearr.prevprizeimg = e.find('img').attr("src");
+			if(prizearr.prizename=='') {
+				zamnotice.showTips('error','奖品名必须设置');
+				return false;
+			}
+			if(prizearr.prizeimg==''){
+				zamnotice.showTips('error','奖品图必须设置');
+				return false;
+			}
+			var html = webcore.tpl($("#awarditem-tpl"),prizearr);
+			$(".award-lists").append(html);
+			confirmObj.close();
+		});
+	});
+	$(".award-lists").on('click','.btn-delprize',function(){
+		$(this).parent().parent().remove();
+	});
+	$(".btn-save").on('click',function(e){
+		e.preventDefault();
+		var $form = $("#itemForm");
+		var postData = $form.serialize();
+		layerBox.showLoading("数据提交中..");
+		$.post(window.location.href+"?ishtml=2",postData, function(result) {
+			layerBox.closeLayer();
+			if(result.code==0){
+				zamnotice.showTips('success','保存成功',500,function(){
+					window.location.reload();
+				});	
+			}else{
+				zamnotice.showTips('error',result.msg);
+			}
+		}, 'json');
+	});
+});
+</script>
+{include file='$Wpath/common/footer'}

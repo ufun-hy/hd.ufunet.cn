@@ -1,0 +1,155 @@
+{include file='$Wpath/common/header'}
+<div class="alert alert-danger" role="alert">
+    <i class="mdi mdi-bell-ring"></i> 用户日志记录了用户在后台的所有行为，是会无限增长的数据，推荐按时清理。在后台管理->用户管理->登录与注册->记录用户后台操作日志开关关闭后将不再记录普通用户的后台行为
+</div>
+<div class="form-inline zam-inline-searchbar">
+    <div class="form-group">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">用户名或手机号</span>
+        <input type="text" class="form-control" value="" id="keyword"  placeholder="请输入用户名或手机号">
+      </div>
+    </div>
+    <a class="btn btn-primary btn-sm btn-search" href="javascript:void(0)"><i class="mdi mdi-magnify"></i> 搜索</a>
+</div>
+{include file='$Wpath/common/tabletoolbar'}
+<table id="listtable" class="zam-btable" data-show-export="true"></table>
+<script type="text/javascript">
+require(['webcore','webtable','jconfirmBox','zamnotice'],function(webcore,webtable,jconfirmBox,zamnotice){
+    var initConfig = {
+        tableId:'#listtable',
+        url:"{:goweb('userlog/index')}",
+        columnoperate:{
+            btns:{
+                del:true,
+            },
+            func:{
+                del:function(value, row, index){
+                    jconfirmBox.confirm('温馨提示','您确定要删除么？',function(){
+                        webcore.ajaxSubmit("{:goweb('userlog/del')}",{recordid:row.id}).then(function(json){
+                            if(json.code==0){
+                                webtable.refresh();
+                                zamnotice.showTips('success','删除成功');
+                            }else{
+                                zamnotice.showTips('error',json.msg);
+                            }
+                        }, function(json){
+                            zamnotice.showTips('error','网络差。操作失败');
+                        });
+                    });
+                },
+            }
+        },
+        columns:[{
+            checkbox: true,
+            width:'5',
+        }, {
+            field: 'id',
+            title: 'id',
+            align: 'center',
+            visible: false,
+            width:'5',
+        },  {
+            field: 'user_name',
+            title: '用户',
+            align: 'center',
+            width:'10',
+            formatter: function (value, row, index) {
+                var html = "<div>"+value+"</div>";
+                if(row.user_mobile!=''){
+                    html += "<div>"+row.user_mobile+"</div>";
+                }
+                return html;
+            },
+        },  {
+            field: 'methodtype',
+            title: '请求方式',
+            align: 'center',
+            width:'10',
+        },  {
+            field: 'pageurl',
+            title: '请求地址',
+            align: 'center',
+            width:'20',
+        },  {
+            field: 'isajax',
+            title: 'ajax请求',
+            align: 'center',
+            width:'10',
+        },  {
+            field: 'data',
+            title: '提交数据',
+            align: 'center',
+            width:'10',
+        },  {
+            field: 'ip',
+            title: '客户端ip',
+            align: 'center',
+            width:'10',
+        },  {
+            field: 'user_agent',
+            title: '客户端标识',
+            align: 'center',
+            width:'15',
+        },
+        {
+            field: 'create_time',
+            title: '操作时间',
+            align: 'center',
+            width:'10',
+        }
+        ],
+        searchParamas:[{'type':'1','id':'keyword'}],
+        toolbar:{
+            
+            del:function(){
+                var getSelects = webtable.getSelections();
+                if(getSelects.length>0){
+                    jconfirmBox.confirm('温馨提示','您确定要删除选中的日志数据么？',function(){
+                        webcore.ajaxSubmit("{:goweb('userlog/del')}",{recordid:getSelects}).then(function(json){
+                            if(json.code==0){
+                                webtable.refresh();
+                                zamnotice.showTips('success','删除成功');
+                            }else{
+                                zamnotice.showTips('error',json.msg);
+                            }
+                        }, function(json){
+                            zamnotice.showTips('error','网络差,操作失败');
+                        });
+                    });
+                }else{
+                    zamnotice.showTips('info','请先选择您要操作的数据');
+                }
+            },
+            reset:function(){
+                jconfirmBox.confirm('温馨提示','您确定要清空所有的日志数据么？',function(){
+                    webcore.ajaxSubmit("{:goweb('userlog/reset')}",{}).then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','删除成功');
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差,操作失败');
+                    });
+                });
+            },
+        },
+    };
+    webtable.init(initConfig);
+	$(".resetwechat").on('click',function(){
+        jconfirmBox.confirm('温馨提示','确定清空微信相关日志么？',function(){
+            webcore.ajaxSubmit("{:goweb('syslog/index')}",{type:'1'}).then(function(json){
+                 if(json.code==0){
+                    zamnotice.showTips('success','操作成功',1e3,function(){
+                        window.location.reload();
+                    });
+                 }else{
+                    zamnotice.showTips('error',json.msg);
+                 }
+            })
+        });
+    });
+});
+</script>
+{include file='$Wpath/common/footer'}

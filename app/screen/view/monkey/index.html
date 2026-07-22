@@ -1,0 +1,147 @@
+{include file='common/header' /}
+<style>
+.shake-mainbox{
+	width: 100%;
+    height: 100%;
+    padding: 0;
+    overflow: hidden;
+}
+.shake-lists{
+	position:relative;
+	height:780px;
+	width:100%;
+	margin: 0 auto;
+	overflow:hidden;
+	z-index:1;
+}
+.monkey-mainbox .innerbg{
+	width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top:0px;
+	z-index:-1;
+}
+.monkey-mainbox .innerbg .backgroundtop {
+    width: 100%;
+    height: 50%;
+    position: absolute;
+    left: 0;
+    top:0;
+    background-image: url("{:tomedia($pcconfig['style']['innerbg'])}");
+    background-size: 100% 200%;
+    background-position: left top;
+}
+.monkey-mainbox .innerbg .backgroundbottom {
+    width: 100%;
+    height: 50%;
+    position: absolute;
+    left: 0;
+    bottom:0;
+    background-image: url("{:tomedia($pcconfig['style']['innerbg'])}");
+    background-size: 100% 200%;
+    background-position: left bottom;
+}
+.monkey-track .shakelineBox{
+    position: relative;
+	width: 96%;
+    height: 580px;
+    position: absolute;
+    z-index: 88889;
+    bottom:100px;
+    left: 50%;
+    transform: translateX(-50%);
+    justify-content: space-around;
+	-webkit-justify-content: space-around;
+}
+.monkey-track .shakelineBox li{
+    height: 100%;
+    width:90px;
+	position:relative;
+}
+.monkey-track .shakelineBox li:before{
+	content: "";
+    width: 218px;
+    height: 580px;
+    background-image: url("{:tomedia($pcconfig['style']['treeimg'])}");
+    background-size: 100% 100%;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 0;
+}
+.monkey-track .player{
+	width:90px;
+	position: absolute;
+	left: 0;
+	bottom: 0;/*max bottom 400px  400*10% 400* 100% */
+	font-size: 20px;
+	font-weight: bold;
+	color: #fff;
+	text-shadow: 0 0 5px #000;
+	transition: bottom 1s linear 0s;
+}
+.monkey-track .player .avatar{
+	width: 70px;
+	height: 70px;
+	border: 3px solid {$pcconfig['style']['avatarbordercolor']};
+	border-radius: 100%;
+	box-shadow: 0 0 5px #000;
+	background-size: 100% 100%;
+	background-color: {$pcconfig['style']['avatarbgcolor']};
+}
+.monkey-track .player .nickname{
+	width: 100%;
+	text-align: center;
+	margin: 6px 0;
+}
+.monkey-track .player .monkey{
+	width: 90px;
+	height: 114px;
+	background-image: url("{:tomedia($pcconfig['style']['monkeygif'])}");
+	background-size: 100% 100%;
+}
+</style>
+<audio id="countaudio" src="/{:WIMGURL}shake/count.mp3"  preload="preload"  style="display:none"></audio>
+<audio id="overaudio" src="/{:SIMGURL}shake/over.mp3"  preload="preload"  style="display:none"></audio>
+<audio id="joinaudio" src="/{:SIMGURL}shake/join.mp3"  preload="preload" style="display:none"></audio>
+<section class="shake-mainbox monkey-mainbox normal-box zam-app-flex-ajCenter2">
+    <div class="emptybox zam-app-flex-ajCenter display-none">
+		<img src="/{:SIMGURL}common/empty.png">
+		<p style="padding:20px;">暂无可用轮次，请到后台添加</p>
+	</div>
+	<div class="shake-lists monkey-track">
+		<ul class="shakelineBox zam-app-flex"></ul>
+	</div>
+	<div class="innerbg">
+		<div class="backgroundtop"></div>
+		<div class="backgroundbottom"></div>
+	</div>
+</section>
+<style>
+.start-btn{
+	width:360px;
+	height:85px;
+}
+</style>
+{include file='common/gamewelcome' /}
+<script id="shakeItem-tpl" type="html/javascript">
+<li class="monkeyBoxItem">
+	<div class="monkeyItem">
+			<div class="player zam-app-flex-ajCenter display-none">
+                <div class="nickname"></div>
+                <div class="avatar"></div>
+                <div class="monkey"></div>
+            </div>
+	</div>
+</li>
+</script>
+{include file='common/gamecommon' /}
+<script>
+var defaultImg = "{:tomedia($pcconfig['style']['userdefaultimg'])}";
+var defaultName = "{$pcconfig['style']['userdefaultname']??'虚位以待'}";
+require(['screenmonkey'],function (screenmonkey) {
+	screenmonkey.init();
+});
+</script>
+{include file='common/footer' /}

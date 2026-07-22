@@ -1,0 +1,226 @@
+{include file='$Wpath/common/header'}
+<div class="alert alert-danger">
+    温馨提醒:键盘空格键用于关闭开奖结果弹窗，随机模式下空格键还用于启动开奖流程，自由模式需要手动点击红包开奖，键盘方向键左键用于切换上一轮，键盘方向键右键用于切换下一轮；修改轮次信息或者奖品后请务必刷新大屏幕与微信端
+</div>
+{include file='$Wpath/common/tabletoolbar'}
+<table id="listtable" class="zam-btable"></table>
+<script>    
+require(['webcore','webtable','jconfirmBox','zamnotice'],function(webcore,webtable,jconfirmBox,zamnotice){
+var initConfig = {
+    tableId:'#listtable',
+    url:"{:gohdmanage('confighbwall/rotate',['hdid'=>$hdid])}",
+    columnoperate:{
+        btns:{
+            edit:true,
+            del:true,
+            reset:true,
+            data:{title:"中奖记录",'except':{'field':'openmode','only':'2'}},
+            shenhe:{title:"复制",icon:"mdi-content-copy",class:"success"},
+            refund:{title:"参与方式",icon:"mdi-barcode",class:"success"},
+        },
+        func:{
+            edit:function(value, row, index){
+                var confirmObj = jconfirmBox.ajaxconfirm("编辑轮次","{:gohdmanage('confighbwall/editrotate',['hdid'=>$hdid])}",{rotateid:row.id},'html','col-lg-8 col-lg-offset-2',function(e){
+                    var postData = webcore.serializeObject(e.find('form'));
+                    postData.rotateid = row.id;
+                    webcore.ajaxSubmit("{:gohdmanage('confighbwall/saverotate',['hdid'=>$hdid])}",postData).then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','保存成功');
+                            confirmObj.close();
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                             return false;
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                         return false;
+                    });
+                });
+            },
+            del:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','删除将删除当前轮次用户以及中奖数据并且无法恢复，您确定要删除么？',function(){
+                        webcore.ajaxSubmit("{:gohdmanage('confighbwall/delrotate',['hdid'=>$hdid])}",{rotateid:row.id}).then(function(json){
+                            if(json.code==0){
+                                webtable.refresh();
+                                zamnotice.showTips('success','删除成功');
+                            }else{
+                                zamnotice.showTips('error',json.msg);
+                            }
+                        }, function(json){
+                            zamnotice.showTips('error','网络差。操作失败');
+                        });
+                });
+            },
+            data:function(value, row, index){
+                window.location.href = "{:gohdmanage('datahbwall/index',['hdid'=>$hdid])}&rotateid="+row.id;
+            },
+            reset:function(value, row, index){
+                var tipword = row.openmode=='1'?'重置本轮将使得所有奖品转变成未开奖状态，':'重置本轮将清空本轮所有的用户选择记录和中奖记录并且重置奖品状态，';
+                jconfirmBox.confirm('温馨提示',"<div class='m-b-5'><span class='text-danger'>如果活动正在进行中，请不要进行此操作</span></div><div>"+tipword+"您确定要强制重置本轮么？</div>",function(){
+                    webcore.ajaxSubmit("{:gohdmanage('confighbwall/resetrotate',['hdid'=>$hdid])}",{rotateid:row.id},'正在重置轮次数据并重新生成中....').then(function(json){
+                        webtable.refresh();
+                        zamnotice.showTips('success','操作成功');
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                    });
+                });
+            },
+            refund:function(value, row, index){
+                  var confirmobj = jconfirmBox.ajaxconfirm("参与方式","{:gohdmanage('confighbwall/jointype',['hdid'=>$hdid])}",{rotateid:row.id},'html','col-lg-8 col-lg-offset-2',function(e){
+                      confirmobj.close();
+                  },false,'2');
+            },
+            shenhe:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','您确定要复制当前轮次生成新的一轮么？',function(){
+                    webcore.ajaxSubmit("{:gohdmanage('confighbwall/copyrotate',['hdid'=>$hdid])}",{rotateid:row.id}).then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','复制成功');
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                    });
+                });
+            },
+        }
+    },
+    columns:[{
+            checkbox: true,
+            width:'5',
+        }, 
+        {
+            field: 'id',
+            title: 'Id',
+            align: 'center',
+            visible: false,
+            width:'5',
+        },{
+            field: 'title',
+            title: '轮次',
+            align: 'center',
+            formatter:function(value,row,index){
+                var html = "<div class='m-b-5'>"+value+"</div>";
+                if(row.isdefault=='1'){
+                    html += '<div class="label label-primary">默认轮次</div>';
+                }
+                return html;
+            },
+            width:'15',
+        },{
+            field: 'openmodehtml',
+            title: '开奖模式',
+            align: 'center',
+            width:'8',
+        },{
+            field: 'prizenum',
+            title: '奖品',
+            align: 'center',
+            width:'8',
+            formatter:function(value,row,index){
+                return '<div class="m-b-5">' + value + '种</div><a href="javascript:;" class="btn btn-primary btn-sm btn-detail-row" data-id="'+row.id+'"">奖品一览</a>';
+            }
+        },
+        {
+            field: 'create_time',
+            title: '创建时间',
+            align: 'center',
+            width:'11',
+        }
+        
+    ],
+    searchParamas:[],
+    toolbar:{
+        add:function(){
+            var confirmobj = jconfirmBox.confirm('选择开奖模式',webcore.tpl($("#selecmode-tpl"),{}),function(e){
+                confirmobj.close();
+                var openmode = e.$content.find(".openmodebox input:radio:checked").val();
+                var confirmObj = jconfirmBox.ajaxconfirm("新增轮次","{:gohdmanage('confighbwall/editrotate',['hdid'=>$hdid])}",{openmode:openmode},'html','col-lg-8 col-lg-offset-2',function(e){
+                    var postData = webcore.serializeObject(e.find('form'));
+                    webcore.ajaxSubmit("{:gohdmanage('confighbwall/saverotate',['hdid'=>$hdid])}",postData,'正在创建轮次...').then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','创建成功');
+                            confirmObj.close();
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                             return false;
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                         return false;
+                    });
+                });
+            },false,'col-lg-8 col-lg-offset-2',true,[{'hidden':false,'txt':'确定'},{'hidden':false,'txt':'取消'}],function(){
+                var modebox = confirmobj.$content.find('.openmodebox');
+                modebox.find('input').click(function(){
+                    var modetype = $(this).val();
+                    if(modetype=='1'){
+                        modebox.find('.mode2').addClass('hidden');
+                        modebox.find('.mode1').removeClass('hidden');
+                    }else{
+                        modebox.find('.mode1').addClass('hidden');
+                        modebox.find('.mode2').removeClass('hidden');
+                    }
+                });
+            });
+        },
+        del:function(){
+            var getSelects = webtable.getSelections();
+            if(!getSelects.length){
+                return zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+            jconfirmBox.confirm('温馨提示','删除将删除所选轮次下的的用户以及中奖数据并且无法恢复，您确定要删除么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('confighbwall/delrotate',['hdid'=>$hdid])}",{rotateid:getSelects}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','删除成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+        },
+        reset:function(){
+            jconfirmBox.confirm('温馨提示','清空轮次将清空所有轮次的用户以及中奖数据，您确定要清空么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('confighbwall/resetallrotate',['hdid'=>$hdid])}",{}).then(function(json){
+                    webtable.refresh();
+                    zamnotice.showTips('success','操作成功');
+                }, function(json){
+                    zamnotice.showTips('error','网络差。操作失败');
+                });
+            });
+        }
+    },
+};
+webtable.init(initConfig);
+$("#listtable").on('click','.btn-detail-row',function() {
+    var rotateid = $(this).attr('data-id');
+    var confirmobj = jconfirmBox.ajaxconfirm("本轮奖品开奖一览","{:gohdmanage('confighbwall/rotateprizedetail',['hdid'=>$hdid])}",{rotateid:rotateid},'html','col-lg-8 col-lg-offset-2',function(e){},false,'2');
+});
+});
+</script>
+<script id='selecmode-tpl' type="text/template">
+<div class="form-horizontal">
+  <div class="form-group openmodebox">
+        <label class="col-lg-3 control-label">* 开奖模式</label>
+        <div class="col-lg-9">
+            <label class="lyear-radio radio-inline radio-primary">
+                <input type="radio" name="openmode" value="1" checked><span>自由模式</span>
+            </label>
+            <label class="lyear-radio radio-inline radio-primary">
+                <input type="radio" name="openmode" value="2" ><span>随机模式</span>
+            </label>
+            <div class="help-block">
+                <div class="mode1">自由模式：用户在现场告知工作人员选了大屏上哪个红包，由工作人员点击开启，用户可以自由选择一个大屏上待开奖的红包</div>
+                <div class="mode2 hidden">随机模式：用户扫码后在微信端选择红包，大屏幕随机开奖，全凭运气，用户无法预知大屏上哪个红包会开奖</div>
+            </div>
+        </div>
+    </div>
+</div>
+</script>
+{include file='$Wpath/common/footer'}

@@ -1,0 +1,34 @@
+<table class="table table-bordered" style="margin-bottom:0px;">
+<thead>
+  <tr>
+	<th style="width:20%;text-align:center;">商品</th>
+	<th style="width:20%;text-align:center;">订单总额</th>
+	<th style="width:20%;text-align:center;">订单总量</th>
+	<th style="width:20%;text-align:center;">订单数</th>
+	<th style="width:20%;text-align:center;">下单人数</th>
+  </tr>
+</thead>
+<tbody class="prize-lists">
+	 {foreach $goods as $good}
+	  <tr>
+	  	<td class="text-center">
+	  		<div class="userimgbox"><img src="{:tomedia($good['goodsimg'])}" width="50px" height="50px"></div>
+			<p class="mt10">{$good['goodsname']}</p>
+		</td>
+		<td class="text-center">
+			{if !empty($good['order']['ordermoneys'])}{$good['order']['ordermoneys']}{else /}0{/if}{$priceunit}
+		</td>
+		<td class="text-center">
+			{if !empty($good['order']['ordernums'])}{$good['order']['ordernums']}{else /}0{/if}{$good['goodsunit']}
+		</td>
+		<td class="text-center">
+			{if !empty($good['order']['ordercounts'])}{$good['order']['ordercounts']}{else /}0{/if}个
+		</td>
+		<td class="text-center">
+			{if !empty($good['orderpersons'])}{$good['orderpersons']}{else /}0{/if}人
+		</td>
+	 </tr>
+	{/foreach}
+</tbody>
+</table>
+

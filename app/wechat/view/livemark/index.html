@@ -1,0 +1,159 @@
+{include file="common/header" /}
+<style>
+.phbbtn{
+	position: fixed;
+    right: .3rem;
+    top: .5rem;
+    z-index:1;
+    padding: 0 .24rem;
+    min-width: 1.58rem;
+    height: .6rem;
+    background: rgba(0,0,0,.3);
+    color: #fff;
+    border-radius: .5rem;
+}
+.phbbtn i{margin-right:0.08rem}
+
+.markrefresh{
+    position: fixed;
+    left: .1rem;
+    top: .5rem;
+    z-index:1;
+    padding: 0 .24rem;
+    min-width: 1.58rem;
+    height: .6rem;
+    background: rgba(0,0,0,.3);
+    color: #fff;
+    border-radius: .5rem;
+}
+.markrefresh i{margin-right:0.08rem}
+.livemark-user-list{
+	width:100%;
+	height:calc(100% - 0.9rem);
+	padding:1.2rem 0 0.76rem 0;
+}
+.livemark-title{
+	margin: 0 auto .28rem;
+    width: 80%;
+    line-height: 1.2;
+    font-size: .36rem;
+    text-align: center;
+    font-weight: 400;
+}
+.livemark-user-list .livemark-user{padding: 0 0.26rem;}
+.livemark-user-list .livemark-user a{
+    position: relative;
+    padding: 2vw;
+    margin-bottom: .3rem;
+    width: 44vw;
+    border: 0.02rem solid {$rotate['maincolor']};
+    border-radius: .05rem;
+    overflow: hidden;
+}
+.livemark-user-list .livemark-user a img{
+    width: 40vw;
+    height: 40vw;
+    -o-object-fit: cover;
+    object-fit: cover;
+    -o-object-position: center;
+    object-position: center;
+    border-radius: .05rem;
+}
+.livemark-user-list .livemark-user a p{
+	width:100%;
+	margin: 0.16rem 0;
+    line-height: 0.4rem;
+}
+.livemark-user-list .livemark-user a p .sort{
+	margin-right: .14rem;
+    -webkit-flex-shrink: 0;
+    -ms-flex-negative: 0;
+    flex-shrink: 0;
+    min-width: 0.4rem;
+    text-align: center;
+    height: 0.4rem;
+    border-radius: 0.06rem;
+    color: #fff;
+	background-color:{$rotate['maincolor']};
+}
+.livemark-user-list .livemark-user a p .limit{
+	min-height:0.4rem;
+	white-space: nowrap;
+    word-break: break-all;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+.fen{
+	position: absolute;
+    width: 100%;
+    line-height: 0.5rem;
+    height: 0.5rem;
+    text-align: center;
+    -webkit-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+    top: 0.2rem;
+    left: -1.2rem;
+}
+.fen.nopf{
+	color: #330;
+    background-color: #fff;
+}
+.fen.hadpf{
+	color:#fff;
+	background-color:{$rotate['maincolor']};
+}
+</style>
+<section class="g-flexview">
+    {if !isset($appconfig['openwxphb']) || (isset($appconfig['openwxphb']) && $appconfig['openwxphb']=='1')}
+    <a href="javascript:;" data-href="{:gowechat(!$pwclient?'livemark/scorephb':'livemarkpw/scorephb',['hdid'=>$hdinfo['hdid']])}" data-module="livemark" class="phbbtn zam-app-flex-ajCenter2"><i class="mxc-unie721"></i><span>排行榜</span></a>
+    {/if}
+    {if $pwclient}
+        <div class="pwclientname limitbox">评委:{$pwname??''}</div>
+    {/if}
+    <div class="markrefresh zam-app-flex-ajCenter2" onclick="javascript:window.location.reload();"><i class="mxc-refresh"></i><span>刷新页面</span></div>
+	<div class="g-scrollview livemark-user-list">
+		<div class="livemark-title">{$rotate['title']}</div>
+		<div class="livemark-user zam-app-flex zam-app-flex-wrap zam-app-justifyspacebetween">
+            {foreach $rotate['pfusers'] as $pfkey=>$pfuser } 
+			{if $pfuser['userstatus']=='1'}
+            <a href="javascript:;" data-href="{:gowechat(!$pwclient?'livemark/pingfen':'livemarkpw/pingfen',['hdid'=>$hdinfo['hdid'],'pfuserid'=>$pfuser['id']])}" data-module="livemark" class="zam-app-flex-ajCenter">
+				<img  src="{$pfuser['userimg']}"> 
+				<p class="zam-app-flex">
+					<span class="sort">
+						{$pfkey+1}
+					</span> 
+					<span class="limit">{:$pfuser['username']}</span>
+				</p>
+                {if $pwclient || (!$pwclient && $rotate['openpubpw']=='1')}
+                    <div class="fen {if $pfuser['score']===false}nopf{else}hadpf{/if}{if isset($rotate['showscore']) && $rotate['showscore']=='2'} hidden{/if}">
+                        {if $pfuser['score']===false}待评分{else}{$pfuser['score']}{/if}
+                    </div>
+                {/if}
+			</a>
+            {/if}
+			{/foreach}
+		</div>
+        {if isset($appconfig['openlistphb']) && $appconfig['openlistphb']=='1'}
+        {include file="livemark/indexphb" /}
+        {/if}
+	</div>
+</section>
+{if $rotate['openpubpw']=='2' && $rotate['openzan']=='1'}
+<style>.livemark-footer .active,.livemark-footer .active i{color:{$rotate['maincolor']};}</style>
+<footer class="m-tabbar tabbar-fixed livemark-footer{if $rotate['openzan']=='2'} hidden{/if}">
+    <a href="javascript:;" data-href="{:gowechat(!$pwclient?'livemark/index':'livemarkpw/index',['hdid'=>$hdinfo['hdid']])}" data-module="livemark" class="tabbar-item active">
+        <span class="tabbar-icon">
+            <i class="mxc-unie68c"></i>
+        </span>
+        <span class="tabbar-txt">评分</span>
+    </a>
+    <a href="javascript:;" data-href="{:gowechat(!$pwclient?'livemark/zanphb':'livemarkpw/zanphb',['hdid'=>$hdinfo['hdid']])}" data-module="livemark" class="tabbar-item">
+        <span class="tabbar-icon">
+            <i class="mxc-hot_light"></i>
+        </span>
+        <span class="tabbar-txt">人气</span>
+    </a>
+</footer>
+{/if}
+{include file="livemark/footer" /}
+{include file="common/footer" /}

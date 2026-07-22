@@ -1,0 +1,44 @@
+<table class="we7-table table" style="margin-bottom:0px;">
+<thead>
+  <tr>
+	<th style="width:5%;text-align:center;">id</th>
+	{foreach $fieldconfig as $yhfield}
+	<th style="width:15%;text-align:center;">{$yhfield['fieldname']}</th>
+	{/foreach}
+	<th style="width:5%;text-align:center;">操作</th>
+  </tr>
+</thead>
+<tbody class="prize-lists">
+	 {foreach $datas as $skey=>$samedata}
+	  <tr>
+		<td class="text-center">
+			{$samedata['id']}
+		</td>
+		{if isset($fieldconfig[0])}
+		<td class="text-center">
+			<span {if $checkkey=='datafield1'}class="text-danger"{/if}>{$samedata['datafield1']}</span>
+		</td>
+		{/if}
+		{if isset($fieldconfig[1])}
+		<td class="text-center">
+			<span {if $checkkey=='datafield2'}class="text-danger"{/if}>{$samedata['datafield2']}</span>
+		</td>
+		{/if}
+		{if isset($fieldconfig[2])}
+		<td class="text-center">
+			<span {if $checkkey=='datafield3'}class="text-danger"{/if}>{$samedata['datafield3']}</span>
+		</td>
+		{/if}
+		{if isset($fieldconfig[3])}
+		<td class="text-center">
+			<span {if $checkkey=='datafield4'}class="text-danger"{/if}>{$samedata['datafield4']}</span>
+		</td>
+		{/if}
+		<td class="text-center">
+			<a class="btn btn-danger btn-sm btn-delsame" data-id="{$samedata['id']}">删除</a>
+		</td>
+	 </tr>
+	{/foreach}
+</tbody>
+</table>
+

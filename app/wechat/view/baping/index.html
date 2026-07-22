@@ -1,0 +1,751 @@
+{include file="common/header" /}
+<link rel="stylesheet" href="/{:WIMGURL}baping/bp.css?t=2.6.8"/>
+<style>
+{/*文字后台配置样式*/}
+.zam-app-msglist{color:{if empty($appconfig['appmsg']['color'])}#fff{else}{$appconfig['appmsg']['color']}{/if};}
+.zam-app-msglist .zam-app-msg-text {background-color:{if empty($appconfig['appmsg']['bgcolor'])}rgba(0,0,0,.5){else}{$appconfig['appmsg']['bgcolor']}{/if};}
+.zam-app-msglist .zam-app-msg-text .msgtxt{font-size:{if empty($appconfig['appmsg']['size'])}0.26rem{else}{$appconfig['appmsg']['size']}px{/if}}
+.zam-app-msglist .zam-app-msg-text .faceImg{width:{if empty($appconfig['appmsg']['size'])}24{else}{$appconfig['appmsg']['size']+4}{/if}px;height:{if empty($appconfig['appmsg']['size'])}24{else}{$appconfig['appmsg']['size']+4}{/if}px;}
+{/*霸屏自定义主题*/}
+{foreach $bpthemes as $bptheme}
+.zam-app-msglist .zam-app-msg-text .msgtxt.app-bptheme-{$bptheme['id']}{background-image: url("{:tomedia($bptheme['themeconfig']['apptopbg'])}");}
+.zam-app-msglist .zam-app-msg-text .msgtxt.app-bptheme-{$bptheme['id']} .txt-bpIcon{background-image: url("{:tomedia($bptheme['themeconfig']['bpappicon'])}");}
+{/foreach}
+{/*打赏礼物样式*/}
+{foreach $dsgifts as $dsgift}
+.zam-app-msglist .zam-app-msg-text .msgtxt.app-dstheme-{$dsgift['id']}{background-image: url("{:tomedia($dsgift['giftconfig']['gifttopbg'])}");}
+.zam-app-msglist .zam-app-msg-text .msgtxt.app-dstheme-{$dsgift['id']} .txt-dsIcon{background-image: url("{:tomedia($dsgift['giftconfig']['giftappicon'])}");}
+{/foreach}
+{/*右侧菜单样式*/}
+{foreach $appconfig.appwidgets as $appwidget}
+.zam-app-bapingfooter-navs .zam-app-bapingfooter-navicon.{$appwidget['iconfield']}-lefticon{background-image:url("{:tomedia($appwidget['iconimg'])}");}
+{/foreach}
+.zam-app-msglist .zam-app-msg-user .userAvatar{border:2px solid #fff;}
+.zam-app-bapingfooter.isforbidden .bapingfooter-inputbox,.zam-app-bapingfooter.isforbidden .uploadImg{
+	pointer-events: none;
+}
+.zam-app-bapingfooter.isforbidden .btn{
+	background-color: #faa64b!important;
+	padding: 0;
+}
+.zam-app-bapingfooter-navs .zam-app-bapingfooter-navicon.zan-lefticon{
+	{if isset($appconfig['zanconfig']['shownum']) && $appconfig['zanconfig']['shownum']=='2'}
+	margin-bottom:0;
+	{else /}
+    margin-bottom:0.24rem;
+    {/if}
+}
+.zan-lefticon span{
+	position: absolute;
+	left: 0;
+    bottom: -0.24rem;
+    width: 100%;
+    text-align: center;
+    {if isset($appconfig['zanconfig']['shownum']) && $appconfig['zanconfig']['shownum']=='2'}
+    display:none;
+    {/if}
+}
+.zan-lefticon canvas{
+    position: absolute;
+    bottom: 0.74rem;
+    left: 50%;
+	transform: translateX(-50%);
+	-webkit-transform: translateX(-50%);
+    cursor: pointer;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    pointer-events: none;
+}
+.sweet-alert .sa-input-error{top:22px;}
+.sweet-alert .sa-error-container {
+    display: -webkit-box;
+	display: -webkit-flex;
+	display: -ms-flexbox;
+	display: flex;
+	-webkit-box-pack: center;
+	-webkit-justify-content: center;
+	-ms-flex-pack: center;
+	justify-content: center;
+	-webkit-box-align: center;
+	-webkit-align-items: center;
+	-ms-flex-align: center;
+	align-items: center;
+}
+.sweet-alert input::-webkit-input-placeholder,.sweet-alert textarea::-webkit-input-placeholder{ color:#666!important}
+</style>
+<script>
+var basicConfig = {
+	appestoppel:"{$appconfig['appestoppel']??'2'}",
+	appjointip:"{$appconfig['appshowjoin']}",
+	cansendImg:"{$appconfig['appcanimg']}",
+	bpuploadvideo:"{$appconfig['bpconfig']['uploadvideo']}",
+	shownotice:"{if $appconfig['appshownotice']=='1' && !empty($appconfig['appnotices'])}1{else /}2{/if}",
+	chatUrl:"",
+	openchat:"1",
+};
+</script>
+<section class="g-flexview zam-app-msg-box">
+    {if $appconfig['appshownotice']=='1' && !empty($appconfig['appnotices'])}
+    {php}$appnotices = explode('#',$appconfig['appnotices']);{/php}
+	<header class="zam-app-topNoticeBox zam-app-flex-ajCenter2">
+        <div class="zam-app-topNotice-laba zam-app-flex-ajCenter"><i class="mxc-notification"></i></div>
+		<ul class="zam-app-topNotice-txt" style="{if $appconfig['appclosenotice']=='1'}width:calc(100% - 80px);{else}width:calc(100% - 40px);{/if}">
+			{foreach $appnotices as $notice}
+			<li>{$notice}</li>
+			{/foreach}
+		</ul>
+		{if $appconfig['appclosenotice']=='1'}
+		<div class="zam-app-topNotice-close zam-app-flex-ajCenter"><i class="mxc-roundclose"></i></div>
+		{/if}
+    </header>
+	{/if}
+	<div class="newjoin-enter zam-app-flex">
+		<div class="name">...</div>
+		<div class="text">已加入</div>
+	</div>
+	<div class="g-view zam-app-msg-scroll {if $appconfig['appshownotice']=='2' || empty($appconfig['appnotices'])}scrollnotop{/if}">
+        <ul class="zam-app-msglist"></ul>
+		<!-- 顶部提示信息 -->
+		<div class="zam-pulldown-box zam-app-flex-ajCenter">
+			<div class="pulldownOver"><i class="mxc-roundcheck"></i>加载完成</div>
+			<div class="pulldownRefresh"><div class="pulldownRefresh-loading"></div></div>
+			<span class="pulldownTxt"><i class="mxc-refresharrow"></i>下拉加载，释放刷新</span>
+		</div>
+    </div>
+	<footer class="zam-app-bapingfooter">
+	  <div class="zam-app-baping-footermain zam-app-flex{if $appconfig['bpconfig']['open']=='2'} zam-app-baping-footermain-nobp{/if}">
+		{if $appconfig['bpconfig']['open']=='1'}
+		<div class="baping-iconBox zam-app-flex-ajCenter2"><i class="mxc-baping"></i></div>
+		{/if}
+		<div class="bapingfooter-inputbox">
+			<input type="text" class="waitsendInput" placeholder="请输入..." autocomplete="off" maxlength="{$appconfig['appmaxlength']}">
+			<span class="mxc-emojiBox"><i class="mxc-emoji"></i></span>
+			<span class="btn btn-sendmsg btn-disabled">发送</span>
+		</div>
+		<div class="emojiadd-iconBox zam-app-flex-ajCenter2">
+			<span class="mxc-roundaddBox"><i class="mxc-roundadd"></i></span>
+		</div>
+      </div>
+	  <div class="zam-app-facebox zam-app-displaynone"></div><!--表情框--->
+	  <div class="zam-app-controlbox zam-app-displaynone">
+		<ul class="zam-app-flex">
+		    {if $appconfig['appcanimg']=='1'}
+			<li class="zam-app-controlbox-li">
+				<a class="uploadImg zam-app-flex-ajCenter">
+					<div class="iconBox zam-app-flex-ajCenter2"><i class="mxc-camera_light"></i></div>
+					<div class="nameBox">图片</div>
+				</a>
+			</li>
+			{/if}
+			{if isset($hdinfo['mobileconfig']['showtmenu']) && $hdinfo['mobileconfig']['showtmenu']=='1'}
+				<li class="zam-app-controlbox-li">
+					<a class="zam-app-flex-ajCenter opengamemodule" href="javascript:;">
+						<div class="iconBox zam-app-flex-ajCenter2"><i class="mxc-unie6df"></i></div>
+						<div class="nameBox">游戏</div>
+					</a>
+				</li>
+			{/if}
+			<li class="zam-app-controlbox-li">
+				<a class="zam-app-flex-ajCenter" href="{:gowechat('home/index',['hdid'=>$hdinfo['hdid']])}">
+					<div class="iconBox zam-app-flex-ajCenter2"><i class="mxc-profile_light"></i></div>
+					<div class="nameBox">个人中心</div>
+				</a>
+			</li>
+			<li class="zam-app-controlbox-li">
+				<a class="zam-app-flex-ajCenter" href="{:gowechat('home/tx',['hdid'=>$hdinfo['hdid']])}">
+					<div class="iconBox zam-app-flex-ajCenter2"><i class="mxc-unie6ed"></i></div>
+					<div class="nameBox">余额提现</div>
+				</a>
+			</li>
+		</ul>
+	  </div><!--操作框--->
+	</footer>
+	<div class="zam-app-bapingfooter-navs">
+		{foreach $appconfig.appwidgets as $righticon}
+			{if in_array($righticon['iconfield'],['bp','ds','song','hb','jiaoyou','zan'])}
+				{if $righticon['iconfield']=='bp' && $appconfig['bpconfig']['open']=='1'}
+				<span class="zam-app-bapingfooter-navicon bp-lefticon"></span>
+				{elseif $righticon['iconfield']=='ds' && $appconfig['dsconfig']['open']=='1'}
+				<span class="zam-app-bapingfooter-navicon ds-lefticon"></span>
+				{elseif $righticon['iconfield']=='hb' && $appconfig['redpackconfig']['open']=='1'}
+				<span class="zam-app-bapingfooter-navicon hb-lefticon"></span>
+				{elseif $righticon['iconfield']=='song' && $appconfig['songconfig']['open']=='1'}
+				<span class="zam-app-bapingfooter-navicon song-lefticon"></span>
+				{elseif $righticon['iconfield']=='zan' && $appconfig['zanconfig']['open']=='1'}
+				<span class="zam-app-bapingfooter-navicon zan-lefticon">
+					<span>{$zannum}</span>
+				</span>
+				{elseif $righticon['iconfield']=='jiaoyou' && $appconfig['jiaoyouconfig']['open']=='1'}
+				<a class="zam-app-bapingfooter-navicon jiaoyou-lefticon" href="">
+					<span class="unreadnum">0</span>
+				</a>
+				{/if}
+			{else /}
+				<a href="{$righticon['iconurl']}" class="zam-app-bapingfooter-navicon {$righticon['iconfield']}-lefticon"></a>
+			{/if}
+		{/foreach}
+	 </div>
+</section>
+<script id="msg-tpl" type="text/html">
+	<li class="zam-app-msg-item appmsg-<% d.id %>" >
+		<p class="msgTime"><% d.create_time %></p>
+		<div class="zam-app-msg-user">
+			<img class="userAvatar" src="<% d.avatar %>" data-openid="<% d.openid %>">
+			<div class="userNickname zam-app-flex">
+				<div class="userName"><% d.nickname %><%#  if(d.type == '6' && d.content.deskno){ %>（台号：<% d.content.deskno %>）<%#  } %></div>
+				<div class="userSex <%# if(d.sex=='2'){ %>womansex<%# }else{ %>mansex<%# } %> hidden"><i class="mxc-<%# if(d.sex=='2'){ %>unie71a<%# }else{ %>unie71c<%# } %>"></i></div>
+			</div>
+		</div>
+		<div class="zam-app-msg-text">
+				<%#  if(d.type == '1'){ %>
+				<div class="msgtxt"><% d.content %></div>
+				<%#  }else if(d.type == '2'){ %>
+				<img class="wechatImg needwait" src="<% d.content %>" />
+				<%#  }else if(d.type == '3'){ %>
+					<div class="msgtxt isrelative bptopbg app-bptheme-<% d.themeid %>"><span class="app-bptheme-name"><% d.content.bpname %></span><span class="app-bptheme-seconds"><% d.content.bptime %>秒</span><div class="txt-Icon txt-bpIcon"></div></div>
+					<%#  if(d.content.bpimgs){ %>
+					<div class="bpimg<%# if(d.content.bpimgs.length>1){ %> bpimgs zam-app-flex zam-app-flex-wrap<%# } %>">
+						<%#  if(d.content.bpimgs.length>1){ %>
+							<%#  $.each(d.content.bpimgs, function(index, item){ %>
+								<div class="bpimgone zam-app-flex-ajCenter2">
+									<img class="needwait" src="<% item %>" />
+								</div>
+							<%# }) %>
+						<%#  }else{ %>
+							<img class="wechatImg needwait" src="<% d.content.bpimgs[0] %>" />
+					    <%# } %>
+					</div>
+					<%#  } %>
+					<%#  if(d.content.bpvideo){ %>
+						<div class="bpvideoBox">
+							<img class="needwait" src="<% d.content.bpvideo.video %>.jpg" />
+							<i class="mxc-videofill msg-videoicon" data-video="<% d.content.bpvideo.video %>"></i>
+						</div>
+					<%#  } %>
+					<%#  if(d.content.bptxt&&d.content.bptxt!=''){ %>
+						<div class="msgtxt bptxt"><% d.content.bptxt %></div>
+					<%#  } %>
+				<%#  }else if(d.type == '4'){ %>
+					<div class="msgtxt isrelative dstopbg app-dstheme-<% d.themeid %>">
+						打赏<span class="app-gift-name">[<% d.content.giftname %>]</span>给
+						<span class="app-artist-name">[<% d.content.artistname %>]</span>
+						<div class="txt-Icon txt-dsIcon"></div>
+					</div>
+					<%#  if(d.content.artistavatar){ %>
+					<div class="bpimg">
+						<img class="wechatImg needwait" src="<% d.content.artistavatar %>" />
+					</div>
+					<%#  } %>
+					<%#  if(d.content.dstxt&&d.content.dstxt!=''){ %>
+						<div class="msgtxt bptxt"><% d.content.dstxt %></div>
+					<%#  } %>
+				<%#  }else if(d.type == '5'){ %>
+					<span class="zam-app-msg-hb" data-hbid="<% d.id %>" data-hbtype="<% d.content.hbtype %>" data-totalnum="<% d.content.hbnum %>">
+						<img class="zam-app-msg-hb-cover needwait" src="/{:WIMGURL}baping/<%# if(d.content.hbtype=='2'){ %>ling.png<%#  }else{ %>ping.png<%#  } %>?t=1" />
+						<div class="zam-app-msg-hb-txt zam-app-flex zam-app-justifyCenter"><span><%# if(d.content.hbtype=='2'){ %><% d.content.kouling %><%#  }else{ %><% d.content.hbtxt %><%#  } %></span></div>
+					</span>
+				<%#  }else if(d.type == '6'){ %>
+					<div class="msgtxt isrelative songtopbg">
+						点歌1首<div class="txt-Icon txt-songIcon"></div>
+					</div>
+					<div class="msgtxt songinfotxt"><% d.content.songname %> - <% d.content.artistname %></div>
+					<%#  if(d.content.artistavatar){ %>
+					<div class="bpimg">
+						<img class="wechatImg needwait" src="<% d.content.artistavatar %>" />
+					</div>
+					<%#  } %>
+					<%#  if(d.content.songtxt&&d.content.songtxt!=''){ %>
+						<div class="msgtxt bptxt"><% d.content.songtxt %></div>
+					<%#  } %>
+				<%#  } %>
+		</div>
+		<%#  if(d.ismanager === '1'){ %>
+			<div class="zam-app-msg-control" data-msgid="<% d.id %>" data-userid="<% d.user_id %>"><span class="delmsg">删除</span><span class="addblack">拉黑</span><span class="addestoppel">禁言</span><%# if(d.type > '2' && d.type!='5'){ %><span class="bpreshow">重新显示</span><%# } %></div>
+		<%#  } %>
+	</li>
+</script>
+<script id="bp-tpl" type="text/html">
+	<div class="zam-app-sendBpBox">
+	<div class="bpTitle"><div>主题</div></div>
+	<div class="bpZhutiBox">
+		<div class="swiper-container zhuti-slider">
+			<div class="swiper-wrapper">
+				<%#  $.each(d.zhutiType, function(i, v){ %>
+					 <%#  if(i%4==0){ %>
+						<div class="swiper-slide">
+							<div class="bpZhutiItem zam-app-flex-ajCenter2" data-index="<% v.id %>" data-mintime="<% v.themeconfig.minseconds %>" >
+								<div class="bpZhutiType zam-app-flex-ajCenter">
+									<div class="bpZhutiImg">
+										<img src="<% v.themeconfig.bpicon %>" />
+									</div>
+									<div class="bpZhutiName"><% v.themeconfig.bpname %></div>
+								</div>
+							</div>
+						<%# if ((i+1)==d.zhutiType.length){ %>
+							</div>
+						<%# } %>
+					<%# }else{ %>
+							<div class="bpZhutiItem zam-app-flex-ajCenter2" data-index="<% v.id %>"  data-mintime="<% v.themeconfig.minseconds %>" >
+								<div class="bpZhutiType zam-app-flex-ajCenter">
+									<div class="bpZhutiImg">
+										<img src="<% v.themeconfig.bpicon %>" />
+									</div>
+									<div class="bpZhutiName"><% v.themeconfig.bpname %></div>
+								</div>
+							</div>
+						 <%# if((i+1)%4 == 0 || (i+1)==d.zhutiType.length){ %>
+							</div>
+						 <%# } %>
+					<%# } %>
+				<%# }) %>
+			</div>
+			<div class="swiper-pagination zhuti-page"></div>
+		</div>
+	</div>
+	<div class="bpTitle"><div>时间</div></div>
+	<div class="bpTimeBox">
+		<div class="swiper-container bptime-slider">
+			<div class="swiper-wrapper">
+					<%#  $.each(d.timeType, function(i, v){ %>
+						 <%#  if(i%5==0){ %>
+							<div class="swiper-slide">
+								<div class="bpTimeItem zam-app-flex-ajCenter"  data-fee="<% v.bpprice %>" data-time="<% v.bpseconds %>" data-imgnum="<% v.imgnum %>">
+									<div class="bpTime">
+											<div class="bpTimeDiv"><% v.bpseconds %>秒</div>
+									</div>
+									<div class="bpPrice">
+										<div class="bpPriceDiv">￥<% v.bpprice %></div>
+									</div>
+								</div>
+							<%# if ((i+1)==d.timeType.length){ %>
+								</div>
+							<%# } %>
+						<%# }else{ %>
+								<div class="bpTimeItem zam-app-flex-ajCenter" data-fee="<% v.bpprice %>" data-time="<% v.bpseconds %>"  data-imgnum="<% v.imgnum %>">
+									<div class="bpTime">
+											<div class="bpTimeDiv"><% v.bpseconds %>秒</div>
+									</div>
+									<div class="bpPrice">
+										<div class="bpPriceDiv">￥<% v.bpprice %></div>
+									</div>
+								</div>
+							 <%#  if((i+1)%5==0 || (i+1) == d.timeType.length){ %>
+								</div>
+							<%# } %>
+						<%# } %>
+					<%# }) %>
+			</div>
+			<div class="swiper-pagination bptime-page"></div>
+		</div>
+	</div>
+	<div class="bpTitle"><div>留言</div></div>
+	<div class="zam-input-item">
+		<div class="zam-input-box" style="padding:0.1rem">
+			<textarea placeholder="请不要发布广告涉黄等内容，霸屏不支持退款" class="bpwords" autocomplete="off"></textarea>
+		</div>
+	</div>
+	<div class="bpTitle"><div>图片{if $appconfig['bpconfig']['uploadvideo']=='1'}或视频{/if}</div></div>
+	<div class="bpImgBox zam-app-flex zam-app-flex-wrap">
+		<div class="uploadBox bpAddpicorvideo zam-app-flex-ajCenter2">
+			<i class="mxc-piclight"></i>
+		</div>
+	</div>
+	<div class="bpTitle bpcanimgnum">
+		<div style="font-size:10px;">可上传<span>1</span>张图片{if $appconfig['bpconfig']['uploadvideo']=='1'}或1个视频{/if}</div>
+	</div>
+	<div class="bpUploadBox">
+	  <div class="typeItemCover"></div>
+	  <div class="typeItemBox zam-app-flex">
+		<div class="typeItem zam-app-flex-ajCenter picItem">
+			<span class="bptypeIcon"><i class="mxc-camera_light"></i></span>
+			<span class="bptypeName">图片</span>
+		</div>
+		<div class="typeItem zam-app-flex-ajCenter videoItem"  style="pointer-events: auto;">
+			<span class="bptypeIcon"><i class="mxc-recordlight"></i></span>
+			<span class="bptypeName">拍视频</span>
+			<input type="file" style="opacity: 0; position: absolute; top: 0px; left: 0px; width: 100%; height: 100%;" accept="video/*" capture="camcorder">
+		</div>
+		<div class="typeItem zam-app-flex-ajCenter videoItem"  style="pointer-events: auto;">
+			<span class="bptypeIcon"><i class="mxc-recordlight"></i></span>
+			<span class="bptypeName">视频文件</span>
+			<input type="file" style="opacity: 0; position: absolute; top: 0px; left: 0px; width: 100%; height: 100%;" accept="video/*">
+		</div>
+	  </div>
+	</div>
+</div>
+</script>
+<script id="redpack-tpl" type="text/html">
+	<div class="zam-bp-sendhbBox">
+		<div class="zam-bp-sendhbBox-body">
+			<ul class="redpacktypes zam-app-flex"><li class="flex1 text-center seltype" data-type='1'><span>拼手气红包</span></li><li class="flex1 text-center" data-type='2'><span>口令红包</span></li></ul>
+			<div class="zam-input-item kouling<%#  if(d.hbtype == '1'){ %> hidden<%# } %>">
+				<div class="zam-input-box zam-app-flex-ajCenter2">
+					<div class="flex2 text-center">口令</div>
+					<input type="text" name="kouhao" class="cell-input zam-app-cell-input flex7" maxlength="20" placeholder="口令20字内" autocomplete="off">
+				</div>
+				<div class="zam-help-block">用户需回复口令抢红包</div>
+			</div>
+			<div class="zam-input-item hbtotalmoney">
+				<div class="zam-input-box zam-app-flex-ajCenter2">
+					<div class="flex2 text-center">总金额</div>
+					<input type="number" name="totalmoney" class="cell-input zam-app-cell-input flex6" style="text-align: center;" placeholder="最少<% d.min %>元，最多<% d.max %>元" autocomplete="off">
+					<div class="flex1 text-center">元</div>
+				</div>
+				<%# if(d.fl > 0){ %><div class="zam-help-block">注:红包需收取<% d.fl %>%的手续费</div><%# } %>
+			</div>
+			<div class="zam-input-item hbnum">
+				<div class="zam-input-box zam-app-flex-ajCenter2">
+					<div class="flex2 text-center">红包个数</div>
+					<input type="number" name="moneynums"  class="cell-input zam-app-cell-input flex6" style="text-align: center;" placeholder="最少1个，最多2000个" autocomplete="off">
+					<div class="flex1 text-center">个</div>
+				</div>
+				<div class="zam-help-block">单个红包金额至少为<% d.onemin %>元</div>
+			</div>
+			<div class="zam-input-item liuyan<%#  if(d.hbtype == '2'){ %> hidden<%# } %>">
+				<div class="zam-input-box zam-app-flex-ajCenter2">
+					<div class="flex2 text-center">留言</div>
+					<input type="text" name="liuyan" class="cell-input zam-app-cell-input flex7" maxlength="20" placeholder="20字内" autocomplete="off">
+				</div>
+			</div>
+		</div>
+	</div>
+</script>
+<script id="redpackopen-tpl" type="text/html">
+<div id="redBagBox" class="redBagBox zam-app-flex-ajCenter2">
+  <div class="redBoxCover"></div>
+  <div class="redBoxMain opening scalcshow">
+	  <img class="redBoxbg" src="/{:WIMGURL}baping/opening_bg.png" />
+	  <div class="redBoxopen">
+		  <div class="redBoxopenUser">
+			<img src="<% d.avatar %>" />
+			<p><% d.nickname %></p>
+		  </div>
+		  <%# if(d.hbtype=='1'){ %>
+		  	<div class="redBoxopenTxt"><% d.txt %></div>
+		  <%# }else{ %>
+		  	<input class="inputkl" type="text" value="" placeholder="输入口令" />
+		  <%# } %>
+		  <div class="redBoxopenBtn" data-hbid="<% d.hbid %>" data-hbtype="<% d.hbtype %>" data-hbnum="<% d.hbnum %>">拆</div>
+	  </div>
+	  <img class="redBoxClose" src="/{:WIMGURL}baping/closed.png" />
+  </div>
+</div>
+</script>
+<script id="redpackopened-tpl" type="text/html">
+<div id="redBagBox" class="redBagBox zam-app-flex-ajCenter2">
+	<div class="redBoxCover"></div>
+	<div class="redBoxMain opened scalcshow">
+		<img class="redBoxbg" src="/{:WIMGURL}baping/opened_bg.png" />
+		<div class="redBoxOpened">
+			<%#  if(d.mymoney > 0){ %>
+			<div class="redBoxOpenedTip" ><div>恭喜抢到红包</div><% d.mymoney/100 %><span>元</span></div>
+			<%# }else{ %>
+			<div class="redBoxOpenedTip" style="font-size:16px;padding:0.5rem 0.4rem 0 0.4rem;overflow:hidden" >手慢了，红包已经抢完了</div>
+			<%# } %>
+			<img class="redBoxOpened-avatar" src="<% d.avatar %>" />
+			<div class="redBoxOpened-nickname" ><% d.nickname %>的红包 <span><%#  if(d.hbtype=='2'){ %>令<%# }else{ %>拼<%# } %></span></div>
+			<div class="redBoxOpened-num" >领取 <% d.list.length %>/<% d.hbnum %></div>
+				<div class="redBoxOpened-lists" >
+					<%#  $.each(d.list, function(i, v){ %>
+					<div class="redBoxOpened-user" >
+						<img class="redBoxOpened-user-avatar" src="<% v.userinfo.avatar %>" />
+						<div class="redBoxOpened-user-info" >
+							<div><% v.userinfo.nickname %></div>
+							<p><% v.create_time %></p>
+							<span><% v.sendmoney/100 %>元</span>
+						</div>
+					</div>
+					<%# }) %>
+				</div>
+			</div>
+			<img class="redBoxClose" src="/{:WIMGURL}baping/closed.png"  />
+		</div>
+   </div>
+</div>
+</script>
+<script id="ds-tpl" type="text/html">
+<div class="dspopBox-main">
+    <div class="dsusertypeBox zam-app-flex-ajCenter2">
+		<%#  $.each(d.artists, function(i, v){ %>
+			<div class="dsusertype-item dsusergroup-<% v.id %> flex1<%# if(i==0){ %> active<%# } %>"><div><% v.groupname %></div></div>
+		<%# }) %>
+    </div>
+    <div class="dsuserBox">
+      <div class="swiper-container dsuser-swiper dsuserList">
+        <div class="swiper-wrapper">
+		  	<%#  $.each(d.artists[0].list, function(i, v){ %>
+			 	<div class="swiper-slide dsuser-slide dsuser-<% v.id %>" data-artid="<% v.id %>">
+					<div class="dsuser-info">
+						<div class="dsuser-info-box">
+							<div class="dsuser-info-avatar">
+							  <img src="<% v.artistavatar %>">
+							</div>
+							<div class="dsuser-info-namebox">
+							  <span class="dsuser-info-type"><% v.artisttypename %></span>
+							  <span class="dsuser-info-name"><% v.artistname %></span>
+							</div>
+						</div>
+					</div>
+					<div class="dsuser-slide-bg"></div>
+			  </div>
+		  	<%# }) %>
+        </div>
+      </div>
+    </div>
+    <div class="giftbox">
+      <div class="swiper-container gift-swiper">
+        <div class="swiper-wrapper">
+			 <%#  $.each(d.gifts, function(i, v){ %>
+				 <%#  if(i%8==0){ %>
+					<div class="swiper-slide">
+						<div class="gift-box">
+						  <div class="gift-item" data-giftid="<% v.id %>">
+								<div class="gift-bg"></div>
+								<div class="gift-info">
+								  <div class="gift-imgbox"><img src="<% v.giftconfig.giftimg %>"></div>
+								  <div class="gift-name"><% v.giftconfig.giftname %></div>
+								  <div class="gift-price">￥<% v.giftconfig.giftprice %></div>
+								</div>
+								<div class="selicon"></div>
+						  </div>
+					<%# if ((i+1)==d.gifts.length){ %>
+						</div></div>
+					<%# } %>
+				<%# }else{ %>
+						  <div class="gift-item" data-giftid="<% v.id %>">
+								<div class="gift-bg"></div>
+								<div class="gift-info">
+								  <div class="gift-imgbox"><img src="<% v.giftconfig.giftimg %>"></div>
+								  <div class="gift-name"><% v.giftconfig.giftname %></div>
+								  <div class="gift-price">￥<% v.giftconfig.giftprice %></div>
+								</div>
+								<div class="selicon"></div>
+						  </div>
+					 <%#  if((i+1)%8==0 || (i+1) == d.gifts.length){ %>
+						</div></div>
+					<%# } %>
+				<%# } %>
+			<%# }) %>
+        </div>
+        <div class="swiper-pagination swiper-pagination-bullets ds-gift-pagination"></div>
+      </div>
+    </div>
+    <div class="inputBox">
+      <input type="text" placeholder="输入想说的话" maxlength="30" class="dstxt">
+	</div>
+</div>
+</script>
+<script id="dsuser-tpl" type="text/html">
+<div class="swiper-wrapper">
+  <%#  $.each(d.artistone, function(i, v){ %>
+	 <div class="swiper-slide dsuser-slide dsuser-<% v.id %>" data-artid="<% v.id %>">
+			<div class="dsuser-info">
+				  <div class="dsuser-info-box">
+					<div class="dsuser-info-avatar">
+					  <img src="<% v.artistavatar %>">
+					</div>
+					<div class="dsuser-info-namebox">
+					  <span class="dsuser-info-type"><% v.artisttypename %></span>
+					  <span class="dsuser-info-name"><% v.artistname %></span>
+					</div>
+				  </div>
+			</div>
+			<div class="dsuser-slide-bg"></div>
+	  </div>
+  <%# }) %>
+</div>
+</script>
+<style>
+.songtimesbox {
+	overflow: hidden;
+	white-space: nowrap;
+	margin: 0.12rem 0;
+}
+.songtimesbox ul li {
+	position: relative;
+	padding: 10px;
+	text-align: center;
+	color: #fff;
+	text-shadow: 0 0 5px #e5156a, 0 0 10px #e5156a,0 0 15px #e5156a;
+	font-size: .32rem;
+	font-weight: bold;
+	max-width: 2.4rem;
+}
+.songtimesbox ul li.active{
+	color: #e5156a;
+}
+.songtimesbox ul li.active:after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    margin: 0 auto;
+    width: .6rem;
+    background: #e5156a;
+    height: 2px;
+    border-radius: 1px;
+}
+.songpopcontent .inputBox{
+	width: 95%;
+	margin: 0 auto;
+	margin-bottom: 0.24rem;
+}
+.songpopBox-main .inputBox input {
+    width: 100%;
+    height: .8rem;
+    background: rgba(137, 124, 225, .1);
+    border-radius: .1rem;
+    display: block;
+    margin: 0 auto;
+    padding: 0 .2rem;
+    box-sizing: border-box;
+    font-weight: 700;
+    font-size: .26rem;
+    color: #897ce1;
+    border: 0
+}
+.songpopBox-main .inputBox.half input {
+	width: 96%;
+}
+</style>
+<script id="song-tpl" type="text/html">
+  <div class="songpopBox-main">
+	<%#  if(d.songtimes.length){ %>
+	<div class="songtimesbox">
+		<ul class="swiper-wrapper">
+			<%#  $.each(d.songtimes, function(i, v){ %>
+			<li class="swiper-slide limitbox" data-id="<% v.id %>"><% v.timename %></li>
+			<%# }) %>
+		</ul>
+	</div>
+	<%# }else{ %>
+	<div class="songnavbox">
+		<ul>
+			<li class="active">今日艺人</li>
+			<li>已点(<% d.pointersongs.length %>首)</li>
+		</ul>
+	</div>
+	<%# } %>
+   <div class="songpopcontent">
+    <div id="songerAndsonglist">
+		 <div class="swiper-container songerlist">
+		  <div class="swiper-wrapper">
+			<div class="swiper-slide songer-slide default-slide">
+				<div class="songer-item zam-app-flex zam-app-alignCenter">
+					<div class="songer-avatar">
+						<img  src="__STATIC__/images/screen/baping/song/yf2.png" />
+					</div>
+					<div class="songer-info"><span class="songer-type">今日艺人</span><span class="songer-name">全部歌曲</span></div>
+				</div>
+			</div>
+		  	<%#  $.each(d.singer, function(i, v){ %>
+			   	<div class="swiper-slide songer-slide">
+					<div class="songer-item zam-app-flex zam-app-alignCenter">
+						<div class="songer-avatar">
+							<img  src="<% v.artistavatar %>" />
+						</div>
+						<div class="songer-info"><span class="songer-type"><% v.groupname %></span><span class="songer-name"><% v.artistname %></span></div>
+						<span class="dstosonger" data-groupid="<% v.groupid %>" data-artid="<% v.id %>"></span>
+					</div>
+			   	</div>
+		   	<%# }) %>
+		  </div>
+		 </div>
+		 <div class="song-search zam-app-flex zam-app-flex-ajCenter2">
+		  <input class="flex5" type="text" placeholder="输入你想要搜索的歌曲名或艺人或原唱" />
+		  <div class="search-btn flex1">搜索</div>
+		 </div>
+		 <ul class="songlists">
+		 <%# $.each(d.song, function(i, v){ %>
+		  <li class="songitem" data-songid="<% v.id %>">
+		   <i class="songcheck"></i>
+		   <div class="songinfo">
+				<p class="songname"><% v.songconfig.songname %> — <% v.singer.artistname %></p>
+				<p class="songold"><span>原唱：<% v.songconfig.singer %></span><span class="songprice">￥<% v.songconfig.songprice %>元</span></p>
+		   </div>
+		   <%# if(!d.songtimes.length){ %>
+		   <span class="songpointed"> <% v.pointednum %>人点过</span>
+		   <%# } %>
+		  </li>
+		  <%# }) %>
+		 </ul>
+		 <div class="inputBox zam-app-flex<%# if(d.songtimes.length){ %> half<%# } %>">
+			<%# if(d.songtimes.length){ %>
+			<div class="desknobox flex1">
+				<input type="text" placeholder="请输入台号" maxlength="12">
+			</div>
+			<%# } %>
+			<div class="songtxtbox flex1">
+				<input type="text"  placeholder="请输入留言祝福" maxlength="30" class="songtxt">
+			</div>
+		 </div>
+    </div>
+    <div class="songpointedlist hidden">
+	 <%#  if(!d.pointersongs.length){ %>
+     <div class="nodatas">没有已点列表</div>
+	 <%# }else{ %>
+		<ul class="pointersongul">
+		 <%#  $.each(d.pointersongs, function(i, v){ %>
+		  <li class="pointersongli">
+			<div class="songitembox">
+				<i class="pindex"><% i+1 %></i>
+				<div class="psonginfo">
+					<p class="psongname"><% v.content.songname %> — <% v.content.artistname %></p>
+					<p class="puser">点播用户:<% v.nickname %></p>
+				</div>
+			</div>
+			<a class="dstoartist" data-groupid="<% v.groupid %>" data-artid="<% v.content.artid %>">打赏</a>
+		  </li>
+		 <%# }) %>
+		</ul>
+	 <%# } %>
+    </div>
+   </div>
+  </div>
+</script>
+<script id="songer-tpl" type="text/html">
+<div class="swiper-slide songer-slide default-slide">
+	<div class="songer-item zam-app-flex zam-app-alignCenter">
+		<div class="songer-avatar">
+			<img  src="__STATIC__/images/screen/baping/song/yf2.png" />
+		</div>
+		<div class="songer-info"><span class="songer-type">今日艺人</span><span class="songer-name">全部歌曲</span></div>
+	</div>
+</div>
+<%#  $.each(d.singer, function(i, v){ %>
+	<div class="swiper-slide songer-slide">
+	 <div class="songer-item zam-app-flex zam-app-alignCenter">
+		 <div class="songer-avatar">
+			 <img  src="<% v.artistavatar %>" />
+		 </div>
+		 <div class="songer-info"><span class="songer-type"><% v.groupname %></span><span class="songer-name"><% v.artistname %></span></div>
+		 <span class="dstosonger" data-groupid="<% v.groupid %>" data-artid="<% v.id %>"></span>
+	 </div>
+	</div>
+<%# }) %>
+</script>
+<script id="songlist-tpl" type="text/html">
+<%#  $.each(d.songs, function(i, v){ %>
+<li class="songitem" data-songid="<% v.id %>">
+	<i class="songcheck"></i>
+	<div class="songinfo">
+		<p class="songname"><% v.songconfig.songname %> — <% v.singer.artistname %></p>
+		<p class="songold"><span>原唱：<% v.songconfig.singer %></span><span class="songprice">￥<% v.songconfig.songprice %>元</span></p>
+	</div>
+	<%#  if(!d.timeid){ %>
+	<span class="songpointed"> <% v.pointednum %>人点过</span>
+	<%# } %>
+</li>
+<%# }) %>
+</script>
+<script id="upimg-tpl" type="text/html">
+<div class="uploadBox <%# if(d.video){ %>had-uploadvideo<%# }else{ %>had-uploadimg<%# } %>" <%# if(d.video){ %>data-video="<% d.video %>"<%# } %> >
+	<div class="uploadBox-img zam-app-flex-ajCenter2">
+		<img src="<% d.img %>" <%# if(!d.video){ %>data-filepath="<% d.filepath %>"<%# } %> />
+		<div class="delupimg"><i class="mxc-delete"></i></div>
+	</div>
+</div>
+</script>
+{include file='baping/js' /}
+{include file='common/footermenu' /}
+{include file="common/footer" /}

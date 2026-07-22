@@ -1,0 +1,71 @@
+<style>
+.searchitem-lists tr td{text-align: center}
+</style>
+<div class="zam-formvalidation form-horizontal searchyh">
+<div class="form-group">
+	<div class="zam-confirmBox-right col-md-12">
+		<div class="input-group">
+			<input type="text" class="form-control username" name="username" placeholder="请输入{if $phototype=='1'}图片名称{else /}微信用户昵称{/if}">
+			<div class="input-group-addon btn btn-primary searchone"><i class="mdi mdi-magnify"></i> 搜索</div>
+		</div>
+	</div>
+</div>
+<table class="table table-bordered">
+    <thead>
+      <tr>
+      	<th style="text-align:center;">选择</th>
+        <th style="text-align:center;">图片</th>
+        <th style="text-align:center;">图片名/发送用户</th>
+      </tr>
+    </thead>
+    <tbody class="searchitem-lists">
+    </tbody>
+</table>
+<script id="user-tpl" type="text/template">
+  <%#  $.each(d.list, function(index, item){ %>
+   	<tr>
+        <td>
+        	<label class="lyear-checkbox checkbox-inline checkbox-primary">
+	         <input type="checkbox" name="selids[]" value="<% item.id %>"><span></span>
+	        </label>
+        </td>
+        <td>
+            <img class='fileimg' src="<% item.filepath %>" / style="max-height:100px;">
+        </td>
+        <td>
+            <div>
+            {if $phototype=='1'}
+            	<p><% item.photoname %></p>
+            {else /}
+            {if $phototype < 4}
+                <img class="sendavatar" src="<% item.avatar %>" width="60px" height="60px">
+            {/if}
+                <p><% item.nickname %></p>
+            {/if}
+            </div>
+        </td>
+    </tr>
+  <%#  }); %>
+</script>
+<script>
+require(["webcore","zamnotice","layerBox"],function(webcore,zamnotice,layerBox){
+	$(".searchone").on('click',function(){
+		var hadsel = [];
+		var hadselBox = $(".nditem-lists input");
+		hadselBox.each(function(){
+			hadsel.push($(this).val());
+		});
+		webcore.ajaxSubmit("{:gohdmanage('configphotocj/searchphoto',['hdid'=>$hdid])}",{search:$(".username").val(),hadsel:hadsel,awardid:"{$awardid}",phototype:"{$phototype}"},'正在查找...').then(function(json){
+			if(json.code==0){
+				var html = webcore.tpl($("#user-tpl"),{list:json.msg});
+				$(".searchitem-lists").html(html);
+			}else{
+				$(".searchitem-lists").html('');
+				zamnotice.showTips('error',json.msg);
+			}
+		}, function(json){
+			zamnotice.showTips('error','网络差。操作失败.');
+		});
+	});
+});
+</script>

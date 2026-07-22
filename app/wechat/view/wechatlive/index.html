@@ -1,0 +1,420 @@
+{include file="common/header" /}
+<style>
+.zam-app-wechatlive{height: 100%;}
+.video_wrap {
+    overflow: hidden;
+    height: 56.25vw;
+    width: 100%;
+}
+.video_wrap.outpage{
+	position:absolute;
+	top:45px;
+	left:0;
+	width:{$appconfig['smallconfig']['width']}px;
+	height:{$appconfig['smallconfig']['width']*9/16}px;
+	z-index:1;
+}
+.video_wrap .waitendbox{
+	position: relative;
+	width: 100%;
+	height:100%;
+	background-image: url({:tomedia($appconfig['liveconfig']['poster'])});
+	background-size:cover;
+	background-repeat:no-repeat;
+}
+.video_wrap .waitendbox .waitendtip{
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	background-color: rgba(0,0,0,0.3);
+	color:#fff;
+	font-size: 0.32rem;
+	padding: 0 0.1rem;
+	transform: translateY(0);
+    transition: all 1s;
+}
+.video_wrap .waitendbox .waitendtip .endtitle{
+	height:0.8rem;
+	line-height: 0.8rem;
+}
+.video_wrap iframe{
+	width: 100%!important;
+	height: 100%!important;
+}
+.video_wrap .erroriframetxt{
+	width: 100%;
+	height: 100%;
+	background: rgba(0,0,0,0.45);
+	text-align: center;
+	color: red;
+	font-size: 0.32rem;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+.timeremain {height: 0.8rem}
+.timeremain .timeremain-title{line-height:0.8rem;font-size:0.28rem;}
+.timeremain .timerremain-box{
+	font-size: 0.26rem;
+    border-radius: 5px;
+}
+.outpage .timeremain .timeremain-title{font-size:0.24rem;}
+.outpage .timeremain .timerremain-box{font-size:0.22rem;}
+.timeremain .timerremain-box span{
+	border:1px solid #ccc;
+	background-color: #fff;
+	color:#333;
+	padding:0.05rem;
+	margin-left:0.1rem;
+	border-radius:3px;
+	box-shadow:1px 1px 1px rgba(0,0,0,0.1);
+}
+.video_wrap .vcp-timeline {
+    left: 0.2rem;
+    width: calc(100% - 0.4rem);
+}
+.vcp-controls-panel{font-size:14px;}
+.marker{
+    position: absolute;
+    top: 0.16rem;
+    left: 0.2rem;
+    z-index: 1001;
+    pointer-events: none;
+}
+.vcp-controls-panel .marker{position: fixed;}
+.marker img{
+    max-height: 0.6rem;
+}
+.marker .playjoinbox{margin-left: 0.16rem;}
+.marker .playjoined {
+	margin-left: 0.12rem;
+    padding: 0.1rem 0.2rem;
+    border-radius: 20px;
+    background: rgba(0,0,0,.3);
+    color: #fff;
+}
+.marker .playjoined i{
+	font-size: 0.26rem;
+}
+.marker .playjoined span{
+	margin-left: 0.1rem;
+}
+.vcp-bigplay{height:100%;opacity: 1;}
+.vcp-bigplay .bigicon{
+	z-index: 65;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 1.2rem;
+    height: 1.2rem;
+    cursor: pointer;
+    transform: translate(-50%,-50%);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-image:url("/{:WIMGURL}wechatlive/playicon3.png");
+}
+.vcp-panel-bg{background: linear-gradient(80deg,transparent,rgba(0,0,0,.8))!important;}
+.vcp-dm-toggle{
+	position: relative;
+	width: 3em;
+    height: 3em;
+    float: right;
+    cursor: pointer;
+    z-index: 1001;
+    color: #fff;
+}
+.vcp-dm-toggle i{font-size:2em;}
+.main-live {
+   height: calc(100vh - 56.25vw);
+}
+.main-live.full {
+   height:100vh;
+}
+.main-live .tab-nav{background-color: {$appconfig['menuconfig']['bgcolor']}}
+.main-live .tab-nav-item{
+   height: {$appconfig['menuconfig']['height']}px;
+   background:none!important;
+}
+.main-live .tab-nav-item.tab-active,.main-live .tab-nav-item.tab-active a{
+    color: {$appconfig['menuconfig']['activecolor']};
+}
+.main-live .tab-nav-item a{line-height:{$appconfig['menuconfig']['height']}px;font-size: {$appconfig['menuconfig']['fontsize']}px;color:{$appconfig['menuconfig']['fontcolor']};}
+.main-live .tab-nav-item.tab-active:before{bottom: 3px;width: 50%;margin-left: -25%}
+.main-live .tab-content{
+	position: relative;
+	-webkit-overflow-scrolling: touch; 
+	overflow: hidden;
+}
+.main-live .tab-content.full{
+	height:100%;
+}
+.loadingbox{
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+.loadingbox p{
+	margin-top: 0.32rem;font-size:0.21rem;color:gray
+}
+.loadingbox img{
+	animation: foreverrotate 2s linear infinite;
+	-webkit-animation:foreverrotate 2s linear infinite;
+}
+@keyframes foreverrotate {
+	0% {
+		transform: rotate(0)
+	}
+
+	to {
+		transform: rotate(-1turn)
+	}
+}
+@-webkit-keyframes foreverrotate {
+	0% {
+		transform: rotate(0)
+	}
+
+	to {
+		transform: rotate(-1turn)
+	}
+}
+.vcp-error-tips{font-size:0.3rem;color:#fff!important;}
+/*七牛封面*/
+.qiniuvideobox{
+	position: relative;
+	width: 100%;
+	height: 100%;
+}
+.qiniucover{
+	position:absolute;
+	top:0;
+	left:0;
+	z-index:999;
+	width: 100%;
+	height: 100%;
+	background-image: url("{:tomedia($appconfig['liveconfig']['poster'])}");
+	background-size:100% 100%;
+	color:#fff;
+}
+.qiniucover span{font-size: 1.52rem;}
+{/*邀请榜*/}
+.zam-app-invite-box{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+}
+.zam-app-invite-box.hidden{display: none!important}
+.zam-app-nodata img{
+	width: 3.62rem;
+}
+.zam-app-invite-main {
+    flex: 1;
+    padding: 0.32rem 0.4rem 0 0.5rem;
+}
+.zam-app-invite-item {
+	display:flex;
+	align-items:center;
+	margin-bottom:.32rem;
+}
+.zam-app-invite-item-number {
+	width:0.6rem;
+	margin-right:0.6rem;
+	text-align:center
+}
+.zam-app-invite-item-number>img {
+	width:100%;
+	height:100%
+}
+.zam-app-invite-item-number>span {
+	display:inline-block;
+	width:0.6rem;
+	height:0.6rem;
+	background:#f5f6f7;
+	border-radius:50%;
+	line-height:0.6rem;
+	font-size:.32rem;
+	font-weight:800;
+	color:#60646b
+}
+.zam-app-invite-item-avatar {
+	width:0.94rem;
+	height:0.94rem;
+	border-radius:50%;
+	margin-right:0.6rem
+}
+.zam-app-invite-item-info {
+	display:flex;
+	flex-direction:column;
+	justify-content:space-between;
+	height:100%;
+	width: calc(100% - 2.74rem);
+}
+.zam-app-invite-item-info .invite-nickname {
+	margin-bottom:.1rem;
+	font-size:.32rem;
+	font-weight:400;
+}
+.zam-app-invite-item-info .invite-person{font-size: 0.26rem;margin-bottom: 0.1rem}
+.zam-app-invite-item-info .invite-person span {
+	margin:0 0.1rem;
+	color:{$appconfig['menuconfig']['activecolor']};
+}
+.h5-touchimg{
+	position: fixed;
+	opacity: 0;
+	z-index: -1;
+	display: none;
+	user-drag:none;
+	-webkit-user-drag: none;
+}
+/*20230619 新增*/
+.vcp-poster.hidden{
+	display: none!important;
+}
+.vcp-qn-playtoggle {
+    cursor: pointer;
+    position: relative;
+    z-index: 1001;
+    width: 3em;
+    height: 100%;
+    float: left;
+    background-image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB2aWV3Qm94PSIwIDAgMzYgMzYiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+DQogICAgPHBhdGggZD0iTTExLDEwIEwxOCwxMy43NCAxOCwyMi4yOCAxMSwyNiBNMTgsMTMuNzQgTDI2LDE4IDI2LDE4IDE4LDIyLjI4IiBmaWxsPSIjZmZmIj48L3BhdGg+DQo8L3N2Zz4=);
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAQAAAD9CzEMAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAAmJLR0QAAKqNIzIAAAAJcEhZcwAAAFoAAABaAHAjuH0AAAAHdElNRQfgBRQSOydLEdPXAAABmUlEQVRYw+2Wu0oDQRhGz2oIEhAtBEHRQpIIXtAH0M7Kd7DQQl/BV/BlFEEsBO9IUAmI8X5Bi6RQoqgYJYr5LMISE5LdmZhyT7mzO9/8Z3b/WQgICAjwxak9JLPbfGiqfwGNCBhkmj4cECqryJyQ52iMWeIccsI9eVfav4tyEZrSjwpKaUHj6lKLHFnXEvIZd3CI080k6yyRJGdryi8AIEyYdtoYZJ9NEnzYyDIJKM7VQw8DROnnmGseihJNY6oiNKWCyvnRq5Y1o6jaFXJ3xMuaaQUuTbQywSgXLLLGXeMU/ZUVoZcOOhljj23OXVnVVdkHFIkwwgBDxEhwRpq3OuaougeV5HWsefXX3ge/XmQiOezloV5FAN+cssEB52QaH/DBNanSJjcyQHySrXxNa39stgEF3tlimR2yvJs8YBfwRIJ1klzyWLro3SpMA0SaG5LssMuL2dTmAV/kyJS3a/MG5xcg4IpVVrjlmbz9uekdkOOILRKkikemuRgjhIY1p7ia7Q/KEn7/RY6t80r8elF9yw4ICAiw4xcxfsNvJiWE7gAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAxNi0wNS0yMFQxODo1OToxOCswODowMJKBy7cAAAAldEVYdGRhdGU6bW9kaWZ5ADIwMTYtMDUtMjBUMTg6NTk6MzkrMDg6MDAHjn/CAAAAPHRFWHRzdmc6YmFzZS11cmkAZmlsZTovLy9EOi9zcGFjZS92Y19wbGF5ZXIvc3JjL2ltZy9wbGF5X2J0bi5zdmedrkudAAAAAElFTkSuQmCC)\0;
+}
+.vcp-playing .vcp-qn-playtoggle {
+    background-image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB2aWV3Qm94PSIwIDAgMzYgMzYiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+DQogICAgPHBhdGggZD0iTTExLDEwIEwxNywxMCAxNywyNiAxMSwyNiBNMjAsMTAgTDI2LDEwIDI2LDI2IDIwLDI2IiBmaWxsPSIjZmZmIj48L3BhdGg+DQo8L3N2Zz4=);
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAQAAAD9CzEMAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAAmJLR0QAAKqNIzIAAAAJcEhZcwAAAFoAAABaAHAjuH0AAAAHdElNRQfgBRQTADNsu4KlAAAAfklEQVRYw+2WsQ2AMAwEPyiZimloWIqOhjHYg1VAMi1Ejo2l0P2VH/kvnQ0QQohLaj9Jl6ocnBInDwpGzI+qgh0LxMhjCGSSN5skaeY6g+m4qn+dTh4WdIACCiiggAIKfEGulntxcrXC4sBaLXc7V/DuosDZolf9fngRQsgHbrk8P6SPYKxbAAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDE2LTA1LTIwVDE5OjAwOjI0KzA4OjAwi3r4LQAAACV0RVh0ZGF0ZTptb2RpZnkAMjAxNi0wNS0yMFQxOTowMDo1MSswODowMKLaZi8AAAA8dEVYdHN2ZzpiYXNlLXVyaQBmaWxlOi8vL0Q6L3NwYWNlL3ZjX3BsYXllci9zcmMvaW1nL3N0b3BfYnRuLnN2Z0xvOgsAAAAASUVORK5CYII=)\0;
+}
+/* 20240616新增banner广告 */
+.adv-lists{
+	width: 100%;
+}
+.adv-lists .swiper-slide{
+	display: flex;
+	align-items: center;
+}
+.adv-lists .swiper-slide img{
+	width: 100%;
+	min-height: 50px;
+	display: block;
+	vertical-align: middle;
+}
+.adv-lists .swiper-pagination-bullet-active {
+    opacity: 1;
+    background: {$appconfig['bannerconfig']['pagecolor']??'#007aff'};
+}
+.adv-lists .swiper-pagination-fraction{
+	color: {$appconfig['bannerconfig']['pagecolor']??'#007aff'};
+}
+</style>
+<section class="zam-app-wechatlive">
+<div class="video_wrap" id="videoLive">
+	{if $appconfig['liveconfig']['status']=='1' || $appconfig['liveconfig']['status']=='3'}
+		<div class="waitendbox zam-app-flex-ajCenter">
+			{if $appconfig['liveconfig']['status']=='1' && !empty($sublivetplid) && $hadsublivetpl=='2'}
+				{include file="wechatlive/sublivebtn" /}
+			{/if}
+			{if $appconfig['liveconfig']['status']=='1' && isset($appconfig['liveconfig']['nostartvideo']) && !empty($appconfig['liveconfig']['nostartvideo'])}
+				<span class="mxc-videofill startplay" style="color:#fff;font-size: 1.52rem;"></span>
+			{/if}
+			<div class="waitendtip">
+				{if $appconfig['liveconfig']['status']=='1'}
+					{if $djs['status']=='1'}
+					<div class="timeremain zam-app-flex">
+						<div class="timeremain-title">距离直播开始时间:</div>
+						<div class="timerremain-box zam-app-flex-ajCenter2">
+							<span id="timeremain-day">0天</span>
+							<span id="timeremain-hour">0时</span>
+							<span id="timeremain-min">00分</span>
+							<span id="timeremain-sec">00秒</span>
+						</div>
+					</div>
+					{/if}
+				{else /}
+					<div class="endtitle">{$appconfig['liveconfig']['stoptxt']}</div>
+				{/if}
+			</div>
+		</div>
+	{elseif $appconfig['liveconfig']['status']=='4' && isset($appconfig['liveconfig']['backurl']['urltype']) && $appconfig['liveconfig']['backurl']['urltype']=='2'}
+		{if isset($appconfig['liveconfig']['backurl']['iframe']) && !empty($appconfig['liveconfig']['backurl']['iframe'])}
+			{:$appconfig['liveconfig']['backurl']['iframe']}
+		{else /}
+			<p class="erroriframetxt">回放状态下未设置第三方视频分享代码块</p>
+		{/if}
+	{/if}
+</div>
+<div class="main-live zam-app-flex zam-app-directionColumn">
+	{if $appconfig['bannerconfig']['open']=='1' && !empty($appconfig['bannerconfig']['list'])}
+	<section class="swiper-container adv-lists">
+		<div class="swiper-wrapper">
+			{foreach $appconfig['bannerconfig']['list'] as $banner}
+			<div class="swiper-slide">
+				<img data-src="{:tomedia($banner['img'])}" data-url="{:trim($banner['url'])}" class="swiper-lazy" />
+				<div class="swiper-lazy-preloader"></div>
+			</div>
+			{/foreach}
+		</div>
+		<div class="swiper-pagination"></div>
+	</section>
+	{/if}
+	<ul class="tab-nav">
+	{foreach $appconfig['menuconfig']['menus'] as $menu}
+		<li class="tab-nav-item{if isset($menu['mstatus']) && $menu['mstatus']=='2'} hidden{/if}"><a href="javascript:void(0)" data-link="{if $menu['mtype']=='1'}{$menu['minurl']}{elseif $menu['mtype']=='2'}{$menu['mouturl']}{elseif $menu['mtype']=='3'}{$menu['arturl']}{/if}" data-mtype="{$menu['mtype']}" {if $menu['mtype']=='4'}data-phbnum="{$menu['phbnum']??'20'}"{/if}>{$menu['mname']}</a></li>
+	{/foreach}
+	</ul>
+	<section class="tab-content flex1">
+		<div class="loadingbox zam-app-flex-ajCenter">
+			<img src="/{:SYSIMGURL}loading2.png" />
+			<p>正在加载，请稍后..</p>
+		</div>
+		<iframe id="myframe" name="myframe" sandbox="allow-forms allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts allow-modals allow-top-navigation" src="" scrolling="yes" frameborder="0" width="100%" height="100%"></iframe>
+		<div class="zam-app-invite-box hidden">
+			<div class="zam-app-invite-main"></div>
+			<div class="zam-app-nodata zam-app-flex-ajCenter flex1 hidden">
+				<img src="/static/images/sys/empty.png" />
+			</div>
+		</div>
+	</section>
+</div>
+</section>
+<img class="h5-touchimg" />
+<script id="fulldmbox-tpl" type="text/html">
+	<div class="fulldmBox"></div>
+	{include file="wechatlive/fulldm" /}
+</script>
+<script id="marker-tpl" type="text/html">
+	<div class="marker">
+		<div class="playjoinbox zam-app-flex zam-app-alignCenter">
+			{if !empty($appconfig['liveconfig']['logo'])}
+				<img src="{:tomedia($appconfig['liveconfig']['logo'])}" >
+			{/if}
+			{if isset($appconfig['liveconfig']['showjoin']) && $appconfig['liveconfig']['showjoin']=='1'}
+				<div class="playjoined"><i class="mxc-attention"></i><span>{$joinednum}</span></div>
+			{/if}
+		</div>
+	</div>
+</script>
+<script id="yqb-tpl" type="text/html">
+	<%#  $.each(d.list, function(index, item){ %>
+		<div class="zam-app-invite-item">
+			<div class="zam-app-invite-item-number"><%#  if(index < 3){ %><img src="/{:SIMGURL}pclive/<% index+1 %>.png"><%#  }else{ %><span><% index+1 %></span><%#  } %></div>
+			<img class="zam-app-invite-item-avatar" src="<% item.avatar %>">
+			<div class="zam-app-invite-item-info">
+				<p class="invite-nickname limitbox"><% item.nickname %></p>
+				<span class="invite-person"><b>邀请了<span><% item.num %></span>人</b></span>
+			</div>
+		</div>
+	<%# }) %>
+	<div class="loadmore-btn hidden"><span style="cursor: pointer;">加载更多</span></div>
+</script>
+{include file="wechatlive/js" /}
+{include file="wechatlive/adv" /}
+{if !empty($subtplid)}
+	{include file="wechatlive/subbtn" /}
+{/if}
+{include file="common/footer" /}

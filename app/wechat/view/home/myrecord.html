@@ -1,0 +1,330 @@
+{include file="common/header" /}
+<style>
+body{overflow-y:auto}
+.top-tabs{position:fixed;top:0.9rem;left:0;width:100%;z-index:1}
+.top-tabs .tab-nav .tab-nav-item:not(:last-child):after,.top-tabs .tab-nav .tab-nav-item.tab-active:before{
+	content:none
+}
+.top-tabs .tab-nav .tab-nav-item.tab-active{
+	background-color:#00aeff;
+	color:#fff
+}
+.list-wrapper{
+	width:100%;
+	max-width:100%;
+	min-width:100%;
+	height:100%;
+	background-color:#F5F5F5;
+	padding:1.92rem 0 0.86rem 0;
+}
+.list-records{width:100%;height: 100%;background-color:#fff}
+.list-records .m-tab{display:block}
+.list-records .tab-panel-item{padding:0}
+.list-records .list-norecords{padding:0.4rem 0;width:100%;height: 100%;}
+.list-records .list-norecords img.none-img{width:2rem;height:2rem}
+.list-records .list-norecords img.load-img{width:48px;height:48px}
+.list-records .list-norecords p{height:1rem;line-height:1rem;font-size:0.32rem;color:gray;text-align:center}
+@-webkit-keyframes rotation {
+from {
+	-webkit-transform: rotate(0deg);
+}
+to {
+	-webkit-transform: rotate(360deg);
+}
+}
+
+.rotation-img {
+-webkit-transform: rotate(360deg);
+animation: rotation 2s linear infinite;
+-moz-animation: rotation 2s linear infinite;
+-webkit-animation: rotation 2s linear infinite;
+-o-animation: rotation 2s linear infinite;
+}
+.clearboth{clear:both}
+.record-list .record-item{
+	border-bottom:0.12rem solid #eee;
+}
+.record-user{
+	position:relative;height:0.78rem; line-height:0.78rem;padding-left:0.2rem;border-bottom: 1px solid #eee;
+}
+.record-avatar img{
+	width:0.4rem;height:0.4rem;border-radius:50%;
+}
+.record-nickname{margin-left:0.2rem;max-width:calc(100% - 3.3rem);overflow:hidden;white-space: nowrap;
+    word-break: break-all;
+    text-overflow: ellipsis;}
+.record-time{position:absolute;right:0.1rem;top:0;width:2.3rem;overflow: hidden;white-space: nowrap;
+    word-break: break-all;
+    text-overflow: ellipsis;}
+.record-prize{position:relative;padding:0.2rem;}
+.record-prizeimg{width:0.8rem;height:0.8rem}
+.record-prizename{margin-left:0.2rem;font-size:0.28rem;}
+.record-prizename .record-prizename2{min-height: 0.8rem}
+.btn-hx{position:absolute;top:0.35rem;right:0.2rem;height:0.5rem;line-height:0.5rem;}
+.hx-record img{margin-top: 0.2rem;width: 3.6rem}
+.hx-record .hxqrTips{line-height:0.6rem;font-size:0.3rem;}
+.hx-ask .layui-m-layercont{padding:8px;background-color: #F5F5F5;}
+.btn-inputaddr {
+    position: absolute;
+    top: 0.35rem;
+    right: 1.52rem;
+    height: 0.5rem;
+    line-height: 0.5rem;
+}
+.m-cell:after{border-bottom: 0;}
+.zam-app-tipsmsg{z-index: 999999999!important}
+</style>
+<header class="m-navbar navbar-fixed">
+	<a href="javascript:history.back(-1)" class="navbar-item">
+		<i class="back-ico"></i>返回
+	</a>
+	<div class="navbar-center"></div>
+</header>
+<div class="list-tabs top-tabs">
+<ul class="tab-nav">
+	<li class="tab-nav-item"><a href="javascript:;">实物 (<span>0</span>)</a></li>
+	<li class="tab-nav-item"><a href="javascript:;">红包 (<span>0</span>)</a></li>
+</ul>
+</div>
+<div class="list-wrapper">
+	<div class="list-records">
+		<div  class="m-tab list-tab-type">
+			<div class="tab-panel">
+				<div class="tab-panel-item"></div>
+				<div class="tab-panel-item"></div>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+var inputaddr = "{$appconfig['inputaddr']}";
+require(['wechatcore'],function (wechatcore) {
+	if(XCV3Config.isiframe){
+		$(".m-navbar").hide();
+		$(".top-tabs").css("top",'0.1rem');
+		$(".list-wrapper").css("padding-top","1.02rem");
+	}
+	var loadtpl = wechatcore.tpl($("#loading-tpl"),{});
+	var nonetpl = wechatcore.tpl($("#isnone-tpl"),{});
+	$(".top-tabs .tab-nav li").on('click',function(){
+		var index  = $(this).index();
+		$(this).addClass('tab-active').siblings().removeClass("tab-active");
+		var activePanel = $(".list-wrapper").find(".tab-panel-item").eq(index);
+		activePanel.addClass('tab-active').siblings().removeClass("tab-active");
+		activePanel.html(loadtpl);
+		wechatcore.ajaxSubmit('/wechat/home/myrecord',{prizetype:(index==0?'1':'2')},'正在加载中奖记录..').then(function(e){
+			    if(e.msg.list.length>0){
+					var recordtpl = '<ul class="record-list">';
+					$.each(e.msg.list, function(index, item){
+						item.inputaddr = inputaddr;
+						item.prizedes = item.prizeinfo.prizedes || '';
+						if(item.prizedes!=''){
+							item.prizedes = item.prizedes.split('#');
+						}	
+						recordtpl += wechatcore.tpl($("#record-tpl"),item);
+					});
+					recordtpl += '</ul>';
+					activePanel.html(recordtpl);
+				}else{
+					activePanel.html(nonetpl);
+				}
+				if(index==0){
+					$(".top-tabs .tab-nav li").eq(0).find('span').text(activePanel.find('ul .record-item').length);
+					$(".top-tabs .tab-nav li").eq(1).find('span').text(e.msg.num);
+				}else{
+					$(".top-tabs .tab-nav li").eq(1).find('span').text(activePanel.find('ul .record-item').length);
+					$(".top-tabs .tab-nav li").eq(0).find('span').text(e.msg.num);
+				}
+				$('body,html').animate({'scrollTop':0},300);
+		},function(){
+			activePanel.html(nonetpl);
+			$(".top-tabs .tab-nav li").eq(0).find('span').text('0');
+			$(".top-tabs .tab-nav li").eq(1).find('span').text('0');
+		});
+	});
+	$(function(){
+		var prizetype = "1";
+		var clickkey = prizetype=='1'?0:1;
+		$(".top-tabs .tab-nav li").eq(clickkey).trigger('click');
+	})
+	$(".list-wrapper").on('click','.btn-gohx',function(){
+		var $this = $(this);
+		var recordid = $(this).attr('data-recordid');//奖品id
+		wechatcore.ajaxSubmit('/wechat/home/loadhxqr',{recordid:recordid},'正在加载核销码..').then(function(e){
+			 if(e.code==0){
+				 wechatcore.ask(false,wechatcore.tpl($("#hx-tpl"),{qrimg:e.msg}),['我已核销'],function(i){
+					wechatcore.close(i);
+					wechatcore.ajaxSubmit('/wechat/home/checkhx',{recordid:recordid}).then(function(e){
+						 if(e.code==0){
+							$this.text('已核销').removeClass('btn-primary btn-gohx').addClass('btn-disabled');
+						 }
+					});
+				 },false,'hx-ask');
+			 }else if(e.code==1){
+				wechatcore.msg(e.msg);
+				$this.text('已核销').removeClass('btn-primary btn-gohx').addClass('btn-disabled');
+			 }else{
+				 wechatcore.msg(e.msg);
+			 }
+		}, function(){
+			  wechatcore.msg('网络差，请稍后重试.');
+		});
+	});
+	$(".list-wrapper").on('click','.btn-inputaddr',function(){
+		var $this = $(this);
+		var recordid = $(this).attr('data-recordid');//奖品id
+		wechatcore.ajaxSubmit('/wechat/home/loadaddress',{recordid:recordid},'正在加载..').then(function(e){
+			 if(e.code==0){
+				 if($('.uploadticket').length && !e.msg.hasOwnProperty('ticketimg')){
+					e.msg.ticketimg = '';
+				 }
+				 wechatcore.ask('请填写收货信息',wechatcore.tpl($("#address-tpl"),e.msg),['保存','取消'],function(i,o){
+					var raddress = {
+						realname:$(o.elem).find('.realname').val(),
+						mobile:$(o.elem).find('.mobile').val(),
+						address:$(o.elem).find('.address').val(),
+					};
+					if(raddress.realname==''){
+						return wechatcore.showtopmsg('收货人姓名必须填写');
+					}
+					if(raddress.mobile==''){
+						return wechatcore.showtopmsg('收货人手机号必须填写');
+					}
+					if(raddress.address==''){
+						return wechatcore.showtopmsg('收货地址必须填写');
+					}
+					if($('.uploadticket').length){
+						raddress.ticketimg = $('.uploadticket input').val() || '';
+						if(raddress.ticketimg == ''){
+							return wechatcore.showtopmsg('请上传小票');
+						}
+					}
+					wechatcore.ajaxSubmit('/wechat/home/saveaddress',{recordid:recordid,address:raddress}).then(function(e){
+						 if(e.code==0){
+						 	wechatcore.close(i);
+							wechatcore.msg('保存成功');
+						 }else{
+						 	wechatcore.msg(e.msg);
+						 }
+					});
+				 },false,'hx-ask');
+			 }
+		}, function(){
+			  wechatcore.msg('网络差，请稍后重试.');
+		});
+	});
+	$("body").on('click','.uploadticket .btn',function(){
+		var $this = $(this);
+		wechatcore.uploadImg({posturl:'/wechat/home/uploadticketimg',type:'home'},function(data){
+			if(data.code==0){
+			  	$this.next().val(data.msg.filepath);
+				$this.html(`点击上传小票<span style="color:red">(已上传)</span>`);
+			}else{
+			  wechatcore.msg(data.msg);
+			}
+		});
+	});
+});
+</script>
+<script id="isnone-tpl" type="text/html">
+<div class="list-norecords zam-app-flex-ajCenter">
+	<img class="none-img" src="/{:SIMGURL}common/isnone.png">
+	<p>暂无记录</p>
+</div>
+</script>
+<script id="loading-tpl" type="text/html">
+<div class="list-norecords zam-app-flex-ajCenter">
+	<img class="load-img rotation-img" src="/{:SYSIMGURL}loading2.png">
+	<p>正在加载...</p>
+</div>
+</script>
+<script id="address-tpl" type="text/html">
+	<div class="m-cell" style="margin-bottom: 0">
+        <div class="cell-item">
+            <div class="cell-left">姓名：</div>
+            <div class="cell-right"><input type="text" class="cell-input realname" placeholder="请输入您的姓名" autocomplete="off" value="<% d.realname %>"></div>
+        </div>
+        <div class="cell-item">
+        	<div class="cell-left">手机号：</div>
+            <div class="cell-right"><input type="number" pattern="[0-9]*" class="cell-input mobile" placeholder="请输入您的手机号" autocomplete="off" value="<% d.mobile %>"></div>
+        </div>
+        <div class="cell-item">
+        	<div class="cell-left">收货地址：</div>
+            <div class="cell-right"><input type="text" class="cell-input address" placeholder="请输入您的详细收货地址" autocomplete="off" value="<% d.address %>"></div>
+        </div>
+		{if $hdinfo['id'] == '25639' && request()->host(true) == 'hd.52hudong.cn'}
+		<div class="cell-item uploadticket">
+        	<div class="cell-left">上传小票：</div>
+            <div class="cell-right" style="justify-content: flex-start;">
+				<a href="javascript:;" class="btn">点击上传小票<%# if(d.ticketimg){ %><span style="color:red">(已上传)</span><%# } %></a>
+				<input type="hidden" value="<% d.ticketimg %>">
+			</div>
+        </div>
+		{/if}
+    </div>
+</script>
+<script id="record-tpl" type="text/html">
+<div class="record-item">
+	<div class="record-user zam-app-flex">
+		<div class="record-avatar zam-app-flex-ajCenter2">
+			<img src="<% d.avatar %>">
+		</div>
+		<div class="record-nickname">
+			<%  d.nickname %>
+			<%# if(d.fromtypename!=""){ %>
+				<span class="fromstylespan">
+				<%# if(d.stylename==""){ %>
+					<span class="fromspan">(<% d.fromtypename %>)</span>
+				<%# }else{ %>
+					 (<span class="fromspan"><% d.fromtypename %></span><span class="stylespan"> - <% d.stylename %></span>)
+				<%# } %>
+				</span>
+			<%# } %>
+		</div>
+		<div class="record-time"><%  d.create_time %></div>
+	</div>
+	<div class="record-prize zam-app-flex">
+		<%# if(d.prizetype=='1'){ %>
+			<img src="<% d.prizeimg %>" class="record-prizeimg">
+			<div class="record-prizename" style="padding-right: 1.18rem">
+				<div class="record-prizename2 zam-app-flex zam-app-alignCenter"><%  d.prizename %></div>
+				<%# if(d.prizedes != ''){ %>
+					<div class="record-prizedes">
+						<%#  $.each(d.prizedes, function(index, item){ %>
+						    <div><% item %></div>
+						<%#  }); %>
+					</div>
+				<%# } %>
+			</div>
+		<%# }else{ %>
+			<div class="record-prizename">
+				<div class="record-prizename2 zam-app-flex zam-app-alignCenter">
+					<%  d.prizeinfo.prizemoney %>元<%#  if(d.hadsend=='1'){  %>，已成功发放<%# } %>
+				</div>
+				<%# if(d.prizedes != ''){ %>
+					<div class="record-prizedes">
+						<%#  $.each(d.prizedes, function(index, item){ %>
+						    <div><% item %></div>
+						<%#  }); %>
+					</div>
+				<%# } %>
+			</div>
+		<%# } %>
+		<%# if(d.prizetype=='1'){ %>
+			<%# if(d.inputaddr=='1'){ %>
+			<a href="javascript:;" data-recordid="<% d.id %>" class="btn btn-primary btn-inputaddr">收货地址</a>
+			<%# } %>
+			<a href="javascript:;" data-recordid="<% d.id %>" class="btn <%#  if(d.hadhx=='1'){  %>btn-disabled<%# }else{ %>btn-primary btn-gohx<%# } %> btn-hx"><%# if(d.hadhx=='1'){ %>已核销<%# }else{ %>去核销<%# } %></a>
+		<%# }else{ %>
+			<a href="javascript:;" data-recordid="<% d.id %>" class="btn <%#  if(d.hadsend=='1'){  %>btn-disabled<%# } else if(d.hadsend=='2') { %>btn-warning btn-waitsend<%# }else{ %>btn-danger btn-waitsend<%# } %> btn-hx"><%# if(d.hadsend=='1'){ %>已发放<%# } else if(d.hadsend=='2') { %>发放中<%# }else{ %>发放失败<%# } %></a>
+		<%# } %>
+	</div>
+</div>
+</script>
+<script id="hx-tpl" type="text/html">
+<div class="hx-record zam-app-flex-ajCenter">
+	<img class="hxqrImg" src="<% d.qrimg %>" />
+	<p class="hxqrTips">请到核销处核销</p>
+</div>
+</script>
+{include file="common/footer" /}

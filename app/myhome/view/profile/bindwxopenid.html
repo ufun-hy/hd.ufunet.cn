@@ -1,0 +1,58 @@
+<style>
+.qrcodeImg .qrcodebox{
+	position: relative;
+}
+.qrcodeImg .qrcodebox img{
+    border: 1px solid #333;
+    border-radius: 10px;
+	width:200px;height:200px;
+}
+.qrcodeImg .qrcodebox .cover{
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(255,255,255,0.92);
+	color: #333;
+}
+.qrcodeImg .qrcodebox .cover div{
+	margin-bottom: 20px;
+	font-size: 12px;
+}
+.paytips{margin-top:20px;}
+</style>
+<section class="bindwxBox zam-flex-column-center">
+	<div class="qrcodeImg">
+		<div class="qrcodebox">
+			<img src="{$url}" />
+			<div class="cover zam-flex-column-center hidden">
+				<div>二维码已经失效，请点击刷新</div>
+				<a href="javascript:;" class="btn btn-primary btn-sm">刷新</a>
+			</div>
+		</div>
+	</div>
+	<p class="paytips">打开微信扫一扫，绑定微信</p>
+</section>
+<script type="text/javascript">
+require(['webcore'],function(webcore){
+	var isclickrf = false,refreshtimer;
+	$('.qrcodebox .btn').click(function(){
+		if(isclickrf) return false;
+		isclickrf = true;
+		webcore.ajaxSubmit("{:gomyhome('profile/maxbindwxqrcode')}",{},'正在处理..').then(function(json){
+           if(json.code==0){
+              $('.qrcodebox .cover').addClass('hidden');
+              $('.qrcodebox img').attr('src',json.msg);
+              clearInterval(refreshtimer);
+              refreshtimer = webcore.countdown(120,false,function(){
+                 $(".bindwxBox .cover").removeClass('hidden');
+              });
+           }else{
+              zamnotice.showTips('error',json.msg);
+           }
+           isclickrf = false;
+        })
+	});
+});
+</script>

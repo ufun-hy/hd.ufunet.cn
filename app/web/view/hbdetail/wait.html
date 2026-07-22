@@ -1,0 +1,149 @@
+{include file='$Wpath/common/header'}
+<div class="alert alert-danger">
+    请及时处理发放待查记录，核验只能核验30天内的发放记录，一旦超过30天无法核验，强烈推荐一周处理一次所有的待查记录。<br/><br/>
+    待查记录怎么来的？<b>微信商户服务器发放红包的时候遇到高并发偶尔会出小问题。</b>
+</div>
+<div class="form-inline zam-inline-searchbar">
+    <div class="form-group">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">活动主题</span>
+        <input type="text" class="form-control" value="" id="keyword" placeholder="请输入活动主题" style="width: 140px;">
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">功能</span>
+          <select id="fromtype" class="form-control js_select2">
+            <option value="0">全部功能</option>
+            {foreach $modulelists as $mkey=>$mval } 
+            <option value="{$mkey}">{$mval}</option>
+            {/foreach}
+          </select>
+        </div>
+    </div>
+    <div class="form-group" style="width: 180px;">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">微信昵称</span>
+        <input type="text" class="form-control" value="" id="keyword" placeholder="请输入微信昵称">
+      </div>
+    </div>
+    <div class="form-group" style="width: 180px;">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">openid</span>
+        <input type="text" class="form-control" value="" id="openid" placeholder="请输入用户openid">
+      </div>
+    </div>
+    <div class="form-group" style="width: 180px;">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">用户id</span>
+        <input type="text" class="form-control" value="" id="userid" placeholder="请输入活动用户id">
+      </div>
+    </div>
+    <a class="btn btn-primary btn-sm btn-search" href="javascript:void(0)"><i class="mdi mdi-magnify"></i> 搜索</a>
+    <a class="btn btn-warning btn-sm btn-export hidden" href="javascript:void(0)"><i class="mdi mdi-export"></i> 导出</a>
+    <a class="btn btn-warning btn-sm btn-exportall hidden" href="javascript:void(0)"><i class="mdi mdi-export"></i> 全部导出</a>
+</div>
+<table id="listtable" class="zam-btable"></table>
+<script>
+require(['webcore','webtable','jconfirmBox','zamnotice'],function(webcore,webtable,jconfirmBox,zamnotice){
+var initConfig = {
+	tableId:'#listtable',
+	url:"{:goweb('hbdetail/wait')}",
+	columnoperate:{
+        btns:{
+            shenhe:{title:"核验",icon:"mdi-gavel",'except':{'field':'status','only':'2'}},
+            reset:{title:"强制解冻",class:"danger",icon:"mdi-gavel",'except':{'field':'status','only':'2'}},
+        },
+        func:{
+            shenhe:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','您确定要检查此条记录是否发放成功么？',function(){
+                        webcore.ajaxSubmit("{:goweb('hbdetail/confirmsend')}",{recordid:row.id},'处理中..').then(function(json){
+                            if(json.code==0){
+                                webtable.refresh();
+                                zamnotice.showTips('success','操作成功');
+                            }else{
+                                zamnotice.showTips('error',json.msg);
+                            }
+                        }, function(json){
+                            zamnotice.showTips('error','网络差。操作失败');
+                        });
+                });
+            },
+            reset:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','<span class="label label-danger">强制解冻将不论发放成功与否均视为发放失败，此条记录的钱将回退到活动所属用户红包账户</span><br/><br/>强制解冻将导致该记录彻底无法核验结果，您确定要强制解冻当前记录么？',function(){
+                        webcore.ajaxSubmit("{:goweb('hbdetail/forceopen')}",{recordid:row.id},'处理中..').then(function(json){
+                            if(json.code==0){
+                                webtable.refresh();
+                                zamnotice.showTips('success','操作成功');
+                            }else{
+                                zamnotice.showTips('error',json.msg);
+                            }
+                        }, function(json){
+                            zamnotice.showTips('error','网络差。操作失败');
+                        });
+                });
+            },
+        }
+    },
+	columns:[{
+			checkbox: true,
+		}, 
+		{
+			field: 'id',
+			title: 'ID',
+			align: 'center',
+            width:'6%',
+			visible: false
+		}, {
+            field: 'hdtitle',
+            title: '活动',
+            align:'center',
+            width:'10%',
+            formatter: function (value, row, index) {
+                if(row.huodong_id=='0') return '-';
+                var html = "<div><span>"+(value==null?"已删除":value)+"</span></div><div class='m-t-5'><span>id:"+row.huodong_id+"</span></div>";
+                return html;
+            },
+        }, {
+            field: 'userinfo',
+            title: '用户',
+            align:'center',
+            width:'10%',
+            formatter: function (value, row, index) {
+                var html = '<div class="zam-flex-column-center"><img class="avatarImg m-b-10" src="'+value.avatar+'" /><span class="label label-primary">'+value.nickname+'</span><span class="m-b-10">'+value.openid+'</span></div>';
+                return html;
+            },
+        }, {
+            field: 'tradeid',
+            title: '交易单号',
+            align:'center',
+            width:'10%',
+        }, {
+            field: 'sendmoney',
+            title: '发放金额(元)',
+            align:'center',
+            formatter: function (value, row, index) {
+                var html = '<div class="zam-flex-column-center"><span>' + row.sendtypename + '</span><span class="m-b-10">' + value + '</span></div>';
+                return html;
+            },
+        },  {
+			field: 'fromtypename',
+			title: '来源',
+			align: 'center',
+		},  {
+            field: 'create_time',
+            title: '发放时间',
+            align: 'center',
+        }
+	],
+	searchParamas:[{'type':'1','id':'keyword'},{'type':'2','id':'fromtype'},{'type':'1','id':'nickname'},{'type':'1','id':'openid'},{'type':'1','id':'userid'}],
+	toolbar:{
+	},
+};
+webtable.init(initConfig);
+$('#hdid,#fromtype').change(function(e) {
+     webtable.refresh();
+})
+});
+</script>
+{include file='$Wpath/common/footer'}

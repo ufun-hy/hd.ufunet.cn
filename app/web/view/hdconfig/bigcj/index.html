@@ -1,0 +1,143 @@
+{include file='$Wpath/common/header'}
+<form id="formBox" class="zam-formvalidation form-horizontal" method="post">
+    <div class="config-titlebox">
+        <span class="config-titlename">大屏设置</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#screenconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+    </div>
+    <div id="screenconfigbox" class="collapse in">
+        {include file="$Wpath/common/configscreencommon" /}
+        {include file="$Wpath/common/configscreenmusic" /}
+        {include file="$Wpath/common/prizeimg" /}
+        <div class="form-group">
+            <label class="col-lg-2 control-label text-right">* 大屏头像墙类型</label>
+            <div class="col-lg-8">
+                <label class="lyear-radio radio-inline radio-primary">
+                    <input type="radio" name="shapetype" {if $config["shapetype"]=="1"}checked{/if} value="1"><span>凹面墙</span>
+                </label>
+                <label class="lyear-radio radio-inline radio-primary">
+                    <input type="radio" name="shapetype" {if $config["shapetype"]=="2"}checked{/if} value="2" ><span>凸面墙</span>
+                </label>
+                <label class="lyear-radio radio-inline radio-primary">
+                    <input type="radio" name="shapetype" {if $config["shapetype"]=="3"}checked{/if} value="3" ><span>平面墙</span>
+                </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label text-right">* 头像墙列数</label>
+            <div class="col-lg-8">
+                <input type="text" class="form-control numberincdec" name="avatarcolnum" 
+                data-bts-min="30" data-bts-replacement-val="30"
+                data-bts-max="60"
+                data-bts-step="1"
+                value="{$config['avatarcolnum']}">
+                <span class="zam-help-block">注:必须是30到60之间的数字</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 默认头像</label>
+            <div class="col-lg-4">
+              {:tpl_image_one('defaultimg',$config['defaultimg'])}
+              <span class="help-block">规格:100*100px</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label text-right">* 抽出用户时隐藏头像墙</label>
+            <div class="col-lg-8">
+                {:tpl_switch('hideavatarwall',$config['hideavatarwall'])}
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label text-right">* 中奖弹窗用户背景图</label>
+            <div class="col-lg-8">
+                {:tpl_image_one('userbg', $config['userbg'])}
+                <span class="help-block">规格:223*223px</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 显示参与抽奖人数</label>
+            <div class="col-lg-3">
+                {:tpl_switch('showjoin',$config['showjoin'])}
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label text-right">* 大屏开始抽奖按钮</label>
+            <div class="col-lg-8">
+                {:tpl_image_one('startbtn', $config['startbtn'])}
+                <span class="help-block">规格:339*76px</span>
+            </div>
+        </div>
+        <div class="form-group hidden">
+            <label class="col-lg-2 control-label">* 中奖数据列表是否自动滚动</label>
+            <div class="col-lg-8">
+                {:tpl_switch('autoscroll',$config['autoscroll']??'2')}
+                 <span class="help-block">注：仅中奖名单总高度超过外框总高度才可以自动滚动，如果您想停止自动滚动，将鼠标移动到某个中奖名单上将自动停止滚动，移开后将会自动重新开始滚动</span>
+            </div>
+        </div>
+        {if dzroundcj()}
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 轮次抽奖奖品背景图</label>
+            <div class="col-lg-8">
+              {:tpl_image_one('roundprizebg', $config['roundprizebg']??SIMGURL . 'importcj/guangquan.png')}
+              <span class="help-block">规格:500*500px</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label text-right">* 轮次抽奖中奖弹窗用户背景图</label>
+            <div class="col-lg-8">
+                {:tpl_image_one('roundluckerbg', (!isset($config['roundluckerbg']) || empty($config['roundluckerbg'])) ?SIMGURL.'lottery/rbg.png':$config['roundluckerbg'])}
+                <span class="help-block">规格:1179*897px</span>
+            </div>
+        </div>
+        {/if}
+    </div>
+     <div class="config-titlebox">
+        <span class="config-titlename">红包发送设置</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#srconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+     </div>
+     <div id="srconfigbox" class="collapse in">
+        {include file="$Wpath/common/sendredpackinfo" /}
+     </div>
+    {include file='$Wpath/common/savepanel'}
+</form>
+<script>
+require(['webcore','jconfirmBox','zamnotice','layerBox','zvalidator'],function(webcore,jconfirmBox,zamnotice,layerBox){
+    $('#formBox').formValidation({
+        framework: 'bootstrap',
+        excluded: [':disabled'],
+        message: '您填写的内容无效',
+        fields: {
+            apptitle:{
+                message: '请输入网页标题',
+                validators: {
+                    notEmpty: {
+                        message: '请输入网页标题'
+                    },
+                }
+            },
+        }
+    }).on('success.form.fv', function(e) {
+        e.preventDefault();
+        var $form = $(e.target);
+        var postData = webcore.serializeObject($form);
+        var bload = $form.find(".zam-fixedbottom button").lyearloading({opacity: 0.2,spinnerSize: 'nm'});
+        $form.formValidation('disableSubmitButtons', true);
+        webcore.ajaxSubmit("{:goweb('hdconfig/bigcj')}",postData).then(function(json){
+            bload.hide();
+            if(json.code==0){
+                $form.formValidation('disableSubmitButtons', false);
+                zamnotice.showTips('success','保存成功',2e3,function(){
+                    window.location.reload();
+                });
+            }else{
+                zamnotice.showTips('error',json.msg);
+                $form.formValidation('disableSubmitButtons', false);
+            }
+        }, function(json){
+            bload.hide();
+            zamnotice.showTips('error','网络差。操作失败');
+            $form.formValidation('disableSubmitButtons', false);
+        });
+    });
+});
+</script>
+{include file='$Wpath/common/footer'}

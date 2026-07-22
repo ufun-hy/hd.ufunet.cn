@@ -1,0 +1,224 @@
+{include file='common/header' /}
+<style type="text/css">
+.vote-container{
+	position: absolute;
+    top: 0px;
+	left:0;
+	width: 100%;
+    height: 100%;
+    color: #fff;
+    --title-size: 62px;
+    --title-color:#fddd7a;
+    --title-mb: 20px;
+    --lists-w: 900px;
+    --lists-p: 30px;
+    --lists-bgcolor:#fff;
+    --item-h: 40px;
+    --item-vs-img: url(/static/images/screen/vote/pk/vs.png);
+    --item-vs-w: 48px;/*145px*/
+    --item-vs-h: 30px;/*90px*/
+    --item-l-color:#e94f6f;
+    --item-r-color:#042fff;
+    --item-score-left: -120px;
+    --item-score-size: 64px;
+    --item-name-top: 80px;
+    --item-name-size: 32px;
+}
+.vote-roundtitle{
+    font-size: var(--title-size);
+    color: var(--title-color);
+    margin-bottom: var(--title-mb);
+    font-weight: bold;
+}
+.vote-lists{
+	width: var(--lists-w);
+    border-radius: calc(var(--item-h) + var(--lists-p));
+    background: var(--lists-bgcolor);
+}
+.voteitems{
+    padding: var(--lists-p);
+}
+.vote-lists .vote-item{
+    position: relative;
+    height: var(--item-h);
+    width: 50%;
+    transition: all 1s linear;
+    -webkit-transition:  all 1s linear;
+}
+
+.vote-lists .vote-item:nth-child(1){
+    border-top-left-radius: calc(var(--item-h) / 2);
+    border-bottom-left-radius: calc(var(--item-h) / 2);
+    background-color: var(--item-l-color);
+}
+.vote-lists .vote-item:nth-child(2){
+    border-top-right-radius: calc(var(--item-h) / 2);
+    border-bottom-right-radius: calc(var(--item-h) / 2);
+    background-color: var(--item-r-color);
+}
+.vote-lists .logo{
+    position: absolute;
+    width: var(--item-vs-w);
+    height:var(--item-vs-h);
+    left: calc((var(--item-vs-w) / 2) * -1);
+    background-image: var(--item-vs-img);
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.vote-container .votescore{
+    position: absolute;
+    font-size: var(--item-score-size);
+    font-weight: bold;
+}
+.vote-lists .vote-item:nth-child(1) .votescore{
+    left: var(--item-score-left);
+}
+.vote-lists .vote-item:nth-child(2) .votescore{
+    right: var(--item-score-left);
+}
+.vote-container .votename{
+    position: absolute;
+    top: var(--item-name-top);
+    font-size: var(--item-name-size);
+    font-weight: bold;
+    min-width: 200px;
+}
+.vote-lists .vote-item:nth-child(1) .votename{
+    left: 0;
+    text-align: left;
+}
+.vote-lists .vote-item:nth-child(2) .votename{
+    right: 0;
+    text-align: right;
+}
+/*底部轮次*/
+.vote-rounds{
+    position: absolute;
+    bottom: 100px;
+	text-align:center;
+}
+.vote-rounds a{
+	display: inline-block;
+    padding: 5px 10px;
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.65);
+    border-radius: 10px;
+    margin-right: 10px;
+}
+.vote-rounds a:last-child{margin: 0;}
+.vote-rounds a.active,.vote-rounds a.active:hover {
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    background-color: rgb(255, 255, 255);
+    color: #000;
+}
+.vote-rounds a:hover {
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    background-color: rgba(255, 255, 255,0.5);
+    color: #000;
+}
+</style>
+<div class="vote-container zam-app-flex-ajCenter">
+    <div class="vote-roundtitle">{$rotate['title']}</div>
+	<div class="vote-lists">
+		<div class="voteitems zam-app-flex-ajCenter2">
+            {foreach $rotate['items'] as $key=>$item}
+                {if $key < 2}
+                <div class="vote-item zam-app-flex-ajCenter2 vote{$item['id']}">
+                    {if $key == 1}
+                        <div class="logo"></div>
+                    {/if}
+                    <div class="votename">{$item['votename']}</div>
+                    <div class="votescore">{$item['votenums']}</div>
+                </div>
+                {/if}
+            {/foreach}
+        </div>
+	</div>
+    <section class="vote-rounds">
+        {foreach $rotate['rotates'] as $rkey=>$ritem}
+            <a href="javascript:;" data-rotateid="{$ritem['id']}" {if $ritem['active']=='1'}class="active"{/if}>第{$rkey + 1}轮</a> 
+        {/foreach}
+    </section>
+</div>
+<script>
+var votetxt = "{$pcconfig['votetxt']??'投票'}",rotateid = "{$rotate['id']??''}",status = "{$rotate['status']??1}";
+require(['screencore','template','keyboard','layerBox'],function(screencore,template,keyboardJS,layerBox){
+	function ajaxvoteuser(){
+		screencore.ajaxSubmit("/screen/vote/dzajaxvotedata",{}).then(function(json){
+			if(json.code==0){
+                var items = json.msg.items??[];
+				$.each(items,function(i,v){
+					if($(".vote-lists .vote"+v.id).length > 0){
+						$(".vote-lists .vote"+v.id).find('.votescore').text(v.votenums);
+                        $(".vote-lists .vote"+v.id).find('.votename').text(v.votename);
+					}
+				});
+                if(items.length > 1){
+                    var item1 = items[0]??{votenums:0,id:0,voteper:'50%'};
+                    var item1per = parseFloat(item1.voteper);
+                    var item2 = items[1]??{votenums:0,id:0,voteper:'50%'};
+                    var item2per = parseFloat(item2.voteper);
+                    if(item1per == item2per){
+                        $(".vote-lists .vote-item").css("width",'50%');
+                    }else{
+                        if(item1per < 5){
+                            item1per = 5;
+                        }
+                        item2per = 100 - item1per;
+                        if(item2per < 5){
+                            item2per = 5;
+                            item1per = 95;
+                        }
+                        $(".vote-lists .vote"+item1.id).css("width",`${item1per}%`);
+                        $(".vote-lists .vote"+item2.id).css("width",`${item2per}%`);
+                    }
+                }
+                
+			}
+		});
+	}
+    ajaxvoteuser();
+	setInterval(function(){
+		ajaxvoteuser();
+	},3e3);
+    //切换上下轮次
+    keyboardJS.bind('right', function(e) {
+        var nextDom = $('.vote-rounds .active').next();
+        if(nextDom.length<=0){
+            $('.vote-rounds a:first').trigger('click');
+        }else{
+            nextDom.trigger('click');
+        }
+    });
+    keyboardJS.bind('left', function(e) {
+        var prevDom = $('.vote-rounds .active').prev();
+        if(prevDom.length<=0){
+            $('.vote-rounds a:last').trigger('click');
+        }else{
+            prevDom.trigger('click');
+        }
+    });
+    $(".vote-rounds a").click(function(){
+        var clickrotateid = $(this).attr('data-rotateid')||'';
+        if(!clickrotateid){
+            return;
+        }
+        screencore.ajaxSubmit("/screen/vote/changerotate",{rotateid:clickrotateid}).then(function(json){
+			 window.location.reload();
+        })
+    });
+    keyboardJS.bind('space', function(e) {
+        screencore.ajaxSubmit("/screen/vote/changestate",{rotateid:rotateid,status:(status=='1'?'2':'1')}).then(function(data){
+            if(data.code==0){
+                layerBox.showMsg(votetxt + (status == '1' ? '通道已关闭' : '通道已开启'));
+                status = (status == '1' ? '2' : '1');
+            }else{
+                layerBox.showMsg('网络异常，操作失败');
+            }
+        });
+    });
+});
+</script>
+{include file='common/footer' /}

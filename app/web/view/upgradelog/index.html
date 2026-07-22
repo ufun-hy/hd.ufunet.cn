@@ -1,0 +1,213 @@
+{include file='$Wpath/common/header'}
+<style type="text/css">
+.shape {    
+	border-style: solid;
+    border-width: 0 70px 40px 0;
+    float: right;
+    height: 0px;
+    width: 0px;
+	-ms-transform: rotate(360deg);
+	-o-transform: rotate(360deg);
+	-webkit-transform: rotate(360deg);
+	transform: rotate(360deg);
+}
+.offer {
+	background: #fff;
+	border: 1px solid #ebebeb;
+	box-shadow: 0 1px 15px 1px rgba(77, 82, 89, .075);
+	margin: 15px 0; 
+	overflow: hidden;
+}
+.shape {
+	border-color: rgba(255, 255, 255, 0) #4d5259 rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
+}
+.offer-primary {
+    border-color: #33cabb;
+}
+.offer-primary .shape {
+	border-color: transparent #33cabb transparent transparent;
+}
+.offer-danger {
+    border-color: #f96868;
+}
+.offer-danger .shape {
+	border-color: transparent #f96868 transparent transparent;
+}
+.offer-success {
+	border-color: #15c377;
+}
+.offer-success .shape {
+	border-color: transparent #15c377 transparent transparent;
+}
+.offer-default {
+    border-color: #eff2f7;
+}
+.offer-default .shape {
+	border-color: transparent #eff2f7 transparent transparent;
+}
+.offer-info {
+    border-color: #48b0f7;
+}
+.offer-info .shape {
+	border-color: transparent #48b0f7 transparent transparent;
+}
+.offer-warning {
+    border-color: #faa64b;
+}
+.offer-warning .shape {
+	border-color: transparent #faa64b transparent transparent;
+}
+.shape-text {
+	color: #fff;
+	font-size: 12px;
+	font-weight: bold; 
+	position: relative;     
+	right: -47px;
+    top: 0px;
+	white-space: nowrap;
+	-ms-transform: rotate(30deg); 
+	-o-transform: rotate(360deg); 
+	-webkit-transform: rotate(30deg);
+	transform: rotate(30deg);
+}	
+.offer-content {
+	padding: 20px;
+}
+/* 带标签的卡片 */
+.pull-float-none {
+    float: none !important;
+}
+.overflow-hidden {
+    overflow: hidden;
+}
+/* 上两个可弄成通用类 */
+.ribbon {
+    width: 150px;
+    height: 150px;
+    overflow: hidden;
+    position: absolute;
+    z-index: 10;
+}
+.ribbon-top-left {
+    top: -10px;
+    left: -10px;
+}
+.ribbon::before,
+.ribbon::after {
+	position: absolute;
+	z-index: -1;
+	content: '';
+	display: block;
+	border: 5px solid;
+}
+.ribbon span {
+	position: absolute;
+	display: block;
+	width: 225px;
+	padding: 8px 0;
+	box-shadow: 0 3px 10px rgba(0, 0, 0, .075);
+	color: #fff;
+	text-shadow: 0 1px 1px rgba(0, 0, 0, .2);
+	text-transform: capitalize;
+	text-align: center;
+}
+.ribbon-top-left {
+	top: -10px;
+	left: -10px;
+}
+.ribbon-top-left::before,
+.ribbon-top-left::after {
+	border-top-color: transparent;
+	border-left-color: transparent;
+}
+.ribbon-top-left::before {
+	top: 0;
+	right: 50px;
+}
+.ribbon-top-left::after {
+	bottom: 50px;
+	left: 0;
+}
+.ribbon-top-left span {
+	right: -8px;
+    top: 30px;
+    transform: rotate(-45deg);
+}
+.ribbon-top-right {
+	top: -10px;
+	right: -10px;
+}
+.ribbon-top-right::before,
+.ribbon-top-right::after {
+	border-top-color: transparent;
+	border-right-color: transparent;
+}
+.ribbon-top-right::before {
+	top: 0;
+	left: 36px
+}
+.ribbon-top-right::after {
+	bottom: 36px;
+	right: 0;
+}
+.ribbon-top-right span {
+	left: -8px;
+	top: 30px;
+	transform: rotate(45deg);
+}
+/* 时光轴 */
+ul.lyear-timeline {
+    position: relative;
+    list-style: none;
+    padding: 0;
+}
+ul.lyear-timeline > li {
+    margin-top: 20px;
+    padding-left: 5rem;
+}
+ul.lyear-timeline:before {
+    content: ' ';
+    border: 2px dotted #edeff5;
+    margin: 20px 20px 0 22px;
+    display: inline-block;
+    position: absolute;
+    left: -5px;
+    width: 2px;
+    height: 100%;
+    z-index: 0;
+}
+ul.lyear-timeline > li i.mdi {
+    width: 35px;
+    height: 35px;
+    text-align: center;
+    border-radius: 50%;
+    position: absolute;
+    left: 1px;
+    background-color: #f3f6f7;
+    font-size: 20px;
+    line-height: 35px;
+    font-size: 15px;
+}
+</style>
+<div class="card">
+<div class="card-header"><h4>仅展示最近30个版本</h4></div>
+<div class="card-body">
+  {if $upgradelog['code']!=0}
+  <div class="alert alert-danger">{$upgradelog['msg']}</div>
+  {else /}
+  <ul class="lyear-timeline m-b-0">
+  	{volist name="upgradelog.msg" id="onelog"}
+    <li>
+      <i class="mdi mdi-check bg-primary text-white"></i>
+      <a href="javascript:void(0)" class="m-b-5 text-default"><strong>{$onelog['versionname']}</strong></a>
+      <a href="javascript:void(0)" class="pull-right text-muted">{:date('Y-m-d H:i:s',$onelog['create_time'])}</a>
+      <p class="m-t-10 text-muted">
+      	{:$onelog['versionlog']}
+      </p>
+    </li>
+    {/volist}
+  </ul>
+  {/if}
+</div>
+</div>
+{include file='$Wpath/common/footer'}

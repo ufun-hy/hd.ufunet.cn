@@ -1,0 +1,109 @@
+<div class="alert alert-info">此处设置的奖品是默认轮次的奖品，默认轮次其他信息由系统自动生成</div>
+<div class="form-horizontal confirmbox-pop">
+<form class="confirm-formbox" method="post">
+ <div class="form-group">
+    <label class="col-lg-3 control-label">* 红包主题</label>
+    <div class="col-lg-8">
+      <input type="text" class="form-control"  name="prizetitle" value="{$config['prizetitle']}" placeholder="12字内，推荐控制在5个字" maxlength="12">
+    </div>
+ </div>
+ <div class="form-group">
+    <label class="col-lg-3 control-label">* 类型</label>
+    <div class="col-lg-8">
+      <label class="lyear-radio radio-inline radio-primary" onclick="showMoneyBox(this)">
+        <input type="radio" name="prizetype" value="1" {if $config['prizetype']=='1'}checked{/if}><span>实物</span>
+      </label>
+      <label class="lyear-radio radio-inline radio-primary" onclick="showMoneyBox(this)">
+        <input type="radio" name="prizetype" value="2" {if $config['prizetype']=='2'}checked{/if}><span>红包</span>
+      </label>
+    </div>
+ </div>
+ <div class="form-group">
+    <label class="col-lg-3 control-label">* 奖品名称</label>
+    <div class="col-lg-8">
+      <input type="text" class="form-control"  name="prizename" value="{$config['prizename']}" placeholder="建议15字内">
+    </div>
+ </div>
+ <div class="form-group">
+	<label class="col-lg-3 control-label">* 奖品图</label>
+	<div class="col-lg-8">
+	   {:tpl_image_one('prizeimg',$config['prizeimg'])}
+       <span class="zam-help-block">规格:100px * 100px</span>
+	</div>
+ </div>
+ <div class="form-group hidden">
+        <label class="col-lg-3 control-label">* 奖品个数</label>
+        <div class="col-lg-8">
+            <input type="text" class="form-control numberincdec" name="prizenum" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="null"
+                data-bts-step="1"
+                data-bts-postfix="个"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['prizenum']}">
+            <span class="zam-help-block">注:至少是1个，当前奖品可选人数最多等于奖品个数</span>
+        </div>
+ </div>
+ <div class="form-group prizetype2{if $config['prizetype']!='2'} hidden{/if}">
+		<label class="col-lg-3 control-label">* 单个红包金额</label>
+		<div class="col-lg-8">
+			<input type="text" class="form-control numberincdec" name="prizemoney" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="null"
+                data-bts-decimals="2"
+                data-bts-step="1"
+                data-bts-force-step-divisibility="xstwo"
+                value="{$config['prizemoney']}">
+		</div>
+</div>
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 自定义红包风格</label>
+    <div class="col-lg-8">
+        {:tpl_switch('prizediy',$config['prizediy'],'opendiyimg')}
+        <span class="zam-help-block">注:开启并设置好红包正反面则使用此处设置的红包正反面图片</span>
+    </div>
+ </div>
+ <div class="diyimgbox{if $config['prizediy']=='2'} hidden{/if}">
+     <div class="form-group">
+        <label class="col-lg-3 control-label">* 红包正面图</label>
+        <div class="col-lg-8">
+            {:tpl_image_one('prizefrontbg',$config['prizefrontbg'])}
+            <span class="help-block m-t-0">默认规格：471 * 650px</span>
+        </div>
+     </div>
+     <div class="form-group">
+        <label class="col-lg-3 control-label">* 红包反面图</label>
+        <div class="col-lg-8">
+            {:tpl_image_one('prizebackbg',$config['prizebackbg'])}
+            <span class="help-block m-t-0">默认规格：471 * 650px，需保证与红包正面图规格一致</span>
+        </div>
+     </div>
+ </div>
+</form>
+</div>
+<script type="text/javascript">
+require(['webcore',"bootstrap-touchspin"],function(webcore){
+    tpl_switch();
+    $(".confirmbox-pop .numberincdec").TouchSpin();
+});
+function showMoneyBox(obj){
+	var type = $(obj).find('input').val();
+	if(type=='1'){
+		$('.prizetype2').addClass('hidden');
+	}else if(type=='2'){
+        $('.prizetype2').removeClass('hidden');
+    }
+}
+function opendiyimg(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".diyimgbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".diyimgbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+</script>

@@ -1,0 +1,362 @@
+<script id='newprize-tpl' type="text/template">
+    <tr class="mc<% d.teamnum %>">
+        <td>
+           <p>
+            <span class="label label-<%# if(d.prizetype&&d.prizetype=='2'){ %>danger<%# }else{ %>primary<%# } %>"><%# if(d.prizetype&&d.prizetype=='2'){ %>红包<%# }else{ %>实物<%# } %></span>
+           </p>
+           <input type="hidden" name="prizetype[mc<% d.teamnum %>][]" value="<% d.prizetype %>">
+        </td>
+        <td>
+            <img class="prizeimg" src="<% d.prizeimg2 %>">
+            <input type="hidden" name="prizeimg[mc<% d.teamnum %>][]" value="<% d.prizeimg %>">
+        </td>
+        <td>
+           <p><% d.prizename %></p>
+           <input type="hidden" name="prizename[mc<% d.teamnum %>][]" value="<% d.prizename %>">
+           <p><% d.prizedes %></p>
+           <input type="hidden" name="prizedes[mc<% d.teamnum %>][]" value="<% d.prizedes %>">
+        </td>
+        <td>
+           <p><%# if(d.prizetype&&d.prizetype=='2'){ %><span class="label label-info"><% d.prizemoney %>元</span><%# }else{ %>-<%# } %></span></p>
+           <input type="hidden" name="prizemoney[mc<% d.teamnum %>][]" value="<%# if(d.prizetype&&d.prizetype=='2'){ %><% d.prizemoney %><%# }else{ %>0<%# } %>">
+        </td>
+        <td class="rangeBox">
+           <%# if(d.isteam=='1'){ %>
+             <div class="m-b-10">团队第<% d.teamnum %>名</div>
+           <%# }else{ %>
+            {if $gametype=='tug'}
+                <%# if(d.teamnum=='1'){ %>
+                <div class="m-b-10">获胜队伍</div>
+                <%# }else{ %>
+                <div class="m-b-10">失败队伍</div>
+                <%# } %>
+            {else /}
+                <div class="m-b-10 hidden">团队第1名</div>
+            {/if}
+           <%# } %>
+           <%# if(d.rangemin!=d.rangemax){ %>
+                <p>第 <span class="rangemin"><% d.rangemin %></span> <span class="rangedot">~</span> <span class="rangemax"><% d.rangemax %></span> 名</p>
+           <%# }else{ %>
+                <p>第 <span class="rangemin"><% d.rangemin %></span> <span class="rangedot hidden">~</span> <span class="rangemax hidden"><% d.rangemax %></span> 名</p>
+           <%# } %>
+           <input type="hidden" name="prizerange[mc<% d.teamnum %>][]" value="<% d.rangemin %>-<% d.rangemax %>">
+        </td>
+        <td>
+          <a href="javascript:;"  class="btn btn-danger btn-xs btn-del"><i class="mdi mdi-close"></i></a>
+        </td>
+    </tr>
+</script>
+<div class="form-group">
+    <div class="col-lg-12 yautooverflow">
+        <table class="table" style="margin-bottom:0px;">
+            <thead>
+              <tr>
+                <th style="width:10%;text-align:center;">类型</th>
+                <th style="width:20%;text-align:center;">奖品图片</th>
+                <th style="width:20%;text-align:center;">奖品名称</th>
+                <th style="width:20%;text-align:center;">奖品金额</th>
+                <th style="width:20%;text-align:center;">中奖范围</th>
+                <th style="width:10%;text-align:center;">操作</th>
+              </tr>
+            </thead>
+            <tbody class="prize-lists">
+                {foreach $rotate['teamprizedetail'] as $pkey=>$oneprize}
+                    {foreach $oneprize as $oneval}
+                    <tr class="{$pkey}{if $pkey!='mc1' && (!isset($rotate['isteam']) || $rotate['isteam']=='2') && $gametype!='tug'} hidden{/if}">
+                        <td>
+                           <p><span class="label label-{if $oneval['prizetype']=='2'}danger{else}primary{/if}">{if $oneval['prizetype']=='2'}红包{else}实物{/if}</span></p>
+                           <input type="hidden" name="prizetype[{if is_numeric($pkey)}mc1{else /}{$pkey}{/if}][]" value="{if !empty($oneval['prizetype'])}{$oneval['prizetype']}{else}1{/if}">
+                        </td>
+                        <td>
+                            <img class="prizeimg" src="{:tomedia($oneval['prizeimg'])}">
+                            <input type="hidden" name="prizeimg[{if is_numeric($pkey)}mc1{else /}{$pkey}{/if}][]" value="{$oneval['prizeimg']}">
+                        </td>
+                        <td>
+                           <p>{$oneval['prizename']}</p>
+                           <input type="hidden" name="prizename[{if is_numeric($pkey)}mc1{else /}{$pkey}{/if}][]" value="{$oneval['prizename']}">
+                           <p>{$oneval['prizedes']??' '}</p>
+                           <input type="hidden" name="prizedes[{if is_numeric($pkey)}mc1{else /}{$pkey}{/if}][]" value="{$oneval['prizedes']??' '}">
+                        </td>
+                        <td>
+                           <p>{if $oneval['prizetype']=='2'}<span class="label label-info">{$oneval['prizemoney']}元</span>{else}-{/if}</span></p>
+                           <input type="hidden" name="prizemoney[{if is_numeric($pkey)}mc1{else /}{$pkey}{/if}][]" value="{if $oneval['prizetype']=='2'}{$oneval['prizemoney']}{else}0{/if}">
+                        </td>
+                        <td class="rangeBox">
+                           {if isset($rotate['isteam']) && $rotate['isteam']=='1'}
+                            <div class="m-b-10">团队第{:str_replace('mc','',$pkey)}名</div>
+                           {else /}
+                            {if $gametype=='tug'}
+                                {if $pkey=='mc1'}
+                                <div class="m-b-10">获胜队伍</div>
+                                {else /}
+                                <div class="m-b-10">失败队伍</div>
+                                {/if}
+                            {else /}
+                                <div class="m-b-10 hidden">团队第1名</div>
+                            {/if}
+                           {/if}
+                           {if $oneval['prizerange'][0]!=$oneval['prizerange'][1]}
+                                <p>第 <span class="rangemin">{$oneval['prizerange'][0]}</span> <span class="rangedot">~</span> <span class="rangemax">{$oneval['prizerange'][1]}</span> 名</p>
+                           {else}
+                                <p>第 <span class="rangemin">{$oneval['prizerange'][0]}</span> <span class="rangedot hidden">~</span> <span class="rangemax hidden">{$oneval['prizerange'][1]}</span> 名</p>
+                           {/if}
+                           <input type="hidden" name="prizerange[{if is_numeric($pkey)}mc1{else /}{$pkey}{/if}][]" value="{$oneval['prizerange'][0]}-{$oneval['prizerange'][1]}">
+                        </td>
+                        <td>
+                          <a href="javascript:;"  class="btn btn-danger btn-xs btn-del{if $rotate['status']!='1'} disabled{/if}">
+                              <i class="mdi mdi-close"></i>
+                          </a>
+                        </td>
+                    </tr>
+                    {/foreach}
+                {/foreach}
+            </tbody>
+            <tfoot style="border: 1px solid #efefef;">
+              <tr>
+                <td colspan="4">
+                  <a  class="btn btn-primary btn-xs addprize{if $rotate['status']!='1'} disabled{/if}" data-type='1' href="javascript:;"> <i class="mdi mdi-plus"></i>&nbsp;<span>添加奖品</span></a>
+                </td>
+              </tr>
+            </tfoot>
+        </table>
+        <span class="zam-help-block">注:请务必严格设置名次</span>
+    </div>
+</div>
+<script type="text/javascript">
+require(['webcore','jconfirmBox','zamnotice','layerBox',"bootstrap-touchspin"],function(webcore,jconfirmBox,zamnotice,layerBox){
+    $(".addprize").on('click',function(){
+        var confirmObj = jconfirmBox.ajaxconfirm("新增奖品","{:gohdmanage('common/gameprize',['hdid'=>$hdid])}",{gametype:"{$gametype}",isteam:$(".teamtypebox").find('input:radio:checked').val()||'2',maxrange:getranmax('1')},'html','col-lg-8 col-lg-offset-2',function(e){
+                var teamnum = {if $gametype=='tug'}e.find(".gameteammcbox input[name=mcnum]:radio:checked").val(){else /}e.find(".mcnum").val(){/if};
+                var prizeimg = e.find("input[name='prizeimg']").val();
+                if(prizeimg==''){
+                    layerBox.showMsg('请完善奖品图片');
+                    return false;
+                }
+                var prizename = e.find("input[name='prizename']").val();
+                if(prizename==''){
+                    layerBox.showMsg('请完善奖品名称');
+                    return false;
+                }
+                var prizedes = e.find("input[name='prizedes']").val();
+                if(prizedes==''){
+                    e.find("input[name='prizedes']").val(' ');
+                }
+                var rangemin = e.find("input[name='rangemin']").val();
+                if(rangemin==''){
+                    layerBox.showMsg('请填写发奖范围最小名次');
+                    return false;
+                }
+                //查询当前团队已经添加的名次 与 本次输入的最小名次是否已经存在
+                var isminIn = isexsits(rangemin,teamnum);
+                if(!isminIn){
+                    layerBox.showMsg('名次'+rangemin+'已设置过发奖，请重新设置');
+                    return false;
+                }
+                var mininrange = isinrange(rangemin,teamnum);
+                if(!mininrange){
+                    layerBox.showMsg('名次设置有误，请重新设置');
+                    return false;
+                }
+                var rangemax = e.find("input[name='rangemax']").val();
+                if(rangemax==''){
+                    layerBox.showMsg('请填写发奖范围最大名次');
+                    return false;
+                }
+                var ismaxIn = isexsits(rangemax,teamnum);
+                if(!ismaxIn){
+                    layerBox.showMsg('名次'+rangemax+'已设置过发奖，请重新设置');
+                    return false;
+                }
+                var isminmaxIn = isminmaxexsits(rangemin,rangemax,teamnum);
+                if(isminmaxIn){
+                    layerBox.showMsg('范围内有名次已设置过了，请重新设置');
+                    return false;
+                }
+                var maxinrange = isinrange(rangemax,teamnum);
+                if(!maxinrange){
+                    layerBox.showMsg('名次设置有误，请重新设置');
+                    return false;
+                }
+                if(!(/(^[1-9]\d*$)/.test(rangemin))||!(/(^[1-9]\d*$)/.test(rangemax))){
+                    layerBox.showMsg('名次必须是大于0的整数，请重新设置');
+                    return false;
+                }else{
+                    rangemin = parseInt(rangemin);
+                    rangemax = parseInt(rangemax);
+                    if(rangemin > 1000|| rangemax > 1000){
+                        layerBox.showMsg('名次必须是1000内的数字');
+                        return false;
+                    }
+                }
+                if(rangemin>rangemax){
+                    layerBox.showMsg('范围设置错误，请重新设置');
+                    return false;
+                }
+                var obj = {isteam:$(".teamtypebox").find('input:radio:checked').val()||'2',teamnum:teamnum};
+                var checkright = false;
+                e.find('input').each(function(){
+                    var $this = $(this);
+                    if($this.attr('name')=='radionouse') return true;
+                    if($this.attr('name')=='prizeimg'){
+                        obj[$this.attr('name')] = $this.val();
+                        obj.prizeimg2 = $this.parent().next().find('img').attr('src');
+                    }else if($this.attr('name')=='prizetype'){
+                        obj[$this.attr('name')] = e.find("input[name=prizetype]:radio:checked").val();
+                    }else{
+                        obj[$this.attr('name')] = $this.val()||'';
+                    }
+                });
+                $closestKey = getcloseset(rangemax,teamnum);
+                if($closestKey < 0){
+                    if($(".prize-lists .mc"+teamnum).length == 0){
+                        $(".prize-lists").append(webcore.tpl($("#newprize-tpl"),obj));
+                    }else{
+                        $(".prize-lists .mc"+teamnum).eq(-1).after(webcore.tpl($("#newprize-tpl"),obj));
+                    }
+                }else{
+                    var closeRangeBox = $(".prize-lists .mc"+teamnum+" .rangeBox").eq($closestKey);
+                    if(closeRangeBox.length<=0){
+                        layerBox.showMsg('设置有误，请核实');
+                        return false;
+                    }else{
+                        closeRangeBox.parent().before(webcore.tpl($("#newprize-tpl"),obj));
+                    }
+                }
+                confirmObj.close();
+        });
+    });
+    $(".prize-lists,.failprize-lists").on('click','.btn-del',function(){
+        var $this = this;
+        setTimeout(function(){
+            $($this).parent().parent().remove();
+        },200);
+    });
+})
+function getcloseset(v,type){
+    type = type || '1';
+    v = parseInt(v);
+    var arr = getKeys(type);
+    if(arr.length==0){
+        return -1;
+    }else{
+        arr = arr.reverse();
+        var key = -2;
+        var keyarr = [];
+        for(var i=0;i<arr.length;i++){
+            if(v < arr[i].min){
+                keyarr.push(arr[i].domkey);
+            }
+        }
+        if(keyarr.length>0){
+            key = Math.min.apply(null, keyarr);
+        }
+        return key;
+    }
+}
+function isexsits(val,type){
+    type = type || '1';
+    val = parseInt(val);
+    var arr = getallmc(type);
+    var checkedin = true;
+    $.each(arr,function(i,v){
+        if(v==val){
+            checkedin = false;
+            return false;
+        }   
+    });
+    return checkedin;
+}
+function isinrange(val,type){
+    type = type || '1';
+    val = parseInt(val);
+    var arr = getallRange(type);
+    var checkedin = true;
+    $.each(arr,function(i,v){
+        if(val>arr[i].min&&val<arr[i].max){
+            checkedin = false;
+            return false;
+        }   
+    });
+    return checkedin;
+}
+function isminmaxexsits(min,max,type){
+    type = type || '1';
+    min = parseInt(min);
+    max = parseInt(max);
+    var arr = getallRange2(type);
+    var checkedin = false;
+    $.each(arr,function(i,v){
+        if(min!=max&&min<arr[i].min&&max>arr[i].max){
+            checkedin = true;
+            return false;
+        }
+    });
+    return checkedin;
+}
+function getallRange2(type){
+    type = type || '1';
+    var $arr = [];
+    var rangeTd = $(".prize-lists .mc"+type+" .rangeBox");
+    if(rangeTd.length<=0)return $arr;
+    rangeTd.each(function(i,v){
+        var rangemin = parseInt($(this).find('.rangemin').text());
+        var rangemax = parseInt($(this).find('.rangemax').text());
+        var range = {min:rangemin,max:rangemax};
+        $arr.push(range);
+    });
+    return $arr;
+}
+function getallmc(type){
+    type = type || '1';
+    var $arr = [];
+    var rangeTd = $(".prize-lists .mc"+type+" .rangeBox");
+    if(rangeTd.length<=0) return $arr;
+    rangeTd.each(function(i,v){
+        var rangemin = parseInt($(this).find('.rangemin').text());
+        var rangemax = parseInt($(this).find('.rangemax').text());
+        if(rangemin==rangemax){
+            $arr.push(rangemin);
+        }else{
+            $arr.push(rangemin,rangemax);
+        }
+    });
+    return $arr;
+}
+function getranmax(type){
+    type = type || '1';
+    var $arr = getallmc(type);
+    if($arr.length==0){
+        return 0;
+    }else{
+        return $arr.pop();
+    }
+}
+function getallRange(type){
+    type = type || '1';
+    var $arr = [];
+    var rangeTd = $(".prize-lists .mc"+type+" .rangeBox");
+    if(rangeTd.length<=0) return $arr;
+    rangeTd.each(function(i,v){
+        var rangemin = parseInt($(this).find('.rangemin').text());
+        var rangemax = parseInt($(this).find('.rangemax').text());
+        if(rangemin!=rangemax){
+            var range = {min:rangemin,max:rangemax};
+            $arr.push(range);
+        }
+    });
+    return $arr;
+}
+function getKeys(type){
+    type = type || '1';
+    var $arr = [];
+    var rangeTd = $(".prize-lists .mc"+type+" .rangeBox");
+    if(rangeTd.length<=0) return $arr;
+    rangeTd.each(function(i,v){
+        var rangemin = parseInt($(this).find('.rangemin').text());
+        var obj = {domkey:i,min:rangemin};
+        $arr.push(obj);
+    });
+    return $arr;
+}
+</script>
+

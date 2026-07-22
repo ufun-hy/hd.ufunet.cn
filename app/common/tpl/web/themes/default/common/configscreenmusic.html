@@ -1,0 +1,26 @@
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 开启背景音效</label>
+    <div class="col-lg-8">
+        {:tpl_switch('bgmusicoff',$config['bgmusicoff'],'openbgmusic')}
+    </div>
+</div>
+<div class="form-group musicinputbox{if $config['bgmusicoff']=='2'} hidden{/if}">
+    <label class="col-lg-2 control-label">* 背景音效</label>
+    <div class="col-lg-8">
+        {:tpl_audio('bgmusic',$config['bgmusic'])}
+    </div>
+</div>
+<script type="text/javascript">
+function openbgmusic(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".musicinputbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".musicinputbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+</script>

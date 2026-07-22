@@ -1,0 +1,330 @@
+<style>
+.qipaobox img{background-color: rgba(0,0,0,0.1);}
+</style>
+<div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 顶部轮次主题</label>
+    <div class="col-lg-6">
+        <div class="input-group">
+            <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+            {:tpl_color('styleconfig[rotatetitle][color]',$config['styleconfig']['rotatetitle']['color']??'#fff')}
+            <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
+            <div class="touchspin">
+            <input type="text" class="form-control numberincdec" name="styleconfig[rotatetitle][size]" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="60"
+                data-bts-step="1"
+                data-bts-postfix="px"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['styleconfig']['rotatetitle']['size']??36}">
+            </div>
+        </div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 左侧排行榜标题</label>
+    <div class="col-lg-6 yautooverflow">
+        <div class="input-group">
+            <div class="input-group-btn not-allow"><a class="btn btn-default">文字</a></div>
+            <input type="text" class="form-control" name="styleconfig[lefttitle][txt]" value="{$config['styleconfig']['lefttitle']['txt']??'实时金额榜'}" />
+            <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
+            <div class="touchspin">
+            <input type="text" class="form-control numberincdec" name="styleconfig[lefttitle][size]" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="40"
+                data-bts-step="1"
+                data-bts-postfix="px"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['styleconfig']['lefttitle']['size']??24}">
+            </div>
+            <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+            {:tpl_color('styleconfig[lefttitle][color]',$config['styleconfig']['lefttitle']['color']??'#fff')}
+        </div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 右侧实时订单标题</label>
+    <div class="col-lg-6 yautooverflow">
+        <div class="input-group">
+            <div class="input-group-btn not-allow"><a class="btn btn-default">文字</a></div>
+            <input type="text" class="form-control" name="styleconfig[righttitle][txt]" value="{$config['styleconfig']['righttitle']['txt']??'实时订单'}" />
+            <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
+            <div class="touchspin">
+            <input type="text" class="form-control numberincdec" name="styleconfig[righttitle][size]" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="40"
+                data-bts-step="1"
+                data-bts-postfix="px"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['styleconfig']['righttitle']['size']??24}">
+            </div>
+            <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+            {:tpl_color('styleconfig[righttitle][color]',$config['styleconfig']['righttitle']['color']??'#fff')}
+        </div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 右侧订单统计标题</label>
+    <div class="col-lg-6 yautooverflow">
+        <div class="input-group">
+            <div class="input-group-btn not-allow"><a class="btn btn-default">文字</a></div>
+            <input type="text" class="form-control" name="styleconfig[tongjititle][txt]" value="{$config['styleconfig']['tongjititle']['txt']??'订单统计'}" />
+            <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
+            <div class="touchspin">
+            <input type="text" class="form-control numberincdec" name="styleconfig[tongjititle][size]" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="40"
+                data-bts-step="1"
+                data-bts-postfix="px"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['styleconfig']['tongjititle']['size']??24}">
+            </div>
+            <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+            {:tpl_color('styleconfig[tongjititle][color]',$config['styleconfig']['tongjititle']['color']??'#fff')}
+        </div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 订单统计金额与数量</label>
+    <div class="col-lg-6">
+        <div class="input-group">
+            <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+            {:tpl_color('styleconfig[tongjinum][color]',$config['styleconfig']['tongjinum']['color']??'#fff')}
+            <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
+            <div class="touchspin">
+            <input type="text" class="form-control numberincdec" name="styleconfig[tongjinum][size]" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="40"
+                data-bts-step="1"
+                data-bts-postfix="px"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['styleconfig']['tongjinum']['size']??16}">
+            </div>
+        </div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 左侧排行榜(大屏端)前</label>
+    <div class="col-lg-6">
+        <input type="text" class="form-control numberincdec" name="styleconfig[leftlimit]" 
+        data-bts-min="1" data-bts-replacement-val="1"
+        data-bts-max="200"
+        data-bts-step="1"
+        data-bts-postfix="名"
+        data-bts-postfix-extra-class="touchspin-postfix"
+        value="{$config['styleconfig']['leftlimit']??10}">
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 排行榜第一名图标(大屏端)</label>
+    <div class="col-lg-8">
+        {:tpl_image_one('styleconfig[first]',$config['styleconfig']['first'])}
+        <span class="help-block">规格:68px*68px</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 排行榜第二名图标(大屏端)</label>
+    <div class="col-lg-8">
+        {:tpl_image_one('styleconfig[second]',$config['styleconfig']['second'])}
+        <span class="help-block">规格:68px*68px</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 排行榜第三名图标(大屏端)</label>
+    <div class="col-lg-8">
+        {:tpl_image_one('styleconfig[third]',$config['styleconfig']['third'])}
+        <span class="help-block">规格:68px*68px</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 第1个柱体背景色(大屏端)</label>
+    <div class="col-lg-4">
+        <div class="input-group">
+            <div class="input-group-btn not-allow"><a class="btn btn-default">顶部颜色</a></div>
+            {:tpl_color('styleconfig[bgcolors][inner1][tc]',$config['styleconfig']['bgcolors']['inner1']['tc']??'rgba(255,20,0,1)')}
+            <div class="input-group-btn not-allow"><a class="btn btn-default">底部颜色</a></div>
+            {:tpl_color('styleconfig[bgcolors][inner1][bc]',$config['styleconfig']['bgcolors']['inner1']['bc']??'rgba(255,20,0,0.05)')}
+        </div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 第2个柱体背景色(大屏端)</label>
+    <div class="col-lg-4">
+        <div class="input-group">
+            <div class="input-group-btn not-allow"><a class="btn btn-default">顶部颜色</a></div>
+            {:tpl_color('styleconfig[bgcolors][inner2][tc]',$config['styleconfig']['bgcolors']['inner2']['tc']??'rgba(255,20,0,1)')}
+            <div class="input-group-btn not-allow"><a class="btn btn-default">底部颜色</a></div>
+            {:tpl_color('styleconfig[bgcolors][inner2][bc]',$config['styleconfig']['bgcolors']['inner2']['bc']??'rgba(255,20,0,0.05)')}
+        </div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 第3个柱体背景色(大屏端)</label>
+    <div class="col-lg-4">
+        <div class="input-group">
+            <div class="input-group-btn not-allow"><a class="btn btn-default">顶部颜色</a></div>
+            {:tpl_color('styleconfig[bgcolors][inner3][tc]',$config['styleconfig']['bgcolors']['inner3']['tc']??'rgba(255,20,0,1)')}
+            <div class="input-group-btn not-allow"><a class="btn btn-default">底部颜色</a></div>
+            {:tpl_color('styleconfig[bgcolors][inner3][bc]',$config['styleconfig']['bgcolors']['inner3']['bc']??'rgba(255,20,0,0.05)')}
+        </div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 第4个柱体背景色(大屏端)</label>
+    <div class="col-lg-4">
+        <div class="input-group">
+            <div class="input-group-btn not-allow"><a class="btn btn-default">顶部颜色</a></div>
+            {:tpl_color('styleconfig[bgcolors][inner4][tc]',$config['styleconfig']['bgcolors']['inner4']['tc']??'rgba(255,20,0,1)')}
+            <div class="input-group-btn not-allow"><a class="btn btn-default">底部颜色</a></div>
+            {:tpl_color('styleconfig[bgcolors][inner4][bc]',$config['styleconfig']['bgcolors']['inner4']['bc']??'rgba(255,20,0,0.05)')}
+        </div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 第5个柱体背景色(大屏端)</label>
+    <div class="col-lg-4">
+        <div class="input-group">
+            <div class="input-group-btn not-allow"><a class="btn btn-default">顶部颜色</a></div>
+            {:tpl_color('styleconfig[bgcolors][inner5][tc]',$config['styleconfig']['bgcolors']['inner5']['tc']??'rgba(255,20,0,1)')}
+            <div class="input-group-btn not-allow"><a class="btn btn-default">底部颜色</a></div>
+            {:tpl_color('styleconfig[bgcolors][inner5][bc]',$config['styleconfig']['bgcolors']['inner5']['bc']??'rgba(255,20,0,0.05)')}
+        </div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 第6个柱体背景色(大屏端)</label>
+    <div class="col-lg-4">
+        <div class="input-group">
+            <div class="input-group-btn not-allow"><a class="btn btn-default">顶部颜色</a></div>
+            {:tpl_color('styleconfig[bgcolors][inner6][tc]',$config['styleconfig']['bgcolors']['inner6']['tc']??'rgba(255,20,0,1)')}
+            <div class="input-group-btn not-allow"><a class="btn btn-default">底部颜色</a></div>
+            {:tpl_color('styleconfig[bgcolors][inner6][bc]',$config['styleconfig']['bgcolors']['inner6']['bc']??'rgba(255,20,0,0.05)')}
+        </div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 第7个柱体背景色(大屏端)</label>
+    <div class="col-lg-4">
+        <div class="input-group">
+            <div class="input-group-btn not-allow"><a class="btn btn-default">顶部颜色</a></div>
+            {:tpl_color('styleconfig[bgcolors][inner7][tc]',$config['styleconfig']['bgcolors']['inner7']['tc']??'rgba(255,20,0,1)')}
+            <div class="input-group-btn not-allow"><a class="btn btn-default">底部颜色</a></div>
+            {:tpl_color('styleconfig[bgcolors][inner7][bc]',$config['styleconfig']['bgcolors']['inner7']['bc']??'rgba(255,20,0,0.05)')}
+        </div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 第8个柱体背景色(大屏端)</label>
+    <div class="col-lg-4">
+        <div class="input-group">
+            <div class="input-group-btn not-allow"><a class="btn btn-default">顶部颜色</a></div>
+            {:tpl_color('styleconfig[bgcolors][inner8][tc]',$config['styleconfig']['bgcolors']['inner8']['tc']??'rgba(255,20,0,1)')}
+            <div class="input-group-btn not-allow"><a class="btn btn-default">底部颜色</a></div>
+            {:tpl_color('styleconfig[bgcolors][inner8][bc]',$config['styleconfig']['bgcolors']['inner8']['bc']??'rgba(255,20,0,0.05)')}
+        </div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 第9个柱体背景色(大屏端)</label>
+    <div class="col-lg-4">
+        <div class="input-group">
+            <div class="input-group-btn not-allow"><a class="btn btn-default">顶部颜色</a></div>
+            {:tpl_color('styleconfig[bgcolors][inner9][tc]',$config['styleconfig']['bgcolors']['inner9']['tc']??'rgba(255,20,0,1)')}
+            <div class="input-group-btn not-allow"><a class="btn btn-default">底部颜色</a></div>
+            {:tpl_color('styleconfig[bgcolors][inner9][bc]',$config['styleconfig']['bgcolors']['inner9']['bc']??'rgba(255,20,0,0.05)')}
+        </div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 第10个柱体背景色(大屏端)</label>
+    <div class="col-lg-4">
+        <div class="input-group">
+            <div class="input-group-btn not-allow"><a class="btn btn-default">顶部颜色</a></div>
+            {:tpl_color('styleconfig[bgcolors][inner10][tc]',$config['styleconfig']['bgcolors']['inner10']['tc']??'rgba(255,20,0,1)')}
+            <div class="input-group-btn not-allow"><a class="btn btn-default">底部颜色</a></div>
+            {:tpl_color('styleconfig[bgcolors][inner10][bc]',$config['styleconfig']['bgcolors']['inner10']['bc']??'rgba(255,20,0,0.05)')}
+        </div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 柱子上商品名</label>
+    <div class="col-lg-6">
+        <div class="input-group">
+            <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+            {:tpl_color('styleconfig[goodsname][color]',$config['styleconfig']['goodsname']['color']??'#fff')}
+            <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
+            <div class="touchspin">
+            <input type="text" class="form-control numberincdec" name="styleconfig[goodsname][size]" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="40"
+                data-bts-step="1"
+                data-bts-postfix="px"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['styleconfig']['goodsname']['size']??16}">
+            </div>
+        </div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 柱子顶部金额与数量</label>
+    <div class="col-lg-6">
+        <div class="input-group">
+            <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+            {:tpl_color('styleconfig[topnum][color]',$config['styleconfig']['topnum']['color']??'#fff')}
+            <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
+            <div class="touchspin">
+            <input type="text" class="form-control numberincdec" name="styleconfig[topnum][size]" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="40"
+                data-bts-step="1"
+                data-bts-postfix="px"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['styleconfig']['topnum']['size']??12}">
+            </div>
+        </div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 大屏每页显示多少商品</label>
+    <div class="col-lg-6 yautooverflow">
+        <input type="text" class="form-control numberincdec" name="styleconfig[slidenum]" 
+                data-bts-min="1" data-bts-replacement-val="10"
+                data-bts-max="10"
+                data-bts-step="1"
+                data-bts-postfix="个"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['styleconfig']['slidenum']??10}">
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 大屏商品分页切换时间</label>
+    <div class="col-lg-6 yautooverflow">
+        <input type="text" class="form-control numberincdec" name="styleconfig[slidedelay]" 
+                data-bts-min="3" data-bts-replacement-val="3"
+                data-bts-max="null"
+                data-bts-step="1"
+                data-bts-postfix="秒"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['styleconfig']['slidedelay']??6}">
+    </div>
+</div>
+<div class="form-group qipaobox">
+    <label class="col-lg-2 control-label">* 气泡动图(大屏端)</label>
+    <div class="col-lg-8">
+        {:tpl_image_one('styleconfig[qipao]',$config['styleconfig']['qipao']??SIMGURL.'dhh/qipao.png')}
+        <span class="help-block">规格:400px*1080px</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 开始按钮(大屏端)</label>
+    <div class="col-lg-8">
+        {:tpl_image_one('styleconfig[startbtn]',$config['styleconfig']['startbtn']??SIMGURL.'dhh/start/1.png')}
+        <span class="help-block">规格:111px*43px</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 结束按钮(大屏端)</label>
+    <div class="col-lg-8">
+        {:tpl_image_one('styleconfig[endbtn]',$config['styleconfig']['endbtn']??SIMGURL.'dhh/start/2.png')}
+        <span class="help-block">规格:111px*43px</span>
+    </div>
+</div>

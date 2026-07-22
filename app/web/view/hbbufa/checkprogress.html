@@ -1,0 +1,32 @@
+<div class="alert alert-danger">
+	注意事项<br>
+	1 核实的目的是为了解决现金红包或商家转账到零钱等接口无法及时知道用户是否领取了红包，是否确定到账，从而导致后台用户红包账户余额多扣了发放成功但未到账的红包金额的问题<br>
+	2 每个发放成功的记录一般只会核实一次，只能核实30天内的发放记录<br>
+	3 如果红包已发放成功但并未到账，核实后系统将自动将发放成功(未到账)的红包转成发放失败<br>
+	4 核实的数量较多需要一定的时间，核实过程中请勿关闭本窗口<br>
+	5 核实完成后待核实总数量没有减少说明红包还处于发放中（到账情况不确定），常见于现金红包接口(没有领取现金红包)和商家转账到零钱接口(未在商家助手小程序内转账验密)
+</div>
+<div class="zam-confirmBox progressbox">
+	<div class="clearfix">
+		<div class="col-lg-6 col-md-6">
+			<div class="zam-confirmBox-item">
+				<span class="zam-confirmBox-left col-lg-6">待核实总金额:</span>
+				<div class="zam-confirmBox-right col-lg-4">
+					<span class="label label-danger p-l-10 p-r-10 fa-1-5x">{$totalmoney}元</span>
+				</div>
+			</div>
+		</div>
+		<div class="col-lg-6 col-md-6">
+			<div class="zam-confirmBox-item">
+				<span class="zam-confirmBox-left col-lg-6">待核实总数量:</span>
+				<div class="zam-confirmBox-right col-lg-4">
+					<span class="label label-success p-l-10 p-r-10 fa-1-5x">{$totalnum}个</span>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="text-center" style="margin-top: 30px;">
+		<a class="btn btn-primary m-b-15"><span><i class="mdi mdi-gavel"></i> 确认核实</span></a>
+		<div id='process'></div>
+	</div>
+</div>

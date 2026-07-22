@@ -1,0 +1,145 @@
+{include file="common/header" /}
+<style>
+.gamerule{
+	position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-color: rgba(0,0,0,.8);
+}
+.gamerule-main{
+    position: absolute;
+    top:40%;
+    left: 0;
+    width: 100%;
+}
+.gamerule-main .guide-txt{
+    color: #fff;
+    font-size: .32rem;
+    font-weight: 700;
+    text-align: center;
+    line-height: 2;
+    margin-bottom: .5rem;
+}
+.gamerule-main .guide-box {
+    width: 100%;
+    background-image: url("/{:WIMGURL}jjb/images/movearrow.png");
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    width: 6.82rem;
+    height:1.84rem;
+    position: relative;
+    margin: 0 auto;
+}
+.gamerule-main .guide-box .moving-box {
+    background-image: url("{:tomedia($appconfig['style']['appplayer'])}");
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    width: 1.35rem;
+    height: 1.5rem;
+    position: absolute;
+    left: .25rem;
+    top: -.2rem;
+    -webkit-animation: moving_box linear infinite 1.5s alternate;
+    animation: moving_box linear infinite 1.5s alternate;
+}
+.guide-close{margin-top:0.4rem;text-align:center;}
+@-webkit-keyframes moving_box{to{-webkit-transform:translateX(4.6rem);transform:translateX(4.6rem)}}@keyframes moving_box{to{-webkit-transform:translateX(4.6rem);transform:translateX(4.6rem)}}
+
+.shake-banglist{
+	height:5.8rem;
+	overflow-x:hidden;
+	overflow-y:auto;
+}
+.shake-bangtitle{position:relative;font-size:0.32rem!important;text-align:center!important;}
+.shake-bangtitle i{position:absolute;right:0.3rem;font-size: 0.5rem;color:gray}
+.shake-banglist li {
+	height:1rem;
+    border-top: 1px solid #f0f0f0;
+}
+.shake-banglist li div{
+	height:100%;
+}
+.shake-banglist .banglist-tag {
+    width:0.6rem;
+}
+.shake-banglist .rolwnum {
+    display: inline-block;
+    width: 0.5rem;
+    text-align: center;
+    font-size: 0.32rem;
+	color:#666
+}
+.shake-banglist .banglist-avatar {
+    width: 0.7rem;
+    height: 0.7rem;
+    border-radius: 100%;
+}
+.shake-banglist .banglist-nickname {
+    width: 100%;
+	color:#666;
+	font-size:0.3rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.shake-banglist .banglist-number em {
+    color: #0084ff;
+	font-size: 0.4rem;
+}
+</style>
+{if !empty($appconfig['style']['diycss'])}<style>{$appconfig['style']['diycss']}</style>{/if}
+<audio id="djsaudio" src="/{:WIMGURL}shake/count.mp3"></audio>
+{if $appconfig['appbgmusicoff']=='1' && !empty($appconfig['appbgmusic'])}
+<audio id="bgm" src="{:tomedia($appconfig['appbgmusic'])}" loop="loop"></audio>
+{/if}
+<div class="zam-app-mainbox" id="zam-app-mainbox"></div>
+<div class="gamerule hidden">
+	<div class="gamerule-main">
+		<div class="guide-txt">按住角色<span>左右滑动，</span>参与游戏</span></div>
+		<div class="guide-box"><div class="moving-box"></div></div>
+		<div class="guide-close"><a class="btn btn-primary">知道了</a></div>
+	</div>
+</div>
+<script>
+var game,sendscore = "{$appconfig['sendscore']}";
+var Gameconfig = {
+	gameW:750,
+	gameH:750 / window.innerWidth * window.innerHeight,
+	gameImgs:{
+		titleimg:"{if empty($appconfig['apptopimg'])}{:tomedia($appconfig['style']['apptopimg'])}{else}{:tomedia($appconfig['apptopimg'])}{/if}",
+		player:"{:tomedia($appconfig['style']['appplayer'])}",
+		coin:"{:tomedia($appconfig['style']['appcoin'])}",
+		boom:"{:tomedia($appconfig['style']['appboom'])}",
+		boomed:"{:tomedia($appconfig['style']['appexploded'])}",
+		zimu:'/{:WIMGURL}jjb/images/zimu.png',
+		zimuxml:'/{:WIMGURL}jjb/images/zimu.xml',
+		scorebox:"{:tomedia($appconfig['style']['appscorebg'])}",
+		timebox:"{:tomedia($appconfig['style']['apptimebg'])}",
+		overbox:"{:tomedia($appconfig['style']['appoverbg'])}",
+		numbertxt:'/{:WIMGURL}jjb/images/num.png',
+		pmbtn:"{:tomedia($appconfig['style']['apppm'])}",
+		coinv:"{:tomedia($appconfig['style']['coinvoice'])}",
+		boomv:"{:tomedia($appconfig['style']['boomvoice'])}",
+		overv:"{:tomedia($appconfig['style']['overvoice'])}",
+	},
+	showscorebox:"{$appconfig['appshowscore']}",
+};
+var alldrops = [{dkey: 'boom',type: '2',score: 1,count: parseInt("{$appconfig['appboomcount']}"),vel: 350,acc: 200,seconds: 5},{dkey: 'coin',type: '1',score: 1,count: parseInt("{$appconfig['appcoincount']}"),vel: 400,acc: 200,seconds: 1}];
+{if !empty($appconfig['drops'])}
+    {foreach $appconfig['drops'] as $dkey=>$drop}
+        Gameconfig.gameImgs["coin{$dkey}"] = "{:tomedia($drop['img'])}";
+        alldrops.push({dkey: "coin{$dkey}", type: "{$drop['type']}", score: "{$drop['score']}", count: parseInt("{$drop['count']}"), vel: (100 + parseInt("{$dkey*50}")), acc: 200, seconds: parseInt("{$dkey+1}")});
+    {/foreach}
+{/if}
+require(['appjjb'],function (appjjb) {	
+	appjjb.init();
+})
+</script>
+{if !empty($appconfig['style']['diycss'])}
+<style>{$appconfig['style']['diycss']}</style>
+{/if}
+{include file="common/gamecommon" /}
+{include file="common/footermenu" /}
+{include file="common/footer" /}

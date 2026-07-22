@@ -1,0 +1,93 @@
+<style type="text/css">     
+    .welcome-users{
+        position: relative;
+        width:100%;
+        flex: 1;
+        -webkit-flex:1;
+    }
+    .welcome-users-items{
+        width: 100%;
+    }
+    .welcome-users .welcome-user-img{
+        position:relative;
+        width:48px;
+        height:48px;
+        border-radius:50%;
+        padding:3px;
+    }
+    .welcome-users .welcome-user-item{
+        width: 10%;
+        margin-bottom: 6px;
+    }
+    .welcome-users .welcome-user-item.hidden{display: none}
+    .welcome-users .welcome-user-item:nth-child(n + 11){
+        margin-bottom: 0;
+    }
+    .welcome-users .welcome-user-img:before{
+        content:"";
+        position:absolute;
+        top:0;
+        left:0;
+        width:100%;
+        height:100%;
+        background-size:cover;
+        background-repeat:no-repeat;
+        background-image:url("{:tomedia($pcconfig['style']['userborderimg'])}");
+        animation: foreverrotate 2s linear infinite;
+    }
+    @keyframes foreverrotate {
+        0% {
+            transform: rotate(0)
+        }
+    
+        to {
+            transform: rotate(-1turn)
+        }
+    }
+    .welcome-users .welcome-user-img img{
+        width:46px;
+        height:46px;
+        border-radius:50%;
+    }
+    .welcome-users .welcome-user-name{
+          width:100%;
+          padding:0 5px;
+          box-sizing:border-box;
+          -webkit-box-sizing:border-box;
+          margin-top:3px;
+          text-align: center;
+          font-weight: 600;
+          font-size: 12px;
+    }
+    .welcome-user-count{
+          width:100%;
+          padding:0 5px;
+          box-sizing:border-box;
+          -webkit-box-sizing:border-box;
+          margin-top:5px;
+          text-align: center;
+          font-weight: 600;
+          font-size: 14px;
+    }
+    .welcome-user-count.hidden{display: none}
+    </style>
+    </style>
+    <div class="welcome-users zam-app-flex-alignCenter">
+        <div class="welcome-users-items zam-app-flex zam-app-flex-wrap"></div>
+    </div>
+    <script type="text/javascript">
+    require(['template'],function(template){
+        var whtml = '';
+        for (var i = 0; i < 20; i++) {
+            whtml += template('welcomeone-tpl',{});
+        }
+        $(".welcome-users-items").html(whtml);
+    });
+    </script>
+    <script id="welcomeone-tpl" type="html/javascript">
+    <div class="welcome-user-item zam-app-flex-ajCenter">
+        <div class="welcome-user-img zam-app-flex-ajCenter2"><img src="{:tomedia($pcconfig['style']['userdefaultimg'])}"></div>
+        <div class="welcome-user-name limitbox">{$pcconfig['style']['userdefaultname']??'虚位以待'}</div>
+        <div class="welcome-user-count hidden"><span>0</span>人</div>
+    </div>
+    </script>

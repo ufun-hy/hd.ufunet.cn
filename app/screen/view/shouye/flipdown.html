@@ -1,0 +1,71 @@
+<style>
+.shouye-flipdown{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    --wrapper-bgimg: url(/static/images/screen/shouye/bg.png);
+    --wrapper-width: 1300px;
+    --wrapper-height: 100px;
+    --rotor-box-right: 250px;
+    --rotor-box-top: 10px;
+    --rotor-color:#fff;
+    --rotor-bgcolor:#fe0000;
+    --rotor-width: 40px;
+    --rotor-height: 40px;
+    --rotor-margin: 6px;
+    --rotor-radius: 2px;
+    --rotor-font-size: 26px;
+    --rotor-group-pr: 20px;
+    --rotor-box-line-width:0px;
+    --rotor-box-line-color: rgba(0,0,0,0.02);
+    --heading-height: 26px;
+    --heading-size: 16px;
+    --heading-color: #fff;
+    --dot-color:#DDDDDD;
+    --dot-size: 4px;
+    --rotor-perspective: 200px;
+}
+.shouye-flipdown-wrapper{
+  position: relative;
+    width: var(--wrapper-width);
+    height: var(--wrapper-height);
+    background-image: var(--wrapper-bgimg);
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+.flipdown {
+    position: absolute;
+    right: var(--rotor-box-right);
+    top: var(--rotor-box-top);
+    overflow: visible;
+}
+</style>
+<div class="shouye-flipdown zam-app-flex-ajCenter2 display-none">
+  <div class="shouye-flipdown-wrapper">
+      <div id="flipdown" class="flipdown"></div>
+  </div>
+</div>
+<script>
+    require(['flipdown'],function(FlipDown){
+      function getJanuaryFirstOfYear() {
+          let date = new Date();
+          var timestamp = new Date(
+              date.getFullYear() + 1,
+              0,
+              1,
+              0,
+              0,
+              0
+          ).getTime();
+          return timestamp / 1000;
+      }
+      var flipdown = new FlipDown(getJanuaryFirstOfYear(),{
+          theme: "light",
+          headings: ["DAYS", "HRS", "MIN", "SEC"],
+      }).start().ifEnded(() => {
+          console.log('The countdown has ended!');
+      });
+    });
+</script>

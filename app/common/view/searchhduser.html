@@ -1,0 +1,60 @@
+<style>
+.user-item{position:relative;width:120px;min-height:100px;}
+.user-item .zam-select{position:absolute;top:20px;left:0px;}
+.user-item div{padding-left: 15px;overflow: hidden;max-width: 100%}
+.user-item img{width:50px;height:50px;border-radius:50%;}
+.resultuser{
+	flex-wrap: wrap;
+    justify-content: center;
+}
+</style>
+<div id="formBox" class="zam-formvalidation form-horizontal">
+<div class="form-group">
+	<div class="zam-confirmBox-right col-md-12">
+		<div class="input-group">
+			<input type="text" class="form-control nickname" name="nickname" placeholder="请输入微信昵称">
+			<div class="input-group-addon btn btn-primary searchone"><i class="mdi mdi-magnify"></i> 搜索</div>
+		</div>
+	</div>
+</div>
+<div class="form-group">
+<ul class="resultuser zam-flex"></ul>
+</div>
+</div>
+<script id="user-tpl" type="text/template">
+	<li class="zam-flex-column-center user-item m-b-10">
+		<span class="zam-select">
+			<label class=" lyear-checkbox checkbox-primary ">
+              <input value="<% d.openid %>" name="selectuser[]" type="checkbox">
+              <span></span>
+            </label>
+		</span>
+		<div><% d.nickname %></div>
+		<div title="<% d.openid %>"><% d.openid %></div>
+	</li>
+</script>
+<script>
+require(["webcore","zamnotice"],function(webcore,zamnotice){
+	$(".searchone").on('click',function(){
+		var searchval = $(".nickname").val();
+		if(searchval=='') return zamnotice.showTips('error','请先输入搜索内容');
+		webcore.ajaxSubmit("{:gocommon('basic/searchhduser')}",{search:searchval},'正在拼命查找用户...').then(function(json){
+			if(json.code==0){
+				var html = '';
+				$.each(json.msg,function(i,v){
+					 html += webcore.tpl($("#user-tpl"),v);
+				});
+				$(".resultuser").html(html);
+				if(html==''){
+					zamnotice.showTips('error','未搜索到相关用户');
+				}
+			}else{
+				$(".resultuser").html('');
+				zamnotice.showTips('error',json.msg);
+			}
+		}, function(json){
+			zamnotice.showTips('error','网络差。操作失败');
+		});
+	});
+});
+</script>

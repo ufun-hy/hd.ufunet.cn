@@ -1,0 +1,169 @@
+{include file='$Wpath/common/header'}
+<div class="form-inline zam-inline-searchbar">
+    <div class="form-group m-l-5">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">选择轮次</span>
+          <select id="rotateid" class="form-control">
+            {if empty($rotates)}
+                <option value="0">暂无轮次</option>
+            {/if}
+            {foreach $rotates as $key=>$rotate} 
+                <option value="{$rotate['id']}" {if $rotateid==$rotate['id']}selected{/if}>{$rotate['title']}</option>
+            {/foreach}
+          </select>
+        </div>
+    </div>
+    <a class="btn btn-primary btn-sm btn-search" href="javascript:void(0)"><i class="mdi mdi-magnify"></i> 搜索</a>
+    <a class="btn btn-warning btn-sm btn-export" href="javascript:void(0)"><i class="mdi mdi-export"></i> 导出</a>
+</div>
+{include file='$Wpath/common/tabletoolbar'}
+<table id="listtable" class="zam-btable"></table>
+<script id='binddata-tpl' type="text/template">
+    <ul class="bddataUl">
+    <%#  $.each(d.bd, function(index, item){ %>
+        <li>
+          <span class="text-primary"><% item %>:</span>
+          <span>
+            <%#  if(d.list){ %>
+            <%#  if(index === 'uploadimg'){ %>
+                <%#  if(d.list[index]){ %>
+                <img style="max-width:120px;" onclick="prevshowattachs(this,1);"  src="<% d.list[index] %>"  />
+                <%#  }else{ %>
+                    -
+                <%# } %>
+            <%#  }else{ %>
+                <%#  if(d.list[index]){ %>
+                <% d.list[index] %>
+                <%#  }else{ %>
+                    -
+                <%# } %>
+            <%#  } %> 
+            <%#  } %> 
+          </span>
+       </li>
+    <%#  }); %>
+    </ul>
+</script>
+<script>
+require(['webcore','webtable','jconfirmBox','zamnotice'],function(webcore,webtable,jconfirmBox,zamnotice){
+var initConfig = {
+    tableId:'#listtable',
+    url:"{:gohdmanage('datalivemark/zanpaydata',['hdid'=>$hdid])}",
+    columnoperate:{
+        btns:{
+            data:true,
+            del:true,
+        },
+        func:{
+            del:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','您确定要删除当前参评用户的付费点赞数据么？',function(){
+                    webcore.ajaxSubmit("{:gohdmanage('datalivemark/delzanpaydata',['hdid'=>$hdid])}",{rotateid:$("#rotateid option:selected").val(),pfuserid:row.id}).then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','删除成功');
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                    });
+                });
+            },
+            data:function(value, row, index){
+                var confirmobj = jconfirmBox.ajaxconfirm("付费送赞明细","{:gohdmanage('datalivemark/zanpaydetail',['hdid'=>$hdid])}",{rotateid:$("#rotateid option:selected").val(),pfuserid:row.id},'html','col-lg-8 col-lg-offset-2',function(e){},false,'2');
+            },
+        }
+    },
+    columns:[{
+            checkbox: true,
+        }, 
+        {
+            field: 'id',
+            title: 'id',
+            align: 'center',
+            visible: false
+        },{
+            field: 'username',
+            title: '参评选手',
+            align: 'center',
+            formatter:function(value,row,index){
+                return `
+                <div class='zam-flex-column-center'>
+                    <img src="${row.userimg}" class="avatarImg" />
+                    <span>${value||'已删除'}</span>
+                </div>
+                `;
+            }
+        },{
+            field: 'zannum',
+            title: '获赞数',
+            align: 'center',
+        },{
+            field: 'personnum',
+            title: '点赞人数',
+            align: 'center',
+        }
+        ,{
+            field: 'totalmoney',
+            title: '点赞收入(元)',
+            align: 'center',
+        }
+    ],
+    searchParamas:[{'type':'2','id':'rotateid'}],
+    toolbar:{
+        del:function(){
+            var getSelects = webtable.getSelections();
+            if(!getSelects.length){
+                return zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+            jconfirmBox.confirm('温馨提示','您确定要删除选中的参评用户的付费点赞数据么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('datalivemark/delzanpaydata',['hdid'=>$hdid])}",{rotateid:$("#rotateid option:selected").val(),pfuserid:getSelects}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','删除成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+        },
+        reset:function(){
+            jconfirmBox.confirm('温馨提示','清空将删除所选轮次内的所有参评用户的付费点赞记录并且无法恢复，您确定要清空么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('datalivemark/resetzanpaydata',['hdid'=>$hdid])}",{rotateid:$("#rotateid option:selected").val()}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','清空成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+        },
+    },
+};
+webtable.init(initConfig);
+$('#rotateid').change(function(e) {
+     webtable.refresh();
+});
+$('.btn-export').on('click',function(){
+    var rotateid = $("#rotateid option:selected").val()||'';
+    if(+rotateid < 1) {
+        return zamnotice.showTips('info','请选择轮次');
+    }
+    webcore.ajaxSubmit("{:gohdmanage('datalivemark/exportzanpaydata',['hdid'=>$hdid,'zantype'=>'2'])}",{rotateid:rotateid}).then(function(json){
+        if(json.code!=0){
+            zamnotice.showTips('error',json.msg);
+        }else{
+            window.location.href = `{:gohdmanage('datalivemark/exportzanpaydata',['hdid'=>$hdid,'zantype'=>'2'])}&rotateid=${rotateid}`;
+        }
+    }, function(json){
+        zamnotice.showTips('error','网络差,操作失败');
+    });
+});
+});
+</script>
+{include file='$Wpath/common/footer'}

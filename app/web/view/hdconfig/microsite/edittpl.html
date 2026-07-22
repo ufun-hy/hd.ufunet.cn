@@ -1,0 +1,38 @@
+<div class="form-horizontal confirmbox-pop">
+    <form class="confirm-formbox" method="post">
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 排序序号</label>
+            <div class="col-lg-6">
+                <input type="text" class="form-control numberincdec" name="displayorder" 
+                data-bts-min="0" data-bts-replacement-val="1"
+                data-bts-max="null"
+                data-bts-step="1"
+                value="{$config['displayorder']}">
+                <div class="help-block m-0">序号越大越显示在前面</div>
+            </div>
+        </div>
+        <div class="form-group">
+          <label class="col-lg-3 control-label">状态</label>
+          <div class="col-lg-7">
+            {foreach $statuss as $k=>$v}
+            <label class="lyear-radio radio-inline radio-primary">
+              <input type="radio" name="status" value="{$k}" {if $config['status']== $k }checked{/if}><span>{$v}</span>
+            </label>
+            {/foreach}
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-lg-3 control-label">* 模板名称</label>
+          <div class="col-lg-7">
+            <input class="form-control" type="text" name="tplname" placeholder="必须唯一" value="{$config['tplname']}">
+          </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 预览图</label>
+            <div class="col-lg-8">
+              {:tpl_image_one('tplimg', $config['tplimg'])}
+              <div class="help-block m-0">推荐尺寸:375px * 734px，编辑模板时可通过右上角的截屏保存封面来重新设置此图</div>
+            </div>
+        </div>
+    </form>
+  </div>

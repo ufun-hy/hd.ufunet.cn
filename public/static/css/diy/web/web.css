@@ -1,0 +1,1394 @@
+html,
+body,
+#app {
+  height: 100%;
+  overflow: hidden;
+  margin: 0;
+}
+[v-cloak] {
+  display: none;
+}
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-thumb {
+  background-color: rgba(144, 147, 153, 0.3);
+  border-radius: 5px;
+}
+.loading-box {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 91;
+  background-color: #fff;
+  opacity: 1;
+}
+.load-wait {
+  height: 60px;
+  line-height: 60px;
+  font-size: 20px;
+  font-weight: bold;
+  color: gray;
+}
+.load-percent {
+  height: 40px;
+  line-height: 40px;
+  font-size: 20px;
+  font-weight: bold;
+  color: gray;
+}
+.load-progress {
+  width: 260px;
+  height: 15px;
+  background: #282828;
+  border: 4px solid #282828;
+  border-radius: 20px;
+  -moz-border-radius: 20px;
+  -webkit-border-radius: 20px;
+  box-shadow: 0 5px 17px rgba(40, 40, 40, 0.5);
+  margin-bottom: 30px;
+}
+.load-bar {
+  display: block;
+  height: 30px;
+  height: 15px;
+  border-radius: 12px;
+  -moz-border-radius: 12px;
+  -webkit-border-radius: 10px;
+  background-color: CornflowerBlue;
+  box-shadow: inset 0 0 6px 2px rgba(255, 255, 255, 0.3);
+  width: 0;
+}
+.load-barfill {
+  width: 100%;
+  height: 15px;
+  border-radius: 20px;
+  -webkit-animation: progress 1s linear infinite;
+  -moz-animation: progress 1s linear infinite;
+  animation: progress 1s linear infinite;
+  background-repeat: repeat-x;
+  background-size: 30px 30px;
+  background-image: -webkit-linear-gradient(-45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
+  background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
+}
+@-webkit-keyframes progress {
+  to {
+    background-position: 30px 0;
+  }
+}
+@-moz-keyframes progress {
+  to {
+    background-position: 30px 0;
+  }
+}
+@keyframes progress {
+  to {
+    background-position: 30px 0;
+  }
+}
+.hidden {
+  display: none !important;
+}
+.limitbox {
+  white-space: nowrap;
+  word-break: break-all;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.d-flex {
+  display: flex;
+}
+.flex-j-c-c {
+  justify-content: center;
+}
+.flex-j-c-s-a {
+  justify-content: space-around;
+}
+.flex-j-c-s-b {
+  justify-content: space-between;
+}
+.flex-a-i-c {
+  align-items: center;
+}
+.flex-a-c-c {
+  align-content: center;
+}
+.flex-w-w {
+  flex-wrap: wrap;
+}
+.flex-d-c {
+  flex-direction: column;
+}
+.flex1 {
+  -webkit-box-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+}
+.fix1px {
+  margin-top: -1px;
+  padding-top: 1px;
+}
+.btn-move {
+  cursor: move;
+}
+/*
+改写elementui的样式
+*/
+.el-tooltip__popper.is-light {
+  color: #666;
+  border-color: #eee !important;
+  -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+.el-tooltip__popper.is-light[x-placement^=right] .popper__arrow {
+  border-right-color: #eee;
+}
+.el-tooltip__popper.is-light[x-placement^=right] .popper__arrow:after {
+  border-right-color: #fff;
+}
+.uploadbox .uploadbox-main {
+  position: relative;
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 4px;
+  border: 1px dashed rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+}
+.uploadbox .uploadbox-main:hover {
+  border-color: #409EFF;
+}
+.uploadbox .uploadbox-main .uploadbox-img {
+  width: 100%;
+  height: 100%;
+}
+.uploadbox .uploadbox-main .uploadbox-img:hover .uploadbox-mask {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.uploadbox .uploadbox-main .uploadbox-img .uploadbox-mask {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  font-size: 18px;
+  color: #fff;
+  cursor: pointer;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: none;
+}
+.uploadbox .uploadbox-main .uploadbox-delete {
+  position: absolute;
+  right: -9px;
+  top: -9px;
+  font-size: 18px;
+  color: #86909c;
+  line-height: 1;
+}
+.uploadbox .uploadbox-main .uploadbox-trigger {
+  color: #8c939d;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  line-height: 1;
+}
+.uploadbox .uploadbox-main .uploadbox-trigger i {
+  margin-bottom: 6px;
+  font-size: 20px;
+}
+.uploadbox .uploadbox-main .uploadbox-trigger div {
+  font-size: 14px;
+}
+.uploadbox .uploadbox-footer-tip {
+  font-size: 12px;
+  color: #606266;
+  margin-top: 8px;
+}
+.fontpicker .picker-icon {
+  position: relative;
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 4px;
+  border: 1px dashed rgba(0, 0, 0, 0.15);
+}
+.fontpicker .picker-icon .icon-box {
+  width: 100%;
+  height: 100%;
+}
+.fontpicker .picker-icon .picker-mask {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+  background-color: rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+}
+.fontpicker .picker-icon .picker-mask i {
+  font-size: 16px;
+  color: #fff;
+}
+.fontpicker .picker-icon:hover .picker-mask {
+  display: flex;
+}
+.attachment-box .el-dialog__header {
+  padding: 20px;
+  border-bottom: 1px solid #eaf1ff;
+}
+.attachment-box .el-dialog__body {
+  padding: 10px 20px;
+}
+.attachment-box .el-dialog__body .attachment-box-wrap {
+  height: 650px;
+}
+.attachment-box .el-dialog__body .attachment-box-wrap .attachment-box-aside {
+  height: 100%;
+  border-right: 1px solid #eaf1ff;
+  overflow: hidden scroll;
+}
+.attachment-box .el-dialog__body .attachment-box-wrap .attachment-box-aside .el-tree > .el-tree-node:focus > .el-tree-node__content,
+.attachment-box .el-dialog__body .attachment-box-wrap .attachment-box-aside .el-tree > .el-tree-node:hover > .el-tree-node__content {
+  background-color: transparent;
+}
+.attachment-box .el-dialog__body .attachment-box-wrap .attachment-box-aside .el-tree .el-tree-node__content {
+  height: 40px;
+}
+.attachment-box .el-dialog__body .attachment-box-wrap .attachment-box-aside .el-tree .el-tree-node__children .el-tree-node.is-checked > .el-tree-node__content {
+  color: #409EFF;
+  background-color: #edf6ff;
+}
+.attachment-box .el-dialog__body .attachment-box-wrap .el-main {
+  padding: 20px;
+}
+.attachment-box .el-dialog__body .attachment-box-wrap .el-main .attachment-box-main {
+  width: 100%;
+  height: 542px;
+}
+.attachment-box .el-dialog__body .attachment-box-wrap .el-main .attachment-box-main .el-scrollbar__wrap {
+  height: 100%;
+  overflow: hidden scroll;
+}
+.attachment-box .el-dialog__body .attachment-box-wrap .el-main .attachment-box-main .el-scrollbar__bar.is-horizontal {
+  display: none;
+}
+.attachment-box .el-dialog__body .attachment-box-wrap .el-main .attachment-box-main .attachment-card {
+  position: relative;
+  padding: 0;
+  user-select: none;
+}
+.attachment-box .el-dialog__body .attachment-box-wrap .el-main .attachment-box-main .attachment-card.selected,
+.attachment-box .el-dialog__body .attachment-box-wrap .el-main .attachment-box-main .attachment-card:hover {
+  border: 1px solid #409EFF !important;
+}
+.attachment-box .el-dialog__body .attachment-box-wrap .el-main .attachment-box-main .attachment-card.selected .el-checkbox,
+.attachment-box .el-dialog__body .attachment-box-wrap .el-main .attachment-box-main .attachment-card:hover .el-checkbox {
+  display: block;
+}
+.attachment-box .el-dialog__body .attachment-box-wrap .el-main .attachment-box-main .attachment-card .el-card__body {
+  padding: 0;
+}
+.attachment-box .el-dialog__body .attachment-box-wrap .el-main .attachment-box-main .attachment-card .el-checkbox {
+  top: 8px;
+  left: 10px;
+  display: none;
+  position: absolute;
+}
+.attachment-box .el-dialog__body .attachment-box-wrap .el-main .attachment-box-main .attachment-card .preview-icon {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 1;
+  width: 16px;
+  height: 16px;
+  padding: 4px;
+  cursor: pointer;
+  border-radius: 100%;
+  -webkit-box-sizing: content-box;
+  box-sizing: content-box;
+  background: rgba(0, 0, 0, 0.05);
+  color: #fff;
+}
+.attachment-box .el-dialog__body .attachment-box-wrap .el-main .attachment-box-main .attachment-card .preview-icon:hover {
+  background: rgba(0, 0, 0, 0.15);
+}
+.attachment-box .el-dialog__body .attachment-box-wrap .el-main .attachment-box-main .attachment-card .attachment-one {
+  width: 100%;
+  height: 132px;
+}
+.attachment-box .el-dialog__body .attachment-box-wrap .el-main .attachment-box-main .attachment-card .attachment-one .image-error {
+  width: 100%;
+  height: 100%;
+}
+.attachment-box .el-dialog__body .attachment-box-wrap .el-main .attachment-box-main .attachment-card .attachment-one .image-error img {
+  width: 80px;
+  height: 80px;
+}
+.attachment-box .el-dialog__body .attachment-box-wrap .el-main .attachment-box-main .attachment-card .filename {
+  padding: 8px 12px;
+  font-size: 12px;
+  background: #f7f7f7;
+  white-space: nowrap;
+  word-break: break-all;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  text-align: center;
+}
+.attachment-box .el-dialog__body .attachment-box-wrap .el-header {
+  height: auto !important;
+}
+.attachment-box .el-dialog__body .attachment-box-wrap .el-footer {
+  height: auto !important;
+}
+.attachment-box .el-dialog__body .attachment-box-wrap .el-footer .attachment-box-foot .chosecount {
+  color: #666;
+  font-size: 13px;
+}
+.attachment-box .el-dialog__body .attachment-box-wrap .el-footer .attachment-box-foot .chosecount span {
+  margin: 0 2px;
+  color: #409EFF;
+}
+.attachment-box .el-dialog__body .upload-loading .el-loading-spinner {
+  position: unset;
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.attachment-box .el-dialog__body .upload-loading .el-loading-spinner .circular {
+  height: 24px;
+  width: 24px;
+  margin-right: 10px;
+}
+.attachment-box .el-dialog__footer {
+  padding: 20px;
+  border-top: 1px solid #eaf1ff;
+  text-align: center;
+}
+.fontpickerdialog-box .fontpickerdialog-box-wrap .searchbox {
+  margin-bottom: 16px;
+}
+.fontpickerdialog-box .fontpickerdialog-box-wrap .fontpickerdialog-box-scrollbar {
+  height: 600px;
+}
+.fontpickerdialog-box .fontpickerdialog-box-wrap .fontpickerdialog-box-scrollbar .el-scrollbar__wrap {
+  overflow: hidden scroll;
+}
+.fontpickerdialog-box .fontpickerdialog-box-wrap .fontpickerdialog-box-scrollbar .el-scrollbar__wrap .el-col {
+  margin: 5px 0;
+}
+.fontpickerdialog-box .fontpickerdialog-box-wrap .fontpickerdialog-box-scrollbar .el-scrollbar__wrap .icon-box {
+  text-align: center;
+  margin: 4px auto;
+  cursor: pointer;
+  transition: all 0.1s ease-out;
+}
+.fontpickerdialog-box .fontpickerdialog-box-wrap .fontpickerdialog-box-scrollbar .el-scrollbar__wrap .icon-box:hover {
+  transform: scale(1.5);
+}
+.fontpickerdialog-box .fontpickerdialog-box-wrap .fontpickerdialog-box-scrollbar .el-scrollbar__wrap .icon-name {
+  font-size: 12px;
+  line-height: 20px;
+  margin-bottom: 4px;
+  text-align: center;
+  color: #666;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.fontpickerdialog-box .fontpickerdialog-box-wrap .fontpickerdialog-box-scrollbar .el-scrollbar__bar.is-horizontal {
+  display: none;
+}
+.previewer-box .previewer-box-wrap img,
+.previewer-box .previewer-box-wrap audio,
+.previewer-box .previewer-box-wrap video {
+  max-width: 400px;
+}
+.clickevent-box .clickevent-box-wrap .el-tabs__header {
+  margin-bottom: 30px;
+}
+.clickevent-box .clickevent-box-wrap .scroll-box .el-scrollbar__wrap {
+  overflow: hidden scroll;
+}
+.clickevent-box .clickevent-box-wrap .scroll-box .el-scrollbar__wrap .controlbtn-row .el-button {
+  width: 100%;
+  margin-bottom: 10px;
+}
+.clickevent-box .clickevent-box-wrap .scroll-box .el-scrollbar__bar.is-horizontal {
+  display: none;
+}
+.vars-box .el-dialog__body {
+  padding-top: 10px;
+}
+.vars-box .el-dialog__body .vars-box-wrap {
+  min-height: 560px;
+}
+.vars-box .el-dialog__body .vars-box-wrap .el-scrollbar {
+  height: 560px;
+}
+.vars-box .el-dialog__body .vars-box-wrap .el-scrollbar .el-scrollbar__wrap {
+  overflow: hidden scroll;
+}
+.vars-box .el-dialog__body .vars-box-wrap .el-scrollbar .el-scrollbar__wrap .el-button {
+  width: 100%;
+  margin-bottom: 12px;
+}
+.vars-box .el-dialog__body .vars-box-wrap .el-scrollbar .el-scrollbar__wrap .el-button .vardes {
+  color: #333;
+}
+.vars-box .el-dialog__body .vars-box-wrap .el-scrollbar .el-scrollbar__wrap .el-button .varname {
+  color: #aaa;
+}
+.vars-box .el-dialog__body .vars-box-wrap .el-scrollbar .el-scrollbar__wrap .el-button .varname i {
+  margin-left: 10px;
+}
+.vars-box .el-dialog__body .vars-box-wrap .el-scrollbar .el-scrollbar__bar.is-horizontal {
+  display: none;
+}
+.widget-item-childrens .el-button {
+  margin: 0;
+  margin-bottom: 10px;
+  width: 100%;
+}
+.tox .tox-tbtn--bespoke .tox-tbtn__select-label {
+  width: 3.2em !important;
+}
+.tox .tox-tbtn {
+  font-size: 13px !important;
+}
+.tox .tox-tbtn--select {
+  padding: 0 2px !important;
+}
+.background-image-box .background-position .pos-grid {
+  width: 69px;
+  height: 69px;
+  background-color: #f5f5f5;
+  padding: 3px;
+  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
+.background-image-box .background-position .pos-grid div {
+  width: 21px;
+  height: 21px;
+  background: #fff;
+}
+.background-image-box .background-position .pos-grid div.actived {
+  background: #409EFF;
+}
+.background-image-box .background-position .pos-grid div.actived i {
+  color: #fff;
+}
+.background-image-box .background-position .pos-grid div i {
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  color: #666;
+}
+/* elementui的样式改写结束 */
+.contextmenu_menu.menu .contextmenu_menu_item:first-child {
+  text-align: center;
+}
+.contextmenu_menu.menu .contextmenu_menu_item:first-child div {
+  display: none;
+}
+.diywrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-width: 1200px;
+}
+.diywrapper .diy-header {
+  display: flex;
+  height: 64px;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #ddd;
+  padding: 0 24px;
+}
+.diywrapper .diy-header .header-left {
+  display: flex;
+  height: 52px;
+}
+.diywrapper .diy-header .header-left .logo img {
+  height: 100%;
+}
+.diywrapper .diy-body {
+  height: calc(100% - 64px);
+  overflow: hidden;
+}
+.diywrapper .diy-body .el-form-item-slider.el-form-item--mini .el-form-item__label {
+  line-height: 38px !important;
+}
+.diywrapper .diy-body .el-form-item-slider .el-form-item__label {
+  line-height: 38px;
+}
+.diywrapper .diy-body .diy-left {
+  width: 360px;
+}
+.diywrapper .diy-body .diy-left .el-tabs {
+  border-top: 0;
+  height: 100%;
+}
+.diywrapper .diy-body .diy-left .el-tabs.el-tabs--border-card {
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+.diywrapper .diy-body .diy-left .el-tabs .el-tabs__header.is-left {
+  margin-right: 0;
+}
+.diywrapper .diy-body .diy-left .el-tabs .el-tabs__header .el-tabs__item {
+  height: auto;
+  line-height: inherit;
+  user-select: none;
+}
+.diywrapper .diy-body .diy-left .el-tabs .el-tabs__header .el-tabs__item .tab-label {
+  text-align: center;
+  padding: 20px 0;
+}
+.diywrapper .diy-body .diy-left .el-tabs .el-tabs__header .el-tabs__item .tab-label i {
+  font-size: 20px;
+}
+.diywrapper .diy-body .diy-left .el-tabs .el-tabs__header .el-tabs__item .tab-label span {
+  margin-top: 5px;
+}
+.diywrapper .diy-body .diy-left .el-tabs .el-tabs__content {
+  padding: 0;
+  height: 100%;
+}
+.diywrapper .diy-body .diy-left .el-tabs .el-tabs__content .el-tab-pane {
+  height: 100%;
+  overflow: hidden;
+}
+.diywrapper .diy-body .diy-left .el-tabs .el-tabs__content .el-tab-pane .el-scrollbar {
+  height: 100%;
+  overflow-x: hidden;
+  position: relative;
+}
+.diywrapper .diy-body .diy-left .el-tabs .el-tabs__content .el-tab-pane .el-scrollbar .el-scrollbar__wrap {
+  overflow: hidden scroll;
+  height: 100%;
+}
+.diywrapper .diy-body .diy-left .el-tabs .el-tabs__content .el-tab-pane .el-scrollbar .el-scrollbar__wrap .el-collapse {
+  border: 0;
+}
+.diywrapper .diy-body .diy-left .el-tabs .el-tabs__content .el-tab-pane .el-scrollbar .el-scrollbar__wrap .el-collapse .el-collapse-item .el-collapse-item__header {
+  padding-left: 14px;
+  padding-top: 2px;
+  height: 36px;
+  line-height: 36px;
+  background: #fdfdfd;
+  color: #aaa;
+}
+.diywrapper .diy-body .diy-left .el-tabs .el-tabs__content .el-tab-pane .el-scrollbar .el-scrollbar__wrap .el-collapse .el-collapse-item .el-collapse-item__content {
+  padding: 0;
+}
+.diywrapper .diy-body .diy-left .el-tabs .el-tabs__content .el-tab-pane .el-scrollbar .el-scrollbar__wrap .el-collapse .el-collapse-item .el-collapse-item__content .widget-list .widget-item {
+  position: relative;
+  text-align: center;
+  color: #333;
+  padding: 10px 0;
+  border-top: 1px dotted #ddd;
+  border-right: 1px dotted #ddd;
+  cursor: pointer;
+  user-select: none;
+}
+.diywrapper .diy-body .diy-left .el-tabs .el-tabs__content .el-tab-pane .el-scrollbar .el-scrollbar__wrap .el-collapse .el-collapse-item .el-collapse-item__content .widget-list .widget-item:nth-child(3n) {
+  border-right: 0;
+}
+.diywrapper .diy-body .diy-left .el-tabs .el-tabs__content .el-tab-pane .el-scrollbar .el-scrollbar__wrap .el-collapse .el-collapse-item .el-collapse-item__content .widget-list .widget-item i {
+  font-size: 20px;
+}
+.diywrapper .diy-body .diy-left .el-tabs .el-tabs__content .el-tab-pane .el-scrollbar .el-scrollbar__wrap .el-collapse .el-collapse-item .el-collapse-item__content .widget-list .widget-item i.widget-item-more {
+  position: absolute;
+  bottom: 8px;
+  right: 3px;
+  font-size: 12px;
+  transform: rotate(90deg);
+  color: #ccc;
+}
+.diywrapper .diy-body .diy-left .el-tabs .el-tabs__content .el-tab-pane .el-scrollbar .el-scrollbar__wrap .el-collapse .el-collapse-item .el-collapse-item__content .widget-list .widget-item div {
+  margin-top: 5px;
+  color: #666;
+}
+.diywrapper .diy-body .diy-left .el-tabs .diy-themes {
+  height: 100%;
+}
+.diywrapper .diy-body .diy-left .el-tabs .diy-themes .el-scrollbar {
+  height: calc(100% - 49px) !important;
+}
+.diywrapper .diy-body .diy-left .el-tabs .diy-themes .el-scrollbar .el-scrollbar__wrap ul li {
+  width: 50%;
+  padding: 8px;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+.diywrapper .diy-body .diy-left .el-tabs .diy-themes .el-scrollbar .el-scrollbar__wrap ul li .theme-item {
+  position: relative;
+  padding: 4px;
+  -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
+  border: 1px solid transparent;
+  border-radius: 5px;
+}
+.diywrapper .diy-body .diy-left .el-tabs .diy-themes .el-scrollbar .el-scrollbar__wrap ul li .theme-item:hover {
+  border: 1px solid #409EFF;
+}
+.diywrapper .diy-body .diy-left .el-tabs .diy-themes .el-scrollbar .el-scrollbar__wrap ul li .theme-item .tplname {
+  margin: 5px 0;
+  font-size: 12px;
+  width: 120px;
+  padding: 0 12px;
+  box-sizing: border-box;
+  text-align: center;
+  white-space: nowrap;
+  word-break: break-all;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.diywrapper .diy-body .diy-left .el-tabs .diy-themes .el-scrollbar .el-scrollbar__wrap ul li .theme-item .isedit {
+  position: absolute;
+  right: 2px;
+  top: 2px;
+}
+.diywrapper .diy-body .diy-left .el-tabs .diy-themes .el-scrollbar .el-scrollbar__bar {
+  display: none;
+}
+.diywrapper .diy-body .diy-left .el-tabs .diy-hdpages {
+  height: 100%;
+}
+.diywrapper .diy-body .diy-left .el-tabs .diy-hdpages .diy-hdpages-header {
+  width: 100%;
+  padding: 8px;
+  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
+.diywrapper .diy-body .diy-left .el-tabs .diy-hdpages .diy-hdpages-header .el-button {
+  width: 60%;
+}
+.diywrapper .diy-body .diy-left .el-tabs .diy-hdpages .el-scrollbar {
+  height: calc(100% - 110px) !important;
+}
+.diywrapper .diy-body .diy-left .el-tabs .diy-hdpages .el-scrollbar .el-scrollbar__wrap .el-row {
+  width: 100%;
+  padding: 0 8px;
+  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  cursor: pointer;
+}
+.diywrapper .diy-body .diy-left .el-tabs .diy-hdpages .el-scrollbar .el-scrollbar__wrap .el-row .el-button {
+  position: relative;
+  width: 100%;
+  text-align: left;
+  margin-bottom: 8px;
+  white-space: normal;
+  padding: 9px 18px;
+  line-height: 16px;
+}
+.diywrapper .diy-body .diy-left .el-tabs .diy-hdpages .el-scrollbar .el-scrollbar__wrap .el-row .el-button i {
+  position: absolute;
+  right: 4px;
+  top: calc(50% - 6px);
+  display: none;
+}
+.diywrapper .diy-body .diy-left .el-tabs .diy-hdpages .el-scrollbar .el-scrollbar__wrap .el-row .el-button.selected {
+  border-color: #409EFF;
+}
+.diywrapper .diy-body .diy-left .el-tabs .diy-hdpages .el-scrollbar .el-scrollbar__wrap .el-row .el-button.selected i {
+  color: #409EFF;
+  display: block;
+}
+.diywrapper .diy-body .diy-left .el-tabs .diy-hdpages .el-scrollbar .el-scrollbar__wrap .el-row .btn-delete {
+  position: absolute;
+  left: 8px;
+  top: 0px;
+  background: #f69e07;
+  color: #fff;
+  font-size: 14px;
+  display: none;
+}
+.diywrapper .diy-body .diy-left .el-tabs .diy-hdpages .el-scrollbar .el-scrollbar__wrap .el-row:hover .btn-delete {
+  display: block;
+}
+.diywrapper .diy-body .diy-left .el-tabs .diy-hdpages .el-scrollbar .el-scrollbar__bar {
+  display: none;
+}
+.diywrapper .diy-body .diy-right {
+  position: relative;
+  width: 480px;
+}
+.diywrapper .diy-body .diy-right .basemenu-form .el-input-group__append,
+.diywrapper .diy-body .diy-right .basemenu-form .el-input-group__prepend {
+  padding: 0 8px;
+}
+.diywrapper .diy-body .diy-right .el-form-item.el-form-item--mini {
+  margin-bottom: 12px;
+}
+.diywrapper .diy-body .diy-right .el-tabs {
+  border-top: 0;
+  height: 100%;
+}
+.diywrapper .diy-body .diy-right .el-tabs .el-tabs__content {
+  padding: 10px;
+  height: 100%;
+  box-sizing: border-box;
+}
+.diywrapper .diy-body .diy-right .el-tabs .el-tabs__content .el-collapse-item__header {
+  padding-left: 0 !important;
+}
+.diywrapper .diy-body .diy-right .el-tabs .el-tabs__content .el-tab-pane {
+  max-height: calc(100vh - 120px);
+  padding-bottom: 120px;
+  overflow: hidden scroll;
+}
+.diywrapper .diy-body .diy-right .el-tabs .el-tabs__content .el-tab-pane::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  background-color: transparent;
+  display: none;
+}
+.diywrapper .diy-body .diy-right .el-tabs .el-tabs__content .el-tab-pane::-webkit-scrollbar-thumb {
+  width: 0;
+  height: 0;
+  background-color: transparent;
+  display: none;
+}
+.diywrapper .diy-body .diy-right .el-tabs .el-tabs__content .el-collapse:nth-child(1) {
+  border-top: 0;
+}
+.diywrapper .diy-body .diy-right .el-tabs .el-tabs__content .el-collapse-item__header {
+  padding-left: 20px;
+  height: 36px;
+  line-height: 36px;
+}
+.diywrapper .diy-body .diy-right .el-tabs .el-tabs__content .el-collapse-item__wrap {
+  padding: 10px 10px 0;
+}
+.diywrapper .diy-body .diy-right .el-tabs .el-tabs__content .el-collapse-item__content {
+  padding-bottom: 15px;
+}
+.diywrapper .diy-body .diy-right .el-tabs .swiper-lists {
+  position: relative;
+  margin-left: 0;
+  margin-right: 0;
+  padding: 10px 5px;
+  background: #fefefe;
+  cursor: move;
+  margin-bottom: 10px;
+  border: 1px solid #f5f5f5;
+}
+.diywrapper .diy-body .diy-right .el-tabs .swiper-lists .list-left {
+  position: relative;
+  width: 64px;
+  cursor: pointer;
+  background: #fafafa;
+}
+.diywrapper .diy-body .diy-right .el-tabs .swiper-lists .list-right .el-row {
+  height: 100%;
+}
+.diywrapper .diy-body .diy-right .layoutset {
+  line-height: 1;
+  font-size: 12px;
+  border-top: none;
+  padding-bottom: 30px;
+}
+.diywrapper .diy-body .diy-right .layoutset .layout-item {
+  background: #fff;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+  border-radius: 0;
+  margin-bottom: 2px;
+  padding: 8px 8px 7px 30px;
+}
+.diywrapper .diy-body .diy-right .layoutset .layout-item.active {
+  background: #f9f9f9;
+}
+.diywrapper .diy-body .diy-right .layoutset .layout-item .layout-title {
+  display: flex;
+  line-height: 1.8;
+  justify-content: space-between;
+}
+.diywrapper .diy-body .diy-right .layoutset .layout-item .layout-title .arrow-icon {
+  margin-right: 10px;
+  cursor: pointer;
+}
+.diywrapper .diy-body .diy-right .layoutset .layout-item .layout-sitem {
+  margin-top: 8px;
+}
+.diywrapper .diy-body .diy-right .layoutset .layout-item .layout-sitem .layout-sitem-li {
+  display: flex;
+  margin-top: -1px;
+  border: 1px solid #ddd;
+  padding: 5px 0 5px 30px;
+  justify-content: space-between;
+}
+.diywrapper .diy-body .diy-right .layoutset .layout-item .layout-sitem .layout-sitem-li.active {
+  background: #f9f9f9;
+}
+.diywrapper .diy-body .diy-right .layoutset .layout-item-btns i {
+  margin-right: 5px;
+  cursor: pointer;
+}
+.diywrapper .diy-body .diy-right .layoutset .layout-item-btns i.el-icon-sort {
+  cursor: move;
+}
+.diywrapper .diy-body .diy-center {
+  position: relative;
+  background-color: #fafafa;
+}
+.diywrapper .diy-body .diy-center .diy-bar {
+  position: absolute;
+  top: 12px;
+  right: 2px;
+  z-index: 1;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.diywrapper .diy-body .diy-center .diy-bar .item {
+  padding: 6px 12px;
+  text-align: center;
+  font-size: 14px;
+  margin-top: 12px;
+  background: #FFF;
+  border: 1px solid #DCDFE6;
+  -webkit-box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.12), 0 0 6px 0 rgba(0, 0, 0, 0.04);
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.12), 0 0 6px 0 rgba(0, 0, 0, 0.04);
+  cursor: pointer;
+}
+.diywrapper .diy-body .diy-center .diy-bar .item.widget-item {
+  cursor: not-allowed;
+}
+.diywrapper .diy-body .diy-center .diy-bar .item.active {
+  color: #fff;
+  background-color: #409EFF;
+}
+.diywrapper .diy-body .diy-center .diy-bar .item i {
+  margin-right: 8px;
+}
+.diywrapper .diy-body .diy-center .diy-phone {
+  height: 100%;
+  overflow: hidden scroll;
+}
+.diywrapper .diy-body .diy-center .diy-phone::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  background-color: transparent;
+  display: none;
+}
+.diywrapper .diy-body .diy-center .diy-phone::-webkit-scrollbar-thumb {
+  width: 0;
+  height: 0;
+  background-color: transparent;
+  display: none;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper {
+  width: 375px;
+  min-height: 798px;
+  margin: 70px auto;
+  background: #ffffff;
+  padding: 10px 15px 20px;
+  -webkit-box-sizing: content-box;
+  box-sizing: content-box;
+  border-radius: 8px;
+  -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-topbar {
+  height: 64px;
+  padding-top: 20px;
+  color: #333;
+  text-align: center;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  background: #fff url(/static/images/diy/phone-head.png);
+  background-size: 100% auto;
+  background-repeat: no-repeat;
+  cursor: pointer;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-topbar .phone-title {
+  width: 100%;
+  padding: 0 100px;
+  box-sizing: border-box;
+  line-height: 44px;
+  font-size: 16px;
+  text-align: center;
+  white-space: nowrap;
+  word-break: break-all;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container {
+  position: relative;
+  background-color: #fafafa;
+  transform: translate(0);
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container.isshotsnap .freecontainer-wrap .freecontainer-area {
+  outline: none !important;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container.isshotsnap .freecontainer-wrap .freecontainer-area .freecontainer-widgets-scroll {
+  overflow: hidden !important;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container.isshotsnap .handle,
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container.isshotsnap .mibovdr-handle {
+  display: none !important;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container.isshotsnap .phone-block.selected::before {
+  outline: none !important;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phonetypeline {
+  position: absolute;
+  left: -75px;
+  font-size: 14px;
+  line-height: 32px;
+  height: 32px;
+  margin-top: -32px;
+  pointer-events: none;
+  opacity: 0.38;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phonetypeline.bzline {
+  top: 603px;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phonetypeline.fullline {
+  top: 734px;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phonetypeline span {
+  width: 60px;
+  display: block;
+  color: #86909c;
+  border-bottom: 1px dashed #ddd;
+  text-align: center;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block {
+  position: relative;
+  width: 100%;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  font-size: 15px;
+  line-height: 1.8;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block.selected::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  pointer-events: none;
+  outline: 1px dotted #409EFF;
+  outline-offset: -1px;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block.isresizing {
+  pointer-events: none;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block:hover .phone-right-control {
+  display: block;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block.sortable-ghost {
+  opacity: 0.5;
+  pointer-events: none;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block img {
+  max-width: 100%;
+  vertical-align: bottom;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .phone-right-control {
+  position: absolute;
+  right: -34px;
+  top: 0;
+  line-height: 1;
+  font-size: 14px;
+  color: #333;
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
+  overflow: hidden;
+  display: none;
+  -webkit-transition: all 0.1s linear;
+  transition: all 0.1s linear;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .phone-right-control.forceshow {
+  display: block;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .phone-right-control .item {
+  display: block;
+  border: none;
+  border-radius: 0;
+  margin: 0;
+  padding: 10px;
+  color: #409EFF;
+  background: #fff;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .phone-right-control .item.movehand {
+  cursor: move;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .phone-right-control .item:hover {
+  display: block;
+  border: none;
+  border-radius: 0;
+  margin: 0;
+  padding: 10px;
+  color: #409EFF;
+  background: #fafafa;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .phone-right-control .el-divider {
+  margin: 0;
+  transform: scaleY(0.5);
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .freecontainer .freecontainer-left .container-leftbar {
+  position: absolute;
+  left: -70px;
+  top: 0;
+  width: 45px;
+  opacity: 0.82;
+  -webkit-transition: opacity 0.1s linear;
+  transition: opacity 0.1s linear;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .freecontainer .freecontainer-left .container-leftbar:hover {
+  opacity: 1;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .freecontainer .freecontainer-left .container-leftbar .divider {
+  border-bottom: 1px solid #dfdfdf;
+  height: 1px;
+  font-size: 0;
+  width: 70%;
+  margin: 0 5% 8px 25%;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .freecontainer .freecontainer-left .container-leftbar .buttons {
+  text-align: right;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .freecontainer .freecontainer-left .container-leftbar .infos {
+  font-size: 12px;
+  color: #aaa;
+  line-height: 1.6;
+  font-family: consolas !important;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .freecontainer .freecontainer-left .container-leftbar .infos > div {
+  -webkit-transform: scale(0.8);
+  transform: scale(0.8);
+  text-align: right;
+  white-space: nowrap;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .freecontainer .freecontainer-left .container-leftbar i {
+  width: 28px;
+  height: 28px;
+  line-height: 28px;
+  font-size: 14px;
+  cursor: pointer;
+  text-align: center;
+  border-radius: 100px;
+  margin-bottom: 8px;
+  color: #fff;
+  background: #409EFF;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .freecontainer .freecontainer-left .container-leftbar i:hover {
+  -webkit-transition: -webkit-transform 0.1s linear;
+  transition: -webkit-transform 0.1s linear;
+  transition: transform 0.1s linear;
+  transition: transform 0.1s linear, -webkit-transform 0.1s linear;
+  -webkit-transform: scale(1.1);
+  transform: scale(1.1);
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .freecontainer .freecontainer-wrap {
+  width: auto;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .freecontainer .freecontainer-wrap .freecontainer-area {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  outline: 1px dotted rgba(0, 0, 0, 0.1);
+  outline-offset: -1px;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .freecontainer .freecontainer-wrap .freecontainer-area .freecontainer-resize {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 2000 !important;
+  pointer-events: none;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .freecontainer .freecontainer-wrap .freecontainer-area .freecontainer-widgets {
+  position: relative;
+  height: 100%;
+  width: 100%;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .freecontainer .freecontainer-wrap .freecontainer-area .freecontainer-widgets .freecontainer-widgets-scroll {
+  position: relative;
+  box-sizing: border-box;
+  height: 100%;
+  overflow: hidden scroll;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .freecontainer .freecontainer-wrap .freecontainer-area .freecontainer-widgets .freecontainer-widgets-scroll::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  background: transparent;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .freecontainer .freecontainer-wrap .freecontainer-area .freecontainer-widgets .freecontainer-widgets-scroll .free-block-box {
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  user-select: none !important;
+  overflow: hidden;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .freecontainer .freecontainer-wrap .freecontainer-area .freecontainer-widgets .freecontainer-widgets-scroll .free-block-box.layout-li-mouse-enter {
+  outline: 3px solid #f66;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .freecontainer .freecontainer-wrap .freecontainer-area .freecontainer-widgets .freecontainer-widgets-scroll .free-block-box .free-text {
+  width: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  word-break: break-all;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .freecontainer .freecontainer-wrap .freecontainer-area .freecontainer-widgets .freecontainer-widgets-scroll .free-block-box .free-image {
+  width: 100%;
+  height: 100%;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .freecontainer .freecontainer-wrap .freecontainer-area .freecontainer-widgets .freecontainer-widgets-scroll .free-block-box .free-image div {
+  width: 100%;
+  height: 100%;
+  background-repeat: no-repeat;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .freecontainer .freecontainer-wrap .freecontainer-area .freecontainer-widgets .freecontainer-widgets-scroll .free-block-box .free-image div.fill {
+  background-position: 0% 0%;
+  background-size: 100% 100%;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .freecontainer .freecontainer-wrap .freecontainer-area .freecontainer-widgets .freecontainer-widgets-scroll .free-block-box .free-image div.contain {
+  background-position: center center;
+  background-size: contain;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .freecontainer .freecontainer-wrap .freecontainer-area .freecontainer-widgets .freecontainer-widgets-scroll .free-block-box .free-image div.cover {
+  background-position: center center;
+  background-size: cover;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .freecontainer .freecontainer-wrap .freecontainer-area .freecontainer-widgets .freecontainer-widgets-scroll .free-block-box .free-hot {
+  width: 100%;
+  height: 100%;
+  background: rgba(70, 160, 255, 0.2) !important;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .freecontainer .freecontainer-wrap .freecontainer-area .freecontainer-widgets .freecontainer-widgets-scroll .free-block-box .free-icon {
+  width: 100%;
+  height: 100%;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .freecontainer .freecontainer-wrap .freecontainer-area .freecontainer-widgets .freecontainer-widgets-scroll .free-block-box .free-icon div {
+  display: inline-block;
+  pointer-events: none;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .freecontainer .freecontainer-wrap .freecontainer-area .freecontainer-widgets .freecontainer-widgets-scroll .free-block-box .free-btn {
+  width: 100%;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .freecontainer .freecontainer-wrap .freecontainer-area .freecontainer-widgets .freecontainer-widgets-scroll .free-overflow-hidden {
+  overflow: hidden !important;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .freecontainer .freecontainer-wrap .freecontainer-area .freecontainer-widgets .freecontainer-widgets-scroll .free-overflow-visible {
+  overflow: visible !important;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .freecontainer .freecontainer-wrap .freecontainer-area .freecontainer-widgets .freecontainer-widgets-scroll .free-overflow-scroll {
+  overflow: hidden scroll !important;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .freecontainer .freecontainer-wrap .freecontainer-area .freecontainer-widgets .freecontainer-widgets-scroll .free-overflow-scroll::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .freecontainer .freecontainer-wrap .freecontainer-area .freecontainer-widgets .freecontainer-resize-copy {
+  border: 0;
+  pointer-events: none;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .module-box {
+  box-sizing: content-box;
+  -webkit-box-sizing: content-box;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  user-select: none !important;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .module-box .phone-block-resize {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .baseline {
+  border: 0 !important;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .baseline div {
+  width: 100%;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .basetitle .basetitle-area {
+  position: relative;
+  width: 100%;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .basetitle .basetitle-box {
+  height: 100%;
+  overflow: hidden;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .baserichtext .richtext {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  pointer-events: none;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .baserichtext .richtext p {
+  margin: 0;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .baseswiper .baseswiper-area {
+  overflow: hidden;
+  box-sizing: content-box;
+  -webkit-box-sizing: content-box;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .baseswiper .baseswiper-area .my-swipe {
+  height: 100%;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .baseswiper .baseswiper-area .my-swipe img {
+  width: 100%;
+  object-fit: cover;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .baseswiper.free-block-box .baseswiper-area {
+  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .basenotice .basenotice-area {
+  position: relative;
+  width: 100%;
+  text-decoration: inherit;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .basenotice .basenotice-area .van-notice-bar {
+  height: inherit;
+  line-height: inherit;
+  padding: inherit;
+  background-color: inherit;
+  color: inherit;
+  font-size: inherit;
+  text-decoration: inherit;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .basenotice .basenotice-area .van-notice-bar i {
+  min-width: unset;
+  font-size: inherit;
+  font-weight: inherit;
+  margin-right: 5px;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .basenotice .basenotice-area .van-notice-bar .van-notice-bar__wrap,
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .basenotice .basenotice-area .van-notice-bar .van-notice-bar__content {
+  text-decoration: inherit;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .basenotice .basenotice-area .van-notice-bar .van-notice-bar__wrap .van-swipe-item,
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .basenotice .basenotice-area .van-notice-bar .van-notice-bar__content .van-swipe-item {
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .baseaudio .tip {
+  color: #999999;
+  text-align: center;
+  font-size: 12px;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .baseaudio .music-icon {
+  position: fixed;
+  color: #333333;
+  vertical-align: bottom;
+  text-align: center;
+  line-height: 1;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  z-index: 10;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .baseaudio .music-icon img {
+  border-radius: 50%;
+  object-fit: cover;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .basevideo {
+  overflow: hidden;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .basecountdown {
+  line-height: unset;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .basecountdown .basecountdown-format .item {
+  border-radius: 3px;
+  white-space: nowrap;
+  width: 36px;
+  height: 36px;
+  background: #409EFF;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .basecountdown .basecountdown-format .colon {
+  margin: 0 2px;
+  padding: 0 2.5px;
+  line-height: 12px;
+  font-size: 12px;
+  color: #000000;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .basemenu .van-grid-item__content {
+  padding: 0;
+  background: none;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .phone-block .basemenu .van-grid-item__content .menu-item {
+  box-sizing: border-box;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .mibovdr {
+  border: none;
+  box-sizing: content-box;
+  max-width: 100%;
+  position: absolute;
+  z-index: 2 !important;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .mibovdr-active {
+  border: none;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .mibovdr-active.vdr-hover-top:active,
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .mibovdr-active.vdr-hover-top:hover,
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .mibovdr-active.vdr-hover-top :target {
+  z-index: 3 !important;
+  opacity: 0.9;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .mibovdr-active.dragging,
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .mibovdr-active.resizing {
+  outline: 1px dotted #409EFF;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .mibovdr-active.dragging .handle,
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .mibovdr-active.resizing .handle {
+  display: none !important;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .mibovdr-active .handle::after {
+  content: "";
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  left: -10px;
+  top: -10px;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .handle {
+  width: 4px !important;
+  height: 4px !important;
+  border: none;
+  background: #409EFF;
+  border-radius: 10px;
+  -webkit-box-shadow: none !important;
+  box-shadow: none !important;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .handle.handle-tm {
+  top: -7px !important;
+  left: calc(50% - 2px) !important;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .handle.handle-bm {
+  bottom: -7px !important;
+  left: calc(50% - 2px) !important;
+}
+.diywrapper .diy-body .diy-center .diy-phone .phone-wrapper .phone-container .phone-components .mibovdr-handle {
+  position: absolute;
+  background-color: #fff;
+  border: 1px solid #409EFF;
+  height: 8px !important;
+  width: 8px !important;
+  -webkit-transition: all 0.3s linear;
+  transition: all 0.3s linear;
+  cursor: s-resize;
+  pointer-events: all;
+}

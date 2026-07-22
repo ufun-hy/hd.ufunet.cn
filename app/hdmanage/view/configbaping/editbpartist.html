@@ -1,0 +1,139 @@
+<div class="form-horizontal confirmbox-pop artistpopbox">
+<form class="confirm-formbox" method="post">
+    <div class="text-center">
+        <div class="btn-group pop-btns" style="margin-bottom:10px;">
+          <a href="javascript:void(0)" class="btn btn-default btn-primary"><span>基础设置</span></a>
+          <a href="javascript:void(0)" class="btn btn-default hidden"><span>分成设置</span></a>
+        </div>
+    </div>
+    <div class="carditem">
+    	<div class="form-group">
+			<label class="col-lg-3 control-label text-right">* 排序序号</label>
+			<div class="col-lg-6">
+			  <input type="text" class="form-control"  name="displayorder" value="{$config['displayorder']}">
+			  <div class="help-block">注意:排序按降序排序，序号越大越排在前面</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-lg-3 control-label text-right">* 艺人类型</label>
+			<div class="col-lg-9">
+				{foreach $artisttypes as $akey=>$aval}
+				<label class="lyear-radio radio-inline radio-primary">
+					<input type="radio" name="artisttype" value="{$akey}" {if $config['artisttype']==$akey}checked{/if}><span>{$aval}</span>
+				</label>
+				{/foreach}
+				<span class="help-block">注:现场即为无需分成，收入归主办方</span>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-lg-3 control-label text-right">* 艺人名称</label>
+			<div class="col-lg-6">
+			  <input type="text" class="form-control"  name="artistname" value="{$config['artistname']}">
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-lg-3 control-label text-right">* 艺人头像(100*100px)</label>
+			<div class="col-lg-6">
+			   {:tpl_image_one('artistavatar',$config['artistavatar'])}
+			</div>
+		</div>
+		
+	</div>
+	<div class="carditem hidden">
+		<div class="form-group">
+            <label class="col-lg-3 control-label">* 打赏分成</label>
+            <div class="col-lg-4">
+                <input type="text" class="form-control numberincdec" name="dsfcb" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="100"
+                data-bts-decimals="2"
+                data-bts-step="1"
+                data-bts-force-step-divisibility="xstwo"
+                data-bts-postfix="%"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['dsfcb']}">
+                <span class="help-block m-0">注:0为不分成，100即为全部给艺人</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 点歌分成</label>
+            <div class="col-lg-4">
+                <input type="text" class="form-control numberincdec" name="songfcb" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="100"
+                data-bts-decimals="2"
+                data-bts-step="1"
+                data-bts-force-step-divisibility="xstwo"
+                data-bts-postfix="%"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['songfcb']}">
+                <span class="help-block m-0">注:0为不分成，100即为全部给艺人</span>
+            </div>
+        </div>
+        <div class="form-group bindwxuser">
+            <label class="col-lg-3 control-label">* 绑定微信用户</label>
+            <div class="col-lg-8">
+                <input type="hidden" name="binduser[openid]" value="{if !empty($config['binduser'])}{$config['binduser']['openid']}{/if}">
+                <input type="hidden" name="binduser[nickname]" value="{if !empty($config['binduser'])}{$config['binduser']['nickname']}{/if}">
+                <input type="hidden" name="binduser[avatar]" value="{if !empty($config['binduser'])}{$config['binduser']['avatar']}{/if}">
+                <a class="img-avatar img-avatar-pill img-avatar-36" href="javascript:void(0)">
+                    <img src="{if !empty($config['binduser'])}{$config['binduser']['avatar']}{/if}" />
+                    <span>{if !empty($config['binduser'])}{$config['binduser']['nickname']}{else /}暂未绑定{/if}</span>
+                </a>
+                <a href="javascript:void(0)" class="btn btn-sm btn-danger btn-bindwx">点击绑定用户</a>
+                <span class="help-block">必须绑定已经实名认证的微信用户，否则提现打款一定会失败</span>
+            </div>
+        </div>
+	</div>
+</form>
+</div>
+<script>
+require(['webcore','jconfirmBox','zamnotice','layerBox',"bootstrap-touchspin"],function(webcore,jconfirmBox,zamnotice,layerBox){
+	$(".confirmbox-pop .numberincdec").TouchSpin();
+    $(".confirmbox-pop .pop-btns a.btn").click(function(){
+        $(this).addClass('btn-primary').siblings().removeClass("btn-primary");
+        $(".confirmbox-pop .carditem").addClass('hidden').eq($(this).index()).removeClass('hidden');
+    });
+    $(".artistpopbox").find('input[type="radio"]').click(function(){
+    	var $type = $(this).val();
+    	//alert($type);
+    	if($type=='0'){
+    		$('.confirmbox-pop a').eq(1).addClass('hidden');
+    		$('.carditem').eq(1).addClass('hidden');
+    	}else{
+    		$('.confirmbox-pop a').eq(1).removeClass('hidden');
+    		$('.carditem').eq(1).addClass('hidden');
+    	}
+    });
+    $('.artistpopbox').find('input[type="radio"]:checked').trigger('click');
+    $(".btn-bindwx").click(function(){
+        var confirmObj = jconfirmBox.ajaxconfirm("绑定微信用户","{:gohdmanage('common/searchuser',['hdid'=>$hdid])}",{ishtml:'1'},'html','col-lg-8 col-lg-offset-2',function(e){
+            var selectuser = e.find("input:checked");
+            if(selectuser.length==1){
+                var obj = {
+                    openid:selectuser.attr('data-openid'),
+                    nickname:selectuser.parent().parent().next().next().text(),
+                    avatar:selectuser.parent().parent().next().attr('src'),
+                };
+                var inputs = $(".bindwxuser").find('input');
+                inputs.each(function(i,v){
+                    if(i==0){
+                        $(v).val(obj.openid);
+                    }else if(i==1){
+                        $(v).val(obj.nickname);
+                    }else{
+                        $(v).val(obj.avatar);
+                    }
+                });
+                $(".bindwxuser a img").attr('src',obj.avatar);
+                $(".bindwxuser a span").text(obj.nickname);
+                confirmObj.close();
+            }else if(selectuser.length > 1){
+                return zamnotice.showTips('error','只能选一个微信用户');
+            }else{
+                zamnotice.showTips('error','请选择需绑定的用户');
+            }
+        });
+    });
+});
+</script>

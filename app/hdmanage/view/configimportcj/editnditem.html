@@ -1,0 +1,101 @@
+<style>
+.yh-left-header{
+	width:100%;
+	display:flex;
+	color:#fff;
+}
+.yh-left-header li{
+	width: {$liw}%;
+	height:40px;
+	display:flex;
+	justify-content:center;
+	align-items:center;
+	background-color:#fe7472;
+}
+.yh-left-data{
+	width:100%;
+	min-height: 50px;
+	max-height:420px;
+	display:flex;
+	flex-wrap:wrap;
+	overflow:hidden;
+	overflow-y:scroll;
+}
+.yh-left-data ul{
+	width:100%;
+	display:flex;
+	border:1px solid #DCDFE6;
+	border-top:0;
+}
+.yh-left-data ul li{
+	width: {$liw}%;
+	height:40px;
+	display:flex;
+	justify-content:center;
+	align-items:center;
+	font-size: 16px;
+	font-weight: 400;
+}
+</style>
+<div class="zam-formvalidation form-horizontal searchyh">
+<div class="form-group">
+	<div class="zam-confirmBox-right col-md-12">
+		<div class="input-group">
+			<input type="text" class="form-control username" name="username" placeholder="请输入关键词">
+			<div class="input-group-addon btn btn-primary searchone"><i class="mdi mdi-magnify"></i> 搜索</div>
+		</div>
+	</div>
+</div>
+<ul class="yh-left-header">
+	<li>id</li>
+	{volist name="fieldconfig" id="yhfield"}
+	<li>{$yhfield['fieldname']}</li>
+	{/volist}
+</ul>
+<div class="yh-left-data"></div>
+</div>
+<script id="user-tpl" type="text/template">
+  <%#  $.each(d.list, function(index, item){ %>
+   <ul>
+    <li>
+    	<label class="lyear-checkbox checkbox-inline checkbox-primary">
+         <input type="checkbox" name="selids[]" value="<% item.id %>"><span></span>
+        </label>
+    </li>
+    {if isset($fieldconfig[0])}
+		<li><span><% item.datafield1 %></span></li>
+	{/if}
+	{if isset($fieldconfig[1])}
+		<li><span><% item.datafield2 %></span></li>
+	{/if}
+	{if isset($fieldconfig[2])}
+		<li><span><% item.datafield3 %></span></li>
+	{/if}
+	{if isset($fieldconfig[3])}
+		<li><span><% item.datafield4 %></span></li>
+	{/if}
+	</ul>
+  <%#  }); %>
+</script>
+<script>
+require(["webcore","zamnotice","layerBox"],function(webcore,zamnotice,layerBox){
+	$(".searchone").on('click',function(){
+		var hadsel = [];
+		var hadselBox = $(".nditem-lists input");
+		hadselBox.each(function(){
+			hadsel.push($(this).val());
+		});
+		webcore.ajaxSubmit("{:gohdmanage('configimportcj/searchdata',['hdid'=>$hdid])}",{search:$(".username").val(),hadsel:hadsel,awardid:"{$awardid}"},'正在查找...').then(function(json){
+			if(json.code==0){
+				var html = webcore.tpl($("#user-tpl"),{list:json.msg});
+				$(".searchyh .yh-left-data").html(html);
+			}else{
+				$(".searchyh .yh-left-data").html('');
+				zamnotice.showTips('error',json.msg);
+			}
+		}, function(json){
+			zamnotice.showTips('error','网络差。操作失败.');
+		});
+	});
+});
+</script>

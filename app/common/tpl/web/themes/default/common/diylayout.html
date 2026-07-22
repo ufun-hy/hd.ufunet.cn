@@ -1,0 +1,194 @@
+{php}$timestamp = '1.69';{/php}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    {block name="title"}<title>diy</title>{/block}
+    <meta name="keywords" content="{$siteinfo['sitetitle']}">
+    <meta name="description" content="{$siteinfo['sitetitle']}">
+    <meta name="author" content="zam">
+    <link rel="shortcut icon" href="{if !empty($siteinfo['siteicon'])}{:tomedia($siteinfo['siteicon'])}{else /}__STATIC__/favicon.ico{/if}" />
+    <link href="__STATIC__/css/loading.css" rel="stylesheet">
+    <script src="__STATIC__/js/diy/utils/const.js"></script>
+    <script src="__STATIC__/js/diy/utils/func.js"></script>
+    <script src="__STATIC__/js/vue/vue.min.js"></script>
+    <link rel="stylesheet" href="__STATIC__/js/vant/vant.min.css" />
+    <script src="__STATIC__/js/vant/vant.min.js"></script>
+    <link rel="stylesheet" href="__STATIC__/js/element-ui/index.css?t={$timestamp}">
+    <script src="__STATIC__/js/element-ui/index.js"></script>
+    <script src="__STATIC__/js/axios/axios.min.js"></script>
+    <script src="__STATIC__/js/tinymce/tinymce.min.js"></script>
+    <link rel="stylesheet" href="__STATIC__/css/animate.min.css" />
+    <link rel="stylesheet" href="__STATIC__/css/diy/web/web.css?t={$timestamp}" />
+    <link rel="stylesheet" href="__STATIC__/css/diy/web/iconfont.css?t={$timestamp}" />
+    <script src="__STATIC__/js/directupload/aliyun.js"></script>
+    <script src="__STATIC__/js/directupload/cos.js"></script>
+    <script src="__STATIC__/js/directupload/qiniu.js"></script>
+    <link rel="stylesheet" href="__STATIC__/js/vue/vdr/VueDraggableResizable.css" />
+    <script src="__STATIC__/js/vue/vdr/VueDraggableResizable.umd.js"></script>
+    <script src="__STATIC__/js/vue/vdp/vue-draggable-plus.umd.js"></script>
+    <script src="__STATIC__/js/vue/tinymcevue/tinymce-vue.min.js"></script>
+    <script src="__STATIC__/js/vue/menujs/contextmenu.umd.js"></script>
+    <script src="__STATIC__/js/vue/vueqr/vue-qr.js"></script>
+    <script src="__STATIC__/js/vue/vue-scrollto/vue-scrollto.js"></script>
+    <script src="__STATIC__/js/vue/vue-clipboard/vue-clipboard.min.js"></script>
+    <script src="__STATIC__/js/domtoimg/domtoimage.js"></script>
+    {block name="header"}{/block}
+</head>
+<body>
+    <div id="app">
+        <div class="loading-box d-flex flex-j-c-c flex-a-i-c flex-d-c" ref="loadingbox">
+            <div class="la-square-jelly-box la-dark">
+                <div></div>
+                <div></div>
+            </div>
+            <div class="load-wait">正在初始化编辑器，请稍后</div>
+        </div>
+        <div class="diywrapper">
+            <div class="diy-header">
+                <div class="header-left">
+                    <div class="logo">
+                        <img src="{if !empty($siteinfo['sitelogo'])}{:tomedia($siteinfo['sitelogo'])}{else/}/static/images/logo-sidebar.png{/if}">
+                    </div>
+                </div>
+                <div class="header-right">
+                    {block name="header-buttons"}{/block}
+                </div>
+            </div>
+            <div class="diy-body d-flex">
+                <div class="diy-left">
+                    <el-tabs v-model="activeLeftTab" type="border-card" tab-position="left" @tab-click="handleLeftTabClick">
+                        <el-tab-pane name="widget">
+                            <template #label>
+                                <div class="tab-label d-flex flex-d-c">
+                                    <i class="el-icon-s-grid"></i>
+                                    <span>组件</span>
+                                </div>
+                            </template>
+                            <el-scrollbar>
+                                <el-collapse v-model="leftactiveWidgets">
+                                    <el-collapse-item v-for="(widgetcate,index) in $configWidgets" :key="index" :title="widgetcate.title" :name="index">
+                                        <el-row class="widget-list">
+                                            <el-col :span="8" v-for="(widget,windex) in widgetcate.lists" :key="windex">
+                                                <div v-if="!widget.children" class="widget-item d-flex flex-d-c" v-debounce="[()=>addComponent(index,windex)]">
+                                                    <i :class="widget.icon"></i>
+                                                    <div v-cloak>{{widget.title}}</div>
+                                                </div>
+                                                <el-popover
+                                                    v-else
+                                                    placement="bottom"
+                                                    width="90"
+                                                    trigger="click">
+                                                    <div class="d-flex flex-j-c-c flex-d-c widget-item-childrens">
+                                                        <el-button v-for="child in widget.children" :key="child.type" type="primary" size="mini" v-debounce="[()=>addComponent(index,windex,child.type)]">{{child.label}}</el-button>
+                                                    </div>
+                                                    <template #reference>
+                                                        <div class="widget-item d-flex flex-d-c">
+                                                            <i :class="widget.icon"></i>
+                                                            <div v-cloak>{{widget.title}}</div>
+                                                            <i class="widget-item-more el-icon-more"></i>
+                                                        </div>
+                                                    </template>
+                                                </el-popover>
+                                            </el-col>
+                                        </el-row>
+                                    </el-collapse-item>
+                                </el-collapse>
+                            </el-scrollbar>
+                        </el-tab-pane>
+                        <el-tab-pane name="systpl">
+                            <template #label>
+                                <div class="tab-label d-flex flex-d-c">
+                                    <i class="el-icon-s-platform"></i>
+                                    <span>模板</span>
+                                </div>
+                            </template>
+                            <systpl ref="systpl" :tplid="tplid" @change-sys-tpl="changeSysTpl"></systpl>
+                        </el-tab-pane>
+                        <el-tab-pane name="diypage" v-if="pageid">
+                            <template #label>
+                                <div class="tab-label d-flex flex-d-c">
+                                    <i class="el-icon-wendang"></i>
+                                    <span>页面</span>
+                                </div>
+                            </template>
+                            <diypage ref="diypage" :pageid="pageid" @change-diy-page="changeDiyPage"></diypage>
+                        </el-tab-pane>
+                    </el-tabs>
+                </div>
+                <div class="diy-center flex1" @contextmenu="contextMenuCenter">
+                    <div class="diy-bar d-flex flex-d-c">
+                        <div class="item" :class="{active: activeCom === 'pageset'}" @click="openPage('pageset')"><i class="el-icon-tickets"></i>页面设置</div>
+                        <div v-show="activeCom === 'widget'" class="item widget-item active"><i class="el-icon-s-grid"></i>组件设置</div>
+                        <div class="item" :class="{active: activeCom === 'layoutset'}" @click="openPage('layoutset')"><i class="el-icon-coin"></i>组件管理</div>
+                    </div>
+                    <div class="diy-phone" @click.self="openPage('pageset')">
+                        <div class="phone-wrapper d-flex flex-d-c">
+                            <div class="phone-topbar" @click="openPage('pageset')">
+                                <div class="phone-title" v-cloak>{{pageset.title}}</div>
+                            </div>
+                            <div class="phone-container d-flex flex-d-c flex1" ref="phonecontainer" :style="parseCssValue({background:pageset.background})">
+                                <el-empty v-if="!phoneComponents.length":image-size="100" description="您未添加任何组件" style="padding: 100px 0px; text-align: center; color: rgb(153, 153, 153); font-size: 14px;"></el-empty>
+                                <div class="phonetypeline d-flex bzline">
+                                    <span>标准屏</span>
+                                </div>
+                                <div class="phonetypeline d-flex fullline">
+                                    <span>全面屏</span>
+                                </div>
+                                <vdp tag="div" class="phone-components" v-model="phoneComponents" animation="120" direction="vertical" draggable=".phone-block" @update="sendResetNotice">
+                                    <div class="phone-block" :ref="`phone-block-${pwidget.key}`" v-for="(pwidget, index) in phoneComponents" :key="pwidget.key" :class="{selected:pwidget.selected,isresizing:pwidget.isresizing}"  @click.stop="clickComponent(pwidget)" @contextmenu="contextmenuComponent(pwidget,index,$event)">
+                                        <div class="phone-right-control" :ref="`right-control-${pwidget.key}`">
+                                            <el-tooltip v-if="index > 0" class="item" effect="light" content="向上移动" placement="right">
+                                                <el-button icon="el-icon-top" @click.native="moveUpComponent(index)"></el-button>
+                                            </el-tooltip>
+                                            <el-tooltip v-if="phoneComponents.length - 1 != index" class="item" effect="light" content="向下移动" placement="right">
+                                                <el-button icon="el-icon-bottom" @click.native="moveDownComponent(index)"></el-button>
+                                            </el-tooltip>
+                                            <el-tooltip class="item" effect="light" content="复制" placement="right">
+                                                <el-button icon="el-icon-document-copy" @click.native.stop="copyComponent(index)"></el-button>
+                                            </el-tooltip>
+                                            <el-divider></el-divider>
+                                            <div @click.stop="">
+                                                <el-popover :ref="`popover-${pwidget.key}`" placement="bottom" @show="$refs[`right-control-${pwidget.key}`][0].classList.add('forceshow')" @hide="$refs[`right-control-${pwidget.key}`][0].classList.remove('forceshow')">
+                                                    <p><i class="el-popconfirm__icon el-icon-info" style="color: red;"></i>删除将无法恢复，您确定删除吗？</p>
+                                                    <div style="text-align: right; margin: 0">
+                                                        <el-button type="text" size="mini" @click="$refs[`popover-${pwidget.key}`][0].doClose()">取消</el-button>
+                                                        <el-button type="primary" size="mini" @click="removeComponent(index)">确定</el-button>
+                                                    </div>
+                                                    <template #reference>
+                                                        <el-tooltip class="item" effect="light" content="删除" placement="right"><el-button class="item" icon="el-icon-delete" style="color: red;"></el-button></el-tooltip>
+                                                    </template>
+                                                </el-popover>
+                                            </div>
+                                        </div>
+                                        <div class="fix1px"></div>
+                                        <component 
+                                        :ref="pwidget.key" 
+                                        :is="pwidget.component" 
+                                        :datas="pwidget" 
+                                        :class="['module-box',pwidget.component]"  
+                                        @active-son-component="activeSonComponent" 
+                                        @remove-son-component="removeSonComponent" 
+                                        @copy-son-component="copySonComponent">
+                                        </component>
+                                        <div class="fix1px"></div>
+                                    </div>
+                                </vdp>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="diy-right">
+                    <pagesetstyle v-if="activeCom === 'pageset'" :datas="pageset"></pagesetstyle>
+                    <layoutsetstyle v-else-if="activeCom === 'layoutset'" :datas.sync="phoneComponents" @remove-component="removeComponent" @remove-son-component="removeSonComponent" @click-component="clickComponent" @active-son-component="activeSonComponent"></layoutsetstyle>
+                    <component v-else-if="activeCom === 'widget'" :is="widgetDatas.component + 'style'" :datas="widgetDatas"></component>
+                </div>
+            </div>
+        </div>
+        <mibo-pre-viewer ref="previewer"></mibo-pre-viewer>
+        <mibo-preview-page ref="previewpage"></mibo-preview-page>
+    </div>
+</body>
+{block name="footer"}{/block}
+</html>

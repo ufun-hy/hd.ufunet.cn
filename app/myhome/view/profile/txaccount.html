@@ -1,0 +1,128 @@
+{include file='$Wpath/common/header'}
+<form id="formBox" class="zam-formvalidation form-horizontal txaccountbox" method="post" data-userid="{$userid}">
+    <div class="config-titlebox">
+        <span class="config-titlename">微信提现账户</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#wechatconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+    </div>
+    <div id="wechatconfigbox" class="collapse in">
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 是否开启</label>
+            <div class="col-lg-3">
+                {:tpl_switch('wxstatus',$config['wxstatus'],'wxtxboxopen')}
+                <span class="help-block">开启则必须填写真实姓名并绑定微信用户</span>
+            </div>
+        </div>
+        <div class="wxtxbox{if $config['wxstatus']=='2'} hidden{/if}">
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 真实姓名</label>
+                <div class="col-lg-8">
+                    <input class="form-control" type="text"  name="wxaccount[realname]" placeholder="请输入微信号实名认证姓名" value="{$config['wxaccount']['realname']}">
+                </div>
+            </div>
+            <div class="form-group bindwxuser">
+                <label class="col-lg-2 control-label">* 绑定微信用户</label>
+                <div class="col-lg-8">
+                    <input type="hidden"  name="wxaccount[openid]" value="{$config['wxaccount']['openid']}">
+                    <input type="hidden"  name="wxaccount[nickname]" value="{$config['wxaccount']['nickname']}">
+                    <input type="hidden"  name="wxaccount[avatar]"  value="{$config['wxaccount']['avatar']}">
+                    <a class="img-avatar img-avatar-pill img-avatar-36" href="javascript:void(0)" {if empty($config['wxaccount']['openid'])}style="display:none!important"{/if}>
+                        <img src="{$config['wxaccount']['avatar']}">
+                        <span>{$config['wxaccount']['nickname']}</span>
+                    </a>
+                    <a href="javascript:void(0)" class="btn btn-sm btn-{if empty($config['wxaccount']['openid'])}primary{else}danger{/if} btn-bindwx">{if empty($config['wxaccount']['openid'])}点击扫码绑定{else}点击更换绑定用户{/if}</a>
+                    <span class="help-block">必须绑定已经实名认证的微信用户，否则提现打款一定会失败</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="config-titlebox">
+        <span class="config-titlename">支付宝提现账户</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#screenconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+    </div>
+    <div id="screenconfigbox" class="collapse in">
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 是否开启</label>
+            <div class="col-lg-3">
+                {:tpl_switch('alistatus',$config['alistatus'],'alitxboxopen')}
+                <span class="help-block">开启则必须填写真实姓名与支付宝账号</span>
+            </div>
+        </div>
+        <div class="alitxbox{if $config['alistatus']=='2'} hidden{/if}">
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 真实姓名</label>
+                <div class="col-lg-8">
+                    <input class="form-control" type="text"  name="aliaccount[realname]" placeholder="请输入支付宝账号实名认证姓名" value="{$config['aliaccount']['realname']}">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 支付宝账号</label>
+                <div class="col-lg-8">
+                    <input class="form-control" type="text"  name="aliaccount[account]" placeholder="请输入支付宝账号对应的真实姓名" value="{$config['aliaccount']['account']}">
+                </div>
+            </div>
+        </div>
+    </div>
+    {include file='$Wpath/common/savepanel'}
+</form>
+<script>
+require(['webcore','jconfirmBox','zamnotice','layerBox','zvalidator'],function(webcore,jconfirmBox,zamnotice,layerBox){
+    $(".btn-bindwx").click(function(){
+        var confirmobj = jconfirmBox.ajaxconfirm("绑定微信用户","{:gomyhome('profile/bindtxwxuser')}",{},'html','col-lg-6 col-lg-offset-3',function(e){
+        },false,'2');
+    });
+    $('#formBox').formValidation({
+        framework: 'bootstrap',
+        excluded: [':disabled'],
+        message: '您填写的内容无效',
+        fields: {
+        }
+    }).on('success.form.fv', function(e) {
+        e.preventDefault();
+        var $form = $(e.target);
+        var postData = webcore.serializeObject($form);
+        var bload = $form.find(".zam-fixedbottom button").lyearloading({opacity: 0.2,spinnerSize: 'nm'});
+        $form.formValidation('disableSubmitButtons', true);
+        webcore.ajaxSubmit("{:gomyhome('profile/txaccount')}",postData).then(function(json){
+            bload.hide();
+            if(json.code==0){
+                $form.formValidation('disableSubmitButtons', false);
+                zamnotice.showTips('success','操作成功',2e3,function(){
+                    window.location.reload();
+                });
+            }else{
+                zamnotice.showTips('error',json.msg);
+                $form.formValidation('disableSubmitButtons', false);
+            }
+        }, function(json){
+            bload.hide();
+            zamnotice.showTips('error','网络差。操作失败');
+            $form.formValidation('disableSubmitButtons', false);
+        });
+    });
+});
+function wxtxboxopen(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".wxtxbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".wxtxbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function alitxboxopen(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".alitxbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".alitxbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+</script>
+{include file='$Wpath/common/footer'}

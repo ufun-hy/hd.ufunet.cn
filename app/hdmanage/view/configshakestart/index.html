@@ -1,0 +1,302 @@
+{include file='$Wpath/common/header'}
+<div class="alert alert-danger">
+    空格键用于开始启动，当助力方式为成绩时，空格键还可以实现快速完成启动，当启动结束后，空格键可以重置状态为未开始<br>
+    在开启了排行榜前提下小于号键可用于显示与隐藏用户摇一摇成绩排行榜<br>
+    大于号键可用于开始或者暂停播放视频(ps:倒计时视频无效)
+</div>
+<form id="formBox" class="zam-formvalidation form-horizontal" method="post">
+    <div id="shakestartbox">
+        <div class="text-center">
+			<div class="btn-group zam-inner-highconfig-btns" style="margin:-5px 0 20px 0;">
+				<a href="javascript:void(0)" class="btn btn-default"><span>大屏设置</span></a>
+				<a href="javascript:void(0)" class="btn btn-default"><span>微信设置</span></a>
+			</div>
+		</div>
+		<div class="highconfig-item hidden">
+			<div class="form-group">
+				<label class="col-lg-2 control-label">* 启动状态</label>
+				<div class="col-lg-8">
+                    <div class="form-control-static"><span class="label label-{if $config['startstatus']=='1'}success{elseif $config['startstatus']=='2'}primary{else /}danger{/if}">{if $config['startstatus']=='1'}未开始{elseif $config['startstatus']=='2'}进行中{else /}已结束{/if}</span>{if $config['startstatus']!='1'}<a class="btn btn-danger btn-xs btn-reset m-l-10" href="javascript:void(0)">重置状态</a>{/if}</div>
+				</div>
+		    </div>
+			<div class="config-titlebox">
+		        <span class="config-titlename">启动前设置</span>
+		        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#waitstart" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+		    </div>
+		    {include file='$Wpath/common/shakestart/waitstart'}
+            <div class="config-titlebox">
+                <span class="config-titlename">扫码参与环节</span>
+                <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#scanqr" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+            </div>
+            {include file='$Wpath/common/shakestart/scanqr'}
+			<div class="config-titlebox">
+		        <span class="config-titlename">启动中设置</span>
+		        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#starting" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+		    </div>
+		    {include file='$Wpath/common/shakestart/starting'}
+			<div class="config-titlebox">
+		        <span class="config-titlename">启动后设置</span>
+		        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#endstart" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+		    </div>
+		    {include file='$Wpath/common/shakestart/endstart'}
+		</div>
+		<div class="highconfig-item hidden">
+			{include file='$Wpath/common/shakestart/appstart'}
+		</div>
+    </div>
+    {include file='$Wpath/common/configsavepanel'}
+</form>
+<script>
+require(['webcore','jconfirmBox','zamnotice','layerBox','zvalidator','tablesorter','jquery.ui'],function(webcore,jconfirmBox,zamnotice,layerBox){;
+	$("#shakestartbox .zam-inner-highconfig-btns a.btn").click(function(){
+		localStorage.setItem("startconfigindex{$hdid}",$(this).index());
+        $(this).addClass('btn-primary').siblings().removeClass("btn-primary");
+        $("#shakestartbox .highconfig-item").addClass('hidden').eq($(this).index()).removeClass('hidden');
+    });
+    var storageindex = localStorage.getItem("startconfigindex{$hdid}");
+	if (storageindex != null && storageindex != 'null') {
+		$("#shakestartbox .zam-inner-highconfig-btns a.btn").eq(storageindex).trigger('click');
+	}else{
+		$("#shakestartbox .zam-inner-highconfig-btns a.btn").eq(0).trigger('click');
+	}
+    $('#formBox').formValidation({
+        framework: 'bootstrap',
+        excluded: [':disabled'],
+        message: '您填写的内容无效',
+        fields: {}
+    }).on('success.form.fv', function(e) {
+        e.preventDefault();
+        var $form = $(e.target);
+        var postData = webcore.serializeObject($form);
+        var bload = $form.find(".zam-fixedbottom button").lyearloading({opacity: 0.2,spinnerSize: 'nm'});
+        $form.formValidation('disableSubmitButtons', true);
+        webcore.ajaxSubmit("{:gohdmanage('configshakestart/index',['hdid'=>$hdid])}",postData).then(function(json){
+            bload.hide();
+            if(json.code==0){
+                $form.formValidation('disableSubmitButtons', false);
+                zamnotice.showTips('success','保存成功',1e3,function(){
+                    window.location.reload();
+                });
+            }else{
+                zamnotice.showTips('error',json.msg);
+                $form.formValidation('disableSubmitButtons', false);
+            }
+        }, function(json){
+            bload.hide();
+            zamnotice.showTips('error','网络差，操作失败');
+            $form.formValidation('disableSubmitButtons', false);
+        });
+    });
+    $('.btn-reset').click(function(){
+			jconfirmBox.confirm('温馨提示','重置将清空摇一摇启动相关用户数据，您确定要重置么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('configshakestart/reset',['hdid'=>$hdid])}",{}).then(function(json){
+                    if(json.code==0){
+                        window.location.reload();
+                        zamnotice.showTips('success','操作成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+    });
+    $(".btn-adduser").click(function(){
+        var confirmObj = jconfirmBox.ajaxconfirm("新增点亮用户","{:gohdmanage('configshakestart/edituser',['hdid'=>$hdid])}",{},'html','col-lg-8 col-lg-offset-2',function(e){
+            var postData = webcore.serializeObject(e.find('form'));
+            webcore.ajaxSubmit("{:gohdmanage('configshakestart/saveuser',['hdid'=>$hdid])}",postData,'正在新增用户...').then(function(json){
+                if(json.code==0){
+                    $(".dluser-lists").append(webcore.tpl($("#dluser-tpl"),json.msg));
+                    zamnotice.showTips('success','新增成功');
+                    confirmObj.close();
+                }else{
+                    zamnotice.showTips('error',json.msg);
+                     return false;
+                }
+            }, function(json){
+                zamnotice.showTips('error','网络差。操作失败');
+                 return false;
+            });
+        });
+    });
+    $(".dluser-lists").on('click','.btn-edituser',function(){
+        var userid = $(this).attr('data-id'),fdom = $(this).parent().parent(),confirmObj = jconfirmBox.ajaxconfirm("编辑点亮用户","{:gohdmanage('configshakestart/edituser',['hdid'=>$hdid])}",{userid:userid},'html','col-lg-8 col-lg-offset-2',function(e){
+            var postData = webcore.serializeObject(e.find('form'));
+            postData.userid = userid;
+            webcore.ajaxSubmit("{:gohdmanage('configshakestart/saveuser',['hdid'=>$hdid])}",postData,'正在保存用户信息...').then(function(json){
+                if(json.code==0){
+                    fdom.html($(webcore.tpl($("#dluser-tpl"),json.msg)).html());
+                    zamnotice.showTips('success','保存成功');
+                    confirmObj.close();
+                }else{
+                    zamnotice.showTips('error',json.msg);
+                     return false;
+                }
+            }, function(json){
+                zamnotice.showTips('error','网络差。操作失败');
+                 return false;
+            });
+        });
+    });
+    $(".dluser-lists").on('click','.btn-deluser',function(){
+        var userid = $(this).attr('data-id'),fdom = $(this).parent().parent();
+        jconfirmBox.confirm('温馨提示','删除将无法恢复，您确定要删除么？',function(){
+            webcore.ajaxSubmit("{:gohdmanage('configshakestart/deluser',['hdid'=>$hdid])}",{userid:userid}).then(function(json){
+                if(json.code==0){
+                    fdom.remove();
+                    zamnotice.showTips('success','删除成功');
+                }else{
+                    zamnotice.showTips('error',json.msg);
+                }
+            }, function(json){
+                zamnotice.showTips('error','网络差。操作失败');
+            });
+        });
+    });
+});
+function openshowjoin(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".joinbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".joinbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openbgmusic2(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".musicinputbox2").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".musicinputbox2").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function showdjs(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".djsbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".djsbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function showball(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".ballbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".ballbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function showpercent(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".percentbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".percentbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function showavatars(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".avatarsbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".avatarsbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openbgmusic3(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".musicinputbox3").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".musicinputbox3").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function showlogo(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".logobox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".logobox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function bgdiy(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".diyendbg").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".diyendbg").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function showflower(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".showflowerbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".showflowerbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+</script>
+<script id='dluser-tpl' type="text/template">
+<tr>
+    <td class="text-center">
+        <div class="zam-flex-column-center">
+            <img src="<% d.userimg %>" class="avatarImg m-b-5">
+            <span><% d.username %></span>
+        </div>
+    </td>
+    <td class="text-center">
+       <% d.usernumber %>
+    </td>
+    <td class="text-center">
+        <%# if(d.status=='1'){ %>
+            <span class="label label-primary">已点亮</span>
+        <%# }else{ %>
+            <span class="label label-warning">待点亮</span>
+        <%# } %>    
+    </td>
+    <td class="text-center">
+        <a class="btn btn-xs btn-primary btn-edituser" data-id="<% d.id %>" href="javascript:void(0)"> <i class="mdi mdi-pencil"></i> </a>
+        <a class="btn btn-xs btn-danger btn-deluser" data-id="<% d.id %>" href="javascript:void(0)"> <i class="mdi mdi-close"></i> </a>
+    </td>
+</tr>
+</script>
+{include file='$Wpath/common/footer'}

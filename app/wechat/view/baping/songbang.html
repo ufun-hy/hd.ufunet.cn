@@ -1,0 +1,274 @@
+{include file="common/header" /}
+<style>
+.zam-app-bodyBg{
+    display: none;
+}
+.bangbox{
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: #fff;
+}
+.topheader{
+    width: 100%;
+    max-height: 2.6rem;
+    background-color: #fff;
+}
+.songtimesbox {
+    max-height: 1rem;
+	overflow: hidden;
+	white-space: nowrap;
+    margin-bottom: 0.3rem;
+    border-bottom: 1px solid #eceeef;
+}
+.songtimesbox ul li {
+	position: relative;
+	padding: 0.3rem 0.1rem;
+	text-align: center;
+	color: #000;
+	font-size: .24rem;
+	font-weight: bold;
+	max-width: 2.4rem;
+}
+.songtimesbox ul li.active{
+	color: #e5156a;
+}
+.songtimesbox ul li.active:after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    margin: 0 auto;
+    width: .6rem;
+    background: #e5156a;
+    height: 2px;
+    border-radius: 1px;
+}
+.songtypebox{
+    width: 100%;
+    margin: 0.24rem 0;
+}
+.songtypebox .typelist{
+    width: 4rem;
+}
+.songtypebox .typeitem{
+    max-width: 2rem;
+    padding: .06rem;
+    cursor: pointer;
+    background: #d5d5d5;
+    -webkit-tap-highlight-color: rgba(255,255,255,0);
+}
+.songtypebox .typeitem:first-child {
+    border-top-left-radius: .13rem;
+    border-bottom-left-radius: .13rem;
+}
+.songtypebox .typeitem:last-child {
+    border-top-right-radius: .13rem;
+    border-bottom-right-radius: .13rem;
+}
+.songtypebox .typeitem div {
+    text-align: center;
+    height: .7rem;
+    line-height: .7rem;
+    font-size: .28rem;
+    color: #fff;
+    font-weight: 700;
+    border-radius: .1rem;
+    white-space: nowrap;
+    overflow: hidden;
+}
+.songtypebox .typeitem.active div {
+    background: #ef4f4f;
+    color: #fff;
+}
+.topbody{
+    overflow: hidden;
+    background-color: #fff;
+}
+.topbody .banglist{
+    height: 100%;
+    overflow: hidden auto;
+}
+.topbody .banglist .norecord{
+    margin-top: 2rem;
+    align-self: center;
+    font-size: 0.32rem;
+}
+.topbody .banglist .banglistbox{
+    padding: 0 0.2rem;
+}
+
+.banglist-item {
+	display:flex;
+	align-items:center;
+	padding:.12rem 0;
+    border-bottom: 1px solid #eceeef;
+}
+.banglist-item:first-child{
+    border-top: 1px solid #eceeef;
+}
+.banglist-item-number {
+	width:0.8rem;
+	text-align:center
+}
+.banglist-item-number>span {
+	display:inline-block;
+	width:0.6rem;
+	height:0.6rem;
+	background:#f5f6f7;
+	border-radius:50%;
+	line-height:0.6rem;
+	font-size:.24rem;
+	font-weight:800;
+	color:#60646b
+}
+.banglist-item-user{
+    width: 2.4rem;
+    padding: 0 0.2rem;
+}
+.banglist-item-avatar {
+	width:0.72rem;
+	height:0.72rem;
+	border-radius:50%;
+}
+.banglist-item-name {
+	margin-top: 0.12rem;
+    text-align: center;
+}
+.banglist-item-info {
+	display:flex;
+	flex-direction:column;
+	justify-content:space-between;
+	height:100%;
+    width: calc(100% - 3.2rem);
+}
+.banglist-item-info .invite-songname {
+	margin-bottom:.12rem;
+	font-size:.32rem;
+	font-weight:bold;
+}
+.banglist-item-info .invite-person{
+    font-size: 0.26rem;
+}
+.banglist-item-info .invite-person span {
+	margin:0 0.1rem;
+	color:red;
+}
+</style>
+<div class="bangbox zam-app-flex zam-app-directionColumn">
+    <div class="topheader">
+        <div class="songtimesbox">
+            <ul class="swiper-wrapper">
+                {foreach $lists as $one}
+                <li class="swiper-slide limitbox" data-id="{$one['id']}">{$one['timename']}</li>
+                {/foreach}
+            </ul>
+        </div>
+        <div class="songtypebox zam-app-flex zam-app-justifyCenter">
+            <div class="typelist zam-app-flex">
+                <div class="typeitem flex1 active" data-type="1">
+                    <div>免费点歌</div>
+                </div>
+                <div class="typeitem flex1" data-type="2">
+                    <div>付费点歌</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="topbody flex1 zam-app-flex">
+        <div class="banglist flex1 zam-app-flex zam-app-directionColumn">
+            <div class="norecord hidden">暂无免费点歌记录</div>
+            <div class="banglistbox"></div>
+        </div>
+        <div class="banglist flex1 zam-app-flex zam-app-directionColumn hidden">
+            <div class="norecord hidden">暂无付费点歌记录</div>
+            <div class="banglistbox"></div>
+        </div>
+    </div>
+</div>
+<script id="free-tpl" type="text/html">
+	<%# $.each(d.lists, function(index, item){ %>
+		<div class="banglist-item">
+			<div class="banglist-item-number zam-app-flex-ajCenter2"><%#  if(index < 3){ %><img src="/{:SIMGURL}pclive/<% index+1 %>.png"><%#  }else{ %><span><% index + 1 %></span><%#  } %></div>
+			<div class="banglist-item-user zam-app-flex-ajCenter">
+                <img class="banglist-item-avatar" src="<% item.artistavatar %>">
+                <div class="banglist-item-name"><% item.songinfo.artistname %></div>
+            </div>
+			<div class="banglist-item-info">
+				<div class="invite-songname limitbox"><% item.songinfo.songname %></div>
+                <div class="invite-person">
+                    <b>点歌<span><% item.song_count %></span>次</b>，
+                    <b>点歌<span><% item.user_count %></span>人</b>
+                </div>
+			</div>
+		</div>
+	<%# }) %>
+</script>
+<script id="pay-tpl" type="text/html">
+	<%# $.each(d.lists, function(index, item){ %>
+		<div class="banglist-item">
+			<div class="banglist-item-number zam-app-flex-ajCenter2"><%#  if(index < 3){ %><img src="/{:SIMGURL}pclive/<% index+1 %>.png"><%#  }else{ %><span><% index + 1 %></span><%#  } %></div>
+			<div class="banglist-item-user zam-app-flex-ajCenter">
+                <img class="banglist-item-avatar" src="<% item.avatar %>">
+                <div class="banglist-item-name"><% item.nickname %></div>
+            </div>
+			<div class="banglist-item-info">
+				<div class="invite-songname limitbox"><% item.content.songname %> - <% item.content.artistname %></div>
+                <div class="invite-person">
+                    <b>台号:<span><% item.content.deskno %></span></b>，
+                    <b>留言:<span><% item.content.songtxt %></span></b>
+                </div>
+                <div class="invite-time">
+                    <b>时间:<span><% item.create_time %></span></b>
+                </div>
+			</div>
+		</div>
+	<%# }) %>
+</script>
+<script>
+    require(['wechatcore','swiper'],function(wechatcore,Swiper){
+        var songtimeswiper = new Swiper('.songtimesbox', {
+            direction: 'horizontal',
+            grabCursor: true,
+            slidesPerView:'auto',
+            slideToClickedSlide:true,
+            freeMode: true,
+        });
+        $('.songtimesbox li').click(function(){
+            var timeid = $(this).attr('data-id')||'',paytype = $(".songtypebox .typeitem.active").attr('data-type')||'1';
+            $(this).addClass('active').siblings().removeClass('active');
+            ajaxbangList();
+        });
+        $('.songtimesbox li').eq(0).trigger('click');
+        $(".songtypebox .typeitem").click(function(){
+            var typeindex = $(this).index();
+            $(".topbody .banglist").eq(typeindex).removeClass('hidden').siblings().addClass('hidden');
+            $(this).addClass('active').siblings().removeClass('active');
+            ajaxbangList();
+        });
+        function ajaxbangList(){
+            const paytype = $(".songtypebox .typeitem.active").attr('data-type')||'1';
+            const timeid = $('.songtimesbox li.active').attr('data-id')||'';
+            wechatcore.ajaxSubmit('/wechat/baping/songbanglist',{timeid:timeid,type:paytype},'正在加载数据..').then(function(json){
+                if(json.code==0){
+                    var banglist = $('.topbody .banglist').eq((paytype == '1' ? 0 : 1)).find('.banglistbox');
+                    var html = wechatcore.tpl($(`#${paytype == '1' ? 'free' : 'pay'}-tpl`),{ 
+                        lists : json.msg,
+                    });
+                    banglist.html(html);
+                    if(!json.msg.length){
+                        banglist.prev().removeClass('hidden');
+                    }else{
+                        banglist.prev().addClass('hidden');
+                    }
+                }else{
+                    wechatcore.msg(json.msg);
+                }
+            }, function(){
+                wechatcore.msg('网络太差，点歌失败');
+            });
+        }
+    })
+</script>
+{include file="common/footer" /}

@@ -1,0 +1,78 @@
+<div class="form-horizontal confirmbox-pop">
+<form class="confirm-formbox" method="post">
+    <div class="text-center">
+        <div class="btn-group pop-btns" style="margin-bottom:10px;">
+          <a href="javascript:void(0)" class="btn btn-default btn-primary"><span>基础设置</span></a>
+          <a href="javascript:void(0)" class="btn btn-default"><span>分类模块</span></a>
+        </div>
+    </div>
+    <div class="carditem">
+        <div class="form-group hidden">
+            <label class="col-lg-3 control-label">* 显示</label>
+            <div class="col-lg-8">
+                {:tpl_switch('catestatus',$config['catestatus'])}
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 分类名</label>
+            <div class="col-lg-8">
+                <input class="form-control" type="text"  name="catename" value="{$config['catename']}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 排序序号</label>
+            <div class="col-lg-8">
+                <input class="form-control" type="text"  name="cateorder" value="{$config['cateorder']}">
+                <span class="zam-help-block">注:升序排序，序号越小越排前面</span>
+            </div>
+        </div>
+    </div>
+    <div class="carditem hidden">
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 模块</label>
+            <div class="col-lg-8">
+               <div class="catemodulelist clearfix">
+                   {volist name="config.catemodules" id="module"}
+                   <div class="catemodule-item cursor"><input type="hidden" name="catemodules[]" value="{$module['id']}">{$module['modulename']} <i class="mdi mdi-close"></i></div>
+                   {/volist}
+               </div>
+               <div class="btn-addmodule cursor" data-cateid="{if isset($config['id'])}{$config['id']}{else}''{/if}">
+                    <a class="btn btn-primary btn-sm"><i class="mdi mdi-plus"></i> 新增模块</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+</div>                     
+<script>    
+require(['webcore','jconfirmBox','zamnotice','layerBox',"jquery.ui"],function(webcore,jconfirmBox,zamnotice,layerBox){
+    $('.carditem .catemodulelist').sortable();
+    $(".carditem .catemodulelist").disableSelection();
+    $(".confirmbox-pop .pop-btns a.btn").click(function(){
+        $(this).addClass('btn-primary').siblings().removeClass("btn-primary");
+        $(".confirmbox-pop .carditem").addClass('hidden').eq($(this).index()).removeClass('hidden');
+    });
+    tpl_switch();
+    $('.btn-addmodule').click(function() {
+       var $this = $(this),moduleitems = $(".catemodulelist input"),moduleids = [];
+       moduleitems.each(function(){
+            moduleids.push($(this).val());
+       });
+       var confirmObj = jconfirmBox.ajaxconfirm("新增模块","{:goweb('hdmodulecate/edit')}",{ismodule:'1',cateid:$this.attr('data-cateid'),moduleids:moduleids},'html','col-lg-6 col-lg-offset-3',function(e){
+            var selmodule = e.find('.addcatemodulelist .active');
+            if(selmodule.length==0){
+                zamnotice.showTips('error','请选择模块');
+                return false;
+            }else{
+                selmodule.each(function(){
+                    $(".catemodulelist").append('<div class="catemodule-item cursor"><input type="hidden" name="catemodules[]" value="'+$(this).attr('data-id')+'">'+$(this).attr('data-modulename')+' <i class="mdi mdi-close"></i></div>');
+                });
+                confirmObj.close();
+            }
+        });
+    });
+    $(".catemodulelist").on('click','i',function(){
+        $(this).parent().remove();
+    });
+});
+</script>

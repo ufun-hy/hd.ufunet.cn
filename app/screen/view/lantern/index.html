@@ -1,0 +1,172 @@
+{include file='common/header' /}
+<style>
+@keyframes bottomimgani {
+  0% {
+    transform: skewX(0deg);
+  }
+  25% {
+    transform: skewX(5deg);
+  }
+  50% {
+    transform: skewX(0deg);
+  }
+  75% {
+    transform: skewX(-5deg);
+  }
+  100% {
+    transform: skewX(0deg);
+  }
+}
+.lantern-mainbox {
+  position: relative;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+.lantern-mainbox .lantern-box {
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+}
+.lantern-mainbox .lantern-box .lantern-item{
+  width: 150px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  will-change: transform;
+}
+.lantern-mainbox .lantern-box .lantern-header {
+  position: relative;
+  width: 150px;
+  height: 190px;
+  background: url("{:tomedia($pcconfig['pcstyle']['lanterns'][0])}") no-repeat top center;
+  background-size: 100% 100%;
+}
+{foreach $pcconfig['pcstyle']['lanterns'] as $key=>$one}
+.lantern-mainbox .lantern-box .lantern-header.bg{$key+1} {
+  background-image: url("{:tomedia($one)}");
+}
+{/foreach}
+.lantern-mainbox .lantern-box .lantern-header img {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 20px;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  box-shadow: 0 0 3px 3px #FFC107, 0 0 20px 0px #FFFDE7;
+  border: 2px solid #ffffff;
+  box-sizing: border-box;
+}
+.lantern-mainbox .lantern-box .lantern-header .name {
+  position: absolute;
+  top: 100px;
+  width: 100%;
+  padding: 0 20px;
+  box-sizing: border-box;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  text-align: center;
+  font-weight: 700;
+  /* text-shadow: 0px 0px 1px #b20c00, 0px 0px 2px #b01500, 0px 0px 3px #bd2d00; */
+  font-size: {$pcconfig['pcstyle']['namesize']}px;
+  color: {$pcconfig['pcstyle']['namecolor']};
+  max-height: {$pcconfig['pcstyle']['namesize'] * 3}px;
+}
+.lantern-mainbox .lantern-box .lantern-header .info {
+    position: absolute;
+    top: 100px;
+    width: 100%;
+    padding: 0 20px;
+    box-sizing: border-box;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 700;
+    color: #ffff99;
+    text-shadow: 0px 0px 1px #b20c00, 0px 0px 2px #b01500, 0px 0px 3px #bd2d00;
+}
+.lantern-mainbox .lantern-box .lantern-header .info div{
+    margin-bottom: 3px;
+}
+.lantern-mainbox .lantern-box .lantern-body {
+  width: 82px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  flex-wrap: nowrap;
+}
+.lantern-mainbox .lantern-box .lantern-body .topline {
+  background: url("{:tomedia($pcconfig['pcstyle']['top'])}") no-repeat top center;
+  background-size: 100% 100%;
+  width: 100%;
+  height: 5px;
+  z-index: 2;
+}
+.lantern-mainbox .lantern-box .lantern-body .bottomline {
+  background: url("{:tomedia($pcconfig['pcstyle']['bottom'])}") no-repeat top center;
+  background-size: 100% 100%;
+  width: 100%;
+  height: 89px;
+  margin-top: -5px;
+  z-index: 2;
+  transform-origin: top right;
+  animation: bottomimgani 4s linear infinite both;
+}
+.lantern-mainbox .lantern-box .lantern-body .center {
+  width: 100%;
+  min-height: 40px;
+  background: url("{:tomedia($pcconfig['pcstyle']['center'])}") no-repeat center center;
+  background-size: 100% 100%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  writing-mode: vertical-lr;
+  text-orientation: mixed;
+  font-weight: 700;
+  letter-spacing: 5px;
+  padding: 20px 0 10px 0;
+  overflow: hidden;
+  text-shadow: 0 0 10px rgba(255, 255, 153, 0.6);
+  display: flex;
+  align-items: center;
+  margin-top: -2px;
+  z-index: 1;
+  font-size: {$pcconfig['pcstyle']['msgsize']}px;
+  color: {$pcconfig['pcstyle']['msgcolor']};
+}
+{if isset($pcconfig['showjoinnum']) && $pcconfig['showjoinnum']=='2'}
+.header .joinPeople{opacity: 0;}
+{/if}
+</style>
+<div class="lantern-mainbox normalbox"></div>
+<script>
+  var showjoinnum = "{$pcconfig['showjoinnum']??'1'}";
+require(['screenlantern'],function (screenlantern) {
+	screenlantern.init({:json_encode($pcconfig['pcstyle'])});
+});
+</script>
+<script type="text/html" id="lantern-tpl">
+    <div class="lantern-item" style="-webkit-transform: scale({{ scale }});opacity: {{ scale }};">
+        <div class="lantern-header bg{{ type }}">
+            <img src="{{ avatar }}" />
+            {{ if typeof nickname === 'array' && nickname.length > 1 }}
+                <div class="info">
+                    {{ each nickname as item }}
+                        <div>{{item}}</div>
+                    {{ /each }}
+                </div>
+            {{ else }}
+                <div class="name">{{ typeof nickname === 'array' ? nickname[0] : nickname }}</div>
+            {{ /if }}
+        </div>
+        <div class="lantern-body">
+            <div class="topline"></div>
+            <div class="center">{{ content }}</div>
+            <div class="bottomline"></div>
+        </div>
+    </div>
+</script>
+{include file='common/footer' /}

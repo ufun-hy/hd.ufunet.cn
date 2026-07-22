@@ -1,0 +1,1169 @@
+<style>
+	table tr td {
+		text-align: center !important
+	}
+
+	.confirmbox-pop .zam-titleBox {
+		font-weight: 600;
+		padding: 5px 0;
+	}
+
+	.userimgbox img {
+		height: 40px !important;
+	}
+
+	.showpwqr {
+		display: inline-block;
+		margin-top: 10px;
+	}
+</style>
+<div class="form-horizontal confirmbox-pop rotate-pop">
+	<form class="confirm-formbox" method="post">
+		<div class="text-center">
+			<div class="btn-group pop-btns" style="margin-bottom:10px;">
+				<a href="javascript:void(0)" class="btn btn-default btn-primary"><span>基础设置</span></a>
+				<a href="javascript:void(0)" class="btn btn-default"><span>评分项</span></a>
+				<a href="javascript:void(0)" class="btn btn-default"><span>参评选手</span></a>
+				<a href="javascript:void(0)" class="btn btn-default"><span>专业评委</span></a>
+				<a href="javascript:void(0)" class="btn btn-default"><span>大众点赞</span></a>
+			</div>
+		</div>
+		<div class="carditem">
+			<div class="form-group">
+				<label class="col-lg-3 control-label">* 轮次名</label>
+				<div class="col-lg-8">
+					<input class="form-control" type="text" name="title" value="{$rotate['title']}">
+				</div>
+			</div>
+			<div class="form-group scoretypebox">
+				<label class="col-lg-3 control-label">* 计分类型</label>
+				<div class="col-lg-8">
+					<label class="lyear-radio radio-inline radio-primary" onclick="scoretypechange('1')">
+						<input type="radio" name="scoretype" value="1" {if $rotate['scoretype']=='1'
+							}checked{/if}><span>总分</span>
+					</label>
+					<label class="lyear-radio radio-inline radio-primary" onclick="scoretypechange('2')">
+						<input type="radio" name="scoretype" value="2" {if $rotate['scoretype']=='2'
+							}checked{/if}><span>平均分</span>
+					</label>
+				</div>
+			</div>
+			<div class="form-group pfmodebox">
+				<label class="col-lg-3 control-label">* 计分模式</label>
+				<div class="col-lg-8">
+					<label class="lyear-radio radio-inline radio-primary" onclick="pfmodechange('1')">
+						<input type="radio" name="pfmode" value="1" {if $rotate['pfmode']=='1'
+							}checked{/if}><span>默认</span>
+					</label>
+					<label class="lyear-radio radio-inline radio-primary" onclick="pfmodechange('2')">
+						<input type="radio" name="pfmode" value="2" {if $rotate['pfmode']=='2'
+							}checked{/if}><span>去掉最高和最低分</span>
+					</label>
+				</div>
+			</div>
+			<div class="form-group m-b-5">
+				<label class="col-lg-3 control-label">* 大众评委</label>
+				<div class="col-lg-8">
+					{:tpl_switch('openpubpw',$rotate['openpubpw'],'openpubpw')}
+					<span class="help-block" style="margin:0;color:red">注:开启后微信用户视作大众评委可以参与评分，不可点赞</span>
+				</div>
+			</div>
+			<div class="pubpw{if $rotate['openpubpw']=='2'} hidden{/if}">
+				<div class="form-group">
+					<label class="col-lg-3 control-label">* 大众评委占比</label>
+					<div class="col-lg-5">
+						<input type="text" class="form-control numberincdec" name="pubweight" data-bts-min="1"
+							data-bts-replacement-val="1" data-bts-max="100" data-bts-step="1"
+							value="{$rotate['pubweight']}">
+						<span class="help-block">请填写1-100的整数</span>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-lg-3 control-label">* 显示评分颜色</label>
+					<div class="col-lg-4">
+						<div class="input-group">
+							<div class="input-group-btn not-allow"><a class="btn btn-default">背景色</a></div>
+							{:tpl_color('scorebgcolor',$rotate['scorebgcolor'])}
+							<div class="input-group-btn not-allow"><a class="btn btn-default">文字颜色</a></div>
+							{:tpl_color('scoretxtcolor',$rotate['scoretxtcolor'])}
+						</div>
+					</div>
+				</div>
+				<div class="form-group maxmintypebox{if $rotate['pfmode'] == '1'} hidden{/if}">
+					<label class="col-lg-3 control-label">* 去掉最高和最低分模式</label>
+					<div class="col-lg-8">
+						<label class="lyear-radio radio-inline radio-primary">
+							<input type="radio" name="maxmintype" value="1" {if !isset($rotate['maxmintype']) || $rotate['maxmintype']=='1'
+								}checked{/if}><span>默认</span>
+						</label>
+						<label class="lyear-radio radio-inline radio-primary">
+							<input type="radio" name="maxmintype" value="2" {if isset($rotate['maxmintype']) && $rotate['maxmintype']=='2'
+								}checked{/if}><span>仅大众评委去掉最高和最低分</span>
+						</label>
+						<label class="lyear-radio radio-inline radio-primary">
+							<input type="radio" name="maxmintype" value="3" {if isset($rotate['maxmintype']) && $rotate['maxmintype']=='3'
+								}checked{/if}><span>仅专家评委去掉最高和最低分</span>
+						</label>
+						<span class="help-block">默认即为专家与大众评委均去掉最高和最低分</span>
+					</div>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-lg-3 control-label">* 切换跟随</label>
+				<div class="col-lg-8">
+					{:tpl_switch('followswitch',$rotate['followswitch']??'2')}
+					<span class="help-block">开启后大屏幕切换到哪个选手，评委端也会自动跟随切换至哪个选手，一般用于选手表演完才可给对应的选手评分的场景</span>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-lg-3 control-label">* 微信端展示得分</label>
+				<div class="col-lg-8">
+					{:tpl_switch('showscore',$rotate['showscore']??'1','showscorebox')}
+					<span class="help-block">开启后微信端参评选手列表页以及微信端排行榜页可展示选手的得分，在参评选手页面只有当前登录的评委对选手评分后才会显示选手的得分否则显示为待评分</span>
+				</div>
+			</div>
+			<div
+				class="form-group showscoretypebox{if isset($rotate['showscore']) && $rotate['showscore']=='2'} hidden{/if}">
+				<label class="col-lg-3 control-label">* 参评选手列表页显示分数类型</label>
+				<div class="col-lg-8">
+					<label class="lyear-radio radio-inline radio-primary">
+						<input type="radio" name="showscoretype" value="1" {if !isset($rotate['showscoretype']) ||
+							$rotate['showscoretype']=='1' }checked{/if}><span>选手当前得分</span>
+					</label>
+					<label class="lyear-radio radio-inline radio-primary">
+						<input type="radio" name="showscoretype" value="2" {if isset($rotate['showscoretype']) &&
+							$rotate['showscoretype']=='2' }checked{/if}><span>评委评分分值</span>
+					</label>
+					<span class="help-block">注意：在参评选手列表页只有当前登录的评委对选手评分后才会显示分数，否则展示为待评分</span>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-lg-3 control-label">* 评委评语输入</label>
+				<div class="col-lg-8">
+					{:tpl_switch('showpl',$rotate['showpl']??'1')}
+					<span class="help-block">开启评委可以点评</span>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-lg-3 control-label">* 评委签名</label>
+				<div class="col-lg-8">
+					{:tpl_switch('showsign',$rotate['showsign']??'2')}
+					<span class="help-block">开启评委必须手写签名才可以提交评分</span>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-lg-3 control-label">* 评委修改评分</label>
+				<div class="col-lg-8">
+					{:tpl_switch('canresave',$rotate['canresave'])}
+					<span class="help-block">开启评委可以修改自己的打分</span>
+				</div>
+			</div>
+			<div class="form-group m-b-5">
+				<label class="col-lg-3 control-label">* 微信端主色调</label>
+				<div class="col-lg-3">
+					{:tpl_color('maincolor',$rotate['maincolor'])}
+				</div>
+			</div>
+		</div>
+		<div class="carditem hidden">
+			<div class="form-group">
+				<label class="col-lg-3 control-label">* 打分模式</label>
+				<div class="col-lg-8" {if isset($rotate['hasdata']) &&
+					!empty($rotate['hasdata'])}style="pointer-events:none" {/if}>
+					<label class="lyear-radio radio-inline radio-primary"
+						onclick="javascript:$('.pftype1Box').removeClass('hidden');$('.pftype2Box').addClass('hidden');">
+						<input type="radio" name="pftype" value="1" {if $rotate['pftype']=='1'
+							}checked{/if}><span>单项</span>
+					</label>
+					<label class="lyear-radio radio-inline radio-primary"
+						onclick="javascript:$('.pftype1Box').addClass('hidden');$('.pftype2Box').removeClass('hidden');">
+						<input type="radio" name="pftype" value="2" {if $rotate['pftype']=='2'
+							}checked{/if}><span>多项</span>
+					</label>
+					<span class="zam-help-block">{if isset($rotate['hasdata']) && !empty($rotate['hasdata'])}<span
+							class="text-danger">注:本轮已产生了评分数据，此项不可更改</span>{/if}</span>
+				</div>
+			</div>
+			<div class="form-group m-b-5">
+				<label class="col-lg-3 control-label">* 打分分数类型</label>
+				<div class="col-lg-8">
+					<label class="lyear-radio radio-inline radio-primary">
+						<input type="radio" name="pfinteger" value="1" {if isset($rotate['pfinteger']) &&
+							$rotate['pfinteger']=='1' }checked{/if}><span>整数</span>
+					</label>
+					<label class="lyear-radio radio-inline radio-primary">
+						<input type="radio" name="pfinteger" value="2" {if !isset($rotate['pfinteger']) ||
+							$rotate['pfinteger']=='2' }checked{/if}><span>保留2位小数</span>
+					</label>
+					<label class="lyear-radio radio-inline radio-primary">
+						<input type="radio" name="pfinteger" value="3" {if isset($rotate['pfinteger']) &&
+							$rotate['pfinteger']=='3' }checked{/if}><span>保留1位小数</span>
+					</label>
+					<span class="help-block mt5"></span>
+				</div>
+			</div>
+			<div class="form-group pftype1Box{if $rotate['pftype']=='2'} hidden{/if}">
+				<label class="col-lg-3 control-label">* 分数范围</label>
+				<div class="col-lg-5">
+					<div class="input-group">
+						<div class="input-group-btn not-allow"><a class="btn btn-default">最低</a></div>
+						<div class="touchspin">
+							<input type="text" class="form-control numberincdec" name="pfmin" data-bts-min="0"
+								data-bts-replacement-val="0" data-bts-max="100" data-bts-step="1"
+								value="{$rotate['pfmin']}" {if isset($rotate['hasdata']) &&
+								!empty($rotate['hasdata'])}disabled{/if}>
+						</div>
+						<div class="input-group-btn not-allow"><a class="btn btn-default">分，最高</a></div>
+						<div class="touchspin">
+							<input type="text" class="form-control numberincdec" name="pfmax" data-bts-min="0"
+								data-bts-replacement-val="0" data-bts-max="100" value="{$rotate['pfmax']}" {if
+								isset($rotate['hasdata']) && !empty($rotate['hasdata'])}disabled{/if}>
+						</div>
+					</div>
+					<span class="zam-help-block">评分时必须大于0，小于等于100分{if isset($rotate['hasdata']) &&
+						!empty($rotate['hasdata'])}<span class="text-danger">，注:本轮已产生了评分数据，此项不可更改</span>{/if}</span>
+				</div>
+			</div>
+			<div class="form-group m-t-15 pftype2Box{if $rotate['pftype']=='1'} hidden{/if}">
+				<label class="col-lg-3 control-label">* 打分项目(最多50项)</label>
+				<div class="col-lg-9">
+					<table class="we7-table table" style="margin-bottom:0px;">
+						<thead>
+							<tr>
+								<th style="width:30%;text-align:center;">项目名</th>
+								<th style="width:20%;text-align:center;">最低分</th>
+								<th style="width:20%;text-align:center;">最高分</th>
+								<th style="width:30%;text-align:center;">操作</th>
+							</tr>
+						</thead>
+						<tbody class="dfitem-lists">
+							{volist name="rotate.pfitem" id="pfrow"}
+							<tr>
+								<td>
+									<input type="hidden" name="dffield[]" value="{$pfrow['dffield']}">
+									<input type="hidden" name="dfname[]" value="{$pfrow['dfname']}">
+									<span>{$pfrow['dfname']}</span>
+								</td>
+								<td>
+									<input type="hidden" name="dfmin[]" value="{$pfrow['dfmin']}">
+									<span>{$pfrow['dfmin']}</span>
+								</td>
+								<td>
+									<input type="hidden" name="dfmax[]" value="{$pfrow['dfmax']}">
+									<span>{$pfrow['dfmax']}</span>
+								</td>
+								<td>
+									<a href="javascript:;" class="btn btn-primary btn-xs btn-editdf" {if
+										isset($rotate['hasdata']) && !empty($rotate['hasdata'])}disabled
+										style="pointer-events: none" {/if}><i class="mdi mdi-pencil"></i></a>
+									<a href="javascript:;" class="btn btn-info btn-xs sortmove" {if
+										isset($rotate['hasdata']) && !empty($rotate['hasdata'])}disabled
+										style="pointer-events: none" {/if}><i class="mdi mdi-arrow-all"></i></a>
+									<a href="javascript:;" class="btn btn-danger btn-xs btn-deldf" {if
+										isset($rotate['hasdata']) && !empty($rotate['hasdata'])}disabled
+										style="pointer-events: none" {/if}><i class="mdi mdi-close"></i></a>
+								</td>
+							</tr>
+							{/volist}
+						</tbody>
+						<tfoot style="border: 1px solid #efefef;">
+							<tr>
+								<td colspan="4">
+									<div>
+										<a class="btn btn-primary btn-sm adddfitem" href="javascript:;" {if
+											isset($rotate['hasdata']) && !empty($rotate['hasdata'])}disabled
+											style="pointer-events: none" {/if}> <i
+												class="mdi mdi-plus"></i>&nbsp;<span>新增打分项</span></a>
+										<a class="btn btn-warning btn-sm importitem" href="javascript:;" {if
+											isset($rotate['hasdata']) && !empty($rotate['hasdata'])}disabled
+											style="pointer-events: none" {/if}> <i
+												class="mdi mdi-import"></i>&nbsp;<span>导入打分项</span></a>
+									</div>
+								</td>
+							</tr>
+						</tfoot>
+					</table>
+					<span class="help-block">{if isset($rotate['hasdata']) && !empty($rotate['hasdata'])}<span
+							class="text-danger">注:本轮已产生了评分数据，此项不可更改</span>{/if}</span>
+				</div>
+			</div>
+
+		</div>
+		<div class="carditem hidden">
+			<div class="form-group col-lg-12" style="margin-right: 0;margin-left: 0">
+				<table class="we7-table table" style="margin-bottom:0px;">
+					<thead>
+						<tr>
+							<th style="width:10%;text-align:center;">评分状态</th>
+							<th style="width:10%;text-align:center;">大屏展示</th>
+							<th style="width:20%;text-align:center;">选手头像</th>
+							<th style="width:20%;text-align:center;">选手名</th>
+							<th style="width:20%;text-align:center;">选手简介</th>
+							<th style="width:20%;text-align:center;">操作</th>
+						</tr>
+					</thead>
+					<tbody class="user-lists">
+						{volist name="rotate.users" id="pfuser"}
+						<tr data-pfuserid="{$pfuser['id']}">
+							<td>
+								<label class="lyear-switch switch-primary normal-swith switch-solid"
+									style="height:38px">
+									<input type="checkbox" {if $pfuser['userstatus']=='1' }checked="checked" {/if}>
+									<input type="hidden" name="userstatus[]" value="{$pfuser['userstatus']}">
+									<span data-status="{$pfuser['userstatus']}" data-func="openscreenshow2"
+										class="normal-span has-func" data-ajax=""></span>
+								</label>
+							</td>
+							<td>
+								<label class="lyear-switch switch-primary normal-swith switch-solid"
+									style="height:38px">
+									<input type="checkbox" {if $pfuser['screenshow']=='1' }checked="checked" {/if}>
+									<input type="hidden" name="screenshow[]" value="{$pfuser['screenshow']}">
+									<span data-status="{$pfuser['screenshow']}" data-func="openscreenshow3"
+										class="normal-span has-func" data-ajax=""></span>
+								</label>
+							</td>
+							<td>
+								<input type="hidden" name="userimg[]" value="{$pfuser['userimg']}">
+								<div class="userimgbox"><img src="{:tomedia($pfuser['userimg']);}"></div>
+							</td>
+							<td>
+								<input type="hidden" name="username[]" value="{$pfuser['username']}">
+								<span>{$pfuser['username']}</span>
+							</td>
+							<td>
+								<input type="hidden" name="userdes[]" value="{$pfuser['userdes']}">
+								<input type="hidden" name="basicscore[]" value="{$pfuser['basicscore']??'0'}">
+								<span>{$pfuser['userdes']}</span>
+							</td>
+							<td>
+								<a href="javascript:;" data-pfuserid="{$pfuser['id']}" class="btn btn-primary btn-xs btn-edituser">
+									<i class="mdi mdi-pencil"></i>
+								</a>
+								<a href="javascript:;" data-pfuserid="{$pfuser['id']}" class="btn btn-info btn-xs sortmove">
+									<i class="mdi mdi-arrow-all"></i>
+								</a>
+								{if request()->host(true) == 'xile.hnzsnetwork.cn' && request()->realhdid == '576'}
+								<a href="javascript:;" data-pfuserid="{$pfuser['id']}" data-username="{$pfuser['username']}" class="btn btn-info btn-xs btn-downloaduser">
+									<i class="mdi mdi-qrcode"></i>
+								</a>
+								{/if}
+								<a href="javascript:;" data-pfuserid="{$pfuser['id']}" class="btn btn-danger btn-xs btn-deluser">
+									<i class="mdi mdi-close"></i>
+								</a>
+							</td>
+						</tr>
+						{/volist}
+					</tbody>
+					<tfoot style="border: 1px solid #efefef;">
+						<tr>
+							<td colspan="6">
+								<a class="btn btn-primary btn-sm adduser" href="javascript:;"> <i
+										class="mdi mdi-plus"></i>&nbsp;<span>新增选手</span></a>
+								<a class="btn btn-warning btn-sm importuser" href="javascript:;"> <i
+										class="mdi mdi-import"></i>&nbsp;<span>导入选手</span></a>
+							</td>
+						</tr>
+					</tfoot>
+				</table>
+			</div>
+		</div>
+		<div class="carditem hidden">
+			<div class="form-group col-lg-12" style="margin-right: 0;margin-left: 0">
+				<table class="we7-table table" style="margin-bottom:0px;">
+					<thead>
+						<tr>
+							<th style="width:20%;text-align:center;">评委头像</th>
+							<th style="width:20%;text-align:center;">评委名</th>
+							<th style="width:20%;text-align:center;">权重</th>
+							<th style="width:20%;text-align:center;">登录码<span class="text-danger">(推荐使用手机号)</span></th>
+							<th style="width:20%;text-align:center;">操作</th>
+						</tr>
+					</thead>
+					<tbody class="pw-lists">
+						{volist name="rotate.pws" id="pw"}
+						<tr>
+							<td>
+								<input type="hidden" name="pwimg[]" value="{$pw['pwimg']}">
+								<div class="userimgbox"><img src="{:tomedia($pw['pwimg']);}"></div>
+								<span class="mdi mdi-qrcode showpwqr cursor hidden"></span>
+							</td>
+							<td>
+								<input type="hidden" name="pwname[]" value="{$pw['pwname']}">
+								<span>{$pw['pwname']}</span>
+							</td>
+							<td>
+								<input type="hidden" name="pwweight[]" value="{$pw['pwweight']}">
+								<span>{$pw['pwweight']}</span>
+							</td>
+							<td>
+								<input type="hidden" name="pwcode[]" value="{$pw['pwcode']}">
+								<span>{$pw['pwcode']}</span>
+							</td>
+							<td>
+								<a href="javascript:;" data-pwid="{$pw['id']}"
+									class="btn btn-primary btn-xs btn-editpw">
+									<i class="mdi mdi-pencil"></i>
+								</a>
+								<a href="javascript:;" data-pwid="{$pw['id']}" class="btn btn-danger btn-xs btn-delpw">
+									<i class="mdi mdi-close"></i>
+								</a>
+							</td>
+						</tr>
+						{/volist}
+					</tbody>
+					<tfoot style="border: 1px solid #efefef;">
+						<tr>
+							<td colspan="5">
+								<a class="btn btn-primary btn-sm addpw" href="javascript:;"> <i
+										class="mdi mdi-plus"></i>&nbsp;<span>新增评委</span></a>
+								<a class="btn btn-warning btn-sm importpw" href="javascript:;"> <i
+										class="mdi mdi-import"></i>&nbsp;<span>导入评委</span></a>
+							</td>
+						</tr>
+					</tfoot>
+				</table>
+			</div>
+		</div>
+		<div class="carditem hidden">
+			<div class="form-group isopendz">
+				<label class="col-lg-3 control-label">* 点赞</label>
+				<div class="col-lg-3">
+					{:tpl_switch('openzan',$rotate['openzan'],'openzan')}
+				</div>
+			</div>
+			<div class="zanBox{if $rotate['openzan']=='2'} hidden{/if}">
+				<div class="form-group">
+					<label class="col-lg-3 control-label">* 每人免费赞数目</label>
+					<div class="col-lg-3">
+						<input type="text" class="form-control numberincdec" name="freezannum" data-bts-min="0"
+							data-bts-replacement-val="0" data-bts-max="100" data-bts-step="1"
+							value="{$rotate['freezannum']}">
+						<span class="zam-help-block">注:必须是大于0的整数</span>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-lg-3 control-label">* 付费点赞</label>
+					<div class="col-lg-8">
+						{:tpl_switch('openpayzan',$rotate['openpayzan'],'openpayzan')}
+						<span class="help-block">开启微信用户可支付相应费用购买赞</span>
+					</div>
+				</div>
+				<div class="form-group zanpayBox{if $rotate['openpayzan']=='2'} hidden{/if}">
+					<label class="col-lg-3 control-label">* 单个赞售价</label>
+					<div class="col-lg-6">
+						<input type="text" class="form-control numberincdec" name="onezanfee" data-bts-min="0.01"
+							data-bts-replacement-val="0.01" data-bts-max="null" data-bts-decimals="2" data-bts-step="1"
+							data-bts-force-step-divisibility="xstwo" value="{$rotate['onezanfee']}">
+						<span class="zam-help-block">注:必须是大于0的整数或者小数，当用户免费赞用完，继续点赞需要支付费用</span>
+					</div>
+				</div>
+				<div class="form-group zanpayBox{if $rotate['openpayzan']!='1'} hidden{/if}">
+					<label class="col-lg-3 control-label">* 批量购赞快捷通道</label>
+					<div class="col-lg-9">
+						<table class="we7-table table" style="margin-bottom:0px;">
+							<thead>
+								<tr>
+									<th style="width:20%;text-align:center;">赞量</th>
+									<th style="width:20%;text-align:center;">售价</th>
+									<th style="width:60%;text-align:center;">操作</th>
+								</tr>
+							</thead>
+							<tbody class="zanitem-lists">
+								{volist name="rotate.zanpayitem" id="zrow"}
+								<tr>
+									<td>
+										<input type="hidden" name="zannum[]" value="{$zrow['zannum']}">
+										<span>{$zrow['zannum']}个</span>
+									</td>
+									<td>
+										<input type="hidden" name="zanfee[]" value="{$zrow['zanfee']}">
+										<span>{$zrow['zanfee']}元</span>
+									</td>
+									<td>
+										<a href="javascript:;" class="btn btn-primary btn-xs btn-editzan"><i
+												class="mdi mdi-pencil"></i></a>
+										<a href="javascript:;" class="btn btn-danger btn-xs btn-delzan"><i
+												class="mdi mdi-close"></i></a>
+									</td>
+								</tr>
+								{/volist}
+							</tbody>
+							<tfoot style="border: 1px solid #efefef;">
+								<tr>
+									<td colspan="4">
+										<a class="btn btn-primary btn-sm addzanitem" href="javascript:;"> <i
+												class="mdi mdi-plus"></i>&nbsp;<span>新增通道</span></a>
+										<a class="btn disabled">最多可添加9个快捷通道</a>
+									</td>
+								</tr>
+							</tfoot>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>
+<script id='newdfitem-tpl' type="text/template">
+	<tr>
+		<td>
+		 <input type="hidden" name="dffield[]" value="<% d.dffield %>">
+		 <input type="hidden" name="dfname[]" value="<% d.dfname %>">
+		 <span><% d.dfname %></span>
+		</td>
+		<td>
+		  <input type="hidden" name="dfmin[]" value="<% d.dfmin %>">
+		   <span><% d.dfmin %></span>
+		</td>
+		<td>
+		   <input type="hidden" name="dfmax[]" value="<% d.dfmax %>">
+		   <span><% d.dfmax %></span>
+		</td>
+		<td>
+		  <a href="javascript:;"  class="btn btn-primary btn-xs btn-editdf"><i class="mdi mdi-pencil"></i></a>
+		  <a href="javascript:;" class="btn btn-info btn-xs sortmove"><i class="mdi mdi-arrow-all"></i></a>
+		  <a href="javascript:;"  class="btn btn-danger btn-xs btn-deldf"><i class="mdi mdi-close"></i></a>
+		</td>
+	</tr>
+</script>
+<script id='newzanitem-tpl' type="text/template">
+	<tr>
+		<td>
+		  <input type="hidden" name="zannum[]" value="<% d.zannum %>">
+		   <span><% d.zannum %>个</span>
+		</td>
+		<td>
+		   <input type="hidden" name="zanfee[]" value="<% d.zanfee %>">
+		   <span><% d.zanfee %>元</span>
+		</td>
+		<td>
+		  <a href="javascript:;"  class="btn btn-primary btn-xs btn-editzan"><i class="mdi mdi-pencil"></i></a>
+		  <a href="javascript:;"  class="btn btn-danger btn-xs btn-delzan"><i class="mdi mdi-close"></i></a>
+		</td>
+	</tr>
+</script>
+<script id='newuser-tpl' type="text/template">
+<tr <%# if(d.id){ %>data-pfuserid="<% d.id %>"<%# } %>>
+	<td>
+		<label class="lyear-switch switch-primary normal-swith switch-solid" style="height:38px">
+		  <input type="checkbox" <%# if(d.userstatus=='1'){ %>checked="checked"<%# } %>>
+		  <input type="hidden" name="userstatus[]" value="<% d.userstatus %>">
+		  <span data-status="<% d.userstatus %>" data-func="openscreenshow2" class="normal-span has-func" data-ajax=""></span>
+		</label>
+    </td>
+	<td>
+		<label class="lyear-switch switch-primary normal-swith switch-solid" style="height:38px">
+		  <input type="checkbox" <%# if(d.screenshow=='1'){ %>checked="checked"<%# } %>>
+		  <input type="hidden" name="screenshow[]" value="<% d.screenshow %>">
+		  <span data-status="<% d.screenshow %>" data-func="openscreenshow3" class="normal-span has-func" data-ajax=""></span>
+		</label>
+    </td>
+	<td>
+	  <input type="hidden" name="userimg[]" value="<% d.userimg %>">
+	  <div class="userimgbox"><img src="<% d.userimgprev %>"></div>
+	</td>
+	<td>
+	  <input type="hidden" name="username[]" value="<% d.username %>">
+	  <input type="hidden" name="basicscore[]" value="<% d.basicscore %>">
+	  <span><% d.username %></span>
+	</td>
+	<td>
+	   <input type="hidden" name="userdes[]" value="<% d.userdes %>">
+	  <span><% d.userdes %></span>
+	</td>
+	<td>
+		<a href="javascript:;" <%# if(d.id){ %>data-pfuserid="<% d.id %>"<%# } %> class="btn btn-primary btn-xs btn-edituser">
+			<i class="mdi mdi-pencil"></i>
+		</a>
+		<a href="javascript:;" <%# if(d.id){ %>data-pfuserid="<% d.id %>"<%# } %> class="btn btn-info btn-xs sortmove">
+			<i class="mdi mdi-arrow-all"></i>
+		</a>
+		{if request()->host(true) == 'xile.hnzsnetwork.cn' && request()->realhdid == '576'}
+		<%# if(d.id){ %>
+		<a href="javascript:;" data-pfuserid="<% d.id %>" data-username="<% d.username %>" class="btn btn-info btn-xs btn-downloaduser">
+			<i class="mdi mdi-qrcode"></i>
+		</a>
+		<%# } %>
+		{/if}
+		<a href="javascript:;" <%# if(d.id){ %>data-pfuserid="<% d.id %>"<%# } %> class="btn btn-danger btn-xs btn-deluser">
+			<i class="mdi mdi-close"></i>
+		</a>
+	</td>
+</tr>
+</script>
+<script id='newpw-tpl' type="text/template">
+<tr>
+	<td>
+	  <input type="hidden" name="pwimg[]" value="<% d.pwimg %>">
+	  <div class="userimgbox"><img src="<% d.pwimgprev %>"></div>
+	  <span class="mdi mdi-qrcode showpwqr cursor hidden"></span>
+	</td>
+	<td>
+	  <input type="hidden" name="pwname[]" value="<% d.pwname %>">
+	  <span><% d.pwname %></span>
+	</td>
+	<td>
+	   <input type="hidden" name="pwweight[]" value="<% d.pwweight %>">
+	  <span><% d.pwweight %></span>
+	</td>
+	<td>
+	   <input type="hidden" name="pwcode[]" value="<% d.pwcode %>">
+	  <span><% d.pwcode %></span>
+	</td>
+	<td>
+	  <a href="javascript:;" <%# if(d.id){ %>data-pwid="<% d.id %>"<%# } %> class="btn btn-primary btn-xs btn-editpw">
+		  <i class="mdi mdi-pencil"></i>
+	  </a>
+	  <a href="javascript:;" <%# if(d.id){ %>data-pwid="<% d.id %>"<%# } %> class="btn btn-danger btn-xs btn-delpw">
+		  <i class="mdi mdi-close"></i>
+	  </a>
+	</td>
+</tr>
+</script>
+<script>
+	require(['webcore', 'jconfirmBox', 'zamnotice', 'layerBox', "bootstrap-touchspin","jquery.ui"], function (webcore, jconfirmBox, zamnotice, layerBox) {
+		tpl_switch();
+		$('.dfitem-lists').sortable({handle: ".sortmove"}).disableSelection();
+		$(".rotate-pop .pop-btns a.btn").click(function () {
+			$(this).addClass('btn-primary').siblings().removeClass("btn-primary");
+			$(".rotate-pop .carditem").addClass('hidden').eq($(this).index()).removeClass('hidden');
+		});
+		$(".confirmbox-pop .numberincdec").TouchSpin().on("change", function () {
+			var $this = $(this), funcstr = $this.data('func');
+			var func = window[funcstr];
+			func && func();
+		});
+		$(function () {
+			$(".sp-container").remove();
+			$(".js-colorpicker").each(function () {
+				tpl_colorpicker(this);
+			});
+		})
+		var rotateid = "{if isset($rotate['id'])}{$rotate['id']}{else}{/if}";
+		$(".adddfitem").on('click', function () {
+			if ($(".dfitem-lists tr").length >= 50) {
+				return zamnotice.showTips('error', '多项打分内的打分项最多可添加50个');
+			}
+			var confirmObj = jconfirmBox.ajaxconfirm("新增打分项目", "{:gohdmanage('configlivemark/editdfitem',['hdid'=>$hdid])}", {}, 'html', 'col-lg-6 col-lg-offset-3', function (e) {
+				var dfitem = {
+					dffield: e.find('.dffield').val(),
+					dfname: e.find('.dfname').val(),
+					dfmin: e.find('.dfmin').val(),
+					dfmax: e.find('.dfmax').val(),
+				};
+				if (dfitem.dfname == '') {
+					return zamnotice.showTips('error', '打分项目名称必须填写');
+				}
+				if (dfitem.dfmin == '' || dfitem.dfmax == '') {
+					return zamnotice.showTips('error', '打分项目最低分与最高分必须填写');
+				}
+				if (parseInt(dfitem.dfmin) > parseInt(dfitem.dfmax)) {
+					return zamnotice.showTips('error', '打分项目最低分必须小于等于最高分');
+				}
+				if (parseInt(dfitem.dfmin) > 100 || parseInt(dfitem.dfmax) > 100) {
+					return zamnotice.showTips('error', '打分项目分数上限为100分');
+				}
+				$(".dfitem-lists").append(webcore.tpl($("#newdfitem-tpl"), dfitem));
+				confirmObj.close();
+			});
+		});
+		$(".dfitem-lists").on('click', '.btn-deldf', function () {
+			$(this).parent().parent().remove();
+		});
+		$(".dfitem-lists").on('click', '.btn-editdf', function () {
+			var parentTr = $(this).parent().parent(), TrInput = parentTr.find('input');
+			var confirmObj = jconfirmBox.ajaxconfirm("修改打分项目", "{:gohdmanage('configlivemark/editdfitem',['hdid'=>$hdid])}", {
+				data: {
+					dffield: TrInput.eq(0).val(),
+					dfname: TrInput.eq(1).val(),
+					dfmin: TrInput.eq(2).val(),
+					dfmax: TrInput.eq(3).val(),
+				}
+			}, 'html', 'col-lg-6 col-lg-offset-3', function (e) {
+				var dfitem = {
+					dffield: e.find('.dffield').val(),
+					dfname: e.find('.dfname').val(),
+					dfmin: e.find('.dfmin').val(),
+					dfmax: e.find('.dfmax').val(),
+				};
+				if (dfitem.dfname == '') {
+					return zamnotice.showTips('error', '打分项目名称必须填写');
+				}
+				if (dfitem.dfmin == '' || dfitem.dfmax == '') {
+					return zamnotice.showTips('error', '打分项目最低分与最高分必须填写');
+				}
+				if (parseInt(dfitem.dfmin) > parseInt(dfitem.dfmax)) {
+					return zamnotice.showTips('error', '打分项目最低分必须小于等于最高分');
+				}
+				if (parseInt(dfitem.dfmin) > 100 || parseInt(dfitem.dfmax) > 100) {
+					return zamnotice.showTips('error', '打分项目分数上限为100分');
+				}
+				parentTr.html($(webcore.tpl($("#newdfitem-tpl"), dfitem)).html());
+				confirmObj.close();
+			});
+		});
+		$(".addzanitem").on('click', function () {
+			if ($(".zanitem-lists tr").length > 9) {
+				return zamnotice.showTips('error', '快捷通道最多可添加9个');
+			}
+			var confirmObj = jconfirmBox.ajaxconfirm("新增点赞快捷通道", "{:gohdmanage('configlivemark/editzanitem',['hdid'=>$hdid])}", {}, 'html', 'col-lg-6 col-lg-offset-3', function (e) {
+				var zanitem = {
+					zannum: e.find('.zannum').val(),
+					zanfee: e.find('.zanfee').val(),
+				};
+				if (zanitem.zannum == '') {
+					return zamnotice.showTips('error', '赞数目必须填写');
+				}
+				if (zanitem.zanfee == '' || zanitem.zanfee <= 0) {
+					return zamnotice.showTips('error', '售价必须大于0');
+				}
+				zanitem.zanfee = parseFloat(zanitem.zanfee).toFixed(2);
+				$(".zanitem-lists").append(webcore.tpl($("#newzanitem-tpl"), zanitem));
+				confirmObj.close();
+			});
+		});
+		$(".zanitem-lists").on('click', '.btn-delzan', function () {
+			$(this).parent().parent().remove();
+		});
+		$(".zanitem-lists").on('click', '.btn-editzan', function () {
+			var parentTr = $(this).parent().parent(), TrInput = parentTr.find('input');
+			var confirmObj = jconfirmBox.ajaxconfirm("修改点赞快捷通道", "{:gohdmanage('configlivemark/editzanitem',['hdid'=>$hdid])}", {
+				data: {
+					zannum: TrInput.eq(0).val(),
+					zanfee: TrInput.eq(1).val(),
+				}
+			}, 'html', 'col-lg-6 col-lg-offset-3', function (e) {
+				var zanitem = {
+					zannum: e.find('.zannum').val(),
+					zanfee: e.find('.zanfee').val(),
+				};
+				if (zanitem.zannum == '') {
+					return zamnotice.showTips('error', '赞数目必须填写');
+				}
+				if (zanitem.zanfee == '' || zanitem.zanfee <= 0) {
+					return zamnotice.showTips('error', '售价必须大于0');
+				}
+				zanitem.zanfee = parseFloat(zanitem.zanfee).toFixed(2);
+				parentTr.html($(webcore.tpl($("#newzanitem-tpl"), zanitem)).html());
+				confirmObj.close();
+			});
+		});
+		$('.user-lists').sortable({
+			handle: ".sortmove",
+			update: function(event, ui) {
+				var $this = $(this),trs = $this.find('tr');
+				if(rotateid){
+					var ids = [];
+					trs.each(function(){
+						ids.push($(this).attr('data-pfuserid'));
+					});
+					webcore.ajaxSubmit("{:gohdmanage('configlivemark/sortpfuser',['hdid'=>$hdid])}",{rotateid:rotateid,ids:ids}).then(function(json){
+						if(json.code != 0){
+							$this.sortable('cancel');
+							layerBox.showMsg(json.msg||'排序出现异常');
+						}
+					}, function(json){
+						layerBox.showMsg('排序出现异常');
+						$this.sortable('cancel');
+					});
+				}
+			}
+		}).disableSelection();
+		$(".adduser").on('click', function () {
+			var confirmObj = jconfirmBox.ajaxconfirm("新增评分用户", "{:gohdmanage('configlivemark/editpfuser',['hdid'=>$hdid])}", { rotateid: rotateid }, 'html', 'col-lg-8 col-lg-offset-2', function (e) {
+				var userarr = webcore.serializeObject(e.find('form'));
+				userarr.userimgprev = e.find('img').attr("src");
+				if (userarr.username == '' || userarr.userimg == '') {
+					zamnotice.showTips('error', '用户名与头像必须设置');
+					return false;
+				}
+				if (userarr.userdes == '') {
+					userarr.userdes = " ";
+				}
+				if (rotateid != '') {
+					webcore.ajaxSubmit("{:gohdmanage('configlivemark/savepfuser',['hdid'=>$hdid])}", { rotateid: rotateid, userarr: userarr }).then(function (json) {
+						if (json.code == 0) {
+							confirmObj.close();
+							userarr.id = json.msg;
+							$(".user-lists").append(webcore.tpl($("#newuser-tpl"), userarr));
+							setTimeout(function () {
+								tpl_switch();
+							}, 1e2);
+							zamnotice.showTips('success', '新增成功');
+						} else {
+							zamnotice.showTips('error', json.msg);
+						}
+					}, function (json) {
+						zamnotice.showTips('error', '网络差。操作失败');
+					});
+				} else {
+					$(".user-lists").append(webcore.tpl($("#newuser-tpl"), userarr));
+					setTimeout(function () {
+						tpl_switch();
+					}, 1e2);
+					confirmObj.close();
+				}
+			});
+		});
+		$(".user-lists").on('click', '.btn-edituser', function () {
+			var $this = $(this), fdom = $this.parent().parent();
+			var pfuserid = $this.attr('data-pfuserid');
+			var edituserarr = {};
+			if (!pfuserid) {
+				fdom.find("input").each(function () {
+					var $this = $(this), inputname = $this[0].name.replace("[]", "").replace("pf", "");
+					edituserarr[inputname] = $this.val();
+				});
+			}
+			var confirmObj = jconfirmBox.ajaxconfirm("编辑评分用户", "{:gohdmanage('configlivemark/editpfuser',['hdid'=>$hdid])}", { rotateid: rotateid, pfuserid: pfuserid, edituserarr: edituserarr }, 'html', 'col-lg-8 col-lg-offset-2', function (e) {
+				var userarr = webcore.serializeObject(e.find('form'));
+				userarr.userimgprev = e.find('img').attr("src");
+				if (userarr.username == '' || userarr.userimg == '') {
+					zamnotice.showTips('error', '用户名与头像必须设置');
+					return false;
+				}
+				if (pfuserid) {
+					webcore.ajaxSubmit("{:gohdmanage('configlivemark/savepfuser',['hdid'=>$hdid])}", { rotateid: rotateid, pfuserid: pfuserid, userarr: userarr }).then(function (json) {
+						if (json.code == 0) {
+							confirmObj.close();
+							userarr.id = pfuserid;
+							fdom.html($(webcore.tpl($("#newuser-tpl"), userarr)).html());
+							setTimeout(function () {
+								tpl_switch();
+							}, 1e2);
+							zamnotice.showTips('success', '编辑成功');
+						} else {
+							zamnotice.showTips('error', json.msg);
+						}
+					}, function (json) {
+						zamnotice.showTips('error', '网络差。操作失败');
+					});
+				} else {
+					fdom.html($(webcore.tpl($("#newuser-tpl"), userarr)).html());
+					setTimeout(function () {
+						tpl_switch();
+					}, 1e2);
+					confirmObj.close();
+				}
+			});
+		});
+		$(".user-lists").on('click', '.btn-deluser', function () {
+			var $this = $(this);
+			var pfuserid = $this.attr('data-pfuserid');
+			jconfirmBox.confirm('温馨提示', '删除将无法恢复，您确定要删除么？', function () {
+				if (pfuserid) {
+					webcore.ajaxSubmit("{:gohdmanage('configlivemark/delpfuser',['hdid'=>$hdid])}", { rotateid: rotateid, pfuserid: pfuserid }).then(function (json) {
+						if (json.code == 0) {
+							zamnotice.showTips('success', '删除成功');
+							$this.parent().parent().remove();
+						} else {
+							zamnotice.showTips('error', json.msg);
+						}
+					}, function (json) {
+						zamnotice.showTips('error', '网络差，操作失败');
+					});
+				} else {
+					$this.parent().parent().remove();
+				}
+			});
+		});
+		var downuserqr = false;
+		$(".user-lists").on('click', '.btn-downloaduser', function () {
+			var $this = $(this);
+			var pfuserid = $this.attr('data-pfuserid');
+			var pfusername = $this.attr('data-username');
+			if(downuserqr){
+				return false;
+			}
+			downuserqr = true;
+			webcore.ajaxSubmit("{:gohdmanage('configlivemark/downloaduserqr',['hdid'=>$hdid])}", { pfuserid: pfuserid}).then(function (json) {
+				if (json.code == 0) {
+					downuserqr = false;
+					if (window.navigator.msSaveOrOpenBlob) {
+						var bstr = atob(json.msg.split(',')[1]);
+						var n = bstr.length;
+						var u8arr = new Uint8Array(n);
+						while (n--) {
+							u8arr[n] = bstr.charCodeAt(n);
+						}
+						var blob = new Blob([u8arr]);
+						window.navigator.msSaveOrOpenBlob(blob, `${pfusername}.png`);
+					} else {
+						var el = document.createElement('a');
+						el.href = json.msg;
+						el.setAttribute('download', `${pfusername}.png`);
+						el.setAttribute('target', '__blank');
+						el.click();
+					}
+				} else {
+					zamnotice.showTips('error', json.msg);
+				}
+			}, function (json) {
+				downuserqr = false;
+				zamnotice.showTips('error', '网络差。操作失败');
+			});
+		});
+		$(".addpw").on('click', function () {
+			var confirmObj = jconfirmBox.ajaxconfirm("新增评委", "{:gohdmanage('configlivemark/editpw',['hdid'=>$hdid])}", { rotateid: rotateid }, 'html', 'col-lg-8 col-lg-offset-2', function (e) {
+				var pwarr = webcore.serializeObject(e.find('form'));
+				pwarr.pwimgprev = e.find('img').attr("src");
+				if (pwarr.pwname == '' || pwarr.pwimg == '') {
+					zamnotice.showTips('error', '评委名称与头像必须设置');
+					return false;
+				}
+				if (pwarr.pwcode == '') {
+					zamnotice.showTips('error', '评委登录码必须设置');
+					return false;
+				}
+				if (rotateid != '') {
+					webcore.ajaxSubmit("{:gohdmanage('configlivemark/savepw',['hdid'=>$hdid])}", { rotateid: rotateid, pwarr: pwarr }).then(function (json) {
+						if (json.code == 0) {
+							confirmObj.close();
+							pwarr.id = json.msg;
+							$(".pw-lists").append(webcore.tpl($("#newpw-tpl"), pwarr));
+							zamnotice.showTips('success', '新增成功');
+						} else {
+							zamnotice.showTips('error', json.msg);
+						}
+					}, function (json) {
+						zamnotice.showTips('error', '网络差。操作失败');
+					});
+				} else {
+					$(".pw-lists").append(webcore.tpl($("#newpw-tpl"), pwarr));
+					confirmObj.close();
+				}
+			});
+		});
+
+		$(".pw-lists").on('click', '.btn-editpw', function () {
+			var $this = $(this), fdom = $this.parent().parent();
+			var pwid = $this.attr('data-pwid');
+			var editpwarr = {};
+			if (!pwid) {
+				fdom.find("input").each(function () {
+					var $this = $(this), inputname = $this[0].name.replace("[]", "").replace("pf", "");
+					editpwarr[inputname] = $this.val();
+				});
+			}
+			var confirmObj = jconfirmBox.ajaxconfirm("编辑评委", "{:gohdmanage('configlivemark/editpw',['hdid'=>$hdid])}", { rotateid: rotateid, pwid: pwid, editpwarr: editpwarr }, 'html', 'col-lg-8 col-lg-offset-2', function (e) {
+				var pwarr = webcore.serializeObject(e.find('form'));
+				pwarr.pwimgprev = e.find('img').attr("src");
+				if (pwarr.pwname == '' || pwarr.pwimg == '') {
+					zamnotice.showTips('error', '评委名称与头像必须设置');
+					return false;
+				}
+				if (pwarr.pwcode == '') {
+					zamnotice.showTips('error', '评委登录码必须设置');
+					return false;
+				}
+				if (pwid) {
+					webcore.ajaxSubmit("{:gohdmanage('configlivemark/savepw',['hdid'=>$hdid])}", { rotateid: rotateid, pwid: pwid, pwarr: pwarr }).then(function (json) {
+						if (json.code == 0) {
+							confirmObj.close();
+							pwarr.id = pwid;
+							fdom.html($(webcore.tpl($("#newpw-tpl"), pwarr)).html());
+							zamnotice.showTips('success', '编辑成功');
+						} else {
+							zamnotice.showTips('error', json.msg);
+						}
+					}, function (json) {
+						zamnotice.showTips('error', '网络差。操作失败');
+					});
+				} else {
+					fdom.html($(webcore.tpl($("#newpw-tpl"), pwarr)).html());
+					confirmObj.close();
+				}
+			});
+		});
+		$(".pw-lists").on('click', '.btn-delpw', function () {
+			var $this = $(this);
+			var pwid = $this.attr('data-pwid');
+			jconfirmBox.confirm('温馨提示', '删除将会同步删除该评委所有的评分数据，无法恢复，您确定要删除么？', function () {
+				if (pwid) {
+					webcore.ajaxSubmit("{:gohdmanage('configlivemark/delpw',['hdid'=>$hdid])}", { rotateid: rotateid, pwid: pwid }).then(function (json) {
+						if (json.code == 0) {
+							zamnotice.showTips('success', '删除成功');
+							$this.parent().parent().remove();
+						} else {
+							zamnotice.showTips('error', json.msg);
+						}
+					}, function (json) {
+						zamnotice.showTips('error', '网络差，操作失败');
+					});
+				} else {
+					$this.parent().parent().remove();
+				}
+			});
+		});
+		$(".importpw").on('click', function () {
+			webcore.importxls({ title: '导入评委信息', url: "{:gohdmanage('configlivemark/importpw',['hdid'=>$hdid])}&rotateid=" + rotateid, moban: "/{:SYSIMGURL}excel/pw.xls", uptxt: "点击上传评委xls文件", xlstxt: "注:请务必严格按照模板内容制作xls文件" }, function (data) {
+				var html = '';
+				if (data.length > 0) {
+					$.each(data, function (i, v) {
+						if (rotateid != '') {
+							v.pwimgprev = v.pwimg.indexOf("http") == 0 ? v.pwimg : '/' + v.pwimg;
+						}
+						html += webcore.tpl($("#newpw-tpl"), v);
+					});
+				}
+				$(".pw-lists").append(html);
+			});
+		});
+		$(".importitem").on('click', function () {
+			webcore.importxls({ title: '导入评分项', url: "{:gohdmanage('configlivemark/importitem',['hdid'=>$hdid])}&rotateid=" + rotateid, moban: "/{:SYSIMGURL}excel/dfitem.xls", uptxt: "点击上传评分项xls文件", xlstxt: "注:请务必严格按照模板内容制作xls文件" }, function (data) {
+				var html = '';
+				if (data.length > 0) {
+					if (data.length + $(".dfitem-lists tr").length > 50) {
+						return zamnotice.showTips('error', '导入的评分项与已添加的评分项总和已大于50，请核实');
+					}
+					$.each(data, function (i, v) {
+						html += webcore.tpl($("#newdfitem-tpl"), v);
+					});
+				}
+				$(".dfitem-lists").append(html);
+			});
+		});
+		$(".importuser").on('click', function () {
+			webcore.importxls({ title: '导入参评用户', url: "{:gohdmanage('configlivemark/importuser',['hdid'=>$hdid])}&rotateid=" + rotateid, moban: "/{:SYSIMGURL}excel/dfuser.xls", uptxt: "点击上传参评用户xls文件", xlstxt: "注:请务必严格按照模板内容制作xls文件" }, function (data) {
+				var html = '';
+				if (data.length > 0) {
+					$.each(data, function (i, v) {
+						if (rotateid != '') {
+							v.userimgprev = v.userimg.indexOf("http") == 0 ? v.userimg : '/' + v.userimg;
+						}
+						html += webcore.tpl($("#newuser-tpl"), v);
+					});
+				}
+				$(".user-lists").append(html);
+			});
+		});
+		$(".pw-lists").on('click', '.showpwqr', function () {
+			var $this = $(this), pwcode = $this.parent().parent().find("input[name='pwcode[]']").val() || '', pwname = $this.parent().parent().find("input[name='pwname[]']").val() || '';
+			if (rotateid == '') return zamnotice.showTips('error', '请先保存轮次信息');
+			if (pwname == '' || pwcode == '') return zamnotice.showTips('error', '评委名称或登录码异常');
+			var confirmobj = jconfirmBox.ajaxconfirm("评委" + pwname + "二维码", "{:gohdmanage('configlivemark/showpwqr',['hdid'=>$hdid])}", { rotateid: rotateid, pwcode: pwcode, pwname: pwname }, 'html', 'col-lg-10 col-lg-offset-1', function (e) { }, false, '2');
+		});
+	});
+	function openpubpw(obj, status, url) {
+		if (status == '1') {
+			obj.prev().val('2');
+			obj.attr('data-status', '2');
+			$(".pubpw").addClass('hidden');
+		} else {
+			obj.prev().val('1');
+			obj.attr('data-status', '1');
+			$(".pubpw").removeClass('hidden');
+		}
+		obj.prev().prev().prop("checked", status == '1' ? false : true);
+	}
+	function openzan(obj, status, url) {
+		if (status == '1') {
+			obj.prev().val('2');
+			obj.attr('data-status', '2');
+			$(".zanBox").addClass('hidden');
+		} else {
+			obj.prev().val('1');
+			obj.attr('data-status', '1');
+			$(".zanBox").removeClass('hidden');
+		}
+		obj.prev().prev().prop("checked", status == '1' ? false : true);
+	}
+	function openpayzan(obj, status, url) {
+		if (status == '1') {
+			obj.prev().val('2');
+			obj.attr('data-status', '2');
+			$(".zanpayBox").addClass('hidden');
+		} else {
+			obj.prev().val('1');
+			obj.attr('data-status', '1');
+			$(".zanpayBox").removeClass('hidden');
+		}
+		obj.prev().prev().prop("checked", status == '1' ? false : true);
+	}
+	function openscreenshow2(obj, status, url) {
+		var pfuserid = obj.parent().parent().parent().find('td:last').find('.btn-primary').attr('data-pfuserid') || '';
+		if (pfuserid == '') {
+			if (status == '1') {
+				obj.prev().val('2');
+				obj.attr('data-status', '2');
+			} else {
+				obj.prev().val('1');
+				obj.attr('data-status', '1');
+			}
+			obj.prev().prev().prop("checked", status == '1' ? false : true);
+		} else {
+			require(["webcore", "zamnotice"], function (webcore, zamnotice) {
+				var rotateid = "{if isset($rotate['id'])}{$rotate['id']}{else}{/if}";
+				webcore.ajaxSubmit("{:gohdmanage('configlivemark/changestatus',['hdid'=>$hdid])}", { rotateid: rotateid, pfuserid: pfuserid, status: (status == '1' ? '2' : '1') }).then(function (json) {
+					if (json.code == 0) {
+						if (status == '1') {
+							obj.prev().val('2');
+							obj.attr('data-status', '2');
+						} else {
+							obj.prev().val('1');
+							obj.attr('data-status', '1');
+						}
+						obj.prev().prev().prop("checked", status == '1' ? false : true);
+					}
+				})
+			})
+		}
+	}
+	function openscreenshow3(obj, status, url) {
+		var pfuserid = obj.parent().parent().parent().find('td:last').find('.btn-primary').attr('data-pfuserid') || '';
+		if (pfuserid == '') {
+			if (status == '1') {
+				obj.prev().val('2');
+				obj.attr('data-status', '2');
+			} else {
+				obj.prev().val('1');
+				obj.attr('data-status', '1');
+			}
+			obj.prev().prev().prop("checked", status == '1' ? false : true);
+		} else {
+			require(["webcore", "zamnotice"], function (webcore, zamnotice) {
+				var rotateid = "{if isset($rotate['id'])}{$rotate['id']}{else}{/if}";
+				webcore.ajaxSubmit("{:gohdmanage('configlivemark/changescreenstatus',['hdid'=>$hdid])}", { rotateid: rotateid, pfuserid: pfuserid, status: (status == '1' ? '2' : '1') }).then(function (json) {
+					if (json.code == 0) {
+						if (status == '1') {
+							obj.prev().val('2');
+							obj.attr('data-status', '2');
+						} else {
+							obj.prev().val('1');
+							obj.attr('data-status', '1');
+						}
+						obj.prev().prev().prop("checked", status == '1' ? false : true);
+					}
+				})
+			})
+		}
+	}
+	function showscorebox(obj, status, url) {
+		if (status == '1') {
+			obj.prev().val('2');
+			obj.attr('data-status', '2');
+			$(".showscoretypebox").addClass('hidden');
+		} else {
+			obj.prev().val('1');
+			obj.attr('data-status', '1');
+			$(".showscoretypebox").removeClass('hidden');
+		}
+		obj.prev().prev().prop("checked", status == '1' ? false : true);
+	}
+	function scoretypechange(type){
+		var pfmode = $('.pfmodebox').find('input:radio:checked').val();
+		if(pfmode == '2'){
+			$('.maxmintypebox').removeClass('hidden');
+		}else{
+			$('.maxmintypebox').addClass('hidden');
+		}
+	}
+	function pfmodechange(type){
+		if(type == '1'){
+			$('.maxmintypebox').addClass('hidden')
+		}else{
+			$('.maxmintypebox').removeClass('hidden')
+		}
+	}
+</script>

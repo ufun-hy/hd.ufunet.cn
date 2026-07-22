@@ -1,0 +1,230 @@
+{include file='$Wpath/common/header'}
+<div class="form-inline zam-inline-searchbar">
+    <div class="form-group m-l-5">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">选择轮次</span>
+          <select id="rotateid" class="form-control">
+            {if empty($rotates)}
+                <option value="0">暂无轮次</option>
+            {/if}
+            {foreach $rotates as $key=>$rotate} 
+                <option value="{$rotate['id']}" {if $rotateid == $rotate['id']}selected{/if}>{$rotate['title']}</option>
+            {/foreach}
+          </select>
+        </div>
+    </div>
+    {if $gametype=='tug'}
+        <div class="form-group m-l-5">
+          <div class="input-group input-group-sm">
+            <span class="input-group-addon">选择队伍</span>
+              <select id="teamid" class="form-control">
+                {if !empty($rotateid) && isset($rotates[$rotateid])}
+                    <option  value="1">{$rotates[$rotateid]['redname']}</option>
+                    <option  value="2">{$rotates[$rotateid]['bluename']}</option>
+                {/if}
+              </select>
+            </div>
+        </div>
+    {else /}
+        <div class="form-group m-l-5">
+          <div class="input-group input-group-sm">
+            <span class="input-group-addon">选择团队</span>
+              <select id="teamid" class="form-control">
+                <option value="0" selected="">全部</option>
+                {if !empty($rotateid) && isset($rotates[$rotateid]) && isset($rotate[$rotateid]['teams'])}
+                    {foreach $rotate[$rotateid]['teams'] as $oneteam}
+                    <option  value="{$oneteam['id']}">{$oneteam['teamname']}</option>
+                    {/foreach}
+                {/if}
+              </select>
+            </div>
+        </div>
+    {/if}
+    <div class="form-group m-l-5">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">核销状态</span>
+          <select id="hxtype" class="form-control">
+            {foreach $hxtypes as $hkey=>$hxtype} 
+                <option value="{$hkey}" {if $hkey=='0'}selected{/if}>{$hxtype}</option>
+            {/foreach}
+          </select>
+        </div>
+    </div>
+    <div class="form-group m-l-5">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">红包发放状态</span>
+          <select id="sendtype" class="form-control">
+            {foreach $sendtypes as $skey=>$sendtype} 
+                <option value="{$skey}" {if $skey=='0'}selected{/if}>{$sendtype}</option>
+            {/foreach}
+          </select>
+        </div>
+    </div>
+    <div class="form-group">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">昵称或表单内容</span>
+        <input type="text" class="form-control" value="" id="keyword" placeholder="请输入用户昵称或表单内容">
+      </div>
+    </div>
+    <a class="btn btn-primary btn-sm btn-search" href="javascript:void(0)"><i class="mdi mdi-magnify"></i> 搜索</a>
+    <a class="btn btn-warning btn-sm btn-export" href="javascript:void(0)"><i class="mdi mdi-export"></i> 导出</a>
+</div>
+{include file='$Wpath/common/tabletoolbar'}
+<table id="listtable" class="zam-btable"></table>
+<script>    
+var $rotates = {:json_encode($rotates)};
+require(['webcore','webtable','jconfirmBox','zamnotice'],function(webcore,webtable,jconfirmBox,zamnotice){
+var searchParamas = [{'type':'2','id':'rotateid'},{'type':'2','id':'hxtype'},{'type':'2','id':'sendtype'},{'type':'1','id':'keyword'},{'type':'2','id':'teamid'}];
+var initConfig = {
+    tableId:'#listtable',
+    url:"{:gohdmanage('common/gamelucker',['hdid'=>$hdid,'gametype'=>$gametype])}",
+    columnoperate:{
+        btns:{
+            del:true,
+        },
+        func:{
+            del:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','删除用户中奖数据将无法回复，您确定要删除么？',function(){
+                    webcore.ajaxSubmit("{:gohdmanage('common/delgamelucker',['hdid'=>$hdid])}",{gametype:"{$gametype}",recordid:row.id}).then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','删除成功');
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                    });
+                });
+            }
+        }
+    },
+    columns:[
+        {
+            checkbox: true,
+        },{
+            field: 'id',
+            title: 'id',
+            align: 'center',
+            visible: false
+        },{
+            field: 'key',
+            title: '排名',
+            align: 'center',
+            width:'10%',
+            formatter: function(value, row, index){
+                var pageSize = $('#listtable').bootstrapTable('getOptions').pageSize;
+                var pageNumber = $('#listtable').bootstrapTable('getOptions').pageNumber;
+                return pageSize * (pageNumber - 1) + index + 1;
+            },
+        },{
+            field: 'teamname',
+            title: '团队',
+            align: 'center',
+        },{
+            field: 'nicknamehtml',
+            title: '用户',
+            align: 'center',
+        },{
+            field: 'prizetypetxt',
+            title: '类型',
+            align: 'center',
+        },{
+            field: 'prizeinfohtml',
+            title: '奖品明细',
+            align: 'center',
+        },{
+            field: 'hxsendmorehtml',
+            title: '核销/发放',
+            align: 'center',
+            width:'15%',
+        },{
+            field: 'create_time',
+            title: '时间',
+            align: 'center',
+        }
+    ],
+    searchParamas:searchParamas,
+    toolbar:{
+        del:function(){
+            var getSelects = webtable.getSelections();
+            if(!getSelects.length){
+                return zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+            jconfirmBox.confirm('温馨提示','删除用户中奖数据将无法恢复，您确定要删除选中的用户么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('common/delgamelucker',['hdid'=>$hdid])}",{gametype:"{$gametype}",recordid:getSelects}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','删除成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+        },
+        reset:function(){
+            var rotateid = $("#rotateid option:selected").val()||'';
+            if(+rotateid < 1) {
+                return zamnotice.showTips('info','请选择轮次');
+            }
+            jconfirmBox.confirm('温馨提示','清空将删除本轮所有用户的中奖数据将无法恢复，您确定要清空么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('common/resetgamelucker',['hdid'=>$hdid])}",{gametype:"{$gametype}",rotateid:rotateid}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','清空成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+        },
+    },
+};
+webtable.init(initConfig);
+$('#rotateid').change(function(e) {
+    var selroundid = $(e.target).find("option:selected").val();
+    var selround = $rotates[selroundid]||false;
+    if(!selround) {
+        return false;
+    }
+    if("{$gametype}" == 'tug'){
+        var html = `
+        <option value="1">${selround.redname}</option>
+        <option value="2">${selround.bluename}</option>
+        `;
+    }else{
+        var html = `<option value="0" selected="">全部</option>`;
+        if(selround.teams.length) {
+            $.each(selround.teams,function(i,v){
+                html += `<option value="${v.id}">${v.teamname}</option>`;
+            });
+        }
+    }
+    $("#teamid").html(html);
+    webtable.refresh();
+});
+$('#teamid,#hxtype,#sendtype').change(function(e) {
+     webtable.refresh();
+});
+$('.btn-export').on('click',function(){
+   var rotateid = $("#rotateid").find('option:selected').val() || '';
+   if(+rotateid < 1){
+        return zamnotice.showTips('info','请先选择轮次');
+   }
+   webcore.ajaxSubmit("{:gohdmanage('common/gameluckerexport',['hdid'=>$hdid])}",{gametype:"{$gametype}",rotateid:rotateid}).then(function(json){
+        if(json.code!=0){
+            zamnotice.showTips('error',json.msg);
+        }else{
+            window.location.href = `{:gohdmanage('common/gameluckerexport',['hdid'=>$hdid])}&gametype={$gametype}&rotateid=${rotateid}`;
+        }
+    }, function(json){
+        zamnotice.showTips('error','网络差,操作失败');
+    });
+});
+});
+</script>
+{include file='$Wpath/common/footer'}

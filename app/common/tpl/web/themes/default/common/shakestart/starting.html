@@ -1,0 +1,293 @@
+ <div id="starting" class="collapse in">
+	<div class="form-group">
+	    <label class="col-lg-2 control-label">* 开启倒计时</label>
+	    <div class="col-lg-8">
+	        {:tpl_switch('startconfig[showdjs]',$config['startconfig']['showdjs'],'showdjs')}
+	    </div>
+	</div>
+    <div class="djsbox{if $config['startconfig']["showdjs"]=="2"} hidden{/if}">
+    	<div class="form-group">
+    	    <label class="col-lg-2 control-label">* 倒计时视频</label>
+    	    <div class="col-lg-8">
+    	        {:tpl_video('startconfig[djsvideo]',$config['startconfig']['djsvideo'])}
+    	        <span class="help-block">规格:1400*800px，具体尺寸需结合屏幕实际尺寸设计</span>
+    	    </div>
+    	</div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 开启倒计时背景音效</label>
+            <div class="col-lg-8">
+                {:tpl_switch('startconfig[djsbgmusicoff]',$config['startconfig']['djsbgmusicoff']??'1','djsmusicoff')}
+                <span class="help-block">注:关闭背景音效将使用倒计时视频音效</span>
+            </div>
+        </div>
+        <div class="form-group djsmusicbox{if !isset($config['startconfig']['djsbgmusicoff']) || $config['startconfig']['djsbgmusicoff']=='1'}{else /}hidden{/if}">
+            <label class="col-lg-2 control-label">* 倒计时音效</label>
+            <div class="col-lg-8">
+                {:tpl_audio('startconfig[djsaudio]',$config['startconfig']['djsaudio']??SIMGURL.'shakestart/djs.mp3')}
+            </div>
+        </div>
+    </div>
+	<div class="form-group">
+	    <label class="col-lg-2 control-label">* 背景类型</label>
+	    <div class="col-lg-8">
+	        <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.bgimgbox2').removeClass('hidden'),$('.bgvideobox2').addClass('hidden');">
+	            <input type="radio" name="startconfig[bgtype]" {if $config['startconfig']["bgtype"]=="1"}checked{/if} value="1"><span>图片</span>
+	        </label>
+	        <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.bgimgbox2').addClass('hidden'),$('.bgvideobox2').removeClass('hidden');">
+	            <input type="radio" name="startconfig[bgtype]" {if $config['startconfig']["bgtype"]=="2"}checked{/if} value="2" ><span>视频</span>
+	        </label>
+	    </div>
+	</div>
+	<div class="form-group bgimgbox2{if $config['startconfig']["bgtype"]=="2"} hidden{/if}">
+	    <label class="col-lg-2 control-label">* 背景图片</label>
+	    <div class="col-lg-8">
+	        {:tpl_image_one('startconfig[bgimg]',$config['startconfig']['bgimg'])}
+	        <span class="help-block">规格:1400*800px，具体尺寸需结合屏幕实际尺寸设计</span>
+	    </div>
+	</div>
+	<div class="form-group bgvideobox2{if $config['startconfig']["bgtype"]=="1"} hidden{/if}">
+	    <label class="col-lg-2 control-label">* 背景视频</label>
+	    <div class="col-lg-8">
+	        {:tpl_video('startconfig[bgvideo]',$config['startconfig']['bgvideo'])}
+	    </div>
+	</div>
+    <div class="form-group">
+	    <label class="col-lg-2 control-label">* 背景音效开关</label>
+	    <div class="col-lg-8">
+	        {:tpl_switch('startconfig[bgmusicoff]',$config['startconfig']['bgmusicoff'],'openbgmusic2')}
+            <span class="help-block">注:关闭背景音效将视作使用视频内置音效</span>
+	    </div>
+	</div>
+	<div class="form-group musicinputbox2{if $config['startconfig']['bgmusicoff']=='2'} hidden{/if}">
+	    <label class="col-lg-2 control-label">* 背景音效</label>
+	    <div class="col-lg-8">
+	        {:tpl_audio('startconfig[bgmusic]',$config['startconfig']['bgmusic'])}
+	    </div>
+	</div>
+    <div class="hidden2">
+        <div class="form-group">
+            <label class="col-lg-2 control-label text-right">* 助力水球</label>
+            <div class="col-lg-8">
+                {:tpl_switch('startconfig[showball]',$config['startconfig']['showball'],'showball')}
+                <span class="help-block">开启则大屏显示助力水球</span>
+            </div>
+        </div>
+        <div class="ballbox{if $config['startconfig']['showball']=='2'} hidden{/if}">
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 水晶球图片</label>
+                <div class="col-lg-8">
+                    {:tpl_image_one('startconfig[ballconfig][imgurl]', $config['startconfig']['ballconfig']['imgurl'])}
+                    <span class="help-block">规格:500px*500px</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 水晶球大小</label>
+                <div class="col-lg-4">
+                    <input type="text" class="form-control numberincdec" name="startconfig[ballconfig][imgsize]" value="{$config['startconfig']['ballconfig']['imgsize']}"
+                    data-bts-min="100" data-bts-replacement-val="100"
+                    data-bts-max="null"
+                    data-bts-step="1"
+                    data-bts-postfix="px"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                    >
+                    <span class="help-block">注:必须是个大于100的整数</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 水波纹图片</label>
+                <div class="col-lg-8">
+                    {:tpl_image_one('startconfig[ballconfig][waterimg]', $config['startconfig']['ballconfig']['waterimg']??'/static/images/screen/shakestart/wave.png')}
+                    <span class="help-block">规格:380px*402px</span>
+                </div>
+            </div>
+        </div>
+    </div>
+   	<div class="form-group">
+        <label class="col-lg-2 control-label text-right">* 启动进程百分比</label>
+        <div class="col-lg-8">
+            {:tpl_switch('startconfig[showpercent]',$config['startconfig']['showpercent'],'showpercent')}
+            <span class="help-block">开启则大屏会显示启动进程百分比</span>
+        </div>
+    </div>
+   	<div class="percentbox{if $config['startconfig']['showpercent']=='2'} hidden{/if}">
+		<div class="form-group">
+            <label class="col-lg-2 control-label">* 大小</label>
+            <div class="col-lg-4">
+                <input type="text" class="form-control numberincdec" name="startconfig[percentconfig][size]" value="{$config['startconfig']['percentconfig']['size']}"
+                data-bts-min="10" data-bts-replacement-val="10"
+                data-bts-max="null"
+                data-bts-step="1"
+                data-bts-postfix="px"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                >
+                <span class="help-block">注:必须是个大于10的整数</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 颜色</label>
+            <div class="col-lg-3">
+                {:tpl_color('startconfig[percentconfig][color]',$config['startconfig']['percentconfig']['color'])}
+                <span class="help-block">默认白色</span>
+            </div>
+        </div>
+   	</div>
+   	<div class="form-group">
+        <label class="col-lg-2 control-label">* 助力类型</label>
+        <div class="col-lg-10">
+           <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.timeover').removeClass('hidden'),$('.scoreover,.dianliangover').addClass('hidden');">
+	       <input type="radio" name="startconfig[type]" value="1" {if $config['startconfig']['type']=='1'}checked{/if}><span>时间</span>
+	      </label>
+	      <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.scoreover').removeClass('hidden'),$('.timeover,.dianliangover').addClass('hidden');">
+	       <input type="radio" name="startconfig[type]" value="2" {if $config['startconfig']['type']=='2'}checked{/if}><span>成绩</span>
+	      </label>
+          {if dzshakestarttype()}
+              <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.dianliangover').removeClass('hidden'),$('.timeover,.scoreover').addClass('hidden');">
+               <input type="radio" name="startconfig[type]" value="3" {if $config['startconfig']['type']=='3'}checked{/if}><span>点亮logo</span>
+              </label>
+          {/if}
+	      <span class="help-block">时间助力即为启动开始后规定时间自动完成助力，成绩助力即为所有用户摇动手机点数达标即可完成助力</span>
+        </div>
+    </div>
+    <div class="form-group timeover{if $config['startconfig']['type'] != '1'} hidden{/if}">
+        <label class="col-lg-2 control-label">* 完成助力时间</label>
+        <div class="col-lg-4">
+            <input type="text" class="form-control numberincdec" name="startconfig[time]" value="{$config['startconfig']['time']}"
+            data-bts-min="5" data-bts-replacement-val="5"
+            data-bts-max="null"
+            data-bts-step="1"
+            data-bts-postfix="秒"
+            data-bts-postfix-extra-class="touchspin-postfix"
+            >
+            <span class="help-block">注:必须是个大于5的整数</span>
+        </div>
+    </div>
+    <div class="form-group scoreover{if $config['startconfig']['type'] != '2'} hidden{/if}">
+        <label class="col-lg-2 control-label">* 完成助力总成绩</label>
+        <div class="col-lg-4">
+            <input type="text" class="form-control numberincdec" name="startconfig[score]" value="{$config['startconfig']['score']}"
+            data-bts-min="10" data-bts-replacement-val="10"
+            data-bts-max="null"
+            data-bts-step="1"
+            data-bts-postfix="点"
+            data-bts-postfix-extra-class="touchspin-postfix"
+            >
+            <span class="help-block">注:必须是个大于10的整数，如果参与积极性不高或助力长时间完成不了，可以通过空格键快速完成助力</span>
+        </div>
+    </div>
+    {if dzshakestarttype() && !empty(request()->hdinfo)}
+        <div class="dianliangover{if $config['startconfig']['type']!='3'} hidden{/if}">
+            <div class="form-group">
+                <label class="col-lg-2 control-label">点亮用户</label>
+                <div class="col-lg-7" style="padding-right: 5px;">
+                    <table class="table table-bordered">
+                        <thead>
+                          <tr>
+                            <th style="width:25%;text-align: center;">用户</th>
+                            <th style="width:25%;text-align: center;">编号</th>
+                            <th style="width:20%;text-align: center;">状态</th>
+                            <th style="width:30%;text-align: center;">操作</th>
+                          </tr>
+                        </thead>
+                        <tbody class="dluser-lists">
+                        {volist name="dlusers" id="user"}    
+                            <tr>
+                                <td class="text-center">
+                                    <div class="zam-flex-column-center">
+                                        <img src="{:tomedia($user['userimg'])}" class="avatarImg m-b-5">
+                                        <span>{$user['username']}</span>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                   {$user['usernumber']}
+                                </td>
+                                <td class="text-center">
+                                    {if $user['status']=='1'}
+                                        <span class="label label-primary">已点亮</span>
+                                    {else /}
+                                        <span class="label label-warning">待点亮</span>
+                                    {/if}    
+                                </td>
+                                <td class="text-center">
+                                    <a class="btn btn-xs btn-primary btn-edituser" data-id="{$user['id']}" href="javascript:void(0)"> <i class="mdi mdi-pencil"></i> </a>
+                                    <a class="btn btn-xs btn-danger btn-deluser" data-id="{$user['id']}" href="javascript:void(0)"> <i class="mdi mdi-close"></i> </a>
+                                </td>
+                            </tr>
+                        {/volist}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="3">
+                                    <div><a href="javascript:;" class="btn btn-primary btn-xs btn-adduser">添加用户</a></div>
+                                    <div class="m-t-10">注：所有用户都在微信端点亮了logo大屏会自动进入启动成功环节</div>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {/if}
+   	<div class="form-group">
+        <label class="col-lg-2 control-label text-right">* 用户头像飞入效果</label>
+        <div class="col-lg-8">
+            {:tpl_switch('startconfig[showavatars]',$config['startconfig']['showavatars'],'showavatars')}
+            <span class="help-block">开启则显示微信用户头像飞入效果</span>
+        </div>
+    </div>
+    <div class="avatarsbox{if $config['startconfig']['showavatars']!='1'} hidden{/if}">
+    	<div class="form-group">
+            <label class="col-lg-2 control-label">* 头像飞入速度</label>
+            <div class="col-lg-3">
+               <label class="lyear-radio radio-inline radio-primary">
+		       <input type="radio" name="startconfig[avatarsconfig][speed]" value="2" {if $config['startconfig']['avatarsconfig']['speed']=='2'}checked{/if}><span>慢</span>
+		      </label>
+		      <label class="lyear-radio radio-inline radio-primary">
+		       <input type="radio" name="startconfig[avatarsconfig][speed]" value="1" {if $config['startconfig']['avatarsconfig']['speed']=='1'}checked{/if}><span>一般</span>
+		      </label>
+		      <label class="lyear-radio radio-inline radio-primary">
+		       <input type="radio" name="startconfig[avatarsconfig][speed]" value="3" {if $config['startconfig']['avatarsconfig']['speed']=='3'}checked{/if}><span>快</span>
+		      </label>
+            </div>
+        </div>
+    	<div class="form-group">
+            <label class="col-lg-2 control-label">* 头像大小</label>
+            <div class="col-lg-4">
+                <input type="text" class="form-control numberincdec" name="startconfig[avatarsconfig][imgsize]" value="{$config['startconfig']['avatarsconfig']['imgsize']}"
+                data-bts-min="20" data-bts-replacement-val="20"
+                data-bts-max="null"
+                data-bts-step="1"
+                data-bts-postfix="px"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                >
+                <span class="help-block">注:必须是个大于20的整数</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 头像边界大小</label>
+            <div class="col-lg-4">
+                <input type="text" class="form-control numberincdec" name="startconfig[avatarsconfig][bordersize]" value="{$config['startconfig']['avatarsconfig']['bordersize']}"
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="30"
+                data-bts-step="1"
+                data-bts-postfix="px"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                >
+                <span class="help-block">注:必须是个大于0的整数</span>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+function djsmusicoff(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".djsmusicbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".djsmusicbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+</script>

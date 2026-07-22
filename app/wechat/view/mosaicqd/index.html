@@ -1,0 +1,527 @@
+{include file="common/header" /}
+<style>
+.mosaicqd-appmain{position:fixed;top:0;left:0;width:100%;height:100%;overflow: hidden;color:#333;}
+.mosaicqd-videobox{
+    position: relative;
+    overflow: hidden;
+    overflow: hidden;
+    width: {$appconfig['appstyle']['width']}px;
+    height: {$appconfig['appstyle']['width']}px;
+    border-radius: {if $appconfig['appstyle']['iscircle']=='1'}50%{else /}2px{/if};
+    margin-bottom: {$appconfig['appstyle']['margin']}px;
+    border: {$appconfig['appstyle']['bordersize']}px solid {$appconfig['appstyle']['bordercolor']};
+}
+.mosaicqd-videobox .btn-openvideo{
+    font-size: 1rem;
+    cursor: pointer;
+    color: {$appconfig['appstyle']['bordercolor']};
+}
+.mosaicqd-videobox video{
+    width: 100%;
+    height: 100%;
+    display: none;
+}
+.mosaicqd-videobox canvas{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    pointer-events: none;
+}
+.mosaicqd-appmain .videocontrolbox{
+    text-align: center;
+    min-width: {$appconfig['appstyle']['width']}px;
+}
+.mosaicqd-appmain .videocontrolbox a{
+    display: inline-block;
+    width: 2.82rem;
+    height: 0.9rem;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    cursor: pointer;
+}
+.mosaicqd-appmain .videocontrolbox .btn-changemode{
+    background-image: url("{:tomedia($appconfig['appstyle']['btnschange'])}");
+    float: left;
+    {if !isset($appconfig['appstyle']['modebtn']) || $appconfig['appstyle']['modebtn']=='2'}
+        display:none;
+    {/if}
+}
+.mosaicqd-appmain .videocontrolbox .btn-snapshot{
+    background-image: url("{:tomedia($appconfig['appstyle']['btnsnapshot'])}");
+    {if isset($appconfig['appstyle']['modebtn']) && $appconfig['appstyle']['modebtn']=='1'}
+        float: right;
+    {/if}
+}
+.snapshotbox{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #fff;
+    background-image: url("{:tomedia($appconfig['appbgimg'])}");
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+.snapshotbox .snapimgbox img{
+    box-sizing: border-box;
+    border-radius: {if $appconfig['appstyle']['iscircle']=='1'}50%{else /}2px{/if};
+    width: {$appconfig['appstyle']['width']}px;
+    height: {$appconfig['appstyle']['width']}px;
+    border: {$appconfig['appstyle']['bordersize']}px solid {$appconfig['appstyle']['bordercolor']};
+}
+.snapshotbox .snapbtn{
+    width: 100%;
+    margin-top: 0.9rem;
+}
+.snapshotbox .snapbtn a{
+    display: inline-block;
+    width: 2.82rem;
+    height: 0.9rem;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    cursor: pointer;
+}
+.snapshotbox .snapbtn a:nth-of-type(1){
+    float: left;
+    background-image: url("{:tomedia($appconfig['appstyle']['btnscancel'])}");
+}
+.snapshotbox .snapbtn a:nth-of-type(2){
+    float: right;
+    background-image: url("{:tomedia($appconfig['appstyle']['btnsconfirm'])}");
+}
+.bdbox{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #fff;
+    background-image: url("{:tomedia($appconfig['appbgimg'])}");
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+.bdbox .bdtitle{
+    font-weight: 700;
+    color:{$appconfig['appstyle']['title']['color']};
+    font-size: {$appconfig['appstyle']['title']['size']}px;
+    margin-bottom: {$appconfig['appstyle']['title']['margin']}px;
+}
+.bdbox input,.bdbox textarea{font:inherit;font-family: 微软雅黑,"Microsoft YaHei";background: none;}
+.bdbox .bditembox{
+	width:6.5rem;
+    padding: 0 0.4rem;
+}
+.bdbox .bditembox .bditems{
+    width: 100%;
+}
+.bdbox .zam-input-item{
+	width: {$appconfig['appstyle']['input']['width']??100}%;
+    margin-bottom:{$appconfig['appstyle']['input']['margin']??10}px;
+}
+.bdbox input::-webkit-input-placeholder,.bdbox textarea::-webkit-input-placeholder,.bdbox .zam-input-box .zam-app-cell-input,.bdbox .zam-input-box .zam-input-select,.bdbox .zam-input-box .cell-textarea{
+	color:{$appconfig['appstyle']['input']['color']??'#555'};
+}
+.bdbox .zam-input-box {
+    border: {$appconfig['appstyle']['input']['bordersize']??1}px solid {$appconfig['appstyle']['input']['bordercolor']??'#f4f4f4'};
+    border-radius: {$appconfig['appstyle']['input']['borderraduis']??5}px;
+    background-color: {$appconfig['appstyle']['input']['bgcolor']??'#fff'};
+    padding: {$appconfig['appstyle']['input']['padtop']??5}px {$appconfig['appstyle']['input']['padleft']??10}px;
+}
+.bdbox .zam-input-box .zam-app-cell-input,.bdbox .zam-input-box .zam-input-select,.bdbox .zam-input-box .cell-textarea{
+	width: 100%;
+	text-align:left;
+	font-size: {$appconfig['appstyle']['input']['size']??16}px;
+}
+.bdbox .zam-input-box .zam-app-cell-input,.bdbox .zam-input-box .zam-input-select,.bdbox .zam-input-box .btn{
+	height: {$appconfig['appstyle']['input']['height']??32}px;
+	line-height: {$appconfig['appstyle']['input']['height']??32}px;
+}
+.bdbox .bdbtn{
+    width: 100%;
+}
+.bdbox .bdbtn a{
+    display: inline-block;
+    width: 2.47rem;
+    height: 0.79rem;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    cursor: pointer; 
+}
+.bdbox .bdbtn a:nth-of-type(1){
+    float: left;
+    background-image: url("{:tomedia($appconfig['appstyle']['btncancel'])}");
+}
+.bdbox .bdbtn a:nth-of-type(2){
+    float: right;
+    background-image: url("{:tomedia($appconfig['appstyle']['btnconfirm'])}");
+}
+
+@media only screen and (min-device-width: 768px) and (max-device-width: 1200px) {
+    .mosaicqd-videobox{
+        border-radius: {if $appconfig['appstyle']['iscircle']=='1'}50%{else /}2px{/if};
+        width: {$appconfig['appstyle']['width'] * 1.5}px;
+        height: {$appconfig['appstyle']['width'] * 1.5}px;
+        margin-bottom: {$appconfig['appstyle']['margin'] * 1.5}px;
+    }
+    .mosaicqd-appmain .videocontrolbox{
+        min-width: {$appconfig['appstyle']['width'] * 1.5}px;
+    }
+    .snapshotbox .snapimgbox img{
+        width: {$appconfig['appstyle']['width'] * 1.5}px;
+        height: {$appconfig['appstyle']['width'] * 1.5}px;
+    }
+    .snapshotbox .snapbtn {
+        margin-top: 1.2rem;
+    }
+    .bdbox .bdtitle{
+        font-size: {$appconfig['appstyle']['title']['size'] * 2}px;
+        margin-bottom: {$appconfig['appstyle']['title']['margin'] * 2}px;
+    }
+    .bdbox input,.bdbox textarea{font:inherit;font-family: 微软雅黑,"Microsoft YaHei";background: none;}
+    .bdbox .bditembox{
+        width:9rem;
+    }
+    .bdbox input::-webkit-input-placeholder,.bdbox textarea::-webkit-input-placeholder,.bdbox .zam-input-box .zam-app-cell-input,.bdbox .zam-input-box .zam-input-select,.bdbox .zam-input-box .cell-textarea{
+        color:{$appconfig['appstyle']['input']['color']??'#555'};
+    }
+    .bdbox .zam-input-item{
+        margin-bottom:{$appconfig['appstyle']['input']['margin'] * 2}px;
+    }
+    .bdbox .zam-input-box {
+        border: {$appconfig['appstyle']['input']['bordersize']??1}px solid {$appconfig['appstyle']['input']['bordercolor']??'#f4f4f4'};
+        border-radius: {$appconfig['appstyle']['input']['borderraduis']??5}px;
+        background-color: {$appconfig['appstyle']['input']['bgcolor']??'#fff'};
+        padding: {$appconfig['appstyle']['input']['padtop'] * 2}px {$appconfig['appstyle']['input']['padleft'] * 2}px;
+    }
+    .bdbox .zam-input-box .zam-app-cell-input,.bdbox .zam-input-box .zam-input-select,.bdbox .zam-input-box .cell-textarea{
+        width: 100%;
+        text-align:left;
+        font-size: {$appconfig['appstyle']['input']['size'] * 2}px;
+    }
+    .bdbox .zam-input-box .zam-app-cell-input,.bdbox .zam-input-box .zam-input-select,.bdbox .zam-input-box .btn{
+        height: {$appconfig['appstyle']['input']['height'] * 2}px;
+        line-height: {$appconfig['appstyle']['input']['height'] * 2}px;
+    }
+    .bdbox .bdbtn a{
+        width: 3.75rem;
+        height: 1.2rem;
+    }
+}
+</style>
+<div class="mosaicqd-appmain zam-app-flex-ajCenter">
+    <div class="mosaicqd-videobox zam-app-flex-ajCenter">
+        <video x5-playsinline="" playsinline="" webkit-playsinline="" ></video>
+        <canvas></canvas>
+        <span class="btn-openvideo mxc-camera"></span>
+    </div>
+    
+    <div class="videocontrolbox hidden">
+        <a class="btn-changemode"></a>
+        <a class="btn-snapshot"></a>
+    </div>
+</div>
+<div class="snapshotbox zam-app-flex-ajCenter hidden">
+    <div class="snapimgbox zam-app-flex-ajCenter">
+        <img src="" />
+        <div class="snapbtn">
+            <a class="btn-close"></a>
+            <a class="btn-save"></a>
+        </div>
+    </div>
+</div>
+<div class="bdbox zam-app-flex-ajCenter hidden">
+    <div class="bdtitle">{$appconfig['appstyle']['title']['txt']??'填写信息'}</div>
+    <div class="bditembox zam-app-flex-ajCenter">
+        <div class="bditems"></div>
+        <div class="bdbtn">
+            <a class="btn-close"></a>
+            <a class="btn-post"></a>
+        </div>
+    </div>
+</div>
+<script>
+var appfacecomic = "{$appconfig['appfacecomic']??2}";
+require(['wechatcore'],function (wechatcore) {
+    let videoobj = $('.mosaicqd-videobox video');
+    let canvas = $('.mosaicqd-videobox canvas');
+    function getUserMedia(constraints, success, error) {
+        if (navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia(constraints).then(success).catch(error);
+        } else if (navigator.webkitGetUserMedia) {
+            navigator.webkitGetUserMedia(constraints, success, error)
+        } else if (navigator.mozGetUserMedia) {
+            navigator.mozGetUserMedia(constraints, success, error);
+        } else if (navigator.getUserMedia) {
+            navigator.getUserMedia(constraints, success, error);
+        }
+    }
+    var mediaStreamTrack;
+    var mode = 'user';
+    function success(stream) {
+        mediaStreamTrack = stream.getTracks()[0];
+        $(".btn-openvideo").addClass('hidden');
+        $(".mosaicqd-videobox video").show();
+        videoobj[0].controls = false;
+        videoobj[0].srcObject = stream;
+        videoobj[0].play();
+        $(".videocontrolbox").removeClass('hidden');
+        canvas[0].width = $(".mosaicqd-videobox").width();
+        canvas[0].height = $(".mosaicqd-videobox").height();
+    }
+    function error(error) {
+        wechatcore.msg('访问摄像头设备失败，请尝试更换浏览器');
+    }
+    $('.btn-changemode').click(function(){
+        mode = mode === 'user' ? 'environment' : 'user';
+        mediaStreamTrack.stop();
+        takePhoto();
+    })
+    function takePhoto() {
+        if (navigator.mediaDevices.getUserMedia || navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia) {
+            getUserMedia({
+                audio: false,
+                video: {
+                    width: $(".mosaicqd-videobox").width(),
+                    height: $(".mosaicqd-videobox").height(),
+                    facingMode: mode,
+                }
+            }, success, error);
+        } else {
+            wechatcore.msg('访问摄像头设备失败，请尝试更换浏览器');
+        }
+    }
+    $(".btn-openvideo").click(function(){
+        takePhoto();
+    });
+    $(".btn-snapshot").click(function(){
+        let ctx = canvas[0].getContext('2d');
+        ctx.drawImage(videoobj[0], 0, 0);
+        let imgBase64 = canvas[0].toDataURL('image/png');
+        $(".snapshotbox img").attr('src',imgBase64);
+        $(".snapshotbox img").removeAttr('data-filepath');
+        $(".snapshotbox").removeClass('hidden');
+    });
+    $(".snapshotbox .btn-close").click(function(){
+        hadcomic = '2';
+        $(".snapshotbox img").attr('src','');
+        $(".snapshotbox img").removeAttr('data-filepath');
+        $(".snapshotbox").addClass('hidden');
+    });
+    var clicksave = '2', hadcomic = '2';
+    $(".snapshotbox .btn-save").click(function(){
+        var base64img = $(".snapshotbox img").attr('src')||'';
+        if(base64img == ''){
+            return wechatcore.msg('请先拍照');
+        }
+        if(clicksave == '1') return false;
+        clicksave = '1';
+        var tiptxt = "正在处理照片...";
+        if(hadcomic == '2' && appfacecomic == '1'){
+            tiptxt = "正在对照片动漫化处理...";
+        }
+        wechatcore.ajaxSubmit("{:gowechat('mosaicqd/postface')}",{fromtype:'mosaicqd', base64img:base64img},tiptxt).then(function(json){
+            clicksave = '2';
+            if(json.code==0){
+                if(hadcomic == '2' && appfacecomic == '1'){
+                    hadcomic = '1';
+                    $(".snapshotbox img").attr({
+                        'src':json.msg.filesrc,
+                        'data-filepath':json.msg.filepath,
+                    });
+                    wechatcore.msg('动漫化处理成功');
+                }else{
+                    if(json.msg.appbd == '1'){
+                        if(json.msg.fileid){
+                            $(".snapshotbox img").attr({
+                                'src':json.msg.filesrc,
+                                'data-filepath':json.msg.filepath,
+                            });
+                        }
+                        var bdhtml = '';
+                        if(json.msg.bddata.length > 0){
+                            $.each(json.msg.bddata, function(i,v){
+                                bdhtml += `<div class="zam-input-item">
+                                    <div class="zam-input-box">
+                                        <input type="text" name="${v.zd}" class="cell-input zam-app-cell-input" autocomplete="off"  data-dtip="${v.defaulttip}" data-etip="${v.errortip}" data-title="${v.title}" data-isfloat="${v.isfloat}" data-min="${v.min}" data-max="${v.max}" placeholder="${v.defaulttip}">
+                                    </div>
+                                </div>`;
+                            })
+                        }
+                        $(".bditembox .bditems").html(bdhtml);
+                        $(".bdbox").removeClass('hidden');
+                    }else{
+                        $(".snapshotbox .btn-close").trigger('click');
+                        wechatcore.msg('签到成功');
+                    }
+                }
+            }else{
+                wechatcore.msg(json.msg + '请重新拍照');
+                $(".snapshotbox .btn-close").trigger('click');
+            }
+        }, function(){
+            wechatcore.msg('网络异常，请稍后重试');
+            clicksave = '2';
+        });
+    });
+    $(".bdbox .btn-close").click(function(){
+        $(".bdbox").addClass('hidden');
+    });
+    var clickbdsave = '2';
+    $(".bdbox .btn-post").click(function(){
+        var userimg = $(".snapshotbox img").attr('data-filepath')||'';
+        if(userimg == ''){
+            return wechatcore.msg('请先拍照');
+        }
+        var bddata = {},fieldBox = $(".bdbox input");
+		if(fieldBox.length <= 0){
+			return wechatcore.msg('签到表单项目异常');
+		}
+		var hascheck = true;
+		fieldBox.each(function(k,v){
+			var inputval = $(this).val(),bdtitle = $(this).attr('data-title')||'';
+            if(typeof inputval != 'undefined' && inputval != ''){
+                var isfloat = $(this).attr('data-isfloat') || 1, dmin = $(this).attr('data-min') || 0, dmax = $(this).attr('data-max') || 0;
+                if(isfloat > 1){
+                    if(isfloat == '2' && !/^[\u4e00-\u9fa5]+$/.test(inputval)){
+                        wechatcore.showtopmsg(bdtitle+'只能输入'+typenames[isfloat]);
+                        hascheck = false;
+                        return false;
+                    }
+                    if(isfloat == '3' && !/^[A-Za-z]+$/.test(inputval)){
+                        wechatcore.showtopmsg(bdtitle+'只能输入'+typenames[isfloat]);
+                        hascheck = false;
+                        return false;
+                    }
+                    if(isfloat == '4' && !/^-?\d+$/.test(inputval)){
+                        wechatcore.showtopmsg(bdtitle+'只能输入整数'+typenames[isfloat]);
+                        hascheck = false;
+                        return false;
+                    }
+                    if(isfloat == '5'){
+                        if(!/^[a-zA-Z\u4e00-\u9fa5]+$/.test(inputval)){
+                            wechatcore.showtopmsg(bdtitle+'只能输入'+typenames[isfloat]);
+                            hascheck = false;
+                            return false;
+                        }else{
+                            if(/^[\u4e00-\u9fa5]+$/.test(inputval)){
+                                wechatcore.showtopmsg(bdtitle+'不能是纯汉字');
+                                hascheck = false;
+                                return false;
+                            }
+                            if(/^[A-Za-z]+$/.test(inputval)){
+                                wechatcore.showtopmsg(bdtitle+'不能是纯字母');
+                                hascheck = false;
+                                return false;
+                            }
+                        }
+                    }
+                    if(isfloat == '6'){
+                        if(!/^[0-9\u4e00-\u9fa5]+$/.test(inputval)){
+                            wechatcore.showtopmsg(bdtitle+'只能输入'+typenames[isfloat]);
+                            hascheck = false;
+                            return false;
+                        }else{
+                            if(/^[\u4e00-\u9fa5]+$/.test(inputval)){
+                                wechatcore.showtopmsg(bdtitle+'不能是纯汉字');
+                                hascheck = false;
+                                return false;
+                            }
+                            if(/^[0-9]+$/.test(inputval)){
+                                wechatcore.showtopmsg(bdtitle+'不能是纯数字');
+                                hascheck = false;
+                                return false;
+                            }
+                        }
+                    }
+                    if(isfloat == '7'){
+                        if(!/^[A-Za-z0-9]+$/.test(inputval)){
+                            wechatcore.showtopmsg(bdtitle+'只能输入'+typenames[isfloat]);
+                            hascheck = false;
+                            return false;
+                        }else{
+                            if(/^[A-Za-z]+$/.test(inputval)){
+                                wechatcore.showtopmsg(bdtitle+'不能是纯字母');
+                                hascheck = false;
+                                return false;
+                            }
+                            if(/^[0-9]+$/.test(inputval)){
+                                wechatcore.showtopmsg(bdtitle+'不能是纯数字');
+                                hascheck = false;
+                                return false;
+                            }
+                        }
+                    }
+                    if(isfloat == '8'){
+                        if(!/^[a-zA-Z\u4e00-\u9fa5]+$/.test(inputval)){
+                            wechatcore.showtopmsg(bdtitle+'只能输入'+typenames[isfloat]);
+                            hascheck = false;
+                            return false;
+                        }
+                    }
+                    if(isfloat == '9'){
+                        if(!/^[0-9\u4e00-\u9fa5]+$/.test(inputval)){
+                            wechatcore.showtopmsg(bdtitle+'只能输入'+typenames[isfloat]);
+                            hascheck = false;
+                            return false;
+                        }
+                    }
+                    if(isfloat == '10'){
+                        if(!/^[a-zA-Z0-9]+$/.test(inputval)){
+                            wechatcore.showtopmsg(bdtitle+'只能输入'+typenames[isfloat]);
+                            hascheck = false;
+                            return false;
+                        }
+                    }
+                    if(isfloat == '11'){
+                        if(!inputval.match(/^[1][3,4,5,6,7,8,9][0-9]{9}$/)){
+							wechatcore.showtopmsg(bdtitle+'格式有误');
+							hascheck = false;
+							return false;
+						}
+                    }
+                    if(dmin > 0 && inputval.length < dmin){
+                        wechatcore.showtopmsg(bdtitle+'最少需输入'+dmin+'位'+typenames[isfloat]);
+                        hascheck = false;
+                        return false;
+                    }
+                    if(dmax > 0 && inputval.length > dmax){
+                        wechatcore.showtopmsg(bdtitle+'最多只能输入'+dmax+'位'+typenames[isfloat]);
+                        hascheck = false;
+                        return false;
+                    }
+                }
+            }else{
+                wechatcore.msg($(this).attr('data-dtip')||'请输入'+bdtitle);
+				hascheck = false;
+				return false;
+            }
+            bddata[$(this).attr('name')] = $(this).val() || '';
+		});
+		if(!hascheck){
+			return false;
+		}
+		if(clickbdsave == '1') return false;
+        clickbdsave = '1';
+		wechatcore.ajaxSubmit("{:gowechat('mosaicqd/postsign')}",{fromtype:'mosaicqd', userimg:userimg, bddata:bddata},'数据提交中...').then(function(json){
+			if(json.code==0){
+                wechatcore.msg('签到成功');
+                fieldBox.val('');
+                $(".snapshotbox .btn-close").trigger('click');
+                $(".bdbox .btn-close").trigger('click');
+			}else{
+                wechatcore.msg(json.msg);
+			}
+            clickbdsave = '2';
+		}, function(){
+			wechatcore.msg('网络异常，请稍后重试');
+			clickbdsave = '2';
+		});
+    });
+})
+</script>
+{include file="common/footermenu" /}
+{include file="common/footer" /}

@@ -1,0 +1,317 @@
+<!--
+ * @Author: 赞木
+ * @Company: 株洲米波网络科技有限公司
+ * @Project: 米波现场v3
+ * @Date: 2024-03-04 10:17:50
+ * @LastEditors: 赞木
+ * @LastEditTime: 2024-03-04 18:45:39
+ * @Link: 公司官网地址:https://miboxianchang.cn
+ * @Copyright: 本软件归株洲米波网络科技有限公司所有，非法渠道获得本系统或者未经授权使用本系统将依法追究当事人或公司法律责任
+-->
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>汉高AAO中国销售大会</title>
+<meta content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0" name="viewport"/>
+<meta content="yes" name="apple-mobile-web-app-capable"/>
+<meta content="black" name="apple-mobile-web-app-status-bar-style"/>
+<meta content="telephone=no" name="format-detection"/>
+<link rel="shortcut icon" href="" />
+<link rel="stylesheet" href="__STATIC__/js/ydui/css/ydui.css"/>
+<link rel="stylesheet" href="__STATIC__/css/zam-icon.css" media="all" />
+<link rel="stylesheet" href="__STATIC__/css/mxc-icon.css" media="all" />
+<link rel="stylesheet" href="__STATIC__/css/wechat/style.css" />
+<link rel="stylesheet" href="__STATIC__/css/animate.css"/>
+<script src="https://res.wx.qq.com/open/js/jweixin-1.6.0.js" type="text/javascript" charset="utf-8"></script>
+<script src="__STATIC__/js/ydui/js/ydui.flexible.js"></script>
+<script src="__STATIC__/js/jquery.2.1.4.js"></script>
+<script src="__STATIC__/js/jquery.extend.js"></script>
+<script type="text/javascript"  src="__STATIC__/js/require.js"></script>
+<script type="text/javascript">
+    require.config({
+        baseUrl: "__STATIC__/js",
+        urlArgs:'v=21',//+(new Date()).getTime(),
+        waitSeconds:0,
+        paths: {
+                css: "css.min",
+                jquery:"jquery.2.1.4",
+                fastclick:'wechatjs/fastclick',
+                mobileselect:"mobileselect/mobileselect",
+                ionrangeslider:'ionrangeslider/ionrangeslider',
+                ydui: "ydui/js/ydui",
+                template:"template/template",
+                layer:"layer/mobile/layer",
+                laytpl:"laytpl/laytpl",
+                howler:"howler/howler.min",
+                cropper:"cropper/cropper",
+                "jquery.shake":'wechatjs/jquery.shake',
+                jform:'jquery.form',
+                touch:'wechatjs/touch',
+                slideBox:'wechatjs/slideBox',
+                wechatcore:"wechatjs/wechatcore",
+                marqueen:"wechatjs/marqueen",
+                bscroll:'wechatjs/bscroll/bscroll',
+                swiper:'swiper/swiper.min',
+                emojicore:"wechatjs/emojicore",
+                appsocket:"wechatjs/appsocket",
+                appmsg:"wechatjs/appmsg",
+                appgame:"wechatjs/appgame",
+                appdgshake:"wechatjs/appdgshake",
+                appshuqian:"wechatjs/appshuqian",
+                appmonkey:"wechatjs/appmonkey",
+                appcar:"wechatjs/appcar",
+                apphorse:"wechatjs/apphorse",
+                appmls:"wechatjs/appmls",
+                appbike:"wechatjs/appbike",
+                appswim:"wechatjs/appswim",
+                apptug:"wechatjs/apptug",
+                appanswerbs:"wechatjs/appanswerbs",
+                appjjb:"wechatjs/appjjb",
+                appcutfruit:"wechatjs/appcutfruit",
+                appdzqy:"wechatjs/appdzqy",
+                videojs:'videojs/video',
+                plupload:'plupload/plupload',
+                uploader:'plupload/uploader',
+                phaser:'wechatjs/phaser.min',
+                dialog:'dialog/js/dialog',
+                directoss:'directupload/aliyun',
+                directqiniu:'directupload/qiniu',
+                directcos:'directupload/cos',
+                DouyinOpenJSBridge:'wechatjs/douyin.open',
+                glightbox:'glightbox/glightbox.min',
+        },
+        shim:{
+            "ydui": {
+                exports:"YDUI"
+            },
+            'template':{
+                exports: 'template',
+            },
+            'layer':{
+                exports: 'layer',
+                deps: ['css!../js/layer/mobile/need/layer.css']
+            },
+            'mobileselect':{
+                exports:'MobileSelect',
+                deps: ['css!../js/mobileselect/mobileselect.css']
+            },
+            'ionrangeslider':{
+                deps:['css!../js/ionrangeslider/ionrangeslider.css'],
+            },
+            'wechatcore':{
+                exports:'wechatcore',
+            },
+            'marqueen':{
+                exports:'marqueen',
+            },
+            'laytpl':{
+                exports: 'laytpl',
+            },
+            'jquery.shake':{
+                exports: 'Shake',
+                deps: ['jquery']
+            },
+            'jform':{
+                deps: ['jquery']
+            },
+            'touch':{
+                exports:'touch',
+            },
+            'bscroll':{
+                exports:'BScroll',
+            },
+            'swiper':{
+                exports:'Swiper',
+                deps: ['css!../js/swiper/swiper.min.css']
+            },
+            'cropper':{
+                exports:'cropper',
+                deps: ['css!../js/cropper/cropper.css']
+            },
+            'glightbox':{
+                exports:'GLightbox',
+                deps: ['css!../js/glightbox/glightbox.min.css'],
+            },
+            'appsocket':{
+                exports:'appsocket',
+            },
+            'appgame':{
+                exports:'appgame',
+            },
+            'appdgshake':{
+                exports:'appdgshake',
+            },
+            'appshuqian':{
+                exports:'appshuqian',
+            },
+            'appmonkey':{
+                exports:'appmonkey',
+            },
+            'appcar':{
+                exports:'appcar',
+            },
+            'apphorse':{
+                exports:'apphorse',
+            },
+            'appmls':{
+                exports:'appmls',
+            },
+            'appbike':{
+                exports:'appbike',
+            },
+            'appswim':{
+                exports:'appswim',
+            },
+            'apptug':{
+                exports:'apptug',
+            },
+            'appanswerbs':{
+                exports:'appanswerbs',
+            },
+            'appdzqy':{
+                exports:'appdzqy',
+            },
+            'appjjb':{
+                exports:'appjjb',
+            },
+            'appcutfruit':{
+                exports:'appcutfruit',
+            },
+            'videojs':{
+                exports:'videojs',
+                deps:['css!../js/videojs/video.css'],
+            },
+            'plupload':{
+                exports:'plupload',
+            },
+            'uploader':{
+                exports:'uploader',
+                deps: ['jquery','plupload'],
+            },
+            'dialog':{
+                exports:'dialog',
+                deps:['css!../js/dialog/css/dialog.css'],
+            },
+        },
+    });
+    define("jquery", [], function () {
+        return jQuery;
+    });
+</script>
+<style type="text/css">
+.zam-app-signsearch{
+    background-color: #fff;
+}
+.zam-app-signsearch .errmsg{
+    margin-top: 2.1rem;
+    font-size: 0.32rem;
+    color: red;
+    text-align: center;
+}
+.zam-app-signsearch .banner{
+    width: 100%;
+}
+.zam-app-signsearch .banner img{
+    width: 100%;
+}
+.search-wrap {
+    margin: 1.2rem 0.8rem 0.8rem;
+}
+.search-wrap .title{
+    font-size: 0.4rem;
+    color: #26aaf2;
+}
+.search-content{
+    margin: 0.32rem 0;
+    text-align: center;
+}
+input {
+    -webkit-appearance: none;
+    border-radius: 0;
+    border: 0;
+    color:#000;
+}
+.grid {
+    border-bottom: 1px solid #E5E5E5;
+    font-size: 0.28rem;
+}
+.grid .leftcol {
+    width: 35%;
+    color: #666;
+    vertical-align: middle;
+    height: 0.82rem;
+}
+.grid .rightcol {
+    width: 65%;
+    height: 0.82rem;
+    vertical-align: middle;
+}
+.grid .rightcol input{
+    height: 0.82rem;
+    width: 100%;
+}
+.submit-btn{
+    display: inline-block;
+    border-radius: 0.12rem;
+    background-color: #ff9a00;
+    color: #fff;
+    font-size: 0.32rem;
+    text-align: center;
+    padding: 0.16rem 1rem;
+    margin-top: 1rem;
+}
+</style>
+</head>
+<body>
+<section class="zam-app-signsearch g-scrollview">
+    <div class="banner">
+        <img src="/top.png" />
+    </div>
+	{if !empty($errmsg)}
+        <div class="errmsg">{$errmsg}</div>
+    {else /}
+    <div class="search-wrap">
+        <div class="title">个人信息查询</div>
+        <div class="search-content">
+            <div class="grid zam-app-flex">
+                <div class="leftcol zam-app-flex-ajCenter">手机号码</div>
+                <div class="rightcol">
+                    <input type="text" placeholder="请输入手机号码" maxlength="11">
+                </div>
+            </div>
+            <div class="submit-btn">立即查询</div>
+        </div>
+    </div>
+    {/if}
+</section>
+</body>
+<script>
+var XCV3Config = {
+    staticurl:"__STATIC__/",
+    amconfig:{:json_encode(amconfig())},
+    clienttype:"1",
+};
+require(['wechatcore'],function (wechatcore) {
+    wechatcore.hidewxmenu();
+    $(".submit-btn").click(function(){
+        var $this = $(this),mobile = $('.search-content input').val()||'';
+        if(mobile == ''){
+            return wechatcore.showtopmsg('请输入手机号');
+        }
+        if(!mobile.match(/^[1][3,4,5,6,7,8,9][0-9]{9}$/)){
+            return wechatcore.showtopmsg('手机号格式有误');
+        }
+        wechatcore.ajaxSubmit("{:gowechatspecial('sign/index',['hdid'=>$hdid])}",{mobile:mobile},'查询中...').then(function(json){
+            if(json.code==0){
+                window.location.href = "{:gowechatspecial('sign/result',['hdid'=>$hdid])}&mobile=" + mobile;
+            }else{
+                wechatcore.showtopmsg(json.msg);
+            }
+        }, function(){
+            wechatcore.msg('网络太差，请稍后重试');
+        });
+    });
+});  
+</script>
+</html>

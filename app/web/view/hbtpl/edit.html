@@ -1,0 +1,205 @@
+<div class="form-horizontal confirmbox-pop">
+  <form class="confirm-formbox" method="post">
+  <div class="text-center">
+        <div class="btn-group pop-btns" style="margin-bottom:10px;">
+          <a href="javascript:void(0)" class="btn btn-default btn-primary"><span>基础设置</span></a>
+          <a href="javascript:void(0)" class="btn btn-default"><span>支付证书</span></a>
+          <a href="javascript:void(0)" class="btn btn-default"><span>发放类型</span></a>
+        </div>
+  </div>
+  <div class="carditem">
+    <div class="form-group">
+      <label class="col-lg-3 control-label">* 模板名</label>
+      <div class="col-lg-7">
+        <input class="form-control" type="text"  name="tplname" placeholder="请务必填写一个您觉得唯一的名称" value="{$config['tplname']}" onkeyup="return trimSpace(this)">
+      </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-3 control-label">* 模板类型</label>
+        <div class="col-lg-8">
+          {foreach $issystypes as $k=>$v}
+          <label class="lyear-radio radio-inline radio-primary">
+           <input type="radio" name="issys" value="{$k}" {if $config['issys'] == $k}checked{/if}><span>{$v}</span>
+          </label>
+          {/foreach}
+          <span class="help-block">这个一定要选对，系统模板即为平台内使用的，用户模板即为平台内注册用户创建的活动专用的</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-3 control-label">* 红包类型</label>
+        <div class="col-lg-8">
+          {foreach $tpltypes as $tk=>$tv}
+          <label class="lyear-radio radio-inline radio-primary">
+           <input type="radio" name="tpltype" value="{$tk}" {if $config['tpltype'] == $tk}checked{/if}><span>{$tv}</span>
+          </label>
+          {/foreach}
+          <span class="help-block">一般而言：同系统公众号appid一致就选择微信红包，反之选择借用微信红包</span>
+        </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-3 control-label">* APPID</label>
+      <div class="col-lg-7">
+        <input class="form-control" type="text"  name="app_id" value="{$config['app_id']}" onkeyup="return trimSpace(this)">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-3 control-label">* APPSECRET</label>
+      <div class="col-lg-7">
+        <input class="form-control" type="text"  name="app_secret" value="{$config['app_secret']}" onkeyup="return trimSpace(this)">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-3 control-label">* 商户号</label>
+      <div class="col-lg-7">
+        <input class="form-control" type="text"  name="mch_id" value="{$config['mch_id']}" onkeyup="return trimSpace(this)">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-3 control-label">* 商户APIv2密钥</label>
+      <div class="col-lg-7">
+        <input class="form-control" type="text"  name="signkey" value="{$config['signkey']}" onkeyup="return trimSpace(this)">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-3 control-label">* APIv3密钥</label>
+      <div class="col-lg-7">
+        <input class="form-control" type="text"  name="v3signkey" value="{$config['v3signkey']??''}" onkeyup="return trimSpace(this)">
+        <div class="help-block">注：此项是指商户平台->账户中心->API安全内的APIv3密钥</div>
+      </div>
+    </div>
+  </div>
+  <div class="carditem hidden">
+    <div class="form-group">
+      <label class="col-lg-3 control-label">* 支付证书CERT</label>
+      <div class="col-lg-7">
+        <textarea class="form-control" name="cert_path" rows="3" placeholder="为保证安全性, 不显示证书内容. 若要修改, 请直接复制粘贴"></textarea>
+        <span class="help-block">{if $config['certsave']=='1'}<span class="text-danger">已保存 </span>{/if}注:证书下载下来后将apiclient_cert.pem文件内的所有内容复制黏贴到此处</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-3 control-label">* 支付证书KEY</label>
+      <div class="col-lg-7">
+        <textarea class="form-control" name="key_path" rows="3" placeholder="为保证安全性, 不显示证书内容. 若要修改, 请直接复制粘贴"></textarea>
+        <span class="help-block">{if $config['keysave']=='1'}<span class="text-danger">已保存 </span>{/if}注:证书下载下来后将apiclient_key.pem文件内的所有内容复制黏贴到此处</span>
+      </div>
+    </div>
+ </div>
+ <div class="carditem hidden">
+  <div class="form-group">
+      <label class="col-lg-3 control-label">* 发放模式</label>
+      <div class="col-lg-8">
+        <label class="lyear-radio radio-inline radio-primary">
+        <input type="radio" name="isasync" value="1" {if isset($config['isasync']) && $config['isasync']=='1'}checked{/if}><span>异步发放 <b class="label label-warning">公测中</b></span>
+        </label>
+        <label class="lyear-radio radio-inline radio-primary">
+        <input type="radio" name="isasync" value="2" {if !isset($config['isasync']) || $config['isasync']=='2'}checked{/if}><span>同步发放</span>
+        </label>
+        <span class="help-block">
+            <div>注意事项:</div>
+            <div>1 同步发放每秒大约仅可发放1-2个红包</div>
+            <div>2 异步发放每秒大约可发放20-50个红包，发放红包较多时能明显感觉到速度超级给力</div>
+            <div>3 同步发放相较异步发放效率比较低，但对服务器性能开销比较小</div>
+        </span>
+      </div>
+  </div>
+   <div class="form-group">
+        <label class="col-lg-3 control-label">* 发放类型</label>
+        <div class="col-lg-9">
+          {foreach $sendtypes as $skey=>$sval}
+          <label class="lyear-radio radio-inline radio-primary" onclick="show_sendtype(this)">
+           <input type="radio" name="sendtype" value="{$skey}" {if $config['sendtype'] == $skey}checked{/if}><span>{$sval}</span>
+          </label>
+          {/foreach}
+        </div>
+    </div>
+    <div class="form-group sendtype1{if $config['sendtype']!='1'} hidden{/if}">
+      <label class="col-lg-3 control-label">* 场景ID</label>
+      <div class="col-lg-7">
+        <input class="form-control" type="text"  name="scene_id" value="{$config['scene_id']}" onkeyup="return trimSpace(this)">
+        <div class="help-block">
+          <div>默认是0，可发放1-200元内的红包</div>
+          <div>如果需要发放金额小于1元或大于200的红包必须设置具体的场景值，如下</div>
+          <div>PRODUCT_1:商品促销</div>
+          <div>PRODUCT_2:抽奖</div>
+          <div>PRODUCT_3:虚拟物品兑奖</div> 
+          <div>PRODUCT_4:企业内部福利</div>
+          <div>PRODUCT_5:渠道分润</div>
+          <div>PRODUCT_6:保险回馈</div>
+          <div>PRODUCT_7:彩票派奖</div>
+          <div>PRODUCT_8:税务刮奖</div>
+          <div class="text-danger">以上场景内你看看商户后台->现金红包接口下对应的场景能发的金额范围再去填写PRODUCT_X到上面的框里，如果是发放1-200元内的红包直接填写0即可</div>
+        </div>
+      </div>
+    </div>
+    <div class="form-group sendtype4{if $config['sendtype'] != '4'} hidden{/if}">
+      <label class="col-lg-3 control-label">* 场景ID</label>
+      <div class="col-lg-7">
+        <input class="form-control" type="text"  name="billscene_id" value="{$config['billscene_id']??1000}">
+        <div class="help-block">
+          <div>默认是1000，使用现金营销场景</div>
+          <div>具体的场景值，如下</div>
+          <div>1000:现金营销</div>
+          <div class="text-danger">商家转账这个产品微信商户在2025年01月15日上线</div>
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-3 control-label">* 支持0.3元</label>
+      <div class="col-lg-7">
+          {:tpl_switch('supporttiny',$config['supporttiny'])}
+          <span class="help-block">如果不支持，可以到微信商户平台发起申请，一般商家转账到零钱接口默认支持</span>
+      </div>
+    </div>
+    {if dznormalrequest('transfersplit')}
+    <div class="sendtype3{if $config['sendtype']!='3'} hidden{/if}">
+      <div class="form-group">
+        <label class="col-lg-3 control-label">* 场景最高额度</label>
+        <div class="col-lg-7">
+          <input type="text" class="form-control numberincdec" name="maxtransfermoney" 
+            data-bts-min="1" data-bts-replacement-val="1"
+            data-bts-max="20000"
+            data-bts-step="1"
+            data-bts-postfix="元"
+            data-bts-postfix-extra-class="touchspin-postfix"
+            value="{$config['maxtransfermoney']??200}">
+          <div class="help-block">一般用户能申请场景有2种，现金营销额度200元，分销返佣额度500元，你申请成功的场景哪个额度大就填写哪个额度值</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-3 control-label">* 自动拆分</label>
+        <div class="col-lg-8">
+            {:tpl_switch('autotransferspilt',$config['autotransferspilt']??'2')}
+            <span class="help-block">开启后活动发放的红包面额大于上面填写的最高额度系统就会自动拆分成多个合适的小红包</span>
+            <div class="help-block">默认拆分是以最高额度为标准拆分，如果拆不出最高额度的红包就会以0.3元到最高额度之间的面值拆分</div>
+        </div>
+      </div>
+    </div>
+    {/if}
+ </div>
+</form>
+</div>
+<script type="text/javascript">
+require(['webcore',"bootstrap-touchspin"],function(webcore){
+  $(".confirmbox-pop .pop-btns a.btn").click(function(){
+      $(this).addClass('btn-primary').siblings().removeClass("btn-primary");
+      $(".confirmbox-pop .carditem").addClass('hidden').eq($(this).index()).removeClass('hidden');
+  });
+  tpl_switch();
+  $(".confirmbox-pop .numberincdec").TouchSpin();
+});
+function show_sendtype(obj){
+  var type = $(obj).find('input').val();
+  if(type=='1'){
+      $(".sendtype1").removeClass('hidden');
+      $(".sendtype3,.sendtype4").addClass('hidden');
+  }else if(type=='2'){
+      $(".sendtype1,.sendtype3,.sendtype4").addClass('hidden');
+  }else if(type=='3'){
+      $(".sendtype1,sendtype4").addClass('hidden');
+      $(".sendtype3").removeClass('hidden');
+  }else{
+      $(".sendtype1,.sendtype3").addClass('hidden');
+      $(".sendtype4").removeClass('hidden');
+  }
+}
+</script>

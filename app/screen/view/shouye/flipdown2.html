@@ -1,0 +1,425 @@
+<style>
+.shouye-flipdown{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+.shouye-flipdown-wrapper{
+    position: relative;
+    width: 1300px;
+    height: 100px;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-image: url(/static/images/screen/shouye/bg.png);
+}
+:root {
+  --flip-height: 100px;
+  --flip-width: calc(var(--flip-height) * 0.6);
+  --line-height: calc(var(--flip-height) * 0.5);
+  --flip-container-color: #171717;
+  --flip-color: #171717;
+  --flip-text-color: #efefef;
+  --flip-border-radius: calc(var(--flip-height) * 0.05);
+  --animation-time: 0.8s;
+  --animation-ease: linear;
+  --perspective: 200px;
+}
+
+
+
+.flip {
+  height: var(--flip-height);
+  width: var(--flip-width);
+  border-radius: 4px;
+  font-size: calc(var(--flip-height) * 0.5);
+  font-weight: 700;
+  position: relative;
+  margin: 0.1rem;
+}
+.flip .flip-display {
+  height: var(--flip-height);
+  width: var(--flip-width);
+  display: flex;
+  flex-direction: column;
+  z-index: 1;
+}
+.flip .flip-display .flip-display-top,
+.flip .flip-display .flip-display-bottom {
+  position: relative;
+  text-align: center;
+  overflow: hidden;
+  width: 100%;
+  height: calc(var(--flip-height) * 0.5);
+  color: var(--flip-text-color);
+  background-color: var(--flip-container-color);
+  line-height: calc(var(--line-height) * var(--i));
+}
+.flip .flip-display .flip-display-top {
+  --i: 2;
+  border-top-left-radius: var(--flip-border-radius);
+  border-top-right-radius: var(--flip-border-radius);
+}
+.flip .flip-display .flip-display-bottom {
+  --i: -2;
+  border-bottom-left-radius: var(--flip-border-radius);
+  border-bottom-right-radius: var(--flip-border-radius);
+}
+.flip .flipper {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  height: var(--flip-height);
+  width: calc(var(--flip-width) * 1);
+  perspective: 200px;
+}
+.flip .flipper .flipper-top,
+.flip .flipper .flipper-bottom {
+  position: absolute;
+  left: -10%;
+  right: -10%;
+  width: calc(var(--flip-width));
+  margin: auto;
+  text-align: center;
+  height: calc(var(--flip-height) * 0.5);
+  line-height: calc(var(--line-height) * var(--i));
+  background-color: var(--flip-color);
+  overflow: hidden;
+  color: var(--flip-text-color);
+}
+.flip .flipper .flipper-top {
+  --i: 2;
+  top: 0;
+  transform-origin: bottom;
+  border-top-left-radius: var(--flip-border-radius);
+  border-top-right-radius: var(--flip-border-radius);
+}
+.flip .flipper .flipper-bottom {
+  --i: -2;
+  bottom: 0;
+  transform: rotateX(90deg);
+  transform-origin: top;
+  border-bottom-left-radius: var(--flip-border-radius);
+  border-bottom-right-radius: var(--flip-border-radius);
+}
+.flip.play .flipper-top {
+  -webkit-animation: flipperTopAnimation var(--animation-time) var(--animation-ease);
+          animation: flipperTopAnimation var(--animation-time) var(--animation-ease);
+}
+.flip.play .flipper-bottom {
+  -webkit-animation: flipperBottomAnimation var(--animation-time) var(--animation-ease);
+          animation: flipperBottomAnimation var(--animation-time) var(--animation-ease);
+}
+
+@-webkit-keyframes flipperTopAnimation {
+  0% {
+    transform: rotateX(0deg);
+  }
+  50%, 100% {
+    transform: rotateX(-90deg);
+  }
+}
+
+@keyframes flipperTopAnimation {
+  0% {
+    transform: rotateX(0deg);
+  }
+  50%, 100% {
+    transform: rotateX(-90deg);
+  }
+}
+@-webkit-keyframes flipperBottomAnimation {
+  0%, 50% {
+    transform: rotateX(90deg);
+  }
+  100% {
+    transform: rotateX(0deg);
+  }
+}
+@keyframes flipperBottomAnimation {
+  0%, 50% {
+    transform: rotateX(90deg);
+  }
+  100% {
+    transform: rotateX(0deg);
+  }
+}
+.flip-clock {
+  border: 1rem solid #212121;
+  background-color: #212121;
+  border-radius: 0.5rem;
+  position: relative;
+  display: flex;
+  flex-shrink: 0;
+}
+.flip-clock::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  bottom: -50%;
+  left: -50%;
+  right: -50%;
+  margin: auto;
+  height: 180%;
+  width: 120%;
+  border-radius: 0.5rem;
+  background-image: linear-gradient(rgba(255, 255, 255, 0.5), transparent);
+  box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.25);
+  z-index: -1;
+}
+.flip-clock .seconds,
+.flip-clock .minutes,
+.flip-clock .hours {
+  z-index: 1;
+  display: inline-flex;
+  margin: 0.2rem;
+}
+.flip-clock .seconds .flip::before,
+.flip-clock .minutes .flip::before,
+.flip-clock .hours .flip::before {
+  content: "";
+  position: absolute;
+  height: 50%;
+  top: 0%;
+  left: 0%;
+  right: 0%;
+  margin: auto;
+  background-color: rgba(0, 0, 0, 0.15);
+  z-index: 3;
+}
+.flip-clock .seconds .flip-display-top,
+.flip-clock .seconds .flip-display-bottom,
+.flip-clock .seconds .flipper-top,
+.flip-clock .seconds .flipper-bottom,
+.flip-clock .minutes .flip-display-top,
+.flip-clock .minutes .flip-display-bottom,
+.flip-clock .minutes .flipper-top,
+.flip-clock .minutes .flipper-bottom,
+.flip-clock .hours .flip-display-top,
+.flip-clock .hours .flip-display-bottom,
+.flip-clock .hours .flipper-top,
+.flip-clock .hours .flipper-bottom {
+  color: #212121;
+}
+.flip-clock .seconds .flip-display-top,
+.flip-clock .seconds .flip-display-bottom,
+.flip-clock .minutes .flip-display-top,
+.flip-clock .minutes .flip-display-bottom,
+.flip-clock .hours .flip-display-top,
+.flip-clock .hours .flip-display-bottom {
+  background-image: radial-gradient(#ffffff, rgba(255, 255, 255, 0.85));
+}
+.flip-clock .seconds .flipper-top,
+.flip-clock .seconds .flipper-bottom,
+.flip-clock .minutes .flipper-top,
+.flip-clock .minutes .flipper-bottom,
+.flip-clock .hours .flipper-top,
+.flip-clock .hours .flipper-bottom {
+  background-image: radial-gradient(circle at center, #ffffff 5%, rgba(255, 255, 255, 0.85));
+}
+</style>
+<div class="shouye-flipdown zam-app-flex-ajCenter2">
+<div class="shouye-flipdown-wrapper">
+    <div class="flip-clock">
+        <!-- hours -->
+        <div class="hours">
+            <div class="flip hours-first">
+                <input type="hidden" />
+                <div class="flip-display">
+                    <div class="flip-display-top"></div>
+                    <div class="flip-display-bottom"></div>
+                </div>
+                <div class="flipper">
+                    <div class="flipper-top"></div>
+                    <div class="flipper-bottom"></div>
+                </div>
+            </div>
+            <div class="flip hours-last">
+                <input type="hidden" />
+                <div class="flip-display">
+                    <div class="flip-display-top"></div>
+                    <div class="flip-display-bottom"></div>
+                </div>
+                <div class="flipper">
+                    <div class="flipper-top"></div>
+                    <div class="flipper-bottom"></div>
+                </div>
+            </div>
+        </div>
+        <!-- minutes -->
+        <div class="minutes">
+            <div class="flip minutes-first">
+                <input type="hidden" />
+                <div class="flip-display">
+                    <div class="flip-display-top"></div>
+                    <div class="flip-display-bottom"></div>
+                </div>
+                <div class="flipper">
+                    <div class="flipper-top"></div>
+                    <div class="flipper-bottom"></div>
+                </div>
+            </div>
+            <div class="flip minutes-last">
+                <input type="hidden" />
+                <div class="flip-display">
+                    <div class="flip-display-top"></div>
+                    <div class="flip-display-bottom"></div>
+                </div>
+                <div class="flipper">
+                    <div class="flipper-top"></div>
+                    <div class="flipper-bottom"></div>
+                </div>
+            </div>
+        </div>
+        <!-- seconds -->
+        <div class="seconds">
+            <div class="flip seconds-first">
+                <input type="hidden" />
+                <div class="flip-display">
+                    <div class="flip-display-top"></div>
+                    <div class="flip-display-bottom"></div>
+                </div>
+                <div class="flipper">
+                    <div class="flipper-top"></div>
+                    <div class="flipper-bottom"></div>
+                </div>
+            </div>
+            <div class="flip seconds-last">
+                <input type="hidden" />
+                <div class="flip-display">
+                    <div class="flip-display-top"></div>
+                    <div class="flip-display-bottom"></div>
+                </div>
+                <div class="flipper">
+                    <div class="flipper-top"></div>
+                    <div class="flipper-bottom"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<script>
+require(['screencore'],function(screencore){
+function generateTimeInfo() {
+  const dateObj = new Date();
+  const hrs = dateObj.getHours();
+  const min = dateObj.getMinutes();
+  const sec = dateObj.getSeconds();
+  return {
+    hours: {
+      firstDigit: parseInt(hrs / 10),
+      lastDigit: parseInt(hrs % 10)
+    },
+    minutes: {
+      firstDigit: parseInt(min / 10),
+      lastDigit: parseInt(min % 10)
+    },
+    seconds: {
+      firstDigit: parseInt(sec / 10),
+      lastDigit: parseInt(sec % 10)
+    }
+  };
+}
+$(document).ready(function () {
+  $(".flip-clock").each(function (_, flipClock) {
+    // generate handles for each flip element and its child elements
+    const hoursFirst = createHandles($(flipClock).find(".hours-first"));
+    const hoursLast = createHandles($(flipClock).find(".hours-last"));
+    const minutesFirst = createHandles($(flipClock).find(".minutes-first"));
+    const minutesLast = createHandles($(flipClock).find(".minutes-last"));
+    const secondsFirst = createHandles($(flipClock).find(".seconds-first"));
+    const secondsLast = createHandles($(flipClock).find(".seconds-last"));
+    const intialTime = generateTimeInfo();
+    setInitialValues(minutesFirst, intialTime.minutes.firstDigit);
+    setInitialValues(minutesLast, intialTime.minutes.lastDigit);
+    setInitialValues(secondsFirst, intialTime.seconds.firstDigit);
+    setInitialValues(secondsLast, intialTime.seconds.lastDigit);
+    setInitialValues(hoursFirst, intialTime.hours.firstDigit);
+    setInitialValues(hoursLast, intialTime.hours.lastDigit);
+
+    setInterval(() => {
+      const time = generateTimeInfo();
+      flipDigit(secondsLast, time.seconds.lastDigit);
+      flipDigit(secondsFirst, time.seconds.firstDigit);
+      flipDigit(minutesLast, time.minutes.lastDigit);
+      flipDigit(minutesFirst, time.minutes.firstDigit);
+      // flipDigit(hoursLast, time.hours.lastDigit);
+      // flipDigit(hoursFirst, time.hours.firstDigit);
+    }, 1000);
+  });
+
+  function setInitialValues(flipElement, initialValue) {
+    const {
+      flipperTop,
+      flipperBottom,
+      flipperDisplayBottom,
+      flipperDisplayTop,
+      flipHiddenInput
+    } = flipElement;
+    flipperTop.text(initialValue);
+    flipperBottom.text(initialValue);
+    flipperDisplayBottom.text(initialValue);
+    flipperDisplayTop.text(initialValue);
+    flipHiddenInput.val(initialValue);
+  }
+
+  function createHandles(flipElement) {
+    const flipperTop = flipElement.find(".flipper-top");
+    const flipperBottom = flipElement.find(".flipper-bottom");
+    const flipperDisplayTop = flipElement.find(".flip-display-top");
+    const flipperDisplayBottom = flipElement.find(".flip-display-bottom");
+    const flipHiddenInput = flipElement.find("[type='hidden']");
+    return {
+      flipElement,
+      flipperTop,
+      flipperBottom,
+      flipperDisplayBottom,
+      flipperDisplayTop,
+      flipHiddenInput
+    };
+  }
+
+  function flipDigit(flipHandles, digitValue) {
+    const {
+      flipElement,
+      flipperTop,
+      flipperBottom,
+      flipperDisplayBottom,
+      flipperDisplayTop,
+      flipHiddenInput
+    } = flipHandles;
+
+    const setPreviousValue = (value) => {
+      flipperTop.text(value);
+      flipperDisplayBottom.text(value);
+    };
+    const setAfterValue = (value) => {
+      flipperDisplayTop.text(value);
+      flipperBottom.text(value);
+    };
+
+    if (parseInt(flipHiddenInput.val()) !== digitValue) {
+      setPreviousValue(flipHiddenInput.val());
+      flipHiddenInput.val(digitValue).trigger("valueChanged");
+    }
+
+    flipHiddenInput.one("valueChanged", () => {
+      setAfterValue(flipHiddenInput.val());
+      flipElement.addClass("play");
+    });
+
+    flipperBottom.one("animationend", () => {
+      setAfterValue(flipHiddenInput.val());
+      setPreviousValue(flipHiddenInput.val());
+      flipElement.removeClass("play");
+    });
+  }
+});
+});
+</script>
+    

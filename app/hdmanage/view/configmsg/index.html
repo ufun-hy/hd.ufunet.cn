@@ -1,0 +1,550 @@
+{include file='$Wpath/common/header'}
+{if !empty($config['id'])}
+<div class="form-horizontal">
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 禁言状态</label>
+        <div class="col-lg-8">
+            {:tpl_switch('appestoppel',$config['appestoppel']??'2','openestoppel')}
+            <div class="help-block">注：禁言开启后普通用户(非管理员)将无法发送普通文字消息和图片消息</div>
+        </div>
+    </div>
+</div>
+<div class="form-horizontal msgselectgrouobox{if !$showselectgroups} hidden{/if}">
+    <div class="config-titlebox">
+        <span class="config-titlename">分组留言设置</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#groupconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+    </div>
+    <div id="groupconfigbox" class="collapse in">
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 状态</label>
+            <div class="col-lg-8">
+                {:tpl_switch('groupconfig[open]',$config['groupconfig']['open']??'2','opengroupconfig')}
+                <div class="help-block">注：开启后可选择任意2个分组</div>
+            </div>
+        </div>
+        <div class="signgroupbox{if !isset($config['groupconfig']['open']) || (isset($config['groupconfig']['open']) && $config['groupconfig']['open']=='2')} hidden{/if}">
+            <div class="form-group groupbox">
+                <label class="col-lg-2 control-label">* 分组</label>
+                <div class="col-lg-8">
+                    {foreach $selectitems as $s}
+                        <label class="lyear-checkbox checkbox-inline checkbox-primary">
+                            <input type="checkbox" name="groupconfig[groups][]" value="{$s}" {if isset($config['groupconfig']['groups']) && in_array($s,$config['groupconfig']['groups'])}checked{/if}><span>{$s}</span>
+                        </label>
+                    {/foreach}
+                    <div class="help-block">注：请选择任意2个分组</div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label"></label>
+            <div class="col-lg-8">
+                <button class="btn btn-primary zam-btn" onclick="savegroupconfig(this)">确定</button>
+                <div class="help-block">注：点击确定如果系统发现所选分组有变化会自动进行清屏操作</div>
+            </div>
+        </div>
+    </div>
+</div>
+{/if}
+<form id="formBox" class="zam-formvalidation form-horizontal" method="post">
+    <div class="config-titlebox">
+        <span class="config-titlename">微信设置</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#wechatconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+    </div>
+    <div id="wechatconfigbox" class="collapse in">
+        {include file="$Wpath/common/configwechatcommon" /}
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 开启加入提示</label>
+            <div class="col-lg-8">
+                {:tpl_switch('appjointip',$config['appjointip'])}
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 是否开启顶部公告</label>
+            <div class="col-lg-8">
+                {:tpl_switch('appshownotice',$config['appshownotice'],'opennotice')}
+            </div>
+        </div>
+        <div class="appnoticebox{if $config['appshownotice']=='2'} hidden{/if}">
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 公告是否准许关闭</label>
+                <div class="col-lg-8">
+                    {:tpl_switch('appclosenotice',$config['appclosenotice'])}
+                    <span class="help-block">注:准许则微信用户可以点击关闭按钮关闭通告</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 公告内容</label>
+                <div class="col-lg-8">
+                    <textarea class="form-control" name="appnotices" rows="4" placeholder="注:多条公告必须以#隔开">{$config['appnotices']}</textarea>
+                    <span class="zam-help-block">注:多条公告请以#隔开，否则视为仅一条公告</span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 固定发送内容</label>
+            <div class="col-lg-8">
+                {:tpl_switch('appstabletxt',$config['appstabletxt']??'2','openstabletxt')}
+                <span class="zam-help-block">注:开启则无法发送图片消息</span>
+            </div>
+        </div>
+        <div class="stabletxtbox{if !isset($config['appstabletxt']) || $config['appstabletxt'] == '2'} hidden{/if}">
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 固定文字列表</label>
+                <div class="col-lg-8">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                            <th style="width:80%;text-align: center;">内容</th>
+                            <th style="width:20%;text-align: center;">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody class="stabletxt-lists">
+                        {if isset($config['stabletxts']) && !empty($config['stabletxts'])}
+                        {foreach $config['stabletxts'] as $txt}    
+                            <tr>
+                                <td class="text-center">
+                                    <input type="text" class="form-control" name="stabletxts[]" value="{$txt}" /> 
+                                </td>
+                                <td class="text-center">
+                                    <a class="btn btn-xs btn-primary zam-sortable sortmove" data-tooltip="laytip" title="拖动排序" href="javascript:void(0)"> <i class="mdi mdi-arrow-all"></i> </a>
+                                    <a class="btn btn-xs btn-danger btn-delshowitem" data-tooltip="laytip" title="删除" href="javascript:void(0)"> <i class="mdi mdi-close"></i> </a>
+                                </td>
+                            </tr>
+                        {/foreach}
+                        {/if}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="2">
+                                    <a class="btn btn-primary btn-xs btn-addstabletxt"><span class="mdi mdi-plus"></span>新增</a>
+                                    <div class="m-t-10">注：最多可添加20条</div>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 输入框提示文字</label>
+                <div class="col-lg-8">
+                  <input type="text" class="form-control"  name="appstabletip"  value="{$config['appstabletip']??'点击选择您想要说的话'}" maxlength="30" placeholder="30个字符以内">
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 消息审核</label>
+            <div class="col-lg-8">
+                {:tpl_switch('appverify',$config['appverify'])}
+                <div class="help-block">开启后用户发送的消息均需要审核通过后才可显示在大屏</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 发送消息时间间隔</label>
+            <div class="col-lg-4">
+                <input type="text" class="form-control numberincdec" name="appsendtime" value="{$config['appsendtime']}"
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="null"
+                data-bts-step="1"
+                data-bts-postfix="秒"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                >
+                <span class="zam-help-block">用于防刷屏 注:必须是整数，0为不限制发送时间间隔</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 每人发送文字消息数量限制</label>
+            <div class="col-lg-4">
+                <input type="text" class="form-control numberincdec" name="appsendtxtcount" value="{$config['appsendtxtcount']??0}"
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="100"
+                data-bts-step="1"
+                data-bts-postfix="条文字消息"
+                data-bts-postfix-extra-class="touchspin-postfix">
+                <span class="zam-help-block">注:必须是小于等于100的整数，0为不限制发送文字消息数量</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 准许发送图片</label>
+            <div class="col-lg-8">
+                {:tpl_switch('appcanimg',$config['appcanimg'],'opencanimg')}
+            </div>
+        </div>
+        <div class="form-group canimgbox{if $config['appcanimg'] == '2'} hidden{/if}">
+            <label class="col-lg-2 control-label">* 每人发送图片消息数量限制</label>
+            <div class="col-lg-4">
+                <input type="text" class="form-control numberincdec" name="appsendimgcount" value="{$config['appsendimgcount']??0}"
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="100"
+                data-bts-step="1"
+                data-bts-postfix="条图片消息"
+                data-bts-postfix-extra-class="touchspin-postfix">
+                <span class="zam-help-block">注:必须是小于等于100的整数，0为不限制发送图片消息数量</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 消息最大长度</label>
+            <div class="col-lg-4">
+                <input type="text" class="form-control numberincdec" name="appmaxlength" value="{$config['appmaxlength']}"
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="null"
+                data-bts-step="1"
+                data-bts-postfix="个字符"
+                data-bts-postfix-extra-class="touchspin-postfix">
+                <span class="zam-help-block">注:必须是个大于0的整数</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 消息颜色(用户名与文字)</label>
+            <div class="col-lg-3">
+                {:tpl_color('appfontcolor',$config['appfontcolor'])}
+                <span class="help-block">默认白色</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 消息背景色</label>
+            <div class="col-lg-3">
+                {:tpl_color('appbgcolor',$config['appbgcolor'],'rgba')}
+                <span class="help-block">默认黑色 rgba(0,0,0,.5)</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 输入框提示文字</label>
+            <div class="col-lg-8">
+              <input type="text" class="form-control"  name="apptxttip"  value="{$config['apptxttip']??'请输入你想说的话'}" maxlength="30" placeholder="30个字符以内">
+            </div>
+        </div>
+    </div>
+    <div class="config-titlebox">
+        <span class="config-titlename">大屏设置</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#screenconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+    </div>
+    <div id="screenconfigbox" class="collapse in">
+        {include file="$Wpath/common/configscreencommon" /}
+        {include file="$Wpath/common/configscreenmusic" /}
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 右上角显示消息数量</label>
+            <div class="col-lg-8">
+                {:tpl_switch('showjoinnum',$config['showjoinnum']??'1')}
+                <div class="help-block">开启后大屏右上角会显示已发送的消息总数量</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 每页消息数量</label>
+            <div class="col-lg-8">
+              <label class="lyear-radio radio-inline radio-primary">
+               <input type="radio" name="msgnums" value="3" {if $config['msgnums']=='3'}checked{/if}><span>3条</span>
+              </label>
+              <label class="lyear-radio radio-inline radio-primary">
+               <input type="radio" name="msgnums" value="4" {if $config['msgnums']=='4'}checked{/if}><span>4条</span>
+              </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 显示消息发送时间</label>
+            <div class="col-lg-8">
+                {:tpl_switch('showmsgtime',$config['showmsgtime'])}
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 消息背景颜色</label>
+            <div class="col-lg-3">
+                {:tpl_color('pcbgcolor',$config['pcbgcolor'])}
+                <span class="help-block">默认黑色</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 消息颜色(用户名与文字)</label>
+            <div class="col-lg-3">
+                {:tpl_color('pcfontcolor',$config['pcfontcolor'])}
+                <span class="help-block">默认白色</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 消息边界大小</label>
+            <div class="col-lg-2">
+                <input type="text" class="form-control numberincdec" name="pcbordersize" value="{$config['pcbordersize']}"
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="null"
+                data-bts-step="1"
+                data-bts-postfix="px"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                >
+                <span class="zam-help-block">0则为无边界</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 消息边界颜色</label>
+            <div class="col-lg-3">
+                {:tpl_color('pcbordercolor',$config['pcbordercolor'])}
+                <span class="help-block">默认淡黄色</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 头像背景图片</label>
+            <div class="col-lg-8">
+                {:tpl_image_one('pcavatarbg',$config['pcavatarbg'])}
+                <span class="help-block">可以不设置此项，规格:241*168px</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 滚动时间间隔</label>
+            <div class="col-lg-4">
+                <input type="text" class="form-control numberincdec" name="rolltime" value="{$config['rolltime']}"
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="null"
+                data-bts-step="1"
+                data-bts-postfix="秒"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                >
+                <span class="zam-help-block">即为每几秒切换至下一页</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 加载历史消息条数</label>
+            <div class="col-lg-4">
+                <input type="text" class="form-control numberincdec" name="historynums" value="{$config['historynums']}"
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="null"
+                data-bts-step="1"
+                data-bts-postfix="条"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                >
+                <span class="zam-help-block">注:必须是个大于0的整数</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 图片自动放大</label>
+            <div class="col-lg-2">
+                {:tpl_switch('showbigimg',$config['showbigimg'],'openbigshow')}
+                <span class="help-block">开启则图片会自动放大</span>
+            </div>
+        </div>
+        <div class="bigshowbox{if $config['showbigimg']=='2'} hidden{/if}">
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 开启循环放大</label>
+                <div class="col-lg-3">
+                    {:tpl_switch('bigimgtype',$config['bigimgtype'])}
+                    <span class="help-block">关闭则图片仅放大一次</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 放大时间</label>
+                <div class="col-lg-4">
+                    <input type="text" class="form-control numberincdec" name="bigimgtime" value="{$config['bigimgtime']}"
+                    data-bts-min="1" data-bts-replacement-val="1"
+                    data-bts-max="null"
+                    data-bts-step="1"
+                    data-bts-postfix="秒"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                    >
+                    <span class="zam-help-block">注:必须是个大于0的整数，注:合理设置此值，一般3-4秒即可</span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 仅显示弹幕</label>
+            <div class="col-lg-3">
+                {:tpl_switch('onlydm',$config['onlydm'])}
+                <span class="help-block">开启则大屏不显示上墙滚动消息，只显示弹幕横屏滚动消息</span>
+            </div>
+        </div>
+    </div>
+    {include file='$Wpath/common/configsavepanel'}
+</form>
+<script>
+require(['webcore','jconfirmBox','zamnotice','layerBox','zvalidator','jquery.ui'],function(webcore,jconfirmBox,zamnotice,layerBox){
+    $('#formBox').formValidation({
+        framework: 'bootstrap',
+        excluded: [':disabled'],
+        message: '您填写的内容无效',
+        fields: {
+            apptitle:{
+                message: '请输入网页标题',
+                validators: {
+                    notEmpty: {
+                        message: '请输入网页标题'
+                    },
+                }
+            },
+        }
+    }).on('success.form.fv', function(e) {
+        e.preventDefault();
+        var $form = $(e.target);
+        var postData = webcore.serializeObject($form);
+        var bload = $form.find(".zam-fixedbottom button").lyearloading({opacity: 0.2,spinnerSize: 'nm'});
+        $form.formValidation('disableSubmitButtons', true);
+        webcore.ajaxSubmit("{:gohdmanage('configmsg/index',['hdid'=>$hdid])}",postData).then(function(json){
+            bload.hide();
+            if(json.code==0){
+                $form.formValidation('disableSubmitButtons', false);
+                zamnotice.showTips('success','操作成功',2e3,function(){
+                    window.location.reload();
+                });
+            }else{
+                zamnotice.showTips('error',json.msg);
+                $form.formValidation('disableSubmitButtons', false);
+            }
+        }, function(json){
+            bload.hide();
+            zamnotice.showTips('error','网络差。操作失败');
+            $form.formValidation('disableSubmitButtons', false);
+        });
+    });
+    $('.groupbox input[type="checkbox"]').change(function(){
+        var len = $('.groupbox input[type="checkbox"]:checked').length;
+        if($(this).prop("checked") == true){
+            if(len > 2){
+                $(this).prop("checked",false);
+                return zamnotice.showTips('error','最多只能选择2个分组');
+            }
+        }
+    });
+    $('.stabletxt-lists').sortable({handle: ".sortmove"}).disableSelection();
+    $('.stabletxt-lists').on('click','.btn-delshowitem',function(){
+        var $this = $(this);
+        jconfirmBox.confirm('温馨提示','您确定要删除么？',function(){
+            $this.parent().parent().remove();
+            zamnotice.showTips('success','删除成功');
+        });
+    });
+    $(".btn-addstabletxt").click(function(){
+        var iserror = false,yuluinputs = $('.stabletxt-lists input');
+        yuluinputs.each(function(){
+            if($(this).val() == ''){
+                iserror = true;
+                return false;
+            }
+        });
+        if(iserror){
+            return zamnotice.showTips('warning','请先将现有的内容设置好再加其他的内容');
+        }
+        if(yuluinputs.length >= 20){
+            return zamnotice.showTips('error','最多只能添加20条');
+        }
+        var html = webcore.tpl($("#stabletxt-tpl"),{word:''});
+        $('.stabletxt-lists').append(html);
+    });
+});
+function opennotice(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".appnoticebox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".appnoticebox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openstabletxt(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".stabletxtbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".stabletxtbox").removeClass('hidden');
+        var appcanimg = $('input[name=appcanimg]');
+        if((appcanimg.val()||'2') == '1'){
+            appcanimg.next().trigger('click');
+        }
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openbigshow(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".bigshowbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".bigshowbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openestoppel(obj,status,url){
+    require(['webcore','zamnotice'],function(webcore,zamnotice){
+        webcore.ajaxSubmit("{:gohdmanage('configmsg/openestoppel',['hdid'=>$hdid])}",{appestoppel:(status=='1'?'2':'1')},'正在执行命令...').then(function(json){
+            if(status=='1'){
+                obj.prev().val('2');
+                obj.attr('data-status','2');
+            }else{
+                obj.prev().val('1');
+                obj.attr('data-status','1');
+            }
+            obj.prev().prev().prop("checked",status=='1'?false:true);
+            zamnotice.showTips('success','操作成功');
+        }, function(json){
+            
+        });
+    });
+}
+function opengroupconfig(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".signgroupbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".signgroupbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function changeasnickname(obj){
+    var check = $(obj).prop('checked');
+    $(obj).prev().val(check?"1":"2");
+}
+function savegroupconfig(obj){
+    require(['webcore','zamnotice'],function(webcore,zamnotice){
+        var pobj = $(obj).parent().parent().parent(),groups = [];
+        pobj.find('.groupbox input[type="checkbox"]:checked').each(function() {
+            groups.push($(this).val());
+        });
+        if(groups.length != 2){
+            return zamnotice.showTips('error','请先选择2个分组');
+        }
+        webcore.ajaxSubmit("{:gohdmanage('configmsg/savegroupconfig',['hdid'=>$hdid])}",{
+            open:pobj.find('input[name="groupconfig[open]"]').val() || '1',
+            groups:groups,
+        },'正在执行命令...').then(function(json){
+            if(json.code == 0){
+                zamnotice.showTips('success','操作成功',1e3,function(){
+                    window.location.reload();
+                });
+            }else{
+                zamnotice.showTips('error',json.msg);
+            }
+        }, function(json){
+            zamnotice.showTips('error','出现异常，请稍后重试');
+        });
+    });
+}
+function opencanimg(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".canimgbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".canimgbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+</script>
+<script id='stabletxt-tpl' type="text/template">
+    <tr>
+        <td class="text-center">
+            <input type="text" class="form-control" name="stabletxts[]" value="<% d.word %>" /> 
+        </td>
+        <td class="text-center">
+            <a class="btn btn-xs btn-primary zam-sortable sortmove" href="javascript:void(0)"> <i class="mdi mdi-arrow-all"></i> </a>
+            <a class="btn btn-xs btn-danger btn-delshowitem" href="javascript:void(0)"> <i class="mdi mdi-close"></i> </a>
+        </td>
+    </tr>
+</script>
+{include file='$Wpath/common/footer'}

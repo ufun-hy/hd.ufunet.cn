@@ -1,0 +1,141 @@
+{include file="common/header" /}
+<style>
+.livemark-zan-list{
+	width:100%;
+	height:calc(100% - 0.2rem);
+	padding:0.2rem 0 0.76rem 0;
+}
+.livemark-title{
+	margin: 0 auto .28rem;
+    width: 80%;
+    line-height: 1.2;
+    font-size: .36rem;
+    text-align: center;
+    font-weight: 400;
+}
+.livemark-footer .active,.livemark-footer .active i{
+    color:rgb(255, 115, 171);
+}
+.livemark-zan-user li{
+	padding: 2vw 4vw;
+    width: 100%;
+    border-bottom: 1px solid hsla(0,0%,64.7%,.5);
+}
+.livemark-zan-user li .sortnum{
+	width: 6vw;
+    line-height: 6vw;
+    height: 6vw;
+	font-size:0.36rem;
+	font-weight: 600;
+	text-align:center;
+}
+.livemark-zan-user li .sortnum i{
+	display:inline-block;
+	width:100%;
+	height:100%;
+	background-repeat:no-repeat;
+	background-size:cover;
+}
+.livemark-zan-user li:nth-child(1) .sortnum i{
+	background-image:url("/{:WIMGURL}livemark/1.png");
+}
+.livemark-zan-user li:nth-child(2) .sortnum i{
+	background-image:url("/{:WIMGURL}livemark/2.png");
+}
+.livemark-zan-user li:nth-child(3) .sortnum i{
+	background-image:url("/{:WIMGURL}livemark/3.png");
+}
+.livemark-zan-user li .avatarimg{
+	margin: 0 3vw;
+    width: 14.4vw;
+    height: 14.4vw;
+    border-radius: 50%;
+    border: 2px solid {$rotate['maincolor']};
+}
+.livemark-zan-user li .rightbox{
+	width:66vw;
+}
+.livemark-zan-user li .rightbox .username-zan{
+	margin-bottom:0.1rem;
+	height:0.5rem;
+}
+.username{
+	align-self: flex-end;
+	white-space: nowrap;
+    word-break: break-all;
+    text-overflow: ellipsis;
+    overflow: hidden;
+	font-size:0.32rem;
+}
+.zanhand{align-self: flex-end;text-align:right}
+.zannum{
+	font-size:0.4rem;
+	font-weight:600
+}
+.hand{
+	margin-left:0.4rem;
+}
+.hand i{font-size: 0.32rem;}
+.livemark-zan-box{
+	background: rgba(0,0,0,0.1);
+    border-radius:0.13rem;
+    overflow: hidden;
+	height:0.26rem;
+}
+.livemark-zan-bar{
+    height:0.26rem;
+    border-radius:0.13rem;
+	width:0;
+	background-color:{$rotate['maincolor']};
+}
+</style>
+<section class="g-flexview">
+	<div class="g-scrollview livemark-zan-list">
+		<div class="livemark-title">{$rotate['title']}</div>
+		<ul class="livemark-zan-user">
+			{foreach $rotate['pfusers'] as $pfkey=>$pfuser } 
+			<li class="zam-app-flex-alignCenter">
+				<div class="sortnum">
+					{if $pfkey<3}
+					<i class="sortimg"></i>
+					{else}
+					{$pfkey+1}
+					{/if}
+				</div> 
+				<img src="{$pfuser['userimg']}" class="avatarimg"> 
+				<div class="rightbox">
+						<div class="username-zan zam-app-flex">
+							<div class="username flex7">{$pfuser['username']}</div>
+							<div class="zanhand flex4">
+								<span class="zannum">{$pfuser['zan']}</span>
+								<span class="hand"><i class="mxc-unie69d"></i></span>
+							</div>
+						</div>
+						<div class="livemark-zan-box">
+							<div class="livemark-zan-bar" style="width: {if $rotate['totalzan']>0}{$pfuser['zan'] / $rotate['totalzan'] * 100}{else}0{/if}%;"></div>
+						</div>
+				</div>
+			</li>
+			{/foreach}
+		</ul>
+	</div>
+</section>
+{if $rotate['openpubpw']=='2' && $rotate['openzan']=='1'}
+<style>.livemark-footer .active,.livemark-footer .active i{color:{$rotate['maincolor']};}</style>
+<footer class="m-tabbar tabbar-fixed livemark-footer{if $rotate['openzan']=='2'} hidden{/if}">
+	<a href="javascript:;" data-href="{:gowechat(!$pwclient?'livemark/index':'livemarkpw/index',['hdid'=>$hdinfo['hdid']])}" data-module="livemark" class="tabbar-item">
+		<span class="tabbar-icon">
+			<i class="mxc-unie68c"></i>
+		</span>
+		<span class="tabbar-txt">评分</span>
+	</a>
+	<a href="javascript:;" data-href="{:gowechat(!$pwclient?'livemark/zanphb':'livemarkpw/zanphb',['hdid'=>$hdinfo['hdid']])}" data-module="livemark" class="tabbar-item active">
+		<span class="tabbar-icon">
+			<i class="mxc-hot_light"></i>
+		</span>
+		<span class="tabbar-txt">人气</span>
+	</a>
+</footer>
+{/if}
+{include file="livemark/footer" /}
+{include file="common/footer" /}

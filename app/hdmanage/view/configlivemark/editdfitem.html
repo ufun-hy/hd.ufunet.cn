@@ -1,0 +1,41 @@
+<div class="form-horizontal confirmbox-pop">
+  <input type="hidden" class="form-control dffield" name="dffield" value="{$dfitem['dffield']}">
+  <div class="form-group">
+	<label class="col-lg-4 control-label text-right">* 打分项目名</label>
+	<div class="col-lg-6">
+	  <input type="text" class="form-control dfname"  name="dfname" value="{$dfitem['dfname']}">
+	</div>
+ </div>
+ <div class="form-group">
+	<label class="col-lg-4 control-label text-right">* 分数范围</label>
+	<div class="col-lg-7">
+		<div class="input-group">
+            <div class="input-group-btn not-allow"><a class="btn btn-default">最低</a></div>
+            <div class="touchspin">
+                <input type="text" class="form-control numberincdec dfmin" name="dfmin" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="100"
+                data-bts-step="1"
+                value="{$dfitem['dfmin']}">
+            </div>
+            <div class="input-group-btn not-allow"><a class="btn btn-default">分，最高</a></div>
+            <div class="touchspin">
+                <input type="text" class="form-control numberincdec dfmax" name="dfmax" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="100"
+                value="{$dfitem['dfmax']}">
+            </div>
+        </div>
+		<span class="zam-help-block">最大分数为100，最小为0</span>
+	</div>
+ </div>
+</div>
+<script type="text/javascript">
+require(["bootstrap-touchspin"],function(){
+    $(".confirmbox-pop .numberincdec").TouchSpin().on("change", function(){
+        var $this = $(this),funcstr = $this.data('func');
+        var func = window[funcstr];
+        func && func();
+    });
+});
+</script>

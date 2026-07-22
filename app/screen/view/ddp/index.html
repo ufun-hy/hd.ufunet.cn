@@ -1,0 +1,754 @@
+{include file='common/header' /}
+<style type="text/css">
+::-webkit-scrollbar {
+    width: 6px;
+    border-radius: 6px;
+}
+::-webkit-scrollbar-track {
+    background-color: #666;
+    border-radius: 6px;
+}
+::-webkit-scrollbar-thumb {
+    border-radius: 6px;
+    outline-offset: -2px;
+    background-color: #dedede;
+}
+::-webkit-scrollbar-thumb:hover {
+    background-color: #dedede;
+}
+.ddp-mainbox {
+    top: 90px;
+    bottom: 40px;
+    padding: 0;
+    height: 670px;
+    box-sizing: border-box;
+}
+.ddp-mainbox .singlebox{
+	width: 100%;
+	height: 100%;
+}
+.ddp-mainbox .singlebox .singleheader{
+	position: relative;
+}
+.ddp-mainbox .singlebox .singleheader .starsbox{
+	position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 120px;
+    height: 120px;
+    margin-left: -60px;
+    margin-top: -90px;
+}
+.ddp-mainbox .singlebox .singleheader .starsbox .starlogo{
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-size: cover;
+    background-repeat: no-repeat;
+    {if !empty($pcconfig['styleconfig']['starlogo'])}
+    	background-image:url({:tomedia($pcconfig['styleconfig']['starlogo'])});
+    {/if}
+}
+.singlebox.isdrawing .starsbox .starlogo{
+	{if !empty($pcconfig['styleconfig']['starlogo'])}
+		animation: heartbeatani 0.6s infinite;
+	{/if}
+}
+@keyframes heartbeatani{
+	0%{
+		transform:scale(1);
+	}
+	25%{
+		transform:scale(1.5);
+	}
+	to{
+		transform:scale(1);
+	}
+}
+.singlebox.isdrawing .starsbox .star-lists{
+	display: none;
+}
+.singleheader .starsbox .star-lists img{position: absolute;bottom:60px;;left: 50%;margin-left: -5px;width: 10px; }
+.singleheader .starsbox .star-lists .star1{animation: star1ani 3s ease-in infinite}
+.singleheader .starsbox .star-lists .star2{animation: star2ani 3s 0.5s ease-in infinite}
+.singleheader .starsbox .star-lists .star3{animation: star3ani 3s 1s ease-in infinite}
+.singleheader .starsbox .star-lists .star4{animation: star4ani 3s 1.5s ease-in infinite}
+.singleheader .starsbox .star-lists .star5{animation: star5ani 3s 2s ease-in infinite}
+.singleheader .starsbox .star-lists .star6{animation: star6ani 3s 2.5s ease-in infinite}
+@keyframes star1ani{
+	0%{ 
+		transform: translate(0,0) scale(1);
+		opacity: 1; 
+	}
+	100%{
+		transform: translate(100px,-160px) scale(10) rotate(60deg);
+		opacity: 0;
+	}
+}
+@keyframes star2ani{
+	0%{ 
+		transform: translate(0,0) scale(1);
+		opacity: 1; 
+	}
+	100%{transform: translate(0,-180px) scale(10) rotate(-60deg);
+		opacity: 0;
+	}
+}
+@keyframes star3ani{
+	0%{ 
+		transform: translate(0,0) scale(1);
+		opacity: 1; 
+	}
+	100%{
+		transform: translate(-100px,-170px) scale(10) rotate(-30deg);
+		opacity: 0;
+	}
+}
+@keyframes star4ani{
+	0%{ 
+		transform: translate(0,0) scale(1);
+		opacity: 1;
+	}
+	100%{
+		transform: translate(160px,-180px) scale(10) rotate(-40deg);
+		opacity: 0;
+	}
+}
+@keyframes star5ani{
+	0%{ 
+		transform: translate(0,0) scale(1);
+		opacity: 1;
+	}
+	100%{
+		transform: translate(0px,-190px) scale(10) rotate(-40deg);
+		opacity: 0;
+	}
+}
+@keyframes star6ani{
+	0%{ 
+		transform: translate(0,0) scale(1);
+		opacity: 1;
+	}
+	100%{
+		transform: translate(-160px,-140px) scale(10) rotate(-30deg);
+		opacity: 0;
+	}
+}
+.singlebox .singleheader .starsbox .star-bubbles {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index:2;
+    pointer-events:  none;
+}
+.singlebox .singleheader .starsbox .star-bubbles .bubble {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 40px;
+    height: 40px;
+    margin-left: -20px;
+    margin-top: -20px;
+    background-size: cover;
+    background-repeat: no-repeat;
+    {if !empty($pcconfig['styleconfig']['bubble'])}
+    	background-image:url({:tomedia($pcconfig['styleconfig']['bubble'])});
+    {/if}
+}
+.singlebox .singleheader .panel{
+	position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 330px;
+    height: 330px;
+    margin-left: -165px;
+    margin-top: -200px;
+    background-size: cover;
+    background-repeat: no-repeat;
+    z-index: -1;
+    {if !empty($pcconfig['styleconfig']['quan'])}
+    	background-image:url({:tomedia($pcconfig['styleconfig']['quan'])});
+    	animation: panelrotateani .5s .5s backwards;
+    {/if}
+}
+@keyframes panelrotateani{
+	0%{
+		opacity: 0;
+		transform:rotate(-90deg);
+	}
+	10%{
+		opacity: 1;
+	}
+	to{
+		transform:rotate(0);
+	}
+}
+.singlebox .singleheader .single-item.single-right{
+	flex-direction: row-reverse;
+	flex-direction: row-reverse;
+}
+.singlebox .singleheader .single-item .single-info .single-avatar{
+	position: relative;
+	width: 250px;
+	height: 250px;
+}
+.singlebox .singleheader .single-item .single-info .single-avatar .bgwrap{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    z-index: -1;
+}
+.singlebox .singleheader .single-item .single-info .single-avatar .bgwrap.bgwraprotate{
+    transform: rotate(200deg);
+}
+.singlebox.isdrawing .single-item .single-info .single-avatar .bgwrap{
+	animation: foreverrotate 0.5s linear infinite;
+	animation-fill-mode:both;
+}
+@keyframes foreverrotate {
+    0% {
+        transform: rotate(0)
+    }
+    to {
+        transform: rotate(-1turn)
+    }
+}
+.singlebox .singleheader .single-item .single-info .single-avatar img{
+	width: 200px;
+	height: 200px;
+	box-sizing: border-box;
+	border-radius: 50%;
+	vertical-align: middle;
+}
+.singlebox .singleheader .single-item.single-left .single-info .single-avatar .bgwrap{
+    {if !empty($pcconfig['styleconfig']['leftavatarbg'])}
+	background-image:url({:tomedia($pcconfig['styleconfig']['leftavatarbg'])});
+	{/if}
+}
+.singlebox .singleheader .single-item.single-right .single-info .single-avatar .bgwrap{
+    {if !empty($pcconfig['styleconfig']['rightavatarbg'])}
+	background-image:url({:tomedia($pcconfig['styleconfig']['rightavatarbg'])});
+	{/if}
+}
+.singlebox .singleheader .single-item.single-left .single-info .single-avatar img{
+	border: {$pcconfig['styleconfig']['leftbordersize']??14}px solid {$pcconfig['styleconfig']['leftbordercolor']??'#00ffff'};
+}
+.singlebox .singleheader .single-item.single-right .single-info .single-avatar img{
+	border: {$pcconfig['styleconfig']['rightbordersize']??14}px solid {$pcconfig['styleconfig']['rightbordercolor']??'#ff3366'};;
+}
+.singlebox .singleheader .single-item .single-info .single-name{
+	margin-top: 20px;
+	width: 200px;
+	height: 57px;
+	font-weight: bold;
+	background-repeat: no-repeat;
+	background-size: 100% 100%;
+}
+.singlebox .singleheader .single-item.single-left .single-name{
+	color: {$pcconfig['styleconfig']['leftnamecolor']??'#fff'};
+	font-size: {$pcconfig['styleconfig']['leftnamesize']??20}px;
+	{if !empty($pcconfig['styleconfig']['leftnamebg'])}
+	background-image:url({:tomedia($pcconfig['styleconfig']['leftnamebg'])});
+	{/if}
+}
+.singlebox .singleheader .single-item.single-right .single-name{
+	color: {$pcconfig['styleconfig']['rightnamecolor']??'#fff'};
+	font-size: {$pcconfig['styleconfig']['rightnamesize']??20}px;
+	{if !empty($pcconfig['styleconfig']['rightnamebg'])}
+	background-image:url({:tomedia($pcconfig['styleconfig']['rightnamebg'])});
+	{/if}
+}
+.singlebox .singleheader .single-item .single-lines{
+	position: relative;
+	margin-top: -86px;
+}
+.singlebox .singleheader .single-item.single-left .single-lines{
+	margin-left: -27px;
+}
+.singlebox .singleheader .single-item.single-right .single-lines{
+	margin-right: -27px;
+}
+.singlebox .singleheader .single-item .single-lines svg{
+	fill: none;
+    fill-rule: evenodd;
+    stroke-linejoin: round;
+    stroke-width: 3px;
+}
+.singlebox .singleheader .single-item.single-left svg{
+    transform: scaleX(-1);
+    transform: scaleX(-1);
+}
+.singlebox .singleheader .single-item.single-left .single-lines svg:nth-child(1) path {
+	stroke:{$pcconfig['styleconfig']['leftlinecolor']??'#fff'};
+}
+.singlebox .singleheader .single-item.single-right .single-lines svg:nth-child(1) path {
+	stroke:{$pcconfig['styleconfig']['rightlinecolor']??'#fff'};
+}
+.singlebox .singleheader .single-item .single-lines svg:nth-child(2){
+	position: absolute;
+	left: 0;
+	top: 0;
+}
+.singlebox .singleheader .single-item .single-lines svg:nth-child(2) path{
+	stroke-width: 6px;
+	stroke-dasharray: 780;
+    stroke-dashoffset: 780;
+}
+.singlebox.isdrawing .singleheader .single-item .single-lines svg:nth-child(2) path{
+    animation: linesvgani .8s ease-out infinite forwards;
+}
+@keyframes linesvgani{
+	to{stroke-dashoffset:0}
+}
+.singlebox .singlefooter{
+	margin-top: 40px;
+}
+.singlebox .singlefooter .startbtn{
+	width: 450px;
+	height: 100px;
+	font-weight: bold;
+	letter-spacing: 4px;
+	background-repeat: no-repeat;
+	background-size: 100% 100%;
+	cursor: pointer;
+	color: {$pcconfig['styleconfig']['starttxtcolor']??'#fff'};
+	font-size: {$pcconfig['styleconfig']['starttxtsize']??42}px;
+	{if !empty($pcconfig['styleconfig']['startbg'])}
+    	background-image:url({:tomedia($pcconfig['styleconfig']['startbg'])});
+	{/if}
+}
+.singlebox .singlefooter .startbtn.isining{
+	pointer-events: none;
+}
+.singlebox .singlefooter .single-controls{
+	margin-top: 40px;
+}
+.singlebox .singlefooter .single-controls .single-nums{
+	width: 160px;
+	height: 45px;
+	background-repeat: no-repeat;
+	background-size: 100% 100%;
+	margin-right: 50px;
+	color: #fff;
+	{if !empty($pcconfig['styleconfig']['numbg'])}
+    	background-image:url({:tomedia($pcconfig['styleconfig']['numbg'])});
+	{/if}
+}
+.singlebox .singlefooter .single-controls .single-nums .dec,.single-nums .inc{
+	width: 30px;
+	height: 30px;
+	cursor: pointer;
+}
+.singlebox .singlefooter .single-controls .single-nums .dec i,.single-nums .inc i{
+	font-size: 20px;
+	font-weight: bold;
+}
+.singlebox .singlefooter .single-controls .single-nums .selnum{
+	width: 80px;
+	height: 50px;
+	padding: 10px;
+	box-sizing: border-box;
+}
+.singlebox .singlefooter .single-controls .single-nums .selnum input{
+	width: 100%;
+	height: 100%;
+	text-align: center;
+	font-size: 20px;
+	font-weight: 600;
+	color: #fff;
+	border: 0;
+	outline: none;
+	background-color: transparent;
+}
+.singlebox .singlefooter .single-controls .single-record{
+	width: 160px;
+	height: 45px;
+	background-repeat: no-repeat;
+	background-size: 100% 100%;
+	cursor: pointer;
+	font-size: 20px;
+	letter-spacing: 4px;
+	font-weight: bold;
+	color:#fff;
+	margin-left: 50px;
+	{if !empty($pcconfig['styleconfig']['recordbg'])}
+    	background-image:url({:tomedia($pcconfig['styleconfig']['recordbg'])});
+	{/if}
+}
+.ddp-recordlists{
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 1;
+	background-color: rgba(0,0,0,0.42);
+}
+.ddp-recordlists .user-lists{
+	position: relative;
+	width: 1300px;
+	height: 637px;
+	background-repeat: no-repeat;
+	background-size: 100% 100%;
+	animation-duration: 0.3s;
+	{if !empty($pcconfig['styleconfig']['popbg'])}
+    	background-image:url({:tomedia($pcconfig['styleconfig']['popbg'])});
+	{/if}
+}
+.ddp-recordlists.hidden{
+	display: none;
+}
+.ddp-recordlists .user-lists .close{
+	position: absolute;
+	top: 40px;
+	right: 20px;
+	width: 33px;
+	height: 32px;
+	background-repeat: no-repeat;
+	background-size: 100% 100%;
+	cursor: pointer;
+	z-index: 1;
+	{if !empty($pcconfig['styleconfig']['popclose'])}
+    	background-image:url({:tomedia($pcconfig['styleconfig']['popclose'])});
+	{/if}
+}
+.ddp-recordlists .user-lists .pageprev{
+	position: absolute;
+    top: 50%;
+    left: 0;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    transform: translate(0,-50%);
+	color: #fff;
+	z-index: 1
+}
+.ddp-recordlists .user-lists .pageprev span{
+	font-size: 40px;
+}
+.ddp-recordlists .user-lists .pagenext{
+	position: absolute;
+    top: 50%;
+    right: 0;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    transform: translate(0,-50%);
+	color: #fff;
+	z-index: 1;
+}
+.ddp-recordlists .user-lists .pagenext span{
+	font-size: 40px;
+}
+.recordlist{
+	width: 100%;
+	height: 100%;
+}
+.user-wrapper{
+	position: relative;
+	height: calc(100% - 70px);
+	width: calc(100% - 70px);
+	margin: 60px 35px 10px 35px;
+}
+.user-wrapper .user-round{
+	height: 36px;
+	line-height: 36px;
+	text-align: center;
+	font-size: 22px;
+	color: #fff;
+}
+.user-wrapper .user-round span{
+	display: inline-block;
+	line-height: 36px;
+	text-align: center;
+	font-size: 16px;
+	color: #fbce07;
+}
+.user-wrapper .user-items{
+	width: 100%;
+	height: calc(100% - 30px);
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+.user-wrapper .user-items .user-item{
+	position: relative;
+	width: 1000px;
+}
+.user-wrapper .user-items .user-item:hover .del{
+	display: flex
+}
+.user-wrapper .user-items .user-item .del{
+	position: absolute;
+	top: 50%;
+    left: 50%;
+    cursor: pointer;
+    transform: translate(-50%,-50%);
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	background-color: rgba(0,0,0,0.32);
+	display: none;
+}
+.user-wrapper .user-items .user-item .del i{
+	color: #fff;
+	font-size: 24px;
+}
+.user-wrapper .user-items .user-item .userman{
+	width: 50%;
+}
+.user-wrapper .user-items .user-avatar{
+	position: relative;
+	width: 300px;
+	height: 300px;
+    background-size: cover;
+    padding: 6px;
+    box-sizing: border-box;
+    margin: 0 auto;
+    {if !empty($pcconfig['styleconfig']['userbg'])}
+    	background-image:url({:tomedia($pcconfig['styleconfig']['userbg'])});
+	{/if}
+}
+.user-wrapper .user-item .userman.left .user-avatar{
+	transform: rotate(-45deg);
+}
+.user-wrapper .user-item .userman.right .user-avatar{
+	transform: rotate(45deg);
+}
+.user-wrapper .user-item .user-avatar img{
+	position: absolute;
+	top: 0;
+	width: calc(100% - 6px);
+	height: calc(100% - 6px);
+	{if !empty($pcconfig['styleconfig']['userbg'])}
+    	mask-image: url({:tomedia($pcconfig['styleconfig']['userbg'])});
+	    mask-size: cover;
+	    -webkit-mask-image: url({:tomedia($pcconfig['styleconfig']['userbg'])});
+	    -webkit-mask-size: cover;
+	{/if}
+    
+}
+.user-wrapper .user-item .user-name{
+	width: 100%;
+	padding: 0 8px;
+	text-align: center;
+	font-size: 32px;
+	color: #fff;
+	box-sizing: border-box;
+}
+/*
+mode2 2个
+*/
+.user-wrapper.mode2 .user-items .user-item{
+	width: 480px;
+	min-height: 300px;
+	padding: 30px;
+}
+.user-wrapper.mode2 .user-items .user-item .user-avatar{
+	position: relative;
+	width: 240px;
+	height: 240px;
+    padding: 6px;
+}
+.user-wrapper.mode2 .user-item .user-name{
+	font-size: 28px;
+}
+/*
+mode3 3-6个
+*/
+.user-wrapper.mode3 .user-items .user-item{
+	width: 360px;
+	min-height: 240px;
+	padding: 10px;
+}
+.user-wrapper.mode3 .user-items .user-item .user-avatar{
+	position: relative;
+	width: 180px;
+	height: 180px;
+    padding: 6px;
+}
+.user-wrapper.mode3 .user-item .user-name{
+	font-size: 24px;
+}
+/*
+mode4 7-12个
+*/
+.user-wrapper.mode4 .user-items .user-item{
+	width: 270px;
+	min-height: 156px;
+	padding: 8px;
+}
+.user-wrapper.mode4 .user-items .user-item .user-avatar{
+	position: relative;
+	width: 135px;
+	height: 135px;
+    padding: 6px;
+}
+.user-wrapper.mode4 .user-item .user-name{
+	font-size: 20px;
+}
+/*
+mode5 13以上个
+*/
+.user-wrapper.mode5 .user-items .user-item{
+	width: 210px;
+	min-height: 130px;
+	padding: 8px;
+}
+.user-wrapper.mode5 .user-items .user-item .user-avatar{
+	position: relative;
+	width: 105px;
+	height: 105px;
+    padding: 6px;
+}
+.user-wrapper.mode5 .user-item .user-name{
+	font-size: 16px;
+}
+</style>
+{if isset($pcconfig['styleconfig']['drawingmusic']) && !empty($pcconfig['styleconfig']['drawingmusic'])}
+<audio id="drawing" src="{:tomedia($pcconfig['styleconfig']['drawingmusic'])}"  preload="preload" loop="true" style="display:none"></audio>
+{/if}
+{if isset($pcconfig['styleconfig']['endmusic']) && !empty($pcconfig['styleconfig']['endmusic'])}
+<audio id="drawed" src="{:tomedia($pcconfig['styleconfig']['endmusic'])}"  preload="preload"  style="display:none"></audio>
+{/if}
+<section class="ddp-mainbox normal-box">
+	<div class="emptybox zam-app-flex-ajCenter display-none">
+		<img src="/{:SIMGURL}common/empty.png">
+		<p style="padding:20px;">请到后台添加轮次</p>
+  	</div>
+	<div class="singlebox zam-app-flex-ajCenter display-none">
+		<div class="singleheader zam-app-flex">
+			<div class="single-item single-left zam-app-flex-ajCenter2">
+				<div class="single-info zam-app-flex-ajCenter">
+					<div class="single-avatar zam-app-flex-ajCenter2">
+						<div class="bgwrap bgwraprotate"></div>
+						<img src="{if !empty($pcconfig['styleconfig']['leftavatar'])}{:tomedia($pcconfig['styleconfig']['leftavatar'])}{else /}/static/images/screen/ddp/style/waitfor.png{/if}" />
+					</div>
+					<div class="single-name zam-app-flex-ajCenter2">{$rotate['leftgroupconfig']['name']??'男神队'}</div>
+				</div>
+				<div class="single-lines">
+					<svg xmlns="http://www.w3.org/2000/svg" width="342" height="130" >
+						<path class="leftpath" d="M 0 80 h 100 l 25 25 l 18 -95 l 30 110 l 15 -70 l 22 30 L 261 10 l 29 80 h 62"></path>
+					</svg>
+					<svg xmlns="http://www.w3.org/2000/svg" width="342" height="130"  >
+						<defs>
+							<linearGradient id="linearline1" x1="0%" y1="0%" x2="100%" y2="0%">
+								<stop offset="0%" stop-color="{$pcconfig['styleconfig']['leftlinecolor']??'#fff'}"></stop>
+								<stop offset="100%" stop-color="{$pcconfig['styleconfig']['leftalinecolor']??'#00ffff'}"></stop>
+							</linearGradient>
+						</defs>
+						<path d="M 0 80 h 100 l 25 25 l 18 -95 l 30 110 l 15 -70 l 22 30 L 261 10 l 29 80 h 62" stroke="url(#linearline1)"></path>
+					</svg>
+				</div>
+			</div>
+			<div class="single-item single-right zam-app-flex-ajCenter2">
+				<div class="single-info zam-app-flex-ajCenter">
+					<div class="single-avatar zam-app-flex-ajCenter2">
+						<div class="bgwrap"></div>
+						<img src="{if !empty($pcconfig['styleconfig']['rightavatar'])}{:tomedia($pcconfig['styleconfig']['rightavatar'])}{else /}/static/images/screen/ddp/style/waitfor.png{/if}" />
+					</div>
+					<div class="single-name zam-app-flex-ajCenter2">{$rotate['rightgroupconfig']['name']??'女神队'}</div>
+				</div>
+				<div class="single-lines">
+					<svg xmlns="http://www.w3.org/2000/svg" width="342" height="130" >
+						<path class="rightpath" d="M 0 80 h 100 l 25 25 l 18 -95 l 30 110 l 15 -70 l 22 30 L 261 10 l 29 80 h 62"></path>
+					</svg>
+					<svg xmlns="http://www.w3.org/2000/svg" width="342" height="130"  >
+						<defs>
+							<linearGradient id="linearline2" x1="0%" y1="0%" x2="100%" y2="0%">
+								<stop offset="0%" stop-color="{$pcconfig['styleconfig']['rightlinecolor']??'#fff'}"></stop>
+								<stop offset="100%" stop-color="{$pcconfig['styleconfig']['rightalinecolor']??'#ff3366'}"></stop>
+							</linearGradient>
+						</defs>
+						<path d="M 0 80 h 100 l 25 25 l 18 -95 l 30 110 l 15 -70 l 22 30 L 261 10 l 29 80 h 62" stroke="url(#linearline2)"></path>
+					</svg>
+				</div>
+			</div>
+			<div class="starsbox">
+				<div class="star-lists">
+					{if !empty($pcconfig['styleconfig']['movestar'])}
+		                <img class="star1" src="{:tomedia($pcconfig['styleconfig']['movestar'])}">
+		                <img class="star2" src="{:tomedia($pcconfig['styleconfig']['movestar'])}">
+		                <img class="star3" src="{:tomedia($pcconfig['styleconfig']['movestar'])}">
+		                <img class="star4" src="{:tomedia($pcconfig['styleconfig']['movestar'])}">
+		                <img class="star5" src="{:tomedia($pcconfig['styleconfig']['movestar'])}">
+		                <img class="star6" src="{:tomedia($pcconfig['styleconfig']['movestar'])}">
+	                {/if}
+			    </div>
+			    <div class="starlogo"></div>
+			    <div class="star-bubbles"></div>
+			</div>
+			<div class="panel"></div>
+		</div>
+		<div class="singlefooter zam-app-flex-ajCenter">
+			<div class="startbtn zam-app-flex-ajCenter2 waiting">开始匹配</div>
+			<div class="single-controls zam-app-flex-ajCenter2">
+				<div class="single-nums zam-app-flex-ajCenter2">
+					<span class="dec zam-app-flex-ajCenter2"><i class="mxc-move"></i></span>
+					<span class="selnum">
+						<input type="text" value="{$rotate['outnum']??'1'}" onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}" onpaste="return false" />
+					</span>
+					<span class="inc zam-app-flex-ajCenter2"><i class="mxc-add"></i></span>
+				</div>
+				<div class="single-record zam-app-flex-ajCenter2">匹配结果</div>
+			</div>
+		</div>
+		<div class="ddp-recordlists zam-app-flex-ajCenter2 hidden">
+			<div class="user-lists">
+				<div class="close"></div>
+				<div class="pageprev zam-app-flex-ajCenter2"><span class="mxc-back"></span></div>
+				<div class="pagenext zam-app-flex-ajCenter2"><span class="mxc-right"></span></div>
+				<div class="recordlist"></div>
+			</div>
+		</div>	
+	</div>
+</section>
+<script type="text/javascript">
+var leftwaitimg = "{if !empty($pcconfig['styleconfig']['leftavatar'])}{:tomedia($pcconfig['styleconfig']['leftavatar'])}{else /}/static/images/screen/ddp/style/waitfor.png{/if}",rightwaitimg = "{if !empty($pcconfig['styleconfig']['rightavatar'])}{:tomedia($pcconfig['styleconfig']['rightavatar'])}{else /}/static/images/screen/ddp/style/waitfor.png{/if}",bubbleimg = "{if !empty($pcconfig['styleconfig']['bubble'])}{:tomedia($pcconfig['styleconfig']['bubble'])}{/if}"
+require(['screenddp'],function(screenddp){
+	screenddp.init();
+});
+</script>
+<script id="ddp-tpl" type="html/javascript">
+	<div class="user-item zam-app-flex-ajCenter2">
+		<div class="userman left">
+			<div class="user-avatar zam-app-flex-ajCenter2">
+				<img src="{{ manavatar }}">
+			</div>
+			<div class="user-name limitbox">
+				{{ if isArray(manname) }}
+					{{ each manname as value index }}
+				        <div class="name-item limitbox">{{ value }}</div>
+				    {{ /each }}
+				{{ else }}
+					{{ manname }}
+				{{ /if }}
+			</div>
+		</div>
+		<div class="userman right">
+			<div class="user-avatar zam-app-flex-ajCenter2">
+				<img src="{{ womanavatar }}">
+			</div>
+			<div class="user-name limitbox">
+				{{ if isArray(womanname) }}
+					{{ each womanname as value index }}
+				        <div class="name-item limitbox">{{ value }}</div>
+				    {{ /each }}
+				{{ else }}
+					{{ womanname }}
+				{{ /if }}
+			</div>
+		</div>
+		<div class="del zam-app-flex-ajCenter2" data-id="{{ recordid }}">
+			<i class="mxc-close"></i>
+		</div>
+	</div>
+</script>
+{include file='common/footer' /}

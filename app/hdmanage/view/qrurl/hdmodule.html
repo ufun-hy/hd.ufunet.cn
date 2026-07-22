@@ -1,0 +1,86 @@
+<style>
+.addcatemodulelist li{
+	text-align:center;
+	width:25%;
+	float:left;
+	padding:8px;
+	
+}
+.addcatemoduleitem .moduleinfo{
+	position:relative;
+	left:10px;
+	width:112px;
+	font-size:15px;
+	background-color:#fff;
+	cursor:pointer;
+	border:1px solid #dfe6ec;
+}
+.addcatemodulelist li.disabled .moduleinfo{
+	background-color:#ecf0f1;
+	color: gray
+}
+.addcatemoduleitem .moduleinfo:hover{
+	box-shadow: -3px 5px 15px rgba(64,102,178,.3);
+}
+.addcatemoduleitem .moduleinfo .moduleicon,.addcatemoduleitem .moduleinfo .modulename{
+	display:inline-block;
+	text-align:center;
+	width: 100%;
+	height: 30px;
+	line-height: 30px;
+}
+.addcatemoduleitem .moduleinfo .moduleicon i{
+	font-size:14px;
+}
+.addcatemoduleitem .zam-typeselected {
+	position: absolute;
+	top: -2px;
+	right: 3px;
+	display: none;
+	font-size: 12px;
+	color: #fff;
+	text-align: center;
+	transition: 0.3s;
+	-moz-transition: 0.3s;
+	-o-transition: 0.3s;
+	-webkit-transition: 0.3s;
+}
+.addcatemoduleitem .zam-righttriangle{
+	position: absolute;
+	top: -1px;
+	right: -1px;
+	border-top: 25px solid #4886ff;
+	border-left: 35px solid transparent;
+	display:none;
+}
+.moduleinfo.active .zam-typeselected{
+	display:block
+}
+.moduleinfo.active .zam-righttriangle{
+	display:block
+}
+</style>
+<ul class="addcatemodulelist clearfix">
+{volist name="modules" id="module"}
+<li class="addcatemoduleitem{if in_array($module['field'],$selmodules)} disabled{/if}">
+	<div class="moduleinfo text-primary" data-modulefield="{$module['field']}" data-modulename="{$module['name']}" data-url="{$module['url']}">
+		<span class="zam-righttriangle"></span>
+		<i class="mdi mdi-check zam-typeselected"></i>
+		<span class="modulename">{$module['name']}</span>
+	</div>
+</li>
+{/volist}
+</ul>
+<script type="text/javascript">
+var selmodules = {:json_encode($selmodules)};
+require(['webcore','zamnotice'],function(webcore,zamnotice){
+	$(".addcatemodulelist .moduleinfo").on('click',function(){
+		var $this = $(this),field = $this.attr('data-modulefield');
+		if($.inArray(field,selmodules)!=-1) {
+			return zamnotice.showTips('errno','您已添加，上墙与霸屏上墙功能仅可加其中一个');
+		}
+		$this.parent().parent().find('.moduleinfo').removeClass('active');
+		$this.addClass('active');
+	});
+});
+</script>

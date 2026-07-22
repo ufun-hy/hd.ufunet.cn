@@ -1,0 +1,114 @@
+{include file='$Wpath/common/header'}
+
+{include file='$Wpath/common/tabletoolbar'}
+<table id="listtable" class="zam-btable"></table>
+<script>
+require(['webcore','webtable','jconfirmBox','zamnotice'],function(webcore,webtable,jconfirmBox,zamnotice){
+var initConfig = {
+	tableId:'#listtable',
+	url:"{:goweb('usergroup/index')}",
+	columnoperate:{
+        btns:{
+            edit:true,
+            del:true,
+        },
+	    func:{
+    	    edit:function(value, row, index){
+                window.location.href = "{:goweb('usergroup/edit')}?groupid="+row.id;
+    	    },
+    	    del:function(value, row, index){
+            	jconfirmBox.confirm('温馨提示','删除用户组将导致用户组下所有用户转成默认组用户，您确定要删除么？',function(){
+            			webcore.ajaxSubmit("{:goweb('usergroup/del')}",{groupid:row.id}).then(function(json){
+            			    if(json.code==0){
+            				    webtable.refresh();
+            				    zamnotice.showTips('success','删除成功');
+            			    }else{
+            			        zamnotice.showTips('error',json.msg);
+            			    }
+            			}, function(json){
+            				zamnotice.showTips('error','网络差。操作失败');
+            			});
+            	});
+    	    },
+	    }
+	},
+	columns:[{
+			checkbox: true,
+		}, 
+		{
+			field: 'id',
+			title: 'Id',
+			align: 'center',
+			visible: false
+		}, {
+			field: 'groupname',
+			title: '用户组',
+			align: 'center',
+		}, {
+            field: 'usernum',
+            title: '成员数(个)',
+            align: 'center',
+        },  {
+			field: 'isdefaultname',
+			title: '默认组',
+			align: 'center',
+		},  {
+			field: 'isfreename',
+			title: '免费发布新增',
+			align: 'center',
+		},  {
+            field: 'maxhd',
+            title: '活动数量',
+            align: 'center',
+        },  {
+            field: 'maxhdperson',
+            title: '活动人数',
+            align: 'center',
+        },  {
+            field: 'czhbfl',
+            title: '充值红包费率(%)',
+            align: 'center',
+        },  {
+            field: 'txfl',
+            title: '提现费率(%)',
+            align: 'center',
+        },  {
+            field: 'txmin',
+            title: '提现最小额(元)',
+            align: 'center',
+        }
+
+	],
+	onload:function(){
+	    
+	},
+	searchParamas:[],
+	toolbar:{
+	    add:function(){
+            window.location.href = "{:goweb('usergroup/add')}";
+	    },
+	    del:function(){
+	        var getSelects = webtable.getSelections();
+        	if(getSelects.length>0){
+        		jconfirmBox.confirm('温馨提示','删除用户组会导致用户组下的用户转成默认用户组用户，您确定要删除选中的用户组么？',function(){
+        			webcore.ajaxSubmit("{:goweb('usergroup/del')}",{groupid:getSelects}).then(function(json){
+        				if(json.code==0){
+        					webtable.refresh();
+        					zamnotice.showTips('success','删除成功');
+        				}else{
+        					zamnotice.showTips('error',json.msg);
+        				}
+        			}, function(json){
+        				zamnotice.showTips('error','网络差,操作失败');
+        			});
+        		});
+        	}else{
+        		zamnotice.showTips('info','请先选择您要操作的数据');
+        	}
+	    },
+	},
+};
+webtable.init(initConfig);
+});
+</script>
+{include file='$Wpath/common/footer'}

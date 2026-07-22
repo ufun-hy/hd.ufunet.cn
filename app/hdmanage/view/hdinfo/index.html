@@ -1,0 +1,2048 @@
+{include file='$Wpath/common/header'}
+<style type="text/css">
+.select2-container {
+    width: 100%!important;
+}
+#gdmap{width:90%;height:500px;margin-top: 10px;}
+#gdmap > div{z-index: 1!important}
+{if $canchangebq=='2'}
+.logoBox input,.logoBox button,.logoBox i{pointer-events: none;}
+{/if}
+.city-picker-span{padding-left:10px;border: 1px solid #ccc;position: absolute;width: calc(100% - 86px)!important;}
+.city-picker-span > .placeholder {
+    margin-left: 10px;
+}
+.city-select-tab>a.active,.city-select a:hover, .city-select a:focus{
+    color: #1869FF;
+}
+.city-select a.active{background-color: #1869FF;}
+.city-picker-dropdown{width: 100%!important}
+.city-picker-dropdown,.amap-controls,.amap-toolbar{z-index: 1}
+</style>
+<div class="card">
+	<div class="card-body">
+		<div>
+			活动版本：<span class="label label-primary">{$hdnames['mode'.$config['hdmode']]}</span>
+			{if $config['hdmode']=='1'}
+				<span class="label label-{if $config['ispub']=='1'}warning{else /}danger{/if}">{if $config['ispub']=='1'}{$hdnames['mode1ispub']}{else /}{$hdnames['mode1nopub']}{/if}</span>
+			{/if}
+			<span class="m-l-10 m-r-10">参与人数:<span class="text-danger m-r-5 m-l-5">{$hdusernums}</span>人</span>/<span class="m-l-10">上限人数:<span class="text-primary m-r-5 m-l-5">{$limitperson}</span>人</span>
+		</div>
+		<div class="m-t-15">
+			{if $config['hdmode']=='1'}
+				<a class="btn btn-primary btn-md" href="{if $config['ispub']=='1'}{:gomyhd('addmodules/index',['hdid'=>$config['hdid']])}{else /}{:gomyhd('buymodules/index',['hdid'=>$config['hdid']])}{/if}" target="__blank" >{if $config['ispub']=='1'}新增活动功能与人数{else /}正式购买{/if}</a>
+			{else}
+				<a class="btn btn-warning btn-md" href="{:gomyhd('buymodules/index',['hdid'=>$config['hdid']])}" target="__blank">立即升级{$hdnames['mode1']}</a>
+			{/if}
+		</div>
+	</div>
+</div>
+<form id="formBox" class="zam-formvalidation form-horizontal" method="post" style="margin-bottom: 60px">
+    <div class="config-titlebox">
+        <span class="config-titlename">基础设置</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#wechatconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+    </div>
+    <div id="wechatconfigbox" class="collapse in">
+    	<div class="form-group">
+            <label class="col-lg-2 control-label">* 活动主题</label>
+            <div class="col-lg-8">
+              <input class="form-control inputneedmax" type="text"  name="hdtitle" maxlength="40" placeholder="请输入活动主题.." value="{$config['hdtitle']}">
+            </div>
+        </div>
+        {if ($config['hdmode']=='1' && $config['ispub']=='1') || $config['hdmode']=='2'}
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 活动时间</label>
+            <div class="col-lg-6">
+              {:tpl_daterangetime([
+              	'name'=>'startendtime',
+              	'autoval'=>'1',
+              	'needsfm'=>'1',
+              	'needsdd'=>'1',
+              	'val'=>[
+              		'start'=>$config['starttime'],
+              		'end'=>$config['endtime']
+              	],
+              	'neededit'=>$managerhdrights['edit']
+              ])}
+             <div class="help-block">
+             	<div>请在活动时间内完成活动，过期后活动将无法使用</div>
+				{if $config['hdmode']=='1'}
+					{if $config['ispub']=='1' && $managerhdrights['edit']=='2'}
+             			<span class="text-danger">当前活动已经正式发布，活动时间无法更改</span>
+					{/if}
+             	{else}
+             		<span class="text-danger">当前活动是{$hdnames['mode2']}，活动时间无法更改</span>
+             	{/if}
+             </div>
+            </div>
+        </div>
+        {/if}
+        {if $config['hdmode']=='2' && $managerhdrights['edit']=='1'}
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 活动人数</label>
+            <div class="col-lg-6">
+				<input type="text" name="maxperson" class="form-control numberincdec" value="{$config['maxperson']??'0'}"
+				data-bts-min="1" 
+				data-bts-replacement-val="1"
+				data-bts-max="null"
+				data-bts-step="1"
+				/>
+				<span class="help-block"><span class="text-danger">此项仅免费活动有效，仅限管理员可更改</span></span>
+            </div>
+        </div>
+        {/if}
+        <div class="form-group logoBox">
+			<label class="col-lg-2 control-label">全局LOGO</label>
+			<div class="col-lg-8">
+			  {:tpl_image_one("copyright[logo]",$config['copyright']['logo'])}
+			  <span class="help-block">规格:260*70px{if $canchangebq=='2'}<span class="text-danger">，当前活动还未正式发布，正式发布后可更改LOGO</span>{/if}</span>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-lg-2 control-label">全局底部版权</label>
+			<div class="col-lg-8">
+				<input class="form-control inputneedmax" type="text"  name="copyright[copyright]" maxlength="30"  value="{$config['copyright']['copyright']}" {if $canchangebq=='2'}readonly{/if}>
+				{if $canchangebq == '2'}
+				<span class="help-block text-danger">当前活动未发布，购买后可更改版权信息</span>
+				{/if}
+			</div>
+		</div>
+		<div class="form-group">
+            <label class="col-lg-2 control-label">活动备注信息</label>
+            <div class="col-lg-8">
+              <input class="form-control inputneedmax" type="text"  name="beizhu" maxlength="32" value="{$config['beizhu']}" placeholder="32个字符内">
+            </div>
+        </div>
+        {if $managerhdrights['edit']=='1'}
+        <div class="form-group">
+            <label class="col-lg-2 control-label">活动备注信息(管理员)</label>
+            <div class="col-lg-8">
+              <input class="form-control inputneedmax" type="text"  name="adminbeizhu" maxlength="32" value="{$config['adminbeizhu']}"  placeholder="32个字符内">
+            </div>
+        </div>
+        {/if}
+    </div>
+    <div class="config-titlebox">
+        <span class="config-titlename">高级设置</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#screenconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+    </div>
+    <div id="screenconfigbox" class="collapse in">
+        <div class="text-center">
+			<div class="btn-group zam-inner-highconfig-btns" style="margin:-5px 0 20px 0;">
+				<a href="javascript:void(0)" class="btn btn-default"><span>微信端设置</span></a>
+				<a href="javascript:void(0)" class="btn btn-default"><span>大屏端设置</span></a>
+				<a href="javascript:void(0)" class="btn btn-default"><span>关键词回复</span></a>
+				<a href="javascript:void(0)" class="btn btn-default"><span>活动地区限制</span></a>
+				<a href="javascript:void(0)" class="btn btn-default"><span>微信分享设置</span></a>
+				<a href="javascript:void(0)" class="btn btn-default"><span>特殊设置</span></a>
+				<a href="javascript:void(0)" class="btn btn-default"><span>私有Oauth</span></a>
+				{if dzhuodongadv() && ($managerhdrights['edit']=='1' || $config['hdmode']=='1')}
+				<a href="javascript:void(0)" class="btn btn-default"><span>开屏广告设置</span></a>
+				{/if}
+				{if dzdouyin()}
+					<a href="javascript:void(0)" class="btn btn-default"><span>抖音设置</span></a>
+				{/if}
+				{if dzguestopen() && ($managerhdrights['edit']=='1' || $config['specialconfig']['openguestopen']=='1')}
+				<a href="javascript:void(0)" class="btn btn-default"><span>游客登录设置</span></a>
+				{/if}
+				{if $managerhdrights['userid']=='1'}
+					<a href="javascript:void(0)" class="btn btn-default"><span>支付与红包模板</span></a>
+				{/if}
+				{if $managerhdrights['edit']=='1'}
+					<a href="javascript:void(0)" class="btn btn-default"><span>自定义css</span></a>
+				{/if}
+			</div>
+		</div>
+		<div class="highconfig-item hidden">
+			<div class="form-group">
+				<label class="col-lg-2 control-label">功能互动按钮</label>
+				<div class="col-lg-8">
+				  {:tpl_switch("mobileconfig[showtmenu]",$config['mobileconfig']['showtmenu'])}
+				  <span class="help-block">开启后所有功能微信端页面右上角会显示一个互动功能按钮</span>
+				</div>
+		    </div>
+		    <div class="form-group">
+				<label class="col-lg-2 control-label">互动按钮图片</label>
+				<div class="col-lg-8">
+				  {:tpl_image_one("mobileconfig[tmenuimg]",$config['mobileconfig']['tmenuimg'])}
+				  <span class="help-block">规格:64*64px 尽量使用彩色图片</span>
+				</div>
+		    </div>
+		    <div class="form-group">
+			  <label class="col-lg-2 control-label">个人中心菜单图标</label>
+			  <div class="col-lg-8">
+			    {:tpl_image_one("mobileconfig[homeicon]",$config['mobileconfig']['homeicon'])}
+			    <span class="help-block">微信端互动菜单个人中心小图标，规格:100*100px</span>
+			  </div>
+			</div>
+			<div class="form-group">
+				<label class="col-lg-2 control-label">可修改个人信息(微信端)</label>
+				<div class="col-lg-8">
+				  {:tpl_switch("mobileconfig[editprofile]",$config['mobileconfig']['editprofile']??'2')}
+				  <span class="help-block">开启则用户可在个人中心修改自己头像，昵称以及签到信息</span>
+				</div>
+		    </div>
+		    <div class="form-group">
+				<label class="col-lg-2 control-label">中奖弹窗</label>
+				<div class="col-lg-8">
+				  {:tpl_switch("mobileconfig[showluckeralert]",$config['mobileconfig']['showluckeralert'])}
+				  <span class="help-block">开启则中奖用户在微信端页面可以收到中奖弹窗通知</span>
+				</div>
+		    </div>
+		    <div class="form-group">
+				<label class="col-lg-2 control-label">密码验证</label>
+				<div class="col-lg-8">
+				  {:tpl_switch("mobileconfig[safeverify]",$config['mobileconfig']['safeverify'],'opensafe')}
+				  <span class="help-block">开启就必须填写微信安全密码</span>
+				</div>
+		    </div>
+		    <div class="form-group safebox{if $config['mobileconfig']['safeverify']=='2'} hidden{/if}">
+				<label class="col-lg-2 control-label">微信安全密码</label>
+				<div class="col-lg-3">
+                    <input type="text" class="form-control" name="mobileconfig[safeword]" value="{$config['mobileconfig']['safeword']}" maxlength="6" onkeyup="return trimSpace(this)">
+                  	<span class="zam-help-block">必须是6位数字</span>
+				</div>
+		    </div>
+		    {if dzpclive()}
+		    <div class="form-group">
+				<label class="col-lg-2 control-label">付费参与活动</label>
+				<div class="col-lg-8">
+				  {:tpl_switch("payjoinconfig[open]",$config['payjoinconfig']['open']??'2','openpayjoinbox')}
+				  <span class="help-block">开启并添加支付快捷通道后用户需要支付相应费用才可进入活动</span>
+				</div>
+		    </div>
+		    <div class="payjoinbox{if !isset($config['payjoinconfig']['open']) || $config['payjoinconfig']['open']=='2'} hidden{/if}">
+				<div class="form-group">
+					<label class="col-lg-2 control-label">网页标题</label>
+					<div class="col-lg-8">
+	                    <input type="text" class="form-control" name="payjoinconfig[title]" value="{$config['payjoinconfig']['title']??'付费参与活动'}">
+	                  	<span class="zam-help-block">可以是付费参与活动或者付费观看直播回放等</span>
+					</div>
+			    </div>
+			    <div class="form-group">
+					<label class="col-lg-2 control-label">充值标题</label>
+					<div class="col-lg-8">
+	                    <input type="text" class="form-control" name="payjoinconfig[pagetitle]" value="{$config['payjoinconfig']['pagetitle']??'选择购买天数'}">
+					</div>
+			    </div>
+			    <div class="form-group">
+					<label class="col-lg-2 control-label">个人中心展示过期时间标题</label>
+					<div class="col-lg-8">
+	                    <input type="text" class="form-control" name="payjoinconfig[homeexpiredes]" value="{$config['payjoinconfig']['homeexpiredes']??'参与活动有效期'}">
+					</div>
+			    </div>
+			    <div class="form-group">
+					<label class="col-lg-2 control-label">用户支付协议链接</label>
+					<div class="col-lg-8">
+	                    <input type="text" class="form-control" name="payjoinconfig[xieyiurl]" value="{$config['payjoinconfig']['xieyiurl']??''}" >
+	                  	<span class="zam-help-block">推荐到H5文件内添加一篇文章，把文章链接填写到此处，不填写此项用户支付时将不会展示支付即代表同意用户支付协议的文字</span>
+					</div>
+			    </div>
+			    <div class="form-group">
+			    	<label class="col-lg-2 control-label">支付页主色调</label>
+					<div class="col-lg-3">
+	                    {:tpl_color('payjoinconfig[pagecolor]',$config['payjoinconfig']['pagecolor']??'#2878ff')}
+	                  	<span class="zam-help-block">默认蓝色</span>
+					</div>
+			    </div>
+				<div class="form-group">
+				    <label class="col-lg-2 control-label">* 天数通道</label>
+				    <div class="col-lg-9">
+				        <table class="table table-bordered">
+				          <thead>
+				            <tr>
+				              <th style="width:20%;text-align: center;">名称</th>
+				              <th style="width:20%;text-align: center;">天数</th>
+				              <th style="width:20%;text-align: center;">价格</th>
+				              <th style="width:20%;text-align: center;">折扣</th>
+				              <th style="width:10%;text-align: center;">状态</th>
+				              <th style="width:10%;text-align: center;">操作</th>
+				            </tr>
+				          </thead>
+				          <tbody class="day-lists">
+				            {foreach $config['payjoinconfig']['days'] as $day}
+				            <tr>
+				              <td class="text-center">
+				                  <input type="text" class="form-control" name="payjoinconfig[days][name][]" value="{$day['name']}">
+				              </td>
+				              <td class="text-center">
+				                <div class="input-group">
+				                  <input type="text" class="form-control" name="payjoinconfig[days][day][]" value="{$day['day']}">
+				                  <div class="input-group-addon">天</div>
+				                </div>
+				              </td>
+				              <td class="text-center">
+							    <div class="input-group">
+							      <input type="text" class="form-control" name="payjoinconfig[days][price][]" value="{$day['price']}">
+							      <div class="input-group-addon">元</div>
+							    </div>
+							  </td>
+				              <td class="text-center">
+				                <div class="input-group">
+				                  <input type="text" class="form-control" name="payjoinconfig[days][discount][]" value="{$day['discount']}">
+				                  <div class="input-group-addon">折</div>
+				                </div>
+				              </td>
+				              <td class="text-center">
+				                  <label class="lyear-switch switch-primary normal-swith switch-solid" style="height:38px">
+				                      <input type="checkbox" {if $day['status']=='1'}checked="checked"{/if}>
+				                      <input type="hidden" name="payjoinconfig[days][status][]" value="{$day['status']}">
+				                      <span data-status="{$day['status']}" class="normal-span " data-ajax=""></span>
+				                  </label>
+				              </td>
+				              <td class="text-center">
+				                <a class="btn btn-xs btn-primary zam-sortable btn-moveitem" href="javascript:void(0)">
+				                  <i class="mdi mdi-arrow-all"></i>
+				                </a>
+				                <a class="btn btn-xs btn-danger" href="javascript:;" onclick="javascript:$(this).parent().parent().remove()">
+				                  <i class="mdi mdi-close"></i>
+				                </a>
+				              </td>
+				            </tr>
+				            {/foreach}
+				          </tbody>
+				          <tfoot>
+				            <tr>
+				              <td colspan="5">
+				                <div class="m-b-10"><a class="btn btn-primary btn-xs btn-addday" href="javascript:;"><i class="mdi mdi-plus"></i> 新增通道</a></div>
+				                <div class="m-b-10" style="color:gray">折扣必须是大于等于0，小于10的数字，填写小数时可填写1-2位小数，<span class="text-danger">0即为不打折</span></div>
+				                <div class="m-b-10" style="color:gray">价格必须是大于0的数字，保留2位小数</div>
+				                <div class="m-b-10" style="color:gray">通道名称与通道天数必须保证唯一</div>
+				              </td>
+				            </tr>
+				          </tfoot>
+				        </table>
+				    </div>
+				</div>
+		    </div>
+		    {/if}
+		    <div class="form-group">
+                <label class="col-lg-2 control-label">* 全局禁词</label>
+                <div class="col-lg-8">
+                     <textarea class="form-control" name="mobileconfig[stopword]" rows="4" placeholder="注:多条公告必须以#隔开">{$config['mobileconfig']['stopword']}</textarea>
+                    <span class="zam-help-block">对微信端所有发送内容的功能生效，一般是谩骂、涉黄、涉政等内容，注:多条请以#隔开，否则视为仅一条</span>
+                </div>
+            </div>
+            <div class="form-group">
+			    <label class="col-lg-2 control-label">拉黑用户进入提示</label>
+			    <div class="col-lg-8">
+			      <input class="form-control" type="text"  name="mobileconfig[blackword]" value="{$config['mobileconfig']['blackword']}">
+			      <span class="help-block">被拉黑的用户进入活动页面提示语</span>
+			    </div>
+			</div>
+			<div class="form-group">
+			    <label class="col-lg-2 control-label">禁止重复中奖提示</label>
+			    <div class="col-lg-8">
+			      <input class="form-control" type="text"  name="mobileconfig[forbiddenword]" value="{$config['mobileconfig']['forbiddenword']}" maxlength="20">
+			      <span class="help-block">开启了中奖唯一或者游戏禁止重复中奖提示语</span>
+			    </div>
+			</div>
+			<div class="form-group">
+				<label class="col-lg-2 control-label">测试活动总人数达到上限提示文案</label>
+				<div class="col-lg-8">
+					<input class="form-control" type="text" name="mobileconfig[nopubovernumword]"
+						value="{$config['mobileconfig']['nopubovernumword']??'您好当前活动未正式发布处于测试状态，仅限【defaultnum】人参与，目前参与总人数已达上限'}" maxlength="50">
+					<span class="help-block">仅对测试状态的活动有效，当活动进入总人数达到了系统测试总人数则会提示此文案，文案内可通过【defaultnum】可调用系统测试总人数，默认文案：您好当前活动未正式发布处于测试状态，仅限【defaultnum】人参与，目前参与总人数已达上限</span>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-lg-2 control-label">未开始活动总人数达到上限提示文案</label>
+				<div class="col-lg-8">
+					<input class="form-control" type="text" name="mobileconfig[notstartovernumword]"
+						value="{$config['mobileconfig']['notstartovernumword']??'您好活动将于【starttime】正式开始，目前处于测试阶段仅限【defaultnum】人参与，目前参与总人数已达上限'}"
+						maxlength="80">
+					<span
+						class="help-block">仅对已正式发布并处于未开始状态的活动有效，当活动进入总人数达到了系统测试总人数则会提示此文案，文案内可通过【starttime】调用活动开始时间，可通过【defaultnum】可调用系统测试总人数，默认文案：您好活动将于【starttime】正式开始，目前处于测试阶段仅限【defaultnum】人参与，目前参与总人数已达上限</span>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-lg-2 control-label">活动总人数达到上限提示文案</label>
+				<div class="col-lg-8">
+				  <input class="form-control" type="text"  name="mobileconfig[overmaxnumword]" value="{$config['mobileconfig']['overmaxnumword']??'您好当前活动购买了【maxnum】人，目前参与总人数已达上限'}" maxlength="50">
+				  <span class="help-block">仅对已正式发布并处于进行中状态的活动有效，当活动进入总人数达到了活动购买总人数则会提示此文案，文案内可通过【maxnum】可调用活动已购买人数，默认文案：您好当前活动购买了【maxnum】人，目前参与总人数已达上限</span>
+				</div>
+			</div>
+			<div class="form-group">
+			    <label class="col-lg-2 control-label">活动结束后用户扫码跳转链接</label>
+			    <div class="col-lg-8">
+			      <input class="form-control" type="text"  name="mobileconfig[endurl]"  placeholder="请填写一个完整的url链接" value="{$config['mobileconfig']['endurl']??''}">
+			      <span class="help-block">ps:可以到<a class="m-l-5 m-r-5" href="{:gohdmanage('configh5/index',['hdid'=>$hdid])}" target="__blank">H5文章</a>里编辑一篇文章然后将文章链接复制到此处</span>
+			    </div>
+			</div>
+		</div>	
+		<div class="highconfig-item hidden">
+			<div class="form-group">
+	            <label class="col-lg-2 control-label">登录密码</label>
+	            <div class="col-lg-8">
+	              <input class="form-control inputneedmax" type="text" name="screenconfig[password]" maxlength="10" placeholder="请输入大屏登录密码.." value="{$config['screenconfig']['password']}" onkeyup="return trimSpace(this)">
+	              <span class="zam-help-block">不填写将不用登录大屏</span>
+	            </div>
+	        </div>
+			<div class="form-group">
+				<label class="col-lg-2 control-label">* 大屏登录背景图</label>
+				<div class="col-lg-8">
+				     {:tpl_image_one("screenconfig[loginbg]",$config['screenconfig']['loginbg'])}
+				</div>
+			</div>
+			<div class="form-group">
+			    <label class="col-lg-2 control-label">* 大屏顶部公告</label>
+			    <div class="col-lg-3">
+			        {:tpl_switch("screenconfig[opennotice]",$config['screenconfig']['opennotice'],'opennotice')}
+			        <span class="help-block">关闭后大屏顶部将不显示公告</span>
+			    </div>
+			</div>
+			<div class="noticeBox{if $config['screenconfig']['opennotice']=='2'} hidden{/if}">
+				<div class="form-group">
+				    <label class="col-lg-2 control-label">公告内容</label>
+				    <div class="col-lg-8">
+				      <textarea class="form-control" name="screenconfig[notice]" rows="4" placeholder="注:多条公告必须以#隔开">{$config['screenconfig']['notice']}</textarea>
+				      <div class="help-block">注:多条请以#隔开，否则视为仅一条</div>
+				    </div>
+				</div>
+				<div class="form-group">
+				    <label class="col-lg-2 control-label">* 公告文字颜色</label>
+				    <div class="col-lg-4">
+				      <div class="input-group">
+				        <span class="input-group-btn"><a class="btn btn-default">大小</a></span>
+				        <input type="text" class="form-control" name="screenconfig[noticesize]" value="{$config['screenconfig']['noticesize']}">
+				        <span class="input-group-btn"><a class="btn btn-default">px，颜色</a></span>
+				        {:tpl_color('screenconfig[noticecolor]',$config['screenconfig']['noticecolor'])}
+				      </div>
+				    </div>
+				</div>
+			</div>
+	        <div class="form-group">
+	            <label class="col-lg-2 control-label">* 大屏底部功能菜单</label>
+	            <div class="col-lg-8">
+	            	<label class="lyear-radio radio-inline radio-primary">
+		               	<input type="radio" name="screenconfig[hidemenu]" value="2" {if $config['screenconfig']['hidemenu']=='2'}checked{/if}><span>默认展开</span>
+		            </label>
+	            	<label class="lyear-radio radio-inline radio-primary">
+		               	<input type="radio" name="screenconfig[hidemenu]" value="1" {if $config['screenconfig']['hidemenu']=='1'}checked{/if}><span>默认折叠</span>
+		            </label>
+		            <label class="lyear-radio radio-inline radio-primary">
+		               	<input type="radio" name="screenconfig[hidemenu]" value="3" {if $config['screenconfig']['hidemenu']=='3'}checked{/if}><span>完全隐藏</span>
+		            </label>
+	                <span class="help-block">完全隐藏将使得菜单栏不可见</span>
+	            </div>
+	        </div>
+			<div class="form-group">
+	            <label class="col-lg-2 control-label">* 大屏左右双二维码</label>
+	            <div class="col-lg-8">
+	                {:tpl_switch('screenconfig[qrdouble]',$config['screenconfig']['qrdouble']??'2')}
+	                <span class="help-block">开启后大屏幕左右两侧均有一个二维码</span>
+	            </div>
+	        </div>
+	        <div class="form-group">
+	            <label class="col-lg-2 control-label">* 自定义大屏二维码</label>
+	            <div class="col-lg-8">
+	                {:tpl_switch('screenconfig[diyqr]',$config['screenconfig']['diyqr'],'opendiyqr')}
+	                <span class="help-block">开启后必须上传下面的二维码图片</span>
+	            </div>
+	        </div>
+	        <div class="form-group qrimgbox{if $config['screenconfig']['diyqr']=='2'} hidden{/if}">
+				<label class="col-lg-2 control-label">大屏二维码</label>
+				<div class="col-lg-8">
+				  {:tpl_image_one("screenconfig[qrimg]",$config['screenconfig']['qrimg'])}
+				  <span class="help-block">规格:200*200px，上传后大屏端所有二维码将使用此二维码图片</span>
+				</div>
+		    </div>
+		    <div class="form-group">
+				<label class="col-lg-2 control-label">二维码下说明文字</label>
+				<div class="col-lg-8">
+				  <input type="text" class="form-control" name="screenconfig[qrtxt]" value="{$config['screenconfig']['qrtxt']}">
+				</div>
+		    </div>
+		    <div class="form-group">
+				<label class="col-lg-2 control-label">* 大屏加载模式</label>
+				<div class="col-lg-8">
+				    <label class="lyear-radio radio-inline radio-primary">
+		               	<input type="radio" name="screenconfig[loadtype]" value="1" {if !isset($config['screenconfig']['loadtype']) || $config['screenconfig']['loadtype']=='1'}checked{/if}><span>默认模式</span>
+		            </label>
+	            	<label class="lyear-radio radio-inline radio-primary">
+		               	<input type="radio" name="screenconfig[loadtype]" value="2" {if isset($config['screenconfig']['loadtype']) && $config['screenconfig']['loadtype']=='2'}checked{/if}><span>iframe加载模式</span>
+		            </label>
+	                <span class="help-block">iframe加载模式开启大屏全屏后切换功能将不会自动退出全屏模式</span>
+				</div>
+			</div>
+			{if dzscreenhelp()}
+				<div class="form-group">
+		            <label class="col-lg-2 control-label">* 大屏新手引导层</label>
+		            <div class="col-lg-8">
+		                {:tpl_switch('screenconfig[opennewerlayer]',$config['screenconfig']['opennewerlayer']??'1')}
+		                <span class="help-block">关闭后活动均不会默认显示新手引导页面，用户需手动点击右下角的帮助菜单打开新手引导</span>
+		            </div>
+		        </div>
+	        {/if}
+		</div>
+		<div class="highconfig-item">
+			<div class="zam-jointype-wechataccount">
+			  <div class="form-group zam-wechataccountBox">
+				<label class="col-lg-2 control-label"><span class="laytip-span" style="width:30px;" lay-tips="点击选取右侧的一个公众号，如未显示公众号请点击立即绑定"><i class="fa fa-question-circle"></i></span> * 选择关键词对应的公众号</label>
+				<div class="col-lg-8">
+					<div class="zam-wechataccountList clearfix">
+						{if !empty($mywxaccount)}
+							{foreach $mywxaccount as $akey=>$aval}
+							<div class="zam-wechataccountItem{if $config['wechat_id']==$aval['id']} active{/if}{if $aval['status']=='2'} unauthrized{/if}" data-uniacid="{$aval['id']}">
+								<img src="{:tomedia($aval['qrcode'])}" onerror="javascript:this.src='/static/images/sys/nopic.jpg';this.title='暂无图片'" />
+								<p>{$aval['accountname']}</p>
+								{if $aval['status']=='2'}
+								<div class="unbind-txt">已取消授权</div>
+								{/if}
+								<div class="wechat-has-select">
+									<i class="mdi mdi-check"></i>
+								</div>
+							</div>
+							{/foreach}
+							<input type="hidden" name="wechat_id" value="{$config['wechat_id']}" />
+						{else/}
+							<div class="form-control-static">
+								<span class="mdi mdi-information" style="font-size:18px;margin-right:10px;"></span><span>您暂无可用公众号，</span>
+								<a href="{:gomyhome('wxaccount/index')}" draggable="false">立即绑定 &gt;</a>
+								<input type="hidden" name="wechat_id" value="0" />
+							</div>
+						{/if}
+					</div>
+					<span class="help-block">注意:<span class="text-danger">请点击选择上面一个公众号</span>，已解绑的公众号无法触发关键词回复</span>
+				</div>
+			  </div>
+			  <div class="form-group">
+				<label class="col-lg-2 control-label">* 触发关键词</label>
+				<div class="col-lg-8">
+				  <input type="text" class="form-control inputneedmax ajaxkeyword" name="wechatkeyword" maxlength="20" placeholder="微信公众号发送此关键词参与活动"  value="{$config['wechatkeyword']}">
+				  <div class="zam-help-block" style="padding-top: 4px;">
+				  	<div class="keywordtipbox"></div>
+				  </div>
+				</div>
+			  </div>
+			  <div class="form-group">
+	            <label class="col-lg-2 control-label">* 公众号回复消息类型</label>
+	            <div class="col-lg-8">
+	              <label class="lyear-radio radio-inline radio-primary" onclick="keywordtype(this)">
+	               	<input type="radio" name="keywordconfig[type]" value="1" {if $keyinfo['type']=='1'}checked{/if}><span>文字消息</span>
+	              </label>
+	              <label class="lyear-radio radio-inline radio-primary" onclick="keywordtype(this)">
+	               	<input type="radio" name="keywordconfig[type]" value="2" {if $keyinfo['type']=='2'}checked{/if}><span>图文消息</span>
+	              </label>
+	              <span class="help-block">图文消息可以自定义小图片</span>
+	            </div>
+	          </div>
+	          <div class="form-group keywordtype1{if $keyinfo['type']=='2'} hidden{/if}">
+				<label class="col-lg-2 control-label">* 文字内容</label>
+				<div class="col-lg-8">
+				  <input type="text" class="form-control"  name="keywordconfig[text]" value="{$keyinfo['text']}">
+				   <span class="help-block">文字内容</span>
+				</div>
+			  </div>
+			  <div class="form-group keywordtype2{if $keyinfo['type']=='1'} hidden{/if}">
+					<label class="col-lg-2 control-label">* 图文标题</label>
+					<div class="col-lg-8">
+					  <input type="text" class="form-control"  name="keywordconfig[title]" value="{$keyinfo['title']}">
+					  <span class="help-block">图文标题</span>
+					</div>
+			  </div>
+			  <div class="form-group keywordtype2{if $keyinfo['type']=='1'} hidden{/if}">
+					<label class="col-lg-2 control-label">* 图文封面</label>
+					<div class="col-lg-8">
+					  {:tpl_image_one('keywordconfig[icon]', $keyinfo['icon'])}
+					  <span class="help-block">图文封面</span>
+					</div>
+			  </div>
+			  <div class="form-group keywordtype2{if $keyinfo['type']=='1'} hidden{/if}">
+					<label class="col-lg-2 control-label">* 图文介绍</label>
+					<div class="col-lg-8">
+					  <textarea class="form-control" name="keywordconfig[des]" rows="4">{$keyinfo['des']}</textarea>
+					  <span class="help-block">图文内容</span>
+					</div>
+			  </div>
+			  <div class="form-group">
+					<label class="col-lg-2 control-label">点击消息跳转地址(非必填)</label>
+					<div class="col-lg-8">
+					  <input type="text" class="form-control" name="keywordconfig[url]" value="{$keyinfo['url']}">
+					  <span class="help-block">此项不填写则跳转到活动微信端主页，如需跳转到其他功能微信端地址可到活动的二维码与链接内复制对应功能地址</span>
+					</div>
+			  </div>
+			  <div class="form-group">
+				    <label class="col-lg-2 control-label">* 关注回复</label>
+				    <div class="col-lg-6">
+				        {:tpl_switch("keywordconfig[opensubreturn]",$config['keywordconfig']['opensubreturn']??'2')}
+				        <span class="help-block">开启后用户扫公众号二维码关注也会触发上面的关键词回复</span>
+				    </div>
+			  </div>
+		    </div>
+		</div>
+		<div class="highconfig-item hidden">
+	        <div class="form-group">
+	            <label class="col-lg-2 control-label">* 活动定位限制</label>
+	            <div class="col-lg-6">
+	                {:tpl_switch('locconfig[open]',$config['locconfig']['open'],'openarealimit')}
+	                <div class="help-block">注:开启活动定位后只有在范围内的用户才可以扫码进入活动</div>
+	            </div>
+	        </div>
+	        <div class="arealimitbox{if $config['locconfig']['open']=='2'} hidden{/if}">
+	        <div class="form-group">
+	            <label class="col-lg-2 control-label">* 定位类型</label>
+	            <div class="col-lg-8">
+	              <label class="lyear-radio radio-inline radio-primary">
+	               <input type="radio" name="locconfig[type]" value="1" {if $config['locconfig']['type']=='1'}checked{/if} onclick="showgps(this)"><span>位置限制</span>
+	              </label>
+	              <label class="lyear-radio radio-inline radio-primary">
+	               <input type="radio" name="locconfig[type]" value="2" {if $config['locconfig']['type']=='2'}checked{/if} onclick="showgps(this)"><span>地区限制</span>
+	              </label>
+	              <span class="help-block">推荐使用位置限制</span>
+	            </div>
+	        </div>
+	        <div class="form-group gpsitem{if $config['locconfig']['type']=='2'} hidden{/if}">
+	            <label class="col-lg-2 control-label">* 有效范围</label>
+	            <div class="col-lg-3">
+		            <input type="text" class="form-control numberincdec" name="locconfig[range]" value="{$config['locconfig']['range']}"
+	                data-bts-min="1" data-bts-replacement-val="1"
+	                data-bts-max="null"
+	                data-bts-step="1"
+	                data-bts-postfix="米"
+	                data-bts-postfix-extra-class="touchspin-postfix"
+	                >
+	                <span class="zam-help-block">位置中心以外多少米有效，注:有效范围越大，容错率越高</span>
+	            </div>
+	        </div>
+	        <div class="form-group gpsitem{if $config['locconfig']['type']=='2'} hidden{/if}">
+	            <label class="col-lg-2 control-label">* 单次验证有效时间</label>
+	            <div class="col-lg-3">
+		            <input type="text" class="form-control numberincdec" name="locconfig[lifetime]" value="{$config['locconfig']['lifetime']}"
+	                data-bts-min="0" data-bts-replacement-val="0"
+	                data-bts-max="null"
+	                data-bts-step="1"
+	                data-bts-postfix="分钟"
+	                data-bts-postfix-extra-class="touchspin-postfix"
+	                >
+	                <span class="zam-help-block">注:设置为0即为验证通过长期有效，一般是主办方要求参与互动的用户必须在现场，防止用户后期离开了活动现场</span>
+	            </div>
+	        </div>
+	        <div class="form-group gpsitem{if $config['locconfig']['type']=='2'} hidden{/if}">
+				<label class="col-lg-2 control-label text-right">* 限制位置列表</label>
+				<div class="col-lg-8">
+					<table class="table table-bordered">
+                    <thead>
+                      <tr>
+                        <th style="width:60%;text-align:center;">位置</th>
+                        <th style="width:30%;text-align:center;">纬度与经度</th>
+                        <th style="width:10%;text-align:center;">操作</th>
+                      </tr>
+                    </thead>
+                    <tbody class="gpsloc-lists">
+                    {volist name="config.locconfig.locs" id="loc"}
+                    <tr>
+                        <td class="text-center">
+                           <input type="hidden" name="locconfig[locs][address][]" value="{$loc['address']}" />
+                           <div class="zam-flex-center">{$loc['address']}</div>
+                        </td>
+                        <td class="text-center">
+                           <input type="hidden" name="locconfig[locs][latlng][]" value="{$loc['latlng']}" />
+                           <div class="zam-flex-center">{$loc['latlng']}</div>
+                        </td>
+                        <td class="text-center">
+                            <a class="btn btn-xs btn-danger" href="javascript:void(0)" onclick="javascript:$(this).parents('tr').remove();"> <i class="mdi mdi-close"></i> </a>
+                        </td>
+                    </tr>
+                    {/volist}
+                    </tbody>
+                    <tfoot>
+                      <tr>
+                        <td colspan="3">
+                          <div class="help-block">注:请先到下面搜索位置再点击添加位置列表按钮</div>
+                        </td>
+                      </tr>
+                    </tfoot>
+                	</table>
+				</div>
+			</div>
+	        <div class="form-group gpsitem{if $config['locconfig']['type']=='2'} hidden{/if}" style="margin-bottom:10px">
+				<label class="col-lg-2 control-label text-right"></label>
+				<div class="col-lg-6">
+					<div class="input-group">
+						<input type="hidden" name="locconfig[latlng]"   value="{$config['locconfig']['latlng']}" class="latlng" />
+		                <input type="text" class="form-control address" name="locconfig[address]" value="" placeholder="请输入详细地址信息，例如：湖南省长沙市岳麓书院">
+		                <div class="input-group-btn">
+		                  <button class="btn btn-success searchaddress" type="button">搜索位置</button>
+		                  <button class="btn btn-primary confirmaddress" type="button">添加至位置列表</button>
+		                </div>
+		            </div>
+				</div>
+			</div>
+			<div class="form-group gpsitem{if $config['locconfig']['type']=='2'} hidden{/if}">
+				<label class="col-lg-2 control-label text-right"></label>
+				<div class="col-md-10">
+					<div id="gdmap" class="gdmap"></div>
+				</div>
+			</div>
+	        <div class="form-group ipitem{if $config['locconfig']['type']=='1'} hidden{/if}">
+	        	<label class="col-lg-2 control-label">* 选择地区</label>
+	        	<div class="col-lg-5">
+	            <div class="input-group">
+	                <input type="text" class="form-control city-picker-value" name="locconfig[area]" data-toggle="city-picker" />
+	                <div class="input-group-btn">
+	                  <button class="btn btn-primary plusaddress" type="button">添加至地区列表</button>
+	                </div>
+	            </div>
+	            <div class="help-block">注：请选择好地区后再点击添加地区，如果需要多个地区请添加多个地区</div>
+	        	</div>
+	        </div>
+	        <div class="form-group ipitem{if $config['locconfig']['type']=='1'} hidden{/if}">
+				<label class="col-lg-2 control-label text-right">* 限制地区列表</label>
+				<div class="col-lg-8">
+					<table class="table table-bordered">
+                    <thead>
+                      <tr>
+                        <th style="width:50%;text-align:center;">地区</th>
+                        <th style="width:50%;text-align:center;">操作</th>
+                      </tr>
+                    </thead>
+                    <tbody class="areas-lists">
+                    {volist name="config.locconfig.areas" id="area"}
+                    <tr>
+                        <td class="text-center">
+                           <input type="hidden" name="locconfig[areas][]" value="{$area}" />
+                           <div class="zam-flex-center">{$area}</div>
+                        </td>
+                        <td class="text-center">
+                            <a class="btn btn-xs btn-danger" href="javascript:void(0)" onclick="javascript:$(this).parents('tr').remove();"> <i class="mdi mdi-close"></i> </a>
+                        </td>
+                    </tr>
+                    {/volist}
+                    </tbody>
+                	</table>
+				</div>
+			</div>
+	    	</div>
+		</div>
+		<div class="highconfig-item hidden">
+	        <div class="form-group">
+	            <label class="col-lg-2 control-label">* 分享</label>
+	            <div class="col-lg-8">
+	                {:tpl_switch('shareconfig[open]',$config['shareconfig']['open'],'openshare')}
+	            	<div class="help-block">注：活动微信端默认不准许分享，开启后用户可以点击微信端右上角三个点进行页面分享给好友或朋友圈</div>
+	            </div>
+	        </div>
+	        <div class="sharebox{if $config['shareconfig']['open']=='2'} hidden{/if}">
+	        <div class="form-group">
+	            <label class="col-lg-2 control-label">* 标题</label>
+	            <div class="col-lg-8">
+	              <input class="form-control inputneedmax" type="text"  name="shareconfig[title]" maxlength="30" value="{$config['shareconfig']['title']}">
+	              <div class="help-block">微信端分享页面时显示的标题</div>
+	            </div>
+	        </div>
+	        <div class="form-group">
+	            <label class="col-lg-2 control-label">* 介绍</label>
+	            <div class="col-lg-8">
+	              <input class="form-control inputneedmax" type="text"  name="shareconfig[desc]" maxlength="50" value="{$config['shareconfig']['desc']}">
+	              <div class="help-block">微信端分享页面时显示的简介内容</div>
+	            </div>
+	        </div>
+	        <div class="form-group">
+				<label class="col-lg-2 control-label">* 图标</label>
+				<div class="col-lg-8">
+				  {:tpl_image_one("shareconfig[icon]",$config['shareconfig']['icon'])}
+				  <span class="help-block">规格:64*64px</span>
+				  <div class="help-block">微信端分享页面时显示的icon图标</div>
+				</div>
+		    </div>
+			</div>
+		</div>
+		<div class="highconfig-item hidden">
+			{if $managerhdrights['edit']=='1'}
+			<div class="form-group">
+	            <label class="col-lg-2 control-label">* 强制关注系统公众号</label>
+	            <div class="col-lg-8">
+	                {:tpl_switch('forcesub',$config['forcesub']??'2')}
+	                <span class="help-block"><span class="text-danger">此项仅管理员可设置</span>，如果开启了私有oauth此设置无效，<span class="text-danger">强制关注有封公众号的风险，如果系统公众号未通过扫码授权接入到系统，请务必在活动管理->基础设置里设置一下系统公众号的二维码图片</span></span>
+	            </div>
+	        </div>
+	        {/if}
+			<div class="form-group">
+	            <label class="col-lg-2 control-label">* 获取微信用户高清头像</label>
+	            <div class="col-lg-8">
+	                {:tpl_switch('specialconfig[gethighavatar]',$config['specialconfig']['gethighavatar']??'2')}
+	                <span class="help-block">开启后活动获取到的微信用户头像是高清头像，反之则获取普通头像，注意:高清头像因为像素很高，加载比较慢，可能抽奖抽取人数较多会有点卡</span>
+	            </div>
+	        </div>
+	        <div class="form-group">
+	            <label class="col-lg-2 control-label">* 屏幕跟随</label>
+	            <div class="col-lg-8">
+	                {:tpl_switch('specialconfig[followchange]',$config['specialconfig']['followchange'])}
+	                <span class="help-block">开启后大屏幕点击哪个功能，微信端将跳转至哪个微信功能</span>
+	            </div>
+	        </div>
+	        <div class="form-group">
+	            <label class="col-lg-2 control-label">* 中奖唯一</label>
+	            <div class="col-lg-8">
+				      <label class="lyear-radio radio-inline radio-primary">
+				       <input type="radio" name="specialconfig[onlyone]" value="1" {if $config['specialconfig']['onlyone']=='1'}checked{/if}><span>全局唯一</span>
+				      </label>
+				      <label class="lyear-radio radio-inline radio-primary">
+				       <input type="radio" name="specialconfig[onlyone]" value="3" {if $config['specialconfig']['onlyone']=='3'}checked{/if}><span>抽奖功能唯一</span>
+				      </label>
+				      <label class="lyear-radio radio-inline radio-primary">
+				       <input type="radio" name="specialconfig[onlyone]" value="4" {if $config['specialconfig']['onlyone']=='4'}checked{/if}><span>游戏功能唯一</span>
+				      </label>
+				      <label class="lyear-radio radio-inline radio-primary">
+				       <input type="radio" name="specialconfig[onlyone]" value="2" {if $config['specialconfig']['onlyone']=='2'}checked{/if}><span>不限制</span>
+				      </label>
+				      <div class="help-block">红包雨功能不计数</div>
+	            </div>
+	        </div>
+	        <div class="form-group">
+	            <label class="col-lg-2 control-label">* 填写收货地址(实物中奖)</label>
+	            <div class="col-lg-8">
+	                {:tpl_switch('specialconfig[inputaddr]',(isset($config['specialconfig']['inputaddr'])?$config['specialconfig']['inputaddr']:""))}
+	                <span class="help-block">一般是直播年会或者大件物品需要填写收货地址</span>
+	            </div>
+	        </div>
+	        {if $managerhdrights['edit']=='1'}
+		        <div class="form-group">
+		            <label class="col-lg-2 control-label">* 重置活动数据</label>
+		            <div class="col-lg-8">
+		                {:tpl_switch('specialconfig[resethddata]',isset($config['specialconfig']['resethddata'])?$config['specialconfig']['resethddata']:'2')}
+		                <span class="help-block"><span class="text-danger">此项仅管理员可设置</span>，开启后活动所属用户可以自行重置活动数据</span>
+		            </div>
+		        </div>
+		        <div class="form-group">
+		            <label class="col-lg-2 control-label">* 游戏可设置付费参与</label>
+		            <div class="col-lg-8">
+						<label class="lyear-radio radio-inline radio-primary">
+						<input type="radio" name="specialconfig[openpayjoin]" value="2" {if !isset($config['specialconfig']['openpayjoin']) || $config['specialconfig']['openpayjoin']=='2'}checked{/if}><span>关闭</span>
+						</label>
+						<label class="lyear-radio radio-inline radio-primary">
+						<input type="radio" name="specialconfig[openpayjoin]" value="1" {if $config['specialconfig']['openpayjoin']=='1'}checked{/if}><span>开启</span>
+						</label>
+						<label class="lyear-radio radio-inline radio-primary">
+						<input type="radio" name="specialconfig[openpayjoin]" value="3" {if $config['specialconfig']['openpayjoin']=='3'}checked{/if}><span>开启并强制付费</span>
+						</label>
+		                <span class="help-block"><span class="text-danger">此项仅管理员可设置</span>
+		            	<span class="help-block">选择关闭则用户创建轮次无法开启付费参与</span>
+		           		<span class="help-block">选择开启则用户可在游戏高级设置里开启付费参与游戏也可关闭付费参与</span>
+		           		<span class="help-block">选择开启并强制付费则用户添加或编辑轮次会强制开启付费参与且参与费用最小为1元</span>
+		            </div>
+		        </div>
+		        <div class="form-group">
+		            <label class="col-lg-2 control-label">* 抽奖内定用户</label>
+		            <div class="col-lg-8">
+		                {:tpl_switch('specialconfig[opencjnd]',$config['specialconfig']['opencjnd']??'1')}
+		                <span class="help-block"><span class="text-danger">此项仅管理员可设置</span>，开启后当前活动所属用户可以在抽奖功能里内定用户</span>
+		            </div>
+		        </div>
+		        {if dzgamend()}
+			        <div class="form-group">
+			            <label class="col-lg-2 control-label">* 游戏内定用户</label>
+			            <div class="col-lg-8">
+			                {:tpl_switch('specialconfig[opengamend]',$config['specialconfig']['opengamend']??'2')}
+			                <span class="help-block"><span class="text-danger">此项仅管理员可设置</span>，开启后当前活动所属用户可以在游戏里内定用户</span>
+			            </div>
+			        </div>
+		        {/if}
+				{if dzguestopen()}
+			        <div class="form-group">
+			            <label class="col-lg-2 control-label">* 准许用户设置游客浏览器访问</label>
+			            <div class="col-lg-8">
+			                {:tpl_switch('specialconfig[openguestopen]',$config['specialconfig']['openguestopen']??'2')}
+			                <span class="help-block"><span class="text-danger">此项仅管理员可设置</span>，开启后当前活动所属用户可以自己开关浏览器访问</span>
+			            </div>
+			        </div>
+		        {/if}
+	        {/if}
+	        {if $managerhdrights['changehdurl']=='1'}
+		        <div class="form-group">
+		            <label class="col-lg-2 control-label">* 改变活动地址</label>
+		            <div class="col-lg-8">
+		                {:tpl_switch('changeurl',$config['changeurl']??'2')}
+		                <span class="help-block"><span class="text-danger">此项仅管理员可设置</span>，开启后活动创建者可以在我的活动列表右上角改变活动地址</span>
+		            </div>
+		        </div>
+	        {/if}
+	        <div class="form-group">
+	            <label class="col-lg-2 control-label">* 签到写入sign.txt</label>
+	            <div class="col-lg-8">
+	                {:tpl_switch('specialconfig[signinfy]',$config['specialconfig']['signinfy'])}
+	                <span class="help-block">开启后用户签到数据将写入到sign.txt，用于对接3d签到桌面软件</span>
+	            </div>
+	        </div>
+		</div>
+		<div class="highconfig-item hidden">
+	        <div class="form-group">
+	            <label class="col-lg-2 control-label">* 开关</label>
+	            <div class="col-lg-8">
+	                {:tpl_switch('oauthconfig[open]',$config['oauthconfig']['open'],'oauthself')}
+	                <span class="help-block">开启并配置好下面的信息即可使用自有认证服务号授权获取用户的头像和昵称，关闭则使用系统内置公众号授权获取</span>
+	            </div>
+	        </div>
+	        <div class="selfoauthBox{if $config['oauthconfig']['open']!='1'} hidden{/if}">
+	        	<div class="form-group">
+		            <label class="col-lg-2 control-label">* Oauth模式</label>
+		            <div class="col-lg-8">
+		              <label class="lyear-radio radio-inline radio-primary">
+		               <input type="radio" name="oauthconfig[type]" value="1" {if $config['oauthconfig']['type']=='1'}checked{/if} onclick="javascript:$('.oauthbox1').addClass('hidden'),$('.oauthbox2').removeClass('hidden')"><span>授权接入认证服务号 <b class="label label-success">推荐</b></span>
+		              </label>
+		              <label class="lyear-radio radio-inline radio-primary">
+		               <input type="radio" name="oauthconfig[type]" value="2" {if $config['oauthconfig']['type']=='2'}checked{/if} onclick="javascript:$('.oauthbox1').removeClass('hidden'),$('.oauthbox2').addClass('hidden')"><span>手动配置认证服务号</span>
+		              </label>
+		              <span class="help-block">选择手动配置认证服务号需填写认证服务号开发者ID和开发者密码并上传校验公众号文件</span>
+		            </div>
+		        </div>
+		        <div class="oauthbox1{if $config['oauthconfig']['type']=='1'} hidden{/if}">
+		        	<div class="form-group">
+		        		<label class="col-lg-2 control-label">* 公众号校验文件</label>
+		        		<div class="col-lg-8">
+		        			<div class="form-control-static">
+		        				<a href="javascript:void(0)" class="btn btn-primary btn-xs btn-uploadtxtfile">点我上传校验文件</a>
+		        			</div>
+		        			<span class="help-block">注:需在微信公众平台内设置与开发->公众号设置->功能设置->网页授权域名内添加域名{:getrequesthost()}<span class="label label-primary cursor m-l-5 zam-clip" data-href="{:getrequesthost()}">点我复制</span></span>
+		        		</div>
+		        	</div>
+			        <div class="form-group">
+			            <label class="col-lg-2 control-label">* 开发者ID(AppID)</label>
+			            <div class="col-lg-8">
+			                <input class="form-control inputneedmax" type="text"  name="oauthconfig[appid]" value="{$config['oauthconfig']['appid']}" maxlength="18" onkeyup="return trimSpace(this)">
+			                <span class="help-block">打开微信公众平台的设置与开发->基本配置将公众号开发信息的APPID复制过来</span>
+			            </div>
+			        </div>
+			        <div class="form-group">
+			            <label class="col-lg-2 control-label">* 开发者密码(AppSecret)</label>
+			            <div class="col-lg-8">
+			                <input class="form-control inputneedmax" type="text"  name="oauthconfig[appsecret]" value="{$config['oauthconfig']['appsecret']}" maxlength="32" onkeyup="return trimSpace(this)">
+			                <span class="help-block">打开微信公众平台的设置与开发->基本配置将公众号开发信息的AppSecret复制过来</span>
+			            </div>
+			        </div>
+		    	</div>
+		    	<div class="oauthbox2{if $config['oauthconfig']['type']=='2'} hidden{/if}">
+			    	<div class="form-group">
+			    		<label class="col-lg-2 control-label">* 选择公众号</label>
+				        <div class="col-lg-6">
+		                    {if !empty($mywxaccount)}
+			                    <select class="form-control" name="oauthconfig[wechatid]" size="1">
+			                        <option value="0"{if $config['oauthconfig']['wechatid']=='0'} selected{/if}>请选择</option>
+			                        {foreach $mywxaccount as $wxa}
+				                        {if $wxa['level']=='4'}
+				                        <option value="{$wxa['id']}"{if $config['oauthconfig']['wechatid']==$wxa['id']} selected{/if}>{$wxa['accountname']}{if $wxa['status']!='1'}(已取消授权){/if}</option>
+				                        {/if}
+			                        {/foreach}
+			                    </select>
+							{else/}
+								<div class="form-control-static">
+									<span class="mdi mdi-information" style="font-size:18px;margin-right:10px;"></span><span>暂无可用认证服务号，</span>
+									<a href="{:gomyhome('wxaccount/index')}" draggable="false">立即接入 &gt;</a>
+								</div>
+							{/if}
+		                    <span class="help-block">仅可选您已授权接入的认证服务号</span>
+	                	</div>
+	                </div>
+
+					<div class="form-group{if $managerhdrights['edit']=='2'} hidden{/if}">
+			            <label class="col-lg-2 control-label">* 强制关注授权服务号</label>
+			            <div class="col-lg-8">
+			                {:tpl_switch('oauthconfig[forcesub]',$config['oauthconfig']['forcesub']??'2')}
+			                <span class="help-block"><span class="text-danger">此项仅管理员可设置</span>，推荐关闭此项，非要开启此项如果被微信官方停封公众号与域名责任自担</span>
+			            </div>
+			        </div>
+		    	</div>
+	    	</div>
+		</div>
+		{if dzhuodongadv() && ($managerhdrights['edit']=='1' || $config['hdmode']=='1')}
+		<div class="highconfig-item hidden">
+			<div class="config-titlebox m-l-15">
+		        <span class="config-titlename">微信端开屏广告</span>
+		    </div>
+			<div class="form-group">
+	            <label class="col-lg-2 control-label">* 开关</label>
+	            <div class="col-lg-8">
+	                {:tpl_switch('advconfig[h5][open]',$config['advconfig']['h5']['open']??'2','openh5adv')}
+	                <span class="help-block">开启微信端会有广告</span>
+	            </div>
+	        </div>
+	        <div class="h5advbox{if !isset($config['advconfig']['h5']['open']) || $config['advconfig']['h5']['open']=='2'} hidden{/if}">
+	        	<div class="form-group">
+					<label class="col-lg-2 control-label">加载层</label>
+					<div class="col-lg-8">
+	                     {:tpl_switch("advconfig[h5][loadopen]",$config['advconfig']['h5']['loadopen']??'1','openh5load')}
+			    		 <span class="help-block">注:若您需要开启广告层推荐您开启加载层</span>
+					</div>
+			    </div>
+				<div class="h5loadbox{if isset($config['advconfig']['h5']['loadopen']) && $config['advconfig']['h5']['loadopen']=='2'} hidden{/if}">
+		        	<div class="form-group">
+						<label class="col-lg-2 control-label">加载层提示图</label>
+						<div class="col-lg-8">
+		                     {:tpl_image_one("advconfig[h5][loadimg]",$config['advconfig']['h5']['loadimg']??'')}
+				    		 <span class="help-block">规格:150*100px，如果您不设置提示图系统将使用旋转圆圈作为加载提示图</span>
+						</div>
+				    </div>
+				    <div class="form-group">
+					    <label class="col-lg-2 control-label text-right">* 加载层提示文字</label>
+					    <div class="col-lg-8">
+					        <div class="input-group">
+					            <div class="input-group-btn not-allow"><a class="btn btn-default">文字</a></div>
+					            <input type="text" class="form-control" name="advconfig[h5][loadtxt]" value="{$config['advconfig']['h5']['loadtxt']??'大屏互动正在为您加载...'}" />
+					            <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
+					            <div class="touchspin">
+					            	<input type="text" class="form-control numberincdec" name="advconfig[h5][loadsize]" 
+					                data-bts-min="1" data-bts-replacement-val="1"
+					                data-bts-max="40"
+					                data-bts-step="1"
+					                value="{$config['advconfig']['h5']['loadsize']??24}">
+					            </div>
+					            <div class="input-group-btn not-allow"><a class="btn btn-default">px，颜色</a></div>
+					            {:tpl_color('advconfig[h5][loadcolor]',$config['advconfig']['h5']['loadcolor']??'#000')}
+					            <div class="input-group-btn not-allow"><a class="btn btn-default">距提示图距离</a></div>
+					            <div class="touchspin">
+					            	<input type="text" class="form-control numberincdec" name="advconfig[h5][loadmt]" 
+					                data-bts-min="1" data-bts-replacement-val="1"
+					                data-bts-max="200"
+					                data-bts-step="1"
+					                value="{$config['advconfig']['h5']['loadmt']??15}">
+					            </div>
+					        </div>
+					    </div>
+					</div>
+				    <div class="form-group">
+						<label class="col-lg-2 control-label">加载层展示时长</label>
+						<div class="col-lg-2">
+		                    <input type="text" class="form-control numberincdec" name="advconfig[h5][loadtime]" value="{$config['advconfig']['h5']['loadtime']??3}"
+			                data-bts-min="1" data-bts-replacement-val="1"
+			                data-bts-max="null"
+			                data-bts-step="1"
+			                data-bts-postfix="秒"
+			                data-bts-postfix-extra-class="touchspin-postfix"
+			                >
+			                <div class="help-block">注:最少1秒</div>
+						</div>
+				    </div>
+				</div>
+			    <div class="form-group">
+					<label class="col-lg-2 control-label">广告层</label>
+					<div class="col-lg-8">
+	                     {:tpl_switch("advconfig[h5][advopen]",$config['advconfig']['h5']['advopen']??'1','openh5advimg')}
+			    		 <span class="help-block">开启并设置广告图才会有广告</span>
+					</div>
+			    </div>
+			    <div class="h5advimgbox{if isset($config['advconfig']['h5']['advopen']) && $config['advconfig']['h5']['advopen']=='2'} hidden{/if}">
+			    	<div class="form-group">
+						<label class="col-lg-2 control-label">广告标题</label>
+						<div class="col-lg-8">
+		                     <input type="text" class="form-control" name="advconfig[h5][advtitle]" value="{$config['advconfig']['h5']['advtitle']??'广告'}" />
+				    		 <span class="help-block">尽量简单明了，推荐控制在16个字</span>
+						</div>
+				    </div>
+				    <div class="form-group">
+						<label class="col-lg-2 control-label">广告图</label>
+						<div class="col-lg-8">
+		                     {:tpl_image_one("advconfig[h5][advimg]",$config['advconfig']['h5']['advimg']??'')}
+				    		 <span class="help-block">规格:640*1260px</span>
+						</div>
+				    </div>
+		        	<div class="form-group">
+						<label class="col-lg-2 control-label">广告时长</label>
+						<div class="col-lg-2">
+		                    <input type="text" class="form-control numberincdec" name="advconfig[h5][advtime]" value="{$config['advconfig']['h5']['advtime']??10}"
+			                data-bts-min="1" data-bts-replacement-val="1"
+			                data-bts-max="null"
+			                data-bts-step="1"
+			                data-bts-postfix="秒"
+			                data-bts-postfix-extra-class="touchspin-postfix"
+			                >
+			                <div class="help-block">注:最少1秒</div>
+						</div>
+				    </div>
+				    <div class="form-group">
+						<label class="col-lg-2 control-label">广告链接</label>
+						<div class="col-lg-8">
+		                    <input type="text" class="form-control" name="advconfig[h5][advurl]" value="{$config['advconfig']['h5']['advurl']??''}">
+		                    <div class="help-block">设置了广告链接用户可点击查看详情跳转过去</div>
+						</div>
+				    </div>
+				    <div class="form-group">
+			            <label class="col-lg-2 control-label">* 跳过广告</label>
+			            <div class="col-lg-8">
+			                {:tpl_switch('advconfig[h5][advclose]',$config['advconfig']['h5']['advclose']??'1')}
+			                <span class="help-block">开启则用户可点击跳过按钮来关闭广告</span>
+			            </div>
+			        </div>
+		    	</div>
+	        </div>
+	        <div class="config-titlebox m-l-15">
+		        <span class="config-titlename">大屏开屏广告</span>
+		    </div>
+	        <div class="form-group">
+	            <label class="col-lg-2 control-label">* 开关</label>
+	            <div class="col-lg-8">
+	                {:tpl_switch('advconfig[pc][open]',$config['advconfig']['pc']['open']??'2','openpcadv')}
+	                <span class="help-block">开启大屏幕会有广告</span>
+	            </div>
+	        </div>
+	        <div class="pcadvbox{if !isset($config['advconfig']['pc']['open']) || $config['advconfig']['pc']['open']=='2'} hidden{/if}">
+	        	<div class="form-group">
+					<label class="col-lg-2 control-label">加载层</label>
+					<div class="col-lg-8">
+	                     {:tpl_switch("advconfig[pc][loadopen]",$config['advconfig']['pc']['loadopen']??'1','openpcload')}
+			    		 <span class="help-block">注:若您需要开启广告层推荐开启加载层</span>
+					</div>
+			    </div>
+				<div class="pcloadbox{if isset($config['advconfig']['pc']['loadopen']) && $config['advconfig']['pc']['loadopen']=='2'} hidden{/if}">
+		        	<div class="form-group">
+						<label class="col-lg-2 control-label">加载层提示图</label>
+						<div class="col-lg-8">
+		                     {:tpl_image_one("advconfig[pc][loadimg]",$config['advconfig']['pc']['loadimg']??'')}
+				    		 <span class="help-block">注:规格:150*100px，如果您不设置提示图系统将使用旋转圆圈作为加载提示图</span>
+						</div>
+				    </div>
+		        	<div class="form-group">
+						<label class="col-lg-2 control-label">加载中提示文字</label>
+						<div class="col-lg-8">
+							<div class="input-group">
+			                    <div class="input-group-btn not-allow"><a class="btn btn-default">文字</a></div>
+					            <input type="text" class="form-control" name="advconfig[pc][loadtxt]" value="{$config['advconfig']['pc']['loadtxt']??'大屏互动正在为您加载...'}" />
+					            <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
+					            <div class="touchspin">
+					            	<input type="text" class="form-control numberincdec" name="advconfig[pc][loadsize]" 
+					                data-bts-min="1" data-bts-replacement-val="1"
+					                data-bts-max="40"
+					                data-bts-step="1"
+					                value="{$config['advconfig']['pc']['loadsize']??24}">
+					            </div>
+					            <div class="input-group-btn not-allow"><a class="btn btn-default">px，颜色</a></div>
+					            {:tpl_color('advconfig[pc][loadcolor]',$config['advconfig']['pc']['loadcolor']??'#000')}
+					            <div class="input-group-btn not-allow"><a class="btn btn-default">距提示图距离</a></div>
+					            <div class="touchspin">
+					            	<input type="text" class="form-control numberincdec" name="advconfig[pc][loadmt]" 
+					                data-bts-min="1" data-bts-replacement-val="1"
+					                data-bts-max="200"
+					                data-bts-step="1"
+					                value="{$config['advconfig']['pc']['loadmt']??15}">
+					            </div>
+				        	</div>
+						</div>
+				    </div>
+				    <div class="form-group">
+						<label class="col-lg-2 control-label">加载中提示时长</label>
+						<div class="col-lg-2">
+		                    <input type="text" class="form-control numberincdec" name="advconfig[pc][loadtime]" value="{$config['advconfig']['pc']['loadtime']??3}"
+			                data-bts-min="1" data-bts-replacement-val="1"
+			                data-bts-max="null"
+			                data-bts-step="1"
+			                data-bts-postfix="秒"
+			                data-bts-postfix-extra-class="touchspin-postfix"
+			                >
+			                <div class="help-block">注:最少1秒</div>
+						</div>
+				    </div>
+				</div>
+			    <div class="form-group">
+					<label class="col-lg-2 control-label">广告层</label>
+					<div class="col-lg-8">
+	                     {:tpl_switch("advconfig[pc][advopen]",$config['advconfig']['pc']['advopen']??'1','openpcadvimg')}
+			    		 <span class="help-block">开启并设置广告图才会有广告</span>
+					</div>
+			    </div>
+			    <div class="pcadvimgbox{if isset($config['advconfig']['pc']['advopen']) && $config['advconfig']['pc']['advopen']=='2'} hidden{/if}">
+			    	<div class="form-group">
+						<label class="col-lg-2 control-label">广告标题</label>
+						<div class="col-lg-8">
+		                     <input type="text" class="form-control" name="advconfig[pc][advtitle]" value="{$config['advconfig']['pc']['advtitle']??'广告'}" />
+				    		 <span class="help-block">尽量简单明了，推荐控制在50个字</span>
+						</div>
+				    </div>
+				    <div class="form-group">
+						<label class="col-lg-2 control-label">广告图</label>
+						<div class="col-lg-8">
+		                     {:tpl_image_one("advconfig[pc][advimg]",$config['advconfig']['pc']['advimg']??'')}
+				    		 <span class="help-block">规格:1920*1080px</span>
+						</div>
+				    </div>
+		        	<div class="form-group">
+						<label class="col-lg-2 control-label">广告时长</label>
+						<div class="col-lg-2">
+		                    <input type="text" class="form-control numberincdec" name="advconfig[pc][advtime]" value="{$config['advconfig']['pc']['advtime']??10}"
+			                data-bts-min="1" data-bts-replacement-val="1"
+			                data-bts-max="null"
+			                data-bts-step="1"
+			                data-bts-postfix="秒"
+			                data-bts-postfix-extra-class="touchspin-postfix"
+			                >
+			                <div class="help-block">注:最少1秒</div>
+						</div>
+				    </div>
+				    <div class="form-group">
+						<label class="col-lg-2 control-label">广告链接</label>
+						<div class="col-lg-8">
+		                    <input type="text" class="form-control" name="advconfig[pc][advurl]" value="{$config['advconfig']['pc']['advurl']??''}">
+		                    <div class="help-block">设置了广告链接用户可点击查看详情跳转过去</div>
+						</div>
+				    </div>
+				    <div class="form-group">
+			            <label class="col-lg-2 control-label">* 跳过广告</label>
+			            <div class="col-lg-8">
+			                {:tpl_switch('advconfig[pc][advclose]',$config['advconfig']['pc']['advclose']??'1')}
+			                <span class="help-block">开启则用户可点击跳过按钮来关闭广告</span>
+			            </div>
+			        </div>
+		    	</div>
+	        </div>
+		</div>
+		{/if}
+		{if dzdouyin()}
+		<div class="highconfig-item hidden">
+			<div class="form-group">
+	            <label class="col-lg-2 control-label">* 准许抖音用户进入活动</label>
+	            <div class="col-lg-8">
+	                {:tpl_switch('douyinconfig[open]',$config['douyinconfig']['open']??'2','douyinoauth')}
+	                <span class="help-block">开启则抖音用户扫大屏幕二维码可进入活动</span>
+	            </div>
+	        </div>
+	        <div class="douyinoauthBox{if !isset($config['douyinconfig']['open']) || $config['douyinconfig']['open']=='2'} hidden{/if}">
+		        <div class="form-group">
+		            <label class="col-lg-2 control-label">* 仅限抖音客户端参与</label>
+		            <div class="col-lg-8">
+		                {:tpl_switch('douyinconfig[forcedouyin]',$config['douyinconfig']['forcedouyin']??'2')}
+		                <span class="help-block">开启则非抖音客户端无法进入活动</span>
+		            </div>
+		        </div>
+				<div class="form-group">
+		            <label class="col-lg-2 control-label">* 私有oauth</label>
+		            <div class="col-lg-8">
+		                {:tpl_switch('douyinconfig[diyauth]',$config['douyinconfig']['diyauth']??'2','diydouyinauth')}
+		                <span class="help-block">默认使用系统抖音oauth，开启则必须填写下面的client_key，client_secret</span>
+		            </div>
+		        </div>
+		        <div class="diydouyinauthBox{if !isset($config['douyinconfig']['diyauth']) || $config['douyinconfig']['diyauth']=='2'} hidden{/if}">
+		        	<div class="form-group">
+			            <label class="col-lg-2 control-label">* 网站应用的Client Key</label>
+			            <div class="col-lg-8">
+			                <input class="form-control inputneedmax" type="text"  name="douyinconfig[client_key]" value="{$config['douyinconfig']['client_key']??''}" maxlength="16" onkeyup="return trimSpace(this)">
+			                <span class="help-block">注意:必须在<a href="https://open.douyin.com/platform" data-tooltip="laytip" title="点我去抖音开放平台" target="__blank">抖音开放平台</a> 的网站应用详情->基础信息->授权域回调与JSBridge安全域名设置为当前域名<span class="label label-primary cursor m-l-10 zam-clip" data-tooltip="laytip" title="点击复制" data-href="{:getrequesthost()}">{:getrequesthost()}</span></span>
+			            </div>
+			        </div>
+			        <div class="form-group">
+			            <label class="col-lg-2 control-label">* 网站应用的Client Secret</label>
+			            <div class="col-lg-8">
+			                <input class="form-control inputneedmax" type="text"  name="douyinconfig[client_secret]" value="{$config['douyinconfig']['client_secret']??''}" maxlength="32" onkeyup="return trimSpace(this)">
+			                <span class="help-block">32个字符</span>
+			            </div>
+			        </div>
+			        <div class="form-group">
+			            <label class="col-lg-2 control-label">* 强制关注抖音用户</label>
+			            <div class="col-lg-9">
+			                {:tpl_switch('douyinconfig[forcesub]',$config['douyinconfig']['forcesub']??'2','douyinforcesub')}
+			                <span class="help-block">注意：强制关注将会调用网站应用->用户权限->fan.check接口(需自己申请)，默认抖音开放平台赠送1000次/每日调用量，超额将无法使用，请自行提前购买额度</span>
+			            </div>
+			        </div>
+			        <div class="douyinforcesubBox{if !isset($config['douyinconfig']['forcesub']) || $config['douyinconfig']['forcesub']=='2'} hidden{/if}">
+			        	<div class="form-group binddouyinuser">
+				            <label class="col-lg-2 control-label">* 绑定抖音用户</label>
+				            <div class="col-lg-8">
+				                <input type="hidden" name="douyinconfig[binduser][openid]" value="{$config['douyinconfig']['binduser']['openid']??''}">
+				                <input type="hidden" name="douyinconfig[binduser][nickname]" value="{$config['douyinconfig']['binduser']['nickname']??''}">
+				                <input type="hidden" name="douyinconfig[binduser][avatar]" value="{$config['douyinconfig']['binduser']['avatar']??''}">
+				                <a class="img-avatar img-avatar-pill img-avatar-36" href="javascript:void(0)">
+				                    <img {if !isset($config['douyinconfig']['binduser']['avatar']) || empty($config['douyinconfig']['binduser']['avatar'])}class="hidden"{/if} src="{$config['douyinconfig']['binduser']['avatar']??''}">
+				                    <span>{$config['douyinconfig']['binduser']['nickname']??'暂未绑定'}</span>
+				                </a>
+				                <a href="javascript:void(0)" class="btn btn-sm btn-danger btn-binddouyin">点击绑定用户</a>
+				                <span class="help-block">必须绑定已经进入活动的抖音用户</span>
+				            </div>
+				        </div>
+				        <div class="form-group">
+				            <label class="col-lg-2 control-label">* 关注方式</label>
+				            <div class="col-lg-8">
+								<label class="lyear-radio radio-inline radio-primary">
+								<input type="radio" name="douyinconfig[subtype]" value="1" {if !isset($config['douyinconfig']['subtype']) || $config['douyinconfig']['subtype']=='1'}checked{/if} onclick="douyinsubtype(this)"><span>图片引导</span>
+								</label>
+								<label class="lyear-radio radio-inline radio-primary">
+								<input type="radio" name="douyinconfig[subtype]" value="2" {if $config['douyinconfig']['subtype']=='2'}checked{/if} onclick="douyinsubtype(this)"><span>自定义链接引导</span>
+								</label>
+				            </div>
+				        </div>
+				        <div class="form-group douyinsubimg{if isset($config['douyinconfig']['subtype']) && $config['douyinconfig']['subtype']=='2'} hidden{/if}">
+							<label class="col-lg-2 control-label">* 引导关注图</label>
+							<div class="col-lg-8">
+							     {:tpl_image_one("douyinconfig[subimg]",$config['douyinconfig']['subimg']??'')}
+							     <span class="help-block">推荐使用抖音个人中心二维码</span>
+							</div>
+						</div>
+						<div class="form-group douyinsuburl{if !isset($config['douyinconfig']['subtype']) || $config['douyinconfig']['subtype']=='1'} hidden{/if}">
+							<label class="col-lg-2 control-label">* 引导关注链接</label>
+							<div class="col-lg-8">
+							     <input class="form-control" type="text" name="douyinconfig[suburl]" value="{$config['douyinconfig']['suburl']??''}">
+							     <span class="help-block">推荐使用抖音个人中心链接</span>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-lg-2 control-label">* 错误提示</label>
+							<div class="col-lg-9">
+								{:tpl_switch('douyinconfig[showsuberror]',$config['douyinconfig']['showsuberror']??'1')}
+								<span class="help-block">注意：开启则如果系统在获取用户是否关注抖音号过程内出现异常会跳转到异常页面并显示异常原因，关闭则直接可进入活动页面</span>
+							</div>
+						</div>
+			        </div>
+		        </div>
+	    	</div>
+		</div>
+		{/if}
+		{if dzguestopen() && ($managerhdrights['edit']=='1' || $config['specialconfig']['openguestopen']=='1')}
+		<div class="highconfig-item hidden">
+			<div class="form-group">
+	            <label class="col-lg-2 control-label">* 准许通过普通浏览器进入活动</label>
+	            <div class="col-lg-8">
+	                {:tpl_switch('guestconfig[open]',$config['guestconfig']['open']??'2','guestopen')}
+	                <span class="help-block">开启则活动二维码或链接可在非微信浏览器里打开，用户需要上传头像并设置姓名进入活动</span>
+	            </div>
+	        </div>
+	        <div class="guestBox{if !isset($config['guestconfig']['open']) || $config['guestconfig']['open']=='2'} hidden{/if}">
+	        	<div class="form-group">
+					<label class="col-lg-2 control-label">网页标题</label>
+					<div class="col-lg-8">
+	                    <input type="text" class="form-control" name="guestconfig[title]" value="{$config['guestconfig']['title']??'登录参与活动'}">
+					</div>
+			    </div>
+			    <div class="form-group">
+					<label class="col-lg-2 control-label">登录标题</label>
+					<div class="col-lg-8">
+	                    <input type="text" class="form-control" name="guestconfig[pagetitle]" value="{$config['guestconfig']['pagetitle']??'填写用户信息'}">
+					</div>
+			    </div>
+				<div class="form-group">
+					<label class="col-lg-2 control-label">登录默认头像</label>
+					<div class="col-lg-8">
+					  {:tpl_image_one('guestconfig[avatar]', $config['guestconfig']['avatar']??'')}
+					  <span class="help-block">设置了默认头像则游客登录时只需要填写姓名即可登录，当然点击默认头像也可继续上传头像</span>
+					</div>
+			  	</div>
+				<div class="form-group">
+					<label class="col-lg-2 control-label">上传头像提示文字</label>
+					<div class="col-lg-8">
+					  <input type="text" class="form-control" name="guestconfig[uploadtip]" value="{$config['guestconfig']['uploadtip']??'点击上传头像'}">
+					</div>
+			  	</div>
+				<div class="form-group">
+					<label class="col-lg-2 control-label">用户登录时未上传头像提示文字</label>
+					<div class="col-lg-8">
+					  <input type="text" class="form-control" name="guestconfig[avatarerrortip]" value="{$config['guestconfig']['avatarerrortip']??'请上传头像'}">
+					</div>
+			  	</div>
+				<div class="form-group">
+					<label class="col-lg-2 control-label">姓名输入框默认提示文字</label>
+					<div class="col-lg-8">
+					  <input type="text" class="form-control" name="guestconfig[nametip]" value="{$config['guestconfig']['nametip']??'请输入姓名'}">
+					</div>
+			  	</div>
+				<div class="form-group">
+					<label class="col-lg-2 control-label">用户登录时未填写姓名提示文字</label>
+					<div class="col-lg-8">
+					  <input type="text" class="form-control" name="guestconfig[nameerrortip]" value="{$config['guestconfig']['nameerrortip']??'请输入姓名'}">
+					</div>
+			  	</div>
+			    <div class="form-group">
+                	<label class="col-lg-2 control-label text-right">* 登录按钮</label>
+	                <div class="col-lg-6 col-xs-12">
+	                    <div class="input-group">
+	                        <div class="input-group-btn not-allow"><a class="btn btn-default">文字</a></div>
+	                        <input type="text" class="form-control" name="guestconfig[loginbtn][txt]" value="{$config['guestconfig']['loginbtn']['txt']??'登录'}">
+	                        <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+	                        {:tpl_color('guestconfig[loginbtn][color]',$config['guestconfig']['loginbtn']['color']??'#fff')}
+	                        <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
+	                        <div class="touchspin">
+	                        <input type="text" class="form-control numberincdec" name="guestconfig[loginbtn][size]" 
+	                        data-bts-min="0" data-bts-replacement-val="0"
+	                        data-bts-max="100"
+	                        data-bts-step="1"
+							data-bts-postfix="px"
+                			data-bts-postfix-extra-class="touchspin-postfix"
+	                        value="{$config['guestconfig']['loginbtn']['size']??'16'}">
+	                        </div>
+	                        <div class="input-group-btn not-allow"><a class="btn btn-default">背景色</a></div>
+	                        {:tpl_color('guestconfig[loginbtn][bgcolor]',$config['guestconfig']['loginbtn']['bgcolor']??'#48b0f7')}
+	                    </div>
+	                </div>
+	            </div>
+	            <div class="form-group">
+		            <label class="col-lg-2 control-label">* 准许退出登录</label>
+		            <div class="col-lg-8">
+		                {:tpl_switch('guestconfig[loginout]',$config['guestconfig']['loginout']??'2')}
+		                <span class="help-block">开启后游客用户可到微信端活动个人中心退出登录，注意:用户一旦退出后再次登录可能会产生多个雷同用户</span>
+		            </div>
+		        </div>
+	        </div>
+	    </div>
+		{/if}
+		{if $managerhdrights['userid']=='1'}
+		<div class="highconfig-item hidden">
+	        <div class="form-group">
+	            <label class="col-lg-2 control-label">* 自定义微信端支付</label>
+	            <div class="col-lg-10">
+	                {:tpl_switch('openpaytpl',$config['openpaytpl'],'openpaytpl')}
+	                <span class="help-block">一般不用开启此项设置，关闭则活动使用系统后台选择的微信端通用模板发起支付</span>
+	            </div>
+	        </div>
+	        <div class="diyhpaytplbox{if !isset($config['openpaytpl']) || $config['openpaytpl']=='2'} hidden{/if}">
+		        <div class="form-group">
+		            <label class="col-lg-2 control-label">* 支付模板</label>
+		            <div class="col-lg-10">
+		                 <select class="form-control js_select2 paytplid" name="paytplid">
+		                 	  <option value="">-----请选择-----</option>
+		                 	  <optgroup label="系统模板">
+		                 	  	{volist name="syspaytpls" id="paytpl"}
+				                  <option value="{$paytpl['id']}">{$paytpl['tplname']}</option>
+		                 	  	{/volist}
+							  </optgroup>
+							  <optgroup label="用户模板">
+								{volist name="userpaytpls" id="usertpl"}
+				                  <option value="{$usertpl['id']}">{$usertpl['tplname']}</option>
+		                 	  	{/volist}
+							  </optgroup>
+		                </select>
+		                <div class="help-block">
+		                	<div class="text-danger">一般是主办方不想使用咱们平台内的商户在微信端发起支付，非要使用自己的商户收钱才需要设置此项</div>
+		                	<div class="text-danger">选择用户模板将导致当前活动微信端产生的支付费用不计入后台用户收入</div>
+		                	<div class="text-danger">不可随意切换此模板，一旦活动有人扫码进入了活动需要清空所有用户才可切换此模板</div>
+		            	</div>
+		            </div>
+		        </div>
+		        <div class="form-group">
+		            <label class="col-lg-2 control-label">*霸屏红包以及微信提现打款</label>
+		            <div class="col-lg-10">
+		                 <select class="form-control js_select2 txtplid" name="txtplid">
+		                 	  <option value="">-----请选择-----</option>
+		                 	  <option value="0">请选择模板</option>
+		                 	  <optgroup label="系统模板">
+		                 	  	{volist name="syshbtpls" id="txtpl"}
+				                  <option value="{$txtpl['id']}">{$txtpl['tplname']}</option>
+		                 	  	{/volist}
+							  </optgroup>
+							  <optgroup label="用户模板">
+								{volist name="userhbtpls" id="usertxtpl"}
+				                  <option value="{$usertxtpl['id']}">{$usertxtpl['tplname']}</option>
+		                 	  	{/volist}
+							  </optgroup>
+		                </select>
+		                <div class="help-block">
+		                	<div class="text-danger">上面的支付模板选择用户支付模板则霸屏红包以及微信提现打款模板必须选择用户模板，尽可能与上面的支付模板对应</div>
+		                	<div class="text-danger">上面的支付模板选择系统支付模板则霸屏红包以及微信提现打款模板必须选择系统模板，尽可能与上面的支付模板对应</div>
+		                	<div>原因：用户在霸屏上墙发红包支付的费用到了别人的商户平台，此处设置的模板是用来给领取红包的人发红包的，如果你选择自己的商户给用户发红包，你能乐意？？？，请理解前面的话再去设置，原则是支付模板与霸屏红包以及微信提现打款模板内部是同一个商户号，同一个appid</div>
+		                </div>
+		            </div>
+		        </div>
+	    	</div>
+	        <div class="form-group">
+	            <label class="col-lg-2 control-label">* 自定义活动普通红包模板</label>
+	            <div class="col-lg-10">
+	                {:tpl_switch('openhbtpl',$config['openhbtpl'],'openhbtpl')}
+	                <div class="help-block">
+	                	<div class="help-block">一般不用开启此项设置，关闭则活动使用系统后台选择的微信端通用红包模板给活动用户发红包</div>
+	                	<div class="text-danger">一般是主办方不想使用咱们平台内的商户发红包，非要使用主办方自己的商户发红包才需要设置此项</div>
+	                	<div class="text-danger">若选择了用户模板下的红包模板则当前活动(红包雨，游戏，抽奖等功能)发放红包不会判断当前活动所属用户是否红包账户余额充足，也不会导致活动所属用户红包账户余额减少</div>
+	                	<div class="text-danger">不可随意切换此模板，一旦活动有人扫码进入了活动需要清空所有用户才可切换此模板</div>
+	                </div>
+	            </div>
+	        </div>
+	        <div class="form-group diyhbtplbox{if !isset($config['openhbtpl']) || $config['openhbtpl']=='2'} hidden{/if}">
+	            <label class="col-lg-2 control-label">* 红包模板</label>
+	            <div class="col-lg-10">
+	                 <select class="form-control js_select2 hbtplid" name="hbtplid">
+	                 	  <option value="">-----请选择-----</option>
+	                 	  <optgroup label="系统模板">
+	                 	  	{volist name="syshbtpls" id="hbtpl"}
+			                  <option value="{$hbtpl['id']}">{$hbtpl['tplname']}</option>
+	                 	  	{/volist}
+						  </optgroup>
+						  <optgroup label="用户模板">
+							{volist name="userhbtpls" id="usertpl"}
+			                  <option value="{$usertpl['id']}">{$usertpl['tplname']}</option>
+	                 	  	{/volist}
+						  </optgroup>
+	                </select>
+	                <span class="help-block">请特别小心设置此项，如果选择用户活动类红包模板将使得当前活动创建发放红包功能不需要充值红包</span>
+	            </div>
+	        </div>
+		</div>
+		{/if}
+		{if $managerhdrights['edit']=='1'}
+		<div class="highconfig-item hidden">
+	        <div class="form-group">
+	            <label class="col-lg-2 control-label"> css内容</label>
+	            <div class="col-lg-8">
+	                <textarea class="form-control" name="diycss" rows="3" placeholder="必须是压缩后的css代码">{$config['diycss']}</textarea>
+	                <span class="help-block">必须是压缩后的css代码</span>
+	            </div>
+	        </div>
+		</div>
+		{/if}
+    </div>
+    {include file='$Wpath/common/savepanel'}
+</form>
+{include file='$Wpath/common/map'}
+<script id='day-tpl' type="text/template">
+<tr>
+  <td class="text-center">
+      <input type="text" class="form-control" name="payjoinconfig[days][name][]" value="x天">
+  </td>
+  <td class="text-center">
+    <div class="input-group">
+      <input type="text" class="form-control" name="payjoinconfig[days][day][]" value="1">
+      <div class="input-group-addon">天</div>
+    </div>
+  </td>
+  <td class="text-center">
+    <div class="input-group">
+      <input type="text" class="form-control" name="payjoinconfig[days][price][]" value="1">
+      <div class="input-group-addon">元</div>
+    </div>
+  </td>
+  <td class="text-center">
+    <div class="input-group">
+      <input type="text" class="form-control" name="payjoinconfig[days][discount][]" value="0">
+      <div class="input-group-addon">折</div>
+    </div>
+  </td>
+  <td class="text-center">
+      <label class="lyear-switch switch-primary normal-swith switch-solid" style="height:38px">
+          <input type="checkbox" checked="checked">
+          <input type="hidden" name="payjoinconfig[days][status][]" value="1">
+          <span data-status="1" class="normal-span " data-ajax=""></span>
+      </label>
+  </td>
+  <td class="text-center">
+    <a class="btn btn-xs btn-primary zam-sortable btn-moveitem" href="javascript:void(0)">
+      <i class="mdi mdi-arrow-all"></i>
+    </a>
+    <a class="btn btn-xs btn-danger" href="javascript:;" onclick="javascript:$(this).parent().parent().remove()">
+      <i class="mdi mdi-close"></i>
+    </a>
+  </td>
+</tr>
+</script>
+<script type="text/javascript">
+require(['webcore','jconfirmBox','zamnotice','layerBox','clipboard','zvalidator','citypicker'],function(webcore,jconfirmBox,zamnotice,layerBox,Clipboard){
+	var clipboard = new Clipboard('.zam-clip', {
+        text: function(e) {
+            return $(e).data('url') || $(e).data('href')
+        }
+    });
+    clipboard.on('success',function(e) {
+       zamnotice.showTips('success','复制成功',2e3);
+    });
+	$(".confirmaddress").on('click',function(){
+		var address = $(".address").val(),latlng = $('.latlng').val();
+		if(address=='' || latlng==""){
+			return zamnotice.showTips('error','请先搜索位置再点击添加位置');
+		}
+		var whtml = $(webcore.tpl($("#gpslocitem"),{address:address,latlng:latlng})).clone();
+		$(".gpsloc-lists").append(whtml);
+	});
+	$(".plusaddress").on('click',function () {
+	    var areavalue = $(".city-picker-value").val();
+		if(areavalue==''){
+			return zamnotice.showTips('error','请先选择地区再点击添加地区');
+		}
+		var whtml = $(webcore.tpl($("#areaitem"),{area:areavalue})).clone();
+		$(".areas-lists").append(whtml);
+	});
+	$(".paytplid").val("{$config['paytplid']}").trigger("change");
+	$(".txtplid").val("{$config['txtplid']}").trigger("change");
+	$(".hbtplid").val("{$config['hbtplid']}").trigger("change");
+	$("#screenconfigbox .zam-inner-highconfig-btns a.btn").click(function(){
+		var btnindex = $(this).index();
+		localStorage.setItem("tabindex{$config['id']}",btnindex);
+        $(this).addClass('btn-primary').siblings().removeClass("btn-primary");
+        $("#screenconfigbox .highconfig-item").addClass('hidden').eq(btnindex).removeClass('hidden');
+        {// 腾讯地图初始化 }
+        {if isset($map['type']) && $map['type']=='3'}
+        	if(!$("#gdmap").is(':hidden') && btnindex===3  && $("#gdmap").children().length===0){
+				initmap();
+        	}
+        {/if}
+        {// 腾讯地图初始化end }
+    });
+    var storageindex = localStorage.getItem("tabindex{$config['id']}");
+	if (typeof storageindex != "null") {
+		if($("#screenconfigbox .zam-inner-highconfig-btns a.btn").eq(storageindex).length >0){
+			$("#screenconfigbox .zam-inner-highconfig-btns a.btn").eq(storageindex).trigger('click');
+		}else{
+			$("#screenconfigbox .zam-inner-highconfig-btns a.btn").eq(0).trigger('click');
+		}
+	}else{
+		$("#screenconfigbox .zam-inner-highconfig-btns a.btn").eq(0).trigger('click');
+	}
+    $(".zam-wechataccountList .zam-wechataccountItem").click(function(e){
+		var $this = $(this);
+		if($this.hasClass('active')){
+			$this.siblings().removeClass('active');
+			$this.removeClass("active");
+			$(".zam-wechataccountList input").val($this.attr("0"));
+		}else{
+			if($this.hasClass('unauthrized')){
+				return zamnotice.showTips('error','已取消授权的公众号无法选择'); 
+			}
+			$this.siblings().removeClass('active');
+			$this.addClass("active");
+			$(".zam-wechataccountList input").val($this.attr("data-uniacid"));
+		}
+	});
+    $('#formBox').formValidation({
+            framework: 'bootstrap',
+            excluded: [':disabled'],
+            message: '您填写的内容无效',
+            fields: {
+            	hdtitle: {
+					message: '您填写的活动标题内容无效',
+					validators: {
+						notEmpty: {
+							message: '活动主题必须填写'
+						},
+						stringLength: {
+			              min: 1,
+			              max: 40,
+			              message: '活动主题必须是40个字符内'
+			            },
+					}
+				},
+            	"mobileconfig[safeword]": {
+		          message: '密码验证失败',
+		          validators: {
+		            stringLength: {
+		              min: 6,
+		              max: 6,
+		              message: '密码长度必须是6位'
+		            },
+		            regexp: {
+		              regexp: /^[0-9]+$/,
+		              message: '密码只能是纯数字'
+		            },
+		          }
+		        },
+            	"screenconfig[password]": {
+		          message: '密码验证失败',
+		          validators: {
+		            stringLength: {
+		              min: 6,
+		              max: 10,
+		              message: '登录密码长度必须在6到10位之间'
+		            },
+		            regexp: {
+		              regexp: /^[a-zA-Z0-9_]+$/,
+		              message: '登录密码只能包含大写、小写、数字和下划线'
+		            },
+		          }
+		        },
+            }
+    }).on('success.form.fv', function(e) {
+        e.preventDefault();
+        var $form = $(e.target);
+        var postData = webcore.serializeObject($form);
+        var bload = $form.find(".zam-fixedbottom button").lyearloading({opacity: 0.2,spinnerSize: 'nm'});
+        $form.formValidation('disableSubmitButtons', true);
+        webcore.ajaxSubmit("{:gohdmanage('hdinfo/index',['hdid'=>$hdid])}",postData).then(function(json){
+            bload.hide();
+            if(json.code==0){
+                $form.formValidation('disableSubmitButtons', false);
+                zamnotice.showTips('success','操作成功',1e3,function(){
+                    window.location.reload();
+                });
+            }else{
+                zamnotice.showTips('error',json.msg);
+                $form.formValidation('disableSubmitButtons', false);
+            }
+        }, function(json){
+            bload.hide();
+            zamnotice.showTips('error','网络差，操作失败');
+            $form.formValidation('disableSubmitButtons', false);
+        });
+    });
+    $(".btn-addday").click(function(){
+      $(".day-lists").append(webcore.tpl($("#day-tpl"),{}));
+      setTimeout(function(){
+        tpl_switch();
+      },1e2);
+    });
+    $(".btn-uploadtxtfile").click(function(){
+		webcore.importxls({title:'上传微信校验文件',url:"{:gohdmanage('hdinfo/uptxtfile',['hdid'=>$hdid])}",moban:'',uptxt:"点击上传校验文件",xlstxt:"注:文件名必须与微信公众平台下载的txt文件名称一致，均以MP_verify_开头",filetype:'txt'},function(){
+		   wzamnotice.showTips('success','上传成功');
+		});
+    });
+    $(".btn-binddouyin").click(function(){
+        var confirmObj = jconfirmBox.ajaxconfirm("绑定抖音用户","{:gohdmanage('common/searchuser',['hdid'=>$hdid])}",{ishtml:'1',usertype:'2'},'html','col-lg-8 col-lg-offset-2',function(e){
+            var selectuser = e.find("input:checked");
+            if(selectuser.length==1){
+                var obj = {
+                    openid:selectuser.attr('data-openid'),
+                    nickname:selectuser.parent().parent().next().next().text(),
+                    avatar:selectuser.parent().parent().next().attr('src'),
+                };
+                var inputs = $(".binddouyinuser").find('input');
+                inputs.each(function(i,v){
+                    if(i==0){
+                        $(v).val(obj.openid);
+                    }else if(i==1){
+                        $(v).val(obj.nickname);
+                    }else{
+                        $(v).val(obj.avatar);
+                    }
+                });
+                $(".binddouyinuser a img").removeClass('hidden').attr('src',obj.avatar);
+                $(".binddouyinuser a span").text(obj.nickname);
+                confirmObj.close();
+            }else if(selectuser.length > 1){
+                return zamnotice.showTips('error','只能选一个抖音用户');
+            }else{
+                zamnotice.showTips('error','请选择需绑定的用户');
+            }
+        });
+    });
+    $(".btn-download").click(function(){
+        var $this = $(this),imgUrl = $this.prev().attr('src'),mname = '互动小程序二维码.png';
+        if (window.navigator.msSaveOrOpenBlob) {
+          var bstr = atob(imgUrl.split(',')[1]);
+          var n = bstr.length;
+          var u8arr = new Uint8Array(n);
+          while (n--) {
+            u8arr[n] = bstr.charCodeAt(n);
+          }
+          var blob = new Blob([u8arr]);
+          window.navigator.msSaveOrOpenBlob(blob, mname);
+        } else {
+          var el = document.createElement('a');
+          el.href = imgUrl;
+          el.setAttribute('download', mname);
+          el.setAttribute('target', '__blank');
+          el.click();
+        }
+    });
+    $(".ajaxkeyword").on("input propertychange change blur",function(event){
+    	var $this = $(this),keywordval = $this.val(),tipbox = $('.keywordtipbox'),wechatid = $(".zam-wechataccountList .zam-wechataccountItem.active").attr('data-uniacid') || '';
+    	if(wechatid=='' || keywordval==''){
+    		tipbox.html('');
+    		return '';
+    	}
+		webcore.ajaxSubmit("{:gohdmanage('hdinfo/searchkeyword',['hdid'=>$hdid])}",{wechatid:wechatid,keyword:keywordval}).then(function(json){
+            if(json.code==0 && json.msg > 0){
+                tipbox.html('<b>您输入的触发关键词('+keywordval+')当前已被<span class="text-danger m-l-5 m-r-5">'+json.msg+'</span>个活动使用，建议您更换别的触发关键词</b>');
+            }else{
+               tipbox.html('');
+    			return '';
+            }
+        }, function(json){
+            tipbox.html('');
+    		return '';
+        });
+    });
+    if($(".ajaxkeyword").val()!='' && $(".zam-wechataccountList .zam-wechataccountItem.active").length > 0){
+    	$(".ajaxkeyword").trigger('change');
+    }
+});
+function opennotice(obj,status){
+	if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".noticeBox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".noticeBox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function opensafe(obj,status){
+	if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".safebox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".safebox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openpayjoinbox(obj,status){
+	if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".payjoinbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".payjoinbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+
+function opendiyqr(obj,status){
+	if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".qrimgbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".qrimgbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openshare(obj,status){
+	if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".sharebox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".sharebox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openarealimit(obj,status){
+	if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".arealimitbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".arealimitbox").removeClass('hidden');
+        {// 腾讯地图初始化 }
+        {if isset($map['type']) && $map['type']=='3'}
+        	if(!$("#gdmap").is(':hidden') && $("#gdmap").children().length===0){
+				initmap();
+        	}
+        {/if}
+        {// 腾讯地图初始化end }
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function showgps(obj){
+	var type = $(obj).val();
+	if(type=='1'){
+		$(".gpsitem").removeClass('hidden');
+		$(".ipitem").addClass('hidden');
+		{// 腾讯地图初始化 }
+        {if isset($map['type']) && $map['type']=='3'}
+        	if(!$("#gdmap").is(':hidden') && $("#gdmap").children().length===0){
+				initmap();
+        	}
+        {/if}
+        {// 腾讯地图初始化end }
+	}else{
+		$(".ipitem").removeClass('hidden');
+		$(".gpsitem").addClass('hidden');
+	}
+}
+function oauthself(obj,status){
+	if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".selfoauthBox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".selfoauthBox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function keywordtype(obj){
+	var type = $(obj).find('input').val();
+	if(type=='1'){
+		$(".keywordtype1").removeClass('hidden');
+		$(".keywordtype2").addClass('hidden');
+	}else{
+		$(".keywordtype2").removeClass('hidden');
+		$(".keywordtype1").addClass('hidden');
+	}
+}
+function openhbtpl(obj,status){
+	if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".diyhbtplbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".diyhbtplbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openpaytpl(obj,status){
+	if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".diyhpaytplbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".diyhpaytplbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function douyinoauth(obj,status){
+	if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".douyinoauthBox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".douyinoauthBox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function guestopen(obj,status){
+	if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".guestBox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".guestBox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function diydouyinauth(obj,status){
+	if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".diydouyinauthBox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".diydouyinauthBox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function douyinforcesub(obj,status){
+	if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".douyinforcesubBox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".douyinforcesubBox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function douyinsubtype(obj){
+	var subtype = $(obj).val();
+	if(subtype=='1'){
+		$(".douyinsubimg").removeClass('hidden');
+		$(".douyinsuburl").addClass('hidden');
+	}else{
+		$(".douyinsubimg").addClass('hidden');
+		$(".douyinsuburl").removeClass('hidden');
+	}
+}
+function wxminiopen(obj,status){
+	if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".wxminiBox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".wxminiBox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openh5adv(obj,status){
+	if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".h5advbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".h5advbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openpcadv(obj,status){
+	if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".pcadvbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".pcadvbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openh5load(obj,status){
+	if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".h5loadbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".h5loadbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openh5advimg(obj,status){
+	if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".h5advimgbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".h5advimgbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openpcload(obj,status){
+	if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".pcloadbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".pcloadbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openpcadvimg(obj,status){
+	if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".pcadvimgbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".pcadvimgbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+</script>
+<script id='gpslocitem' type="text/template">
+<tr>
+    <td class="text-center">
+       <input type="hidden" name="locconfig[locs][address][]" value="<% d.address %>" />
+       <div class="zam-flex-center"><% d.address %></div>
+    </td>
+    <td class="text-center">
+       <input type="hidden" name="locconfig[locs][latlng][]" value="<% d.latlng %>" />
+       <div class="zam-flex-center"><% d.latlng %></div>
+    </td>
+    <td class="text-center">
+        <a class="btn btn-xs btn-danger" href="javascript:void(0)" onclick="javascript:$(this).parents('tr').remove();"> <i class="mdi mdi-close"></i> </a>
+    </td>
+</tr>
+</script>
+<script id='areaitem' type="text/template">
+<tr>
+<td class="text-center">
+	<input type="hidden" name="locconfig[areas][]" value="<% d.area %>" />
+	<div class="zam-flex-center"><% d.area %></div>
+</td>
+<td class="text-center">
+	<a class="btn btn-xs btn-danger" href="javascript:void(0)" onclick="javascript:$(this).parents('tr').remove();"> <i class="mdi mdi-close"></i> </a>
+</td>
+</tr>
+</script>
+{include file='$Wpath/common/footer'}

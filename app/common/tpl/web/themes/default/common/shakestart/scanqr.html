@@ -1,0 +1,52 @@
+<div id="scanqr" class="collapse in">
+    <div class="form-group">
+        <label class="col-lg-2 control-label text-right">* 状态</label>
+        <div class="col-lg-8">
+            {:tpl_switch('scanqrconfig[open]',$config['scanqrconfig']['open']??'2','scanqropen')}
+            <span class="help-block">开启则点击空格先进入扫码环节，关闭则直接进入倒计时或者启动环节</span>
+        </div>
+    </div>
+    <div class="shakestartscanQrbox{if $config['scanqrconfig']['open']=='2'} hidden{/if}">
+        <div class="form-group">
+            <label class="col-lg-2 control-label text-right">* 用户头像飞入效果</label>
+            <div class="col-lg-8">
+                {:tpl_switch('scanqrconfig[flyavatar]',$config['scanqrconfig']['flyavatar']??'1')}
+                <span class="help-block">开启则显示微信用户头像飞入效果</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label text-right">* 展示参与人数</label>
+            <div class="col-lg-8">
+                {:tpl_switch('scanqrconfig[showjoin]',$config['scanqrconfig']['showjoin']??'1')}
+                <span class="help-block">开启则在二维码上方显示参与人数</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 二维码大小</label>
+            <div class="col-lg-4">
+                <input type="text" class="form-control numberincdec" name="scanqrconfig[qrsize]" value="{$config['scanqrconfig']['qrsize']}"
+                data-bts-min="100" data-bts-replacement-val="100"
+                data-bts-max="null"
+                data-bts-step="1"
+                data-bts-postfix="px"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                >
+                <span class="help-block">注:必须是个大于100的整数</span>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+function scanqropen(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".shakestartscanQrbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".shakestartscanQrbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status == '1' ? false : true);
+}
+</script>

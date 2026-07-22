@@ -1,0 +1,133 @@
+<div class="form-horizontal confirmbox-pop">
+  <form class="confirm-formbox" method="post">
+    <div class="text-center">
+        <div class="btn-group pop-btns" style="margin-bottom:10px;">
+          <a href="javascript:void(0)" class="btn btn-default btn-primary"><span>用户信息</span></a>
+          {if !empty($config['signconfig']) && $config['signconfig']['openstatus']=='1'}
+          <a href="javascript:void(0)" class="btn btn-default"><span>签到信息</span></a>
+          {/if}
+        </div>
+    </div>
+    <div class="carditem">
+      <div class="form-group">
+        <label class="col-lg-3 control-label">* 昵称</label>
+        <div class="col-lg-7">
+          <input class="form-control" type="text"  name="nickname" placeholder="昵称" value="{$config['nickname']}">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-3 control-label">* 头像</label>
+        <div class="col-lg-8">
+          {:tpl_image_one('avatar',$config['avatar'])}
+          <span class="help-block">规格:100*100px</span>
+        </div>
+      </div>
+      <div class="form-group">
+          <label class="col-lg-3 control-label">* 性别</label>
+          <div class="col-lg-8">
+            {foreach $sextypes as $sk=>$sv}
+            <label class="lyear-radio radio-inline radio-primary">
+             <input type="radio" name="usex" value="{$sk}" {if $config['sex'] == $sk}checked{/if}><span>{$sv}</span>
+            </label>
+            {/foreach}
+          </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-3 control-label">* 黑名单</label>
+        <div class="col-lg-6">
+            {:tpl_switch("isblack",$config['isblack'])}
+            <span class="help-block">黑名单用户无法进入活动</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-3 control-label">* 管理员</label>
+        <div class="col-lg-8">
+            {:tpl_switch("ismanager",$config['ismanager'])}
+            <span class="help-block">管理员微信扫一扫可以核销用户中奖记录</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-3 control-label">* 不能中奖</label>
+        <div class="col-lg-6">
+            {:tpl_switch("isexcept",$config['isexcept'])}
+            <span class="help-block">仅对抽奖类功能有效</span>
+        </div>
+      </div>
+    </div>
+    {if !empty($config['signconfig']) && $config['signconfig']['openstatus']=='1'}
+    <div class="carditem hidden">
+      <div class="form-group{if !empty($config['signinfo'])} hidden{/if}">
+        <label class="col-lg-3 control-label">* 是否签到</label>
+        <div class="col-lg-8">
+            {:tpl_switch("issign",$config['issign'],'openbdbox')}
+            <span class="help-block">开启则用户签到了，开启了表单的话必须完善表单信息</span>
+        </div>
+      </div>
+      {if $config['signconfig']['appopenbd']=='1'}
+      <div class="bdbox{if $config['issign']=='2'} hidden{/if}">
+        {if $config['signconfig']['appuploadimg']=='1'}
+        <div class="form-group">
+          <label class="col-lg-3 control-label">* 头像</label>
+          <div class="col-lg-8">
+            {:tpl_image_one('uploadimg',(!empty($config['signinfo'])&&isset($config['signinfo']['bddata']['uploadimg'])?$config['signinfo']['bddata']['uploadimg']:''))}
+            <span class="help-block">规格:100*100px</span>
+          </div>
+        </div>
+        {/if}
+        {if !empty($config['signconfig']['appbddata'])}
+          {volist name="config.signconfig.appbddata" id="bditem"}
+            <div class="form-group">
+              <label class="col-lg-3 control-label">* {$bditem['title']}</label>
+              <div class="col-lg-8">
+                {if !in_array($bditem['type'],['select','sex'])}
+                  <input class="form-control" type="text"  name="{$bditem['zd']}" value="{if !empty($config['signinfo'])&&isset($config['signinfo']['bddata'][$bditem['zd']])}{$config['signinfo']['bddata'][$bditem['zd']]}{/if}">
+                {else}
+                  {if $bditem['type']=='select'}
+                  <select class="form-control" name="{$bditem['zd']}">
+                      <option value="" {if !empty($config['signinfo'])&&isset($config['signinfo']['bddata'][$bditem['zd']])}{else}selected{/if}>-----请选择-----</option>
+                      {volist name="bditem.items" id="selectitem"}
+                          <option value="{$selectitem}" {if !empty($config['signinfo'])&&isset($config['signinfo']['bddata'][$bditem['zd']])&&$config['signinfo']['bddata'][$bditem['zd']]==$selectitem}selected{/if}>{$selectitem}</option>
+                      {/volist}
+                  </select>
+                  {else /}
+                      <select class="form-control" name="sex">
+                          <option value="男" {if isset($config['signinfo']['bddata']['sex']) && $config['signinfo']['bddata']['sex']=='男'}selected{/if}>男</option>
+                          <option value="女" {if isset($config['signinfo']['bddata']['sex']) && $config['signinfo']['bddata']['sex']=='女'}selected{/if}>女</option>
+                      </select>
+                      <div class="help-block">用户信息内的性别必须与此性别保持一致否则无法保存成功</div>
+                  {/if}
+                {/if}
+              </div>
+            </div>
+          {/volist}
+        {/if}
+      </div>
+      {/if}
+    </div>
+    {/if}
+</form>
+</div>
+<script type="text/javascript">
+$(function(){
+  $(".confirmbox-pop .pop-btns a.btn").click(function(){
+      $(this).addClass('btn-primary').siblings().removeClass("btn-primary");
+      $(".confirmbox-pop .carditem").addClass('hidden').eq($(this).index()).removeClass('hidden');
+  });
+  {if !empty($config['signconfig']) && $config['signconfig']['openstatus']=='1' && $config['signconfig']['appopenbd']!='1' && !empty($config['signinfo'])}
+    $(".confirmbox-pop .pop-btns a.btn").eq(1).remove();
+  {/if}
+  tpl_switch();
+});
+function openbdbox(obj,status){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".bdbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".bdbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+</script>

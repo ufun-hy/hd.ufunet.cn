@@ -1,0 +1,125 @@
+{include file='$Wpath/common/header'}
+<div class="confirmbox-pop">
+<div class="text-center">
+      <div class="btn-group pop-btns" style="margin-bottom:10px;">
+        <a href="javascript:void(0)" class="btn btn-default btn-primary"><span>基础设置</span></a>
+        <a href="javascript:void(0)" class="btn btn-default"><span>大屏欢迎页</span></a>
+        <a href="javascript:void(0)" class="btn btn-default"><span>大屏设置</span></a>
+        <a href="javascript:void(0)" class="btn btn-default"><span>排行榜</span></a>
+        <a href="javascript:void(0)" class="btn btn-default"><span>微信设置</span></a>
+        <a href="javascript:void(0)" class="btn btn-default"><span>自定义css</span></a>
+      </div>
+</div>
+<form id="formBox" class="zam-formvalidation form-horizontal" method="post">
+  <div class="carditem">
+    {include file='$Wpath/common/gamestyle/basic'}
+    {include file='$Wpath/common/gamestyle/bgmusic'}
+  </div>
+  <div class="carditem hidden">
+    {include file='$Wpath/common/gamestyle/welcome'}
+  </div>
+  <div class="carditem hidden">
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 钱顶</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('hmoney', $config['hmoney'])}
+        <span class="help-block">{$desconfig['hmoney']}</span>
+      </div>
+     </div>
+     <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 钱身</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('bmoney', $config['bmoney'])}
+        <span class="help-block">{$desconfig['bmoney']}</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 钱底</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('fmoney', $config['fmoney'])}
+        <span class="help-block">{$desconfig['fmoney']}</span>
+      </div>
+    </div>
+  </div>
+  <div class="carditem hidden">
+    {include file='$Wpath/common/gamestyle/phb'}
+  </div>
+  <div class="carditem hidden">
+    {include file='$Wpath/common/gamestyle/wechat'}
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 钱图</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('appredbag', $config['appredbag'])}
+        <span class="help-block">{$desconfig['appredbag']}</span>
+      </div>
+     </div>
+     <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 底部金币</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('appgold', $config['appgold'])}
+        <span class="help-block">{$desconfig['appgold']}</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 数钱时滑动的钱</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('appflymoney', $config['appflymoney'])}
+        <span class="help-block">{$desconfig['appflymoney']}</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 数钱时掉落的钱</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('appdropimg', $config['appdropimg'])}
+        <span class="help-block">{$desconfig['appdropimg']}</span>
+      </div>
+    </div>
+    
+  </div>
+  <div class="carditem hidden">
+    {include file='$Wpath/common/gamestyle/diycss'}
+  </div>
+  {include file='$Wpath/common/cancelsavepanel'}
+</form>
+</div>
+<script type="text/javascript">
+require(['webcore','jconfirmBox','zamnotice','zvalidator'],function(webcore,jconfirmBox,zamnotice){
+  $(".confirmbox-pop .pop-btns a.btn").click(function(){
+      $(this).addClass('btn-primary').siblings().removeClass("btn-primary");
+      $(".confirmbox-pop .carditem").addClass('hidden').eq($(this).index()).removeClass('hidden');
+  });
+  $(".confirmbox-pop .type-btns a.btn").click(function(){
+      $(this).addClass('btn-primary').siblings().removeClass("btn-primary");
+      $(".confirmbox-pop .typeitem").addClass('hidden').eq($(this).index()).removeClass('hidden');
+  });
+  $('#formBox').formValidation({
+      framework: 'bootstrap',
+      excluded: [':disabled'],
+      message: '您填写的内容无效',
+      fields: {}
+  }).on('success.form.fv', function(e) {
+    e.preventDefault();
+    var $form = $(e.target);
+    var postData = webcore.serializeObject($form);
+    var bload = $form.find(".zam-fixedbottom button").lyearloading({opacity: 0.2,spinnerSize: 'nm'});
+    $form.formValidation('disableSubmitButtons', true);
+    webcore.ajaxSubmit("{:goweb('hdconfig/edit'.$gametype.'style')}",postData).then(function(json){
+      bload.hide();
+      if(json.code==0){
+          $form.formValidation('disableSubmitButtons', false);
+          zamnotice.showTips('success','操作成功',1e3,function(){
+            window.location.href = "{:goweb('hdconfig/'.$gametype.'style')}";
+          });
+        }else{
+            zamnotice.showTips('error',json.msg);
+            $form.formValidation('disableSubmitButtons', false);
+        }
+    }, function(json){
+      bload.hide();
+      zamnotice.showTips('error','网络差。操作失败');
+      $form.formValidation('disableSubmitButtons', false);
+    });
+  });
+});
+</script>
+{include file='$Wpath/common/footer'}

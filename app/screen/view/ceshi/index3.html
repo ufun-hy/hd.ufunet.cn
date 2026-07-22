@@ -1,0 +1,103 @@
+{include file='common/header' /}
+<div id="load-container"></div>
+<style type="text/css">
+#demoCanvas {
+    position: absolute;
+    top: 200px;
+    left: 100px;
+    width: 200px;
+    height: auto;
+}
+#sheshou{
+    position: absolute;
+    top: 300px;
+    left: 100px;
+    width: 466px;
+    height: 244px;
+}
+#stars{
+    position: absolute;
+    top: 300px;
+    left: 100px;
+    width: 620px;
+    height: 281px;
+}
+.jb {
+    position: absolute;
+    top: 100px;
+    left: 100px;
+    width: 500px;
+    height: 80px;
+    background-image: linear-gradient(to right, #fff, rgba(27, 159, 218));
+    border-radius: 40px;
+    border: 4px solid black
+}
+
+</style>
+<div class="jb"></div>
+<div id="demoCanvas"></div>
+<div id="sheshou"></div>
+<div id="stars"></div>
+<script type="text/javascript">
+require(['screencore','layerBox','svga'],function(screencore,layerBox,SVGA){
+    var player = new SVGA.Player('#demoCanvas');
+    var parser = new SVGA.Parser('#demoCanvas'); // Must Provide same selector eg:#demoCanvas IF support IE6+
+    
+    parser.load('/static/images/screen/shakestart/dllogo/ballMove.svga', function(videoItem) {
+        console.log(videoItem);
+        player.loops = 1;
+        player.clearsAfterStop  = false;//默认为true当循环播放次数达标后清空画布 啥都没了
+        player.fillMode = 'Backward';//string fillMode; - 默认值为 Forward，可选值 Forward / Backward，当 clearsAfterStop 为 false 时，Forward 表示动画会在结束后停留在最后一帧，Backward 则会在动画结束后停留在第一帧。
+        player.setVideoItem(videoItem);
+        player.startAnimation();//从第 0 帧开始播放动画
+        setTimeout(()=>{
+            player.pauseAnimation();//暂停在当前帧
+            //player.stopAnimation();//停止播放动画，如果 clearsAfterStop === true，将会清空画布 即为默认调用stop会清空画布
+            setTimeout(()=>{
+                player.startAnimation();//先stop 再start则表现为 stop后 可能停在任何帧 再start会从第一帧开始播放
+            },2e3);
+        },2e3)
+    })
+    /*
+    //动画停止播放时回调
+    player.onFinished(()=>{
+        console.log('onFinished');
+    })
+    //动画播放至某帧后回调
+    player.onFrame((frame)=>{
+        console.log(frame);
+    }); 
+    //动画播放至某进度后回调
+    player.onPercentage((per)=>{
+        //console.log(per);
+    })
+    */
+    var player2 = new SVGA.Player('#sheshou');
+    var parser2 = new SVGA.Parser('#sheshou'); // Must Provide same selector eg:#demoCanvas IF support IE6+
+    parser2.load('/static/images/screen/shakestart/dllogo/sheshoutitle.svga', function(videoItem) {
+        console.log(videoItem);
+        //player2.loops = 1;
+        player2.clearsAfterStop  = false;//默认为true当循环播放次数达标后清空画布 啥都没了
+        player2.fillMode = 'Backward';//string fillMode; - 默认值为 Forward，可选值 Forward / Backward，当 clearsAfterStop 为 false 时，Forward 表示动画会在结束后停留在最后一帧，Backward 则会在动画结束后停留在第一帧。
+        player2.setVideoItem(videoItem);
+        player2.startAnimation();//从第 0 帧开始播放动画
+        
+    })
+    var player3 = new SVGA.Player('#stars');
+    var parser3 = new SVGA.Parser('#stars'); // Must Provide same selector eg:#demoCanvas IF support IE6+
+    parser3.load('/static/images/screen/shakestart/dllogo/stars.svga', function(videoItem) {
+        console.log(videoItem);
+        //player3.loops = 1;
+        player3.clearsAfterStop  = false;//默认为true当循环播放次数达标后清空画布 啥都没了
+        player3.fillMode = 'Backward';//string fillMode; - 默认值为 Forward，可选值 Forward / Backward，当 clearsAfterStop 为 false 时，Forward 表示动画会在结束后停留在最后一帧，Backward 则会在动画结束后停留在第一帧。
+        player3.setVideoItem(videoItem);
+        player3.startAnimation();//从第 0 帧开始播放动画
+        
+    })
+    /*
+    <div src="/static/images/screen/shakestart/dllogo/ballMove.svga" id="demoCanvas2"></div>
+    new SVGA.autoload(document.querySelector('#demoCanvas2'))
+    */
+});
+</script>
+{include file='common/footer' /}

@@ -1,0 +1,31 @@
+{include file='common/header' /}
+<style>
+.shouye-mainbox {
+    top: 90px;
+    bottom: 40px;
+}
+.shouye-laybox{
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+</style>
+<section class="shouye-mainbox normal-box"></section>
+<section class="shouye-laybox">
+    {if isset($pcconfig['layitems']) && !empty($pcconfig['layitems'])}
+    {foreach $pcconfig['layitems'] as $item}
+        {if $item['type'] == '1'}
+            <div style="font-size: {$item['size']}px;letter-spacing:{$item['letterspace']??1}px;color:{$item['color']};margin-top:{$item['margin']}px">{:$item['txt']??''}</div>
+        {else /}
+            <img src="{:tomedia($item['img'])}" style="height: {$item['size']}px;margin-top:{$item['margin']}px" />
+        {/if}
+    {/foreach}
+    {/if}
+</section>
+{include file='shouye/flipdown' /}
+{include file='common/footer' /}

@@ -1,0 +1,349 @@
+<div class="form-horizontal confirmbox-pop">
+  <form class="confirm-formbox" method="post">
+    <div class="text-center">
+      <div class="btn-group pop-btns" style="margin-bottom:10px;">
+        <a href="javascript:void(0)" class="btn btn-default btn-primary"><span>基础设置</span></a>
+        <a href="javascript:void(0)" class="btn btn-default"><span>附加信息</span></a>
+        <a href="javascript:void(0)" class="btn btn-default"><span>账号时间信息</span></a>
+        <a href="javascript:void(0)" class="btn btn-default"><span>用户OEM</span></a>
+        {if dzpclive()}
+        <a href="javascript:void(0)" class="btn btn-default"><span>直播推拉流</span></a>
+        {/if}
+      </div>
+    </div>
+    <div class="carditem">
+      <div class="form-group">
+        <label class="col-lg-3 control-label">状态</label>
+        <div class="col-lg-7">
+          <label class="lyear-radio radio-inline radio-primary">
+            <input type="radio" name="status" value="1" {if $config['status']=='1' }checked{/if}><span>正常</span>
+          </label>
+          <label class="lyear-radio radio-inline radio-primary">
+            <input type="radio" name="status" value="2" {if $config['status']=='2' }checked{/if}><span>禁用</span>
+          </label>
+          <label class="lyear-radio radio-inline radio-primary">
+            <input type="radio" name="status" value="3" {if $config['status']=='3' }checked{/if}><span>待审核</span>
+          </label>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-3 control-label">* 用户名</label>
+        <div class="col-lg-7">
+          <input class="form-control" type="text" name="user_name" placeholder="必须唯一，4-16个字符，可包含汉字，字母，数字，下划线" value="{$config['user_name']}">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-3 control-label">* 密码</label>
+        <div class="col-lg-7">
+          <input class="form-control" type="text" name="user_password" value="" placeholder="出于安全考虑不显示">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-3 control-label">用户组</label>
+        <div class="col-lg-7">
+          <select class="form-control js_select2 group_id" name="group_id">
+            <option value="">-----请选择-----</option>
+            {volist name="groups" id="group"}
+            <option value="{$group['id']}">{$group['groupname']}{if $group['isdefault']=='1'}（系统默认用户组）{/if}</option>
+            {/volist}
+          </select>
+          <span class="help-block">必须选一个分组</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-3 control-label">* 手机号</label>
+        <div class="col-lg-7">
+          <input class="form-control" type="text" name="user_mobile" placeholder="必须唯一" value="{$config['user_mobile']}"
+            maxlength="11">
+          <span class="help-block">手机号可用于用户登录后台，同一个手机号只能绑定唯一一个用户</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-3 control-label">* 微信号openid</label>
+        <div class="col-lg-7">
+          <input class="form-control" type="text" name="user_openid" placeholder="必须唯一" value="{$config['user_openid']}"
+            maxlength="28">
+          <span class="help-block">同一个微信号只能绑定一个后台用户</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-3 control-label">备注</label>
+        <div class="col-lg-7">
+          <input class="form-control" type="text" name="user_beizhu" placeholder="选填项" value="{$config['user_beizhu']}"
+            maxlength="11">
+          <span class="help-block">管理员可通过备注信息快速了解该用户</span>
+        </div>
+      </div>
+    </div>
+    <div class="carditem hidden">
+      <div class="form-group">
+        <label class="col-lg-3 control-label">头像</label>
+        <div class="col-lg-7">
+          {:tpl_image_one('user_avatar',$config['user_avatar'])}
+          <span class="zam-help-block">规格:64*64px</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-3 control-label">性别</label>
+        <div class="col-lg-7">
+          <label class="lyear-radio radio-inline radio-primary">
+            <input type="radio" name="user_sex" value="1" {if $config['user_sex']=='1' }checked{/if}><span>男</span>
+          </label>
+          <label class="lyear-radio radio-inline radio-primary">
+            <input type="radio" name="user_sex" value="2" {if $config['user_sex']=='2' }checked{/if}><span>女</span>
+          </label>
+          <label class="lyear-radio radio-inline radio-primary">
+            <input type="radio" name="user_sex" value="3" {if $config['user_sex']=='3' }checked{/if}><span>保密</span>
+          </label>
+        </div>
+      </div>
+    </div>
+    <div class="carditem hidden" style="height:340px">
+      <div class="form-group loginlimitbox">
+        <label class="col-lg-3 control-label">* 账号有效期截止时间</label>
+        <div class="col-lg-7">
+          {:tpl_daterangetime([
+          'name'=>'loginlimittime',
+          'issingle'=>'1',
+          'autoval'=>'2',
+          'needsfm'=>'1',
+          'needsdd'=>'1',
+          'val'=>(isset($config['loginlimittime']) && !empty($config['loginlimittime'])) ? $config['loginlimittime']:'',
+          'func'=>'limitchange'
+          ])}
+          <div class="zam-help-block">注:用户账号有效期一旦过期将无法登录后台并且创建的所有活动均会提示活动账号已过期，不设置时间即为账号永久有效<a
+              class='btn btn-primary btn-xs btn-resetlimitbox'>清空上面的截止时间</a></div>
+        </div>
+      </div>
+      {if $isfree=='1'}
+      <div class="form-group">
+        <label class="col-lg-3 control-label">* 免费截止时间</label>
+        <div class="col-lg-7">
+          {:tpl_daterangetime([
+          'name'=>'freeendtime',
+          'issingle'=>'1',
+          'autoval'=>'1',
+          'needsfm'=>'1',
+          'needsdd'=>'1',
+          'val'=>$config['freeendtime']?:time()
+          ])}
+          <div class="zam-help-block">注:一般是包年包月用户才有此项设置，此时间代表当前用户免费发布活动或新增功能与人数截止时间</div>
+        </div>
+      </div>
+      {/if}
+    </div>
+    <div class="carditem hidden">
+      {include file="$Wpath/common/userglobconfig"}
+    </div>
+    {if dzpclive()}
+    <div class="carditem hidden">
+      {php}
+      if(isset($config['globconfig']['livetype'])){
+      $openlive = $config['globconfig']['openlive']??'1';
+      }else{
+      $openlive = $config['globconfig']['openlive']??'2';
+      }
+      {/php}
+      <div class="form-group{if !dzlivebanner()} hidden{/if}">
+        <label class="col-lg-3 control-label">* 直播banner广告</label>
+        <div class="col-lg-8">
+          {:tpl_switch('globconfig[bannerset]',$config['globconfig']['bannerset']??'2')}
+          <span class="zam-help-block">注:开启后当前用户可到活动直播基础设置里设置直播banner广告</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-3 control-label">* 开关</label>
+        <div class="col-lg-8">
+          {:tpl_switch('globconfig[openlive]',$openlive,'openlivebox')}
+          <span class="zam-help-block">注:关闭后当前用户的所有活动的直播功能将不能选择下面配置的直播平台</span>
+        </div>
+      </div>
+      <div class="openlivebox{if $openlive=='2'} hidden{/if}">
+        <div class="form-group">
+          <label class="col-lg-3 control-label">直播平台</label>
+          <div class="col-lg-7 livetypebox">
+            <label class="lyear-radio radio-inline radio-primary">
+              <input type="radio" name="globconfig[livetype]" value="0" {if !isset($config['globconfig']['livetype']) ||
+                $config['globconfig']['livetype']=='0' }checked{/if}><span>其他直播平台</span>
+            </label>
+            <label class="lyear-radio radio-inline radio-primary">
+              <input type="radio" name="globconfig[livetype]" value="1" {if isset($config['globconfig']['livetype']) &&
+                $config['globconfig']['livetype']=='1' }checked{/if}><span>腾讯云直播</span>
+            </label>
+            <label class="lyear-radio radio-inline radio-primary">
+              <input type="radio" name="globconfig[livetype]" value="2" {if isset($config['globconfig']['livetype']) &&
+                $config['globconfig']['livetype']=='2' }checked{/if}><span>七牛云直播</span>
+            </label>
+            <span class="help-block">此项将决定活动直播设置内默认选择哪个直播平台</span>
+          </div>
+        </div>
+        <div
+          class="txlive{if isset($config['globconfig']['livetype']) && $config['globconfig']['livetype']=='1'}{else /} hidden{/if}">
+          <div class="form-group">
+            <label class="col-lg-3 control-label">推流域名</label>
+            <div class="col-lg-7">
+              <input class="form-control" name="globconfig[txlive][tlhost]"
+                value="{$config['globconfig']['txlive']['tlhost']??''}" placeholder="请只填写域名部分，比如zam.baidu.com">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-lg-3 control-label">直播空间名</label>
+            <div class="col-lg-7">
+              <input class="form-control" name="globconfig[txlive][bucket]"
+                value="{$config['globconfig']['txlive']['bucket']??''}">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-lg-3 control-label">流名称</label>
+            <div class="col-lg-7">
+              <div class="form-control-static">系统会自动生成</div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-lg-3 control-label">HLS拉流域名</label>
+            <div class="col-lg-7">
+              <input class="form-control" name="globconfig[txlive][llhost]"
+                value="{$config['globconfig']['txlive']['llhost']??''}" placeholder="请只填写域名部分，比如zam.baidu.com">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-lg-3 control-label">RTMP拉流域名</label>
+            <div class="col-lg-7">
+              <input class="form-control" name="globconfig[txlive][rllhost]"
+                value="{$config['globconfig']['txlive']['rllhost']??''}" placeholder="请只填写域名部分，比如zam.baidu.com">
+            </div>
+          </div>
+        </div>
+        <div
+          class="qiniulive{if isset($config['globconfig']['livetype']) && $config['globconfig']['livetype']=='2'}{else /} hidden{/if}">
+          <div class="form-group">
+            <label class="col-lg-3 control-label">推流域名</label>
+            <div class="col-lg-7">
+              <input class="form-control" name="globconfig[qiniulive][tlhost]"
+                value="{$config['globconfig']['qiniulive']['tlhost']??''}" placeholder="请只填写域名部分，比如zam.baidu.com">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-lg-3 control-label">直播空间名</label>
+            <div class="col-lg-7">
+              <input class="form-control" name="globconfig[qiniulive][bucket]"
+                value="{$config['globconfig']['qiniulive']['bucket']??''}">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-lg-3 control-label">流名称</label>
+            <div class="col-lg-7">
+              <div class="form-control-static">系统会自动生成</div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-lg-3 control-label">HLS拉流域名</label>
+            <div class="col-lg-7">
+              <input class="form-control" name="globconfig[qiniulive][llhost]"
+                value="{$config['globconfig']['qiniulive']['llhost']??''}" placeholder="请只填写域名部分，比如zam.baidu.com">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-lg-3 control-label">RTMP拉流域名</label>
+            <div class="col-lg-7">
+              <input class="form-control" name="globconfig[qiniulive][rllhost]"
+                value="{$config['globconfig']['qiniulive']['rllhost']??''}" placeholder="请只填写域名部分，比如zam.baidu.com">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {/if}
+  </form>
+</div>
+<script type="text/javascript">
+  require(['webcore', 'jconfirmBox', 'zamnotice', 'layerBox', "ueditor", "bootstrap-touchspin", "select2-zhcn", "bootstrap-daterangepicker", "jquery.ui"], function (webcore, jconfirmBox, zamnotice, layerBox, UE) {
+    tpl_switch();
+    if ($("#edui_fixedlayer").length > 0) UE.getEditor('globconfig[kefu][mobilecode]').destroy();
+    $(function () {
+      tpl_ueditor();
+      $('.icon-picker').fontIconPicker({
+        theme: 'fip-bootstrap',
+        source: webcore.fontarr,
+      });
+    })
+    $('.qq-lists,.toplinks-lists').sortable({ handle: ".mousemove" }).disableSelection();
+    $(".qq-lists,.toplinks-lists").disableSelection();
+    $(".addtoplink").click(function () {
+      var whtml = $(webcore.tpl($("#addtoplink"), {})).clone();
+      $(".toplinks-lists").append(whtml);
+      tpl_switch();
+      $('.icon-picker').fontIconPicker({
+        theme: 'fip-bootstrap',
+        source: webcore.fontarr,
+      });
+    });
+    $(".addqqkefu").click(function () {
+      var whtml = $(webcore.tpl($("#addqqkefu"), {})).clone();
+      $(".qq-lists").append(whtml);
+    });
+    $("table").on('click', '.btn-del', function () {
+      $(this).parent().parent().remove();
+    });
+    $(".livetypebox label").click(function () {
+      var type = $(this).find('input').val();
+      if (type == '1') {
+        $('.txlive').removeClass('hidden');
+        $('.qiniulive').addClass('hidden');
+      } else if (type == '2') {
+        $('.txlive').addClass('hidden');
+        $('.qiniulive').removeClass('hidden');
+      } else {
+        $('.txlive,.qiniulive').addClass('hidden');
+      }
+    });
+    $(".confirmbox-pop .pop-btns a.btn").click(function () {
+      $(this).addClass('btn-primary').siblings().removeClass("btn-primary");
+      $(".confirmbox-pop .carditem").addClass('hidden').eq($(this).index()).removeClass('hidden');
+    });
+    $('.group_id').select2({ width: 'resolve', placeholder: '请选择' });
+    $(".group_id").val("{$config['group_id']}").trigger("change");
+    $('.js-datetimepicker').each(function () {
+      var $input = $(this), $obj = {
+        singleDatePicker: $input.data('issingle') == '1' ? true : false,
+        timePicker: $input.data('needsfm') == '1' ? true : false,
+        showDropdowns: $input.data('needsdd') == '1' ? true : false,
+        timePicker24Hour: true,
+        timePickerSeconds: true,
+        autoUpdateInput: $input.data('autoval') == '1' ? true : false,
+        locale: {
+          format: $input.attr('data-format'),
+        }
+      };
+      if ($input.data('start')) $obj.startDate = $input.data('start');
+      if ($input.data('end')) $obj.endDate = $input.data('end');
+      if ($input.data('mintime')) $obj.minDate = $input.data('mintime');
+      if ($input.data('maxtime')) $obj.maxDate = $input.data('maxtime');
+      $input.daterangepicker($obj, function (start, end, label) {
+        var funcstr = $input.data('func');
+        var func = window[funcstr];
+        func && func(start, end);
+      });
+    });
+    $(".btn-resetlimitbox").click(function () {
+      $(".loginlimitbox input").val('');
+    });
+  });
+  function limitchange(start, end) {
+    var endtime = start.format('YYYY-MM-DD HH:mm:ss');
+    $(".loginlimitbox input").val(endtime);
+  }
+  function openlivebox(obj, status, url) {
+    if (status == '1') {
+      obj.prev().val('2');
+      obj.attr('data-status', '2');
+      $(".openlivebox").addClass('hidden');
+    } else {
+      obj.prev().val('1');
+      obj.attr('data-status', '1');
+      $(".openlivebox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked", status == '1' ? false : true);
+  }
+
+</script>

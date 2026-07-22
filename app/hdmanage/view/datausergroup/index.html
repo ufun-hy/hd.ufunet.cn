@@ -1,0 +1,373 @@
+{include file='$Wpath/common/header'}
+<style>
+.zam-hdusers-Box{
+    border: 1px solid #e8e9eb;
+    overflow: hidden;
+    padding:10px;
+    min-height: 460px;
+}
+.zam-hdusers-grouplist{
+    width: calc(18% - 10px);
+    height:100%;
+    float: left;
+    border: 1px solid #e8e9eb;
+    overflow: hidden;
+    margin-right:10px;
+}
+.zam-hdusers-grouplist dt.zam-hdusers-grouplist-item {
+    height:45px;
+    line-height: 45px;
+}
+.zam-hdusers-grouplist dd.zam-hdusers-grouplist-item {
+    border-top: 1px solid #e8e9eb;
+    padding: 10px 0;
+    cursor: pointer;
+}
+.zam-hdusers-grouplist dd.zam-hdusers-grouplist-item .zam-hdusers-grouplist-name{
+    flex: 1;
+    padding-right: 5px;
+    word-wrap: break-word; /* 允许在长单词内部换行 */
+    word-break: break-all; /* 允许在任意位置换行 */
+}
+.zam-hdusers-grouplist dt .zam-hdusers-grouplist-info{
+    font-size:16px;
+    font-weight: 800;
+}
+.zam-hdusers-grouplist dd .zam-hdusers-grouplist-info{
+    position:relative;
+}
+.zam-hdusers-grouplist-btns{
+    display: flex;
+    justify-content: space-between;
+    width: 90px;
+}
+.zam-hdusers-grouplist .zam-hdusers-grouplist-item .zam-hdusers-grouplist-info {
+    color: #252424;
+    padding: 0 5px 0 10px;
+}
+.zam-hdusers-grouplist .zam-hdusers-grouplist-item.active{
+    background-color: rgb(245, 247, 250);
+    font-weight: bold;
+}
+.zam-hdusers-grouplist .zam-hdusers-grouplist-item.active .zam-hdusers-grouplist-name{
+    color: rgb(72, 134, 255);
+}
+.zam-hdusers-grouplist-add{padding-top:10px;text-align:center;border-top: 1px solid #e8e9eb;}
+.zam-hdusers-list {
+    width: 82%;
+    float: left;
+}
+#userlistTable .avatarImg{width:100px;height:100px;}
+</style>
+<div class="zam-hdusers-Box">
+    <div class="zam-hdusers-grouplist">
+        <dl>
+            <dt class="zam-hdusers-grouplist-item">
+                <div class="zam-flex-center">全部分组</div>
+            </dt>
+            {foreach $groups as $k=>$group}
+                <dd class="zam-hdusers-grouplist-item {if $k=='0'}active{/if}">
+                    <div class="zam-hdusers-grouplist-info zam-flex-center" href="javascript:;" data-groupid="{$group['id']}">
+                        <div class="zam-hdusers-grouplist-name">
+                            <span>(id:{$group['id']})</span>
+                            <span class="group-name">{$group['groupname']}</span>
+                            <span class="group-pnum">({$group['total']}人)</span>
+                        </div>
+                        <div class="zam-hdusers-grouplist-btns">
+                            <a class="btn btn-xs btn-primary btn-edit"><i class="mdi mdi-lead-pencil"></i></a>
+                            <a class="btn btn-xs btn-default btn-qr"><i class="mdi mdi-qrcode-scan"></i></a>
+                            <a class="btn btn-xs btn-danger btn-delete"><i class="mdi mdi-delete"></i></a>
+                        </div>
+                    </div>
+                </dd>
+            {/foreach}
+        </dl>
+        <div class="zam-hdusers-grouplist-add" style="padding-bottom:10px;">
+            <a class="btn btn-primary btn-sm btn-addgroup" href="javascript:;"><i class="mdi mdi-plus"></i> <span>新增分组</span></a>
+        </div>
+    </div>
+    <div class="zam-hdusers-list">
+        <div class="form-inline zam-inline-searchbar">
+            <div class="form-group">
+              <div class="input-group input-group-sm">
+                <span class="input-group-addon">用户信息</span>
+                <input type="text" class="form-control" value="" id="keyword" name="username" placeholder="请输入用户名或表单内容">
+              </div>
+            </div>
+            <a class="btn btn-primary btn-sm btn-search" href="javascript:void(0)"><i class="mdi mdi-magnify"></i> 搜索</a>
+        </div>
+        {include file='$Wpath/common/tabletoolbar'}
+        <table id="listtable" class="zam-btable"></table>
+    </div>
+</div>
+<script id='binddata-tpl' type="text/template">
+    <ul class="bddataUl">
+    <%#  $.each(d.bd, function(index, item){ %>
+        <li>
+          <span class="text-primary"><% item %>:</span>
+          <span>
+            <%#  if(d.list){ %>
+            <%#  if(index === 'uploadimg'){ %>
+                <%#  if(d.list[index]){ %>
+                <img style="max-width:120px;" onclick="prevshowattachs(this,1);"  src="<% d.list[index] %>"  />
+                <%#  }else{ %>
+                    -
+                <%# } %>
+            <%#  }else{ %>
+                <%#  if(d.list[index]){ %>
+                <% d.list[index] %>
+                <%#  }else{ %>
+                    -
+                <%# } %>
+            <%#  } %> 
+            <%#  } %> 
+          </span>
+       </li>
+    <%#  }); %>
+    </ul>
+</script>
+<script>
+var zdconfig = {:json_encode($zd2title)};  
+require(["zamnotice","layerBox","jconfirmBox","webcore","webtable"],function(zamnotice,layerBox,jconfirmBox,webcore,webtable){
+        var initConfig = {
+            tableId:'#listtable',
+            url:"{:gohdmanage('datausergroup/index',['hdid'=>$hdid])}",
+            columnoperate:{
+                btns:{
+                    del:true,
+                },
+                func:{
+                    del:function(value, row, index){
+                        var groupdom = $(".zam-hdusers-grouplist .zam-hdusers-grouplist-item.active .zam-hdusers-grouplist-info");
+                        if(!groupdom.length) {
+                            return zamnotice.showTips('error','请先添加用户组');
+                        }
+                        jconfirmBox.confirm('温馨提示','您确定要从当前分组内删除该用户么？',function(){
+                            webcore.ajaxSubmit("{:gohdmanage('datausergroup/deluser',['hdid'=>$hdid])}",{groupid:groupdom.attr('data-groupid')||'',userid:row.id}).then(function(json){
+                                if(json.code==0){
+                                    webtable.refresh();
+                                    zamnotice.showTips('success','操作成功');
+                                }else{
+                                    zamnotice.showTips('error',json.msg);
+                                }
+                            }, function(json){
+                                zamnotice.showTips('error','网络差。操作失败');
+                            });
+                        });
+                    },
+                }
+            },
+            columns:[
+                {
+                    checkbox: true
+                }, 
+                {
+                    field: 'id',
+                    title: 'ID',
+                    align: 'center',
+                    width:'4%',
+                    visible:false,
+                }, {
+                    field: 'nickname',
+                    title: '昵称',
+                    align: 'center',
+                    width:'20%'
+                }, {
+                    field: 'avatar',
+                    title: '头像',
+                    align: 'center',
+                    width:'20%',
+                    formatter: function(value, row, index){
+                        return `<img src="${value}" style="width:100px;height:100px">`;
+                    },
+                },{
+                    field: 'sex',
+                    title: '性别',
+                    align: 'center',
+                    width:'10%'
+                }, 
+                {if !empty($zd2title)}
+                {
+                    field: 'bddata',
+                    title: '签到表单',
+                    align: 'center',
+                    formatter: function(value, row, index){
+                         if(value=='') return ''; 
+                         return $.isEmptyObject(zdconfig)?'-':webcore.tpl($("#binddata-tpl"),{list:value,bd:zdconfig});
+                    }
+                }
+                {/if}
+            ],
+            searchParamas:[
+                {'type':'1','id':'keyword'},
+                {'type':'3','items':
+                    [
+                         {
+                          'field':'groupid',
+                          'dom':".zam-hdusers-grouplist .zam-hdusers-grouplist-item.active .zam-hdusers-grouplist-info",
+                          'isstable':false,
+                          'isdata':true,//是否为data属性值 不是则为val值
+                          'datasx':'data-groupid',//data属性值
+                          'val':'',
+                         },
+                    ]
+                },
+            ],
+            onload:function(data){
+            },
+            onloadsuccess:function(data){
+                var keyword = $("#keyword").val() || '';
+                if(!keyword) {
+                    $(".zam-hdusers-grouplist .zam-hdusers-grouplist-item.active .group-pnum").text(`(${data.total}人)`);
+                }
+            },
+            toolbar:{
+                add:function(){
+                    var groupdom = $(".zam-hdusers-grouplist .zam-hdusers-grouplist-item.active .zam-hdusers-grouplist-info");
+                    if(!groupdom.length) {
+                        return zamnotice.showTips('error','请先添加用户组');
+                    }
+                    var groupname = groupdom.find('.group-name').text();
+                    var confirmObj = jconfirmBox.ajaxconfirm(`新增用户到用户分组<span class="text-danger">（${groupname}）</span>`,"{:gohdmanage('common/searchuser',['hdid'=>$hdid])}",{ishtml:'1'},'html','col-lg-8 col-lg-offset-2',function(e){
+                            var selectuser = e.find("input:checked");
+                            if(!selectuser.length){
+                                return zamnotice.showTips('error','请选择用户');
+                            }
+                            var seluser = [];
+                            selectuser.each(function(){
+                                seluser.push($(this).attr('data-id'));
+                            });
+                            webcore.ajaxSubmit("{:gohdmanage('datausergroup/adduser',['hdid'=>$hdid])}",{groupid:groupdom.attr('data-groupid')||'',userid:seluser},'正在新增用户...').then(function(json){
+                                if(json.code==0){
+                                    confirmObj.close();
+                                    zamnotice.showTips('success','新增成功');
+                                    webtable.refresh();
+                                }else{
+                                    $(".resultuser").html('');
+                                    zamnotice.showTips('error',json.msg);
+                                }
+                            }, function(json){
+                                zamnotice.showTips('error','网络差。操作失败.');
+                            });
+                    });
+                },
+                del:function(){
+                    var groupdom = $(".zam-hdusers-grouplist .zam-hdusers-grouplist-item.active .zam-hdusers-grouplist-info");
+                    if(!groupdom.length) {
+                        return zamnotice.showTips('error','请先添加用户组');
+                    }
+                    var getSelects = webtable.getSelections();
+                    if(!getSelects.length){
+                        return zamnotice.showTips('info','请先选择您要操作的数据');
+                    }
+                    var groupid = groupdom.attr('data-groupid') || '';
+                    jconfirmBox.confirm('温馨提示','删除将无法恢复，您确定要删除么？',function(){
+                        webcore.ajaxSubmit("{:gohdmanage('datausergroup/deluser',['hdid'=>$hdid])}",{groupid:groupid,userid:getSelects}).then(function(json){
+                            if(json.code==0){
+                                webtable.refresh();
+                                zamnotice.showTips('success','删除成功');
+                            }else{
+                                zamnotice.showTips('error',json.msg);
+                            }
+                        }, function(json){
+                            zamnotice.showTips('error','网络差，操作失败');
+                        });
+                    });
+                }
+            },
+        };
+        webtable.init(initConfig);
+        $(".zam-inline-searchbar .btn-search").on('click',function() {
+            webtable.refresh();
+        });
+        $(".zam-hdusers-grouplist dd.zam-hdusers-grouplist-item").on('click',function() {
+            $(".zam-hdusers-grouplist dd.zam-hdusers-grouplist-item").removeClass('active');
+            $(this).addClass('active');
+            $("#keyword").val('');
+            webtable.refresh();
+        });
+        $(".zam-hdusers-grouplist dd.zam-hdusers-grouplist-item").on('click','.btn-edit',function(e){
+            e.stopPropagation();
+            var $this = $(this),groupid = $(this).parent().parent().attr("data-groupid"),groupname = $(this).parent().prev().find('.group-name').text();
+            var confirmobj = jconfirmBox.confirm('编辑用户分组',webcore.tpl($("#editgroup-tpl"),{groupname:groupname}),function(e){
+                var newgroupname = e.$content.find('.groupname').val() || '';
+                if(!groupname){
+                    return zamnotice.showTips('error','用户分组名称必须填写');
+                }
+                webcore.ajaxSubmit("{:gohdmanage('datausergroup/editgroup',['hdid'=>$hdid])}",{groupid:groupid,groupname:newgroupname}).then(function(json){
+                    if(json.code==0){
+                        confirmobj.close();
+                        zamnotice.showTips('success','保存成功');
+                        $this.parent().prev().find('.group-name').text(newgroupname);
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                        return false;
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差。操作失败');
+                    confirmobj.close();
+                });
+            },false,false,true,[{'hidden':false,'txt':'保存'},{'hidden':false,'txt':'取消'}]);
+        });
+        $(".zam-hdusers-grouplist dd.zam-hdusers-grouplist-item").on('click','.btn-qr',function(e){
+            e.stopPropagation();
+            var confirmobj = jconfirmBox.ajaxconfirm("自动分组二维码","{:gohdmanage('datausergroup/qrcode',['hdid'=>$hdid])}",{groupid:$(this).parent().parent().attr('data-groupid')},'html','col-lg-8 col-lg-offset-2',function(e){
+                confirmobj.close();
+            },false,'2');
+        });
+        $(".zam-hdusers-grouplist dd.zam-hdusers-grouplist-item").on('click','.btn-delete',function(e){
+            e.stopPropagation();
+            var groupdom = $(".zam-hdusers-grouplist .zam-hdusers-grouplist-item.active .zam-hdusers-grouplist-info");
+            var groupid = groupdom.attr('data-groupid')||'';
+            if(!groupdom.length) {
+                return zamnotice.showTips('error','请先添加用户组');
+            }
+            jconfirmBox.confirm('温馨提示','删除用户分组将无法恢复，您确定要删除么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('datausergroup/delgroup',['hdid'=>$hdid])}",{groupid:groupid}).then(function(json){
+                    if(json.code == 0){
+                        zamnotice.showTips('success','删除成功',1e3,function(){
+                            window.location.reload();
+                        });
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差，操作失败');
+                });
+            });
+        });
+        $(".btn-addgroup").on('click',function(){
+            var confirmobj = jconfirmBox.confirm('新增用户分组',webcore.tpl($("#editgroup-tpl"),{groupname:''}),function(e){
+                var groupname = e.$content.find('.groupname').val()||'';
+                if(!groupname){
+                    return zamnotice.showTips('error','用户分组名称必须填写');
+                }
+                webcore.ajaxSubmit("{:gohdmanage('datausergroup/editgroup',['hdid'=>$hdid])}",{groupname:groupname},'正在新增，请稍后..').then(function(json){
+                    if(json.code==0){
+                        confirmobj.close();
+                        zamnotice.showTips('success','新增成功',1e3,function(){
+                            window.location.reload();
+                        });
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                        return false;
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差，操作失败');
+                    confirmobj.close();
+                });
+            },false,false,true,[{'hidden':false,'txt':'确定'},{'hidden':false,'txt':'取消'}]);
+        });
+});
+</script>
+<script id='editgroup-tpl' type="text/template">
+<div id="formBox" class="zam-formvalidation form-horizontal">
+    <div class="form-group">
+      <label class="col-lg-3 control-label">* 用户分组名称</label>
+      <div class="col-lg-9">
+        <input class="form-control groupname" type="text"  name="groupname" placeholder="请填写用户分组名称，最多42个字符" value="<% d.groupname %>" maxlength="42">
+      </div>
+    </div>
+</div>
+</script>
+{include file='$Wpath/common/footer'}

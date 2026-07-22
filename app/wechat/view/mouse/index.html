@@ -1,0 +1,361 @@
+{include file="common/header" /}
+<style type="text/css">
+.money-tips{
+	width: 100%;
+    height: 100%;
+    position: fixed;
+	top:0;
+	left:0;
+	z-index:3;
+	background-color:rgba(0,0,0,0.5);
+	color:#fff;
+	font-size:0.4rem;
+}
+.money-tips .gametip .handimg{
+	margin:0 auto;
+	margin-top: 0.32rem;
+	width: 1.2rem;
+}
+.money-tips .gamestatus{
+	padding:0.3rem 0.4rem;
+	font-size:0.32rem;
+	color:#fff;
+	background-color:rgba(0,0,0,0.3);
+	border-radius:5px;
+	margin-bottom:0.4rem;
+}
+.money-tips .phb-btn{
+	width:3.6rem;
+	height:1.25rem;
+	background-image: url("{:tomedia($appconfig['style']['apppm'])}");
+    background-size: cover;   
+	background-repeat:no-repeat;
+	
+}
+{/*得分和成绩*/}
+.time-score{
+	color: #fefb05;
+	opacity: 0.88;
+	font-size: .32rem;
+}
+.time-score div{
+	height: 0.8rem;
+	line-height: 0.8rem;
+	padding: 0 0.26rem;
+	font-weight: 700;
+    border-radius: 6px;
+    letter-spacing: 1px;
+    background-color: rgba(0,0,0,0.4);
+    box-sizing: border-box;
+}
+.time-score .gametime{
+	position: absolute;
+	top: 0.24rem;
+	left:0.2rem;
+}
+.time-score .gamescore{
+	position: absolute;
+	top: 0.24rem;
+	right:0.2rem;
+}
+.mousebox{
+	width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    overflow: hidden;
+    background-size: 100% 100%;
+    /* background-color: #f45d1b; */
+}
+.mouseholes{
+	position: absolute;
+    top: 25%;
+    left: 5%;
+    width: 90%;
+    height: 50%;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+.mouseholes .onehole{
+	width: 33%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.mouseholes .hole-info {
+	position: relative;
+    width: 90px;
+    height: 30px;
+    background-image: url({$appconfig['style']['roleimgs']['hole']});
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+.mouseholes .onehole:nth-child(1),.mouseholes .onehole:nth-child(2),.mouseholes .onehole:nth-child(3){
+	zoom: 0.8;
+}
+.mouseholes .onehole:nth-child(4),.mouseholes .onehole:nth-child(5),.mouseholes .onehole:nth-child(6){
+	zoom: 0.9
+}
+.mouseholes .onehole:nth-child(7),.mouseholes .onehole:nth-child(8),.mouseholes .onehole:nth-child(9){
+	zoom: 1;
+}
+.mouseholes .onehole .mouse {
+    width: 73px;
+    height: 65px;
+    position: absolute;
+    overflow: hidden;
+    border-radius: 25%;
+    left: 5px;
+    top: -47px;
+}
+.mouseholes .onehole .mouse img {
+    position: absolute;
+    width: 100%;
+    bottom: -70px;
+    left: 0;
+}
+.mouseholes .onehole .score {
+    position: absolute;
+    left: -4px;
+    top:0;
+    color: #fff446;
+    font-size: 0.32rem;
+    font-weight: 700;
+    width: 100%;
+    text-align: center;
+    pointer-events: none;
+}
+.mouseholes .onehole .mousedrop {
+	position: absolute;
+    left: -6px;
+    top: -75px;
+    width: 90px;
+    height: 90px;
+    pointer-events: none;
+}
+.mouseholes .onehole .mousedrop.ani {
+    background: url({$appconfig['style']['roleimgs']['drop']??'/'.WIMGURL.'mouse/mousedrop.png'}) no-repeat;
+    animation: ani .6s steps(1) infinite;
+    -webkit-animation: ani .6s steps(1) infinite;
+}
+@keyframes ani{
+	0%{
+		background-position:0 0
+	}7%{
+		background-position:0 -110px
+	}14%{
+		background-position:0 -220px
+	}21%{
+		background-position:0 -330px
+	}28%{
+		background-position:0 -440px
+	}35%{
+		background-position:0 -550px
+	}42%{
+		background-position:0 -660px
+	}49%{
+		background-position:0 -770px
+	}57%{
+		background-position:0 -880px
+	}64%{
+		background-position:0 -990px
+	}71%{
+		background-position:0 -1100px
+	}78%{
+		background-position:0 -1210px
+	}85%{
+		background-position:0 -1320px
+	}92%{
+		background-position:0 -1430px
+	}100%{
+		background-position:0 -1540px
+	}
+}
+@-webkit-keyframes ani{
+	0%{
+		background-position:0 0
+	}7%{
+		background-position:0 -110px
+	}14%{
+		background-position:0 -220px
+	}21%{
+		background-position:0 -330px
+	}28%{
+		background-position:0 -440px
+	}35%{
+		background-position:0 -550px
+	}42%{
+		background-position:0 -660px
+	}49%{
+		background-position:0 -770px
+	}57%{
+		background-position:0 -880px
+	}64%{
+		background-position:0 -990px
+	}71%{
+		background-position:0 -1100px
+	}78%{
+		background-position:0 -1210px
+	}85%{
+		background-position:0 -1320px
+	}92%{
+		background-position:0 -1430px
+	}100%{
+		background-position:0 -1540px
+	}
+}
+.hammer{
+	position: absolute;
+	top:100px;
+	left:0;
+	width: 49px;
+	height: 38px;
+	background-image: url("/{:WIMGURL}mouse/chuizi.png");
+	background-size: cover;
+	background-repeat: no-repeat;
+}
+</style>
+<audio id="djsaudio" src="/{:WIMGURL}shake/count.mp3"></audio>
+{if !isset($appconfig['style']['hitvoice'])}
+<audio id="successaudio" src="/{:WIMGURL}mouse/hit.mp3"></audio>
+{else /}
+{if !empty($appconfig['style']['hitvoice'])}
+<audio id="successaudio" src="{:tomedia($appconfig['style']['hitvoice'])}"></audio>
+{/if}
+{/if}
+{if !isset($appconfig['style']['failvoice'])}
+<audio id="failaudio" src="/{:WIMGURL}mouse/fail.mp3"></audio>
+{else /}
+{if !empty($appconfig['style']['failvoice'])}
+<audio id="failaudio" src="{:tomedia($appconfig['style']['failvoice'])}"></audio>
+{/if}
+{/if}
+<section class="mousebox">
+<div class="mouseholes">
+	<div class="onehole">
+		<div class="hole-info">
+	        <div class="mouse">
+	               <img src="{$appconfig['style']['roleimgs']['tiger']}">
+	        </div>
+	        <div class="score"></div>
+	        <div class="mousedrop"></div>
+		</div>
+	</div>
+	<div class="onehole">
+		<div class="hole-info">
+	        <div class="mouse">
+	               <img src="{$appconfig['style']['roleimgs']['tiger']}">
+	        </div>
+	        <div class="score"></div>
+	        <div class="mousedrop"></div>
+		</div>
+	</div>
+	<div class="onehole">
+		<div class="hole-info">
+	        <div class="mouse">
+	               <img src="{$appconfig['style']['roleimgs']['tiger']}">
+	        </div>
+	        <div class="score"></div>
+	        <div class="mousedrop"></div>
+		</div>
+	</div>
+	<div class="onehole">
+		<div class="hole-info">
+	        <div class="mouse">
+	               <img src="{$appconfig['style']['roleimgs']['tiger']}">
+	        </div>
+	        <div class="score"></div>
+	        <div class="mousedrop"></div>
+		</div>
+	</div>
+	<div class="onehole">
+		<div class="hole-info">
+	        <div class="mouse">
+	               <img src="{$appconfig['style']['roleimgs']['tiger']}">
+	        </div>
+	        <div class="score"></div>
+	        <div class="mousedrop"></div>
+		</div>
+	</div>
+	<div class="onehole">
+		<div class="hole-info">
+	        <div class="mouse">
+	               <img src="{$appconfig['style']['roleimgs']['tiger']}">
+	        </div>
+	        <div class="score"></div>
+	        <div class="mousedrop"></div>
+		</div>
+	</div>
+	<div class="onehole">
+		<div class="hole-info">
+	        <div class="mouse">
+	               <img src="{$appconfig['style']['roleimgs']['tiger']}">
+	        </div>
+	        <div class="score"></div>
+	        <div class="mousedrop"></div>
+		</div>
+	</div>
+	<div class="onehole">
+		<div class="hole-info">
+	        <div class="mouse">
+	               <img src="{$appconfig['style']['roleimgs']['tiger']}">
+	        </div>
+	        <div class="score"></div>
+	        <div class="mousedrop"></div>
+		</div>
+	</div>
+	<div class="onehole">
+		<div class="hole-info">
+	        <div class="mouse">
+	               <img src="{$appconfig['style']['roleimgs']['tiger']}">
+	        </div>
+	        <div class="score"></div>
+	        <div class="mousedrop"></div>
+		</div>
+	</div>
+</div>
+</section>
+<div class="hammer hidden"></div>
+<div class="money-tips zam-app-flex-ajCenter hidden">
+	<div class="gametip hidden">
+		<p>游戏开始后，手指快速点击角色</p>
+		<img src="/{:WIMGURL}mouse/hand.png" class="handimg" />
+	</div>
+	<div class="gamestatus hidden"></div>
+	<div class="phb-btn zam-app-flex-ajCenter hidden"></div>
+</div>
+<div class="time-score">
+	<div class="gametime">时间:<span>0</span></div>
+	<div class="gamescore{if $appconfig['appshowscore']=='2'} hidden{/if}">得分:<span>0</span></div>
+</div>
+<script type="text/javascript">
+var roleImgs = {:json_encode($appconfig['style']['roleimgs'])};
+require(['wechatcore','appmouse'],function(wechatcore,appmouse){
+	appmouse.init();
+	$(".phb-btn").on('click',function(){
+		var $this = $(this);
+		wechatcore.ajaxSubmit("{:gowechat('common/getphbdata')}",{gametype:XCV3Config.gametype,rotateid:$this.attr('data-rotateid'),gamephb:$this.attr('data-gamephb'),teamid:$this.attr('data-teamid')},'正在获取排行榜数据').then(function(data){
+			 if(data.code==0){
+				 if(data.msg.list.length>0){
+					 $("body").append(wechatcore.tpl($("#phb-tpl"),{list:data.msg.list,myrank:data.msg.myrank}));
+				 }else{
+					wechatcore.msg('暂无数据');
+				 }
+			 }else{
+				wechatcore.msg(data.msg);
+			 }
+		}, function(){
+			  wechatcore.msg('网络太差，请稍后重试');
+		});
+	});
+});
+</script>
+{if !empty($appconfig['style']['diycss'])}
+<style>{$appconfig['style']['diycss']}</style>
+{/if}
+{include file="common/gamecommon" /}
+{include file="common/footermenu" /}
+{include file="common/footer" /}

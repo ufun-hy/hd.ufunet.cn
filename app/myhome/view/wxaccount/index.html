@@ -1,0 +1,250 @@
+{include file='$Wpath/common/header'}
+<div class="form-inline zam-inline-searchbar">
+	<div class="form-group">
+		<div class="input-group input-group-sm">
+			<span class="input-group-addon">公众号名称</span>
+			<input type="text" class="form-control" value="" id="keyword" placeholder="请输入公众号名称">
+		</div>
+	</div>
+	<a class="btn btn-primary btn-sm btn-search" href="javascript:void(0)"><i class="mdi mdi-magnify"></i> 搜索</a>
+</div>
+<div id="toolbar" class="toolbar-btn-action zam-toolbar"></div>
+<table id="listtable" class="zam-btable"></table>
+<script>
+	require(['webcore', 'webtable', 'jconfirmBox', 'zamnotice', 'clipboard'], function (webcore, webtable, jconfirmBox, zamnotice, Clipboard) {
+		var initConfig = {
+			tableId: '#listtable',
+			url: "{:gomyhome('wxaccount/index')}",
+			columnoperate: {
+				btns: {
+					edit: { title: "中奖模板", icon: "mdi-pencil", 'except': { 'field': 'level', 'only': '4' } },
+					del: { title: "解绑", icon: "mdi-gavel", 'except': { 'field': 'status', 'only': '1' } },
+				},
+				func: {
+					edit: function (value, row, index) {
+						var confirmobj = jconfirmBox.confirm('设置中奖模板消息id', webcore.tpl($("#zjtplid-tpl"), { zjtplid: row.zjtplid, paytplidtype: row.paytplidtype, paytplid: row.paytplid, subtplid: row.subtplid, subnoticetplid: row.subnoticetplid, subnoticelivetplid: row.subnoticelivetplid }), function (e) {
+							var $_this = e.$content, zjtplid = $_this.find('.zjtplid').val(), paytplidtype = $_this.find('.paytplidtype').val(), paytplid = $_this.find('.paytplid').val(), subtplid = $_this.find('.subtplid').val(), subnoticetplid = $_this.find('.subnoticetplid').val(), subnoticelivetplid = $_this.find('.subnoticelivetplid').val();
+							if (zjtplid == '' && subtplid == '') return zamnotice.showTips('error', '请设置中奖模板消息id或者一次性订阅消息模板id');
+							webcore.ajaxSubmit("{:gomyhome('wxaccount/savezjtplid')}", { wechatid: row.id, zjtplid: zjtplid, paytplidtype: paytplidtype, paytplid: paytplid, subtplid: subtplid, subnoticetplid: subnoticetplid, subnoticelivetplid: subnoticelivetplid }).then(function (json) {
+								if (json.code == 0) {
+									confirmobj.close();
+									webtable.refresh();
+									zamnotice.showTips('success', '保存成功');
+								} else {
+									zamnotice.showTips('error', json.msg);
+								}
+							})
+						}, false, 'col-lg-10 col-lg-offset-1', true, [{ 'hidden': false, 'txt': '确定' }, { 'hidden': false, 'txt': '取消' }], function () {
+							tpl_switch();
+							confirmobj.$content.find('.btn-send').off('click').on('click', function () {
+								var sendtype = $(this).attr('data-type'), tplid = '', sendname = '';
+								if (sendtype == '1') {
+									tplid = $(".zjtplid").val();
+									sendname = '发送中奖模板消息';
+								} else if (sendtype == '2') {
+									tplid = $(".subtplid").val();
+									sendname = '一次性订阅消息';
+								} else if (sendtype == '3') {
+									tplid = $(".subnoticetplid").val();
+									sendname = '中奖订阅通知';
+								} else if (sendtype == '4') {
+									tplid = $(".paytplid").val();
+									sendname = '发送支付成功模板消息';
+								} else if (sendtype == '5') {
+									tplid = $(".subnoticelivetplid").val();
+									sendname = '直播开播订阅通知';
+								}
+								if (tplid == '') {
+									return zamnotice.showTips('error', '请先填写模板id');
+								}
+								webcore.ajaxSubmit("{:gomyhome('wxaccount/ceshitplid')}", { weid: row.id, sendtype: sendtype, tplid: tplid }).then(function (json) {
+									if (json.code == 0) {
+										var confirmobj = jconfirmBox.confirm('微信扫码测试' + sendname, webcore.tpl($("#ceshitplid-tpl"), { src: json.msg }), function (e) { }, false, 'col-lg-6 col-lg-offset-3', true, [{ 'hidden': true, 'txt': '确定' }, { 'hidden': false, 'txt': '关闭' }]);
+									} else {
+										zamnotice.showTips('error', json.msg);
+									}
+								})
+							});
+							var clipboard = new Clipboard('.zam-clip', {
+								text: function (e) {
+									return $(e).data('url') || $(e).data('href')
+								}
+							});
+							clipboard.on('success', function (e) {
+								zamnotice.showTips('success', '复制成功', 2e3);
+							});
+							confirmobj.$content.find('.btn-uploadtxtfile').off('click').on('click', function () {
+								webcore.importxls({ title: '上传微信校验文件', url: "{:gomyhome('wxaccount/uptxtfile')}", moban: '', uptxt: "点击上传校验文件", xlstxt: "注:文件名必须与微信公众平台下载的txt文件名称一致，均以MP_verify_开头", filetype: 'txt' }, function () {
+									wzamnotice.showTips('success', '上传成功');
+								});
+							});
+						});
+					},
+					del: function (value, row, index) {
+						jconfirmBox.confirm('温馨提示', '解绑后与当前公众号相关的活动无法通过关键词出发，您确定要解绑么？', function () {
+							webcore.ajaxSubmit("{:gomyhome('wxaccount/unbind')}", { appid: row.appid }).then(function (json) {
+								if (json.code == 0) {
+									webtable.refresh();
+									zamnotice.showTips('success', '解绑成功');
+								} else {
+									zamnotice.showTips('error', json.msg);
+								}
+							}, function (json) {
+								zamnotice.showTips('error', '网络差。操作失败');
+							});
+						});
+					},
+				}
+			},
+			columns: [{
+				checkbox: true,
+			},
+			{
+				field: 'id',
+				title: 'id',
+				align: 'center',
+				visible: false
+			}, {
+				field: 'statushtml',
+				title: '状态',
+				align: 'center',
+			}, {
+				field: 'accountname',
+				title: '公众号名称',
+				align: 'center',
+			}, {
+				field: 'appid',
+				title: 'APPID',
+				align: 'center'
+			}, {
+				field: 'levelhtml',
+				title: '类型',
+				align: 'center',
+			}, {
+				field: 'qrcode',
+				title: '二维码',
+				align: 'center',
+				formatter: function (value, row, index) {
+					return '<img src="' + value + '" style="width:80px;height:80px;object-fit: cover;" onerror="javascript:this.src=\'/static/images/sys/nopic.jpg\'" />';
+				},
+			}
+				, {
+				field: 'create_time',
+				title: '接入时间',
+				align: 'center',
+			}
+			],
+			searchParamas: [{ 'type': '1', 'id': 'keyword' }],
+
+		};
+		webtable.init(initConfig);
+		initopenUrl();
+		$("#toolbar").on('click', '.btn-addwxerror', function () {
+			zamnotice.showTips('error', $(this).data('msg'));
+		});
+	});
+	var plateformUrl = "{:gomyhome('wxaccount/openauth')}";
+	function initopenUrl() {
+		require(['webcore', 'jconfirmBox', 'zamnotice'], function (webcore, jconfirmBox, zamnotice) {
+			webcore.ajaxSubmit("{:gomyhome('wxaccount/makeopenurl')}", {},).then(function (json) {
+				if (json.code == 0) {
+					if (json.msg != '') {
+						$("#toolbar").html('<a class="btn btn-sm btn-primary btn-goauth" href="' + plateformUrl + '" target="__blank"><i class="mdi mdi-plus"></i> 接入公众号</a>');
+					} else {
+						$("#toolbar").html('<a class="btn btn-sm btn-primary btn-addwxerror" href="javascript:void(0)" data-msg="平台暂未开放接入公众号"><i class="mdi mdi-plus"></i> 接入公众号</a>');
+					}
+				} else {
+					json.msg = webcore.filterStr(json.msg);
+					$("#toolbar").html('<a class="btn btn-sm btn-primary btn-addwxerror" href="javascript:void(0)" data-msg="' + json.msg + '"><i class="mdi mdi-plus"></i> 接入公众号</a>');
+				}
+			}, function (json) {
+				console.log('发生异常,无法接入公众号');
+			});
+		});
+	}
+</script>
+<script id='zjtplid-tpl' type="text/template">
+<div class="form-horizontal confirmbox-pop">
+	<div class="form-group">
+		<label class="col-lg-3 control-label">* 公众号校验文件</label>
+		<div class="col-lg-8">
+			<div class="form-control-static">
+				<a href="javascript:void(0)" class="btn btn-primary btn-xs btn-uploadtxtfile">点我上传校验文件</a>
+			</div>
+			<span class="help-block">注:需在微信公众平台内设置与开发->公众号设置->功能设置->业务域名内添加域名{:getrequesthost()}<span class="label label-primary cursor m-l-5 zam-clip" data-toggle="tooltip" data-href="{:getrequesthost()}">点我复制域名</span></span>
+		</div>
+	</div>
+	<div class="form-group m-b-5">
+      <label class="col-lg-3 control-label">中奖模板消息id</label>
+      <div class="col-lg-9">
+        <input type="text" class="form-control zjtplid" name="zjtplid" value="<% d.zjtplid %>">
+        <div class="help-block">
+        	<div>此模板用于告知微信用户中奖在某活动中奖了(除了红包雨和摇大奖功能)，中奖用户必须关注公众号)。请在“微信公众平台服务类目”选择行业为：“商业服务  >  软件/建站/技术开发”，在类目模板库中添加标题为：”新工单提醒“，编号为：“44268”的模板，在关键词库中添加工单标题，项目名称，创建时间，工单类型4个关键词。<a class="btn btn-primary btn-xs m-l-5 btn-send" href="javascript:void(0)" data-type="1">点击测试是否配置正常</a></div>
+        </div>
+      </div>
+    </div>
+	<div class="form-group">
+        <label class="col-lg-3 control-label">* 新版支付模板消息</label>
+        <div class="col-lg-8">
+			<label class="lyear-switch switch-primary normal-swith switch-solid" style="height:38px">
+                <input type="checkbox" <%# if(d.paytplidtype == '1'){ %>checked="checked"<%# } %>>
+                <input type="hidden" class="paytplidtype" name="paytplidtype" value="<% d.paytplidtype %>">
+                <span data-status="<% d.paytplidtype %>" class="normal-span" data-ajax=""></span>
+            </label>
+            <div class="help-block">开启则为新版模板消息，请在“微信公众平台服务类目”选择行业为：“商业服务 >
+                软件/建站/技术开发”，在类目模板库中添加标题为：”订单支付成功提醒“，编号为：“51617”的模板，在关键词库中添加商户名称，客户名称，订单编号，订单金额，产品名称5个关键词。</div>
+        </div>
+    </div>
+    <div class="form-group m-b-5">
+      <label class="col-lg-3 control-label">支付模板消息id</label>
+      <div class="col-lg-9">
+        <input type="text" class="form-control paytplid" name="paytplid" value="<% d.paytplid %>">
+        <div class="help-block">
+        	<div>此模板用于告知霸屏等设置的推送接收用户有新的霸屏等支付订单，接收者微信必须关注公众号)。请在“微信公众平台”选择行业为：“IT科技 - 互联网|电子商务”，添加标题为：”订单支付成功通知“，编号为：“OPENTM207498902”的模板。<a class="btn btn-primary btn-xs m-l-5 btn-send" href="javascript:void(0)" data-type="4">点击测试是否配置正常</a></div>
+        </div>
+      </div>
+    </div>
+    {if dzsubmessage()}
+    <div class="form-group m-b-5">
+      <label class="col-lg-3 control-label">中奖一次性订阅消息模板id</label>
+      <div class="col-lg-9">
+        <input type="text" class="form-control subtplid" name="subtplid" value="<% d.subtplid %>">
+        <div class="help-block">
+        	<div>请到公众平台登录当前认证服务号，到接口权限中获取一次性订阅消息模板id<a class="btn btn-primary btn-xs m-l-5 btn-send" href="javascript:void(0)" data-type='2'>点击测试是否配置正常</a></div>
+        </div>
+      </div>
+    </div>
+    {/if}
+    {if dzsubnotice()}
+    <div class="form-group m-b-5">
+      <label class="col-lg-3 control-label">订阅通知中奖模板id</label>
+      <div class="col-lg-9">
+        <input type="text" class="form-control subnoticetplid" name="subnoticetplid" value="<% d.subnoticetplid %>">
+        <div class="help-block">
+        	<div>请到公众平台登录当前认证服务号，到订阅通知菜单中添加并获取中奖订阅消息模板id<a class="btn btn-primary btn-xs m-l-5 btn-send" href="javascript:void(0)" data-type='3'>点击测试是否配置正常</a></div>
+        </div>
+      </div>
+    </div>
+    {/if}
+    {if dzpclive()}
+    <div class="form-group m-b-5">
+      <label class="col-lg-3 control-label">订阅通知直播开播模板id</label>
+      <div class="col-lg-9">
+        <input type="text" class="form-control subnoticelivetplid" name="subnoticelivetplid" value="<% d.subnoticelivetplid %>">
+        <div class="help-block">
+        	<div>请到公众平台登录当前认证服务号，到订阅通知菜单中添加并获取直播开播订阅消息模板id<a class="btn btn-primary btn-xs m-l-5 btn-send" href="javascript:void(0)" data-type='5'>点击测试是否配置正常</a></div>
+        </div>
+      </div>
+    </div>
+    {/if}
+</div>
+</script>
+<script id='ceshitplid-tpl' type="text/template">
+<div class="form-horizontal confirmbox-pop m-t-10 m-b-10">
+	<div class="zam-flex-column-center">
+		<img width="200px;" src="<% d.src %>" >
+		<p class="m-t-10" style="font-weight:bold">打开微信扫一扫，扫码测试</p>
+	</div>
+</div>
+</script>
+{include file='$Wpath/common/footer'}

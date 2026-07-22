@@ -1,0 +1,26 @@
+<!--菜单子栏目-->
+{if !empty($leftmenu['pmenu'])}
+<div class="lyear-layout-sidebar-scroll lyear-layout-sub-column" style="overflow: hidden;">
+  {/*只需要拿到当前激活的菜单下面的所有子菜单*/}
+  <ul class="nav nav-subnav" style="display: block;">
+    {volist name="leftmenu.pmenu" id="vo"}
+      {if !empty($vo['children'])}
+      <li class="nav-item nav-item-has-subnav{if $vo['active']=='1'} open{/if}"> 
+        <a class="subnav-title" href="javascript:void(0)">{$vo['permis_name']}</a>
+        <ul class="nav nav-subnav">
+          {volist name="vo.children" id="vo2"}
+          <li class="{if $vo2['active']=='1'}active{/if}">
+            <a href="{$vo2['permis_url']}">{$vo2['permis_name']}</a>
+          </li>
+          {/volist}
+        </ul>
+      </li>
+      {else /}
+        <li class="{if $vo['active']=='1'}active{/if}">
+          <a href="{$vo['permis_url']}">{$vo['permis_name']}</a>
+        </li>
+      {/if}
+    {/volist}
+  </ul>
+</div>
+{/if}

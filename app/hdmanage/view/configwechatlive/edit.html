@@ -1,0 +1,87 @@
+<div class="form-horizontal confirmbox-pop">
+<form class="confirm-formbox" method="post">
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 状态</label>
+            <div class="col-lg-8">
+              {:tpl_switch('mstatus',$config['mstatus']??'1')}
+              <span class="help-block">注:关闭则微信端直播不会显示这个菜单</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 菜单名</label>
+            <div class="col-lg-8">
+              <input type="text" class="form-control"  name="menuname"  value="{$config['menuname']}" maxlength="6">
+              <span class="help-block">注:最多6个字</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 菜单类型</label>
+            <div class="col-lg-8">
+                <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.inurlbox').removeClass('hidden'),$('.outurlbox,.yqbbox,.articlebox').addClass('hidden');">
+                    <input type="radio" name="menutype" {if $config['type']=="1"}checked{/if} value="1"><span>内链</span>
+                </label>
+                <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.inurlbox,.yqbbox,.articlebox').addClass('hidden'),$('.outurlbox').removeClass('hidden');">
+                    <input type="radio" name="menutype" {if $config['type']=="2"}checked{/if} value="2" ><span>外链</span>
+                </label>
+                <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.inurlbox,.yqbbox,.outurlbox').addClass('hidden'),$('.articlebox').removeClass('hidden');">
+                    <input type="radio" name="menutype" {if $config['type']=="3"}checked{/if} value="3" ><span>h5文章</span>
+                </label>
+                {if dzpclive()}
+                <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.inurlbox,.outurlbox,.articlebox').addClass('hidden'),$('.yqbbox').removeClass('hidden');">
+                    <input type="radio" name="menutype" {if $config['type']=="4"}checked{/if} value="4" ><span>邀请榜</span>
+                </label>
+                {/if}
+            </div>
+        </div>
+        <div class="form-group inurlbox{if $config['type']!='1'} hidden{/if}">
+            <label class="col-lg-3 control-label">* 内链</label>
+            <div class="col-lg-8">
+              {:tpl_hdlinks('menuinurl',$config['inurl'],$selmodules)}
+              <span class="help-block">注:只能填写当前活动微信端相关链接，可以到活动二维码与链接内部获取微信端链接</span>
+            </div>
+        </div>
+        <div class="form-group outurlbox{if $config['type']!='2'} hidden{/if}">
+            <label class="col-lg-3 control-label">* 外链</label>
+            <div class="col-lg-8">
+                <input class="form-control" type="text"  name="menuouturl" value="{$config['outurl']}">
+                <span class="help-block">注:必须是完整的url，外链用户点击后将会跳出直播间</span>
+            </div>
+        </div>
+        <div class="form-group articlebox{if $config['type']!='3'} hidden{/if}">
+            <label class="col-lg-3 control-label">* 活动文章</label>
+            <div class="col-lg-8">
+                <select class="form-control js_select2 articleselect" name="menuartid">
+                    {foreach $articles as $article}
+                        <option value="">-----请选择-----</option>
+                        <option value="{$article['id']}">{$article['apptitle']}</option>
+                    {/foreach}
+                </select>
+                <span class="help-block"><a class="label label-primary" href="{:gohdmanage('configh5/index',['hdid'=>$hdid])}" target="__blank" >点我新增编辑文章内容</a></span>
+            </div>
+        </div>
+
+        <div class="form-group yqbbox{if $config['type']!='4'} hidden{/if}">
+            <label class="col-lg-3 control-label">排行榜人数</label>
+            <div class="col-lg-8">
+                <input type="text" class="form-control numberincdec" name="phbnum" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="100"
+                data-bts-init-val=""
+                data-bts-step="1"
+                value="{$config['phbnum']??'20'}">
+                <span class="help-block">最多100人</span>
+            </div>
+        </div>
+</form>
+</div>    
+<script>    
+require(['webcore','jconfirmBox','zamnotice','layerBox',"select2-zhcn","bootstrap-touchspin"],function(webcore,jconfirmBox,zamnotice,layerBox){
+    $('.articleselect').select2({width: 'resolve',placeholder: '请选择'});
+    $(".articleselect").val("{$config['artid']}").trigger("change");
+    $(".confirmbox-pop .numberincdec").TouchSpin().on("change", function(){
+        var $this = $(this),funcstr = $this.data('func');
+        var func = window[funcstr];
+        func && func();
+    });
+})
+</script>

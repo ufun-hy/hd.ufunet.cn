@@ -1,0 +1,393 @@
+{include file="$Wpath/common/header_base" /}
+<style>
+.lyear-wrapper-bg {
+    position: fixed;
+    left:0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-image: url({:tomedia($config['common']['bgimg'])});
+}
+.lyear-wrapper {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden auto;
+}
+.lyear-login{
+  margin-top: 20px;
+}
+.login-center {
+    position: relative;
+    background: #fff;
+    width: 410px;
+    padding: 30px 30px 30px 30px;
+    border-radius: 3px;
+  }
+
+  @media screen and (max-width:768px) {
+    .login-center {
+      background: #fff;
+      width: 410px;
+      padding: 30px 30px 30px 30px;
+      border-radius: 3px;
+    }
+  }
+
+  @media screen and (max-width:480px) {
+    .login-center {
+      background: #fff;
+      width: 310px;
+      padding: 25px 25px 25px 25px;
+      border-radius: 3px;
+    }
+  }
+.login-header {
+    margin-bottom: 12px !important;
+}
+.login-header img{max-width: 260px;}
+.login-center .has-feedback.feedback-left .form-control {
+    padding-left: 38px;
+    padding-right: 12px;
+}
+.login-center .has-feedback.feedback-left .form-control-feedback {
+    left: 0;
+    right: auto;
+    width: 38px;
+    height: 38px;
+    line-height: 38px;
+    z-index: 4;
+    color: #dcdcdc;
+}
+.login-center .has-success .form-control-feedback {
+    display: block!important;
+}
+.login-center .has-feedback.feedback-right .form-control-feedback-right {
+    position: absolute;
+    top:0;
+    right: 0;
+    width: 30px;
+    height: 38px;
+    line-height: 38px;
+    z-index: 4;
+    color: #dcdcdc;
+    text-align: center;
+}
+.btn-sendcode.disabled{pointer-events: none;cursor: not-allowed;}
+.login-nav{margin-bottom: 20px;}
+.login-nav li a{border-width:3px!important;border-radius: 0!important;}
+.has-success .input-group-addon,.has-error .input-group-addon{background-color: #48b0f7}
+.yzm-box{position: relative;margin: 10px;}
+.yzm-box *{box-sizing: border-box;}
+.yzm-box input{
+  width: 220px;
+  height: 42px;
+  line-height: 42px;
+  padding-left: 42px;
+}
+.yzm-box span{
+  position: absolute;
+  left: 0;
+  right: auto;
+  width: 42px;
+  height: 42px;
+  line-height: 42px;
+  z-index: 4;
+  color: #dcdcdc;
+}
+.yzm-box a{width: 157.5px}
+.yzm-box a img{width:157.5px;height: 42px;}
+.layui-layer-btn0.disabled{pointer-events: none;}
+</style>
+<div class="lyear-wrapper-bg"></div>
+<div class="lyear-wrapper">
+  <div class="lyear-login">
+    <div class="login-center">
+      <div class="login-header text-center">
+        <img src="{:tomedia($config['common']['logo'])}">
+      </div>
+      <ul class="nav nav-tabs text-center login-nav">
+        <li class="nav-item active d-inline-block" style="float: none">
+          <a data-toggle="tab" href="#username-login">账号注册</a>
+        </li>
+      </ul>
+      <div class="login-box tab-content">
+        <form id="formBox" class="zam-formvalidation"  method="post" style="margin-bottom: 0">
+          <div class="tab-pane fade active in" id="username-login">
+            <div class="form-group namelogin has-feedback feedback-left">
+              <input type="text" placeholder="请输入您的用户名" class="form-control username" name="username" maxlength="20" />
+              <span class="mdi mdi-account form-control-feedback" aria-hidden="true"></span>
+            </div>
+            <div class="form-group has-feedback feedback-left">
+              <input type="text" placeholder="请输入您的手机号" class="form-control mobile" name="mobile" maxlength="11"  />
+              <span class="mdi mdi-cellphone form-control-feedback" aria-hidden="true"></span>
+            </div>
+            <div class="form-group has-feedback feedback-left">
+              <div class="input-group zam-flex zam-alignItems">
+                <input name="mobilecode" type="text" class="form-control mobilecode" placeholder="请输入短信验证码" maxlength="4">
+                <span class="mdi mdi-verified form-control-feedback" aria-hidden="true"></span>
+                <span href="javascript:void(0)" class="input-group-addon btn btn-primary btn-sendcode" style="width: 100px;height: 38px;line-height: 38px;padding: 0 10px;">发送验证码</span>
+              </div>
+            </div>
+            <div class="form-group namelogin has-feedback feedback-left feedback-right">
+              <input type="password"  style="display:none" autocomplete="new-password"/>
+              <input type="password" placeholder="请输入密码" class="form-control password" name="password" />
+              <span class="mdi mdi-lock form-control-feedback" aria-hidden="true"></span>
+              <span class="mdi mdi-eye-off form-control-feedback-right password-showtext cursor" aria-hidden="true"></span>
+            </div>
+            <div class="form-group namelogin has-feedback feedback-left feedback-right">
+              <input type="password" placeholder="请再次输入密码" class="form-control repassword" name="repassword" />
+              <span class="mdi mdi-lock form-control-feedback" aria-hidden="true"></span>
+              <span class="mdi mdi-eye-off form-control-feedback-right password-showtext cursor" aria-hidden="true"></span>
+            </div>
+          </div>
+          <div class="form-group">
+            <button class="btn btn-block btn-primary btn-reg" type="submit">注册</button>
+          </div>
+          <div style="display: inline-block;font-size: 14px;">点击注册表示您已阅读并同意<a target="__blank" href="{:goweb('register/fwnotice')}">《服务条款》</a></div>
+        </form>
+        <div class="form-group m-t-5 m-b-0">
+          <div style="height:30px;line-height: 30px;">
+            <div class="pull-right ">已有账号？<a href="{:APP_WEB_LOGIN}">立即登录</a></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {include file="login/common" /}
+</div>
+<script>
+require(['webcore','layerBox','zamnotice','zvalidator','slider-min'],function(webcore,layerBox,zamnotice){
+    $(".password-showtext").click(function(){
+      var $this = $(this),passworddom = $this.parent().find('input');
+      if($this.hasClass('mdi-eye-off')){
+        $this.removeClass('mdi-eye-off').addClass('mdi-eye');
+        passworddom.attr("type",'text');
+      }else{
+        $this.removeClass('mdi-eye').addClass('mdi-eye-off');
+        passworddom.attr("type",'password');
+      }
+    });
+    $('#formBox').formValidation({
+      framework: 'bootstrap',
+      excluded: [':disabled'],
+      message: '您填写的内容无效',
+      fields: {
+        username: {
+          message: '用户名必填',
+          validators: {
+            notEmpty: {
+              message: '用户名必填'
+            },
+            regexp : {
+              regexp: /^[\u4e00-\u9fa5a-z\d_]{4,20}$/i,
+              message: '用户名为4-20位，可包含汉字、字母、数字、下划线',
+            }
+          }
+        },
+        mobile:{
+          message: '手机号必填',
+          validators: {
+            notEmpty: {
+              message: '手机号必填'
+            },
+            regexp: {
+                regexp: /^[1][3,4,5,6,7,8,9][0-9]{9}$/,
+                message: '手机号格式错误'
+            }
+          }
+        },
+        mobilecode:{
+          message: '验证码必填',
+          validators: {
+            notEmpty: {
+              message: '验证码必填'
+            },
+            stringLength: {
+                min: 4,
+                max: 4,
+                message: '验证码为4位'
+            }
+          }
+        },
+        password:{
+          message: '密码必填',
+          validators: {
+            notEmpty: {
+              message: '密码必填'
+            },
+            regexp : {
+              regexp: /^(?=.*[a-zA-Z])(?=.*\d)[a-zA-Z\d]{6,32}$/,
+              message: '密码为6-32位，需同时包含字母和数字'
+            }
+          }
+        },
+        repassword:{
+          message: '重复密码必填',
+          validators: {
+            identical: {
+              field: 'password',
+              message: '两次输入的密码不一致'
+            }
+          }
+        },
+      }
+    }).on('success.form.fv', function(e) {
+      e.preventDefault();
+      var $form = $(e.target);
+      var postData = webcore.serializeObject($form);
+      var bload = $form.find(".btn-reg").lyearloading({opacity: 0.2,spinnerSize: 'nm'});
+      $form.formValidation('disableSubmitButtons', true);
+      var username = $(".username").val(),mobile = $(".mobile").val(),mobilecode = $(".mobilecode").val(),password = $(".password").val(),repassword = $(".repassword").val();
+      webcore.ajaxSubmit("{:goweb('register/index')}",{
+        username:username,
+        mobile:mobile,
+        mobilecode:mobilecode,
+        password:password,
+        repassword:repassword
+      },'注册中...').then(function(json){
+        if(json.code==0){
+            zamnotice.showTips('success','注册成功',1e3,function(){
+              bload.hide();
+              window.location.href = "{:APP_WEB_LOGIN}";
+            });
+          }else{
+            bload.hide();
+            zamnotice.showTips('error',json.msg);
+            $form.formValidation('disableSubmitButtons', false);
+          }
+      },function(){
+          bload.hide();
+          $form.formValidation('disableSubmitButtons', false);
+          zamnotice.showTips('error','注册出现异常');
+      });
+    });
+    $(".btn-sendcode").click(function(){
+        var $this = $(this),username = $(".username").val()||'',mobile = $(".mobile").val(),phonereg = /^[1][3,4,5,6,7,8,9][0-9]{9}$/;
+        if(!username){
+            return false;
+        }
+        if(!mobile || !phonereg.test(mobile)){
+            return zamnotice.showTips('error','请输入正确的手机号码');
+        }
+        // captcha();
+        // return false;
+        var yzmlayer = layerBox.sendcodeLayer('请输入验证码',webcore.tpl($("#yzm-tpl"),{}),['发送短信验证码'],function(index,layerno){
+            var yzm = $(".captcha").val();
+            if(yzm == ''){
+              return zamnotice.showTips('error','请先输入验证码');
+            }
+            layerno.find('.layui-layer-btn0').addClass('disabled');
+            webcore.ajaxSubmit("{:goweb('register/sendcode')}",{
+              username:username,
+              username2:username,
+              mobile:mobile,
+              yzm:yzm
+            }).then(function(json){
+                if(json.code==0){
+                    $this.addClass("disabled");
+                    webcore.countdown(60,function(t){
+                      $this.text(`${t} s`);
+                    },function(){
+                      $this.text('短信验证码').removeClass('disabled');
+                    });
+                    layerBox.close(index);
+                    zamnotice.showTips('success','验证码下发成功，请稍后查收');
+                }else{
+                    setTimeout(function(){
+                      layerno.find('.layui-layer-btn0').removeClass('disabled');
+                    },1e3);
+                    zamnotice.showTips('error',json.msg);
+                    $('.imgverify img').trigger('click');
+                }
+            },function(){
+                setTimeout(function(){
+                  layerno.find('.layui-layer-btn0').removeClass('disabled');
+                },1e3);
+                zamnotice.showTips('error','下发验证码出现异常');
+            });
+        });
+    });
+    // 开始验证
+    function captcha(){
+      Slider = new langSlider({
+        title: '滑块安全验证', 
+        start: function(Slider) {
+          getSlider(function(json){
+            Slider.sliderStart({
+                sliderBg: json.img||'', 
+                sliderKey: json.key||'', 
+                sliderY: json.y||'', 
+            })
+          })
+        },
+        check: function(sliderKey, sliderX, Slider) {
+          var username = $(".username").val()||'',mobile = $(".mobile").val()||'';
+          webcore.ajaxSubmit("{:gocommon('verify/registerverify')}",{username:username,mobile:mobile,key:sliderKey, x:sliderX},'加载中...').then(function(json){
+            if(json.code == 0){
+              Slider.sliderSuccess();
+              setTimeout(()=>{
+                $('.lang-dialog-header-btn').trigger('click');
+                zamnotice.showTips('success','验证码下发成功，请稍后查收');
+                var $btn = $('.btn-sendcode');
+                $btn.addClass("disabled");
+                webcore.countdown(60,function(t){
+                  $btn.text(`${t} s`);
+                },function(){
+                  $btn.text('短信验证码').removeClass('disabled');
+                });
+              },5e2);
+            }else{
+              getSlider(function(json){
+                Slider.sliderError({
+                  sliderBg: json.img||'', 
+                  sliderKey: json.key||'', 
+                  sliderY: json.y||'', 
+                })
+              })
+            }
+          });
+        },
+        refresh: async function(Slider){
+          getSlider(function(json){
+            Slider.sliderStart({
+                sliderBg: json.img||'', 
+                sliderKey: json.key||'', 
+                sliderY: json.y||'', 
+            })
+          })
+        },
+      })
+    }
+    function getSlider(func) {
+      webcore.ajaxSubmit("{:gocommon('verify/register')}",{},'加载中...').then(function(json){
+        if(json.code == 0){
+          func && func(json.msg);
+        }
+      });
+    }
+});
+$("form.zam-formvalidation button").addClass('disabled');
+window.formtableInitTimer = setInterval(function () {
+	if (window.formInited) {
+		$("form.zam-formvalidation button").removeClass('disabled');
+		clearInterval(window.formtableInitTimer);
+	}else{
+		if($(".zam-formvalidation.fv-form-bootstrap").length>0){
+			window.formInited = true;
+		}
+	}
+},10);
+</script>
+<script id='yzm-tpl' type="text/template">
+<div class="yzm-box zam-flex">
+  <input name="captcha" type="text" class="form-control captcha" placeholder="请输入验证码" maxlength="4">
+  <span class="mdi mdi-verified form-control-feedback" aria-hidden="true"></span>
+  <a href="javascript:;" class="input-group-btn imgverify"><img id="captchaimg" src="/common/verify/register" title="点击图片更换验证码" onerror=""></a>
+</div>
+</script>
+{include file="$Wpath/common/footer_base" /}

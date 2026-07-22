@@ -1,0 +1,263 @@
+<style type="text/css">
+.config-titlename{
+    border-left: 3px solid #48b0f7;
+    padding-left: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    margin: 15px 0;
+}
+</style>
+<div class="config-titlename">大屏端</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 区域填充色(无数据)</label>
+    <div class="col-lg-5">
+        {:tpl_color('styleconfig[bgcolor]',$config['styleconfig']['bgcolor']??'#3777FF')}
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 区域填充色(有数据)</label>
+    <div class="col-lg-5">
+        {:tpl_color('styleconfig[highlightcolor]',$config['styleconfig']['highlightcolor']??'#ff9800')}
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 区域边界色</label>
+    <div class="col-lg-5">
+        {:tpl_color('styleconfig[bordercolor]',$config['styleconfig']['bordercolor']??'#00FFFF')}
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 标注点水波纹效果</label>
+    <div class="col-lg-5">
+        {:tpl_switch('styleconfig[markerdot]',$config['styleconfig']['markerdot']??'1')}
+        <div class="help-block">开启后有新的签到用户标注点会播放水波纹效果</div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 标注点签到人数</label>
+    <div class="col-lg-5">
+        {:tpl_switch('styleconfig[markernum]',$config['styleconfig']['markernum']??'1')}
+        <div class="help-block">开启后标注点会展示签到用户数量</div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 右上角签到人数</label>
+    <div class="col-lg-5">
+        {:tpl_switch('styleconfig[joinopen]',$config['styleconfig']['joinopen']??'1')}
+        <div class="help-block">开启后大屏幕右上角会展示总地图签到人数</div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 地区位置</label>
+    <div class="col-lg-6">
+        <div class="input-group">
+            <div class="input-group-btn not-allow"><a class="btn btn-default">左偏移</a></div>
+            <div class="touchspin">
+                <input type="text" class="form-control numberincdec" name="styleconfig[left]" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="NULL"
+                data-bts-step="1"
+                data-bts-postfix="px"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['styleconfig']['left']??0}">
+            </div>
+            <div class="input-group-btn not-allow"><a class="btn btn-default">下偏移</a></div>
+            <div class="touchspin">
+                <input type="text" class="form-control numberincdec" name="styleconfig[top]" 
+                    data-bts-min="0" data-bts-replacement-val="0"
+                    data-bts-max="NULL"
+                    data-bts-step="1"
+                    data-bts-postfix="px"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                    value="{$config['styleconfig']['top']??0}">
+            </div>
+            <div class="input-group-btn not-allow"><a class="btn btn-default">缩放比</a></div>
+            <div class="touchspin">
+                <input type="text" class="form-control numberincdec" name="styleconfig[scale]" 
+                data-bts-min="0.01" data-bts-replacement-val="0.01"
+                data-bts-max="3"
+                data-bts-decimals="2"
+                data-bts-step="1"
+                data-bts-force-step-divisibility="xstwo"
+                data-bts-postfix="倍"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['styleconfig']['scale']??1}">
+            </div>
+        </div>
+        <div class="help-block">默认地图整体居中，一般是觉得地图过大挡住了部分背景元素才需要偏移和缩放，左偏移和下偏移等于0即为不偏移，缩放比为1即为不缩放</div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 签到弹窗</label>
+    <div class="col-lg-5">
+        {:tpl_switch('styleconfig[popopen]',$config['styleconfig']['popopen']??'1','popopen')}
+    </div>
+</div>
+<div class="popbox{if isset($config['styleconfig']['popopen']) && $config['styleconfig']['popopen']=='2'} hidden{/if}">
+    <div class="form-group">
+        <label class="col-lg-2 control-label text-right">* 弹窗内容</label>
+        <div class="col-lg-5">
+            <input type="text" class="form-control" name="styleconfig[poptxt]" value="{$config['styleconfig']['poptxt']??'欢迎来自【地区】的【昵称】签到成功'}" />
+            <div class="help-block">【地区】代表用户选中的地区，【昵称】代表用户昵称或者真实姓名，【头像】代表用户头像或者上传头像</div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label text-right">* 弹窗文字</label>
+        <div class="col-lg-5">
+            <div class="input-group">
+                <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+                {:tpl_color('styleconfig[popcolor]',$config['styleconfig']['popcolor']??'#fff')}
+                <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
+                <div class="touchspin">
+                <input type="text" class="form-control numberincdec" name="styleconfig[popsize]" 
+                    data-bts-min="1" data-bts-replacement-val="1"
+                    data-bts-max="100"
+                    data-bts-step="1"
+                    value="{$config['styleconfig']['popsize']??42}">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label text-right">* 弹窗背景色</label>
+        <div class="col-lg-5">
+            {:tpl_color('styleconfig[popbgcolor]',$config['styleconfig']['popbgcolor']??'rgba(0,0,0,0.6)')}
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label text-right">* 弹窗时间</label>
+        <div class="col-lg-3">
+            <input type="text" class="form-control numberincdec" name="styleconfig[popseconds]" 
+                data-bts-min="2" data-bts-replacement-val="2"
+                data-bts-max="20"
+                data-bts-step="1"
+                data-bts-postfix="秒"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['styleconfig']['popseconds']??6}">
+            <div class="help-block">推荐6秒，必须是2 - 20内的数字</div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label text-right">* 烟花效果</label>
+        <div class="col-lg-5">
+            {:tpl_switch('styleconfig[popyanhua]',$config['styleconfig']['popyanhua']??'1')}
+            <div class="help-block">开启后有新的签到用户可以播放烟花效果</div>
+        </div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 隐藏大屏地图区域</label>
+    <div class="col-lg-5">
+        {:tpl_switch('styleconfig[closemapbox]',$config['styleconfig']['closemapbox']??'2')}
+        <div class="help-block">开启后大屏幕将不显示地图内的所有区域但是不会隐藏标注点，一般是想通过大屏背景图来标注点位才需要隐藏大屏区域</div>
+    </div>
+</div>
+<div class="config-titlename">微信端</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 距离顶部距离</label>
+    <div class="col-lg-3">
+        <input type="text" class="form-control numberincdec" name="styleconfig[appmt]" 
+            data-bts-min="null" data-bts-replacement-val="120"
+            data-bts-max="null"
+            data-bts-step="1"
+            data-bts-postfix="px"
+            data-bts-postfix-extra-class="touchspin-postfix"
+            value="{$config['styleconfig']['appmt']??120}">
+        <div class="help-block">一般是因为地区列表覆盖了背景图上的部分元素才设置此值</div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 地区背景色(未选中)</label>
+    <div class="col-lg-5">
+        {:tpl_color('styleconfig[appbgcolor]',$config['styleconfig']['appbgcolor']??'#a29c9c')}
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 地区背景色(选中)</label>
+    <div class="col-lg-5">
+        {:tpl_color('styleconfig[appactivecolor]',$config['styleconfig']['appactivecolor']??'#00aeff')}
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 地区名称</label>
+    <div class="col-lg-5">
+        <div class="input-group">
+            <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+            {:tpl_color('styleconfig[areacolor]',$config['styleconfig']['areacolor']??'#fff')}
+            <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
+            <div class="touchspin">
+            <input type="text" class="form-control numberincdec" name="styleconfig[areasize]" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="60"
+                data-bts-step="1"
+                value="{$config['styleconfig']['areasize']??16}">
+            </div>
+        </div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 签到按钮</label>
+    <div class="col-lg-5">
+        <div class="input-group">
+            <div class="input-group-btn not-allow"><a class="btn btn-default">文字</a></div>
+            <input type="text" class="form-control" name="styleconfig[btntxt]" value="{$config['styleconfig']['btntxt']??'签到'}" />
+            <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
+            <div class="touchspin">
+            <input type="text" class="form-control numberincdec" name="styleconfig[btnsize]" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="60"
+                data-bts-step="1"
+                value="{$config['styleconfig']['btnsize']??16}">
+            </div>
+            <div class="input-group-btn not-allow"><a class="btn btn-default">背景色</a></div>
+            {:tpl_color('styleconfig[btncolor]',$config['styleconfig']['btncolor']??'#00aeff')}
+            
+        </div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 签到成功</label>
+    <div class="col-lg-5">
+        <div class="input-group">
+            <div class="input-group-btn not-allow"><a class="btn btn-default">文字</a></div>
+            <input type="text" class="form-control" name="styleconfig[sutxt]" value="{$config['styleconfig']['sutxt']??'恭喜签到成功'}" />
+            <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
+            <div class="touchspin">
+            <input type="text" class="form-control numberincdec" name="styleconfig[susize]" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="60"
+                data-bts-step="1"
+                value="{$config['styleconfig']['susize']??24}">
+            </div>
+            <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+            {:tpl_color('styleconfig[sucolor]',$config['styleconfig']['sucolor']??'#fff')}
+        </div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 签到成功烟花效果</label>
+    <div class="col-lg-5">
+        {:tpl_switch('styleconfig[showyanhua]',$config['styleconfig']['showyanhua']??'1')}
+        <div class="help-block">开启后用户微信端签到成功会播放烟花效果</div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">签到成功跳转链接</label>
+    <div class="col-lg-8">
+      <input class="form-control" type="text"  name="styleconfig[successurl]"  placeholder="请填写一个完整的url链接" value="{$config['styleconfig']['successurl']??''}">
+    </div>
+</div>
+<script type="text/javascript">
+function popopen(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".popbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".popbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+</script>

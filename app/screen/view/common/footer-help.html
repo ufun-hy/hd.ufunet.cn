@@ -1,0 +1,114 @@
+{php}
+$newerconfig = globalnewerconfig();
+{/php}
+<style type="text/css">
+.help-shadow{
+	box-shadow: 0 0 10px {$newerconfig['catebordercolor']};
+}
+.help-shouye{
+	position: absolute;
+	width: 286px;
+	height: 256px;
+	bottom:56px;
+	left: 7.5%;
+	background-size: 100% 100%;
+	{if isset($newerconfig['shouyepopimg']) && !empty($newerconfig['shouyepopimg'])}
+		background-image: url({:tomedia($newerconfig['shouyepopimg'])});
+	{/if}
+}
+.help-moduleall{
+	position: absolute;
+	width: 286px;
+	height: 256px;
+	bottom:56px;
+	left: 50%;
+	background-size: 100% 100%;
+	{if isset($newerconfig['modulepopimg']) && !empty($newerconfig['modulepopimg'])}
+		background-image: url({:tomedia($newerconfig['modulepopimg'])});
+	{/if}
+}
+.help-normalall{
+	position: absolute;
+	width: 286px;
+	height: 256px;
+	bottom:56px;
+	right: 80%;
+	background-size: 100% 100%;
+	{if isset($newerconfig['normalpopimg']) && !empty($newerconfig['normalpopimg'])}
+		background-image: url({:tomedia($newerconfig['normalpopimg'])});
+	{/if}
+}
+.help-fullscreen{
+	position: absolute;
+	width: 230px;
+	height: 256px;
+	bottom:56px;
+	right: 0;
+	background-size: 100% 100%;
+	{if isset($newerconfig['helppopimg']) && !empty($newerconfig['helppopimg'])}
+		background-image: url({:tomedia($newerconfig['helppopimg'])});
+	{/if}
+}
+.showhelp .help-popimg{display: block}
+.showhelp .help-shadow{display: block}
+.showkeyboard .help-popimg{display: none;}
+.showkeyboard .help-shadow{display: none;}
+.showkeyboard .help-keyboard{display: block}
+</style>
+{if !isset($hdinfo['loadtype']) || $hdinfo['loadtype']=='1'}
+{include file='common/footer-help-box' /}
+{/if}
+<script type="text/javascript">
+var opennewerlayer = "{if isset($hdinfo['screenconfig']['opennewerlayer'])}{$hdinfo['screenconfig']['opennewerlayer']}{else /}{$newerconfig['isopen']??'1'}{/if}";
+$(function(){
+	$(".openhelp").click(function(){
+		if($('body').hasClass('showhelp')){
+			$('body').removeClass('showhelp');
+			if(XCV3Config.loadtype=='2'){
+				$("#myframe").contents().find('body').removeClass('showhelp');
+			}
+		}else{
+			$('body').addClass('showhelp');
+			if(XCV3Config.loadtype=='2'){
+				$("#myframe").contents().find('body').addClass('showhelp');
+				if($("#myframe").contents().find(".hdQrbox").is(':hidden')){
+					$(".control-normal-list .openqr").trigger('click');
+				}
+			}else{
+				if($(".hdQrbox").is(':hidden')){
+					$(".control-normal-list .openqr").trigger('click');
+				}
+			}
+		}
+	});
+	if(XCV3Config.loadtype=='1'){
+		var hadclose = window.localStorage.getItem("closehelp"+XCV3Config.hdid);
+		if(opennewerlayer=='1' && hadclose!='1'){
+			$(".openhelp").trigger('click');
+		}
+	}else{
+		document.getElementById('myframe').addEventListener('load', function(){
+			var hadclose = window.localStorage.getItem("closehelp"+XCV3Config.hdid);
+			if(hadclose!='1'){
+				//需要开屏打开指引
+				if($('body').hasClass('showhelp')) {
+					$("#myframe").contents().find('body').addClass('showhelp');
+					if($("#myframe").contents().find(".hdQrbox").is(':hidden')){
+						$(".control-normal-list .openqr").trigger('click');
+					}
+				}else{
+					if(opennewerlayer!='1') return false;
+					$(".openhelp").trigger('click');
+				}
+			}else{
+				if($('body').hasClass('showhelp')) {
+					if($("#myframe").contents().find(".hdQrbox").is(':hidden')){
+						$(".control-normal-list .openqr").trigger('click');
+					}
+					$("#myframe").contents().find('body').addClass('showhelp');
+				}
+			}
+		}, true);
+	}
+})
+</script>

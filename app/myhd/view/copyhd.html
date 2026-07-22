@@ -1,0 +1,75 @@
+<div class="alert alert-success">复制活动将复制当前活动的所有功能设置数据<span class="text-danger m-l-5 m-r-5">(不含奖品和轮次数据)</span>生成一个全新的活动</div>
+<div class="form-horizontal confirmbox-pop copy-pop">
+	<div class="form-group">
+		<label class="col-lg-2 control-label">* 活动主题</label>
+		<div class="col-lg-8">
+			    <input class="form-control hdtitle" type="text"  name="hdtitle" maxlength="40" placeholder="请输入活动主题..">
+			    <div class="help-block">活动主题必须设置</div>
+		</div>
+	</div>
+	{if $hdmode == '2'}
+	<div class="form-group timestartbox">
+		<label class="col-lg-2 control-label">* 活动开始时间</label>
+		<div class="col-lg-8">
+			{:tpl_daterangetime([
+				'name'=>'starttime',
+				'val'=>'',
+				'placeholder'=>'点击选择活动正式开始日期',
+				'mintime'=>time(),
+				'issingle'=>'1',
+				'format'=>'YYYY-MM-DD'
+			])}
+			<div class="zam-help-block">
+				<div class="timerangebox m-t-5 hidden">
+					<span class="text-danger m-r-5">活动起止时间:</span><b><span class="m-r-5">2024-04-08 09:00:00</span> 至 <span class="m-l-5">2024-04-08 23:59:59</span></b>
+				</div>
+			</div>
+		</div>
+	</div>
+	{/if}
+</div>
+<script>
+require(['webcore', "bootstrap-daterangepicker"],function(webcore,jconfirmBox,zamnotice){
+	$('.copy-pop .js-datetimepicker').each(function () {
+      var $input = $(this), $obj = {
+        singleDatePicker: $input.data('issingle') == '1' ? true : false,
+        timePicker: $input.data('needsfm') == '1' ? true : false,
+        showDropdowns: $input.data('needsdd') == '1' ? true : false,
+        timePicker24Hour: true,
+        timePickerSeconds: true,
+        autoUpdateInput: $input.data('autoval') == '1' ? true : false,
+        locale: {
+          format: $input.attr('data-format'),
+        }
+      };
+      if ($input.data('start')) $obj.startDate = $input.data('start');
+      if ($input.data('end')) $obj.endDate = $input.data('end');
+      if ($input.data('mintime')) $obj.minDate = $input.data('mintime');
+      if ($input.data('maxtime')) $obj.maxDate = $input.data('maxtime');
+      $input.daterangepicker($obj, function (start, end, label) {
+        var funcstr = $input.data('func');
+        var func = window[funcstr];
+        func && func(start, end);
+      });
+    });
+	$('input[name="starttime"]').on('apply.daterangepicker', function(ev, picker) {
+		var selday = 1,seldate = picker.startDate.format('YYYY-MM-DD'),stabletime = $(".timerangebox");
+		$(this).val(seldate);
+		var endtime = new Date(picker.startDate.format('YYYY-MM-DD HH:mm:ss')).getTime();
+		endtime = timeTostring(endtime + parseInt(selday)*24*3600000 - 1);
+		stabletime.find('span').eq(1).text(seldate+" 00:00:00");
+		stabletime.find('span').eq(2).text(endtime);
+		stabletime.removeClass('hidden');
+	});
+});
+function timeTostring(time){
+  var    now = new Date(time);
+  var    year = now.getFullYear();     
+  var   month = now.getMonth()+1;     
+  var   date = now.getDate();     
+  var   hour = now.getHours();     
+  var   minute = now.getMinutes();     
+  var   second = now.getSeconds(); 
+  return year+'-'+(month<10?'0'+month:month)+"-"+(date<10?'0'+date:date)+" "+(hour<10?'0'+hour:hour)+":"+(minute<10?'0'+minute:minute)+":"+(second<10?'0'+second:second);		
+}
+</script>

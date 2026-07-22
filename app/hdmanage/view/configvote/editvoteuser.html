@@ -1,0 +1,56 @@
+<div class="form-horizontal confirmbox-pop">
+<form class="confirm-formbox" method="post">
+	<div class="form-group">
+		<label class="col-lg-3 control-label">* 微信状态</label>
+		<div class="col-lg-8">
+			{:tpl_switch('votestatus',$config['votestatus']??'1')}
+			<span class="zam-help-block">关闭则微信端不显示该投票项，并且无法给该项目投票</span>
+		</div>
+	</div>
+    <div class="form-group">
+		<label class="col-lg-3 control-label">* 大屏显示状态</label>
+		<div class="col-lg-8">
+			{:tpl_switch('screenstatus',$config['screenstatus']??'1')}
+			<span class="zam-help-block">关闭则大屏端不显示该投票项</span>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-lg-3 control-label">* 项目名</label>
+			<div class="col-lg-8">
+			<input type="text" class="form-control" name="votename" value="{$config['votename']}" maxlength="120" placeholder="120字内" />
+			<span class="zam-help-block">项目名较长可以通过<pre style="display:inline;background:none;border:0;">&lt;br&gt;</pre>换行</span>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-lg-3 control-label"> 项目图片</label>
+		<div class="col-lg-8">
+			{:tpl_image_one('voteimg', $config['voteimg'])}
+			<span class="zam-help-block">图片可不设置，如果设置了图片必须保证所有投票项的图片尺寸保持一致，推荐尺寸:200*200px</span>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-lg-3 control-label"> 项目大图</label>
+		<div class="col-lg-8">
+			{:tpl_image_one('votebigimg', $config['votebigimg']??'')}
+			<span class="zam-help-block">推荐尺寸:640*1240，设置后点击项目图片会弹窗显示此大图</span>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-lg-3 control-label"> 分组</label>
+		<div class="col-lg-8">
+			<select id="groupid" class="form-control">
+				<option value="">请选择分组</option>
+				{foreach $groups as $group } 
+					<option value="{$group['id']}" {if isset($config['groupid']) && $config['groupid']==$group['id']}selected{/if}>{$group['groupname']}</option>
+				{/foreach}
+			</select>
+			<span class="zam-help-block">分组可不设置</span>
+		</div>
+	</div>
+</form>
+</div>
+<script type="text/javascript">
+	require(['webcore'],function(webcore){
+		tpl_switch();
+	});
+</script>

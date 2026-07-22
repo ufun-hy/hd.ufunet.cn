@@ -1,0 +1,90 @@
+{include file='$Wpath/common/header'}
+<div class="alert alert-info">
+	活动黑名单用户一般是一些恶意薅羊毛的微信用户(一般是想搞活动里的红包的微信用户)，见一个拉黑一个<br>
+	比如近几年的比较猖獗的一个用户:(微信昵称)弯弓射大雕，此人应该是薅羊毛公司的机器人微信号。
+</div>
+{include file='$Wpath/common/tabletoolbar'}
+<table id="listtable" class="zam-btable"></table>
+<script>
+require(['webcore','webtable','jconfirmBox','zamnotice'],function(webcore,webtable,jconfirmBox,zamnotice){
+var initConfig = {
+    tableId:'#listtable',
+    url:"{:goweb('hdblacklist/index')}",
+    columnoperate:{
+        btns:{
+            del:true,
+        },
+        func:{
+            del:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','您确定要移出黑名单么？',function(){
+                      webcore.ajaxSubmit("{:goweb('hdblacklist/del')}",{blackid:row.id},'处理中..').then(function(json){
+                          if(json.code==0){
+                              webtable.refresh();
+                              zamnotice.showTips('success','操作成功');
+                          }else{
+                              zamnotice.showTips('error',json.msg);
+                          }
+                      }, function(json){
+                          zamnotice.showTips('error','网络差。操作失败');
+                      });
+                });
+            },
+        }
+    },
+    columns:[{
+            checkbox: true,
+        }, 
+        {
+            field: 'id',
+            title: 'ID',
+            align: 'center',
+            width:'6%',
+            visible: false
+        }, {
+            field: 'openid',
+            title: 'openid',
+            align:'center',
+        }, {
+            field: 'userinfo',
+            title: '微信用户',
+            align:'center',
+            formatter: function (value, row, index) {
+               var html = '<div class="zam-flex-column-center"><img class="avatarImg m-b-10" src="'+value.avatar+'" /><span>'+value.nickname+'</span></div>';
+                return html;
+            },
+        },  {
+            field: 'create_time',
+            title: '添加时间',
+            align: 'center',
+        }
+    ],
+    searchParamas:[],
+    toolbar:{
+        add:function(ajaxurl){
+            var confirmobj = jconfirmBox.ajaxconfirm('微信用户<span class="text-danger">(用户openid不一样就不是同一个用户)</span>',"{:goweb('hdblacklist/add')}",{ishtml:'1'},'html','col-lg-10 col-lg-offset-1',function(e){},false,'2');
+        },
+        del:function(ajaxurl){
+            var getSelects = webtable.getSelections();
+            if(getSelects.length>0){
+                jconfirmBox.confirm('温馨提示','您确定要将选中的用户移出黑名单么？',function(){
+                    webcore.ajaxSubmit(ajaxurl,{blackid:getSelects},'处理中..').then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','操作成功');
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差,操作失败');
+                    });
+                });
+            }else{
+                zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+        },
+    },
+};
+webtable.init(initConfig);
+});
+</script>
+{include file='$Wpath/common/footer'}

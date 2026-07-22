@@ -1,0 +1,240 @@
+{include file="common/header" /}
+<style type="text/css">
+.wechatbody{
+	padding-top: 0.76rem;
+	overflow: hidden;
+}
+.num_box{
+}
+.num_box .num_box_ul li{
+	width: 2rem;
+}
+.num_box .num_box_ul li.sline{
+	width: 0.1rem;
+	height: 1rem;
+	background-image: url(__STATIC__/images/wechat/vote/shule/sline.png);
+	background-repeat: no-repeat;
+	background-size: cover;
+	margin: 0 0.12rem;
+}
+.num_box .num_box_ul li span.text{
+	color: #fff;
+	font-size: 0.26rem;
+}
+.num_box .num_box_ul li span.num{
+	color: #4697e9;
+	font-size: 0.46rem;
+	margin-top: 0.12rem;
+}
+.timeremain{
+	margin-top: 0.52rem;
+	color: #fff;
+}
+.timeremain-title{
+	font-size: 0.28rem;
+	text-align: center;
+	background-image: url(__STATIC__/images/wechat/vote/shule/line.png);
+	background-repeat: no-repeat;
+	background-size: contain;
+}
+.timeremain-title span{
+	margin-left: 0.12rem
+}
+.timerremain-box{
+	margin-top: 0.34rem;
+	font-size: 0.46rem;
+	color: #4697e9;
+	text-align: center;
+}
+.timerremain-box div{
+	margin-right: 0.1rem;
+}
+.timerremain-box div span{
+	font-size: 0.24rem;
+	margin-left: 0.12rem;
+	color: #fff;
+}
+.remainnums{
+	margin-top: 0.56rem;
+	font-size: 0.36rem;
+	text-align: center;
+	background-image: url(__STATIC__/images/wechat/vote/shule/line2.png);
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-position: center;
+}
+.remainnums span{font-weight: 600}
+
+.vote-itemlists{
+	margin-top: 0.62rem;
+}
+.vote-itemlists .vote-item{
+	position: relative;
+	width: 50%;
+}
+.vote-itemlists .vote-item .sline2{
+	position: absolute;
+	right: -0.05rem;
+	top: 0;
+	height: 100%;
+}
+.vote-itemlists .vote-item .sline2 img{
+	height: 1rem;
+}
+.vote-itemlists .vote-item .vote-imgbox{
+	
+	margin-bottom: 0.2rem;
+}
+.vote-itemlists .vote-item .vote-imgbox img.vote-itemimg{
+	width: 2.6rem;
+	height: 2.6rem;
+}
+
+.btn-vote{
+	color: #fff;
+	padding: 0.06rem 0.34rem;
+	border: 1px solid #fff;
+	border-radius: 0.24rem;
+	text-align: center;
+}
+.btn-vote i{
+	margin-right: 0.1rem;
+}
+</style>
+<div class="num_box">
+	<ul class="num_box_ul zam-app-flex-ajCenter2">
+		<li class="zam-app-flex-ajCenter">
+			<span class="text"> <i class="mxc-appreciate_light"></i> {$appconfig['votetxt']??'投票'}量</span>
+			<span class="num">{$appconfig['allvote']}</span>
+		</li>
+		<li class="sline"></li>
+		<li class="zam-app-flex-ajCenter">
+			<span class="text"><i class="mxc-unie6cc"></i> 参与人次</span>
+			<span class="num">{$appconfig['alljoin']}</span>
+		</li>
+	</ul>
+</div>
+<div class="timeremain">
+    <div class="timeremain-title"><i class="mxc-unie6b2"></i> <span>距离{$appconfig['votetxt']??'投票'}结束时间</span></div>
+	<div class="timerremain-box zam-app-flex-ajCenter2">
+		<div id="timeremain-day" class="hidden">0<span>天</span></div>
+		<div id="timeremain-hour">0<span>时</span></div>
+		<div id="timeremain-min">00<span>分</span></div>
+		<div id="timeremain-sec">00<span>秒</span></div>
+	</div>
+	<div class="remainnums">您还剩余<span>{$rotate['myremain']}</span>{$appconfig['voteunit']??'票'}</div>
+</div>
+<script>
+var remainSec,votetxt = "{$appconfig['votetxt']??'投票'}";
+$(function(){
+	{if $rotate['endtime'] < time()}
+		$(".timeremain .timeremain-title span").text(votetxt+'已结束');
+		$(".remainnums").remove();
+	{elseif $rotate['starttime'] > time() /}
+		$(".timeremain .timeremain-title span").text('距离'+votetxt+'开始时间');
+		remainSec = parseInt("{$rotate['starttime'] - time()}");
+		timerun(remainSec);
+		$(".remainnums").remove();
+	{else /}
+		{// 进行中}
+		$(".timeremain .timeremain-title span").text('距离'+votetxt+'结束时间');
+		remainSec = parseInt("{$rotate['endtime'] - time()}");
+		timerun(remainSec);
+	{/if}
+})
+{// 倒计时逻辑}
+function timerun(remainSec){
+	var t = setInterval(function(){
+		var day = 0,hour = 0,minute = 0,second = 0;		
+		if(remainSec > 0){
+			day = Math.floor(remainSec / (60 * 60 * 24));
+			hour = Math.floor(remainSec / (60 * 60)) - (day * 24);
+			minute = Math.floor(remainSec / 60) - (day * 24 * 60) - (hour * 60);
+			second = Math.floor(remainSec) - (day * 24 * 60 * 60) - (hour * 60 * 60) - (minute * 60);
+		}
+		if (minute <= 9) minute = '0' + minute;
+		if (second <= 9) second = '0' + second;
+		$('#timeremain-day').html(day+"<span>天</span>");
+		$('#timeremain-hour').html(hour+'<span>时</span>');
+		$('#timeremain-min').html(minute+'<span>分</span>');
+		$('#timeremain-sec').html(second+'<span>秒</span>');
+		remainSec--;
+		if(remainSec < 0){
+			clearInterval(t);
+			window.location.reload();
+		}
+	}, 1e3);
+} 
+</script>
+</style>
+<section class="vote-itemlists zam-app-flex">
+	{foreach $rotate['items'] as $key=>$item}
+		<div class="vote-item zam-app-flex-ajCenter">
+			<div class="vote-imgbox">
+				<img class="vote-itemimg" src="{:tomedia($item['voteimg'])}">
+			</div>
+			{if $key==0}
+			<div class="sline2 zam-app-flex-ajCenter">
+				<img src="__STATIC__/images/wechat/vote/shule/sline2.png">
+			</div>
+			{/if}
+			<a class="btn-vote zam-app-flex-ajCenter2"  data-voteid="{$item['id']}" data-votename="{$item['votename']}">
+				<i class="mxc-appreciate_light"></i> {$appconfig['votetxt']??'投票'}
+			</a>
+		</div>
+	{/foreach}
+</section>
+<script>
+var clicked = false,maxselect = parseInt("{$rotate['maxselect']}"),minselect = parseInt("{$rotate['minselect']}"),rotateid = "{$rotate['id']}",votetype = "{$rotate['votetype']}";
+require(['wechatcore','appsocket'],function(wechatcore,appsocket){
+	var wsConfig = {};
+	wsConfig.onmessage = function(data){
+		if(data.type=='connected'){
+			appsocket.isclose = false;
+			wechatcore.connectsocket({clientid:data.clientid});
+		}else if(data.type=='delshowvote' || data.type=='rollvoterotate' || data.type=='resetallvote'){
+			wechatcore.reloadpage();
+		}else if(data.type=='goto'){
+			wechatcore.goto(data);
+		}else if(data.type=='addblack'){
+			data.userid==XCV3Config.userid&&wechatcore.closewxwindow();
+		}else if(data.type=='luckeruserids'){
+			wechatcore.layerAsklucker(data);
+		}
+	};
+	appsocket.init(wsConfig);
+	$(".vote-itemlists").on('click','.btn-vote',function(){
+		var $this = $(this);
+		var remainnum = parseInt($(".timeremain .remainnums span").text());
+		if(remainnum<=0) return wechatcore.msg('您已无可'+votetxt+'数');
+		var voteid = $(this).attr('data-voteid');
+		var votename = $(this).attr('data-votename')||'';
+		if(clicked) return;
+		clicked = true;
+		wechatcore.ask('温馨提醒','确定给'+votename+votetxt+'么?',['确定','取消'],function(k){
+			wechatcore.ajaxSubmit('{:gowechat("vote/ajaxvote")}',{rotateid:rotateid,voteid:voteid,votetxt:votetxt},'正在处理请求..').then(function(data){
+				 clicked = false;
+				 wechatcore.close(k);
+				 if(data.code==0){
+					$(".timeremain .remainnums span").text(remainnum>0?remainnum-1:0);
+					if(votetype < 3) $this.text('已'+votetxt+'此项').addClass('btn-disabled');
+					wechatcore.msg(votetxt+'成功');
+				 }else if(data.code==-2){
+					wechatcore.showtopmsg(data.msg,1e3,function(){
+						wechatcore.reloadpage();
+					});
+				 }else{
+					wechatcore.msg(data.msg);
+				 }
+			}, function(){
+				  clicked = false;
+				  wechatcore.close(k);
+				  wechatcore.msg(votetxt+'失败，请稍后重试');
+			});
+		},function(){
+			clicked = false;
+		});
+	});
+});
+</script>
+{include file="common/footer" /}

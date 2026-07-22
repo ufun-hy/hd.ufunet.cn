@@ -1,0 +1,240 @@
+{include file='$Wpath/common/header'}
+<div class="form-inline zam-inline-searchbar">
+    <div class="form-group m-l-5">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">选择轮次</span>
+          <select id="rotateid" class="form-control">
+            {foreach $rotates as $key=>$rotate} 
+                <option value="{$rotate['id']}" {if $rotateid==$rotate['id']}selected{/if}>{$rotate['title']}</option>
+            {/foreach}
+          </select>
+        </div>
+    </div>
+    <div class="form-group">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">券号</span>
+        <input type="text" class="form-control" value="" id="keyword" name="username" placeholder="请输入券号">
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">状态</span>
+          <select id="status" class="form-control js_select2">
+            {foreach $statustypes as $k=>$v } 
+            <option value="{$k}" {if $k == "0"}selected{/if}>{$v}</option>
+            {/foreach}
+          </select>
+        </div>
+    </div>
+    <a class="btn btn-primary btn-sm btn-search" href="javascript:void(0)"><i class="mdi mdi-magnify"></i> 搜索</a>
+    <a class="btn btn-warning btn-sm btn-export" href="javascript:void(0)"><i class="mdi mdi-export"></i> 导出</a>
+</div>
+{include file='$Wpath/common/tabletoolbar'}
+<table id="listtable" class="zam-btable"></table>
+<script>
+var cardrotatess = {:json_encode(array_column($rotates,null,'id'))};
+require(['webcore','webtable','jconfirmBox','zamnotice'],function(webcore,webtable,jconfirmBox,zamnotice){
+var initConfig = {
+    tableId:'#listtable',
+    url:"{:gohdmanage('configdzp/cardno',['hdid'=>$hdid])}",
+    columnoperate:{
+        btns:{
+            //edit:true,
+            del:true,
+        },
+        func:{
+            edit:function(value, row, index){
+                var confirmObj = jconfirmBox.ajaxconfirm("编辑券号信息","{:gohdmanage('configdzp/editcardid',['hdid'=>$hdid])}",{ishtml:'1',cardid:row.id},'html','col-lg-6 col-lg-offset-3',function(e){
+                    var postData = webcore.serializeObject(e.find('form'));
+                    postData.userid = row.id;
+                    webcore.ajaxSubmit("{:gohdmanage('configdzp/editcardid',['hdid'=>$hdid])}",postData).then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','保存成功');
+                            confirmObj.close();
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                             return false;
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                         return false;
+                    });
+                });
+            },
+            del:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','删除将同步删除券号关联的中奖信息并且无法恢复，您确定要删除么？',function(){
+                    webcore.ajaxSubmit("{:gohdmanage('configdzp/delcardid',['hdid'=>$hdid])}",{cardid:row.id,rotateid:row.rotate_id}).then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','删除成功');
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                    });
+                });
+            },
+        }
+    },
+    columns:[{
+            checkbox: true,
+        }, 
+        {
+            field: 'id',
+            title: 'id',
+            align: 'center',
+            visible: false
+        },{
+            field: 'title',
+            title: '轮次',
+            align: 'center',
+        },{
+            field: 'statushtml',
+            title: '状态',
+            align: 'center',
+        },{
+            field: 'user_id',
+            title: '使用者',
+            align: 'center',
+            formatter: function (value, row, index) {
+                if(value==''){
+                    return '-';
+                }
+                if(row.wxuser==null || row.wxuser==''){
+                    return '-';
+                }
+                return "<div class='zam-flex-column-center'><img src='"+row.wxuser.avatar+"' class=\"avatarImg m-b-5\" /><span>"+row.wxuser.nickname+"</span></div>"; 
+            },
+        },{
+            field: 'cardno',
+            title: '券号',
+            align: 'center',
+        },{
+            field: 'prize_id',
+            title: '奖品',
+            align: 'center',
+            formatter: function (value, row, index) {
+                if(value=='0'){
+                    return '-';
+                }
+                var selro = cardrotatess[row.rotate_id]||false;
+                if(selro && selro.prizes.length > 0){
+                    var prizename = '奖品不存在';
+                    $.each(selro.prizes,function(i,v){
+                        if(v.id==value){
+                            prizename = v.prizename;
+                            return false;
+                        }
+                    });
+                    return prizename;
+                }else{
+                    return '奖品不存在';
+                }
+            },
+        },  {
+            field: 'create_time',
+            title: '创建时间',
+            align: 'center',
+        }
+    ],
+    searchParamas:[{'type':'2','id':'rotateid'},{'type':'1','id':'keyword'},{'type':'2','id':'status'}],
+    toolbar:{
+        add:function(){
+            var confirmObj = jconfirmBox.ajaxconfirm("批量新增券号","{:gohdmanage('configdzp/addcardid',['hdid'=>$hdid])}",{ishtml:'1'},'html','col-lg-8 col-lg-offset-2',function(e){
+                var postData = webcore.serializeObject(e.find('form'));
+                postData.ishtml = '2';
+                webcore.ajaxSubmit("{:gohdmanage('configdzp/addcardid',['hdid'=>$hdid])}",postData,'正在努力生成券号中....').then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','批量新增成功');
+                        confirmObj.close();
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                         return false;
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差。操作失败');
+                     return false;
+                });
+            });
+        },
+        del:function(){
+            var getSelects = webtable.getSelections();
+            if(!getSelects.length){
+                return zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+            jconfirmBox.confirm('温馨提示','删除券号将删除关联的中奖记录并且无法恢复，您确定要删除选中的券号么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('configdzp/delcardid',['hdid'=>$hdid])}",{cardid:getSelects,rotateid:rotateid}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','删除成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+        },
+        reset:function(){
+            var rotateid = $("#rotateid").find("option:selected").val();
+            if(typeof(rotateid)=='undefined' || rotateid==''){
+                return zamnotice.showTips('error','请选择轮次');
+            }
+            jconfirmBox.confirm('温馨提示','清空券号将删除本轮所有的券号以及券号对应的中奖记录并且无法恢复，您确定要清空么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('configdzp/resetcardid',['hdid'=>$hdid])}",{rotateid:rotateid}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','清空成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+        },
+        shenhe:function(){
+            var rotateid = $("#rotateid").find("option:selected").val();
+            var confirmobj = jconfirmBox.ajaxconfirm("重复券号检查结果","{:gohdmanage('configdzp/checkcardno',['hdid'=>$hdid])}",{rotateid:rotateid},'html','col-lg-8 col-lg-offset-2',function(e){},false,'2');
+        },
+    },
+};
+webtable.init(initConfig);
+$('.zam-inline-searchbar select').change(function(e) {
+    webtable.refresh();
+});
+$('.btn-export').on('click',function(){
+    var status = $("#status").find('option:selected').val(),rotateid = $("#rotateid").find("option:selected").val();
+    webcore.ajaxSubmit("{:gohdmanage('configdzp/exportcardno',['hdid'=>$hdid])}",{rotateid:rotateid,status:status}).then(function(json){
+        if(json.code!=0){
+            zamnotice.showTips('error',json.msg);
+        }else{
+            window.location.href = `{:gohdmanage('configdzp/exportcardno',['hdid'=>$hdid])}&rotateid=${rotateid}&status=${status}`;
+        }
+    }, function(json){
+        zamnotice.showTips('error','网络差,操作失败');
+    });
+});
+$("body").on('click','.btn-samedetail',function() {
+    var rotateid = $("#rotateid").find("option:selected").val();
+    var confirmobj = jconfirmBox.ajaxconfirm("重复券号明细","{:gohdmanage('configdzp/repeatcardno',['hdid'=>$hdid])}",{rotateid:rotateid},'html','col-md-10 col-md-offset-1',function(e){},false,'2');
+});
+$("body").on('click','.btn-delsame',function(){
+    var $this = $(this),dataid = $this.attr('data-id');
+    var rotateid = $("#rotateid").find("option:selected").val();
+    jconfirmBox.confirm('温馨提示','删除所选券号将同步删除与当前券号相关联的中奖记录并且无法恢复，您确定要删除么？',function(){
+        webcore.ajaxSubmit("{:gohdmanage('configdzp/delcardid',['hdid'=>$hdid])}",{rotateid:rotateid,cardid:dataid}).then(function(json){
+            $this.parent().parent().remove();
+            webtable.refresh();
+            zamnotice.showTips('success','删除成功');
+        }, function(json){
+            zamnotice.showTips('error','网络差。操作失败');
+        });
+    });
+});
+});
+</script>
+{include file='$Wpath/common/footer'}

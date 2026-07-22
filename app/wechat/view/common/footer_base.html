@@ -1,0 +1,66 @@
+</body>
+<script>
+require(['wechatcore'],function (wechatcore) {
+	$("body").on('click','a',function(){
+		var href = $(this).attr('data-href');
+		var amodule = $(this).attr('data-module');
+		if(href!=null){
+			wechatcore.clickalink({r:amodule,url:href});
+		}
+	});
+});
+{if isset($clienttype) && $clienttype == '1'}
+if(!XCV3Config.isiframe){
+	var wxshareopen = XCV3Config.gametype != 'wechatlive' ? "{if isset($hdinfo['shareconfig']['open']) && $hdinfo['shareconfig']['open']=='1'}1{else /}2{/if}" : "{if !isset($shareconfig['open']) || $shareconfig['open']=='1'}1{else /}{$shareconfig['open']}{/if}";
+	if(XCV3Config.gametype == 'wechatlive' && wxshareopen == '1'){
+		wxshareopen = "{if isset($hdinfo['shareconfig']['open']) && $hdinfo['shareconfig']['open']=='1'}1{else /}2{/if}";
+	}
+	wx.ready(function () {
+		if(wxshareopen == '2'){
+			wx.hideOptionMenu();
+		}else{
+			var shareData = {:json_encode($hdinfo['shareconfig'])};
+			shareData.imgUrl = "{:tomedia($hdinfo['shareconfig']['icon']??'', false, '1')}";
+			if(wxshareopen == '3'){
+				shareData = {if isset($shareconfig) && !empty($shareconfig)}{:json_encode($shareconfig)}{else /}{}{/if};
+				if(!shareData.title || shareData.title == ''){
+					shareData.title = "{$hdinfo['hdtitle']??''}";
+				}
+				if(!shareData.icon || shareData.icon == ''){
+					shareData.imgUrl = "{:tomedia($appconfig['liveconfig']['poster']??'', false, '1')}";
+				}else{
+					shareData.imgUrl = "{:tomedia($shareconfig['icon']??'', false, '1')}";
+				}
+			}
+			shareData.link = window.location.href + '&shareid=' + XCV3Config.userid;
+			if (shareData.desc) {
+				shareData.desc = shareData.desc.replace(new RegExp("<br/>", "g"), "\r\n");
+			}
+			wx.hideMenuItems({
+				menuList: [
+					'menuItem:share:qq',
+					'menuItem:share:weiboApp',
+					'menuItem:share:QZone',
+					'menuItem:share:email',
+					'menuItem:readMode',
+					'menuItem:originPage'
+				],
+			});
+			wx.updateAppMessageShareData({
+				title: shareData.title,
+				desc: shareData.desc || '',
+				link: shareData.link,
+				imgUrl:shareData.imgUrl
+			});
+			wx.updateTimelineShareData({
+				title: shareData.title,
+				link: shareData.link,
+				imgUrl:shareData.imgUrl
+			})
+		}
+	});
+}
+{/if}
+</script>
+{:globalbaiducalc()}
+</html>

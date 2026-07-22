@@ -1,0 +1,150 @@
+{if isset($appconfig['appbgimg']) && !empty($appconfig['appbgimg'])}
+<div class="zam-app-bodyBg" style="background-image: url({:tomedia($appconfig['appbgimg'])})"></div>
+{/if}
+{if isset($appconfig['appbgmusic']) && !empty($appconfig['appbgmusic']) && isset($appconfig['gametype']) && !in_array($appconfig['gametype'],['cutfruit','jjb'])}
+<audio id="appbgmusic" src="{:tomedia($appconfig['appbgmusic'])}" loop="loop"></audio>
+{/if}
+<script>
+if(XCV3Config.clienttype < 0){
+	{// 禁止双指放大}
+	document.documentElement.addEventListener('touchstart', function (event) {
+		if (event.touches.length > 1) {
+		    event.preventDefault();
+		}
+	}, {passive: false});
+	{// 禁止双击放大}
+	var lastTouchEnd = 0;
+	document.documentElement.addEventListener('touchend', function (event) {
+	    var now = Date.now();
+	    if (now - lastTouchEnd <= 300) {
+	        event.preventDefault();
+	    }
+	    lastTouchEnd = now;
+	}, {passive: false});
+}
+var isselfsocket = "{if isselfsocket()}1{else /}2{/if}";
+if(isselfsocket == '2'){
+	require(['wechatcore','appsocket'],function (wechatcore,appsocket) {
+		function checkUrlnosocket(){
+			var isin = false, localUrlpage = window.location.href;
+			var notsocketroutes = ['apph5','yuyuedj','dzpdz','mosaicqd','submessage','subnotice'];
+			for (let i = 0; i < notsocketroutes.length; i++) {
+				if (localUrlpage.indexOf('wechat/' + notsocketroutes[i]) !== -1) {
+					isin = true;
+					break;
+				}
+			}
+			return isin;
+		}
+		function checkSignandSoon(){
+			var isin = false, localUrlpage = window.location.href;
+			var nogotoModules = ['sign','subwxmininotice'];
+			for (let i = 0; i < nogotoModules.length; i++) {
+				if (localUrlpage.indexOf('wechat/' + nogotoModules[i]) !== -1) {
+					isin = true;
+					break;
+				}
+			}
+			return isin;
+		}
+		if(!checkUrlnosocket() && XCV3Config.wsAddress != '' && XCV3Config.onlysearch != '1'){
+			appsocket.init({
+				onmessage:function(data){
+					if(data.type=='connected'){
+						appsocket.isclose = false;
+						wechatcore.connectsocket({clientid:data.clientid});
+					}else if(data.type=='goto'){
+						{/*签到页面不跳*/}
+						if (!checkSignandSoon()) {
+							wechatcore.goto(data);
+						}
+					}else if(data.type=='addblack'){
+						if(data.userid == XCV3Config.userid){
+							wechatcore.closewxwindow();
+						}
+					}else if(data.type=='luckeruserids'){
+						{/*签到页面不弹窗*/}
+						if (!checkSignandSoon()) {
+							wechatcore.layerAsklucker(data);
+						}
+					}else if(data.type=='confirmwxtxopenid'){
+						if(data.userid == XCV3Config.userid){
+							wechatcore.msg('授权成功');
+							setTimeout(function(){
+								window.location.reload();
+							},1e3);
+						}
+					}else if(data.type=='wxminiphone'){
+						if(data.phone){
+							$(".zam-input-box input[name='mobile']").val(data.phone);
+						}
+					}else if(data.type=='subwxmininotice'){
+						wechatcore.msg('订阅成功');
+						setTimeout(function(){
+							window.location.reload();
+						},1e3);
+					}else if(data.type == 'answerbsleveldjs'){
+						if($(".answerbsleveltime").length){
+							if(!$(".issellevel").length && !$(".isgiveup").length){
+								$(".levelbox .btn").removeClass('btn-disabled');
+								$(".levelbox .isdjsover").addClass('hidden');
+							}
+							$(".answerbsleveltime span").text(data.djs+'秒');
+							$(".answerbsleveltime").removeClass('hidden');
+							if(data.djs <= 0){
+								$(".answerbsleveltime span").text('时间到');
+								$(".levelbox .btn").addClass('btn-disabled');
+								if(!$(".issellevel").length && !$(".isgiveup").length){
+									$(".levelbox .isdjsover").removeClass('hidden');
+								}
+								setTimeout(function(){
+									window.location.reload();
+								},1e3);
+							}
+						}
+					}else if(data.type == 'answerbslevelreselect'){
+						var hdurl = data.url||'';
+						if(hdurl != ''){
+							window.location.href = hdurl;
+						}
+					}
+				}
+			});
+		}
+	});
+}
+function wxjsbridgeready() {
+	if(window.__wxjs_environment === 'miniprogram') {
+		XCV3Config.isminiProgram = '1';
+	}
+	if(XCV3Config.isminiProgram == '1'){
+		if(!XCV3Config.isiframe && XCV3Config.hasvipbtn == '1'){
+			$('.zam-app-vipbtn').removeClass('hidden');
+		}
+	}else{
+		if(XCV3Config.qrtype == '4' && XCV3Config.inminiprogram == '1'){
+			var mustmini = "{:mustInminiprogram()}";
+			if(mustmini == '1'){
+				window.location.href = "{:gowechat('common/errorhappend',['hdid'=>$hdinfo['hdid'],'errmsg'=>'请通过微信小程序访问','title'=>'温馨提醒'])}";
+			}
+		}
+	}
+}
+if (!window.WeixinJSBridge || !WeixinJSBridge.invoke) {
+	document.addEventListener('WeixinJSBridgeReady', wxjsbridgeready, false);
+} else {
+	wxjsbridgeready();
+}
+</script>
+{:globalcss()}
+{if !empty($hdinfo['diycss'])}
+<style type="text/css">{$hdinfo['diycss']}</style>
+{/if}
+{if isset($appconfig['style']) && isset($appconfig['style']['diycss']) && !empty($appconfig['style']['diycss'])}
+<style type="text/css">{$appconfig['style']['diycss']}</style>
+{/if}
+{if !isset($appconfig['gametype']) || $appconfig['gametype'] != 'wechatlive'}
+{include file="common/adv" /}
+{/if}
+{include file="common/vip" /}
+{include file="common/footer_base" /}

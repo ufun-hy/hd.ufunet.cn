@@ -1,0 +1,98 @@
+<form id="formBox" class="zam-formvalidation form-horizontal confirmbox-pop" method="post">
+  <div class="form-group bindwxuser">
+    <label class="col-lg-2 control-label">* 绑定用户</label>
+    <div class="col-lg-8">
+        <input type="hidden" name="user_id" class="binduserid" value="">
+        <a class="img-avatar img-avatar-pill img-avatar-36" href="javascript:void(0)">
+            <span></span>
+        </a>
+        <a href="javascript:void(0)" class="btn btn-danger btn-sm btn-binduser">点击选择用户</a>
+        <span class="help-block">必须绑定一个所属用户，注意一旦活动创建完成，无法修改活动所属用户</span>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-lg-2 control-label">* 活动主题</label>
+    <div class="col-lg-8">
+      <input class="form-control inputneedmax" type="text"  name="hdtitle" maxlength="30" placeholder="请输入活动主题..">
+    </div>
+  </div>
+  {if $config['createconfig']['opencate']=='1'}
+  <div class="form-group">
+	<label class="col-lg-2 control-label">* 活动类型</label>
+	<div class="col-lg-8">
+	   <select name="cate_id" class='form-control js_select2 cateidselect'>
+			 <option  value="">请选择</option>
+			 {volist name="hdcates" id="cate"}
+			 <option  value="{$cate['id']}">{$cate['catename']}</option>
+			 {/volist}
+	   </select>
+	</div>
+  </div>
+  {/if}
+  {if $config['createconfig']['openarea']=='1'}
+  <div class="form-group procitydist-unnormal">
+    <label class="col-lg-2 control-label">* 活动地点</label>
+    <div class="col-lg-4">
+        <a href="javascript:void(0)" class="pick-area pick-activityarea" ></a>
+		<input type="text" class="form-control hidden"  name="hdarea">
+    </div>
+  </div>
+  {/if}
+  <div class="form-group">
+	<label class="col-lg-2 control-label">* 活动人数</label>
+	<div class="col-lg-3">
+		<input type="text" class="form-control numberincdec" name="maxperson" 
+        data-bts-min="1" data-bts-replacement-val="1"
+        data-bts-max="null"
+        data-bts-step="1"
+        value="100">
+      <div class="zam-help-block">活动人数</div>
+	</div>
+  </div>
+  <div class="form-group">
+	<label class="col-lg-2 control-label">备注(可不填写)</label>
+	<div class="col-lg-8">
+	  <input type="text" class="form-control"  name="adminbeizhu" placeholder="管理员活动备注信息" >
+	  <span class="help-block">此项为选填</span>
+	</div>
+  </div>
+</form>
+<script>
+require(['webcore','jconfirmBox','zamnotice','zvalidator','pickcity',"bootstrap-touchspin"],function(webcore,jconfirmBox,zamnotice){
+	$(".confirmbox-pop .numberincdec").TouchSpin();
+	$('.cateidselect').select2({width: 'resolve',placeholder: '请选择'});
+	//初始化城市选择器
+	$(".pick-activityarea").pickArea({
+		"width":"400px",
+		"hoverColor":"#4886ff",
+		"maxWidth":"100",
+		"getVal":function(){
+			var pickcityDom = $("."+$(".pick-area-dom").val());
+			pickcityDom.next().val($(".pick-area-hidden").val());
+			$('#formBox').data('formValidation').revalidateField('hdarea');
+		},
+		"pickcity":function(){
+			zamnotice.showTips('error','请先选择省');
+		},
+		"pickdist":function(){
+			zamnotice.showTips('error','请先选择省和市');
+		},
+	});
+	$(".btn-binduser").click(function(){
+		var confirmobj = jconfirmBox.ajaxconfirm("绑定用户","{:gocommon('basic/searchuser')}",{ishtml:'1'},'html','col-lg-6 col-lg-offset-3',function(e){
+	      var selectuser = e.find("input:checked");
+        if(selectuser.length>0){
+            if(selectuser.length > 1){
+            	zamnotice.showTips('error','只能选择一个用户');
+            	return false;
+            }
+            $(".binduserid").val(selectuser.val());
+            $(".binduserid").next().find("span").html(selectuser.parent().parent().next().text());
+            confirmobj.close();
+        }else{
+            zamnotice.showTips('error','请选择用户');
+        }
+    });
+	});
+});
+</script>

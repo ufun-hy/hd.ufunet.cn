@@ -1,0 +1,74 @@
+<div class="alert alert-info">
+请认真填写，每项必填
+</div>
+<div class="form-horizontal confirmbox-pop">
+  <form class="confirm-formbox" method="post">
+  <div class="form-group phototypes">
+      <label class="col-lg-3 control-label">* 图片来源</label>
+      <div class="col-lg-8">
+        <label class="lyear-radio radio-inline radio-primary">
+         <input type="radio" name="phototype" value="1" {if !isset($config['phototype']) || $config['phototype']=='1'}checked{/if}><span>本地图片</span>
+        </label>
+        <label class="lyear-radio radio-inline radio-primary">
+         <input type="radio" name="phototype" value="2" {if isset($config['phototype']) && $config['phototype']=='2'}checked{/if}><span>上墙图片</span>
+        </label>
+        <label class="lyear-radio radio-inline radio-primary">
+         <input type="radio" name="phototype" value="3" {if isset($config['phototype']) && $config['phototype']=='3'}checked{/if}><span>霸屏图片</span>
+        </label>
+        <label class="lyear-radio radio-inline radio-primary">
+         <input type="radio" name="phototype" value="4" {if isset($config['phototype']) && $config['phototype']=='4'}checked{/if}><span>全部用户头像</span>
+        </label>
+        <label class="lyear-radio radio-inline radio-primary">
+         <input type="radio" name="phototype" value="5" {if isset($config['phototype']) && $config['phototype']=='5'}checked{/if}><span>签到用户头像</span>
+        </label>
+        <div class="help-block">
+          <div>本地图片需要您先本地上传，霸屏只会调用图片消息图片，并不会调用用户在霸屏消息中上传的图片</div>
+        </div>
+      </div>
+  </div>
+  <div class="form-group">
+	<label class="col-lg-3 control-label text-right">* 奖项名</label>
+	<div class="col-lg-8">
+	  <input type="text" class="form-control"  name="awardname"  value="{$config['awardname']}">
+	</div>
+  </div>
+  <div class="form-group">
+	<label class="col-lg-3 control-label text-right">* 奖品名</label>
+	<div class="col-lg-8">
+	  <input type="text" class="form-control"  name="prizename"  value="{$config['prizename']}">
+	</div>
+  </div>
+  <div class="form-group">
+	  <label class="col-lg-3 control-label">* 奖品图</label>
+	  <div class="col-lg-8">
+	    {:tpl_image_one('prizeimg', $config['prizeimg'])}
+	    <span class="help-block">100px*100px</span>
+	  </div>
+  </div>
+  <div class="form-group">
+    <label class="col-lg-3 control-label">* 奖品数量</label>
+    <div class="col-lg-4">
+        <input type="text" class="form-control numberincdec" name="prizenum" 
+        data-bts-min="1" data-bts-replacement-val="1"
+        data-bts-max="null"
+        data-bts-step="1"
+        value="{$config['prizenum']}">
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-lg-3 control-label">* 一次抽奖数量</label>
+    <div class="col-lg-4">
+        <input type="text" class="form-control numberincdec" name="onceout" 
+        data-bts-min="1" data-bts-replacement-val="1"
+        data-bts-max="null"
+        data-bts-step="1"
+        value="{$config['onceout']}">
+    </div>
+  </div>
+</form>
+</div>
+<script type="text/javascript">
+require(["bootstrap-touchspin"],function(){
+    $(".confirmbox-pop .numberincdec").TouchSpin();
+});
+</script>

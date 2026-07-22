@@ -1,0 +1,111 @@
+{include file='$Wpath/common/header'}
+<form id="formBox" class="zam-formvalidation form-horizontal" method="post">
+    <div class="config-titlebox">
+        <span class="config-titlename">大屏设置</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#screenconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+    </div>
+    <div id="screenconfigbox" class="collapse in">
+        {include file="$Wpath/common/configscreencommon" /}
+        {include file="$Wpath/common/configscreenmusic" /}
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 默认头像</label>
+            <div class="col-lg-4">
+              {:tpl_image_one('defaultimg',$config['defaultimg'])}
+              <span class="help-block">规格:100*100px</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 显示参与抽奖人数</label>
+            <div class="col-lg-3">
+                {:tpl_switch('showjoin',$config['showjoin'])}
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 显示获奖人数</label>
+            <div class="col-lg-3">
+                {:tpl_switch('showluckernum',$config['showluckernum'])}
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">一次性抽取多人弹窗类型</label>
+            <div class="col-lg-6">
+                <label class="lyear-radio radio-inline radio-primary">
+                   <input type="radio" name="oneshowtype" value="1" {if $config['oneshowtype']=='1'}checked{/if}><span>逐个循环弹出</span>
+                </label>
+                <label class="lyear-radio radio-inline radio-primary">
+                   <input type="radio" name="oneshowtype" value="2" {if $config['oneshowtype']=='2'}checked{/if}><span>一次性弹出</span>
+                </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 单个中奖用户弹出停留时间</label>
+            <div class="col-lg-2">
+                <input type="text" class="form-control numberincdec" name="oneanitime" value="{$config['oneanitime']}"
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="999"
+                data-bts-step="1"
+                data-bts-postfix="秒"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                >
+                <span class="zam-help-block">至少为1秒</span>
+            </div>
+        </div>
+    </div>
+    <div class="config-titlebox">
+        <span class="config-titlename">抽奖风格设置</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#screenstylebox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+    </div>
+    <div id="screenstylebox" class="collapse in">
+        {include file="$Wpath/common/normalcjstyle" /}
+    </div>
+     <div class="config-titlebox">
+        <span class="config-titlename">红包发送设置</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#srconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+     </div>
+     <div id="srconfigbox" class="collapse in">
+        {include file="$Wpath/common/sendredpackinfo" /}
+     </div>
+    {include file='$Wpath/common/savepanel'}
+</form>
+<script>
+require(['webcore','jconfirmBox','zamnotice','layerBox','zvalidator'],function(webcore,jconfirmBox,zamnotice,layerBox){
+    $('#formBox').formValidation({
+        framework: 'bootstrap',
+        excluded: [':disabled'],
+        message: '您填写的内容无效',
+        fields: {
+            apptitle:{
+                message: '请输入网页标题',
+                validators: {
+                    notEmpty: {
+                        message: '请输入网页标题'
+                    },
+                }
+            },
+        }
+    }).on('success.form.fv', function(e) {
+        e.preventDefault();
+        var $form = $(e.target);
+        var postData = webcore.serializeObject($form);
+        var bload = $form.find(".zam-fixedbottom button").lyearloading({opacity: 0.2,spinnerSize: 'nm'});
+        $form.formValidation('disableSubmitButtons', true);
+        webcore.ajaxSubmit("{:goweb('hdconfig/normalcj')}",postData).then(function(json){
+            bload.hide();
+            if(json.code==0){
+                $form.formValidation('disableSubmitButtons', false);
+                zamnotice.showTips('success','保存成功',2e3,function(){
+                    window.location.reload();
+                });
+            }else{
+                zamnotice.showTips('error',json.msg);
+                $form.formValidation('disableSubmitButtons', false);
+            }
+        }, function(json){
+            bload.hide();
+            zamnotice.showTips('error','网络差。操作失败');
+            $form.formValidation('disableSubmitButtons', false);
+        });
+    });
+});
+</script>
+{include file='$Wpath/common/footer'}

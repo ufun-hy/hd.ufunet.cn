@@ -1,0 +1,81 @@
+{if isset($appconfig['ruleinfo']) && isset($appconfig['ruleinfo']['open']) && $appconfig['ruleinfo']['open']=='1'}
+<style>
+.rule-btn {
+    position: fixed;
+    top: calc(50% - 1rem);
+    left: 0;
+    width: 0.60rem;
+    font-size: 0.32rem;
+    -webkit-writing-mode: vertical-rl;
+    -ms-writing-mode: tb-rl;
+    writing-mode: vertical-rl;
+    text-indent: 2px;
+    color: #fff;
+    border-radius: 0 6px 6px 0;
+    background-color: rgba(0,0,0,.4);
+    cursor: pointer;
+    z-index: 3;
+    letter-spacing: 0.15rem;
+    color: #fff;
+    padding-top: 0.15rem;
+}
+.popup-in-modal {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 3;
+    display: none;
+}
+.rule-modal-wraper {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    background-color: rgba(0,0,0,.8);
+}
+.rule-modal-content {
+    position: absolute;
+    width: 5.4rem;
+    max-height: 6.67rem;
+    top: 50%;
+    left: 50%;
+    padding: .24rem;
+    border-radius: .1rem;
+    background: #fff;
+    -webkit-transform: translate(-50%,-50%);
+    transform: translate(-50%,-50%);
+}
+.rule-btnclose {
+    position: absolute;
+    width: .54rem;
+    height: .54rem;
+    right: -.27rem;
+    top: -.27rem;
+    background-size: 100%;
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFcAAABXCAMAAABGFileAAAAZlBMVEVHcEzn5+fg4ODk5OTh4eHj4+Ph4eHh4eHg4ODp6enk5OTg4OD////w8PDi4uLh4eHh4eHg4ODg4ODg4ODg4ODg4ODg4ODg4OBmZmbV1dXa2tqDg4N5eXmwsLB/f39xcXHFxcVra2sMBscFAAAAF3RSTlMAH/wXzUuJ6vYPHJUDCGCRvcLc2aewO1l+nbIAAAH/SURBVHjatZnrboMwDEZDmquglK6XD9jo1vd/yVVoWrS1gEvzHfVfpSMrcoxjq2XiuXYnc/BBB38wJ1efo3qVrXVGY0SPvxFtnN2ul1b2GDBFONpqlXXjPObxbvO0tSgDlgll8ZQ1lhoydBnl2tpDjq+lR7DHc+xFh2E9nsXb5YTdYQ27hXSODdbRxNmcNViLmcnl4g3reSsmo03aVeKJiKPBa5j4MBMavErzKCt2eJ3dvdYiB/YuFTxy4P8nxR552P+rYMhF/SfFPHLho0qUyEeZtIVGPnRBCRcp4E1ATsLmx+uQF6dGKo+8+GrpBnfD0OMR/TB0S7f5OK39bNtL9+iPS9t+TouPY30MmGJob3x099qP9saAKcI2HcOkN4mRtPNe2Pls6C9JfKe99PMZYSAUy7UwSkUNoViuhY7qDAjFci1wXqy8/fuvOGnf+8Uq7ABhxPJoAadOgDRicbTASRmIxV9iLYw6QCxuxVoclIdYLNdqrwKkYrkWCEpDRHcdtdcOIjQrXtb5svKBlb+s+8aqD6x6xqq/rO8F6fvG+h6z+gdWv0Pqz1j9JKv/JfXrrPcF6T3Eer+R3pus9zHpPc+cP/DnJRVhvkOYRxHmZ4x5H2k+SZqnkua/tHk1f77O3wckKsL+grBvIeyHCPsswv6Nti+U7zcT4v0max/7DaMoFZeb5NVRAAAAAElFTkSuQmCC);
+}
+.rule-modal-content .rule-header {
+    margin-bottom: .18rem;
+    text-align: center;
+    font-size: .32rem;
+    color: #151516;
+    font-weight: 700;
+}
+.rule-modal-content .rule-list {
+    overflow-x: hidden;
+    overflow-y: scroll;
+    max-height: 5.63rem;
+    font-size: 0.34rem;
+}
+</style>
+<div class="rule-btn zam-app-flex-ajCenter2" onclick="javascript:$('.popup-in-modal').show();">游戏规则</div>
+<div class="popup-in-modal">
+    <div class="rule-modal-wraper"></div>
+    <div class="rule-modal-content">
+        <div class="rule-btnclose" onclick="javascript:$('.popup-in-modal').hide();"></div>
+        <div class="rule-header">游戏规则</div>
+        <div class="rule-list">{:$appconfig['ruleinfo']['rulecont']}</div>
+    </div>
+</div>
+{/if}

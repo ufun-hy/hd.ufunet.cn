@@ -1,0 +1,15 @@
+{if !empty($leftmenu['smenu']['ajax'])}
+<div id="toolbar" class="toolbar-btn-action zam-toolbar{if !empty(request()->hdmode) && request()->hdmode == '2'} freehdmode-toolbar{/if}">
+      {volist name="leftmenu.smenu.ajax" id='urls'}
+        {:getBtnHtml($urls)}
+      {/volist}
+</div>
+{else}
+{if !empty($leftmenu['ssmenu']['ajax'])}
+<div id="toolbar" class="toolbar-btn-action zam-toolbar{if !empty(request()->hdmode) && request()->hdmode == '2'} freehdmode-toolbar{/if}">
+      {volist name="leftmenu.ssmenu.ajax" id='urls'}
+        {:getBtnHtml($urls)}
+      {/volist}
+</div>
+{/if}
+{/if}

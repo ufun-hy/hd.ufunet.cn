@@ -1,0 +1,375 @@
+<style>
+.footer-controlBox{
+	position: absolute;
+    z-index: 10;
+    bottom:0px;
+    width: 100%;
+    -webkit-transition: .5s;
+    transition: .5s;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+}
+.footer-controlBox.down{
+	bottom:-65px;
+}
+.footer-controlBox.up{
+	bottom:0px
+}
+.footer-controlBox-main{
+	width:100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: justify;
+    -webkit-justify-content: space-between;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+}
+.footer-controlBox-main .icon-box{
+    position: relative;
+	height: 65px;
+	margin: 0 10px;
+    cursor: pointer;
+    -webkit-flex-shrink: 0;
+    -ms-flex-negative: 0;
+    flex-shrink: 0;
+}
+.footer-controlBox-main .icon-box .icon{
+    width: -webkit-max-content;
+    width: -moz-max-content;
+    width: max-content;
+    height: 100%;
+	text-align: center;
+}
+.footer-controlBox-main .icon-box .icon .icon-wrap{
+	width:32px;
+	height:32px;
+	border-radius:100%;
+}
+.footer-controlBox-main .icon-box .icon .icon-wrap i{
+	color:#fff;font-size:18px;
+}
+.footer-controlBox-main .icon-box .icon .name{
+	white-space: nowrap;
+    margin: 0;
+    font-size: 13px;
+    margin-top:2px;
+    color: #e9d5ab;
+}
+.mouseOn{
+    position: relative;
+    width: 100%;
+    height: 25px;
+}
+.mouseOn span{
+	position: absolute;
+    right: 0;
+    bottom: 0;
+    cursor: pointer;
+	height: 31px;
+    line-height: 31px;
+    width: 40px;
+    text-align: center;
+    float: right;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    border-bottom: 0;
+    border-radius: 40px 40px 0 0;
+    background: rgba(255, 255, 255, 0.5);
+    opacity: 0.3;
+}
+.mouseOn span i{
+	display: inline-block;
+	font-size:20px;
+	color:#fff;
+}
+.menuArrowbox-icon-up{
+	margin-left:4px;
+	transform:rotate(90deg);
+	-webkit-transform:rotate(90deg);
+}
+.menuArrowbox-icon-down{
+	margin-right:4px;
+	transform:rotate(-90deg);
+	-webkit-transform:rotate(-90deg);
+}
+.control-module-list{
+    width: -webkit-max-content;
+    width: -moz-max-content;
+    width: max-content;
+    height:65px;
+    position: relative;
+}
+.control-module-list-items{
+	width: 100%;
+    overflow: hidden;
+}
+.control-module-list-items .wrapbox{
+	position: relative;
+	width:100%;
+	height:65px;
+}
+
+.control-module-list .wrap{
+	position: relative;
+    top: 0;
+    left: 0;
+    width:100%;
+	height:100%;
+	-webkit-flex-wrap: wrap;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    -webkit-transition: -webkit-transform .3s;
+    transition: -webkit-transform .3s;
+    transition: transform .3s;
+    transition: transform .3s,-webkit-transform .3s;
+    -webkit-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+}
+
+.control-module-list .wrap .icon-box{
+	margin:0 15px;
+}
+.control-module-list .wrap .icon-box .icon .icon-wrap{
+}
+.control-module-list .wrap .icon-wrap img{
+	width:100%;
+	height:100%;
+}
+.switch-next{
+    width:30px;
+    height:65px;
+	cursor: pointer;
+	color:#fff;
+	background-color: #141415;
+	opacity:0.5;
+}
+.switch-prev{
+    width:30px;
+    height:65px;
+	cursor: pointer;
+	background-color: #141415;
+    color: #fff;
+    opacity: 0.5;
+}
+.control-msg-list{
+    width: -webkit-max-content;
+    width: -moz-max-content;
+    width: max-content;
+    height: 100%;
+}
+.control-msg-list.hidden{display: none;}
+.control-msg-list .icon-box .icon .icon-wrap{
+	background-color: #141415;
+    opacity: .5;
+}
+.control-msg-list .icon-box .icon .icon-wrap i{
+	font-size:18px;
+}
+.control-normal-list{
+	width: -webkit-max-content;
+    width: -moz-max-content;
+    width: max-content;
+    height: 100%;
+    position: relative;
+	padding:0 10px;
+}
+.control-normal-list-items{
+	position: relative;
+	width: 100%;
+}
+.control-normal-list .icon-box .icon .icon-wrap{
+	position:relative;
+	background-color: #141415;
+    opacity: .5;
+}
+.control-normal-list .isstop{
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	pointer-events:none;
+}
+.control-normal-list .isstop i{
+	font-size:20px!important;
+	color:red!important;
+}
+/*多种风格显示*/
+.menutooltip{
+	position:fixed;
+	bottom:65px;
+	color:#333;
+	width:100%;
+	height:auto;
+	text-align:center;
+	z-index:5
+}
+.menutooltip li{
+	position: relative;
+    width: 100%;
+    height: 42px;
+    padding: 0 12px;
+    line-height: 42px;
+    background-color: #191818b8;
+    color: #e9d5ab;
+    text-align: center;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size:14px;
+}
+.menutooltip li span{
+	display:none;
+}
+.menutooltip li:hover{
+	color:#4886ff;
+}
+.menutooltip li.active{
+	color: #e9d5ab;
+}
+.menutooltip li.active span{
+	color:#e9d5ab;
+	display:block;
+	font-size:14px;
+	position:absolute;
+	right:5px;
+	top:0;
+}
+.help-popimg{display: none}
+.help-shadow{
+	position: absolute;
+	height: 55px;
+	margin: 5px 0;
+	width: 100%;
+	top: 0;
+	left: 0;
+	border-radius: 5px;
+	box-shadow: 0 0 10px #fff002;
+	pointer-events: none;
+	z-index: 1;
+	display: none
+}
+.help-qr{
+	position: absolute;
+	width: 340px;
+	height: 120px;
+	top: 50%;
+    right: -350px;
+    transform: translate(0,-50%);
+	background-size: 100% 100%;
+}
+</style>
+<div  class="footer-controlBox">
+	<div  class="mouseOn"><span><i class="zam-icon-openTab menuArrowbox-icon-down"></i></span></div>
+	<div  class="footer-controlBox-main">
+		<div  class="control-module-list">
+			<div class="control-module-list-items zam-app-flex">
+				<div  class="switch-prev zam-app-flex-ajCenter">
+					<span><i class="zam-icon-arrow-l"></i></span>
+				</div>
+				<div class="wrapbox">
+					<div  class="wrap zam-app-flex-ajCenter2">
+						{volist name="menus" id="menu"}
+						{if $menu['openstatus']=='1'}
+						{if $menu['modulefield']!='fulldm'}
+							<div data-href="{if $menu['ishandadd']=='2'}{:goscreen($menu['modulefield'].'/index')}{else}{$menu['moduleurl']}{/if}" data-module="{$menu['modulefield']}" data-ishandadd="{$menu['ishandadd']}" data-styles={:json_encode($menu['styles'])} class="icon-box zam-app-flex-ajCenter2">
+								<div class="icon zam-app-flex-ajCenter">
+									<div class="icon-wrap zam-app-flex-ajCenter"><img src="{:tomedia($menu['moduleimg'])}"></div>
+									<p class="name">{$menu['modulename']}{if !empty($menu['modulekjj'])}({$menu['modulekjj']}){/if}</p>
+								</div>
+							</div>
+						{/if}
+						{/if}
+						{/volist}
+					</div>
+					<div class="help-shadow"></div>
+				</div>
+				<div  class="switch-next zam-app-flex-ajCenter">
+					<span><i class="zam-icon-arrow-r"></i></span>
+				</div>
+			</div>
+			<div class="help-popimg help-shouye"></div>
+			<div class="help-popimg help-moduleall"></div>
+		</div>
+		<div  class="control-msg-list zam-app-flex-ajCenter2{if isset($pcconfig['gametype']) && $pcconfig['gametype']=='msg'}{else/} hidden{/if}">
+			<div class="icon-box zam-app-flex-ajCenter2">
+				<div  class="icon zam-app-flex-ajCenter">
+					<div class="icon-wrap zam-app-flex-ajCenter2 to-firstpage"><i class="mxc-untitled109"></i></div>
+					<p class="name">首 页</p>
+				</div>
+			</div>
+			<div class="icon-box zam-app-flex-ajCenter2">
+				<div  class="icon zam-app-flex-ajCenter">
+					<div class="icon-wrap zam-app-flex-ajCenter2 to-prevpage"><i class="mxc-unie605"></i></div>
+					<p class="name">上一页</p>
+				</div>
+			</div>
+			<div class="icon-box zam-app-flex-ajCenter2">
+				<div  class="icon zam-app-flex-ajCenter">
+					<div class="icon-wrap zam-app-flex-ajCenter2 pause-start-page"><i class="mxc-stop"></i></div>
+					<p class="name">开始/暂停</p>
+				</div>
+			</div>
+			<div class="icon-box zam-app-flex-ajCenter2">
+				<div  class="icon zam-app-flex-ajCenter">
+					<div class="icon-wrap zam-app-flex-ajCenter2 to-nextpage"><i class="mxc-unie607"></i></div>
+					<p class="name">下一页</p>
+				</div>
+			</div>
+			<div class="icon-box zam-app-flex-ajCenter2">
+				<div  class="icon zam-app-flex-ajCenter">
+					<div class="icon-wrap zam-app-flex-ajCenter2 to-lastpage"><i class="mxc-untitled108"></i></div>
+					<p class="name">尾 页</p>
+				</div>
+			</div>
+		</div>
+		<div  class="control-normal-list">
+			<div class="control-normal-list-items zam-app-flex">
+				<div class="icon-box bgmusic-icon-box zam-app-flex-ajCenter2">
+					<div  class="icon zam-app-flex-ajCenter">
+						<div class="icon-wrap zam-app-flex-ajCenter2 openmusic" data-open="2"><i class="mxc-unie66b"></i><div class="isstop zam-app-flex-ajCenter2"><i class="mxc-untitled56"></i></div></div>
+						<p class="name">音效 (1)</p>
+					</div>
+				</div>
+				{if isset($menus['fulldm']) && !empty($dmconfig)}
+				<div class="icon-box fulldm-icon-box zam-app-flex-ajCenter2" >
+					<div  class="icon zam-app-flex-ajCenter">
+						<div class="icon-wrap zam-app-flex-ajCenter2 opendm"><i class="mxc-subtitle_block_light"></i><div class="isstop zam-app-flex-ajCenter2"><i class="mxc-untitled56"></i></div></div>
+						<p class="name">弹幕 (2)</p>
+					</div>
+				</div>
+				{/if}
+				<div class="icon-box zam-app-flex-ajCenter2" >
+					<div class="icon zam-app-flex-ajCenter">
+						<div class="icon-wrap zam-app-flex-ajCenter2 openqr"><i class="mxc-unie6b0"></i><div class="isstop zam-app-flex-ajCenter2"><i class="mxc-untitled56"></i></div></div>
+						<p class="name">二维码 (3)</p>
+					</div>
+				</div>
+				{if dzscreenhelp()}
+				<div class="icon-box zam-app-flex-ajCenter2" >
+					<div class="icon zam-app-flex-ajCenter">
+						<div class="icon-wrap zam-app-flex-ajCenter2 openhelp"><i class="mxc-question"></i></div>
+						<p class="name">帮助</p>
+					</div>
+				</div>
+				{/if}
+				<div class="icon-box zam-app-flex-ajCenter2" >
+					<div class="icon zam-app-flex-ajCenter">
+						<div class="icon-wrap zam-app-flex-ajCenter2 openfull" data-open="2"><i class="mxc-full"></i></div>
+						<p class="name">全屏 (4)</p>
+					</div>
+				</div>
+				<div class="help-shadow"></div>
+			</div>
+			<div class="help-popimg help-normalall"></div>
+			<div class="help-popimg help-fullscreen"></div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,122 @@
+<style>
+    .hdQrbox {
+        position:absolute;
+        top:20%;
+        left:50%;
+        width:150px;
+        color:#646464;
+        display:none;
+        z-index:11
+    }
+    .hdQrbox.active:before {
+        content: '';
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        left: -2px;
+        top: -2px;
+        border:2px solid #4886ff;
+        z-index:-1
+    }
+    .hdQrbox-txt {
+        margin:0;
+        height:40px;
+        color:#fff;
+        text-align:center;
+        line-height:40px;
+        cursor:default;
+        overflow:hidden;
+        text-overflow:ellipsis;
+        white-space:nowrap;
+        box-sizing:border-box
+    }
+    .hdQrbox img {
+        display:block;
+        width:100%;
+        height:calc(100% - 40px);
+        vertical-align: middle;
+        cursor:move;
+        border-radius:5px;
+    }
+    .hdQrbox span{
+        width: 10px;
+        height: 10px;
+        overflow: hidden;
+        border-radius: 10px;
+        background-color: #4886ff;
+        position:absolute;
+        z-index: 1;
+        cursor:nwse-resize;
+        display:none;
+    }
+    .hdQrbox.active span{
+        display:block;
+    }
+    .hdQrbox .bl,.hdQrbox .tl,.hdQrbox .lc,.hdQrbox .lc{
+        left:-6px
+    }
+    .hdQrbox .br,.hdQrbox .tr,.hdQrbox .rc,.hdQrbox .rc{
+        right:-6px
+    }
+    .hdQrbox .bl,.hdQrbox .br,.hdQrbox .bc{
+        bottom:-6px
+    }
+    .hdQrbox .tl,.hdQrbox .tr,.hdQrbox .tc{
+        top:-6px
+    }
+    .hdQrbox .bl,.hdQrbox .tr {
+        cursor:nesw-resize
+    }
+    .hdQrbox .lc,.hdQrbox .rc {
+        top:calc(50% - 5px);
+        cursor:w-resize;
+        display:none;
+    }
+    .hdQrbox .tc,.hdQrbox .bc {
+        left:calc(50% - 5px);
+        cursor:n-resize;
+        display:none;
+    }
+    .hdQrbox .help-qr{
+        position: absolute;
+        width: 340px;
+        height: 120px;
+        top: 50%;
+        right: -350px;
+        transform: translate(0,-50%);
+        background-size: 100% 100%;
+        
+    }
+    </style>
+    <div class="hdQrbox hdQrbox1">
+        <span class="tr"></span>
+        <span class="tl"></span>
+        <span class="br"></span>
+        <span class="bl"></span>
+        <span class="lc"></span>
+        <span class="rc"></span>
+        <span class="tc"></span>
+        <span class="bc"></span>
+        <div style="position:relative;width:100%;height:100%;">
+            <img src="{$qrcode}">
+            <p class="hdQrbox-txt">{$hdinfo['screenconfig']['qrtxt']}</p>
+            <div class="help-popimg help-qr"></div>
+        </div>
+    </div>
+    {if isset($hdinfo['screenconfig']['qrdouble']) && $hdinfo['screenconfig']['qrdouble'] == '1'}
+    <div class="hdQrbox hdQrbox2">
+        <span class="tr"></span>
+        <span class="tl"></span>
+        <span class="br"></span>
+        <span class="bl"></span>
+        <span class="lc"></span>
+        <span class="rc"></span>
+        <span class="tc"></span>
+        <span class="bc"></span>
+        <div style="position:relative;width:100%;height:100%;">
+            <img src="{$qrcode}">
+            <p class="hdQrbox-txt">{$hdinfo['screenconfig']['qrtxt']}</p>
+            <div class="help-popimg help-qr"></div>
+        </div>
+    </div>
+    {/if}

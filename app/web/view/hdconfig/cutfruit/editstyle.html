@@ -1,0 +1,504 @@
+{include file='$Wpath/common/header'}
+<div class="confirmbox-pop">
+<div class="text-center">
+      <div class="btn-group pop-btns" style="margin-bottom:10px;">
+        <a href="javascript:void(0)" class="btn btn-default btn-primary"><span>基础设置</span></a>
+        <a href="javascript:void(0)" class="btn btn-default"><span>大屏欢迎页</span></a>
+        <a href="javascript:void(0)" class="btn btn-default"><span>大屏设置</span></a>
+        <a href="javascript:void(0)" class="btn btn-default"><span>排行榜</span></a>
+        <a href="javascript:void(0)" class="btn btn-default"><span>微信设置</span></a>
+        <a href="javascript:void(0)" class="btn btn-default"><span>自定义css</span></a>
+      </div>
+</div>
+<form id="formBox" class="zam-formvalidation form-horizontal" method="post">
+  <div class="carditem">
+    {include file='$Wpath/common/gamestyle/basic'}
+    {include file='$Wpath/common/gamestyle/bgmusic'}
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 切水果音效</label>
+      <div class="col-lg-8">
+        {:tpl_audio('cutvoice', $config['cutvoice'])}
+        <span class="help-block">注意:必须控制在100KB内</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 切到炸弹音效</label>
+      <div class="col-lg-8">
+        {:tpl_audio('boomvoice', $config['boomvoice'])}
+        <span class="help-block">注意:必须控制在100KB内</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 游戏结束音效</label>
+      <div class="col-lg-8">
+        {:tpl_audio('overvoice', $config['overvoice'])}
+        <span class="help-block">注意:必须控制在100KB内</span>
+      </div>
+    </div>
+  </div>
+  <div class="carditem hidden">
+    {include file='$Wpath/common/gamestyle/welcome'}
+  </div>
+  <div class="carditem hidden">
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 空篮子图</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('emptylanzi', $config['emptylanzi'])}
+        <span class="help-block">规格:240*90px</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 昵称与成绩背景图</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('gamenamebg', $config['gamenamebg'])}
+        <span class="help-block">规格:170*72px</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 篮子1图</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('lanzi[]', $config['lanzi'][0])}
+        <span class="help-block">规格:240*272px</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 篮子2图</label>
+        <div class="col-lg-8">
+          {:tpl_image_one('lanzi[]', $config['lanzi'][1])}
+          <span class="help-block">规格:240*272px</span>
+        </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 篮子3图</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('lanzi[]', $config['lanzi'][2])}
+        <span class="help-block">规格:240*272px</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 篮子4图</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('lanzi[]', $config['lanzi'][3])}
+        <span class="help-block">规格:240*272px</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 篮子5图</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('lanzi[]', $config['lanzi'][4])}
+        <span class="help-block">规格:240*272px</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 篮子6图</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('lanzi[]', $config['lanzi'][5])}
+        <span class="help-block">规格:240*272px</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 篮子7图</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('lanzi[]', $config['lanzi'][6])}
+        <span class="help-block">规格:240*272px</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 篮子8图</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('lanzi[]', $config['lanzi'][7])}
+        <span class="help-block">规格:240*272px</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 篮子9图</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('lanzi[]', $config['lanzi'][8])}
+        <span class="help-block">规格:240*272px</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 篮子10图</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('lanzi[]', $config['lanzi'][9])}
+        <span class="help-block">规格:240*272px</span>
+      </div>
+    </div>
+  </div>
+  <div class="carditem hidden">
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 昵称与成绩背景图</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('pmnamebg', $config['pmnamebg'])}
+        <span class="help-block">规格:230*90px</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 排名按钮</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('pmimg', $config['pmimg'])}
+        <span class="help-block">规格:282*86px</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 下一轮按钮</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('nextimg', $config['nextimg'])}
+        <span class="help-block">规格:282*86px</span>
+      </div>
+    </div>
+    <div class="zam-inner-highconfig zam-hdinfo-highconfig">
+      <div class="btn-group type-btns zam-flex-center mb20">
+        <a href="javascript:;" class="btn btn-primary">排名图</a>
+        <a href="javascript:;" class="btn btn-default">排名数字</a>
+      </div>
+      <div class="typeitem">
+        <div class="form-group">
+          <label class="col-lg-2 control-label text-right">* 第1名水果篮子图</label>
+          <div class="col-lg-8">
+            {:tpl_image_one('pmlanzi[]', $config['pmlanzi'][0])}
+            <span class="help-block">规格:240*272px</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-lg-2 control-label text-right">* 第2名水果篮子图</label>
+          <div class="col-lg-8">
+            {:tpl_image_one('pmlanzi[]', $config['pmlanzi'][1])}
+            <span class="help-block">规格:240*272px</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-lg-2 control-label text-right">* 第3名水果篮子图</label>
+          <div class="col-lg-8">
+            {:tpl_image_one('pmlanzi[]', $config['pmlanzi'][2])}
+            <span class="help-block">规格:240*272px</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-lg-2 control-label text-right">* 第4名水果篮子图</label>
+          <div class="col-lg-8">
+            {:tpl_image_one('pmlanzi[]', $config['pmlanzi'][3])}
+            <span class="help-block">规格:240*272px</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-lg-2 control-label text-right">* 第5名水果篮子图</label>
+          <div class="col-lg-8">
+            {:tpl_image_one('pmlanzi[]', $config['pmlanzi'][4])}
+            <span class="help-block">规格:240*272px</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-lg-2 control-label text-right">* 第6名水果篮子图</label>
+          <div class="col-lg-8">
+            {:tpl_image_one('pmlanzi[]', $config['pmlanzi'][5])}
+            <span class="help-block">规格:240*272px</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-lg-2 control-label text-right">* 第7名水果篮子图</label>
+          <div class="col-lg-8">
+            {:tpl_image_one('pmlanzi[]', $config['pmlanzi'][6])}
+            <span class="help-block">规格:240*272px</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-lg-2 control-label text-right">* 第8名水果篮子图</label>
+          <div class="col-lg-8">
+            {:tpl_image_one('pmlanzi[]', $config['pmlanzi'][7])}
+            <span class="help-block">规格:240*272px</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-lg-2 control-label text-right">* 第9名水果篮子图</label>
+          <div class="col-lg-8">
+            {:tpl_image_one('pmlanzi[]', $config['pmlanzi'][8])}
+            <span class="help-block">规格:240*272px</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-lg-2 control-label text-right">* 第10名水果篮子图</label>
+          <div class="col-lg-8">
+            {:tpl_image_one('pmlanzi[]', $config['pmlanzi'][9])}
+            <span class="help-block">规格:240*272px</span>
+          </div>
+        </div>
+      </div>
+      <div class="typeitem hidden">
+        <div class="form-group">
+          <label class="col-lg-2 control-label text-right">* 第1名图标</label>
+          <div class="col-lg-8">
+            {:tpl_image_one('pmicon[]', $config['pmicon'][0])}
+            <span class="help-block">规格:56*78px</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-lg-2 control-label text-right">* 第2名图标</label>
+          <div class="col-lg-8">
+            {:tpl_image_one('pmicon[]', $config['pmicon'][1])}
+            <span class="help-block">规格:56*78px</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-lg-2 control-label text-right">* 第3名图标</label>
+          <div class="col-lg-8">
+            {:tpl_image_one('pmicon[]', $config['pmicon'][2])}
+            <span class="help-block">规格:56*78px</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-lg-2 control-label text-right">* 第4名图标</label>
+          <div class="col-lg-8">
+            {:tpl_image_one('pmicon[]', $config['pmicon'][3])}
+            <span class="help-block">规格:56*78px</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-lg-2 control-label text-right">* 第5名图标</label>
+          <div class="col-lg-8">
+            {:tpl_image_one('pmicon[]', $config['pmicon'][4])}
+            <span class="help-block">规格:56*78px</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-lg-2 control-label text-right">* 第6名图标</label>
+          <div class="col-lg-8">
+            {:tpl_image_one('pmicon[]', $config['pmicon'][5])}
+            <span class="help-block">规格:56*78px</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-lg-2 control-label text-right">* 第7名图标</label>
+          <div class="col-lg-8">
+            {:tpl_image_one('pmicon[]', $config['pmicon'][6])}
+            <span class="help-block">规格:56*78px</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-lg-2 control-label text-right">* 第8名图标</label>
+          <div class="col-lg-8">
+            {:tpl_image_one('pmicon[]', $config['pmicon'][7])}
+            <span class="help-block">规格:56*78px</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-lg-2 control-label text-right">* 第9名图标</label>
+          <div class="col-lg-8">
+            {:tpl_image_one('pmicon[]', $config['pmicon'][8])}
+            <span class="help-block">规格:56*78px</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-lg-2 control-label text-right">* 第10名图标</label>
+          <div class="col-lg-8">
+            {:tpl_image_one('pmicon[]', $config['pmicon'][9])}
+            <span class="help-block">规格:56*78px</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="carditem hidden">
+    {include file='$Wpath/common/gamestyle/wechat'}
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 顶部文字图</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('apptopimg', $config['apptopimg'])}
+        <span class="help-block">规格:744*394px</span>
+      </div>
+    </div>
+    <div class="form-group hidden">
+      <label class="col-lg-2 control-label text-right">* 右侧游戏说明按钮</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('apphelp', $config['apphelp'])}
+        <span class="help-block">规格:80*208px</span>
+      </div>
+    </div>
+    <div class="form-group hidden">
+      <label class="col-lg-2 control-label text-right">* 游戏说明图</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('apphelpbox', $config['apphelpbox'])}
+        <span class="help-block">规格:738*498px</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 掉落水果1</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('appleimg[]', $config['appleimg'][0])}
+        <span class="help-block">规格:66*66px</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 水果1-1</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('appleimg[]', $config['appleimg'][1])}
+        <span class="help-block">规格:66*66px</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 水果1-2</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('appleimg[]', $config['appleimg'][2])}
+        <span class="help-block">规格:66*66px</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 掉落水果2</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('bananaimg[]', $config['bananaimg'][0])}
+        <span class="help-block">规格:126*50px</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 水果2-1</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('bananaimg[]', $config['bananaimg'][1])}
+        <span class="help-block">规格:126*50px</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 水果2-2</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('bananaimg[]', $config['bananaimg'][2])}
+        <span class="help-block">规格:126*50px</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 掉落水果3</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('basahaimg[]', $config['basahaimg'][0])}
+        <span class="help-block">规格:86*72px</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 水果3-1</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('basahaimg[]', $config['basahaimg'][1])}
+        <span class="help-block">规格:68*72px</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 水果3-2</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('basahaimg[]', $config['basahaimg'][2])}
+        <span class="help-block">规格:68*72px</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 掉落水果4</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('peachimg[]', $config['peachimg'][0])}
+        <span class="help-block">规格:62*59px</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 水果4-1</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('peachimg[]', $config['peachimg'][1])}
+        <span class="help-block">规格:62*59px</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 水果4-2</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('peachimg[]', $config['peachimg'][2])}
+        <span class="help-block">规格:62*59px</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 掉落水果5</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('sandiaimg[]', $config['sandiaimg'][0])}
+        <span class="help-block">规格:98*85px</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 水果5-1</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('sandiaimg[]', $config['sandiaimg'][1])}
+        <span class="help-block">规格:98*85px</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 水果5-2</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('sandiaimg[]', $config['sandiaimg'][2])}
+        <span class="help-block">规格:98*85px</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 掉落炸弹</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('bombimg', $config['bombimg'])}
+        <span class="help-block">规格:64*93px</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 顶部得分背景</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('appscorebg', $config['appscorebg'])}
+        <span class="help-block">规格:269*125px</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 顶部时间背景</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('apptimebg', $config['apptimebg'])}
+        <span class="help-block">规格:267*115px</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 游戏结束背景</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('appoverbg', $config['appoverbg'])}
+        <span class="help-block">规格:989*679px</span>
+      </div>
+    </div>
+  </div>
+  <div class="carditem hidden">
+    {include file='$Wpath/common/gamestyle/diycss'}
+  </div>
+  {include file='$Wpath/common/cancelsavepanel'}
+</form>
+</div>
+<script type="text/javascript">
+require(['webcore','jconfirmBox','zamnotice','zvalidator'],function(webcore,jconfirmBox,zamnotice){
+  $(".confirmbox-pop .pop-btns a.btn").click(function(){
+      $(this).addClass('btn-primary').siblings().removeClass("btn-primary");
+      $(".confirmbox-pop .carditem").addClass('hidden').eq($(this).index()).removeClass('hidden');
+  });
+  $(".confirmbox-pop .type-btns a.btn").click(function(){
+      $(this).addClass('btn-primary').siblings().removeClass("btn-primary");
+      $(".confirmbox-pop .typeitem").addClass('hidden').eq($(this).index()).removeClass('hidden');
+  });
+  $('#formBox').formValidation({
+      framework: 'bootstrap',
+      excluded: [':disabled'],
+      message: '您填写的内容无效',
+      fields: {}
+  }).on('success.form.fv', function(e) {
+    e.preventDefault();
+    var $form = $(e.target);
+    var postData = webcore.serializeObject($form);
+    var bload = $form.find(".zam-fixedbottom button").lyearloading({opacity: 0.2,spinnerSize: 'nm'});
+    $form.formValidation('disableSubmitButtons', true);
+    webcore.ajaxSubmit("{:goweb('hdconfig/edit'.$gametype.'style')}",postData).then(function(json){
+      bload.hide();
+      if(json.code==0){
+          $form.formValidation('disableSubmitButtons', false);
+          zamnotice.showTips('success','操作成功',1e3,function(){
+            window.location.href = "{:goweb('hdconfig/'.$gametype.'style')}";
+          });
+        }else{
+            zamnotice.showTips('error',json.msg);
+            $form.formValidation('disableSubmitButtons', false);
+        }
+    }, function(json){
+      bload.hide();
+      zamnotice.showTips('error','网络差。操作失败');
+      $form.formValidation('disableSubmitButtons', false);
+    });
+  });
+});
+</script>
+{include file='$Wpath/common/footer'}

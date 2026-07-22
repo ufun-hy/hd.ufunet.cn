@@ -1,0 +1,96 @@
+{include file='$Wpath/common/header'}
+<style>
+.rotate-lists tr td{text-align:center!important;}
+</style>
+<div class="m-t-5 m-b-15">
+	<a  class="btn btn-success btn-sm additem" href="javascript:;"><i class="mdi mdi-plus"></i> 添加轮次</a>
+</div>
+<form id="itemForm" method="post" class="form-horizontal">
+<table class="we7-table table" style="margin-bottom:0px;">
+<thead>
+  <tr>
+	<th style="width:20%;text-align:center;">轮次名称</th>
+	<th style="width:15%;text-align:center;">匹配信息</th>
+	<th style="width:15%;text-align:center;">重复配对</th>
+	<th style="width:20%;text-align:center;">左侧队伍</th>
+	<th style="width:20%;text-align:center;">右侧队伍</th>
+	<th style="width:10%;text-align:center;">操作</th>
+  </tr>
+</thead>
+<tbody class="rotate-lists">
+	{volist name="rotates" id="rotate"}
+		<tr>
+		<td>
+			{$rotate['title']}
+		</td>
+		<td>
+			
+			<div>{if $rotate['sextype']=='1'}男女{elseif $rotate['sextype']=='2' /}男男{elseif $rotate['sextype']=='3' /}女女{else /}随机{/if}对对碰</div>
+			<div>计划匹配:{$rotate['plannum']}对</div>
+			<div>单次抽出:{$rotate['outnum']}对</div>
+		</td>
+		<td>
+			{if $rotate['isexcept']=='1'}匹配自动剔除{else /}独立轮次{/if}
+		</td>
+		<td>
+			
+			<div>{$rotate['leftgroupconfig']['name']??'男神队'}</div>
+			<div>{if $rotate['leftgroupconfig']['type']=='1'}全部用户{elseif $rotate['leftgroupconfig']['type']=='2' /}签到用户{elseif $rotate['leftgroupconfig']['type']=='3' /}签到分组{else /}自定义分组{/if}</div>
+		</td>
+		<td>
+			
+			<div>{$rotate['rightgroupconfig']['name']??'女神队'}</div>
+			<div>{if $rotate['rightgroupconfig']['type']=='1'}全部用户{elseif $rotate['rightgroupconfig']['type']=='2' /}签到用户{elseif $rotate['rightgroupconfig']['type']=='3' /}签到分组{else /}自定义分组{/if}</div>
+		</td>
+		<td>
+		    <a href="javascript:;"  class="btn btn-danger btn-sm delitem" data-roundid="{$rotate['roundid']??''}">
+			  <i class="mdi mdi-close"></i>
+		    </a>
+		</td>
+        </tr>
+	{/volist}
+</tbody>
+</table>
+<form>
+<script>
+require(["zamnotice","layerBox","jconfirmBox","webcore"],function(zamnotice,layerBox,jconfirmBox,webcore){
+	$(".additem").click(function(){
+		var confirmObj = jconfirmBox.ajaxconfirm("新增轮次","{:goweb('hdconfig/ddprotate')}",{ishtml:'1'},'html','col-lg-8 col-lg-offset-2',function(e){
+			var postData = webcore.serializeObject(e.find('form'));
+			if(postData.title==''){
+				zamnotice.showTips('error','轮次名必须填写');
+				return false;
+			}
+			layerBox.showLoading("数据提交中..");
+			$.post(window.location.href+"?ishtml=2",postData, function(result) {
+				layerBox.closeLayer();
+				if(result.code==0){
+					confirmObj.close();
+					zamnotice.showTips('success','保存成功',500,function(){
+						window.location.reload();
+					});	
+				}else{
+					zamnotice.showTips('error',result.msg);
+				}
+			}, 'json');
+		});
+	});
+	$(".rotate-lists").on('click','.delitem',function(){
+		var $this = $(this),roundid = $this.attr('data-roundid') || '';
+		jconfirmBox.confirm('温馨提示','删除将无法恢复，您确定要删除么？',function(){
+                webcore.ajaxSubmit("{:goweb('hdconfig/ddprotate')}",{ishtml:'3',roundid:roundid}).then(function(json){
+                    if(json.code==0){
+                        $this.parent().parent().remove();
+                        zamnotice.showTips('success','删除成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差。操作失败');
+                });
+        });
+		
+	});
+});
+</script>
+{include file='$Wpath/common/footer'}

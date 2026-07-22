@@ -1,0 +1,223 @@
+{include file='$Wpath/common/header'}
+<div class="alert alert-danger">
+    特别注意：删除或者清空中奖记录不会重置轮次内的奖品余量，推荐通过复制新的一轮来作为正式活动轮次
+</div>
+<div class="form-inline zam-inline-searchbar">
+    <div class="form-group m-l-5">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">选择轮次</span>
+          <select id="rotateid" class="form-control">
+            {if empty($rotates)}
+                <option value="0">暂无轮次</option>
+            {/if}
+            {foreach $rotates as $k=>$r} 
+                <option value="{$r['id']}" {if $rotate['id'] == $r['id']}selected{/if}>{$r['title']}</option>
+            {/foreach}
+          </select>
+        </div>
+    </div>
+    <div class="form-group m-l-5">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">奖品</span>
+          <select id="prizeid" class="form-control">
+            <option value='' selected>全部</option>
+            {if !empty($rotate)}
+                {foreach $rotate['prizes'] as $pkey=>$prize}
+                    {if $prize['prizetype'] != '3' || ($prize['prizetype'] == '3' && $prize['saverecord'] == '1')}
+                    <option value="{$prize['id']}">{$prize['prizename']}</option>
+                    {/if}
+                {/foreach}
+            {/if}
+          </select>
+        </div>
+    </div>
+    <div class="form-group wxluckerbox{if isset($rotate['cjmode']) && $rotate['cjmode']=='1'} hidden{/if}">
+        <div class="form-group m-l-5">
+          <div class="input-group input-group-sm">
+            <span class="input-group-addon">核销状态</span>
+              <select id="hxtype" class="form-control">
+                {foreach $hxtypes as $hkey=>$hxtype} 
+                    <option value="{$hkey}" {if $hkey == '0'}selected{/if}>{$hxtype}</option>
+                {/foreach}
+              </select>
+            </div>
+        </div>
+        <div class="form-group m-l-5">
+          <div class="input-group input-group-sm">
+            <span class="input-group-addon">红包发放状态</span>
+              <select id="sendtype" class="form-control">
+                {foreach $sendtypes as $skey=>$sendtype} 
+                    <option value="{$skey}" {if $skey == '0'}selected{/if}>{$sendtype}</option>
+                {/foreach}
+              </select>
+            </div>
+        </div>
+        <div class="form-group" style="max-width: 200px">
+          <div class="input-group input-group-sm">
+            <span class="input-group-addon">昵称或表单内容</span>
+            <input type="text" class="form-control" value="" id="keyword" placeholder="请输入用户昵称或表单内容">
+          </div>
+        </div>
+        {if dzdzpcardno()}
+        <div class="form-group" style="max-width: 150px">
+          <div class="input-group input-group-sm">
+            <span class="input-group-addon">券号</span>
+            <input type="text" class="form-control" value="" id="cardno" placeholder="请输入券号">
+          </div>
+        </div>
+        {/if}
+    </div>
+    <a class="btn btn-primary btn-sm btn-search" href="javascript:void(0)"><i class="mdi mdi-magnify"></i> 搜索</a>
+    <a class="btn btn-warning btn-sm btn-export" href="javascript:void(0)"><i class="mdi mdi-export"></i> 导出</a>
+</div>
+{include file='$Wpath/common/tabletoolbar'}
+<table id="listtable" class="zam-btable"></table>
+<script>    
+var $rotates = {:json_encode($rotates)};
+require(['webcore','webtable','jconfirmBox','zamnotice'],function(webcore,webtable,jconfirmBox,zamnotice){
+var searchParamas = [{'type':'2','id':'rotateid'},{'type':'2','id':'prizeid'},{'type':'2','id':'hxtype'},{'type':'2','id':'sendtype'},{'type':'1','id':'keyword'},{'type':'1','id':'cardno'}];
+var initConfig = {
+    tableId:'#listtable',
+    url:"{:gohdmanage('datadzp/index',['hdid'=>$hdid])}",
+    columnoperate:{
+        btns:{
+            del:true,
+        },
+        func:{
+            del:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','删除中奖数据将无法恢复，您确定要删除么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('datadzp/dellucker',['hdid'=>$hdid])}",{rotateid:$("#rotateid option:selected").val(),recordid:row.id}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','删除成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差。操作失败');
+                });
+                });
+            }
+        }
+    },
+    columns:[
+        {
+            checkbox: true,
+        },{
+            field: 'id',
+            title: 'id',
+            align: 'center',
+            visible: false
+        },{
+            field: 'userinfohtml',
+            title: '中奖用户',
+            align: 'center',
+            formatter:function(value,row,index){
+                return row.cjmode == '1' ? '-' : value;
+            }
+        },{
+            field: 'prizetypetxt',
+            title: '类型',
+            align: 'center',
+        },{
+            field: 'prizeinfohtml',
+            title: '奖品明细',
+            align: 'center',
+        },{
+            field: 'hxsendmorehtml',
+            title: '核销/发放',
+            align: 'center',
+            width:'15%',
+        },{
+            field: 'cardno',
+            title: '抽奖券号',
+            align: 'center',
+        },{
+            field: 'create_time',
+            title: '中奖时间',
+            align: 'center',
+        }
+    ],
+    searchParamas:searchParamas,
+    toolbar:{
+        del:function(){
+            var getSelects = webtable.getSelections();
+            if(!getSelects.length){
+                return zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+            jconfirmBox.confirm('温馨提示','删除用户中奖数据将无法恢复，您确定要删除选中的用户么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('datadzp/dellucker',['hdid'=>$hdid])}",{rotateid:$("#rotateid option:selected").val(),recordid:getSelects}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','删除成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+        },
+        reset:function(){
+            var rotateid = $("#rotateid option:selected").val()||'';
+            if(+rotateid < 1) {
+                return zamnotice.showTips('info','请选择轮次');
+            }
+            jconfirmBox.confirm('温馨提示','清空将删除本轮所有用户的中奖数据并且无法恢复，您确定要清空么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('datadzp/resetlucker',['hdid'=>$hdid])}",{rotateid:rotateid}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','清空成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+        },
+    },
+};
+webtable.init(initConfig);
+$('#rotateid').change(function(e) {
+    var selroundid = $(e.target).find("option:selected").val()||'';
+    var selround = $rotates[selroundid].prizes;
+    if(!selround) {
+        return false;
+    }
+    var html = `<option value="0" selected>全部</option>`;
+    $.each(selround,function(i,v){
+        if(v.prizetype != '3' || (v.prizetype == '3' && v.saverecord == '1')) {
+            html += `<option value="${v.id}">${v.prizename}</option>`;
+        }
+    });
+    $("#prizeid").html(html);
+    var cjmode = $rotates[selroundid].cjmode || '1';
+    if(cjmode == '1'){
+        $(".wxluckerbox").addClass('hidden');
+    }else{
+        $(".wxluckerbox").removeClass('hidden');
+    }
+    webtable.refresh();
+});
+$('#prizeid,#sendtype,#hxtype').change(function(e) {
+     webtable.refresh();
+})
+$('.btn-export').on('click',function(){
+   var rotateid = $("#rotateid").find('option:selected').val() || '';
+   if(+rotateid < 1){
+     return zamnotice.showTips('error','请先选择轮次');
+   }
+   webcore.ajaxSubmit("{:gohdmanage('datadzp/exportlucker',['hdid'=>$hdid])}",{rotateid:rotateid}).then(function(json){
+        if(json.code!=0){
+            zamnotice.showTips('error',json.msg);
+        }else{
+            window.location.href = `{:gohdmanage('datadzp/exportlucker',['hdid'=>$hdid])}&rotateid=${rotateid}`;
+        }
+    }, function(json){
+        zamnotice.showTips('error','网络差,操作失败');
+    });
+});
+});
+</script>
+{include file='$Wpath/common/footer'}

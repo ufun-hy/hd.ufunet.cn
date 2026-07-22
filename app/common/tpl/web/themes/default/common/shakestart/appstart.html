@@ -1,0 +1,123 @@
+{include file="$Wpath/common/configwechatcommon" /}
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 显示微信头像</label>
+    <div class="col-lg-8">
+        {:tpl_switch('apppageconfig[showavatar]',$config['apppageconfig']['showavatar'])}
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 头像大小</label>
+    <div class="col-lg-4">
+        <input type="text" class="form-control numberincdec" name="apppageconfig[avatarsize]" value="{$config['apppageconfig']['avatarsize']}"
+        data-bts-min="10" data-bts-replacement-val="10"
+        data-bts-max="null"
+        data-bts-step="1"
+        data-bts-postfix="px"
+        data-bts-postfix-extra-class="touchspin-postfix"
+        >
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 显示微信昵称</label>
+    <div class="col-lg-8">
+        {:tpl_switch('apppageconfig[showname]',$config['apppageconfig']['showname'])}
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 昵称大小</label>
+    <div class="col-lg-4">
+        <input type="text" class="form-control numberincdec" name="apppageconfig[namesize]" value="{$config['apppageconfig']['namesize']}"
+        data-bts-min="10" data-bts-replacement-val="10"
+        data-bts-max="null"
+        data-bts-step="1"
+        data-bts-postfix="px"
+        data-bts-postfix-extra-class="touchspin-postfix"
+        >
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 昵称颜色</label>
+    <div class="col-lg-3">
+        {:tpl_color('apppageconfig[namecolor]',$config['apppageconfig']['namecolor'])}
+        <span class="help-block">默认白色</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 提示文字大小</label>
+    <div class="col-lg-4">
+        <input type="text" class="form-control numberincdec" name="apppageconfig[tipsize]" value="{$config['apppageconfig']['tipsize']}"
+        data-bts-min="10" data-bts-replacement-val="10"
+        data-bts-max="null"
+        data-bts-step="1"
+        data-bts-postfix="px"
+        data-bts-postfix-extra-class="touchspin-postfix"
+        >
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 提示文字颜色</label>
+    <div class="col-lg-3">
+        {:tpl_color('apppageconfig[tipcolor]',$config['apppageconfig']['tipcolor'])}
+        <span class="help-block">默认白色</span>
+    </div>
+</div>
+<div class="form-group">
+	<label class="col-lg-2 control-label">* 等待开始提示</label>
+	<div class="col-lg-8">
+        <input type="text" class="form-control" name="apppageconfig[waittip]" value="{$config['apppageconfig']['waittip']}">
+    	<div class="help-block">提示用户启动还未开始</div>
+	</div>
+</div>
+<div class="form-group">
+	<label class="col-lg-2 control-label">* 进行中提示</label>
+	<div class="col-lg-8">
+        <input type="text" class="form-control" name="apppageconfig[starttip]" value="{$config['apppageconfig']['starttip']}">
+    	<div class="help-block">提示用户启动已经开始</div>
+	</div>
+</div>
+<div class="form-group">
+	<label class="col-lg-2 control-label">* 已结束提示</label>
+	<div class="col-lg-8">
+        <input type="text" class="form-control" name="apppageconfig[endtip]" value="{$config['apppageconfig']['endtip']}">
+    	<div class="help-block">提示用户启动已完成</div>
+	</div>
+</div>
+<div class="form-group">
+	<label class="col-lg-2 control-label">* 倒计时提示</label>
+	<div class="col-lg-8">
+        <input type="text" class="form-control" name="apppageconfig[djstip]" value="{$config['apppageconfig']['djstip']??'倒计时中，马上开始'}">
+    	<div class="help-block">提示用户启动正在倒计时准备开始</div>
+	</div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 显示成绩</label>
+    <div class="col-lg-8">
+        {:tpl_switch('apppageconfig[showscore]',$config['apppageconfig']['showscore'])}
+    </div>
+</div>
+<div class="form-group">
+	<label class="col-lg-2 control-label">* 成绩文字</label>
+	<div class="col-lg-8">
+        <input type="text" class="form-control" name="apppageconfig[scoretxt]" value="{$config['apppageconfig']['scoretxt']}">
+    	<div class="help-block">注意:文字中的#符号将会被用户真实成绩替换</div>
+	</div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 成绩文字大小</label>
+    <div class="col-lg-4">
+        <input type="text" class="form-control numberincdec" name="apppageconfig[scoresize]" value="{$config['apppageconfig']['scoresize']}"
+        data-bts-min="10" data-bts-replacement-val="10"
+        data-bts-max="null"
+        data-bts-step="1"
+        data-bts-postfix="px"
+        data-bts-postfix-extra-class="touchspin-postfix"
+        >
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 成绩文字大小颜色</label>
+    <div class="col-lg-3">
+        {:tpl_color('apppageconfig[scorecolor]',$config['apppageconfig']['scorecolor'])}
+        <span class="help-block">默认白色</span>
+    </div>
+</div>

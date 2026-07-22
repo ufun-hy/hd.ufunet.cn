@@ -1,0 +1,27 @@
+<table class="we7-table table" style="margin-bottom:0px;">
+<thead>
+  <tr>
+	<th style="width:10%;text-align:center;">id</th>
+	<th style="width:15%;text-align:center;">图片名称</th>
+	<th style="width:60%;text-align:center;">图片</th>
+	<th style="width:10%;text-align:center;">操作</th>
+  </tr>
+</thead>
+<tbody class="prize-lists">
+	 {volist name='photos' id="samedata"}
+	  <tr>
+		<td class="text-center">
+			{$samedata['id']}
+		</td>
+		<td class="text-center">
+			<span class="text-danger">{$samedata['photoname']}</span>
+		</td>
+		<td class="text-center"><img src="{$samedata['filepath']}" style="max-height:100px;" /></td>
+		<td class="text-center">
+			<a class="btn btn-danger btn-sm btn-delsame" data-id="{$samedata['id']}">删除</a>
+		</td>
+	 </tr>
+	{/volist}
+</tbody>
+</table>
+

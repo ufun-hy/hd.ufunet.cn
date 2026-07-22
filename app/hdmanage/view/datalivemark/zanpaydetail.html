@@ -1,0 +1,100 @@
+<div class="zam-inline-searchbar searchplan">
+	<div class="input-group zam-flex col-md-7">
+		<input type="text" class="form-control" id="keyword" placeholder="请输入微信名">
+		<span class="input-group-btn">
+			<button onclick="plansearch(this)" class="btn btn-primary btn-search"><i class="mdi mdi-magnify"></i> 搜索</button>
+		</span>
+	</div>
+</div>
+<table class="table" style="margin-bottom:0px;">
+<thead>
+  <tr>
+	<th style="width:40%;text-align:center;">用户</th>
+	<th style="width:30%;text-align:center;">赞数量</th>
+	<th style="width:30%;text-align:center;">总费用</th>
+  </tr>
+</thead>
+<tbody class="pf-lists"></tbody>
+</table>
+<div class="pf-pager" style="padding:10px;text-align: center;"></div>
+<script id="detailpf-tpl" type="text/template">
+	<tr>
+		<td class="text-center">
+			<div><img src="<% d.pwimg %>" width="60px"></div>
+			<div><% d.pwname %></div>
+		</td>
+		<td class="text-center">
+			<% d.zannum %>
+		</td>
+		<td class="text-center">
+			<% d.zanfee %>
+		</td>
+	</tr>
+</script>
+<script>
+var pfitems = {if $rotate['pftype']=='2'}{:json_encode($rotate['pfitem'])}{else/}[]{/if};
+function ajaxpflist(page,obj){ 
+	require(["zamnotice","webcore"],function(zamnotice,webcore){
+		webcore.ajaxSubmit("{:gohdmanage('datalivemark/zandetail',['hdid'=>$hdid])}",{ajaxtype:'2',rotateid:"{$rotateid}",pfuserid:"{$pfuserid}",page:page,pwname:$(".searchplan input").val(),zantype:2},'正在加载..').then(function(json){
+			if(json.code==0){
+				rushhtml(json);
+			}else{
+				zamnotice.showTips('error',json.msg);
+			}
+		}, function(json){
+			zamnotice.showTips('error','网络差。操作失败');
+		});
+	});
+}
+function initpflist(){
+	require(["zamnotice","webcore"],function(zamnotice,webcore){
+		webcore.ajaxSubmit("{:gohdmanage('datalivemark/zandetail',['hdid'=>$hdid])}",{ajaxtype:'2',rotateid:"{$rotateid}",pfuserid:"{$pfuserid}",pwname:$(".searchplan input").val(),zantype:2},'正在加载..').then(function(json){
+			var html = '';
+			if(json.code==0){
+				rushhtml(json);
+			}else{
+				zamnotice.showTips('error',json.msg);
+			}
+		}, function(json){
+			zamnotice.showTips('error','网络差。操作失败');
+		});
+	});
+}
+function plansearch(obj){ 
+	require(["zamnotice","webcore"],function(zamnotice,webcore){
+		webcore.ajaxSubmit("{:gohdmanage('datalivemark/zandetail',['hdid'=>$hdid])}",{ajaxtype:'2',rotateid:"{$rotateid}",pfuserid:"{$pfuserid}",pwname:$(obj).parent().prev().val(),zantype:2},'正在加载..').then(function(json){
+			var html = '';
+			if(json.code==0){
+				rushhtml(json);
+			}else{
+				zamnotice.showTips('error',json.msg);
+			}
+		}, function(json){
+			zamnotice.showTips('error','网络差。操作失败');
+		});
+	});
+}
+function rushhtml(json){
+	require(["webcore"],function(webcore){
+		var html = '';
+		var detaildata = json.msg.item;
+		$.each(detaildata,function(i,v){
+			html += webcore.tpl($("#detailpf-tpl"),v);
+		});
+		$(".pf-lists").html(html);
+		$(".pf-pager").html(json.msg.pager);
+	});
+}
+function findfieldname(key){
+	key = key || "";
+	var dfname = "";
+	$.each(pfitems,function(k,item){
+		if(item.dffield==key){
+			dfname = item.dfname;
+			return false;
+		}
+	})
+	return dfname;
+}
+initpflist();
+</script>

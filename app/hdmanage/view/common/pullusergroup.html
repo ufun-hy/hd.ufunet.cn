@@ -1,0 +1,13 @@
+<div class="zam-confirmBox">
+   {if empty($groups)}
+   <div class="alert text-danger text-center">活动暂未添加自定义分组</div>
+   {/if}
+   {foreach $groups as $group }
+	<div class="zam-confirmBox-item">
+		<label class=" lyear-checkbox checkbox-primary ">
+              <input value="{$group['id']}" name="groupids[]" type="checkbox">
+              <span>{$group['groupname']}</span>
+        </label>
+	</div>
+   {/foreach}
+</div>

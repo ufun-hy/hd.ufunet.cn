@@ -1,0 +1,203 @@
+{include file='$Wpath/common/header'}
+<form id="formBox" class="zam-formvalidation form-horizontal" method="post">
+    <div class="config-titlebox">
+        <span class="config-titlename">微信设置</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#wechatconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+    </div>
+    <div id="wechatconfigbox" class="collapse in">
+        {include file="$Wpath/common/configwechatcommon" /}
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 心愿审核</label>
+            <div class="col-lg-8">
+                {:tpl_switch('appverify',$config['appverify'])}
+                <div class="help-block">开启后用户发送的心愿均需要审核通过后才可显示在大屏</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 发送心愿时间间隔</label>
+            <div class="col-lg-4">
+                <input type="text" class="form-control numberincdec" name="appsendtime" value="{$config['appsendtime']}"
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="null"
+                data-bts-step="1"
+                data-bts-postfix="秒"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                >
+                <span class="zam-help-block">用于防刷屏 注:必须是整数，0为不限制发送时间间隔</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 每人发送心愿数量限制</label>
+            <div class="col-lg-4">
+                <input type="text" class="form-control numberincdec" name="appsendmax" value="{$config['appsendmax']??0}"
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="100"
+                data-bts-step="1"
+                data-bts-postfix="个心愿"
+                data-bts-postfix-extra-class="touchspin-postfix">
+                <span class="zam-help-block">注:必须是小于等于100的整数，0为不限制数量</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 每条心愿文字最大长度</label>
+            <div class="col-lg-4">
+                <input type="text" class="form-control numberincdec" name="appmaxlength" value="{$config['appmaxlength']}"
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="100"
+                data-bts-step="1"
+                data-bts-postfix="个字符"
+                data-bts-postfix-extra-class="touchspin-postfix">
+                <span class="zam-help-block">注:必须是小于等于100的整数，0为不限制长度</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 祝福语列表</label>
+            <div class="col-lg-8">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                        <th style="width:80%;text-align: center;">内容</th>
+                        <th style="width:20%;text-align: center;">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody class="word-lists">
+                    {foreach $config['appwords'] as $word}    
+                        <tr>
+                            <td class="text-center">
+                                <input type="text" class="form-control" name="appwords[]" value="{$word}" /> 
+                            </td>
+                            <td class="text-center">
+                                <a class="btn btn-xs btn-primary zam-sortable sortmove" data-tooltip="laytip" title="拖动排序" href="javascript:void(0)"> <i class="mdi mdi-arrow-all"></i> </a>
+                                <a class="btn btn-xs btn-danger btn-delshowitem" data-tooltip="laytip" title="删除" href="javascript:void(0)"> <i class="mdi mdi-close"></i> </a>
+                            </td>
+                        </tr>
+                    {/foreach}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="2">
+                                <a class="btn btn-primary btn-xs btn-addword"><span class="mdi mdi-plus"></span>新增</a>
+                                <div class="m-t-10">注：最多可添加100条祝福语</div>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 准许手动输入心愿内容</label>
+            <div class="col-lg-8">
+                {:tpl_switch('appselfinput',$config['appselfinput']??1)}
+                <div class="help-block">开启后用户可以自己输入心愿内容，关闭则用户只能手动选择祝福语</div>
+            </div>
+        </div>
+    </div>
+    <div class="config-titlebox">
+        <span class="config-titlename">大屏设置</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#screenconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+    </div>
+    <div id="screenconfigbox" class="collapse in">
+        {include file="$Wpath/common/configscreencommon" /}
+        {include file="$Wpath/common/configscreenmusic" /}
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 右上角显示参数人数</label>
+            <div class="col-lg-8">
+                {:tpl_switch('showjoinnum',$config['showjoinnum']??'1')}
+                <div class="help-block">开启后大屏右上角会显示发送心愿总人数</div>
+            </div>
+        </div>
+    </div>
+    {include file="$Wpath/common/lanternstyle" /}
+    {include file='$Wpath/common/configsavepanel'}
+</form>
+<script>
+require(['webcore','jconfirmBox','zamnotice','layerBox','zvalidator','jquery.ui'],function(webcore,jconfirmBox,zamnotice,layerBox){
+    $('#formBox').formValidation({
+        framework: 'bootstrap',
+        excluded: [':disabled'],
+        message: '您填写的内容无效',
+        fields: {
+            apptitle:{
+                message: '请输入网页标题',
+                validators: {
+                    notEmpty: {
+                        message: '请输入网页标题'
+                    },
+                }
+            },
+        }
+    }).on('success.form.fv', function(e) {
+        e.preventDefault();
+        var $form = $(e.target);
+        var postData = webcore.serializeObject($form);
+        var bload = $form.find(".zam-fixedbottom button").lyearloading({opacity: 0.2,spinnerSize: 'nm'});
+        $form.formValidation('disableSubmitButtons', true);
+        webcore.ajaxSubmit("{:gohdmanage('configlantern/index',['hdid'=>$hdid])}",postData).then(function(json){
+            bload.hide();
+            if(json.code==0){
+                $form.formValidation('disableSubmitButtons', false);
+                zamnotice.showTips('success','操作成功',2e3,function(){
+                    window.location.reload();
+                });
+            }else{
+                zamnotice.showTips('error',json.msg);
+                $form.formValidation('disableSubmitButtons', false);
+            }
+        }, function(json){
+            bload.hide();
+            zamnotice.showTips('error','网络差。操作失败');
+            $form.formValidation('disableSubmitButtons', false);
+        });
+    });
+    $('.word-lists').sortable({handle: ".sortmove"}).disableSelection();
+    $('.word-lists').on('click','.btn-delshowitem',function(){
+        var $this = $(this);
+        jconfirmBox.confirm('温馨提示','您确定要删除么？',function(){
+            $this.parent().parent().remove();
+            zamnotice.showTips('success','删除成功');
+        });
+    });
+    $(".btn-addword").click(function(){
+        var iserror = false,wordinputs = $('.word-lists input');
+        wordinputs.each(function(){
+            if($(this).val() == ''){
+                iserror = true;
+                return false;
+            }
+        });
+        if(iserror){
+            return zamnotice.showTips('warning','请先将现有的祝福语填写完毕再去添加');
+        }
+        if(wordinputs.length >= 100){
+            return zamnotice.showTips('error','最多只能添加100条祝福语');
+        }
+        var html = webcore.tpl($("#word-tpl"),{word:''});
+        $('.word-lists').append(html);
+    });
+    $('.lantern-lists').sortable({handle: ".sortmove"}).disableSelection();
+});
+function opencanimg(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".canimgbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".canimgbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+</script>
+<script id='word-tpl' type="text/template">
+    <tr>
+        <td class="text-center">
+            <input type="text" class="form-control" name="appwords[]" value="<% d.word %>" /> 
+        </td>
+        <td class="text-center">
+            <a class="btn btn-xs btn-primary zam-sortable sortmove" href="javascript:void(0)"> <i class="mdi mdi-arrow-all"></i> </a>
+            <a class="btn btn-xs btn-danger btn-delshowitem" href="javascript:void(0)"> <i class="mdi mdi-close"></i> </a>
+        </td>
+    </tr>
+</script>
+{include file='$Wpath/common/footer'}

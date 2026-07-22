@@ -1,0 +1,380 @@
+{include file='$Wpath/common/header'}
+<div class="alert alert-danger">
+    新版模板消息即为微信公众号推出的新版类目模板消息，开启后必须填写新模板消息id,关闭则继续使用老版本模板消息
+</div>
+<form id="formBox" class="zam-formvalidation form-horizontal" method="post">
+    <div class="zam-titleBox">后台注册账号通知设置</div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 新版模板消息</label>
+        <div class="col-lg-8">
+            {:tpl_switch('regtplidtype',$config['regtplidtype']??'2')}
+            <div class="help-block">开启则为新版模板消息，请在“微信公众平台服务类目”选择行业为：“商业服务 >
+                软件/建站/技术开发”，在类目模板库中添加标题为：”用户注册成功通知“，编号为：“50810”的模板，在关键词库中添加用户名，注册手机号，注册时间，登录地址4个关键词。</div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 模板号</label>
+        <div class="col-lg-8">
+            <input class="form-control" type="text" name="regtplid" value="{$config['regtplid']}" onkeyup="return trimSpace(this)">
+            <div class="help-block">此模板用于告知管理员有新的注册用户。请在“微信公众平台”选择行业为：“IT科技 -
+                互联网|电子商务”，添加标题为：”注册成功通知“，编号：“OPENTM411984350”的模板。</div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 接收消息用户</label>
+        <div class="col-lg-8 yautooverflow">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th style="width:40%;text-align:center;">用户昵称</th>
+                        <th style="width:40%;text-align:center;">openid</th>
+                        <th style="width:20%;text-align:center;">删除</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {foreach $config['regopenids'] as $regone}
+                    <tr>
+                        <td class="text-center">
+                            {$regone['nickname']}
+                            <input type="hidden" name="regopenids[nickname]" value="{$regone['nickname']}" />
+                        </td>
+                        <td class="text-center">
+                            {$regone['openid']}
+                            <input type="hidden" name="regopenids[openid]" value="{$regone['openid']}" />
+                        </td>
+                        <td class="text-center">
+                            <a class="btn btn-danger btn-xs deluser"><i class="mdi mdi-close"></i></a>
+                        </td>
+                    </tr>
+                    {/foreach}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3">
+                            <a class="btn btn-primary btn-xs adduser" data-type="regopenids" href="javascript:;"><i class="mdi mdi-plus"></i>新增</a>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+    <div class="zam-titleBox">创建活动通知设置</div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 新版模板消息</label>
+        <div class="col-lg-8">
+            {:tpl_switch('createhdtplidtype',$config['createhdtplidtype']??'2')}
+            <div class="help-block">开启则为新版模板消息，请在“微信公众平台服务类目”选择行业为：“生活服务 >
+                休闲娱乐”，在类目模板库中添加标题为：”收到服务工单提醒“，编号为：“48977”的模板，在关键词库中添加服务项目，客人名称，客户电话，客户下单时间4个关键词。</div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 模板号</label>
+        <div class="col-lg-8">
+            <input class="form-control" type="text" name="createhdtplid" value="{$config['createhdtplid']}" onkeyup="return trimSpace(this)">
+            <div class="help-block">此模板用于告知管理员有用户创建了活动。请在“微信公众平台”选择行业为：“IT科技 -
+                互联网|电子商务”，添加标题为：”服务申请通知“，编号为：“OPENTM409712403”的模板。</div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 接收消息用户</label>
+        <div class="col-lg-8 yautooverflow">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th style="width:40%;text-align:center;">用户昵称</th>
+                        <th style="width:40%;text-align:center;">openid</th>
+                        <th style="width:20%;text-align:center;">删除</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {foreach $config['createhdopenids'] as $createhdone}
+                    <tr>
+                        <td class="text-center">
+                            {$createhdone['nickname']}
+                            <input type="hidden" name="createhdopenids[nickname]" value="{$createhdone['nickname']}" />
+                        </td>
+                        <td class="text-center">
+                            {$createhdone['openid']}
+                            <input type="hidden" name="createhdopenids[openid]" value="{$createhdone['openid']}" />
+                        </td>
+                        <td class="text-center">
+                            <a class="btn btn-danger btn-xs deluser"><i class="mdi mdi-close"></i></a>
+                        </td>
+                    </tr>
+                    {/foreach}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3">
+                            <a class="btn btn-primary btn-xs adduser" data-type="createhdopenids" href="javascript:;"><i class="mdi mdi-plus"></i>新增</a>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+    <div class="zam-titleBox">支付通知设置</div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 新版模板消息</label>
+        <div class="col-lg-8">
+            {:tpl_switch('paytplidtype',$config['paytplidtype']??'2')}
+            <div class="help-block">开启则为新版模板消息，请在“微信公众平台服务类目”选择行业为：“商业服务 >
+                软件/建站/技术开发”，在类目模板库中添加标题为：”订单支付成功提醒“，编号为：“51617”的模板，在关键词库中添加商户名称，客户名称，订单编号，订单金额，产品名称5个关键词。</div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 模板号</label>
+        <div class="col-lg-8">
+            <input class="form-control" type="text" name="paytplid" value="{$config['paytplid']}" onkeyup="return trimSpace(this)">
+            <div class="help-block">此模板用于告知管理员有用户付费发布活动/付费新增了功能人数/充值红包账号/充值短信余额等。请在“微信公众平台”选择行业为：“IT科技 -
+                互联网|电子商务”，添加标题为：”订单支付成功通知“，编号为：“OPENTM207498902”的模板。</div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 接收消息用户</label>
+        <div class="col-lg-8 yautooverflow">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th style="width:40%;text-align:center;">用户昵称</th>
+                        <th style="width:40%;text-align:center;">openid</th>
+                        <th style="width:20%;text-align:center;">删除</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {foreach $config['payopenids'] as $payone}
+                    <tr>
+                        <td class="text-center">
+                            {$payone['nickname']}
+                            <input type="hidden" name="payopenids[nickname]" value="{$payone['nickname']}" />
+                        </td>
+                        <td class="text-center">
+                            {$payone['openid']}
+                            <input type="hidden" name="payopenids[openid]" value="{$payone['openid']}" />
+                        </td>
+                        <td class="text-center">
+                            <a class="btn btn-danger btn-xs deluser"><i class="mdi mdi-close"></i></a>
+                        </td>
+                    </tr>
+                    {/foreach}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3">
+                            <a class="btn btn-primary btn-xs adduser" data-type="payopenids" href="javascript:;"><i class="mdi mdi-plus"></i>新增</a>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+    <div class="zam-titleBox">发起提现通知设置</div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 新版模板消息</label>
+        <div class="col-lg-8">
+            {:tpl_switch('txtplidtype',$config['txtplidtype']??'2')}
+            <div class="help-block">开启则为新版模板消息，请在“微信公众平台服务类目”选择行业为：“生活服务 >
+                悠闲娱乐”，在类目模板库中添加标题为：”提现申请审批通知“，编号为：“44766”的模板，在关键词库中添加用户名称，申请时间，提现金额，到账金额，用户类型5个关键词。</div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 模板号</label>
+        <div class="col-lg-8">
+            <input class="form-control" type="text" name="txtplid" value="{$config['txtplid']}" onkeyup="return trimSpace(this)">
+            <div class="help-block">此模板用于告知管理员有新的提现请求(后台或微信端发起提现申请均会提示)，请打款。请在“微信公众平台”选择行业为：“IT科技 -
+                互联网|电子商务”，添加标题为：”提现申请通知“，编号为：“OPENTM405485000”的模板。</div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 接收消息用户</label>
+        <div class="col-lg-8 yautooverflow">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th style="width:40%;text-align:center;">用户昵称</th>
+                        <th style="width:40%;text-align:center;">openid</th>
+                        <th style="width:20%;text-align:center;">删除</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {foreach $config['txopenids'] as $txone}
+                    <tr>
+                        <td class="text-center">
+                            {$txone['nickname']}
+                            <input type="hidden" name="txopenids[nickname]" value="{$txone['nickname']}" />
+                        </td>
+                        <td class="text-center">
+                            {$txone['openid']}
+                            <input type="hidden" name="txopenids[openid]" value="{$txone['openid']}" />
+                        </td>
+                        <td class="text-center">
+                            <a class="btn btn-danger btn-xs deluser"><i class="mdi mdi-close"></i></a>
+                        </td>
+                    </tr>
+                    {/foreach}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3"><a class="btn btn-primary btn-xs adduser" data-type="txopenids"
+                                href="javascript:;"> <i class="mdi mdi-plus"></i>新增</a></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+    <div class="zam-titleBox">提现审核不通过通知设置</div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 新版模板消息</label>
+        <div class="col-lg-8">
+            {:tpl_switch('txrefusetplidtype',$config['txrefusetplidtype']??'2')}
+            <div class="help-block">开启则为新版模板消息，请在“微信公众平台服务类目”选择行业为：“商业服务 >
+                软件/建站/技术开发”，在类目模板库中添加标题为：”提现失败通知“，编号为：“53925”的模板，在关键词库中添加提现金额、提现时间、审核时间3个关键词。</div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 模板号</label>
+        <div class="col-lg-8">
+            <input class="form-control" type="text" name="txrefusetplid" value="{$config['txrefusetplid']??''}" onkeyup="return trimSpace(this)">
+            <div class="help-block">此模板用于告知后台用户提现审核不通过(后台个人中心绑定了微信号的用户)或微信用户提现申请审核不通过(必须关注)，请在“微信公众平台”选择行业为：“IT科技 -
+                互联网|电子商务”，添加标题为：”审核不通过提醒“，编号：“OPENTM411793308”的模板。</div>
+        </div>
+    </div>
+    <div class="zam-titleBox">提现到账成功通知设置</div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 新版模板消息</label>
+        <div class="col-lg-8">
+            {:tpl_switch('txdztplidtype',$config['txdztplidtype']??'2')}
+            <div class="help-block">开启则为新版模板消息，请在“微信公众平台服务类目”选择行业为：“商业服务 >
+                软件/建站/技术开发”，在类目模板库中添加标题为：”提现成功通知“，编号为：“49581”的模板，在关键词库中添加提现时间、项目名称、提现金额、提现手续费，到账金额5个关键词。</div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 模板号</label>
+        <div class="col-lg-8">
+            <input class="form-control" type="text" name="txdztplid" value="{$config['txdztplid']??''}" onkeyup="return trimSpace(this)">
+            <div class="help-block">此模板用于告知后台用户提现已经打款(后台个人中心绑定了微信号的用户)或微信用户提现已打款(必须关注)，请在“微信公众平台”选择行业为：“IT科技 -
+                互联网|电子商务”，添加标题为：”提现到账通知“，编号：“OPENTM417972146”的模板。</div>
+        </div>
+    </div>
+    <div class="zam-titleBox">活动用户中奖发送模板通知</div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 模板号</label>
+        <div class="col-lg-8">
+            <input class="form-control" type="text" name="luckertplid" value="{$config['luckertplid']}" onkeyup="return trimSpace(this)">
+            <div class="help-block">
+                此模板用于告知微信用户在某个活动中奖了(除了红包雨和摇大奖功能)，中奖用户必须关注系统公众号。此模板用于告知微信用户中奖在某活动中奖了(除了红包雨和摇大奖功能)，中奖用户必须关注公众号)。请在“微信公众平台服务类目”选择行业为：“商业服务
+                > 软件/建站/技术开发”，在类目模板库中添加标题为：”新工单提醒“，编号为：“44268”的模板，在关键词库中添加工单标题，项目名称，创建时间，工单类型4个关键词。</div>
+        </div>
+    </div>
+    <div class="{if !dzsubmessage()} hidden{/if}">
+        <div class="zam-titleBox">活动用户中奖发送一次性订阅消息(<span class="text-danger"
+                style="font-size: 10px">此项为定制项目，未参与的用户请忽略</span>)</div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 一次性订阅消息模板id</label>
+            <div class="col-lg-8">
+                <input class="form-control" type="text" name="luckersubtplid" value="{$config['luckersubtplid']??''}" onkeyup="return trimSpace(this)">
+                <div class="help-block">一次性订阅消息，可以实现用户在未关注公众号下发中奖通知，怎么设置参照此文档，特别注意一次性订阅消息不支持小程序<a class="m-l-10"
+                        target="__blank" href="https://www.yuque.com/zanmu/dh95p9/oztkem">点我查看教程</a></div>
+            </div>
+        </div>
+    </div>
+    <div class="{if !dzsubnotice()} hidden{/if}">
+        <div class="zam-titleBox">活动用户中奖发送订阅通知(<span class="text-danger"
+                style="font-size: 10px">此项为定制项目，未参与的用户请忽略</span>)</div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 订阅通知中奖模板id</label>
+            <div class="col-lg-8">
+                <input class="form-control" type="text" name="luckersubnoticetplid"
+                    value="{$config['luckersubnoticetplid']??''}" onkeyup="return trimSpace(this)">
+                <div class="help-block">订阅通知消息，可以实现用户无需关注公众号下发中奖通知，怎么设置参照此文档，特别注意订阅通知不支持小程序<a class="m-l-10"
+                        target="__blank" href="https://www.yuque.com/zanmu/dh95p9/odwt2m">点我查看教程</a></div>
+            </div>
+        </div>
+    </div>
+    <div class="{if !dzpclive()} hidden{/if}">
+        <div class="zam-titleBox">活动用户直播开播发送订阅通知(<span class="text-danger"
+                style="font-size: 10px">此项为定制项目，未参与的用户请忽略</span>)</div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 订阅通知直播开播提醒模板id</label>
+            <div class="col-lg-8">
+                <input class="form-control" type="text" name="livesubnoticetplid"
+                    value="{$config['livesubnoticetplid']??''}" onkeyup="return trimSpace(this)">
+                <div class="help-block">订阅通知消息，可以实现用户无需关注公众号下发直播订阅通知，怎么设置参照此文档，特别注意订阅通知不支持小程序<a class="m-l-10"
+                        target="__blank" href="https://www.yuque.com/zanmu/dh95p9/odwt2m">点我查看教程</a></div>
+            </div>
+        </div>
+    </div>
+    {include file='$Wpath/common/savepanel'}
+</form>
+<script type="text/javascript">
+    require(['webcore', 'jconfirmBox', 'zamnotice', 'layerBox', 'zvalidator'], function (webcore, jconfirmBox, zamnotice, layerBox) {
+        $('#formBox').formValidation({
+            framework: 'bootstrap',
+            excluded: [':disabled'],
+            message: '您填写的内容无效',
+            fields: {}
+        }).on('success.form.fv', function (e) {
+            e.preventDefault();
+            var $form = $(e.target);
+            var postData = webcore.serializeObject($form);
+            var bload = $form.find(".zam-fixedbottom button").lyearloading({ opacity: 0.2, spinnerSize: 'nm' });
+            $form.formValidation('disableSubmitButtons', true);
+            webcore.ajaxSubmit("{:goweb('wxtemplate/index')}", postData).then(function (json) {
+                bload.hide();
+                if (json.code == 0) {
+                    $form.formValidation('disableSubmitButtons', false);
+                    zamnotice.showTips('success', '操作成功', 2e3, function () {
+                        window.location.reload();
+                    });
+                } else {
+                    zamnotice.showTips('error', json.msg);
+                    $form.formValidation('disableSubmitButtons', false);
+                }
+            }, function (json) {
+                bload.hide();
+                zamnotice.showTips('error', '网络差。操作失败');
+                $form.formValidation('disableSubmitButtons', false);
+            });
+        });
+        $(".adduser").click(function () {
+            var $this = $(this), inputtype = $(this).data('type');
+            var confirmObj = jconfirmBox.ajaxconfirm("新增接收推送微信用户<span class='text-danger' style='font-size:12px'>(只有扫码进入了活动的微信用户才可以搜索到)</span>", "{:gocommon('basic/searchhduser')}", { ishtml: '1' }, 'html', 'col-lg-8 col-lg-offset-2', function (e) {
+                var selectuser = e.find("input:checked");
+                if (selectuser.length > 0) {
+                    if (selectuser.length > 1) {
+                        return zamnotice.showTips('error', '一次只能选择一个用户');
+                    } else {
+                        var obj = {
+                            openid: selectuser.val(),
+                            nickname: selectuser.parent().parent().next().text(),
+                            type: inputtype
+                        };
+                        $this.parent().parent().parent().prev().append(webcore.tpl($("#tplone-tpl"), obj));
+                        confirmObj.close();
+                    }
+                } else {
+                    zamnotice.showTips('error', '请选择一个用户');
+                }
+            });
+        });
+        $("table").on('click', '.deluser', function () {
+            $(this).parent().parent().remove();
+        });
+    });
+</script>
+<script id="tplone-tpl" type="text/template">
+<tr>
+    <td class="text-center">
+       <% d.nickname %>
+       <input type="hidden" name="<% d.type %>[nickname]" value="<% d.nickname %>"
+    </td>
+    <td class="text-center">
+       <% d.openid %>
+       <input type="hidden" name="<% d.type %>[openid]" value="<% d.openid %>"
+    </td>
+    <td class="text-center">
+        <a class="btn btn-danger btn-xs deluser"><i class="mdi mdi-close"></i></a>
+    </td>
+</tr>
+</script>
+{include file='$Wpath/common/footer'}

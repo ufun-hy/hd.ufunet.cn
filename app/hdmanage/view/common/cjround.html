@@ -1,0 +1,218 @@
+{include file='$Wpath/common/header'}
+{include file='$Wpath/common/tabletoolbar'}
+<style type="text/css">.awardgroup .d-inline-block:first-child{padding-left: 0}</style>
+<table id="listtable" class="zam-btable"></table>
+<script>    
+require(['webcore','webtable','jconfirmBox','zamnotice',"bootstrap-touchspin"],function(webcore,webtable,jconfirmBox,zamnotice){
+var initConfig = {
+    tableId:'#listtable',
+    url:"{:gohdmanage('common/ajaxcjround',['hdid'=>$hdid,'gametype'=>$gametype])}",
+    columnoperate:{
+        btns:{
+            edit:true,
+            del:true,
+            data:true,
+        },
+        func:{
+            edit:function(value, row, index){
+                var confirmObj = jconfirmBox.ajaxconfirm("编辑轮次","{:gohdmanage('common/editcjround',['hdid'=>$hdid,'gametype'=>$gametype])}",{roundid:row.id},'html','col-lg-12 col-lg-offset-0',function(e){
+                    var postData = webcore.serializeObject(e.find('form')),roundtitle = postData.roundtitle || '';
+                    postData.roundid = row.id;
+                    if(roundtitle == ''){
+                        zamnotice.showTips('error','请先设置轮次标题');
+                        return false;
+                    }
+                    if(!postData['roundawards[prizeid][]']){
+                        zamnotice.showTips('error','请先新增奖品');
+                        return false;
+                    }
+                    if(postData['roundawards[prizeid][]'].length > 10){
+                        zamnotice.showTips('error','每轮最多只可设置10种不同的奖品');
+                        return false;
+                    }
+                    postData.roundid = row.id;
+                    webcore.ajaxSubmit("{:gohdmanage('common/savecjround',['hdid'=>$hdid,'gametype'=>$gametype])}",postData).then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','保存成功');
+                            confirmObj.close();
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                             return false;
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                         return false;
+                    });
+                });
+            },
+            del:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','删除将删除当前轮次以及轮次内的中奖记录数据并且无法恢复，您确定要删除么？',function(){
+                        webcore.ajaxSubmit("{:gohdmanage('common/delcjround',['hdid'=>$hdid,'gametype'=>$gametype])}",{roundid:row.id}).then(function(json){
+                            if(json.code==0){
+                                webtable.refresh();
+                                zamnotice.showTips('success','删除成功');
+                            }else{
+                                zamnotice.showTips('error',json.msg);
+                            }
+                        }, function(json){
+                            zamnotice.showTips('error','网络差。操作失败');
+                        });
+                });
+            },
+            data:function(value, row, index){
+                window.location.href = "{:gohdmanage('data'.$gametype.'/index',['hdid'=>$hdid])}&roundid="+row.id;
+            },
+        }
+    },
+    columns:[{
+            checkbox: true,
+        }, 
+        {
+            field: 'id',
+            title: 'id',
+            align: 'center',
+            visible: false
+        }, {
+            field: 'displayorder',
+            title: '序号',
+            align: 'center',
+            formatter:function(value,row,index){
+                return `
+                <span>${value}</span>
+                <span class="label label-primary m-l-10"><i class="mdi mdi-pencil cursor editorder" data-order="${value}" data-roundid="${row.id}"></i></span>
+                `;
+            }
+        },{
+            field: 'roundtitle',
+            title: '轮次名称',
+            align: 'center'
+        },  {
+            field: 'roundawards',
+            title: '奖品信息',
+            align: 'center',
+            formatter:function(value,row,index){
+                if(!(value instanceof Array) || !value.length) {
+                    return '-';
+                }
+                var html = `<div>`;
+                $.each(value,function(key,item){
+                    html += `<div class="m-r-5"><span>${item.pname}(${item.aname})</span>-<span class="text-danger m-l-5">${item.num}个</span></div>`;
+                });
+                html += `</div>`;
+                return html;
+            }
+        }
+        ,{
+            field: 'create_time',
+            title: '创建时间',
+            align: 'center',
+            visible: false
+        }
+    ],
+    searchParamas:[],
+    toolbar:{
+        add:function(){
+            var confirmObj = jconfirmBox.ajaxconfirm("新增轮次","{:gohdmanage('common/editcjround',['hdid'=>$hdid,'gametype'=>$gametype])}",{},'html','col-lg-12 col-lg-offset-0',function(e){
+	            var postData = webcore.serializeObject(e.find('form')),roundtitle = postData.roundtitle || '';
+                if(roundtitle == ''){
+                    zamnotice.showTips('error','请先设置轮次标题');
+	                return false;
+                }
+                if(!postData['roundawards[prizeid][]']){
+                    zamnotice.showTips('error','请先新增奖品');
+	                return false;
+                }
+                if(postData['roundawards[prizeid][]'].length > 10){
+                    zamnotice.showTips('error','每轮最多只可设置10种不同的奖品');
+                    return false;
+                }
+	            webcore.ajaxSubmit("{:gohdmanage('common/savecjround',['hdid'=>$hdid,'gametype'=>$gametype])}",postData,'轮次新增中...').then(function(json){
+	                if(json.code==0){
+	                    webtable.refresh();
+	                    zamnotice.showTips('success','新增成功');
+	                    confirmObj.close();
+	                }else{
+	                    zamnotice.showTips('error',json.msg);
+	                    return false;
+	                }
+	            }, function(json){
+	                zamnotice.showTips('error','网络差。操作失败');
+	                return false;
+	            });
+	        });
+        },
+        del:function(){
+            var getSelects = webtable.getSelections();
+            if(!getSelects.length){
+                return zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+            jconfirmBox.confirm('温馨提示','删除将删除所选轮次数据以及轮次内的中奖数据并且无法恢复，您确定要删除么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('common/delcjround',['hdid'=>$hdid,'gametype'=>$gametype])}",{roundid:getSelects}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','删除成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+        },
+        reset:function(){
+            jconfirmBox.confirm('温馨提示','清空轮次将清空所有轮次数据以及轮次内的所有中奖数据，您确定要清空么？',function(){
+                    webcore.ajaxSubmit("{:gohdmanage('common/resetcjround',['hdid'=>$hdid,'gametype'=>$gametype])}",{}).then(function(json){
+                        webtable.refresh();
+                        zamnotice.showTips('success','操作成功');
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                    });
+            });
+        }
+    },
+};
+webtable.init(initConfig);
+$("#listtable").on('click','.editorder',function(){
+    var $this = $(this),disorder=  $this.attr('data-order');
+    var confirmobj = jconfirmBox.confirm('编辑轮次排序序号',webcore.tpl($("#awardorder-tpl"),{displayorder:disorder}),function(e){
+        var displayorder = e.$content.find(".displayorder").val();
+        if(displayorder=='') return zamnotice.showTips('error','请设置排序序号');
+        webcore.ajaxSubmit("{:gohdmanage('common/editcjroundorder',['hdid'=>$hdid,'gametype'=>$gametype])}",{roundid:$this.attr('data-roundid'),displayorder:displayorder},'正在处理..').then(function(json){
+             if(json.code==0){
+                confirmobj.close();
+                zamnotice.showTips('success','修改成功');
+                webtable.refresh();
+             }else{
+                zamnotice.showTips('error',json.msg);
+             }
+        })
+    },false,false,true,false,function(){
+        $(".confirmbox-pop .numberincdec").TouchSpin().on("change", function(){
+            var $this = $(this),funcstr = $this.data('func');
+            var func = window[funcstr];
+            func && func();
+        });
+    });
+});
+});
+</script>
+<script id='awardorder-tpl' type="text/template">
+<div class="form-horizontal confirmbox-pop">
+  <form class="confirm-formbox" method="post">
+    <div class="form-group">
+      <label class="col-lg-3 control-label">* 序号</label>
+      <div class="col-lg-7">
+        <input type="text" class="form-control numberincdec displayorder" name="displayorder" value="<% d.displayorder %>"
+        placeholder="排序序号"
+        data-bts-min="0" data-bts-replacement-val="0"
+        data-bts-max="null"
+        data-bts-step="1"
+        >
+        <span class="help-block">轮次排序序号越小排在越前</span>
+      </div>
+    </div>
+  </form>
+</div>
+</script>
+{include file='$Wpath/common/footer'}

@@ -1,0 +1,21 @@
+{include file='common/header' /}
+<style>
+    .game{
+        width: 100%;
+        height: 100%;
+    }
+</style>
+<div id="game">
+</div>
+<script>
+require(['screencore','phaser'],function(screencore){
+ var game = new Phaser.Game($(".main-box").width(), $(".main-box").height(), Phaser.CANVAS, 'game', { preload: preload, create: create },true);
+ function preload() {
+     this.load.image("avatar", 'https://thirdwx.qlogo.cn/mmopen/vi_32/m4icIw7fHBsJqDpqGfLsgkZGdysiaUENMTah6UPmPYvr45tmeBEiaWibAU6TWPIT1ZCCe9mo0lVLdl0rNoDQialaibic6qnMCFzsp6sNTmfESFfzRI/0');
+ }
+ function create() {   
+ }  
+
+});
+</script>
+{include file='common/footer' /}

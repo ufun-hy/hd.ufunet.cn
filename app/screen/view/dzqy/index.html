@@ -1,0 +1,52 @@
+{include file='common/header' /}
+<style>
+.loading-box{display: none}
+.dzqy-mainbox{
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    overflow: hidden;
+}
+.dzqy-bg{width:100%;height:100%;}
+.dzqy-mainbox .dzqy_device{display:inline-block;position:absolute}
+.loading-box{position:fixed;top:0;left:0;width:100%;height:100%;z-index:91;background-color:#fff;opacity:1;}
+.load-wait{height:60px;line-height:60px;font-size:20px;font-weight:bold;color:gray}
+.firebox{position: fixed;top:0;left:0;width: 100%;height: 100%}
+.firebox canvas{width: 100%;height:100%;}
+.main-bg{background-position: inherit;}
+</style>
+<link href="__STATIC__/css/loading.css" rel="stylesheet">
+<div class="loading-box zam-app-flex-ajCenter">
+    <div class="la-square-jelly-box la-dark">
+        <div></div>
+        <div></div>
+    </div>
+    <div class="load-wait">正在连接云签约系统，请稍后</div>
+</div>
+<section class="dzqy-mainbox normal-box">
+<div class="firebox">
+    <canvas id="firecanvas" width="1536" height="722"></canvas>
+</div>
+<div class="emptybox zam-app-flex-ajCenter display-none">
+    <img src="/{:SIMGURL}common/empty.png">
+    <p style="padding:20px;">暂无可用轮次，请到后台添加</p>
+</div>
+{if !empty($rotate['hyimg'])}<img class="dzqy-bg">{/if}
+</section>
+<img class="maoimg display-none" src="/{:SIMGURL}dzqy/mao.png">
+<audio class="boom display-none" src="/{:SIMGURL}dzqy/boom.mp3"></audio>
+<script id="qyclient-tpl" type="html/javascript">
+<span class="dzqy_device device-{{ id }}{{ if needfly=='1' }} needfly{{ /if }}" data-deviceid="{{ id }}" data-flytop="{{ flytoppos }}" data-flyleft="{{ flyleftpos }}" data-flyzoom="{{ flyzoom }}" style="top:{{ toppos }}px;left:{{ leftpos }}px">
+    <canvas class="dzqy_canvas" width="{{ cwidth }}px" height="{{ cheight }}px"></canvas>
+    {{ if readyimg&&readyimg!='' }}
+        <img class="dzqy_readyimg display-none" style="max-width:{{ cwidth }}px" src="{{ readyimg }}">
+    {{ /if }}
+</span>
+</script>
+<script>
+var rotateInfo = {if !empty($rotate)}{:json_encode($rotate)}{else /}""{/if};
+require(['screendzqy'],function (screendzqy) {
+    screendzqy.init(rotateInfo);
+});
+</script>
+{include file='common/footer' /}

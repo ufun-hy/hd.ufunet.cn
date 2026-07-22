@@ -1,0 +1,27 @@
+<table class="we7-table table" style="margin-bottom:0px;">
+<thead>
+  <tr>
+	<th style="width:40%;text-align:center;">项目</th>
+	<th style="width:30%;text-align:center;">重复种类</th>
+	<th style="width:30%;text-align:center;">详情</th>
+  </tr>
+</thead>
+<tbody class="prize-lists">
+	{foreach $fieldconfig as $yhkey=>$yhfield}
+	  <tr>
+		<td class="text-center">
+			{$yhfield['fieldname']}
+		</td>
+		<td class="text-center">{if $yhfield['fieldsame'] > 0}<span class="text-danger">{$yhfield['fieldsame']}种</span>{else}0种{/if}</td>
+		<td class="text-center">
+			{if $yhfield['fieldsame']>0}
+			<a class="btn btn-primary btn-sm btn-samedetail" data-field="datafield{$yhkey+1}">详情</a>
+			{else /}
+				无
+			{/if}
+		</td>
+	 </tr>
+	{/foreach}
+</tbody>
+</table>
+

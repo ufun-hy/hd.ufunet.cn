@@ -1,0 +1,26 @@
+<div class="form-horizontal confirmbox-pop">
+  <form class="confirm-formbox" method="post">
+      <div class="form-group filetypes">
+      <label class="col-lg-3 control-label">* 状态</label>
+      <div class="col-lg-8">
+        {foreach $statustypes as $skey=>$sv}
+        <label class="lyear-radio radio-inline radio-primary">
+         <input type="radio" name="status" value="{$skey}" {if $config['status'] == $skey}checked{/if}><span>{$sv}</span>
+        </label>
+        {/foreach}        
+      </div>
+    </div>
+      <div class="form-group">
+        <label class="col-lg-3 control-label">* 订单量</label>
+        <div class="col-lg-8">
+          <input class="form-control" type="text"  name="ordernum" value="{$config['ordernum']}">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-3 control-label">* 订单金额</label>
+        <div class="col-lg-8">
+          <input class="form-control" type="text"  name="ordermoney" value="{$config['ordermoney']}">
+        </div>
+      </div>
+  </form>
+</div>

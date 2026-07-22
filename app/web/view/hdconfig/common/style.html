@@ -1,0 +1,102 @@
+{include file='$Wpath/common/header'}
+{include file='$Wpath/common/tabletoolbar'}
+<table id="listtable" class="zam-btable"></table>
+<script>
+require(['webcore','webtable','jconfirmBox','zamnotice'],function(webcore,webtable,jconfirmBox,zamnotice){
+var initConfig = {
+    tableId:'#listtable',
+    url:"{:goweb('hdconfig/'.$gametype.'style',['ajaxtype'=>'1'])}",
+    columnoperate:{
+        btns:{
+            edit:true,
+            del:true,
+        },
+        func:{
+            del:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','您确定要删除么？',function(){
+                        webcore.ajaxSubmit("{:goweb('hdconfig/'.$gametype.'style',['ajaxtype'=>'2'])}",{styleid:row.id},'处理中..').then(function(json){
+                            if(json.code==0){
+                                webtable.refresh();
+                                zamnotice.showTips('success','删除成功');
+                            }else{
+                                zamnotice.showTips('error',json.msg);
+                            }
+                        }, function(json){
+                            zamnotice.showTips('error','网络差。操作失败');
+                        });
+                });
+            },
+            edit:function(value, row, index){
+                window.location.href = "{:goweb('hdconfig/edit'.$gametype.'style')}?styleid="+row.id;
+            }
+        }
+    },
+    columns:[{
+            checkbox: true,
+        }, 
+        {
+            field: 'id',
+            title: 'id',
+            align: 'center',
+            width:'6%',
+            visible: false
+        }, {
+            field: 'displayorder',
+            title: '排序序号',
+            align:'center',
+            width:'10%',
+        }, {
+            field: 'statushtml',
+            title: '状态',
+            align:'center',
+            width:'10%',
+        }, {
+            field: 'stylename',
+            title: '风格名',
+            align:'center',
+            width:'20%',
+        }, {
+            field: 'styleimg',
+            title: '预览图',
+            align:'center',
+            width:'20%',
+            formatter: function (value, row, index) {
+                return '<img width="200px" src="'+value+'" >';
+            },
+        },  {
+            field: 'create_time',
+            title: '创建时间',
+            align: 'center',
+            width:'15%',
+        }
+    ],
+    searchParamas:[],
+    toolbar:{
+        add:function(){
+           window.location.href = "{:goweb('hdconfig/edit'.$gametype.'style')}";
+        },
+        del:function(ajaxurl){
+            var getSelects = webtable.getSelections();
+            if(getSelects.length>0){
+                jconfirmBox.confirm('温馨提示','您确定要删除选中的数据么？',function(){
+                    webcore.ajaxSubmit("{:goweb('hdconfig/'.$gametype.'style',['ajaxtype'=>'2'])}",{styleid:getSelects},'处理中..').then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','删除成功');
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差,操作失败');
+                    });
+                });
+            }else{
+                zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+        },
+    },
+};
+webtable.init(initConfig);
+});
+</script>
+{include file='$Wpath/common/footer'}

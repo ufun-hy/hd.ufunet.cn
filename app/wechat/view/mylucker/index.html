@@ -1,0 +1,187 @@
+{include file="common/header" /}
+<style type="text/css">
+body{overflow-y: hidden;}
+.zam-app-bodyBg{min-height: 100%;height: auto;overflow:hidden;overflow-y: auto;background-position: center;}
+.mylogo{
+	position: fixed;
+	top:0.12rem;
+	left:0.64rem;
+	width: 1.3rem;
+	height:1.04rem;
+	background-repeat: no-repeat;
+	background-size: cover;
+	background-image: url(/{:WIMGURL}mylucker/logo.png);
+}
+.mylogin-box{
+	position: relative;
+	top: 6.9rem;
+}
+@media only screen and (min-height: 724px) { 
+	.mylogin-box{top:8.2rem;}
+	.mylogin-box .mylogin-box-item{
+		margin-bottom: 0.42rem;
+	}
+}
+.mylogin-box .mylogin-box-item{
+	width: 5.6rem;
+	height:.824rem;
+	background-repeat: no-repeat;
+	background-size: cover;
+	margin-bottom: 0.36rem;
+	color:#103380;
+	
+}
+input{border: 0;color:#103380;}
+input::-webkit-input-placeholder{
+	text-align: center;
+	font-size:0.32rem;
+	color:#103380;
+	font-weight: bold;
+	-webkit-font-smoothing: antialiased;
+    font-family: 微软雅黑,"Microsoft YaHei";
+}
+
+.btn-getyzm{width: 40%;height: 100%;}
+.mylogin-box .mylogin-box-item.item-phone{background-image: url(/{:WIMGURL}mylucker/login/phone.png);}
+.mylogin-box .mylogin-box-item.item-yzm{background-image: url(/{:WIMGURL}mylucker/login/yzm.png);}
+.mylogin-box .mylogin-box-item.item-submit{background-image: url(/{:WIMGURL}mylucker/login/submit.png);}
+.mylogin-box .mylogin-box-item.item-back{background-image: url(/{:WIMGURL}mylucker/login/back.png);}
+.mylogin-box .mylogin-box-item.item-submit,.mylogin-box .mylogin-box-item.item-back{
+	font-size:0.32rem;
+	font-weight: bold;
+	letter-spacing: 5px;
+}
+.mylogin-box .mylogin-box-item .myphone{
+	width: 100%;
+	height: 100%;
+	font-size:0.32rem;
+	font-weight: bold;
+	padding: 0.2rem 0.46rem;
+	text-align: center;
+}
+.myyzm{
+	width: 59%;
+	height: 100%;
+	font-size:0.32rem;
+	font-weight: bold;
+	padding: 0.2rem 0.36rem;
+	text-align: center;
+}
+.btn-getyzm{
+	width:41%;
+	height: 100%;
+	font-size:0.32rem;
+	font-weight: bold;
+	cursor: pointer;
+}
+.btn-getyzm.disabled{
+	pointer-events: none;
+}
+.tip{
+	color: #fff;
+	font-size: 0.16rem;
+}
+.tipbox{
+	position: fixed;
+	top: 0;
+	left:0;
+	width: 100%;
+	height: 100%;
+	background-color: rgb(0,0,0,0.56);
+}
+.tipbox div{position: relative;}
+.tipbox img{
+	width: 3.87rem;
+	height: 2.96rem;
+}
+.tipbox span{
+	position: absolute;
+	top:-0.2rem;
+	right: -0.2rem;
+	color: #fff;
+	font-size: 0.48rem;
+	cursor: pointer;
+}
+</style>
+<div class="mylogo"></div>
+<div class="mylogin-box zam-app-flex-ajCenter">
+	<div class="mylogin-box-item item-phone">
+		<input class="myphone" type="number" name="myphone" placeholder="请输入手机号码"  oninput="if(value.length>11)value=value.slice(0,11)" maxlength="11" />
+	</div>
+	<div class="mylogin-box-item item-yzm zam-app-flex">
+		<input class="myyzm" type="number" name="myyzm" placeholder="请输入手机验证码" oninput="if(value.length>4)value=value.slice(0,4)" />
+		<span class="btn-getyzm zam-app-flex-ajCenter">获取验证码</span>
+	</div>
+	<div class="mylogin-box-item item-submit zam-app-flex-ajCenter">提交</div>
+	<a class="mylogin-box-item item-back zam-app-flex-ajCenter" href="#">返回</a>
+	<div class="tip">*温馨提示: 请经销商客户使用参加周年感恩抽奖的有效手机号码进行登录查询。</div>
+</div>
+<div class="tipbox zam-app-flex-ajCenter hidden">
+	<div>
+		<img src="/{:WIMGURL}mylucker/mycard/tip.png" />
+		<span onclick="javascript:$('.tipbox').addClass('hidden');"><i class="mxc-roundclose"></i></span>
+	</div>
+</div>
+<script type="text/javascript">
+require(['wechatcore'],function (wechatcore) {
+	$(".item-submit").click(function(){
+		var myphone = $(".myphone").val(),myyzm = $(".myyzm").val();
+		if(myphone=='' || myphone.length!=11 || !myphone.match(/^[1][3,4,5,6,7,8,9][0-9]{9}$/)){
+			$(".tipbox").removeClass('hidden');
+			return false;
+		}
+		if(myyzm==''){
+			wechatcore.msg('请输入手机验证码');
+			return false;
+		}
+		if(myyzm.length!=4){
+			wechatcore.msg('请输入4位数字验证码');
+			return false;
+		}
+		wechatcore.ajaxSubmit("{:gowechat('mylucker/loginin')}",{myphone:myphone,myyzm:myyzm},'数据提交中...').then(function(data){
+			if(data.code==0){
+				wechatcore.msg("登录成功");
+				setTimeout(function(){
+					wechatcore.reloadpage();
+				},1e3);
+			}else if(data.code==-2){
+				$(".tipbox").removeClass('hidden');
+				return false;
+			}else{
+				wechatcore.msg(data.msg);
+			}
+		}, function(){
+			wechatcore.msg('网络太差，请稍后重试');
+		});
+	});
+	$(".btn-getyzm").on('click',function(){
+		 var $this = $(this);
+		 var mobile = $(".myphone").val();
+		 if(mobile==null||mobile=='') return wechatcore.msg('请先输入手机号码');
+		 if(!mobile.match(/^[1][3,4,5,6,7,8,9][0-9]{9}$/)) return wechatcore.msg('您输入的手机号格式有误');
+		 $this.addClass('disabled');
+		 wechatcore.ajaxSubmit("{:gowechat('mylucker/sendcode')}",{mobile:mobile},'发送验证码中...').then(function(data){
+			if(data.code==0){
+				wechatcore.msg('验证码已下发，请查收');
+				$this.text('60s');
+				wechatcore.coundown(60,function(t){
+					$this.text(t+'s');
+				},function(){
+					$this.removeClass('disabled').text('获取验证码');
+				},1e3);
+			}else if(data.code==-2){
+				$this.removeClass('disabled').text('获取验证码');
+				$(".tipbox").removeClass('hidden');
+				return false;
+			}else{
+				$this.removeClass('disabled').text('获取验证码');
+				wechatcore.msg(data.msg);
+			}
+		 }, function(){
+			$this.removeClass('disabled').text('获取验证码');
+			wechatcore.msg('网络太差，请稍后重试');
+		 });
+	});
+});
+</script>
+{include file="common/footer" /}

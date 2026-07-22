@@ -1,0 +1,171 @@
+{include file="common/header" /}
+<style>
+.sign-mainbox{
+	top:90px;
+	bottom:40px;
+}
+.sign-lists::-webkit-scrollbar {
+	width:7px
+}
+.sign-lists::-webkit-scrollbar-track {
+	-webkit-box-shadow:inset 0 0 6px rgba(0,0,0,0.3);
+	box-shadow:inset 0 0 6px rgba(0,0,0,0.3);
+	-webkit-border-radius:10px;
+	border-radius:10px
+}
+.sign-lists::-webkit-scrollbar-thumb {
+	-webkit-border-radius:10px;
+	border-radius:10px;
+	background:rgba(0,0,0,0.1);
+	-webkit-box-shadow:inset 0 0 6px rgba(0,0,0,0.5)
+}
+.sign-lists::-webkit-scrollbar-thumb:window-inactive {
+	background:rgba(0,0,0,0.2)
+}
+.sign-lists {
+	position:relative;
+	height:100%;
+	width:1360px;
+	margin: 0 auto;
+	overflow-y:auto;;
+	overflow-x:hidden;
+	color: #fff;
+    border-radius: 12px;
+	display:none;
+	opacity:0;
+	{if !isset($pcconfig['appstyleconfig']['listcover']) || $pcconfig['appstyleconfig']['listcover'] == '1'}
+	background-color: rgba(0,0,0,.3);
+	{/if}
+}
+.sign-lists ul{
+	/* height:100%; */
+	width:100%;
+	padding:0 8px;
+	display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-flex-wrap: wrap;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    -webkit-align-content: flex-start;
+    -ms-flex-line-pack: start;
+    align-content: flex-start;
+}
+.sign-lists ul li.bigtosmall {
+	-webkit-animation:bigtosmall 1s ease forwards;
+	opacity:1;
+}
+.sign-lists ul li.rotatebigtosmall{
+	-webkit-animation:rotatebigtosmall 1s ease-out;
+	-webkit-transform-origin:left top;
+	-moz-animation:rotatebigtosmall 1s ease-out;
+	-moz-transform-origin:left top;
+	opacity:1;
+}
+.signitem{
+	position:relative;
+	width:168px;
+	margin:0;
+    margin-top: 25px;
+    padding: 0;
+	opacity:0;
+}
+.signitem img{
+	width: 115px;
+    height:115px;
+    border:4px solid #eee;
+    border-radius: 50%;
+    overflow: hidden;
+    box-shadow: 1px 1px 10px #000;
+}
+.signitem .sign-nickname{
+	margin: 0;
+    padding: 0;
+    width: calc(100% - 18px);
+    text-align: center;
+    color: #fff;
+    text-shadow: 1px 1px 2px #000;
+    overflow: hidden;
+}
+.signitem .sign-nickname div{
+	height:45px;
+	line-height:45px;
+	font-size:24px;
+	font-weight: 700;
+	overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.signitem .sign-nickname span{
+	display: block;
+	padding-top:8px;
+	font-size:20px;
+	font-weight: 700;
+	overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.signitem .signitem-num{
+    position: absolute;
+    font-size: 20px;
+    top: 100px;
+    left: 50%;
+    background-color: rgba(255,255,255,1);
+    color: #000;
+    padding: 0;
+    border-radius: 100px;
+    width: 66px;
+    margin: 0;
+    margin-left: -33px;
+	text-align:center;
+}
+@-webkit-keyframes bigtosmall {
+0% {
+	-webkit-transform:scale(0.1);
+	opacity:0;
+}
+70% {
+	-webkit-transform:scale(1.2);
+	opacity:1;
+}
+100% {
+	-webkit-transform:scale(1);
+	opacity:1;
+}
+}
+@-webkit-keyframes rotatebigtosmall {
+0% {
+	-webkit-transform:rotate(360deg) scale(0)
+}
+10% {
+	-webkit-transform:rotate(0) scale(1)
+}
+85% {
+	-webkit-transform:rotate(0) scale(1.8)
+}
+100% {
+	-webkit-transform:rotate(-360deg) scale(1)
+}
+}
+{if $pcconfig['hidesignnum']=='1'}
+.joinPeople{display: none}
+{/if}
+</style>
+<section class="sign-mainbox normal-box">
+	<div class="sign-lists"><ul></ul></div>
+</section>
+<script type="text/html" id="sign-tpl">
+	<li class="signitem zam-app-flex-ajCenter signid-{{ user_id }}" style="z-index:{{ num }}">
+		<img src="{{ avatar }}">
+		<div class="sign-nickname">{{# nickname }}</div>
+		<div class="signitem-num{if $pcconfig['showsignsx']=='2'} display-none{/if}">{{ num }}</div>
+	</li>
+</script>
+<script>
+var itemshowtype = "{if !empty($pcconfig['itemshowtype'])}{$pcconfig['itemshowtype']}{else}1{/if}";
+require(['signs','screencore'],function (signs,screencore) {
+	signs.init();
+});
+</script>
+{include file="common/footer" /}

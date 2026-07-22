@@ -1,0 +1,37 @@
+<div class="alert alert-danger">仅展示购买了功能或者人数的订单(除去续期订单)</div>
+<table class="table" style="margin-bottom:0px;">
+<thead>
+  <tr>
+	<th style="width:20%;text-align:center;">订单编号</th>
+	<th style="width:60%;text-align:center;">功能与人数</th>
+	<th style="width:20%;text-align:center;">操作</th>
+  </tr>
+</thead>
+<tbody class="order-lists">
+	{foreach $orders as $order}
+	{if $order['isrenewal']=='2'}
+		<tr>
+			<td class="text-center">{$order['tradeid']}</td>
+			{php}$html = '';{/php}
+			<td class="text-center">
+				{php}$html = '人数:'.$order['addnums'];{/php}
+				{if !empty($order['payinfo']['modules'])}
+					{volist name="order.payinfo.modules" id="module"}
+					{php}$html .= '+'.$module['name'];{/php}
+					{/volist}
+				{/if}
+				{if !empty($order['payinfo']['fws'])}
+					{volist name="order.payinfo.fws" id="fw"}
+					{php}$html .= '+'.$fw['name'];{/php}
+					{/volist}
+				{/if}
+				{$html}
+			</td>
+			<td class="text-center">
+				<a href="javascript:;" class="btn btn-primary btn-sm edit-orderinfo" data-orderid="{$order['id']}"  lay-tips="编辑">编辑</a>
+			</td>
+		</tr>
+	{/if}
+	{/foreach}
+</tbody>
+</table>

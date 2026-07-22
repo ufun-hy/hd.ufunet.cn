@@ -1,0 +1,455 @@
+{include file="common/header" /}
+<style>
+::-webkit-scrollbar {
+    width: 10px;
+}
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-thumb {
+    background-color: rgba(0,0,0,0.2);
+    height: 50px;
+    outline-offset: -2px;
+    -webkit-border-radius: 4px;
+}
+::-webkit-scrollbar-track-piece {
+    -webkit-border-radius: 9px;
+}
+::-webkit-scrollbar-track-piece {
+    background-color: transparent;
+    -webkit-border-radius: 0;
+}
+.hidden{display: none}
+.zjd-mainbox{
+	width: 100%;
+    height: 100%;
+    margin: 0 auto;
+    padding: 0;
+    overflow: hidden;
+}
+.zjd-container{
+	position: relative;
+	width: 100%;
+	height: 100%;
+}
+.zjd-boxlists {
+	width: 860px;
+	height:562px;
+}
+.zjd-boxlists .zjd-boxs { width: 100%; }
+.zjd-boxlists .zjd-boxs img { 
+	position: absolute; 
+	bottom:60px;
+	left: 100px;
+	pointer-events: none; 
+	width: 860px; 
+	height: 562px;
+}
+.zjd-boxlists .zjd-boxs img.leftbox{opacity: 0}
+.zjd-boxlists .zjd-boxs img.rightbox{opacity: 0;z-index: 1}
+.zjd-boxlists .zjd-boxs img.waitbox {width:940px;height:669px;left:250px;bottom:120px;z-index:3; }
+.zjd-boxlists.boxmoving .zjd-boxs .leftbox{ animation:leftboxani 0.5s 0.5s ease forwards; opacity:0;}
+.zjd-boxlists.boxmoving .zjd-boxs .rightbox{ animation:leftboxani 0.5s 0.5s ease forwards;opacity:0;}
+@keyframes leftboxani{
+    0%{opacity:0;}
+	50%{opacity:1;}
+    100%{opacity:1; }
+}
+.zjd-boxlists.boxmoving .zjd-boxs .stablebox{  
+ 	animation:stableboxani 0.5s 0.5s ease forwards;opacity:1;  
+}
+@keyframes stableboxani{
+    0%{opacity:1;}
+	50%{opacity:0;}
+    100%{opacity:0; }
+}
+/*手势图*/
+.zjd-boxlists .zjd-hands { 
+	width: 257px; 
+	height: 104px; 
+	margin: 0 auto; 
+	position: absolute;
+	left: 510px; 
+	bottom: 590px;
+	margin-left: -20px;
+	z-index: 2; 
+	display: none; 
+}
+.zjd-boxlists .zjd-hands .handone,.zjd-boxlists .zjd-hands .handtwo { 
+	width: 257px; 
+	height: 174px; 
+	background-size: 100% 100%; 
+	background-repeat: no-repeat; 
+	position: absolute; 
+	left: 50%; 
+	margin-left: -110px; 
+	bottom: 0; 
+}
+.zjd-boxlists .zjd-hands .handone {
+	background-image: url("{:tomedia($pcconfig['styleconfig']['hammer'])}");
+}
+.zjd-boxlists .zjd-hands .handtwo { 
+	background-image: url({:tomedia($pcconfig['styleconfig']['hammer2'])});
+	z-index:3;
+}
+.userone {
+    position: absolute;
+    top: 15px;
+    left: 0px;
+    margin: 15px auto;
+    overflow: visible;
+    border: 3px solid #fff;
+    border-radius: 8px;
+    box-shadow: 0px 0px 10px 5px rgb(0 0 0 / 30%);
+    background-color: rgba(0, 0, 0, 0.85);
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background-image: url('');
+    background-repeat:no-repeat;
+    background-size: contain;
+}
+.userone .userinfo{
+    position: absolute;
+    top: calc(100% + 5px);
+    left: -50%;
+    width: 200%;
+    text-shadow: 0 1px 3px rgb(0 0 0 / 45%);
+}
+.userone .userinfo div{
+    width: 100%;
+    height: 30px;
+    line-height: 30px;
+    font-size: 18px;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    word-break: break-all;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    text-shadow: 0 1px 3px rgb(0 0 0 / 45%);
+}
+.zjd-boxlists.boxmoving .zjd-hands { 
+	-webkit-animation: handani 2s ease-in-out forwards; 
+	animation: handani 2s ease-in-out forwards; 
+	-webkit-transition-property: all; 
+	transition-property: all; 
+	display: block; 
+	opacity: 0; 
+}
+ @keyframes handani {
+	0%{opacity: 0;-webkit-transform:translateY(0px) translateX(0px) rotate(0deg);}
+	10% {opacity: 1;}
+	35%{opacity: 1;-webkit-transform:translateY(150px) translateX(-85px) rotate(-40deg);}
+	100%{opacity: 1;-webkit-transform:translateY(0px) translateX(0px) rotate(0deg);}	 	 
+}
+.zjd-boxlists.boxmoving .userone { 
+	-webkit-animation: useroneani .1s ease-in-out forwards 0.8s; 
+	animation: useroneani .1s ease-in-out forwards 0.8s; 
+	-webkit-transition-property: all; 
+	transition-property: all; 
+	z-index: 1500; 
+	opacity: 0; 
+}
+@keyframes useroneani { 
+ 0% {}
+ 100% {opacity:1;z-index: 1500;}
+}
+
+/*右侧中奖列表*/
+.zjd-luckers{
+	position: relative;
+    width: 402px;
+    height: 660px;
+    overflow: hidden;
+    z-index: 3;
+}
+.lucker-title{
+	height: 60px;
+	line-height: 60px;
+	font-size: 20px;
+	text-align: center;
+	font-weight: 500;
+	color: #fff;
+	padding: 0 5px;
+}
+.lucker-list {
+	height: calc(100% - 60px);
+	width:100%;
+	overflow-y: auto;
+	color:#fff;
+}
+.lucker-list .lucker-item{
+	width:100%;
+	overflow: hidden;
+}
+.lucker-list .lucker-item:hover .lucker-item-showmore{
+	display: flex!important;
+}
+.lucker-list .lucker-item .lucker-item-box{
+	width:100%;
+	height:80px;
+	padding:3px 0;
+	position: relative;
+}
+.lucker-item .lucker-msg-box .lucker-user {
+	height:100%;
+	width:120px
+}
+.lucker-item .lucker-msg-box .lucker-user .lucker-user-headerimg-box{
+	position: relative;
+	height:68px;
+	width:68px;
+	border-radius:50%;
+}
+.lucker-item .lucker-msg-box .lucker-user .lucker-user-headerimg-box:before {
+    content: " ";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-image: url("{:tomedia($pcconfig['styleconfig']['userbg'])}");
+    animation: foreverrotate 2s linear infinite;
+}
+@keyframes foreverrotate {
+	0% {
+		transform: rotate(0)
+	}
+	to {
+		transform: rotate(-1turn)
+	}
+}
+.lucker-item .lucker-header-img{
+	width:calc(100% - 8px);
+	height:calc(100% - 8px);
+	border-radius:50%;
+}
+.lucker-item .lucker-msginfo{
+	height:60px;
+	padding: 10px 0;
+	width:calc(100% - 120px);
+}
+.lucker-item .lucker-msginfo div{
+	line-height: 30px;
+    height: 30px;
+}
+.lucker-item .lucker-msginfo .onlyname{
+	line-height: 60px;
+    height: 60px;
+    font-size: 26px;
+}
+.lucker-list .lucker-item-box .lucker-item-bg {
+	position: absolute;
+	z-index:-1;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+}
+.lucker-list .lucker-item-box .lucker-item-bg .lucker-item-bg-warp{
+	width: 100%;
+	height: 100%;
+	border: 1px solid #fff2cc;
+    border-radius: 10px;
+    background-color: rgba(0, 0, 0, 0.35);
+    box-sizing: border-box;
+}
+.lucker-list .lucker-item-box .lucker-item-showmore{
+	position: absolute;
+	top: 0;
+	right: 0;
+	width: 50px;
+	height: 100%;
+	text-align: center;
+	border-radius: 10px
+	box-shadow: -6px 0 30px rgba(0,0,0,.4);
+	z-index:2;
+	cursor: pointer;
+	color:#fff
+}
+.lucker-list .lucker-item-box .lucker-item-showmore i{
+	font-size: 30px;
+	display: inline-block;
+	cursor: pointer;
+}
+.lucker-list .lucker-item-box .lucker-msg-box {
+	height: 100%;
+	width: 100%;
+	position: relative;
+}
+/*抽奖控制台*/
+.zjd-controlbox { 
+	position: absolute; 
+	left:200px;
+	bottom: 70px;
+	
+	z-index: 3; 
+	font-size: 16px; 
+	color: #fff;
+}
+.zjd-controlbox .zjd-panel{height: 46px;}
+.zjd-prizebox{
+	position: relative;
+	width: 136px;
+	height: 32px;
+	border-radius:3px;
+	background-color: rgba(255,255,255,0.32);			
+}
+.zjd-prizebox .zjd-setarrow{
+	width: 20px;
+	height:32px;
+	line-height: 32px;
+	position: absolute;
+	top:0;
+	right: 0px;
+	pointer-events:none;
+	cursor: pointer;
+	transform: rotate(-90deg);
+	transition: all .5s;
+}
+.zjd-prizebox .zjd-prizename {
+	width: calc( 100% - 20px);
+	height: 32px;
+	line-height: 32px;
+	position: absolute;
+	left: 0;
+	text-align: center;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	cursor:pointer;
+}
+.zjd-prizebox .zjd-prizelist{
+	width: 100%;
+	min-height: 0;
+	max-height: 300px;
+	overflow:hidden;
+	overflow-y: auto;
+	position: absolute;
+	bottom: 36px;
+	left: 0;
+}
+.zjd-prizebox .zjd-prizelist li {
+	height: 30px;
+	line-height: 30px;
+	font-size: 14px;
+	background: rgba(0,0,0,.5);
+	cursor: pointer;
+	text-align: center;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+.zjd-prizebox .zjd-prizelist li.issel {
+	color: yellow
+}
+.zjd-selectbox {
+	text-align: center;
+	width: 220px;
+}
+.zjd-selectbox .numbernum {
+	width: 80px;
+    height: 32px;
+    line-height: 32px;
+    background-color: rgb(255, 255, 255,0.32);
+    text-align: center;
+    border-radius: 3px;
+    margin: 0 5px;
+    font-size: 20px;
+    color: #fff;
+    border: none;
+    outline:none
+}
+.zjd-selectbox img{width:32px;height:32px;cursor: pointer;}
+.zjd-join{margin: 0 10px;}
+.zjd-run{
+	width: 200px;
+    height: 46px;
+    margin-left: 20px;
+    cursor: pointer;
+	background-image: url("{:tomedia($pcconfig['styleconfig']['startbtn'])}");
+	background-repeat: no-repeat;
+	background-size:cover;
+}
+</style>
+{if !empty($pcconfig['styleconfig']['eggmusic'])}
+<audio id="lotterymusic" src="{:tomedia($pcconfig['styleconfig']['eggmusic'])}"  preload="preload" style="display:none"></audio>
+{/if}
+<section class="zjd-mainbox normal-box zam-app-flex-ajCenter2">
+<div class="zjd-container zam-app-flex-ajCenter2">
+    <div class="zjd-boxlists">      
+		<div class="zjd-boxs">
+			<img class="waitbox" src="{:tomedia($pcconfig['styleconfig']['box2'])}">
+			<img class="stablebox" src="{:tomedia($pcconfig['styleconfig']['box'])}">
+			<img class="leftbox" src="{:tomedia($pcconfig['styleconfig']['lbox'])}">
+			<img class="rightbox" src="{:tomedia($pcconfig['styleconfig']['rbox'])}">
+			
+		</div>
+		<div class="zjd-hands">
+			<div class="handone"></div>
+			<div class="handtwo"></div>
+			<div class="userone" style="background-image: url();">
+				<div class="userinfo"></div>
+			</div>
+		</div>
+    </div>
+    <div class="zjd-luckers">
+    	<div class="lucker-title limitbox"><span class="zjdawardname">xxx</span><span class="zjdprizename">(xxx)</span></div>
+	    <div class="lucker-list"></div>
+    </div>
+ 	<div class="zjd-controlbox">
+		<div class="zjd-panel zam-app-flex-ajCenter2">
+			<div style="margin-right: 20px;">选择奖项</div>
+			<div class="zjd-prizebox">
+				<div class="zjd-setarrow zam-app-flex-ajCenter2">
+					<i class="mxc-right"></i>
+				</div>
+				<div class="zjd-prizename" data-id="0">一等奖</div>
+				<ul class="zjd-prizelist" style="height:0"></ul>
+			</div>
+			<div class="zjd-selectbox zam-app-flex-ajCenter2">
+               <img id="prize_decrement" src="/static/images/screen/normalcj/reduce.png">
+               <input class="numbernum" value="1">
+               <img id="prize_increment" src="/static/images/screen/normalcj/add.png">
+       		</div>
+			<div {if $pcconfig['showjoin']!='1'}style="display:none"{/if}>参与人数<span class="zjd-join">0</span>人</div>
+			<a class="zjd-run" href="javascript:void(0)"></a>
+		</div>
+    </div>
+</div>
+<div class="emptybox zam-app-flex-ajCenter hidden">
+	<img src="/{:SIMGURL}common/empty.png">
+	<p style="padding:20px;">请到后台添加奖品</p>
+</div>
+</section>
+<script type="text/html" id="lucker-tpl">
+	<div class="lucker-item">
+	  <div class="lucker-item-box">
+		<div class="lucker-msg-box zam-app-flex">	
+			<div class="lucker-item-bg">
+				<div class="lucker-item-bg-warp"></div>
+			</div>
+			<div class="lucker-item-showmore zam-app-flex-ajCenter2 hidden" data-id="{{ luckerid }}"><i class="mxc-roundclose"></i></div>
+			<div class="lucker-user zam-app-flex-ajCenter2">
+				<div class="lucker-user-headerimg-box zam-app-flex-ajCenter2">
+					<img class="lucker-header-img" src="{{ avatar }}">
+				</div>
+			</div>	
+			<div class="lucker-msginfo">{{# nickname }}</div> 
+		</div>
+	  </div>
+	</div>
+</script>
+<script type="text/html" id="prize-tpl">
+	<li {{ if issel }}class="issel"{{ /if }} data-id="{{ id }}" data-prizename="{{ prizename }}" data-onceout="{{ onceout }}">{{ awardname }}</li>
+</script>
+<script>
+require(['screenzjd'],function (screenzjd) {
+	screenzjd.init();
+});
+</script>
+{include file="common/footer" /}

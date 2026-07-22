@@ -1,0 +1,118 @@
+{include file='$Wpath/common/header'}
+<div class="alert alert-danger" role="alert">
+    <i class="mdi mdi-bell-ring"></i> 系统日志记录了很多有意义的日志，一般是开发人员用来分析日常访问报错原因的，对于运营者来说反而是个无关紧要的东西。故提供清理办法，达到服务器磁盘瘦身的目的
+</div>
+<div class="card">
+	<div class="card-header">系统日志管理</div>
+	<div class="card-body">
+        <a class="btn btn-success m-r-10 m-b-10 resetwechat">清空微信相关日志(共：{$wechat['size']})</a>
+        <a class="btn btn-purple m-r-10 m-b-10 resetalipay">清空支付宝日志(共：{$alipay['size']})</a>
+        <a class="btn btn-danger m-r-10 m-b-10 resetonline">清空系统异常输出日志(共：{$online['size']})</a>
+        <a class="btn btn-brown m-r-10 m-b-10 resetexcel">清空系统excel导入/导出日志(共：{$excel['size']})</a>
+        <a class="btn btn-warning m-r-10 m-b-10 reseterror">清空系统错误日志(共：{$error['size']})</a>
+        <a class="btn btn-dark m-r-10 m-b-10 resetonlinecount">所有活动在线人数记录日志(共：{$onlinecount}条)</a>
+        <a class="btn btn-danger m-r-10 m-b-10 resetsyshdusercount">所有活动历史参与人数日志(共：{$syshdusercount}人)</a>
+    </div>
+    <div class="card-footer">
+        可自行组织时间每月清理一次
+        <div class="text-danger m-t-10">所有活动在线人数记录日志即为所有已发布的活动每1-2分钟统计一次在线人数以及历史人数的日志，一般用于监测活动历史或在线人数峰值。</div>
+        <div class="text-danger m-t-10">所有活动历史参与人数日志即为每个扫码进入活动的微信用户均会在系统内留存一份日志，一般用于同一个用户二次进入系统时跳过微信oauth授权。</div>
+    </div>
+</div>
+<script type="text/javascript">
+require(['webcore','jconfirmBox','zamnotice'],function(webcore,jconfirmBox,zamnotice){
+	$(".resetwechat").on('click',function(){
+        jconfirmBox.confirm('温馨提示','确定清空微信相关日志么？',function(){
+            webcore.ajaxSubmit("{:goweb('syslog/index')}",{type:'1'}).then(function(json){
+                 if(json.code==0){
+                    zamnotice.showTips('success','操作成功',1e3,function(){
+                        window.location.reload();
+                    });
+                 }else{
+                    zamnotice.showTips('error',json.msg);
+                 }
+            })
+        });
+    });
+    $(".resetalipay").on('click',function(){
+        jconfirmBox.confirm('温馨提示','确定清空支付宝支付日志么？',function(){
+            webcore.ajaxSubmit("{:goweb('syslog/index')}",{type:'2'}).then(function(json){
+                 if(json.code==0){
+                    zamnotice.showTips('success','操作成功',1e3,function(){
+                        window.location.reload();
+                    });
+                 }else{
+                    zamnotice.showTips('error',json.msg);
+                 }
+            })
+        });
+    });
+    $(".resetonline").on('click',function(){
+        jconfirmBox.confirm('温馨提示','确定清空系统每日在线人数统计日志么？',function(){
+            webcore.ajaxSubmit("{:goweb('syslog/index')}",{type:'3'}).then(function(json){
+                 if(json.code==0){
+                    zamnotice.showTips('success','操作成功',1e3,function(){
+                        window.location.reload();
+                    });
+                 }else{
+                    zamnotice.showTips('error',json.msg);
+                 }
+            })
+        });
+    });
+    $(".reseterror").on('click',function(){
+        jconfirmBox.confirm('温馨提示','确定清空系统错误日志么？',function(){
+            webcore.ajaxSubmit("{:goweb('syslog/index')}",{type:'4'}).then(function(json){
+                 if(json.code==0){
+                    zamnotice.showTips('success','操作成功',1e3,function(){
+                        window.location.reload();
+                    });
+                 }else{
+                    zamnotice.showTips('error',json.msg);
+                 }
+            })
+        });
+    });
+    $(".resetexcel").on('click',function(){
+        jconfirmBox.confirm('温馨提示','确定清空活动excel导出日志么？',function(){
+            webcore.ajaxSubmit("{:goweb('syslog/index')}",{type:'5'}).then(function(json){
+                 if(json.code==0){
+                    zamnotice.showTips('success','操作成功',1e3,function(){
+                        window.location.reload();
+                    });
+                 }else{
+                    zamnotice.showTips('error',json.msg);
+                 }
+            })
+        });
+    });
+    $(".resetonlinecount").on('click',function(){
+        jconfirmBox.confirm('温馨提示','清空后所有活动的人数走势数据将会清空并且无法恢复，您确定清空所有活动的在线人数统计数据么？',function(){
+            webcore.ajaxSubmit("{:goweb('syslog/index')}",{type:'6'}).then(function(json){
+                 if(json.code==0){
+                    zamnotice.showTips('success','操作成功',1e3,function(){
+                        window.location.reload();
+                    });
+                 }else{
+                    zamnotice.showTips('error',json.msg);
+                 }
+            })
+        });
+    });
+    $(".resetsyshdusercount").on('click',function(){
+        jconfirmBox.confirm('温馨提示','清空后进入系统的所有微信用户数据将会清空并且无法恢复，您确定清空么？<span class="text-danger">（此操作并不会对活动用户产生影响）<span>',function(){
+            webcore.ajaxSubmit("{:goweb('syslog/index')}",{type:'7'}).then(function(json){
+                 if(json.code==0){
+                    zamnotice.showTips('success','操作成功',1e3,function(){
+                        window.location.reload();
+                    });
+                 }else{
+                    zamnotice.showTips('error',json.msg);
+                 }
+            })
+        });
+    });
+    
+});
+</script>
+{include file='$Wpath/common/footer'}

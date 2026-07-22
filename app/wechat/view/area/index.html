@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>地理位置验证 - {$hdinfo['hdtitle']}</title>
+    <meta content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0" name="viewport"/>
+    <meta content="yes" name="apple-mobile-web-app-capable"/>
+    <meta content="black" name="apple-mobile-web-app-status-bar-style"/>
+    <meta content="telephone=no" name="format-detection"/>
+	<link rel="shortcut icon" href="" />
+    <link rel="stylesheet" href="__STATIC__/js/ydui/css/ydui.css"/>
+	<link rel="stylesheet" href="__STATIC__/css/zam-icon.css" media="all" />
+	<link rel="stylesheet" href="__STATIC__/css/mxc-icon.css" media="all" />
+	<link rel="stylesheet" href="__STATIC__/css/wechat/style.css" />
+	<link rel="stylesheet" href="__STATIC__/css/animate.css"/>
+	<script src="https://res.wx.qq.com/open/js/jweixin-1.6.0.js" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript" charset="utf-8">wx.config({:$jssdk});</script>
+    <script src="__STATIC__/js/ydui/js/ydui.flexible.js"></script>
+	<script src="__STATIC__/js/jquery.2.1.4.js"></script>
+	<script src="__STATIC__/js/jquery.extend.js"></script>
+	<script type="text/javascript"  src="__STATIC__/js/require.js"></script>
+	<script type="text/javascript">
+		var XCV3Config = {
+		  staticurl:"__STATIC__/",
+		  amconfig:{:json_encode(amconfig())},
+		  hdid:"{$hdinfo['hdid']}",
+		  isiframe:window.top!=window.self,
+		  clienttype:"{if isset($clienttype)}{$clienttype}{else}1{/if}",
+		  maptype:"{$map['type']??'1'}",
+		};
+		require.config({
+			baseUrl: XCV3Config.staticurl + "js",
+			urlArgs:'v=2.1.1',//+(new Date()).getTime(),
+			waitSeconds:0,
+			paths: {
+				 css: "css.min",
+				 'async': "async",
+				 jquery:"jquery.2.1.4",
+				 fastclick:'wechatjs/fastclick',
+				 mobileselect:"mobileselect/mobileselect",
+				 ionrangeslider:'ionrangeslider/ionrangeslider',
+				 ydui: "ydui/js/ydui",
+				 template:"template/template",
+				 layer:"layer/mobile/layer",
+				 laytpl:"laytpl/laytpl",
+				 howler:"howler/howler.min",
+				 cropper:"cropper/cropper",
+				 "jquery.shake":'wechatjs/jquery.shake',
+				 jform:'jquery.form',
+				 touch:'wechatjs/touch',
+				 slideBox:'wechatjs/slideBox',
+				 wechatcore:"wechatjs/wechatcore",
+				 marqueen:"wechatjs/marqueen",
+				 bscroll:'wechatjs/bscroll/bscroll',
+				 swiper:'swiper/swiper.min',
+				 emojicore:"wechatjs/emojicore",
+				 appsocket:"wechatjs/appsocket",
+				 appmsg:"wechatjs/appmsg",
+				 appgame:"wechatjs/appgame",
+				 appdgshake:"wechatjs/appdgshake",
+				 appshuqian:"wechatjs/appshuqian",
+				 appmonkey:"wechatjs/appmonkey",
+				 appcar:"wechatjs/appcar",
+				 apphorse:"wechatjs/apphorse",
+				 appmls:"wechatjs/appmls",
+				 appbike:"wechatjs/appbike",
+				 appswim:"wechatjs/appswim",
+				 apptug:"wechatjs/apptug",
+				 appanswerbs:"wechatjs/appanswerbs",
+				 appjjb:"wechatjs/appjjb",
+				 appcutfruit:"wechatjs/appcutfruit",
+				 appdzqy:"wechatjs/appdzqy",
+				 videojs:'videojs/video',
+				 plupload:'plupload/plupload',
+				 uploader:'plupload/uploader',
+				 phaser:'wechatjs/phaser.min',
+				 dialog:'dialog/js/dialog',
+				 directoss:'directupload/aliyun',
+				 directqiniu:'directupload/qiniu',
+				 directcos:'directupload/cos',
+				 AMapLoader:'https://webapi.amap.com/loader',
+				 DouyinOpenJSBridge:'wechatjs/douyin.open',
+				 glightbox:'glightbox/glightbox.min',
+			},
+			shim:{
+				"ydui": {
+					exports:"YDUI"
+				},
+				'template':{
+					exports: 'template',
+				},
+				'layer':{
+					exports: 'layer',
+					deps: ['css!../js/layer/mobile/need/layer.css']
+				},
+				'mobileselect':{
+					exports:'MobileSelect',
+					deps: ['css!../js/mobileselect/mobileselect.css']
+				},
+				'ionrangeslider':{
+					deps:['css!../js/ionrangeslider/ionrangeslider.css'],
+				},
+				'wechatcore':{
+					exports:'wechatcore',
+				},
+				'marqueen':{
+					exports:'marqueen',
+				},
+				'laytpl':{
+					exports: 'laytpl',
+				},
+				'jquery.shake':{
+					exports: 'Shake',
+					deps: ['jquery']
+				},
+				'jform':{
+					deps: ['jquery']
+				},
+				'touch':{
+					exports:'touch',
+				},
+				'bscroll':{
+					exports:'BScroll',
+				},
+				'swiper':{
+					exports:'Swiper',
+					deps: ['css!../js/swiper/swiper.min.css']
+				},
+				'cropper':{
+					exports:'cropper',
+					deps: ['css!../js/cropper/cropper.css']
+				},
+				'appsocket':{
+					exports:'appsocket',
+				},
+				'appgame':{
+					exports:'appgame',
+				},
+				'appdgshake':{
+					exports:'appdgshake',
+				},
+				'appshuqian':{
+					exports:'appshuqian',
+				},
+				'appmonkey':{
+					exports:'appmonkey',
+				},
+				'appcar':{
+					exports:'appcar',
+				},
+				'apphorse':{
+					exports:'apphorse',
+				},
+				'appmls':{
+					exports:'appmls',
+				},
+				'appbike':{
+					exports:'appbike',
+				},
+				'appswim':{
+					exports:'appswim',
+				},
+				'apptug':{
+					exports:'apptug',
+				},
+				'appanswerbs':{
+					exports:'appanswerbs',
+				},
+				'appdzqy':{
+					exports:'appdzqy',
+				},
+				'appjjb':{
+					exports:'appjjb',
+				},
+				'appcutfruit':{
+					exports:'appcutfruit',
+				},
+				'videojs':{
+					exports:'videojs',
+					deps:['css!../js/videojs/video.css'],
+				},
+				'plupload':{
+					exports:'plupload',
+				},
+				'uploader':{
+					exports:'uploader',
+					deps: ['jquery','plupload'],
+				},
+				'dialog':{
+					exports:'dialog',
+					deps:['css!../js/dialog/css/dialog.css'],
+				},
+			},
+		});
+		define("jquery", [], function () {
+			return jQuery;
+		});
+		if(XCV3Config.clienttype=='2' && XCV3Config.maptype=='1'){
+			window._AMapSecurityConfig = {
+			    securityJsCode:"{$map['gdmap']['jskeycode']??''}",
+			}
+		}
+	</script>
+</head>
+<body>
+<style>
+/**wechat  通用样式**/
+.zam-app-bodyBg {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+	z-index:-1;
+    background-color:rgba(0,0,0,0.8);
+}
+</style>
+<section id="mapbox" style="display: none"></section>
+<div class="zam-app-bodyBg"></div>
+</body>
+<script>
+(parent.wx||wx).ready(function () {
+	(parent.wx||wx).hideOptionMenu();
+});
+$(function(){
+	var hadgetloc = 0,maptype = "{$map['type']??'1'}";
+	if(XCV3Config.clienttype=='1'){
+		require(['wechatcore'],function (wechatcore) {
+			var loadindex = wechatcore.loading('正在获取您的位置信息');
+			var t = setInterval(function(){
+				if(hadgetloc==1){
+					wechatcore.close(loadindex);
+					clearInterval(t);
+					wechatcore.showtopmsg('地理位置验证成功',1e3,function(){
+						window.location.href = "{:$fromurl}";
+					});
+				}else if(hadgetloc==-1){
+					wechatcore.close(loadindex);
+					clearInterval(t);
+					wechatcore.ask(false,'对不起，您所在位置不在活动范围内','好的',function(){
+						if(XCV3Config.clienttype=='1') wechatcore.closewxwindow();
+					});
+				}
+			},500);
+			wechatcore.getwxlocation(function(res){
+				wechatcore.ajaxSubmit("{:gowechat('area/index')}",{lat:res.latitude,lng:res.longitude},false).then(function(json){
+					if(json.code==0){
+						hadgetloc = 1;
+					}else{
+						hadgetloc = -1;
+					}
+				});
+			},function(){
+				wechatcore.msg('允许获取您的地理位置才可进入活动');
+				setTimeout(function(){
+					window.location.reload(true);
+				},2e3);
+			});
+			
+		});
+	}else{
+		if(maptype == '1'){
+			require(['wechatcore','AMapLoader'],function (wechatcore,AMapLoader) {
+				var loadindex = wechatcore.loading('正在获取您的位置信息');
+				var t = setInterval(function(){
+					if(hadgetloc==1){
+						wechatcore.close(loadindex);
+						clearInterval(t);
+						wechatcore.showtopmsg('地理位置验证成功',1e3,function(){
+							window.location.href = "{:$fromurl}";
+						});
+					}else if(hadgetloc==-1){
+						wechatcore.close(loadindex);
+						clearInterval(t);
+						wechatcore.ask(false,'对不起，您所在位置不在活动范围内','好的',function(){
+							if(XCV3Config.clienttype=='1') wechatcore.closewxwindow();
+						});
+					}
+				},500);
+				AMapLoader.load({
+				    "key": "{$map['gdmap']['jskey']??''}",
+				    "version": "1.4.15",
+				    "plugins": ['AMap.Autocomplete'],
+				}).then((AMap)=>{
+				    AMap.plugin('AMap.Geolocation', function() {
+					  var geolocation = new AMap.Geolocation({
+					    enableHighAccuracy: true,
+					    timeout: 10000,
+					    offset: [10, 20],
+					    zoomToAccuracy: false,
+					  })
+					  geolocation.getCurrentPosition(function(status,result){
+					        if(status=='complete'){
+					            var pos = result.position;
+					            wechatcore.ajaxSubmit("{:gowechat('area/index')}",{lat:pos.lat,lng:pos.lng},false).then(function(json){
+									if(json.code==0){
+										hadgetloc = 1;
+									}else{
+										hadgetloc = -1;
+									}
+								});
+					        }else{
+					            wechatcore.msg('定位出现异常，请刷新重试');
+					        }
+					  });
+					})
+				}).catch(function(e){
+				    wechatcore.msg('地图加载失败，请稍后重试');
+				});
+			});
+		}else if(maptype == '2'){
+			require(['wechatcore',"async!https://api.map.baidu.com/api?v=3.0&ak={$map['bdmap']['jsak']??''}"],function (wechatcore) {
+				var loadindex = wechatcore.loading('正在获取您的位置信息');
+				var t = setInterval(function(){
+					if(hadgetloc==1){
+						wechatcore.close(loadindex);
+						clearInterval(t);
+						wechatcore.showtopmsg('地理位置验证成功',1e3,function(){
+							window.location.href = "{:$fromurl}";
+						});
+					}else if(hadgetloc==-1){
+						wechatcore.close(loadindex);
+						clearInterval(t);
+						wechatcore.ask(false,'对不起，您所在位置不在活动范围内','好的',function(){
+							if(XCV3Config.clienttype=='1') wechatcore.closewxwindow();
+						});
+					}
+				},500);
+				var map = new BMap.Map("mapbox");
+				var point = new BMap.Point(116.331398,39.897445);
+				map.centerAndZoom(point,12);
+				var geolocation = new BMap.Geolocation();
+				geolocation.getCurrentPosition(function(r){
+					if(this.getStatus() == BMAP_STATUS_SUCCESS){
+			            wechatcore.ajaxSubmit("{:gowechat('area/index')}",{lat:r.point.lat,lng:r.point.lng},false).then(function(json){
+							if(json.code==0){
+								hadgetloc = 1;
+							}else{
+								hadgetloc = -1;
+							}
+						});
+					}else {
+						wechatcore.msg('定位出现异常，请稍后重试');
+					}        
+				});
+			});
+		}else{
+			require(['wechatcore',"https://mapapi.qq.com/web/mapComponents/geoLocation/v/geolocation.min.js"],function (wechatcore) {
+				var loadindex = wechatcore.loading('正在获取您的位置信息');
+				var t = setInterval(function(){
+					if(hadgetloc==1){
+						wechatcore.close(loadindex);
+						clearInterval(t);
+						wechatcore.showtopmsg('地理位置验证成功',1e3,function(){
+							window.location.href = "{:$fromurl}";
+						});
+					}else if(hadgetloc==-1){
+						wechatcore.close(loadindex);
+						clearInterval(t);
+						wechatcore.ask(false,'对不起，您所在位置不在活动范围内','好的',function(){
+							if(XCV3Config.clienttype=='1') wechatcore.closewxwindow();
+						});
+					}
+				},500);
+				var geolocation = new qq.maps.Geolocation("{$map['txmap']['key']??''}", "默认应用");
+				geolocation.getLocation(function(pos){
+					wechatcore.ajaxSubmit("{:gowechat('area/index')}",{lat:pos.lat,lng:pos.lng},false).then(function(json){
+						if(json.code==0){
+							hadgetloc = 1;
+						}else{
+							hadgetloc = -1;
+						}
+					});
+				}, function(e){
+					wechatcore.msg('定位出现异常，请稍后重试');
+				});
+			});
+		}
+	}
+});
+</script>
+</html>

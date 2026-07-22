@@ -1,0 +1,249 @@
+<style>
+.leftcontrolBox {
+    position: absolute;
+    height: 100%;
+    left: 0;
+    top: 0;
+    z-index: 11;
+    padding: 100px 0px 0px 0px;
+    box-sizing: border-box;
+    transition: transform 0.3s;
+    transform: translate(-120px, 0);
+}
+.leftcontrolBox.hover{
+	transform: translate(0px, 0);
+}
+.leftcontrolBox i.tohideicon{
+	display:none;
+}
+.leftcontrolBox i.toshowicon{
+	display:inline-block;
+}
+.leftcontrolBox.hover i.tohideicon{
+	display:inline-block;
+}
+.leftcontrolBox.hover i.toshowicon{
+	display:none;
+}
+.leftcontrolCover {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    background: #000;
+    opacity: 0.9;
+}
+.leftcontrolBox-colspan {
+    position: absolute;
+    right: -20px;
+    top: 0;
+    opacity: 1;
+    width: 25px;
+    height: 100%;
+}
+.leftcontrolBox-colspan span {
+    width: 22px;
+    height: 52px;
+    display: inline-block;
+    position: absolute;
+    top: 90%;
+    right: -2px;
+    background: rgba(0, 0, 0, 0.9);
+    text-align: center;
+    font-size: 12px;
+    border-radius: 0 3px 3px 0;
+    color: #fff;
+    text-align: center;
+    padding-top: 5px;
+    opacity: 0.5;
+}
+.leftcontrolBox.hover .leftcontrolBox-colspan span {
+    opacity: 1;
+}
+.leftcontrolTitle {
+	position: relative;
+	height:60px;
+	line-height:60px;
+	text-align:center;
+    font-size: 20px;
+    color: #666;
+    font-weight: bold;
+    letter-spacing: 1px;
+    z-index: 1
+}
+.leftcontrolMenu {
+    text-align: left;
+    width: 120px;
+    margin-top: 0px;
+}
+.leftcontrolMenu-item {
+    font-size: 16px;
+    color: #ccc;
+    position: relative;
+    cursor: pointer;
+    display: block;
+    letter-spacing: 2px;
+	border:solid 1px transparent;
+	box-sizing:border-box;
+	text-align:center;
+}
+.leftcontrolMenu-item a{
+	display:inline-block;
+	height: 42px;
+    line-height: 42px;
+}
+.leftcontrolMenu-item.on {
+    border-color:#ff4b69;
+    border-right-color:transparent;
+}
+.leftcontrolMenu-item span.leftcontrolMenu-item-linecover{
+    display: none;
+	width: 1px;
+	height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+	position: absolute;
+    right: -1px;
+    top: 0;
+	box-sizing:border-box
+}
+.leftcontrolMenu-item.on span.leftcontrolMenu-item-linecover{
+    display: inline-block;
+	z-index:1;
+ }
+
+.leftcontrolMenu-item .leftcontrolMenu-sitem {
+    position: absolute;
+    top: -1px;
+    left:100%;
+    width: 282px;
+    margin-top: 0;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 0 4px 4px 0;
+    text-align: left;
+    font-weight: normal;
+    border: solid 1px #ff4b69;
+    background: rgba(0, 0, 0, 0.9);
+	display:none;
+}
+.leftcontrolMenu-item.on .leftcontrolMenu-sitem{
+    display:block;
+}
+.leftcontrolMenu-item .leftcontrolMenu-sitem-title {
+    color: #ccc;
+    position: relative;
+    font-size: 16px;
+	height:30px;
+	line-height:30px;
+	margin:8px 0;
+}
+.leftcontrolMenu-item .leftcontrolMenu-sitem-title span{
+	display:inline-block;
+}	
+.leftcontrolMenu-sitem-title-switch{
+	float:right;
+	margin-top:5px;
+}
+.leftcontrolMenu-sitem-input .textInput{
+    height: 20px;
+    width: 280px;
+    line-height: 20px;
+    padding: 5px 0;
+    border: 0;
+    outline: 0;
+    background: none;
+    border-bottom: solid 1px #999;
+    font-size: 14px;
+    color: #999
+}
+.leftcontrolMenu-sitem-title-color{
+	float:right;
+}
+.leftcontrolMenu-sitem-title-color .color{
+	width:22px;
+	height:22px;
+	border:1px solid #fff;
+	margin-top:3px;
+}
+.leftcontrolMenu-sitem-scroll {
+    width: 100%;
+    position: relative;
+    overflow-y: auto;
+}
+
+.leftcontrolMenu-sitem-scroll::-webkit-scrollbar {
+    width: 4px;
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+.leftcontrolMenu-sitem-scroll::-webkit-scrollbar-thumb {
+    border-radius: 2px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+    background-color: rgba(0, 0, 0, 0.5);
+}
+.leftcontrolMenu-sitem-btns span{
+	position: relative;
+    display: inline-block;
+    height: 20px;
+	line-height:20px;
+    padding: 4px 18px 4px 18px;
+    border-radius: 2px;
+    border: solid 1px #999;
+    cursor: pointer;
+    margin: 5px 8px 5px 0;
+}
+.leftcontrolMenu-sitem-btns span.sel{
+	border-color: #ff4b69;
+}
+</style>
+<div class="leftcontrolBox">
+	<div class="leftcontrolCover"></div>
+    <span class="leftcontrolBox-colspan"><span>设置<i class="mxc-untitled108 toshowicon"></i><i class="mxc-untitled109 tohideicon"></i></span></span>
+    <div class="leftcontrolTitle">设置</div>
+    <div class="leftcontrolMenu"></div>
+</div>
+<script type="text/html" id="leftcontrolItem-tpl">
+	<div class="leftcontrolMenu-item">
+		<a class="leftcontrolMenu-item-title">{{ title }}</a><span class="leftcontrolMenu-item-linecover"></span>
+		<div class="leftcontrolMenu-sitem">
+			{{ each data as dval dkey }}
+				{{ if dval.moduletype=='range'}}
+					<div class="leftcontrolMenu-sitem-title"><span>{{ dval.title }}</span></div>
+					<input type="text" class="js-range-slider" name="{{ dval.name }}" data-type="single" data-grid="true" data-min="{{ dval.attr.min }}" data-max="{{ dval.attr.max }}" value="{{ dval.val }}" data-modulekey="{{ modulekey }}" />
+				{{ else if dval.moduletype=='switch'}}
+					<div class="leftcontrolMenu-sitem-title">
+						<span>{{dval.title}}</span>
+						<span class="leftcontrolMenu-sitem-title-switch">
+							<input type="checkbox" class="on-off-switch" style="display:none;" name="{{ dval.name }}" data-modulekey="{{ modulekey }}" data-textOn="{{ dval.attr.textOn }}" data-textOff="{{ dval.attr.textOff }}" {{ if dval.val=='1' }}checked{{ /if }} />
+						</span>
+					</div>
+				{{ else if dval.moduletype=='color'}}
+					<div class="leftcontrolMenu-sitem-title">
+						<span>{{dval.title}}</span>
+						<span class="leftcontrolMenu-sitem-title-color">
+							<div class="color" value="{{ dval.val }}" data-modulekey="{{ modulekey }}" data-name="{{ dval.name }}" lay-tips="点击选取您觉得合适的颜色"></div>
+						</span>
+					</div>
+				{{ else if dval.moduletype=='btn'}}
+					<div class="leftcontrolMenu-sitem-title"><span>{{ dval.title }}</span></div>
+					<div class="leftcontrolMenu-sitem-btns">
+						<input type="hidden" name="{{ dval.name }}" value="1" data-modulekey="{{ modulekey }}" />
+						{{ each dval.values as ddval }}
+							{{ if dval.name=='bpfontstyle'}}
+								<span class="{{ ddval.fontval }}{{ if dval.val==ddval.fontval}} sel{{ /if }}" data-type='{{ ddval.fontval }}'>{{ ddval.fontname }}</span>
+							{{ else }}
+								<span {{ if dval.val==ddval.val}}class="sel"{{ /if }} data-type='{{ ddval.val }}'>{{ ddval.title }}</span>
+							{{ /if }}
+						{{ /each }}
+					</div>
+				{{ else if dval.moduletype=='input'}}
+					<div class="leftcontrolMenu-sitem-title"><span>{{ dval.title }}</span></div>
+					<div class="leftcontrolMenu-sitem-input">
+						<input class="textInput" type="{{ dval.inputtype }}" name="{{ dval.name }}" value="{{ dval.val }}" data-modulekey="{{ modulekey }}" />
+					</div>
+				{{ /if }}
+			{{ /each }}
+		</div>
+	</div>
+</script>

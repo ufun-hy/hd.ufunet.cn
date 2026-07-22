@@ -1,0 +1,175 @@
+{include file='$Wpath/common/header'}
+<style type="text/css">
+  .catenameitem{margin-bottom: 20px}
+  .card-hdmodule{border:1px solid #dfe6ec}
+  .card-hdmodule:hover{
+    box-shadow: 1px 3px 10px rgba(37,46,64,.2);
+  }
+  .card-hdmodule .card-body{padding: 15px 10px;}
+  .hdmodule-name{width: 100%}
+  .hdmodule-price input {
+    border-radius: 0px!important;
+    height: 28px;
+    padding: 0;
+    text-align: center;
+  }
+  .hdmodule-price .input-group-addon {
+    height: 28px;
+    padding: 0 5px;
+  }
+</style>
+<div class="confirmbox-pop">
+<div class="text-center">
+      <div class="btn-group pop-btns" style="margin-bottom:10px;">
+        <a href="javascript:void(0)" class="btn btn-default btn-primary"><span>基础设置</span></a>
+        <a href="javascript:void(0)" class="btn btn-default"><span>套餐人数</span></a>
+        <a href="javascript:void(0)" class="btn btn-default"><span>功能模块</span></a>
+        <a href="javascript:void(0)" class="btn btn-default"><span>增值服务</span></a>
+      </div>
+</div>
+<form id="formBox" class="zam-formvalidation form-horizontal" method="post">
+  <input type="hidden"  name="mealid" value="{if isset($config['id'])}{$config['id']}{/if}">
+  <div class="carditem">
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 排序序号</label>
+            <div class="col-lg-8">
+                <input class="form-control" type="text"  name="setmealorder" value="{$config['setmealorder']}">
+                <span class="zam-help-block">注:升序排序，序号越小越排前面</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 套餐名称</label>
+            <div class="col-lg-8">
+                <input class="form-control" type="text"  name="setmealname" value="{$config['setmealname']}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 售价</label>
+            <div class="col-lg-7">
+                  <div class="input-group">
+                      <input type="text" class="form-control" name="setmealprice" value="{$config['setmealprice']}">
+                      <div class="input-group-addon">元</div>
+                  </div>
+                  <span class="help-block">用户组中可差异化设置当前套餐价格</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 预览图(180*101px)</label>
+            <div class="col-lg-8">
+               {:tpl_image_one('setmealimg',$config['setmealimg'])}
+            </div>
+        </div>
+  </div>
+  <div class="carditem hidden">
+      <div class="form-group">
+        <label class="col-lg-3 control-label">人数</label>
+        <div class="col-lg-7">
+              <div class="input-group">
+                  <input type="text" class="form-control" name="personnum" value="{$config['personnum']}">
+                  <div class="input-group-addon">人</div>
+              </div>
+        </div>
+      </div>
+  </div>
+  <div class="carditem hidden">
+      <div class="form-group">
+        <div class="col-lg-12">
+               {volist name="allcatemodules" id="cate"}
+               <div class="modulelist clearfix">
+                 <div class="catenameitem col-lg-12 fa-1-5x">
+                   <label class="lyear-checkbox checkbox-primary">
+                    <input type="checkbox" >
+                    <span>{$cate['catename']}</span>
+                  </label>
+                 </div>
+                 {volist name="cate.catemodules" id="module"}
+                 <div class="catemoduleitem col-sm-4 col-lg-3">
+                    <div class="card card-hdmodule">
+                      <div class="card-body clearfix">
+                        <div class="pull-left hdmodule-name m-t-5">
+                            <label class="lyear-checkbox checkbox-primary ">
+                              <input name="modules[]" type="checkbox" {if !empty($config['modules']) && in_array($module['id'],$config['modules'])}checked{/if} value="{$module['id']}" onchange="selonemodule(this)">
+                              <span>{$module['modulename']}</span>
+                            </label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {/volist}
+              </div>
+               {/volist}
+        </div>
+      </div>
+  </div>
+  <div class="carditem hidden">
+      <div class="form-group">
+        <div class="col-lg-12 fwitems">
+               {volist name="allfws" id="fw"}
+                 <div class="catemoduleitem col-sm-4 col-lg-3">
+                    <div class="card card-hdmodule">
+                      <div class="card-body clearfix">
+                        <div class="pull-left hdmodule-name m-t-5">
+                            <label class="lyear-checkbox checkbox-primary ">
+                              <input name="fws[]" type="checkbox" {if !empty($config['fws']) && in_array($fw['id'],$config['fws'])}checked{/if} value="{$fw['id']}" onchange="selonefw(this)">
+                              <span>{$fw['fwname']}</span>
+                            </label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                {/volist}
+        </div>
+      </div>
+  </div>
+  {include file='$Wpath/common/cancelsavepanel'}
+</form>
+</div>
+<script type="text/javascript">
+require(['webcore','jconfirmBox','zamnotice','zvalidator'],function(webcore,jconfirmBox,zamnotice){
+  $(".confirmbox-pop .pop-btns a.btn").click(function(){
+      $(this).addClass('btn-primary').siblings().removeClass("btn-primary");
+      $(".confirmbox-pop .carditem").addClass('hidden').eq($(this).index()).removeClass('hidden');
+  });
+  $(".catenameitem").click(function(){
+      var $this = $(this),fcheck = $this.find('input[type="checkbox"]').is(':checked');
+      $this.parent().find('.lyear-checkbox').find('input[type="checkbox"]').prop('checked', !fcheck?true:false);
+  });
+  $('#formBox').formValidation({
+      framework: 'bootstrap',
+      excluded: [':disabled'],
+      message: '您填写的内容无效',
+      fields: {}
+  }).on('success.form.fv', function(e) {
+    e.preventDefault();
+    var $form = $(e.target);
+    var postData = webcore.serializeObject($form);
+    var bload = $form.find(".zam-fixedbottom button").lyearloading({opacity: 0.2,spinnerSize: 'nm'});
+    $form.formValidation('disableSubmitButtons', true);
+    webcore.ajaxSubmit("{if isset($config['id'])}{:goweb('hdsetmeal/edit')}{else}{:goweb('hdsetmeal/add')}{/if}",postData).then(function(json){
+      bload.hide();
+      if(json.code==0){
+          $form.formValidation('disableSubmitButtons', false);
+          zamnotice.showTips('success','操作成功',2e3,function(){
+            window.location.href = "{:goweb('hdsetmeal/index')}";
+          });
+        }else{
+            zamnotice.showTips('error',json.msg);
+            $form.formValidation('disableSubmitButtons', false);
+        }
+    }, function(json){
+      bload.hide();
+      zamnotice.showTips('error','网络差。操作失败');
+      $form.formValidation('disableSubmitButtons', false);
+    });
+  });
+});
+function selonemodule(obj){
+    var $this = $(obj),fcheck = $this.is(':checked');
+    //$this.parent().parent().next().find('input').attr("name",!fcheck?"":"moduleprice[]");
+    //$this.parent().parent().parent().parent().parent().parent().find('input').eq(0).prop('checked', !fcheck?false:true);
+}
+function selonefw(obj){
+
+}
+</script>
+{include file='$Wpath/common/footer'}

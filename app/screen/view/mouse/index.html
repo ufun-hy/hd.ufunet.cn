@@ -1,0 +1,401 @@
+{include file='common/header' /}
+<style type="text/css">
+.mouseBox{
+	position: relative;
+	width: 100%;
+	height: 100%;
+	padding: 0;
+	overflow: hidden;
+}
+.mousetopbg{
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+}
+.mousetopbg .topbg{
+	height: 250px;
+	background-size: 1920px 100%;
+	{if !empty($pcconfig['style']['topbg'])}
+	background-image: url("{:tomedia($pcconfig['style']['topbg'])}");
+	{else /}
+	display:none;
+	{/if}
+}
+.mousetopbg .topbg.runbg {
+	-webkit-animation: runbg {if empty($pcconfig['style']['topbgspeed'])}20{else}{$pcconfig['style']['topbgspeed']}{/if}s infinite linear normal none
+}
+.mousebottombg{
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+}
+.mousebottombg .bottombg{
+	height: 61px;
+	background-size: 1920px 100%;
+	{if !empty($pcconfig['style']['bottombg'])}
+	background-image: url("{:tomedia($pcconfig['style']['bottombg'])}");
+	{else /}
+	display:none;
+	{/if}
+}
+.bottombg.runbg {
+	-webkit-animation: runbg {if empty($pcconfig['style']['bottombgspeed'])}20{else}{$pcconfig['style']['bottombgspeed']}{/if}s infinite linear normal none
+}
+@-webkit-keyframes runbg {
+	0% {
+		background-position: 0 100%
+	}
+
+	100% {
+		background-position: -1920px 100%
+	}
+}
+.mousebg{
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-image: url("{:tomedia($pcconfig['style']['trackbg'])}");
+	background-repeat: no-repeat;
+	background-size: 100% 100%;
+}
+.mouseroleBox{
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	width: 100%;
+	height:460px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+.mouseroles{
+	position: relative;
+    width: 740px;
+    height:100%;
+    display: flex;
+    justify-content:center;
+    flex-wrap: wrap;
+    padding-bottom: 100px;
+    box-sizing: border-box;
+}
+.mouseone{
+	width :33%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+.mouseroles .mouseone:nth-child(1),.mouseroles .mouseone:nth-child(2),.mouseroles .mouseone:nth-child(3){
+	zoom: 0.96;
+}
+.mouseroles .mouseone:nth-child(4),.mouseroles .mouseone:nth-child(5),.mouseroles .mouseone:nth-child(6){
+	zoom: 1.2;
+}
+.mouseroles .mouseone:nth-child(7),.mouseroles .mouseone:nth-child(8),.mouseroles .mouseone:nth-child(9){
+	zoom: 1.4;
+}
+.mouseone .hole{
+	position: relative;
+	width: 160px;
+    height: 53px;
+    background-image: url("{:tomedia($pcconfig['style']['roleimgs']['hole'])}");
+    background-repeat:  no-repeat;
+    background-position:  center;
+    background-size: cover;
+    
+}
+.mouseone .role{
+	position: absolute;
+    overflow: hidden;
+    border-radius: 32%;
+    height: 117px;
+    width: 153px;
+    top: -86px;
+    left: 4px;
+}
+.mouseone .role img{
+	position: absolute;
+	top: 118px;
+	left: 0;
+	width: 100%;
+}
+{/* 排行榜 */}
+.phb-lists {
+	background-size: 100% 100%;
+    background-image: url("{:tomedia($pcconfig['style']['leftphbbg'])}");
+    background-repeat: no-repeat;
+    position: absolute;
+    left: 40px;
+    padding: 74px 24px 22px 24px;
+    width: 300px;
+    height: 500px;
+    top: 150px;
+    box-sizing: border-box;
+}
+.phb-lists ul{
+    width: 100%;
+    height: 100%;
+    padding: 0 10px;
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+.phb-lists li{
+	color: #fff;
+	display: flex;
+	height: 40px;
+	line-height: 40px;
+	visibility: hidden;
+}
+.phb-lists li .phbnum{
+	width: 40px;
+	font-size: 15px;
+	font-weight: 600;
+}
+.phb-lists li .phbnum img{
+	width: 28px;
+	height:28px;
+}
+.phb-lists li .score{
+	width: 40px;
+	font-size: 16px;
+	text-align: center;
+	font-weight: 600;
+}
+.phb-lists li .oneinfo{
+	width: calc(100% - 80px);
+	padding: 0 5px;
+	box-sizing: border-box;
+	overflow: hidden;
+	display: flex;
+}
+.phb-lists li .oneinfo .one-avatarbox{width: 40px;}
+.phb-lists li .oneinfo .one-avatarbox img{
+	width: 32px;
+	height: 32px;
+	border-radius: 50%;
+}
+.phb-lists li .oneinfo span{
+	display: inline-block;
+	line-height: 40px;
+	width: calc(100% - 40px);
+	font-size: 14px;
+	font-weight: 500;
+}
+</style>
+<audio id="countaudio" src="/{:WIMGURL}shake/count.mp3"  preload="preload"  style="display:none"></audio>
+<audio id="overaudio" src="/{:SIMGURL}shake/over.mp3"  preload="preload"  style="display:none"></audio>
+<audio id="joinaudio" src="/{:SIMGURL}shake/join.mp3"  preload="preload" style="display:none"></audio>
+<section class="mouseBox">
+<div class="mousetopbg">
+	<div class="topbg"></div>
+</div>
+<div class="mousebg"></div>
+<div class="mousebottombg">
+	<div class="bottombg"></div>
+</div>
+<div class="mouseroleBox">
+	<div class="mouseroles display-none">
+		<div class="mouseone">
+			<div class="hole">
+		        <div class="role">
+		            <img src="{$pcconfig['style']['roleimgs']['tiger']}">
+		        </div>
+		    </div>
+	    </div>
+	    <div class="mouseone">
+			<div class="hole">
+		        <div class="role">
+		            <img src="{$pcconfig['style']['roleimgs']['tiger']}">
+		        </div>
+		    </div>
+	    </div>
+	    <div class="mouseone">
+			<div class="hole">
+		        <div class="role">
+		            <img src="{$pcconfig['style']['roleimgs']['tiger']}">
+		        </div>
+		    </div>
+	    </div>
+	    <div class="mouseone">
+			<div class="hole">
+		        <div class="role">
+		            <img src="{$pcconfig['style']['roleimgs']['tiger']}">
+		        </div>
+		    </div>
+	    </div>
+	    <div class="mouseone">
+			<div class="hole">
+		        <div class="role">
+		            <img src="{$pcconfig['style']['roleimgs']['tiger']}">
+		        </div>
+		    </div>
+	    </div>
+	    <div class="mouseone">
+			<div class="hole">
+		        <div class="role">
+		            <img src="{$pcconfig['style']['roleimgs']['tiger']}">
+		        </div>
+		    </div>
+	    </div>
+	    <div class="mouseone">
+			<div class="hole">
+		        <div class="role">
+		            <img src="{$pcconfig['style']['roleimgs']['tiger']}">
+		        </div>
+		    </div>
+	    </div>
+	    <div class="mouseone">
+			<div class="hole">
+		        <div class="role">
+		            <img src="{$pcconfig['style']['roleimgs']['tiger']}">
+		        </div>
+		    </div>
+	    </div>
+	    <div class="mouseone">
+			<div class="hole">
+		        <div class="role">
+		            <img src="{$pcconfig['style']['roleimgs']['tiger']}">
+		        </div>
+		    </div>
+	    </div>
+	</div>
+	<div class="emptybox zam-app-flex-ajCenter display-none">
+		<img src="/{:SIMGURL}common/empty.png">
+		<p style="padding:20px;">请到后台添加游戏轮次</p>
+	</div>
+</div>
+<div class="phb-lists display-none">
+    <ul class="phb-ul">
+    	<li class="">
+    		<div class="phbnum zam-app-flex-ajCenter"><img src="/{:WIMGURL}shake/1.png"></div>
+    		<div class="oneinfo">
+    			<div class="one-avatarbox zam-app-flex-alignCenter">
+    				<img src="{:tomedia($pcconfig['style']['userdefaultimg'])}">
+    			</div>
+    			<span class="limitbox">xx</span>
+    		</div>
+    		<div class="score">0</div>
+    	</li>
+    	<li>
+    		<div class="phbnum zam-app-flex-ajCenter"><img src="/{:WIMGURL}shake/2.png"></div>
+    		<div class="oneinfo">
+    			<div class="one-avatarbox zam-app-flex-alignCenter">
+    				<img src="{:tomedia($pcconfig['style']['userdefaultimg'])}">
+    			</div>
+    			<span class="limitbox">xx</span>
+    		</div>
+    		<div class="score">0</div>
+    	</li>
+    	<li>
+    		<div class="phbnum zam-app-flex-ajCenter"><img src="/{:WIMGURL}shake/3.png"></div>
+    		<div class="oneinfo">
+    			<div class="one-avatarbox zam-app-flex-alignCenter">
+    				<img src="{:tomedia($pcconfig['style']['userdefaultimg'])}">
+    			</div>
+    			<span class="limitbox">xx</span>
+    		</div>
+    		<div class="score">0</div>
+    	</li>
+    	<li>
+    		<div class="phbnum zam-app-flex-ajCenter"><span>4</span></div>
+    		<div class="oneinfo">
+    			<div class="one-avatarbox zam-app-flex-alignCenter">
+    				<img src="{:tomedia($pcconfig['style']['userdefaultimg'])}">
+    			</div>
+    			<span class="limitbox">xx</span>
+    		</div>
+    		<div class="score">0</div>
+    	</li>
+    	<li>
+    		<div class="phbnum zam-app-flex-ajCenter"><span>5</span></div>
+    		<div class="oneinfo">
+    			<div class="one-avatarbox zam-app-flex-alignCenter">
+    				<img src="{:tomedia($pcconfig['style']['userdefaultimg'])}">
+    			</div>
+    			<span class="limitbox">xx</span>
+    		</div>
+    		<div class="score">0</div>
+    	</li>
+    	<li>
+    		<div class="phbnum zam-app-flex-ajCenter"><span>6</span></div>
+    		<div class="oneinfo">
+    			<div class="one-avatarbox zam-app-flex-alignCenter">
+    				<img src="{:tomedia($pcconfig['style']['userdefaultimg'])}">
+    			</div>
+    			<span class="limitbox">xx</span>
+    		</div>
+    		<div class="score">0</div>
+    	</li>
+    	<li>
+    		<div class="phbnum zam-app-flex-ajCenter"><span>7</span></div>
+    		<div class="oneinfo">
+    			<div class="one-avatarbox zam-app-flex-alignCenter">
+    				<img src="{:tomedia($pcconfig['style']['userdefaultimg'])}">
+    			</div>
+    			<span class="limitbox">xx</span>
+    		</div>
+    		<div class="score">0</div>
+    	</li>
+    	<li>
+    		<div class="phbnum zam-app-flex-ajCenter"><span>8</span></div>
+    		<div class="oneinfo">
+    			<div class="one-avatarbox zam-app-flex-alignCenter">
+    				<img src="{:tomedia($pcconfig['style']['userdefaultimg'])}">
+    			</div>
+    			<span class="limitbox">xx</span>
+    		</div>
+    		<div class="score">0</div>
+    	</li>
+    	<li>
+    		<div class="phbnum zam-app-flex-ajCenter"><span>9</span></div>
+    		<div class="oneinfo">
+    			<div class="one-avatarbox zam-app-flex-alignCenter">
+    				<img src="{:tomedia($pcconfig['style']['userdefaultimg'])}">
+    			</div>
+    			<span class="limitbox">xx</span>
+    		</div>
+    		<div class="score">0</div>
+    	</li>
+    	<li>
+    		<div class="phbnum zam-app-flex-ajCenter"><span>10</span></div>
+    		<div class="oneinfo">
+    			<div class="one-avatarbox zam-app-flex-alignCenter">
+    				<img src="{:tomedia($pcconfig['style']['userdefaultimg'])}">
+    			</div>
+    			<span class="limitbox">xx</span>
+    		</div>
+    		<div class="score">0</div>
+    	</li>
+    </ul>
+</div>
+</section>
+<style>
+.welcomeBox-logo{
+	height:400px;
+}
+.start-btn{
+	width:296px;
+	height:94px;
+}
+</style>
+{include file='common/gamewelcome' /}
+<script id="shakeItem-tpl" type="html/javascript">
+<li class="carBoxItem" style="top:{{-160 + (i-1)*38 }}px;background-image:url('{{carImg}}')">
+	<div class="player">
+		<img src="" class="display-none">
+		<span class="nickname">{$pcconfig['style']['userdefaultname']??'虚位以待'}</span>
+	</div>
+</li>
+</script>
+{include file='common/gamecommon' /}
+<script type="text/javascript">
+var roleImgs = {:json_encode($pcconfig['style']['roleimgs'])},defaultImg = "{:tomedia($pcconfig['style']['userdefaultimg'])}";
+var defaultName = "{$pcconfig['style']['userdefaultname']??'虚位以待'}";
+require(['screenmouse'],function (screenmouse) {
+	screenmouse.init();
+})
+</script>
+{include file='common/footer' /}

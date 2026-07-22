@@ -1,0 +1,209 @@
+{include file='$Wpath/common/header'}
+<div class="alert alert-danger">
+    <i class="mdi mdi-bell"></i>
+    上传图片前请务必对图片进行压缩处理下，尽量压缩到300kb内，否则大屏幕抽奖过程会比较卡
+</div>
+<div class="form-inline zam-inline-searchbar">
+    <div class="form-group">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">图片名称</span>
+        <input type="text" class="form-control" value="" id="keyword" name="username" placeholder="请输入图片名称">
+      </div>
+    </div>
+    <a class="btn btn-primary btn-sm btn-search" href="javascript:void(0)"><i class="mdi mdi-magnify"></i> 搜索</a>
+</div>
+{include file='$Wpath/common/tabletoolbar'}
+<table id="listtable" class="zam-btable"></table>
+<script>    
+require(['webcore','webtable','jconfirmBox','zamnotice','clipboard','layerBox','jcode'],function(webcore,webtable,jconfirmBox,zamnotice,Clipboard,layerBox){
+var initConfig = {
+    tableId:'#listtable',
+    url:"{:gohdmanage('configphotocj/photos',['hdid'=>$hdid])}",
+    columnoperate:{
+        btns:{
+            edit:true,
+            del:true,
+        },
+        func:{
+            edit:function(value, row, index){
+                var confirmObj = jconfirmBox.ajaxconfirm("编辑图片信息","{:gohdmanage('configphotocj/editphoto',['hdid'=>$hdid])}",{photoid:row.id},'html','col-lg-10 col-lg-offset-1',function(e){
+                    var postData = webcore.serializeObject(e.find('form'));
+                    postData.photoid = row.id;
+                    webcore.ajaxSubmit("{:gohdmanage('configphotocj/savephoto',['hdid'=>$hdid])}",postData).then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','保存成功');
+                            confirmObj.close();
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                             return false;
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                         return false;
+                    });
+                });
+            },
+            del:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','删除将删除当前图片以及当前图片的中奖数据并且无法恢复，您确定要删除么？',function(){
+                        webcore.ajaxSubmit("{:gohdmanage('configphotocj/delphoto',['hdid'=>$hdid])}",{photoid:row.id}).then(function(json){
+                            if(json.code==0){
+                                webtable.refresh();
+                                zamnotice.showTips('success','删除成功');
+                            }else{
+                                zamnotice.showTips('error',json.msg);
+                            }
+                        }, function(json){
+                            zamnotice.showTips('error','网络差。操作失败');
+                        });
+                });
+            },
+        }
+    },
+    columns:[{
+            checkbox: true,
+        }, 
+        {
+            field: 'id',
+            title: 'id',
+            align: 'center',
+            visible: false
+        },
+        {
+            field: "photoname",
+            title: "图片名",
+            align: 'center',
+        },
+        {
+            field: "imgsrc",
+            title: "图片",
+            align: 'center',
+            formatter: function(value, row, index){
+            	return '<img src='+value+' style="max-height:100px;" />'; 
+            },
+        },
+        {
+            field: "groupname",
+            title: "图片分组",
+            align: 'center',
+            formatter: function(value, row, index){
+                var html = row.groupid!='0'?'<div><span class="label label-primary">'+value+'</span></div>':'-';
+                html += "<i class='mdi mdi-pencil m-l-5 cursor changegroupid' data-photoid="+row.id+" data-groupid="+row.groupid+"></i>";
+                return html;
+            },
+        }
+    ],
+    searchParamas:[{'type':'1','id':'keyword'}],
+    toolbar:{
+        add:function(){
+            var confirmobj = jconfirmBox.ajaxconfirm("上传图片","{:gohdmanage('configphotocj/uploadphoto',['hdid'=>$hdid])}",{ishtml:'1',cateid:$(".zam-cates-grouplist li.active").data('cateid')},'html','col-lg-8 col-lg-offset-2',function(e){},false,'2');
+        },
+        del:function(){
+            var getSelects = webtable.getSelections();
+            if(getSelects.length>0){
+                jconfirmBox.confirm('温馨提示','删除将删除所选图片以及所选图片中奖数据并且无法恢复，您确定要删除么？',function(){
+                    webcore.ajaxSubmit("{:gohdmanage('configphotocj/delphoto',['hdid'=>$hdid])}",{photoid:getSelects}).then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','删除成功');
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差,操作失败');
+                    });
+                });
+            }else{
+                zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+        },
+        reset:function(){
+            jconfirmBox.confirm('温馨提示','清空将删除所有本地图片和产生的本地图片中奖数据并且无法恢复，您确定要清空么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('configphotocj/resetallphoto',['hdid'=>$hdid])}",{}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','清空成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+        },
+        other:function(){
+            var getSelects = webtable.getSelections();
+            if(getSelects.length>0){
+                var confirmObj = jconfirmBox.ajaxconfirm("加入分组","{:gohdmanage('configphotocj/showgroup',['hdid'=>$hdid])}",{},'html','col-lg-8 col-lg-offset-2',function(e){
+                        var groupid = e.find("option:selected").val();
+                        if(groupid!='' && groupid){
+                            webcore.ajaxSubmit("{:gohdmanage('configphotocj/changephotogroupid',['hdid'=>$hdid])}",{groupid:groupid,photoid:getSelects},'正在设置图片到分组...').then(function(json){
+                                if(json.code==0){
+                                    confirmObj.close();
+                                    zamnotice.showTips('success','操作成功');
+                                    webtable.refresh();
+                                }else{
+                                    zamnotice.showTips('error',json.msg);
+                                }
+                            }, function(json){
+                                zamnotice.showTips('error','网络差，操作失败');
+                            });
+                        }else{
+                            zamnotice.showTips('error','请选择分组');
+                        }
+                });
+            }else{
+                zamnotice.showTips('error','请先选择图片');
+            }
+        },
+        import:function(){
+            webcore.importxls({title:'导入图片信息',url:"{:gohdmanage('configphotocj/importphoto',['hdid'=>$hdid])}",moban:"/{:SYSIMGURL}excel/photocj.xls?t=2",uptxt:"点击上传图片信息",xlstxt:"注:请务必严格按照模板内容制作xls文件"},function(){
+                    webtable.refresh();
+            });
+        },
+        shenhe:function(){
+            var confirmobj = jconfirmBox.ajaxconfirm("重复图片检查结果","{:gohdmanage('configphotocj/checkphoto',['hdid'=>$hdid])}",{},'html','col-lg-8 col-lg-offset-2',function(e){},false,'2');
+        },
+    },
+};
+webtable.init(initConfig);
+$("#listtable").on('click','.changegroupid',function(){
+    var photoid = $(this).attr('data-photoid'),imggroupid = $(this).attr('data-groupid');
+    var confirmObj = jconfirmBox.ajaxconfirm((imggroupid=='0'?"加入分组":"修改分组"),"{:gohdmanage('configphotocj/showgroup',['hdid'=>$hdid])}",{photoid:photoid},'html','col-lg-8 col-lg-offset-2',function(e){
+            var groupid = e.find("option:selected").val();
+            if(groupid!='' && groupid){
+                webcore.ajaxSubmit("{:gohdmanage('configphotocj/changephotogroupid',['hdid'=>$hdid])}",{groupid:groupid,photoid:photoid},'正在新增图片到分组...').then(function(json){
+                    if(json.code==0){
+                        confirmObj.close();
+                        zamnotice.showTips('success','操作成功');
+                        webtable.refresh();
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差。操作失败');
+                });
+            }else{
+                zamnotice.showTips('error','请选择分组');
+            }
+    });
+});
+$("body").on('click','.btn-samedetail',function() {
+        var field = $(this).attr('data-field');
+        var confirmobj = jconfirmBox.ajaxconfirm("重复数据明细","{:gohdmanage('configphotocj/repeatphoto',['hdid'=>$hdid])}",{yhfield:field},'html','col-md-10 col-md-offset-1',function(e){},false,'2');
+});
+$("body").on('click','.btn-delsame',function(){
+    var $this = $(this),dataid = $this.attr('data-id');
+    jconfirmBox.confirm('温馨提示','删除所选数据将同步删除相关的图片中奖结果数据，并且无法恢复，您确定要删除么？',function(){
+        webcore.ajaxSubmit("{:gohdmanage('configphotocj/delphoto',['hdid'=>$hdid])}",{photoid:dataid}).then(function(json){
+            $this.parent().parent().remove();
+            webtable.refresh();
+            zamnotice.showTips('success','删除成功');
+        }, function(json){
+            zamnotice.showTips('error','网络差。操作失败');
+        });
+    });
+});
+});
+</script>
+{include file='$Wpath/common/footer'}

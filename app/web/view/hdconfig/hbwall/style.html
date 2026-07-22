@@ -1,0 +1,175 @@
+{include file='$Wpath/common/header'}
+<form id="formBox" class="zam-formvalidation form-horizontal" method="post">
+    <div class="form-group">
+        <label class="col-lg-3 control-label">* 大屏单行红包个数</label>
+        <div class="col-lg-8">
+            <input type="text" class="form-control numberincdec" name="hboneconfig[colnum]" 
+            data-bts-min="1" data-bts-replacement-val="1"
+            data-bts-max="null"
+            data-bts-step="1"
+            data-bts-postfix="个"
+            data-bts-postfix-extra-class="touchspin-postfix"
+            value="{$config['hboneconfig']['colnum']}">
+            <div class="help-block m-t-0">为了整体居中，若总红包个数小于5个，推荐此项等于总红包个数，具体请结合屏幕宽度以及红包正面图大小设置个数</div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-3 control-label">* 大屏红包行列间距</label>
+        <div class="col-lg-8">
+            <div class="input-group">
+                <div class="input-group-btn not-allow"><a class="btn btn-default">行间距</a></div>
+                <div class="touchspin">
+                    <input type="text" class="form-control numberincdec" name="hboneconfig[rowgap]" 
+                    data-bts-min="1" data-bts-replacement-val="1"
+                    data-bts-max="999"
+                    data-bts-step="1"
+                    data-bts-postfix="px"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                    value="{$config['hboneconfig']['rowgap']}">
+                </div>
+                <div class="input-group-btn not-allow"><a class="btn btn-default">，列间距</a></div>
+                <div class="touchspin">
+                    <input type="text" class="form-control numberincdec" name="hboneconfig[colgap]" 
+                    data-bts-min="1" data-bts-replacement-val="1"
+                    data-bts-max="999"
+                    data-bts-step="1"
+                    data-bts-postfix="px"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                    value="{$config['hboneconfig']['colgap']}">
+                </div>
+             </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-3 control-label">* 大屏红包尺寸</label>
+        <div class="col-lg-8">
+            <div class="input-group">
+                <div class="input-group-btn not-allow"><a class="btn btn-default">宽</a></div>
+                <div class="touchspin">
+                    <input type="text" class="form-control numberincdec" name="hboneconfig[width]" 
+                    data-bts-min="0" data-bts-replacement-val="0"
+                    data-bts-max="999"
+                    data-bts-step="1"
+                    data-bts-postfix="px"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                    value="{$config['hboneconfig']['width']}">
+                </div>
+                <div class="input-group-btn not-allow"><a class="btn btn-default">，高</a></div>
+                <div class="touchspin">
+                    <input type="text" class="form-control numberincdec" name="hboneconfig[height]" 
+                    data-bts-min="0" data-bts-replacement-val="0"
+                    data-bts-max="800"
+                    data-bts-step="1"
+                    data-bts-postfix="px"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                    value="{$config['hboneconfig']['height']}">
+                </div>
+            </div>
+            <div class="help-block m-t-0">宽和高请结合红包正面图宽高比设置</div>
+        </div>
+    </div>
+    <div class="apphbconfig">
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 微信红包尺寸<span class="text-danger">（随机模式）</span></label>
+            <div class="col-lg-8">
+                <div class="input-group">
+                    <div class="input-group-btn not-allow"><a class="btn btn-default">宽</a></div>
+                    <div class="touchspin">
+                        <input type="text" class="form-control numberincdec" name="hboneconfig[appwidth]" 
+                        data-bts-min="0" data-bts-replacement-val="0"
+                        data-bts-max="33"
+                        data-bts-step="1"
+                        data-bts-postfix="vw"
+                        data-bts-postfix-extra-class="touchspin-postfix"
+                        value="{$rotate['hboneconfig']['appwidth']??'33'}">
+                    </div>
+                    <div class="input-group-btn not-allow"><a class="btn btn-default">，高</a></div>
+                    <div class="touchspin">
+                        <input type="text" class="form-control numberincdec" name="hboneconfig[appheight]" 
+                        data-bts-min="1" data-bts-replacement-val="1"
+                        data-bts-max="999"
+                        data-bts-decimals="2"
+                        data-bts-step="1"
+                        data-bts-force-step-divisibility="xstwo"
+                        data-bts-postfix="vw"
+                        data-bts-postfix-extra-class="touchspin-postfix"
+                        value="{$rotate['hboneconfig']['appheight']??'41.4'}">
+                    </div>
+                </div>
+                <div class="help-block m-t-0">由于微信端红包一行是3个，所以单个红包宽最大是33vw，宽和高具体设置多少合适，请结合红包正面图尺寸的宽高比设置</div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-3 control-label">* 通用红包正面图</label>
+        <div class="col-lg-8">
+            {:tpl_image_one('hboneconfig[frontbg]',$config['hboneconfig']['frontbg'])}
+            <span class="help-block m-t-0">默认规格：471 * 650px，此图可控制所有红包正面图，注:可在添加奖品的时候单独设置此图</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-3 control-label">* 通用红包反面图</label>
+        <div class="col-lg-8">
+            {:tpl_image_one('hboneconfig[backbg]',$config['hboneconfig']['backbg'])}
+            <span class="help-block m-t-0">默认规格：471 * 650px，此图可控制所有红包反面图，注:此图大小必须与红包正面图保持一致，可在添加奖品的时候单独设置此图</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-3 control-label">* 星星效果(大屏端)</label>
+        <div class="col-lg-8">
+            {:tpl_switch('hboneconfig[starani]',$config['hboneconfig']['starani']??'1')}
+            <span class="help-block m-t-0">注:开启后红包正反面均会有星星从底到顶部冒出</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-3 control-label">* 红包正面左右翻转效果(大屏端)</label>
+        <div class="col-lg-8">
+            {:tpl_switch('hboneconfig[scaleani]',$config['hboneconfig']['scaleani']??'1')}
+            <span class="help-block m-t-0">注:开启后红包正面图会小幅度左右翻转</span>
+        </div>
+    </div>
+    {include file='$Wpath/common/savepanel'}
+</form>
+<script>
+require(['webcore','jconfirmBox','zamnotice','layerBox','zvalidator'],function(webcore,jconfirmBox,zamnotice,layerBox){
+    $('#formBox').formValidation({
+        framework: 'bootstrap',
+        excluded: [':disabled'],
+        message: '您填写的内容无效',
+        fields: {
+            apptitle:{
+                message: '请输入网页标题',
+                validators: {
+                    notEmpty: {
+                        message: '请输入网页标题'
+                    },
+                }
+            },
+        }
+    }).on('success.form.fv', function(e) {
+        e.preventDefault();
+        var $form = $(e.target);
+        var postData = webcore.serializeObject($form);
+        var bload = $form.find(".zam-fixedbottom button").lyearloading({opacity: 0.2,spinnerSize: 'nm'});
+        $form.formValidation('disableSubmitButtons', true);
+        webcore.ajaxSubmit("{:goweb('hdconfig/hbwallstyle')}",postData).then(function(json){
+            bload.hide();
+            if(json.code==0){
+                $form.formValidation('disableSubmitButtons', false);
+                zamnotice.showTips('success','保存成功',2e3,function(){
+                    window.location.reload();
+                });
+            }else{
+                zamnotice.showTips('error',json.msg);
+                $form.formValidation('disableSubmitButtons', false);
+            }
+        }, function(json){
+            bload.hide();
+            zamnotice.showTips('error','网络差。操作失败');
+            $form.formValidation('disableSubmitButtons', false);
+        });
+    });
+});
+
+</script>
+{include file='$Wpath/common/footer'}

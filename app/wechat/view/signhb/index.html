@@ -1,0 +1,256 @@
+{include file="common/header" /}
+<style>
+.zam-app-signhb-main{position:fixed;top:0;left:0;width:100%;height:100%;overflow: hidden;color:#333;}
+.openredbg {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    overflow-y: scroll;
+}
+.openredbg .bag-mask {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.96);
+}
+.openredbg .inner-wrap {
+    position: absolute;
+    width: 90%;
+    margin: auto;
+    max-height: 80%;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    max-width: 400px;
+    background: url(/static/images/wechat/signhb/redpack.png) left top no-repeat;
+    background-size: 100% 100%;
+    border-radius: 10px;
+}
+.openredbg .bag-open {
+    width: 100px;
+    height: 100px;
+    background: url(/static/images/wechat/signhb/open.png) left top no-repeat;
+    background-size: 100%;
+    position: absolute;
+    left: 50%;
+    margin-left: -50px;
+    bottom: 23.3%;
+}
+.openredbg .bag-open.stopclick{pointer-events: none}
+.openredbg .baginfo {
+	margin-top: 40px;
+    text-align: center;
+    color: #fff;
+}
+.baginfo .bag-photo {
+    width: 90px;
+    height: 90px;
+    border-radius: 100%;
+}
+.baginfo .bag-username {
+    height: 40px;
+    line-height: 40px;
+    font-size: 16px;
+    overflow: hidden;
+}
+.baginfo .bag-des {
+	height: 46px;
+    line-height: 46px;
+    font-size: 22px;
+    overflow: hidden;
+}
+
+/*开了以后的页面*/
+.redbaglist {
+	position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+.redbaglist:before {
+	position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    content: '';
+    background-color: rgba(0,0,0,0.96);
+
+}
+.redbaglist .contentwrap {
+    font-size: 14px;
+    background-color: #fff;
+    width: 90%;
+    max-width: 400px;
+    min-width: 300px;
+    height: 90%;
+    border-radius: 10px;
+}
+.redbaglist-top {
+    position: relative;
+    width: 100%;
+    height: 150px;
+     background: url(/static/images/wechat/signhb/redpacktop.png) center top no-repeat;
+}
+.redbaglist .bag-photo {
+    position: absolute;
+    left: 50%;
+    margin-left: -40px;
+    top: 0px;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin-top: 80px;
+}
+.redbaglist .info{margin-top: 20px;}
+.redbaglist .info .info-name{
+  	font-size: 14px;
+  	font-weight: 600
+}
+.redbaglist .info .info-des{
+	margin-top: 20px;
+  	font-size: 16px;
+}
+.redbaglist .info .info-money {
+	margin-top: 20px;
+    font-size: 14px;
+    font-size: 800;
+}
+.redbaglist .info .info-money span{
+	font-size: 36px;
+	margin-right: 5px;
+}
+.redbaglist .info .info-tip{
+	margin-top: 20px;
+  	font-size: 14px;
+    color: #3eaac9;
+}
+.contentwrap .bag-close {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    background: url(/static/images/wechat/signhb/close.png) no-repeat;
+    background-size: 100% 100%;
+    right: 12px;
+    top: 12px;
+    z-index: 1
+}
+.ani-scale {
+    animation-name: ani-scale;
+    -webkit-animation-name: ani-scale;
+    animation-duration: .4s;
+    -webkit-animation-duration: .4s;
+    animation-fill-mode: both;
+    -webkit-animation-fill-mode: both;
+}
+@keyframes ani-scale{
+	0%{opacity:0;-webkit-transform:scale(.2);transform:scale(.2)}
+	50%{opacity:0.5;-webkit-transform:scale(.5);transform:scale(.5)}
+	100%{opacity:1;-webkit-transform:scale(1);transform:scale(1)}
+}
+@-webkit-keyframes ani-scale{
+	0%{opacity:0;-webkit-transform:scale(.2);transform:scale(.2)}
+	50%{opacity:0.5;-webkit-transform:scale(.5);transform:scale(.5)}
+	100%{opacity:1;-webkit-transform:scale(1);transform:scale(1)}
+}
+.openrotate{
+	animation:openrotate 1s infinite; 
+	-webkit-animation:openrotate 1s infinite;
+}
+@-webkit-keyframes openrotate{
+    from{ -webkit-transform:rotateY(360deg);}
+    to{ -webkit-transform:rotateY(0deg);}     
+}
+@keyframes openrotate{
+    from{ -webkit-transform:rotateY(360deg);}
+    to{ -webkit-transform:rotateY(0deg);}     
+}
+.userinfobox{width: 100%;padding-top: 120px;}
+.userinfobox .useravatar{
+	width: 80px;
+	height: 80px;
+	border-radius: 50%;
+	border:4px solid #fff;
+}
+.userinfobox .useravatar img{
+	width: 100%;
+	height:100%;
+	border-radius: 50%;
+}
+.userinfobox .username{
+	height: 40px;
+	line-height: 40px;
+	font-size: 16px;
+	font-weight: 800;
+	color:#333;
+}
+</style>
+<section class="zam-app-signhb-main">
+	<div class="userinfobox zam-app-flex-ajCenter">
+		<div class="useravatar"><img src="{:tomedia($wxuser['avatar'])}" /></div>
+		<div class="username">{$wxuser['nickname']}</div>
+	</div>
+	<div class="openredbg hidden">
+		<div class="bag-mask"></div>
+		<div class="inner-wrap ani-scale">
+			<a href="javascript:;" class="bag-open"></a>
+			<div class="bg-top">
+				<div class="baginfo zam-app-flex-ajCenter">
+					<img class="bag-photo" src="{:tomedia($wxuser['avatar'])}" />
+					<p class="bag-username">{$wxuser['nickname']}</p>
+					<p class="bag-des">恭喜发财，大吉大利</p>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="redbaglist zam-app-flex-ajCenter hidden">
+		<div class="contentwrap ani-scale">
+			<i class="bag-close" onclick="javascript:$('.redbaglist').addClass('hidden');"></i>
+			<div class="redbaglist-top">
+				<img class="bag-photo" src="{:tomedia($wxuser['avatar'])}" />
+			</div>
+			<div class="info zam-app-flex-ajCenter">
+				<p class="info-name">
+					<span>{$wxuser['nickname']}</span>的红包
+				</p>
+				<p class="info-des">恭喜发财，大吉大利</p>
+				<p class="info-money"><span>0.00</span>元</p>
+				<p class="info-tip">红包将直接发放到微信钱包</p>
+			</div>
+		</div>
+	</div>
+</section>
+<script type="text/javascript">
+require(['wechatcore'],function(wechatcore){
+	$(".openredbg").removeClass('hidden');
+	$(".openredbg .bag-open").click(function(){
+		var $this = $(this);
+		$this.addClass('openrotate stopclick');
+		wechatcore.ajaxSubmit('/wechat/signhb/redpackopen',{},'正在努力打开红包..').then(function(e){
+		    if(e.code==0){
+				$(".openredbg").addClass('hidden');
+				$(".redbaglist .info-money span").text(e.msg.sendmoney);
+				$(".redbaglist").removeClass('hidden');
+			}else if(e.code==1){
+				wechatcore.msg('您已经领取过啦');
+			}else if(e.code==2){
+				wechatcore.msg('来晚了，红包被领走了');
+			}else{
+				wechatcore.msg(e.msg);
+			}
+			$this.removeClass('openrotate stopclick');
+		},function(){
+			$this.removeClass('openrotate stopclick');
+			wechatcore.msg('网络差，请稍后重试');
+		});
+	});
+});
+</script>
+{include file="common/footer" /}

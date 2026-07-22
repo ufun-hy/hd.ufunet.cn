@@ -1,0 +1,183 @@
+{include file="common/header" /}
+<style>
+.app-ydjmain{position:fixed;top:0;left:0;width:100%;height:100%;overflow: hidden;color:#333;}
+/*进入游戏提示*/
+.game-rules{position:fixed; top:0; left:0;width:100%;height:100%;background-color:rgba(0,0,0,0.5);text-align:center;z-index:1}
+.game-rules img{width:2rem;}
+.game-rules p{font-size:18px; line-height:30px; color:#fff; margin:20px 0;}
+/*中奖弹窗*/
+.prize_redenvelop{position:fixed; left:0; top:0;width:100%;height:100%;z-index:8;background-color:rgba(0,0,0,0.5)}
+
+.prize_redenvelop .luckerbox{width:6rem;height:8.69rem;padding-top:0.88rem;background-size:cover;background-repeat:no-repeat;color: #fff;background-image:url("{:tomedia($appconfig['appluckbg'])}");}
+.boxani {animation: boxani 0.5s ease-out 0s both;}
+@keyframes boxani { 
+    0% {
+        opacity:0;
+        transform: scale(0);
+    }
+    100% {
+        opacity:1;
+        transform: scale(1);
+    }
+}
+.prize_redenvelop .luckerbox .prize-avatar{
+	width:1.2rem;
+	height:1.2rem;
+	border-radius:50%;
+	border: 2px solid #fff;
+}
+.prize_redenvelop .luckerbox .prize-nickname{font-size:18px;padding:0.2rem 0;}
+.prize_redenvelop .luckerbox .prize-tip{font-size:20px;padding:0.2rem 0;}
+.prize_redenvelop .luckerbox .prize-info{
+	padding:0.25rem;
+}
+.prize_redenvelop .luckerbox .prize-info img{
+	height:1.4rem;
+	margin-bottom:0.3rem;
+}
+.prize_redenvelop .luckerbox .prize-info p{
+	font-size:16px;
+}
+.prize_redenvelop .luckerbox .prize-txt{
+	font-size:14px;
+	padding:0.2rem;
+}
+.prize_redenvelop .prize-close{
+	position:relative;
+	margin-top: 0.32rem;
+	width: 0.72rem;
+	height: 0.72rem;
+	background-size: cover;
+	background-repeat: no-repeat;
+	background-image: url(/static/images/wechat/redpack/close.png);
+	cursor: pointer;
+}
+/*手型图*/
+.ydj-mainBox {
+	position: absolute;
+	left: 0;
+	right: 0;
+	width:100%;
+	height:100%;
+}
+.ydj-handbox{
+	width: 6rem;
+	height: 6rem;
+	background: url("{:tomedia($appconfig['apphandquan'])}") no-repeat;
+	background-size: cover;
+}
+.ydj-handbox .hand {
+	width: 3.6rem;
+	height: 4.4rem;
+	background: url("{:tomedia($appconfig['apphand'])}") no-repeat;
+	background-size: cover;
+}
+
+/*手抖动*/
+.handshake {
+	-webkit-animation: shaketada 2s ease 0s infinite forwards;
+	animation: shaketada 2s ease 0s infinite forwards;
+	-webkit-transform-origin: 50% 100%;
+	transform-origin: 50% 100%;
+}
+@-webkit-keyframes shaketada {
+	0% {
+		-webkit-transform: scale3d(1,1,1)
+	}
+
+	10%,20% {
+		-webkit-transform: rotate3d(0,0,1,-10deg)
+	}
+
+	30%,50%,70%,90% {
+		-webkit-transform: rotate3d(0,0,1,10deg)
+	}
+
+	40%,60%,80% {
+		-webkit-transform: rotate3d(0,0,1,-10deg)
+	}
+
+	100% {
+		-webkit-transform: scale3d(1,1,1)
+	}
+}
+@keyframes shaketada {
+	0% {
+		transform: scale3d(1,1,1)
+	}
+
+	10%,20% {
+		transform: scale3d(1,1,1) rotate3d(0,0,1,-3deg)
+	}
+
+	30%,50%,70%,90% {
+		transform: scale3d(1,1,1) rotate3d(0,0,1,3deg)
+	}
+
+	40%,60%,80% {
+		transform: scale3d(1,1,1) rotate3d(0,0,1,-3deg)
+	}
+
+	100% {
+		transform: scale3d(1,1,1)
+	}
+}	
+/*顶部title*/
+.ydj-title{position:absolute;top:0.3rem;left:0;width:100%;}
+.ydj-title img{width:5.4rem;margin:0 auto;}
+/*游戏状态*/
+.ydj-tips{
+	width:80%;
+	text-align:center;
+	background-color:rgba(0,0,0,.3);
+	margin-top:0.36rem;
+	padding:0.2rem 0;
+	color:#fff;
+	font-weight:bold;
+	font-size:0.4rem;
+	border-radius:4px;
+}
+.zam-app-tipsmsg{z-index: 999999999!important}
+</style>
+{if !empty($appconfig['style']['diycss'])}<style>{$appconfig['style']['diycss']}</style>{/if}
+<audio id="shakeaudio" src="/{:WIMGURL}shake/shake.mp3"></audio>
+<section class="app-ydjmain">
+  <div class="game-rules zam-app-flex-ajCenter hidden">
+  	<img src="/{:WIMGURL}ydj/tip.png" alt="游戏提示">
+	{:html_entity_decode($appconfig['apptipwords'])}
+	<a href="javascript:;" class="btn btn-primary">我知道了</a>
+  </div>
+  <div class="ydj-mainBox zam-app-flex-ajCenter">
+		<div class="ydj-title">
+			<img src="{:tomedia($appconfig['apptoptitle'])}" alt="主题图">
+		</div>
+		<div class="ydj-handbox zam-app-flex-ajCenter">
+			<div class="hand"></div>
+		</div>
+		<div class="ydj-tips hidden">游戏还未开始</div>
+  </div>
+</section>
+<script id="prize-tpl" type="text/html">
+<div class="prize_redenvelop zam-app-flex-ajCenter">
+	<div class="luckerbox zam-app-flex-ajCenter boxani">
+		<img src="{:tomedia($wxuser['avatar'])}" class="prize-avatar">
+		<div class="prize-nickname">{$wxuser['nickname']}</div>
+		<p class="prize-tip">恭喜您获得</p>
+		<div class="prize-info zam-app-flex-ajCenter">
+			<img src="<% d.prizeimg %>" />
+			<p><% d.prizename %></p>
+		</div>
+		<p class="prize-txt"><% d.txt %></p>
+	</div>
+	<span class="prize-close"></span>
+</div>
+</script>
+<script>
+var failtxt = "{$appconfig['appfailtxt']}";
+var appgetaddress = "{if isset($appconfig['appgetaddress'])}{$appconfig['appgetaddress']}{else}请到领奖处领取{/if}";
+require(['wechatcore','appydj'],function (wechatcore,appydj){
+   wechatcore.gameInit(appydj);
+});
+</script>
+{include file="common/footermenu" /}
+{include file="common/footer" /}

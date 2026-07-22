@@ -1,0 +1,221 @@
+{if $map['type']=='1'}
+{if isset($map['gdmap']['jskeycode']) && !empty($map['gdmap']['jskeycode'])}
+<script type="text/javascript">
+window._AMapSecurityConfig = {
+    securityJsCode:"{$map['gdmap']['jskeycode']??''}",
+}
+</script>
+{/if}
+<script type="text/javascript">
+require(['webcore','zamnotice','AMapLoader'],function(webcore,zamnotice,AMapLoader){
+	AMapLoader.load({
+	    "key": "{$map['gdmap']['jskey']??''}",
+	    "version": "1.4.15",
+	    "plugins": ['AMap.Autocomplete','AMap.Geocoder','AMap.ToolBar','AMap.CitySearch'],
+	}).then(function(AMap){
+		var map = new AMap.Map('gdmap',{
+			resizeEnable: true,
+			expandZoomRange:true,
+			zoom:12,
+			zooms:[3,20],
+		});
+		var citySearch = new AMap.CitySearch();
+		citySearch.getLocalCity(function (status, result) {
+			if (status === 'complete' && result.info === 'OK') {
+				map.setBounds(result.bounds);
+			}
+		});
+		map.addControl(new AMap.ToolBar());
+		map.on('click', function (e) {
+			$('.latlng').val(e.lnglat.lat+'#'+e.lnglat.lng);
+			if (!geocoder) {
+				geocoder = new AMap.Geocoder({
+					city: "全国"
+				});
+			}
+			geocoder.getAddress(e.lnglat, function(status, result) {
+				if (status === 'complete' && result.info === 'OK') {
+					$('.address').val(result.regeocode.formattedAddress);
+				}
+			})
+			marker.setPosition(e.lnglat);
+			map.setFitView(marker);
+		});
+		var geocoder, marker;
+		if (!marker) {
+			if($('.latlng').val()!=''){
+				var latlngArr = $('.latlng').val().split('#');
+				marker = new AMap.Marker({
+					position: new AMap.LngLat(latlngArr[1],latlngArr[0]),
+				});
+				map.add(marker);
+				map.setFitView(marker);
+				//geoCode();
+			}else{
+				marker = new AMap.Marker();
+				map.add(marker);
+				geoCode('init');
+			}
+		}
+		function geoCode(init) {
+			if (!geocoder) {
+				geocoder = new AMap.Geocoder({
+					city: "全国"
+				});
+			}
+			if(init){
+				geocoder.getAddress(map.getCenter(), function(status, result) {
+					if (status === 'complete' && result.info === 'OK') {
+						var address = result.regeocode.addressComponent.city;
+						$('.address').val(address);
+						geocoder.getLocation(address, function (status, result) {
+							if (status === 'complete' && result.geocodes.length) {
+								var lnglat = result.geocodes[0].location;
+								$('.latlng').val(lnglat.lat.toFixed(6)+'#'+lnglat.lng.toFixed(6));
+								marker.setPosition(lnglat);
+								map.setFitView(marker);
+							}
+						});
+					}
+				})
+			} else {
+				var address = $('.address').val();
+				if(typeof(address)==='undefined' || address==''){
+					return false;
+				}
+				geocoder.getLocation(address, function (status, result) {
+					if (status === 'complete' && result.geocodes.length) {
+						var lnglat = result.geocodes[0].location;
+						$('.latlng').val(lnglat.lat.toFixed(6)+'#'+lnglat.lng.toFixed(6));
+						marker.setPosition(lnglat);
+						map.setFitView(marker);
+					}else{
+						return zamnotice.showTips('error','您输入的地址没有解析到结果！');
+					}
+				});
+			}
+		};
+		$(".searchaddress").on('click',function () {
+				geoCode();
+		});
+	}).catch(function(e){
+	    console.log(e);
+	});
+});
+</script>
+{elseif $map['type']=='2'}
+<script type="text/javascript">
+require(['webcore','zamnotice',"async!https://api.map.baidu.com/api?v=3.0&ak={$map['bdmap']['jsak']??''}"],function(webcore,zamnotice){
+	var map = new BMap.Map("gdmap", {coordsType: 5});
+	map.addControl(new BMap.NavigationControl());    
+	map.addControl(new BMap.ScaleControl());    
+	var point = new BMap.Point(116.404, 39.915);  
+	map.centerAndZoom(point, 16);
+	var myCity = new BMap.LocalCity();
+	myCity.get(function(result){
+		if(result.name && result.name!=''){
+			map.setCenter(result.name);
+		}
+	}); 
+	var geocoder = new BMap.Geocoder({extensions_town: true});
+	map.addEventListener('click', function(result){
+        map.clearOverlays();
+        map.addOverlay(new BMap.Marker(result.point));
+        map.centerAndZoom(result.point,20);
+        $('.latlng').val(result.point.lat.toFixed(6)+'#'+result.point.lng.toFixed(6));
+        geocoder.getLocation(result.point, function(e){
+        	$('.address').val(e.address);
+        	if(e.surroundingPois.length > 0){
+        		var selpoint = e.surroundingPois[0];
+        		$('.address').val(selpoint.title);
+        		$('.latlng').val(selpoint.point.lat.toFixed(6)+'#'+selpoint.point.lng.toFixed(6));
+        		map.setCenter(selpoint.point);
+        	}
+        })
+    })
+	function searchaddress() {
+    	var address = $('.address').val();
+        if(typeof(address)==='undefined' || address==''){
+        	return false;
+        }
+        geocoder.getPoint(address, function(point){
+            if(point){
+            	map.clearOverlays();
+				$('.latlng').val(point.lat.toFixed(6)+'#'+point.lng.toFixed(6));
+                map.centerAndZoom(point, 20);
+                map.addOverlay(new BMap.Marker(point, {title: ''}));
+            }else{
+                return zamnotice.showTips('error','您输入的地址没有解析到结果！');
+            }
+        })
+    }
+    $(".searchaddress").on('click',function () {
+	     searchaddress();
+	});
+});
+</script>
+{elseif $map['type']=='3'}
+<script type="text/javascript">
+function initmap(){
+require(['webcore','zamnotice',"async!https://map.qq.com/api/gljs?v=1.exp&libraries=service&key={$map['txmap']['key']??''}"],function(webcore,zamnotice){
+	var map = new TMap.Map(document.getElementById('gdmap'), {
+		zoom: 12,
+	});
+	var ipLocation = new TMap.service.IPLocation(); // 新建一个IP定位类
+	ipLocation.locate('').then(function(result){
+		if(result.status=='0'){
+			map.setCenter(result.result.location);
+		}
+	}).catch(function(error){
+	});
+	var geocoder = new TMap.service.Geocoder(); // 新建一个正逆地址解析类
+	var markers = new TMap.MultiMarker({
+		map: map,
+		geometries: [],
+	});
+	map.on('click', function (result) {
+		var poi = result.poi;
+		if (poi) {
+			$('.latlng').val(poi.latLng.lat.toFixed(6)+'#'+poi.latLng.lng.toFixed(6));
+			$('.address').val(poi.name);
+			markers.updateGeometries([{id: 'main',position: poi.latLng}]);
+			map.setCenter(poi.latLng);
+			map.easeTo({zoom:16},{duration: 1e3});//平滑缩放,旋转到指定级别
+		}else{
+			return zamnotice.showTips('error','未获取poi地址，请重新选择地点');
+			geocoder.getAddress({ location: result.latLng}).then(function(result){
+				if(result.status==0){
+					$('.address').val(result.result.address+'附近');
+				}
+			});
+			$('.latlng').val(result.latLng.lat.toFixed(6)+'#'+result.latLng.lng.toFixed(6));
+		}
+	});
+	function searchaddress() {
+		var address = $('.address').val();
+		if(typeof(address)==='undefined' || address==''){
+			return false;
+		}
+		geocoder.getLocation({ address:  address}).then(function(result){
+			markers.updateGeometries([{
+				id: 'main',
+				position: result.result.location,
+			}]);
+			map.setCenter(result.result.location);
+			$('.latlng').val(result.result.location.lat.toFixed(6)+'#'+result.result.location.lng.toFixed(6));
+			map.easeTo({zoom:16},{duration: 1e3});//平滑缩放,旋转到指定级别
+		}).catch(function(result){
+			var stip = result.message||'请输入详细地址信息';
+			if(stip == '参数错误'){
+				stip = '请输入详细地址信息';
+			}
+			return zamnotice.showTips('error',stip);
+		});
+	}
+	$(".searchaddress").on('click',function () {
+		searchaddress();
+	});
+});
+};
+</script>
+{/if}

@@ -1,0 +1,276 @@
+{include file="common/header" /}
+<style type="text/css">
+.bgbox{
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height:100%;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center 0;
+  background-image: url("{$appconfig['bgimg']}");
+}
+.kuang{
+	position: absolute;
+	//top: calc((100% - 6.1rem)/2);
+	top: 4rem;
+	left: calc((100% - 5.2rem)/2);
+	width: 5.2rem;
+	height:6.1rem;
+	background-repeat: no-repeat;
+    background-size: contain;
+    background-image: url("{$appconfig['kuang']}");
+}
+.topp{
+	position: absolute;
+	top: -1.3rem;
+    left: -0.58rem;
+	width: 4.86rem;
+	height: 2.82rem;
+}
+.leftp{
+	position: absolute;
+	bottom: -0.5rem;
+    left: -0.66rem;
+	width: 1.82rem;
+	height: 2.68rem;
+}
+.rightp{
+	position: absolute;
+	bottom: -0.9rem;
+    right: -0.7rem;
+	width: 2.15rem;
+	height: 2.93rem;
+}
+.topimgs{
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;	
+}
+.logo{
+	position: absolute;
+	top: 0.4rem;
+	left: 0.4rem;
+	width: 1.69rem;
+	height: 0.69rem;
+}
+.xingqiu{
+	position: absolute;
+	top: 0.3rem;
+	right: 0.3rem;
+	width: 1.14rem;
+	height: 0.59rem;
+}
+.year{
+	position: absolute;
+	top: 1.2rem;
+	right: 0.7rem;
+	width:  5.6rem;
+	height: 1.06rem;
+}
+.namebg{
+	position: absolute;
+	top: 2.4rem;
+	right: 0.6rem;
+	width:  4.2rem;
+	height: 0.67rem;
+}
+.namebg img{width: 100%;height: 100%;}
+.uploadbtn{
+	width: 2.23rem;
+	height:0.76rem;
+	background-repeat: no-repeat;
+    background-size: contain;
+    background-image: url("{$appconfig['sc']}");
+}
+.inputbox{
+	position: absolute;
+    top: 0.04rem;
+    height: 0.50rem;
+    left: 1.9rem;
+    width: calc(100% - 1.9rem);
+    overflow: hidden;
+}
+.inputbox input{height:0.50rem;line-height:0.50rem;font-size:0.32rem;border: 0;font-weight: 500}
+.createimg{
+	position: absolute;
+	bottom: 0.3rem;
+	left: 0;
+    width: 100%;
+}
+.createimg img{width:3.45rem;height: 0.73rem;}
+.saveimg{margin-top: 0.2rem}
+.saveimg img{width:3.45rem;height: 0.73rem;}
+
+.domimgbox{
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.9);
+  z-index: 2;
+}
+.domimgbox img{
+	max-height:80%;
+}
+.avatarbox{
+	position: absolute;
+	top: 0.2rem;
+	left: 0.2rem;
+	width: calc(100% - 0.4rem);
+	height: calc(100% - 0.4rem);
+	z-index: -1;
+	border-radius: 0.3rem;
+}
+/*裁剪样式*/
+.img-container{
+	position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+	z-index:1;
+	background-color:#000;
+	overflow:hidden;
+}
+.img-container img{
+	max-width:100%;
+	height:auto;
+}
+.t-image-crop-buttons-item{
+	position: absolute;
+    bottom: 10px;
+    padding: 5px 10px;
+    color: #fff;
+    border: 1px solid #fff;
+    border-radius: 4px;
+    text-shadow: 1px 1px 0 #000;
+    box-shadow: 0 1px 10px #000;
+    z-index: 1;
+}
+.t-image-crop-buttons-cancel {
+    left: 10px;
+}
+.t-image-crop-buttons-rotate {
+    left: 50%;
+    transform: translateX(-50%);
+}
+.t-image-crop-buttons-ensure {
+    right: 10px;
+}
+</style>
+<section class="bgbox">
+	<div class="kuang zam-app-flex-ajCenter">
+		<img class="topp" src="{$appconfig['topp']}" />
+		<img class="leftp" src="{$appconfig['leftp']}" />
+		<img class="rightp" src="{$appconfig['rightp']}" />
+		<div class="uploadbtn"></div>
+		<img class="avatarbox hidden" src="" />
+	</div>
+	<div class="topimgs">
+		<img class="logo" src="{$appconfig['logo']}" />
+		<img class="xingqiu" src="{$appconfig['xingqiu']}" />
+		<img class="year" src="{$appconfig['year']}" />
+		<div class="namebg">
+			<img src="{$appconfig['name']}" />
+			<div class="inputbox"><input class="yourname" /></div>
+		</div>
+	</div>
+	<div class="createimg zam-app-flex-ajCenter">
+		<img src="{$appconfig['create']}">
+	</div>
+</section>
+
+<section class="domimgbox zam-app-flex-ajCenter hidden">
+	<img class="cimg" src="">
+	<div class="saveimg">
+		<img src="{$appconfig['save']}">
+	</div>
+</section>
+<div class="img-container hidden">
+    <img src="" alt="">
+	<div class="t-image-crop-buttons" style="display: block;">
+			<a  href="javascript:;" class="t-image-crop-buttons-item t-image-crop-buttons-cancel">取消</a>
+			<a  href="javascript:;" class="t-image-crop-buttons-item t-image-crop-buttons-rotate">旋转90°</a>
+			<a  href="javascript:;" class="t-image-crop-buttons-item t-image-crop-buttons-ensure">剪裁</a>
+	</div>
+</div>
+<script type="text/javascript">
+	var $image = $('.img-container img'),cropperobj;
+	require(['wechatcore','domtoimage','html2canvas','cropper'],function(wechatcore,domtoimage,html2canvas,Cropper){
+		$(".kuang").on('click','.uploadbtn',function(){
+			var $this = $(this);
+			wechatcore.getwximgbase64(function(data){
+					var loadLayer = wechatcore.loading('正在构建裁剪环境...');
+					$image.attr("src",data);
+					$image.on("load", function() { 
+						wechatcore.close(loadLayer);
+						$('.img-container').removeClass('hidden');
+						cropperobj = new Cropper($image[0],{
+							background:false,
+							dragMode: 'move',
+							aspectRatio: 1,
+							restore: false,
+							viewMode: 1,
+							center: false,
+							cropBoxMovable: false,
+							cropBoxResizable: false,
+							toggleDragModeOnDblclick: false,
+							rotatable: true,
+							checkOrientation: true,
+							aspectRatio:17/20,
+						});
+					});	  
+			},{maxnum:1});
+		});
+		$(".img-container .t-image-crop-buttons-cancel").on('click',function(){
+			$('.img-container').addClass('hidden');
+			$image.attr('src','');
+			cropper.destroy();
+		});
+		$(".img-container .t-image-crop-buttons-rotate").on('click',function(){
+			cropperobj.rotate(90);
+		});
+		$(".img-container .t-image-crop-buttons-ensure").on('click',function(){
+			var canvas = cropperobj.getCroppedCanvas({width: 160,height:160,imageSmoothingQuality: 'high'});
+			$image.attr('src','');
+			cropper.destroy();
+			$('.img-container').addClass('hidden');
+			var imgdata = canvas.toDataURL("image/png");
+			$(".avatarbox").removeClass('hidden').attr('src',imgdata);
+		});
+	    $(".createimg").click(function(){
+	    	var $this = $(this),nameval = $("input").val();
+			if (nameval.replace(/(^s*)|(s*$)/g, "").length ==0) { 
+				return wechatcore.msg('请输入内容'); 
+			}
+			var avatarbox = $(".avatarbox").attr('src');
+			if (avatarbox.replace(/(^s*)|(s*$)/g, "").length ==0) { 
+				return wechatcore.msg('请上传图片'); 
+			}
+			$this.addClass('hidden');
+			$(".uploadbtn").addClass('hidden');
+			var domobj = $(".bgbox").get(0);
+			if(wechatcore.device(1)){
+					html2canvas(domobj).then(canvas => {
+				    showdomimg(canvas.toDataURL("image/png"));
+			  	});
+			}else{
+			  domtoimage.toPng(domobj).then(function (imgUrl) {
+					showdomimg(imgUrl);
+			  }).catch(function (error) {
+					alert('oops, something went wrong');
+			  });
+			}
+	    });
+	});
+	function showdomimg(imgurl){
+		$(".bgbox").addClass('hidden');
+		$(".domimgbox .cimg").attr('src',imgurl);
+		$(".domimgbox").removeClass('hidden');
+	}
+</script>
+{include file="common/footer" /}

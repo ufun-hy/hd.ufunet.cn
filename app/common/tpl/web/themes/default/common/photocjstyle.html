@@ -1,0 +1,109 @@
+<div class="config-titlebox">
+    <span class="config-titlename">风格设置</span>
+    <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#styleconfigbox" aria-expanded="false"><span>展开</span> <i class="mdi mdi-chevron-double-down"></i></span>
+</div>
+<div id="styleconfigbox" class="collapse">
+	<div class="form-group">
+		<label class="col-lg-2 control-label">主色调</label>
+		<div class="col-lg-8">
+			{:tpl_color('styleconfig[color]',$config['styleconfig']['color']??'#feca00')}
+			<span class="help-block">奖品名，奖项名，中奖名单等均会生效</span>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-lg-2 control-label">顶部奖品背景图</label>
+		<div class="col-lg-8">
+			{:tpl_image_one('styleconfig[topbg]',$config['styleconfig']['topbg'])}
+			<span class="help-block">规格:1034px * 76px</span>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-lg-2 control-label">奖品动态背景图</label>
+		<div class="col-lg-8">
+			{:tpl_image_one('styleconfig[prizebg]',$config['styleconfig']['prizebg'])}
+			<span class="help-block">规格:600px * 600px</span>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-lg-2 control-label">奖品动态背景图2</label>
+		<div class="col-lg-8">
+			{:tpl_image_one('styleconfig[prizebg2]',$config['styleconfig']['prizebg2'])}
+			<span class="help-block">规格:600px * 600px</span>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-lg-2 control-label">底部背景图</label>
+		<div class="col-lg-8">
+			{:tpl_image_one('styleconfig[bottombg]',$config['styleconfig']['bottombg'])}
+			<span class="help-block">规格:1056px * 116px</span>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-lg-2 control-label">抽奖按钮背景图</label>
+		<div class="col-lg-8">
+			{:tpl_image_one('styleconfig[btn]',$config['styleconfig']['btn']??'')}
+			<span class="help-block">规格:153px * 45px</span>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-lg-2 control-label">照片背景图</label>
+		<div class="col-lg-8">
+			{:tpl_image_one('styleconfig[imgbg]',$config['styleconfig']['imgbg'])}
+			<span class="help-block">规格:400px * 400px</span>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-lg-2 control-label">中奖照片背景图</label>
+		<div class="col-lg-8">
+			{:tpl_image_one('styleconfig[luckerbg]',$config['styleconfig']['luckerbg'])}
+			<span class="help-block">规格:388px * 576px</span>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-lg-2 control-label text-right">* 中奖图片名称</label>
+		<div class="col-lg-8">
+			<div class="input-group">
+				<div class="input-group-btn not-allow"><a class="btn btn-default">文字色</a></div>
+				{:tpl_color('styleconfig[name][color]',$config['styleconfig']['name']['color']??'#fff')}
+				<div class="input-group-btn not-allow"><a class="btn btn-default">文字大小</a></div>
+				<div class="touchspin">
+				<input type="text" class="form-control numberincdec" name="styleconfig[name][size]" 
+				data-bts-min="12" data-bts-replacement-val="12"
+				data-bts-max="60"
+				data-bts-step="1"
+				data-bts-postfix="px"
+				data-bts-postfix-extra-class="touchspin-postfix"
+				value="{$config['styleconfig']['name']['size']??18}">
+				</div>
+			</div>
+			<span class="help-block">请根据实际情况设置此值</span>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-lg-2 control-label">开始抽奖奖品变小背景视频（变小再散花效果）</label>
+		<div class="col-lg-8">
+			{:tpl_video('styleconfig[hidevideo]',$config['styleconfig']['hidevideo'])}
+			<span class="help-block">规格:1920px * 1080px</span>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-lg-2 control-label">结束抽奖背景视频（爆炸效果）</label>
+		<div class="col-lg-8">
+			{:tpl_video('styleconfig[baozhavideo]',$config['styleconfig']['baozhavideo'])}
+			<span class="help-block">规格:1920px * 1080px</span>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-lg-2 control-label">* 抽奖进行中显示停止按钮</label>
+		<div class="col-lg-8">
+			{:tpl_switch('styleconfig[showstopbtn]',$config['styleconfig']['showstopbtn']??'2')}
+			 <span class="help-block">默认不显示停止按钮，直接通过点击键盘空格键来停止抽奖，一般是空格键坏了等特殊原因才开启此项</span>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-lg-2 control-label">* 右侧中奖列表别名</label>
+		<div class="col-lg-8">
+		  <input type="text" class="form-control"  name="styleconfig[listname]"  value="{$config['styleconfig']['listname']??'中奖列表'}" maxlength="15" placeholder="15个字符以内">
+		</div>
+	</div>
+</div>

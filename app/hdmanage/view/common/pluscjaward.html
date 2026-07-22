@@ -1,0 +1,75 @@
+<style>
+.awardboxs{
+    margin-top:40px;
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.awardboxs li{
+    width: 200px;
+    margin:20px;
+    cursor: pointer;
+    user-select: none;
+}
+.awardboxs li img{
+    width: 100px;
+    height: 100px;
+}
+.awardboxs li div{
+    max-width: 100%;
+}
+.awardboxs li .lyear-checkbox{
+    padding: 0;
+}
+.awardboxs li .lyear-checkbox span::before{
+    position:static;
+}
+</style>
+<div id="formBox">
+<div class="form-inline">
+    <div class="form-group m-b-5" style="width: 250px;">
+        <input style="width: 100%;" class="form-control input-sm searchbox" type="text" placeholder="请输入奖品名称或奖项名称">
+    </div>
+    <a class="btn btn-primary btn-sm m-b-5 searchone" href="javascript:;"><i class="mdi mdi-magnify"></i> 搜索</a>
+</div>
+<div class="form-group">
+    <ul class="awardboxs zam-flex">
+        {volist name="awardlists" id="award"}
+            <li data-pid="{$award['id']}" data-pname="{$award['prizename']}" data-aname="{$award['awardname']}">
+                <div class="zam-flex-column-center">
+                    <img src="{:tomedia($award['prizeimg'])}" />
+                    <div class="limitbox">{$award['prizename']}({$award['awardname']})</div>
+                    <label class="lyear-checkbox checkbox-{if in_array($award['id'],$hadprizeids)}grey{else /}primary{/if} m-t-10">
+                        <input type="checkbox" {if in_array($award['id'],$hadprizeids)}disabled{/if}><span></span>
+                    </label>
+                </div>
+            </li>
+        {/volist}  
+    </ul>
+</div>
+</div>
+<script>
+require(["webcore","zamnotice"],function(webcore,zamnotice){
+    $(".searchone").click(function(){
+        var $this = $(this),inputval = $this.prev().find('input').val(),listitems = $(".awardboxs li");
+        if(inputval==''){
+            listitems.removeClass('hidden');
+            return false;
+        }
+        listitems.addClass('hidden');
+        var filtertitles = listitems.find('.limitbox').filter(":contains('"+inputval+"')");
+        if(filtertitles.length > 0){
+            filtertitles.each(function(){
+                $(this).parent().parent().removeClass('hidden');
+            });
+        }
+    });
+    $(".awardboxs li").click(function(){
+        var inputObj = $(this).find('input');
+        if(inputObj.is(":disabled")) return false;
+        var s = inputObj.prop('checked');
+        inputObj.prop('checked', !s);
+    });
+});
+</script>

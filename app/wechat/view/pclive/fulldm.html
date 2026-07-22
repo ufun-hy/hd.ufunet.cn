@@ -1,0 +1,119 @@
+<style>
+.fulldmBox {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	top: 0;
+	left:0;
+	overflow: hidden;
+	pointer-events: none!important;
+	z-index:11;
+}
+.fulldmBox-item{
+	display: -webkit-box!important;
+	display: -webkit-flex!important;
+	display: -ms-flexbox!important;
+	display: flex!important;
+	position: absolute;
+	height:40px;
+	border:0;
+	top:0;
+	border-radius:5px;
+	padding:5px 0;
+	box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	pointer-events: none!important;
+}
+.fulldmBox-one{
+	display: -webkit-box!important;
+	display: -webkit-flex!important;
+	display: -ms-flexbox!important;
+	display: flex!important;
+	padding: 0 8px;
+	border-radius:8px;
+}
+.fulldmBox-one .fulldmBox-avatar {
+	height: 30px;
+	padding:0;
+	display: -webkit-box!important;
+	display: -webkit-flex!important;
+	display: -ms-flexbox!important;
+	display: flex!important;
+	-webkit-box-pack: center;
+	-webkit-justify-content: center;
+	-ms-flex-pack: center;
+	justify-content: center;
+	-webkit-box-align: center;
+	-webkit-align-items: center;
+	-ms-flex-align: center;
+	align-items: center;
+}
+.fulldmBox-one .fulldmBox-avatar img {
+	width: {if !empty($appconfig['dmconfig'])}{$appconfig['dmconfig']['fontsize']+4}{else /}20{/if}px;
+	height: {if !empty($appconfig['dmconfig'])}{$appconfig['dmconfig']['fontsize']+4}{else /}20{/if};
+	display:inline-block;
+	border-radius: 50%;
+}
+.fulldmBox-one .fulldmBox-info{
+	position: relative;
+	display: -webkit-box!important;
+	display: -webkit-flex!important;
+	display: -ms-flexbox!important;
+	display: flex!important;
+	-webkit-box-pack: center;
+	-webkit-justify-content: center;
+	-ms-flex-pack: center;
+	justify-content: center;
+	-webkit-box-align: center;
+	-webkit-align-items: center;
+	-ms-flex-align: center;
+	align-items: center;
+	border-radius: 10px;
+	padding-right:0px;
+}
+.fulldmBox-one .fulldmBox-info span{display: none}
+.fulldmBox-one .fulldmBox-info div{
+	height:30px;
+	line-height:30px;
+	color:{if !empty($appconfig['dmconfig'])}{$appconfig['dmconfig']['fontcolor']}{else /}#fff{/if};
+	font-size:{if !empty($appconfig['dmconfig'])}{$appconfig['dmconfig']['fontsize']}{else /}16{/if}px;
+}
+.fulldmBox-one .fulldmBox-info .fulldmBox-nickname {
+	margin-right:5px;
+}
+.fulldmBox-one .fulldmBox-info .fulldmBox-msg img{
+	display: inline-block;
+	width:{if !empty($appconfig['dmconfig'])}{$appconfig['dmconfig']['fontsize']}{else /}16{/if}px;
+	height:{if !empty($appconfig['dmconfig'])}{$appconfig['dmconfig']['fontsize']}{else /}16{/if}px;
+	margin-top:-2px;
+	vertical-align:middle
+}
+/*风格一 普通弹幕*/
+.fulldmBox-one.style1{
+	background-color:{if !empty($appconfig['dmconfig']) && $appconfig['dmconfig']['needbg']=='1'}{if $appconfig['dmconfig']['bgcolortype']=='1'}{$appconfig['dmconfig']['bgcolor']}{else /}transparent{/if}{else /}transparent{/if};
+}
+.fulldmBox-one.style1 .fulldmBox-avatar{
+	border-radius: 10px;
+	border-top-right-radius: 0;
+	border-bottom-right-radius: 0;
+	margin-right: 8px;
+}
+.fulldmBox-one.style1 .fulldmBox-info{
+	border-top-left-radius: 0;
+	border-bottom-left-radius: 0;
+}
+</style>
+<script type="text/html" id="fulldm-tpl">
+<div class="fulldmBox-one style1">
+	{{ if showavatar=='1'}}
+	<div class="fulldmBox-avatar"><img src="{{ data.avatar }}" class="imgavatar"></div>
+	{{ /if }}
+	<div class="fulldmBox-info">
+			<span></span>
+		{{ if showname=='1'}}
+			<div class="fulldmBox-son fulldmBox-nickname">{{ data.nickname }}:</div>
+		{{ /if }}
+			<div class="fulldmBox-son fulldmBox-msg">{{# data.content }}</div>
+	</div>
+</div>
+</script>

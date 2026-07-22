@@ -1,0 +1,794 @@
+{include file='$Wpath/common/header'}
+<style type="text/css">
+#mapbox > div{z-index: 1!important}
+.areamap{
+	padding: 20px 0;
+	height: 600px;
+}
+.areamap #mapbox{width: 100%;height: 100%}
+.areatable{
+	margin-top: 0;
+}
+</style>
+<div class="alert alert-danger">
+	操作流程: 选择地区 -> 添加标记点 
+</div>
+<div class="areabox">
+    <div class="form-inline">
+	    <div class="form-group m-l-5">
+	      <div class="input-group input-group-sm">
+	        <span class="input-group-addon">选择省或者直辖市</span>
+	          <select id="provincecode" class="form-control"></select>
+	        </div>
+	    </div>
+	    <div class="form-group m-l-5 cityselectbox hidden">
+	      <div class="input-group input-group-sm">
+	        <span class="input-group-addon">选择地级市</span>
+	          <select id="citycode" class="form-control"></select>
+	        </div>
+	    </div>
+	    <a class="btn btn-primary btn-sm btn-confirm" href="javascript:void(0)">确定切换</a>
+	</div>
+</div>
+<div class="areamap">
+	<div id="mapbox"></div>
+</div>
+<div class="alert alert-danger m-b-0">
+	添加标记点后在所选区域的位置会新增一个标记点，鼠标点击该标记点激活后可拖动调整其位置。
+</div>
+<div class="areatable">
+{include file='$Wpath/common/tabletoolbar'}
+<table id="listtable" class="zam-btable"></table>
+</div>
+<script>
+var layindex;
+var areadata = {
+	ischina : "{$area['ischina']??'1'}",
+	provincecode : "{$area['provincecode']??''}",
+	citycode : "{$area['citycode']??''}",
+	markers:{:json_encode($districts)},
+};
+/*
+allresultList 存储省级 或者 市级 或者 县级 结果
+*/
+var map,district,provinceList = [],cityList = [],allresultList = [],allareacodeList = {};
+var polygons,markers,markergeometries = [],bounds = [],geometries = [];
+require(['webcore','webtable','jconfirmBox','zamnotice','layerBox','async!https://map.qq.com/api/gljs?v=1.exp&libraries=service,tools&key={$mapkey}'],function(webcore,webtable,jconfirmBox,zamnotice,layerBox){
+	var initConfig = {
+	    tableId:'#listtable',
+	    psize:500,
+	    url:"{:gohdmanage('configmapqd/ajaxmarker',['hdid'=>$hdid])}",
+	    columnoperate:{
+	        btns:{
+	            edit:true,
+	            del:true,
+	        },
+	        func:{
+	            edit:function(value, row, index){
+	                if(allresultList.length <= 0){
+		        		return false;
+		        	}
+			        var confirmObj = jconfirmBox.confirm('编辑标记点',webcore.tpl($("#addmarker-tpl"),{
+			        	arealist:allresultList,
+			        	displayorder:row.displayorder,
+			        	areacode:row.areacode,
+			        	areatitle:row.areatitle,
+			        	pointercolor:row.pointercolor,
+			        	titlecolor:row.titlecolor,
+			        	numcolor:row.numcolor,
+			        	titlesize:row.titlesize,
+			        }),function(e){
+						var $this = e.$content,areatitle = $this.find('.areatitle').val(),areacode = $this.find("#areacode").find('option:selected').val() || '';
+						var selarea = allareacodeList[areacode] || '';
+						if(areacode=='' || selarea=='') return zamnotice.showTips('error','请选择地区');
+						if(areatitle=='') return zamnotice.showTips('error','请输入标注点名称');
+						var postData = {
+							did:row.id,
+							areacode:areacode,
+							areaname:selarea.fullname,
+							areatitle:areatitle,
+							displayorder:$this.find('.displayorder').val(),
+							pointercolor:$this.find('.pointercolor').val(),
+							titlecolor:$this.find('.titlecolor').val(),
+							numcolor:$this.find('.numcolor').val(),
+							titlesize:$this.find('.titlesize').val(),
+						};
+			            webcore.ajaxSubmit("{:gohdmanage('configmapqd/savemarker',['hdid'=>$hdid])}",postData,'保存中...').then(function(json){
+			                if(json.code==0){
+			                	var markerdata = json.msg;
+			                    webtable.refresh();
+			                    zamnotice.showTips('success','保存成功');
+			                    confirmObj.close();
+			                    var onemarker = { 
+					                "id": markerdata.id+'',
+					                "styleId": "marker",
+					                "position": new TMap.LatLng(markerdata.arealat,markerdata.arealng),
+					                "properties":{
+					                	"areacode":markerdata.areacode,
+					                	"areaname":markerdata.areaname,
+					                },
+					                "content":markerdata.areatitle,
+					                "rank":markerdata.displayorder,
+					            };
+					            markers.updateGeometries([onemarker]);
+			                }else{
+			                    zamnotice.showTips('error',json.msg);
+			                     return false;
+			                }
+			            }, function(json){
+			                zamnotice.showTips('error','网络差。操作失败');
+			                 return false;
+			            });
+					},false,'col-lg-8 col-lg-offset-2',true,[{'hidden':false,'txt':'确定保存'},{'hidden':false,'txt':'取消'}],function(){
+						tpl_colorpicker();
+						$(".numberincdec").TouchSpin().on("change", function(){
+					        var $this = $(this),funcstr = $this.data('func');
+					        var func = window[funcstr];
+					        func && func(this);
+					    });
+					});
+	            },
+	            del:function(value, row, index){
+	            	var markerid = row.id;
+	                jconfirmBox.confirm('温馨提示','删除将删除当前标记点数据并且无法恢复，您确定要删除么？',function(){
+	                    webcore.ajaxSubmit("{:gohdmanage('configmapqd/delmarker',['hdid'=>$hdid])}",{markerid:markerid}).then(function(json){
+	                        if(json.code==0){
+	                            webtable.refresh();
+	                            markers.remove(markerid+'');
+	                            zamnotice.showTips('success','删除成功');
+	                        }else{
+	                            zamnotice.showTips('error',json.msg);
+	                        }
+	                    }, function(json){
+	                        zamnotice.showTips('error','网络差。操作失败');
+	                    });
+	                });
+	            },
+	           
+	        }
+	    },
+	    columns:[{
+	            checkbox: true,
+	        }, 
+	        {
+	            field: 'id',
+	            title: 'id',
+	            align: 'center',
+	            visible: false
+	        }, {
+	            field: 'displayorder',
+	            title: '序号',
+	            align: 'center',
+	        }, {
+	            field: 'areaname',
+	            title: '区域名称',
+	            align: 'center',
+	        }, {
+	            field: 'areatitle',
+	            title: '标记点名称',
+	            align: 'center',
+	        }, {
+	            field: 'pointercolor',
+	            title: '标记点颜色',
+	            align: 'center',
+	            formatter:function(value,row,index){
+	                return '<div class="btn btn-lg" style="background-color:'+value+'!important"></div>';
+	            }
+	        }
+	    ],
+	    searchParamas:[],
+	    toolbar:{
+	        add:function(){
+	        	if(allresultList.length <= 0){
+	        		return false;
+	        	}
+		        var confirmObj = jconfirmBox.confirm('新增标记点',webcore.tpl($("#addmarker-tpl"),{
+		        	arealist:allresultList,
+		        	displayorder:0,
+		        	areatitle:'',
+		        	pointercolor:'#ffc107',
+			        titlecolor:'#fff',
+			        numcolor:'#fff',
+			        titlesize:'14',
+		        }),function(e){
+					var $this = e.$content,areatitle = $this.find('.areatitle').val(),areacode = $this.find("#areacode").find('option:selected').val() || '';
+					var selarea = allareacodeList[areacode] || '';
+					if(areacode=='' || selarea=='') return zamnotice.showTips('error','请选择地区');
+					if(areatitle=='') return zamnotice.showTips('error','请输入标注点名称');
+					var postData = {
+						areacode:areacode,
+						areaname:selarea.fullname,
+						areatitle:areatitle,
+						arealat:selarea.location.lat,
+						arealng:selarea.location.lng,
+						displayorder:$this.find('.displayorder').val(),
+						pointercolor:$this.find('.pointercolor').val(),
+						titlecolor:$this.find('.titlecolor').val(),
+						numcolor:$this.find('.numcolor').val(),
+						titlesize:$this.find('.titlesize').val(),
+					};
+		            webcore.ajaxSubmit("{:gohdmanage('configmapqd/savemarker',['hdid'=>$hdid])}",postData,'新增中...').then(function(json){
+		                if(json.code==0){
+		                    webtable.refresh();
+		                    zamnotice.showTips('success','新增成功');
+		                    confirmObj.close();
+		                    var onemarker = { 
+				                "id": json.msg.id+'',
+				                "styleId": "marker",
+				                "position": new TMap.LatLng(postData.arealat,postData.arealng),
+				                "properties":{
+				                	"areacode":postData.areacode,
+				                	"areaname":postData.areaname,
+				                },
+				                "content":postData.areatitle,
+				                "rank":postData.displayorder,
+				            };
+				            markers.add(onemarker);
+		                }else{
+		                    zamnotice.showTips('error',json.msg);
+		                     return false;
+		                }
+		            }, function(json){
+		                zamnotice.showTips('error','网络差。操作失败');
+		                 return false;
+		            });
+				},false,'col-lg-8 col-lg-offset-2',true,[{'hidden':false,'txt':'确定新增'},{'hidden':false,'txt':'取消'}],function(){
+					tpl_colorpicker();
+					$(".numberincdec").TouchSpin().on("change", function(){
+				        var $this = $(this),funcstr = $this.data('func');
+				        var func = window[funcstr];
+				        func && func(this);
+				    });
+				});
+	        },
+	        del:function(){
+	            var getSelects = webtable.getSelections();
+	            if(getSelects.length>0){
+	                jconfirmBox.confirm('温馨提示','删除将删除所选的标记点数据并且无法恢复，您确定要删除么？',function(){
+	                    webcore.ajaxSubmit("{:gohdmanage('configmapqd/delmarker',['hdid'=>$hdid])}",{markerid:getSelects}).then(function(json){
+	                        if(json.code==0){
+	                            webtable.refresh();
+	                            getSelects.map((item) => {
+	                            	markers.remove(item+'');
+	                            })
+	                            zamnotice.showTips('success','删除成功');
+	                        }else{
+	                            zamnotice.showTips('error',json.msg);
+	                        }
+	                    }, function(json){
+	                        zamnotice.showTips('error','网络差,操作失败');
+	                    });
+	                });
+	            }else{
+	                zamnotice.showTips('info','请先选择您要操作的数据');
+	            }
+	        },
+	        reset:function(){
+	            jconfirmBox.confirm('温馨提示','清空将删除所有已添加的标记点数据，您确定要清空么？',function(){
+	                    webcore.ajaxSubmit("{:gohdmanage('configmapqd/resetmarker',['hdid'=>$hdid])}",{}).then(function(json){
+	                        webtable.refresh();
+	                        var prevgeos = markers ? markers.getGeometries() : [];
+					    	if(prevgeos.length > 0){
+					    		markers.remove(prevgeos.map((item) => item.id));
+					    	}
+	                        zamnotice.showTips('success','操作成功');
+	                    }, function(json){
+	                        zamnotice.showTips('error','网络差。操作失败');
+	                    });
+	            });
+	        }
+	    },
+	};
+	webtable.init(initConfig);
+	district = new TMap.service.District({
+        polygon: 2,
+    });
+    //给省份选择框赋予值
+    layindex = layerBox.showLoading('地图加载中...');
+    district.getChildren().then((result) => {
+    	if (!result && !result.result) {
+    		zamnotice.showTips('error','获取全国省份数据出错');
+    		return false;
+    	}
+        provinceList = result.result[0],optionhtml = '<option value="">全国所有</option>';
+        provinceList.map((item, index) => {
+        	 var obj = {id:item.id,name:item.fullname};
+             optionhtml += webcore.tpl($("#province-tpl"),obj);
+        });
+        $("#provincecode").html(optionhtml);
+        //初始化选项和标注点
+        $('#provincecode').val(areadata.provincecode).trigger('change',{citycode:areadata.citycode});
+        if(areadata.markers.length > 0){
+        	$.each(areadata.markers,function(index,item){
+	        	markergeometries.push({ 
+	                "id": item.id+'',
+	                "styleId": "marker",
+	                "position": new TMap.LatLng(item.arealat,item.arealng),
+	                "properties":{
+	                	"areacode":item.areacode,
+	                	"areaname":item.areaname
+	                },
+	                "content":item.areatitle,
+	                "rank":item.displayorder,
+	            });
+	        });
+        }
+        setTimeout(function(){
+        	initdata({
+    			'ischina':areadata.provincecode==''?'1':'2',
+    			'iscity':(areadata.citycode!=''?true:false),
+    			'provincecode':areadata.provincecode,
+    			'citycode':areadata.citycode,
+    			'markergeometries':markergeometries
+    		});
+        },1e3);
+    }).catch((error) => {
+		layerBox.close(layindex);
+		zamnotice.showTips('error',error.message||'出现异常');
+    	return false;
+	});
+    var map = new TMap.Map(document.getElementById('mapbox'), {
+        zoom:6,
+        baseMap:null,
+        pitch: 0, // 俯仰度
+        rotation: 0, // 旋转角度
+        mapStyleId: 'style1',
+        doubleClickZoom:false,
+        showControl:true,
+    });
+    map.removeControl(TMap.constants.DEFAULT_CONTROL_ID.ROTATION);
+    map.getControl(TMap.constants.DEFAULT_CONTROL_ID.ZOOM).setNumVisible(true);
+    //边界类
+    polygons = new TMap.MultiPolygon({
+      map: map,
+      geometries: [],
+      styles: {
+        'polygon': new TMap.PolygonStyle({
+            'color': 'rgba(0, 0, 255, 0.81)',
+            'borderWidth':2,
+            'showBorder':true,
+            'borderColor': 'rgba(155, 155, 255, 1)',
+        }),
+      },
+    });
+    $("#provincecode").change(function(e,params){
+    	var provincecode = $(this).find('option:selected').val(),citycode = '';
+    	if(params && params.citycode!=''){
+    		citycode = params.citycode;
+    	}
+    	initselect({
+			'ischina':provincecode==''?'1':'2',
+			'provincecode':provincecode,
+			'citycode':citycode
+		});
+    });
+    $("#citycode").change(function(e){
+    	var citycode = $(this).find('option:selected').val(),provincecode = $('#provincecode').find('option:selected').val();
+		initselect({
+			'ischina':'2',
+			'iscity':(citycode!=''?true:false),
+			'provincecode':provincecode,
+			'citycode':citycode,
+		});
+    });
+    function initselect(params){
+    	var optionhtml = '<option value="">请选择</option>',directcitys = ['110000','120000','310000','500000','810000','820000'],ischina = params.ischina || '1',iscity = params.iscity || false,provincecode = params.provincecode || '', citycode = params.citycode || '',code = (iscity ? citycode : provincecode),i = 0;
+    	if(ischina!='1' && !iscity){
+	    	district.getChildren({id:code}).then((result) => {
+		        if (!result && !result.result) {
+		        	zamnotice.showTips('error','获取城市数据出错');
+		        	return false;
+		        }
+		        var resultcitys = result.result[0];
+		        resultcitys.map((item, index) => {
+					optionhtml += webcore.tpl($("#province-tpl"),{id:item.id,name:item.fullname});
+					i++;
+					if(i >= resultcitys.length){
+			            $("#citycode").html(optionhtml);
+			            if(citycode!=''){
+			            	$('#citycode').val(citycode);
+			            }
+		            }
+		        });
+		    });
+    	}
+    	if(ischina=='1' || $.inArray(code,directcitys) != -1){
+        	$(".cityselectbox").addClass('hidden');
+        }else{
+        	$(".cityselectbox").removeClass('hidden');
+        }
+    }
+    $(".btn-confirm").click(function(){
+   		var provincecode = $('#provincecode').find('option:selected').val(),citycode = $("#citycode").find('option:selected').val();
+   		jconfirmBox.confirm('温馨提示','更改地图所选省市会导致您已添加的所有标注点被删除，您确定要更换么？',function(){
+            webcore.ajaxSubmit("{:gohdmanage('configmapqd/savearea',['hdid'=>$hdid])}",{provincecode:provincecode,citycode:citycode}).then(function(json){
+                if(json.code==0){
+                	var areainfo = json.msg;
+                	webtable.refresh();
+                    zamnotice.showTips('success','切换成功');
+                    bounds = [];
+                    geometries = [];
+			    	polygons.remove(polygons.getGeometries().map((item) => item.id));
+			    	var prevgeos = markers ? markers.getGeometries() : [];
+			    	if(prevgeos.length > 0){
+			    		markers.remove(prevgeos.map((item) => item.id));
+			    	}
+			    	layindex = layerBox.showLoading('地图加载中...');
+                    setTimeout(function(){
+                    	initdata({
+			    			'ischina':areainfo.ischina,
+			    			'iscity':(areainfo.citycode!=''?true:false),
+			    			'provincecode':areainfo.provincecode,
+			    			'citycode':areainfo.citycode,
+			    			'markergeometries':[]
+			    		});
+                    },1e3);
+                }else{
+                    zamnotice.showTips('error',json.msg);
+                }
+            }, function(json){
+                zamnotice.showTips('error','网络差。操作失败');
+            });
+        });
+   	});
+   	$(".btn-other").click(function(){
+   		var provincecode = $('#provincecode').find('option:selected').val(),citycode = $("#citycode").find('option:selected').val();
+   		jconfirmBox.confirm('温馨提示','一键新增会删除所有已添加的标记点以及对应的签到用户数据，自动添加所选地区的所有标记点，您确定要一键新增么？',function(){
+   			bounds = [];
+	        geometries = [];
+	    	polygons.remove(polygons.getGeometries().map((item) => item.id));
+	    	var prevgeos = markers ? markers.getGeometries() : [];
+	    	if(prevgeos.length > 0){
+	    		markers.remove(prevgeos.map((item) => item.id));
+	    	}
+	    	layindex = layerBox.showLoading('地图加载中...');
+	        setTimeout(function(){
+	        	var ischina = (provincecode==''?'1':(citycode==''?'2':'3')); 
+	        	var areainfo  = {
+	        		ischina:ischina,
+	        		provincecode:ischina=='1'?'':provincecode,
+	        		citycode:ischina=='1'?'':citycode,
+	        		iscity:ischina=='3'?true:false
+	        	};
+	        	initdata({
+	    			'ischina':areainfo.ischina,
+	    			'iscity':(areainfo.citycode!=''?true:false),
+	    			'provincecode':areainfo.provincecode,
+	    			'citycode':areainfo.citycode,
+	    			'markergeometries':[],
+	    			'automarker':'1',
+	    			func:function(pointers){
+						var points = pointers||[],pmarkers = [];
+						$.each(points, function(i,v){
+							pmarkers.push({
+								content:v.content,
+								areacode:v.properties.areacode,
+								lat:v.position.lat,
+								lng:v.position.lng,
+							});
+						});
+	    				webcore.ajaxSubmit("{:gohdmanage('configmapqd/directadd',['hdid'=>$hdid])}",{provincecode:provincecode,citycode:citycode,markers:pmarkers}).then(function(json){
+			                if(json.code==0){
+			                    zamnotice.showTips('success','新增成功',2e3,function(){
+			                    	window.location.reload();
+			                    });
+			                }else{
+			                    zamnotice.showTips('error',json.msg);
+			                }
+			            }, function(json){
+			                zamnotice.showTips('error','网络差。操作失败');
+			            });
+	    			},
+	    		});
+	        },1e3);
+        });
+   	});
+    function initdata(params){
+    	var i = 0,ischina = params.ischina || '1',iscity = params.iscity || false,provincecode = params.provincecode || '', citycode = params.citycode || '',automarker = params.automarker || '2',code = iscity ? citycode : provincecode;
+    	markergeometries = params.markergeometries || [],func = params.func || false;
+    	if(iscity && provincecode=='460000'){
+    		district.getChildren({id:provincecode}).then((result) => {
+    			if (result && result.result) {
+					cityList = result.result[0];
+					if(cityList.length > 0){
+			        	$.each(cityList,function(i,v){
+			        		if(v.id==citycode){
+								polygons.updateGeometries(drawPolygon(
+									v.id,
+									v.polygon
+								));
+			        			return false;
+			        		}
+			        	});
+		        	}
+		        }
+	        	district.getChildren({id:code}).then((result) => {
+			        if (!result && !result.result) {
+			        	zamnotice.showTips('error','获取城市数据出错');
+			        	return false;
+			        }
+			        allresultList = result.result[0];
+			        var obj = {};
+			        allresultList.map((item, index) => {
+			        	obj[item.id] = item; 	
+						if(item.id != "-1" && item.polygon){
+							geometries.push.apply(geometries,drawPolygon(
+		                        item.id,
+		                        item.polygon,
+		                    ));
+						}
+						if(automarker=='1'){
+							markergeometries.push({ 
+				                "id": item.id + "_" + index,
+				                "position": item.location,
+				                "rank":0,
+				                "properties":{
+				                	'areacode':item.id,
+				                },
+				                "content":item.fullname,
+				                "styleId": "marker",
+				            });
+						}
+						i++;
+						if(i >= allresultList.length){
+		                	if(!iscity && citycode!=''){
+							}else{
+				                setTimeout(function(){
+				                    markers = new TMap.MultiMarker({
+				                        map: map,
+				                        styles: {
+				                            "marker": new TMap.MarkerStyle({
+				                                "width": 25,
+				                                "height": 35,
+				                                "anchor": { x: 16, y: 32 },
+				                                "offset":{x:0,y:3},
+				                                "direction":'bottom',
+				                                "color":'#fff',
+				                                "size":12
+				                            }),
+				                            "highlight": new TMap.MarkerStyle({
+				                                "width": 25,
+				                                "height": 35,
+				                                "anchor": { x: 16, y: 32 },
+				                                "src": "https://mapapi.qq.com/web/lbs/javascriptGL/demo/img/marker-pink.png",
+				                                "direction":'bottom'
+				                            })
+				                        },
+				                        enableCollision:false,
+				                        geometries: markergeometries
+				                    });
+			                        var editor = new TMap.tools.GeometryEditor({
+			                            map,
+			                            overlayList: [{
+			                              overlay: markers,
+			                              id: "marker",
+			                              selectedStyleId: "highlight"
+			                            }],
+			                            actionMode: TMap.tools.constants.EDITOR_ACTION.INTERACT,
+			                            activeOverlayId: "marker",
+			                            selectable: true,
+			                        });
+			                        editor.on('adjust_complete',function(e){
+			                        	if(e){
+			                        		webcore.ajaxSubmit("{:gohdmanage('configmapqd/savedistrictlatlng',['hdid'=>$hdid])}",{did:e.id,lat:e.position.lat,lng:e.position.lng});
+			                        	}
+			                            editor.select([]);
+			                        });
+				                },5e2);
+				            }
+				            if(geometries.length > 0){
+	                            polygons.updateGeometries(geometries);
+	                        }
+				            if(bounds.length > 0){
+				                bounds = bounds.reduce((a, b) => {
+				                    return fitBounds([
+				                      a.getNorthEast(),
+				                      a.getSouthWest(),
+				                      b.getNorthEast(),
+				                      b.getSouthWest(),
+				                    ]);
+				                });
+				                setTimeout(function(){
+				                	map.fitBounds(bounds);
+				                },5e2);
+			            	}
+			            	layerBox.close(layindex);
+			            	func && func(markergeometries);
+			            }
+			        });
+					allareacodeList = obj;
+			    });
+	        });
+    	}else{
+			district.getChildren({id:code}).then((result) => {
+		        if (!result && !result.result) {
+		        	zamnotice.showTips('error','获取城市数据出错');
+		        	return false;
+		        }
+		        //绘制省或者市外边界
+		        allresultList = result.result[0];
+		        var obj = {};
+		        allresultList.map((item, index) => {
+		        	obj[item.id] = item; 	
+					//海南三沙市
+					if(item.id != "-1" && item.polygon){
+						geometries.push.apply(geometries,drawPolygon(
+	                        item.id,
+	                        item.polygon,
+	                    ));
+					}
+					if(automarker=='1'){
+						markergeometries.push({ 
+			                "id": item.id + "_" + index,
+			                "position": item.location,
+			                "rank":0,
+			                "properties":{
+			                	'areacode':item.id,
+			                },
+			                "content":item.fullname,
+			                "styleId": "marker",
+			            });
+					}
+					i++;
+					if(i == allresultList.length){
+	                	if(!iscity && citycode!=''){
+						}else{
+			                setTimeout(function(){
+			                    markers = new TMap.MultiMarker({
+			                        map: map,
+			                        styles: {
+			                            "marker": new TMap.MarkerStyle({
+			                                "width": 25,
+			                                "height": 35,
+			                                "anchor": { x: 16, y: 32 },
+			                                "offset":{x:0,y:3},
+			                                "direction":'bottom',
+			                                "color":'#fff',
+			                                "size":12
+			                            }),
+			                            "highlight": new TMap.MarkerStyle({
+			                                "width": 25,
+			                                "height": 35,
+			                                "anchor": { x: 16, y: 32 },
+			                                "src": "https://mapapi.qq.com/web/lbs/javascriptGL/demo/img/marker-pink.png",
+			                                "direction":'bottom'
+			                            })
+			                        },
+			                        enableCollision:false,
+			                        geometries: markergeometries
+			                    });
+		                        var editor = new TMap.tools.GeometryEditor({
+		                            map,
+		                            overlayList: [{
+		                              overlay: markers,
+		                              id: "marker",
+		                              selectedStyleId: "highlight"
+		                            }],
+		                            actionMode: TMap.tools.constants.EDITOR_ACTION.INTERACT,
+		                            activeOverlayId: "marker",
+		                            selectable: true,
+		                        });
+		                        editor.on('adjust_complete',function(e){
+		                        	if(e){
+		                        		webcore.ajaxSubmit("{:gohdmanage('configmapqd/savedistrictlatlng',['hdid'=>$hdid])}",{did:e.id,lat:e.position.lat,lng:e.position.lng});
+		                        	}
+		                            editor.select([]);
+		                        });
+			                },5e2);
+			            }
+			            if(bounds.length > 0){
+			                bounds = bounds.reduce((a, b) => {
+			                    return fitBounds([
+			                      a.getNorthEast(),
+			                      a.getSouthWest(),
+			                      b.getNorthEast(),
+			                      b.getSouthWest(),
+			                    ]);
+			                });
+			                setTimeout(function(){
+			                	map.fitBounds(bounds);
+			                },5e2);
+		            	}
+		            	if(geometries.length > 0){
+                            polygons.updateGeometries(geometries);
+                        }
+		            	layerBox.close(layindex);
+		            	func && func(markergeometries);
+		            }
+		        });
+				allareacodeList = obj;
+		    });
+	    }
+    }
+    function drawPolygon(placeId, polygonArray) {
+      var newGeometries = polygonArray.map((polygon, index) => {
+        bounds.push(fitBounds(polygon));
+        return {
+          id: `${placeId}` + index,
+          paths: polygon,
+          styleId: 'polygon',
+        };
+      });
+      return newGeometries;
+    }
+    function fitBounds(latLngList) {
+      if (latLngList.length === 0) {
+        return null;
+      }
+      var boundsN = latLngList[0].getLat();
+      var boundsS = boundsN;
+      var boundsW = latLngList[0].getLng();
+      var boundsE = boundsW;
+      latLngList.forEach((point) => {
+        point.getLat() > boundsN && (boundsN = point.getLat());
+        point.getLat() < boundsS && (boundsS = point.getLat());
+        point.getLng() > boundsE && (boundsE = point.getLng());
+        point.getLng() < boundsW && (boundsW = point.getLng());
+      });
+      return new TMap.LatLngBounds(
+        new TMap.LatLng(boundsS, boundsW),
+        new TMap.LatLng(boundsN, boundsE)
+      );
+    }
+});
+</script>
+<script id='province-tpl' type="text/template">
+<option value="<% d.id %>"> <% d.name %> </option>
+</script>
+<script id='addmarker-tpl' type="text/template">
+<div class="form-horizontal">
+	<div class="form-group">
+		<label class="col-lg-3 control-label">* 排序序号</label>
+		<div class="col-lg-8">
+			<input class="form-control displayorder" type="text"  name="displayorder" placeholder="请输入排序序号" value="<% d.displayorder %>">
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-lg-3 control-label">* 标注点颜色</label>
+		<div class="col-lg-8">
+			<input type="hidden"  class="js-colorpicker pointercolor"  name="pointercolor" value="<% d.pointercolor %>" />
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-lg-3 control-label">* 选择地区</label>
+		<div class="col-lg-8">
+			<select id="areacode" class="form-control">
+				<%# $.each(d.arealist, function(index, item){ %>
+					<option value="<% item.id %>" <%# if(d.areacode && d.areacode==item.id){ %>selected<%# } %> > <% item.fullname %> </option>
+				<%# }) %>
+			</select>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-lg-3 control-label">* 标注点名称</label>
+		<div class="col-lg-8">
+			<input class="form-control areatitle" type="text"  name="areatitle" placeholder="请输入标注点名称" value="<% d.areatitle %>">
+		</div>
+	</div>
+	<div class="form-group">
+        <label class="col-lg-3 control-label text-right">* 标注点名称文字大小</label>
+        <div class="col-lg-5">
+                <input type="text" class="form-control numberincdec titlesize" name="titlesize" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="100"
+                data-bts-step="1"
+                data-bts-postfix="px"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="<% d.titlesize %>">
+        </div>
+    </div>
+	<div class="form-group">
+		<label class="col-lg-3 control-label">* 标注点名称颜色</label>
+		<div class="col-lg-8">
+			<input type="hidden"  class="js-colorpicker titlecolor"  name="titlecolor" value="<% d.titlecolor %>" />
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-lg-3 control-label">* 标注点签到人数颜色</label>
+		<div class="col-lg-8">
+			<input type="hidden"  class="js-colorpicker numcolor"  name="numcolor" value="<% d.numcolor %>" />
+		</div>
+	</div>
+</div>
+</script>
+{include file='$Wpath/common/footer'}

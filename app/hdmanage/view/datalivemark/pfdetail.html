@@ -1,0 +1,145 @@
+<div class="zam-inline-searchbar searchplan">
+	<div class="input-group zam-flex col-md-7">
+		<select class="form-control">
+			 <option value="1">专业评委</option>
+			 <option value="2">大众评委</option>
+		</select>
+		<input type="text" class="form-control" id="keyword" placeholder="请输入评委名或者大众评委微信名">
+		<span class="input-group-btn">
+			<button onclick="plansearch(this)" class="btn btn-primary btn-search"><i class="mdi mdi-magnify"></i> 搜索</button>
+		</span>
+	</div>
+</div>
+<table class="table" style="margin-bottom:0px;">
+<thead>
+  <tr>
+  	<th style="width:20%;text-align:center;">评委类型</th>
+	<th style="width:20%;text-align:center;">评委</th>
+	<th style="width:20%;text-align:center;">分数</th>
+	<th style="width:20%;text-align:center;">签名</th>
+	<th style="width:20%;text-align:center;">操作</th>
+  </tr>
+</thead>
+<tbody class="pf-lists"></tbody>
+</table>
+<div class="pf-pager" style="padding:10px;text-align: center;"></div>
+<script id="detailpf-tpl" type="text/template">
+	<tr>
+		<td class="text-center">
+			<%# if(d.pwtype=='1'){ %><span class="label label-primary">专业评委</span><%# }else{ %><span class="label label-success">大众评委</span><%# } %>
+		</td>
+		<td class="text-center">
+			<div><img src="<% d.pwimg %>" width="60px"></div>
+			<div><% d.pwname %></div>
+		</td>
+		<td class="text-center">
+			总分:<% d.totalscore %>分
+			<%# if(d.detail!=''){ %>
+				<br>打分明细:<br><% d.detail %>
+			<%# } %>
+		</td>
+		<td class="text-center">
+			<%# if(d.pfsignimg!=''){ %>
+				<div><img src="<% d.pfsignimg %>" width="60px"></div>
+			<%# }else{ %>
+				-
+			<%# } %>
+		</td>
+		<td class="text-center">
+			<a class="btn btn-danger btn-xs btn-del" data-recordid="<% d.id %>" title="删除" onclick="delpfrecord(this)"><i class="mdi mdi-close"></i></a>
+		</td>
+	</tr>
+</script>
+<script>
+var pfitems = {if $rotate['pftype'] == '2'}{:json_encode($rotate['pfitem'])}{else/}[]{/if};
+function ajaxpflist(page,obj){ 
+	require(["zamnotice","webcore"],function(zamnotice,webcore){
+		webcore.ajaxSubmit("{:gohdmanage('datalivemark/pfdetail',['hdid'=>$hdid])}",{ajaxtype:'2',rotateid:"{$rotateid}",pfuserid:"{$pfuserid}",page:page,pwname:$(".searchplan input").val(),pwtype:$(".searchplan select").find("option:selected").val()},'正在加载..').then(function(json){
+			if(json.code==0){
+				rushhtml(json);
+			}else{
+				zamnotice.showTips('error',json.msg);
+			}
+		}, function(json){
+			zamnotice.showTips('error','网络差。操作失败');
+		});
+	});
+}
+function initpflist(){
+	require(["zamnotice","webcore"],function(zamnotice,webcore){
+		webcore.ajaxSubmit("{:gohdmanage('datalivemark/pfdetail',['hdid'=>$hdid])}",{ajaxtype:'2',rotateid:"{$rotateid}",pfuserid:"{$pfuserid}",pwname:$(".searchplan input").val(),pwtype:$(".searchplan select").find("option:selected").val()},'正在加载..').then(function(json){
+			var html = '';
+			if(json.code==0){
+				rushhtml(json);
+			}else{
+				zamnotice.showTips('error',json.msg);
+			}
+		}, function(json){
+			zamnotice.showTips('error','网络差。操作失败');
+		});
+	});
+}
+function plansearch(obj){ 
+	require(["zamnotice","webcore"],function(zamnotice,webcore){
+		webcore.ajaxSubmit("{:gohdmanage('datalivemark/pfdetail',['hdid'=>$hdid])}",{ajaxtype:'2',rotateid:"{$rotateid}",pfuserid:"{$pfuserid}",pwname:$(obj).parent().prev().val(),pwtype:$(".searchplan select").find("option:selected").val()},'正在加载..').then(function(json){
+			var html = '';
+			if(json.code==0){
+				rushhtml(json);
+			}else{
+				zamnotice.showTips('error',json.msg);
+			}
+		}, function(json){
+			zamnotice.showTips('error','网络差。操作失败');
+		});
+	});
+}
+function rushhtml(json){
+	require(["webcore"],function(webcore){
+		var html = '';
+		var detaildata = json.msg.item;
+		$.each(detaildata,function(i,v){
+			v.detail = '';
+			if(pfitems.length){
+				$.each(v.scoredetail,function(k,item){
+					var dfname = findfieldname(item.field);
+					if(dfname!='') v.detail += '<div><span class="text-danger">'+dfname+'</span> : '+item.score+'分</div>';
+				})
+			}
+			
+			html += webcore.tpl($("#detailpf-tpl"),v);
+		});
+		$(".pf-lists").html(html);
+		$(".pf-pager").html(json.msg.pager);
+	});
+}
+function findfieldname(key){
+	key = key || "";
+	var dfname = "";
+	$.each(pfitems,function(k,item){
+		if(item.dffield==key){
+			dfname = item.dfname;
+			return false;
+		}
+	})
+	return dfname;
+}
+function delpfrecord(obj){
+	var pfrecordid = $(obj).attr('data-recordid');
+	require(["webcore","zamnotice","jconfirmBox"],function(webcore,zamnotice,jconfirmBox){
+		jconfirmBox.confirm('温馨提示','您确定要删除该条评分记录么？',function(){
+			webcore.ajaxSubmit("{:gohdmanage('datalivemark/delonerecord',['hdid'=>$hdid])}",{rotateid:"{$rotateid}",pfuserid:"{$pfuserid}",pfrecordid:pfrecordid},'正在加载..').then(function(json){
+				if(json.code==0){
+					zamnotice.showTips('success','删除成功');
+					ajaxpflist(1);
+				}else{
+					zamnotice.showTips('error',json.msg);
+				}
+			}, function(json){
+				zamnotice.showTips('error','网络差。操作失败');
+			});
+		});
+	});
+
+}
+initpflist();
+</script>

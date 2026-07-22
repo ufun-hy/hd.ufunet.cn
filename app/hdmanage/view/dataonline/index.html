@@ -1,0 +1,385 @@
+{include file='$Wpath/common/header'}
+{if $ispub == '2'}
+<div class="alert alert-danger">
+	当前活动还未发布，暂不统计活动历史人数以及在线人数
+</div>
+{else /}
+	{if $hdmode == '2'}
+		<div class="alert alert-danger">
+			免费活动暂不统计活动历史人数以及在线人数
+		</div>
+	{else /}
+		<style>
+			.panel-heading{border-bottom: 1px solid #ddd}
+		</style>
+		{if $showlivedata == '1'}
+		<div class="panel">
+			<div class="panel-heading">直播数据概览</div>
+			<div class="panel-body">
+				<div class="row">
+					<div class="col-sm-6 col-lg-3">
+					<div class="card bg-primary">
+						<div class="card-body clearfix">
+						<div class="pull-right">
+							<p class="h6 text-white m-t-0 fa-1-5x">活动总用户数</p>
+							<p class="h3 text-white m-b-0 fa-1x">{$livedata['usercount']??0}<span class="m-l-5">人</span></p>
+						</div>
+						<div class="pull-left"> <span class="img-avatar img-avatar-48"><i class="mdi mdi-account-multiple fa-1-5x"></i></span> </div>
+						</div>
+					</div>
+					</div>
+					<div class="col-sm-6 col-lg-3">
+					<div class="card bg-danger">
+						<div class="card-body clearfix">
+						<div class="pull-right">
+							<p class="h6 text-white m-t-0 fa-1-5x">观看直播总人数</p>
+							<p class="h3 text-white m-b-0 fa-1x">{$livedata['viewusers']['count']??0}<span class="m-l-5">人</span></p>
+						</div>
+						<div class="pull-left"> <span class="img-avatar img-avatar-48"><i class="mdi mdi-account fa-1-5x"></i></span> </div>
+						</div>
+					</div>
+					</div>
+					<div class="col-sm-6 col-lg-3">
+					<div class="card bg-success">
+						<div class="card-body clearfix">
+						<div class="pull-right">
+							<p class="h6 text-white m-t-0 fa-1-5x">观看直播总时长</p>
+							<p class="h3 text-white m-b-0 fa-1x">{:second2hms($livedata['viewusers']['seconds']??0)}</p>
+						</div>
+						<div class="pull-left"> <span class="img-avatar img-avatar-48"><i class="mdi mdi-timer fa-1-5x"></i></span> </div>
+						</div>
+					</div>
+					</div>
+					<div class="col-sm-6 col-lg-3">
+					<div class="card bg-purple">
+						<div class="card-body clearfix">
+						<div class="pull-right">
+							<p class="h6 text-white m-t-0 fa-1-5x">观看直播平均时长</p>
+							<p class="h3 text-white m-b-0 fa-1x">{if $livedata['viewusers']['seconds'] > 0  && $livedata['viewusers']['count'] > 0}{:second2hms($livedata['viewusers']['seconds'] / $livedata['viewusers']['count'])}{else /}0小时0分钟0秒{/if}</p>
+						</div>
+						<div class="pull-left"> <span class="img-avatar img-avatar-48"><i class="mdi mdi-timetable fa-1-5x"></i></span> </div>
+						</div>
+					</div>
+					</div>
+				</div>
+			</div>
+			<div class="panel-footer p-15" style="background: none;">
+				<div class="pc">PC直播观看人数：<span>{$livedata['viewdatas']['pc']['count']}人</span>，总时长：<span>{:second2hms($livedata['viewdatas']['pc']['seconds'])}</span>，平均时长：<span>{:second2hms($livedata['viewdatas']['pc']['pj'])}</span></div>
+				<div class="pcback m-t-10">PC回放观看人数：<span>{$livedata['viewdatas']['pcback']['count']}人</span>，总时长：<span>{:second2hms($livedata['viewdatas']['pcback']['seconds'])}</span>，平均时长：<span>{:second2hms($livedata['viewdatas']['pcback']['pj'])}</span></div>
+				<div class="wechat m-t-10">微信直播观看人数：<span>{$livedata['viewdatas']['wechat']['count']}人</span>，总时长：<span>{:second2hms($livedata['viewdatas']['wechat']['seconds'])}</span>，平均时长：<span>{:second2hms($livedata['viewdatas']['wechat']['pj'])}</span></div>
+				<div class="wechatback m-t-10">微信回放观看人数：<span>{$livedata['viewdatas']['wechatback']['count']}人</span>，总时长：<span>{:second2hms($livedata['viewdatas']['wechatback']['seconds'])}</span>，平均时长：<span>{:second2hms($livedata['viewdatas']['wechatback']['pj'])}</span></div>
+			</div>
+		</div>
+		<div class="panel">
+			<div class="panel-heading">直播观看地区列表</div>
+			<div class="panel-body">
+				<table class="table table-bordered">
+					<thead>
+					<tr>
+						<th style="width:50%" class="text-center">省/直辖市</th>
+						<th style="width:50%" class="text-center">人数</th>
+					</tr>
+					</thead>
+					<tbody class="viewarea-lists">
+						{if !empty($livedata['viewusers']['data'])}
+							{foreach $livedata['viewusers']['data'] as $dk=>$d}    
+							<tr>
+								<td class="text-center">
+									{$dk}
+								</td>
+								<td class="text-center">
+								{$d}人
+								</td>
+							</tr>
+							{/foreach}
+						{else /}
+							<tr>
+								<td colspan="2">
+									<div class="text-danger text-center">暂无地区观看数据</div>
+								</td>
+							</tr>
+						{/if}
+					</tbody>
+				</table>
+			</div>
+		</div>
+		{/if}
+		<div class="panel">
+			<div class="panel-heading">人数走势</div>
+			<div class="panel-body">
+				<div class="col-lg-12">
+					<div class="btn-groups pull-right daysbox">
+						<a class="btn btn-default btn-xs" data-day='1'>昨天</a>
+						<a class="btn btn-default btn-xs btn-primary" data-day='0'>今天</a>
+						<a class="btn btn-default btn-xs" data-day='7'>最近7天</a>
+						<a class="btn btn-default btn-xs" data-day='30'>最近30天</a>
+						<a class="btn btn-default btn-xs" data-day='diy'>自定义日期</a>
+					</div>
+				</div>
+				<div class="col-lg-12 seltimebox hidden">
+					<div class="pull-right m-t-15" style="width: 300px;">
+					{:tpl_daterangetime([
+						'name'=>'startendtime',
+						'autoval'=>'1',
+						'needsfm'=>'1',
+						'needsdd'=>'1',
+						'val'=>[
+							'start'=>time() - 24 * 3600,
+							'end'=>time()
+						],
+						'neededit'=>'1',
+					])}
+					</div>
+				</div>
+				<div id="hdpersondirection" style="width:100%; height:500px;margin-top:90px;"></div>
+			</div>
+		</div>
+		<script type="text/javascript">
+			require(['webcore','zamnotice','echarts'],function(webcore,zamnotice,echarts){
+				initdata(0);
+				$(".daysbox .btn").click(function(){
+					var day = $(this).attr('data-day');
+					$(this).addClass('btn-primary').siblings().removeClass('btn-primary');
+					if(day!='diy'){
+						initdata(day,'day');
+						$(".seltimebox").addClass('hidden');
+					}else{
+						$(".seltimebox").removeClass('hidden');
+						initdata(0,'day');
+					}
+				});
+				$('input[name="startendtime"]').on('apply.daterangepicker', function(ev, picker) {
+					var start = picker.startDate.format('YYYY/MM/DD hh:mm:ss'),end = picker.endDate.format('YYYY/MM/DD hh:mm:ss');
+					var starttime = (new Date(start).getTime()) / 1000,endtime = (new Date(end).getTime()) / 1000;
+					if(endtime - starttime > 30 * 24 * 60 * 60){
+						return zamnotice.showTips('error','日期时间范围不可超出30天，请重新选择日期');
+					}
+					initdata({start:start,end:end},'date');
+				});
+				function get_date(day) {
+				var now = Math.floor((new Date().getTime()) / 1000);
+				var b = 0;
+				var e = now;
+				if (day == 0) {
+					b = (new Date(get_today() + " 00:00:00").getTime()) / 1000;
+				} else if (day == 1) {
+					b = (new Date(get_before_date(day) + " 00:00:00").getTime()) / 1000;
+					e = (new Date(get_before_date(day) + " 23:59:59").getTime()) / 1000;
+				} else {
+					b = (new Date(get_before_date(day - 1) + " 00:00:00").getTime()) / 1000;
+				}
+				b = Math.floor(b);
+				e = Math.floor(e);
+				return {
+					start: b,
+					end: e
+				}
+				}
+				/*获得当天日期*/
+				function get_today() {
+				var mydate = new Date();
+				return format_data(mydate.getTime() / 1000, 'yyyy/MM/dd');
+				}
+				/*获得昨天日期*/
+				function get_before_date(day) {
+				var now = new Date(get_today());//当前日期
+				var now_time = now.getTime();//当前时间 微秒
+				var before_days_time = (now_time - (day * 24 * 3600 * 1000)) / 1000;//当前时间减去 传入的天数 * 24小时 得到1天或者多天前的当前时间
+				return format_data(before_days_time, 'yyyy/MM/dd');
+				}
+				function initdata(day,type){
+					type = type || 'day';
+					if(type=='day'){
+						var data = get_date(day),start = data.start,end = data.end;
+					}else{
+						var start = day.start,end = day.end;
+					}
+					var myChartperson = echarts.init(document.getElementById('hdpersondirection'));
+					myChartperson.showLoading();
+					webcore.ajaxSubmit("{:gohdmanage('dataonline/index',['hdid'=>$hdid])}",{start:start,end:end}).then(function(json){
+						myChartperson.hideLoading();
+						set_data(json, start, end);
+						var yData = [],zData = [];
+						if (json.length > 0) {
+						for (var i = 0; i < json.length; i++) {
+							yData.push([json[i].create_time, json[i].onlinenum]);
+							zData.push([json[i].create_time, json[i].maxnum]);
+						}
+						var startTime = json[0].create_time / 1000;
+						var endTime = json[json.length - 1].create_time / 1000;
+						var option = init_echarts_option(startTime, endTime, yData,zData);
+						myChartperson.setOption(option);
+						window.addEventListener("resize", function () {
+							myChartperson.resize();
+						});
+						}
+					});
+				}
+				function format_data(tm, format) {
+					if (format == undefined) format = "yyyy/MM/dd hh:mm:ss";
+					tm = tm.toString();
+					if (tm.length > 10) {
+					tm = tm.substring(0, 10);
+					}
+					var data = new Date(parseInt(tm) * 1000);
+					var o = {
+					"M+": data.getMonth() + 1, //month
+					"d+": data.getDate(), //day
+					"h+": data.getHours(), //hour
+					"m+": data.getMinutes(), //minute
+					"s+": data.getSeconds(), //second
+					"q+": Math.floor((data.getMonth() + 3) / 3), //quarter
+					"S": data.getMilliseconds() //millisecond
+					}
+					if (/(y+)/.test(format)) format = format.replace(RegExp.$1,
+						(data.getFullYear() + "").substr(4 - RegExp.$1.length));
+					for (var k in o)
+					if (new RegExp("(" + k + ")").test(format))
+						format = format.replace(RegExp.$1,
+							RegExp.$1.length == 1 ? o[k] : ("00" + o[k]).substr(("" + o[k]).length));
+					return format;
+				}
+				function set_data(data, startTime, endTime) {
+					if (data.length <= 0) return;
+					var time;
+					for (var i = 0; i < data.length; i++) {
+						if (typeof data[i].create_time === "number") continue;
+						time = get_time(data[i].create_time, data[data.length - 1].create_time);
+						data[i].create_time = time;
+					}
+				}
+				function get_time(date, endDate) {
+					var endYear = endDate.split(' ')[0].split('-');
+					endYear = parseInt(endYear);
+					var today = new Date();
+					var str = date.split(' ');
+					var dateStr = str[0].split('-');
+					var timeStr = str[1].split(':');
+					var nowyear = parseInt(dateStr[0]);
+					var month = parseInt(dateStr[1]);
+					if (nowyear > endYear) {
+						nowyear -= 1;
+					}
+					var newDate = new Date(nowyear, month - 1, dateStr[2], timeStr[0], timeStr[1]);
+					return newDate.getTime();
+				}
+				/**
+				* 初始化图标配置
+				*/
+				function init_echarts_option(startTime, endTime, yData,zData) {
+					var option = get_default_option(startTime, endTime);
+					option.tooltip.formatter = function (config) {
+						var data = config[0];
+						var time = data.data[0];
+						var date = format_data(time / 1000);
+						var unit = '人';
+						var tips = '';
+						for (var i = 0; i < config.length; i++) {
+						tips += '<span style="display: inline-block;width: 10px;height: 10px;margin-rigth:10px;border-radius: 50%;background: ' + config[i].color + ';"></span> ' + config[i].seriesName + '：' + config[i].data[1] + unit + (config.length - 1 !== i ? '<br />' : '');
+						}
+						return "时间：" + date + "<br />" + tips;
+					};
+					option.yAxis.name = '人数走势';
+					option.yAxis.min = 0;
+					option.series = [
+						{
+						name: '在线总人数',
+						type: 'line',
+						symbol: 'none',
+						itemStyle: {
+							normal: {
+							color: 'rgb(255, 140, 0)'
+							}
+						},
+						data: yData
+						},
+						{
+						name: '活动总人数',
+						type: 'line',
+						symbol: 'none',
+						itemStyle: {
+							normal: {
+							color: 'rgb(30, 144, 255)'
+							}
+						},
+						data: zData
+						}
+					];
+					option.legend = {
+						top: '18px',
+						data: ['在线总人数', '活动总人数']
+					};
+					return option;
+				}
+				/*默认配置*/
+				function get_default_option(startTime, endTime) {
+					var interval = ((endTime - startTime) / 3) * 1000;
+					return {
+						tooltip: {
+						trigger: 'axis',
+						axisPointer: {
+							type: 'cross'
+						}
+						},
+						grid: {
+						bottom: 80
+						},
+						xAxis: {
+						type: 'time',
+						//boundaryGap: ['1%', '0%'],
+						minInterval: interval,
+						axisLine: {
+							lineStyle: {
+							color: "#666"
+							}
+						},
+						axisLabel: {
+							formatter: function (value) {
+							return format_data(value / 1000, 'yyyy/MM/dd\nhh:mm');
+							}
+						}
+						},
+						yAxis: {
+						type: 'value',
+						//boundaryGap: [0, '100%'],
+						minInterval: 1,
+						splitLine: {
+							lineStyle: {
+							color: "#ddd"
+							}
+						},
+						axisLine: {
+							lineStyle: {
+							color: "#666"
+							}
+						}
+						},
+						dataZoom: [
+						{
+							type: 'inside',
+							start: 0,
+							end: 100,
+							zoomLock: true
+						},
+						{
+							bottom: 10,
+							start: 0,
+							end: 100,
+							handleIcon: 'M10.7,11.9v-1.3H9.3v1.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4v1.3h1.3v-1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
+							handleSize: '80%',
+							handleStyle: {
+							color: '#fff',
+							shadowBlur: 3,
+							shadowColor: 'rgba(0, 0, 0, 0.6)',
+							shadowOffsetX: 2,
+							shadowOffsetY: 2
+							}
+						}
+						]
+					}
+				}
+			});
+		</script>
+	{/if}
+{/if}
+{include file='$Wpath/common/footer'}

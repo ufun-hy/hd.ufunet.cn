@@ -1,0 +1,610 @@
+<script>
+    var menumodules = {:json_encode($menumodules)},playerstatus = "{$appconfig['liveconfig']['status']}",dmconfig = {if !empty($appconfig['dmconfig'])}{:json_encode($appconfig['dmconfig'])}{else /}false{/if},showjoin = {if isset($appconfig['liveconfig']['showjoin']) && $appconfig['liveconfig']['showjoin']=='1'}'1'{else /}'2'{/if},djsstatus = "{$djs['status']}",backurltype = "{$appconfig['liveconfig']['backurl']['urltype']??'1'}";
+    var platformtype = "{$appconfig['liveconfig']['liveurl']['platform']??'0'}",thirdtype = "{$appconfig['liveconfig']['liveurl']['thirdtype']??'1'}",liveurl = '',webrtcurl = '',waitvideo = "{if isset($appconfig['liveconfig']['nostartvideo']) && !empty($appconfig['liveconfig']['nostartvideo'])}{:tomedia($appconfig['liveconfig']['nostartvideo'])}{else /}{/if}";
+    if(playerstatus=='2' || playerstatus=='4'){
+        if(playerstatus=='2'){
+            liveurl = "{:$appconfig['liveconfig']['liveurl']['m3u8']??''}";
+            webrtcurl = "{:$appconfig['liveconfig']['liveurl']['webrtc']??''}";
+            if(platformtype=='1'){
+                liveurl = "{:$appconfig['liveconfig']['liveurl']['txm3u8']??''}";
+                var txopenwebrtc = "{$appconfig['liveconfig']['liveurl']['txopenwebrtc']??2}";
+                if(txopenwebrtc=='1'){
+                    webrtcurl = "{:$appconfig['liveconfig']['liveurl']['txwebrtc']??''}";
+                }
+                thirdtype = '1';
+            }else if(platformtype=='2'){
+                liveurl = "{:$appconfig['liveconfig']['liveurl']['qinium3u8']??''}";
+                var qiniuopenwebrtc = "{$appconfig['liveconfig']['liveurl']['qiniuopenwebrtc']??2}";
+                if(qiniuopenwebrtc=='1'){
+                    webrtcurl = "{:$appconfig['liveconfig']['liveurl']['qiniuwebrtc']??''}";
+                }
+                thirdtype = '2';
+            }
+        }else{
+            liveurl = "{:$appconfig['liveconfig']['backurl']['m3u8']??''}";
+        }
+    }
+    if(XCV3Config.clienttype < 0){
+        var vh = $(window).width() * 9 / 16;
+        $(".video_wrap").css('height',vh+'px');
+        $(".main-live").css('height','calc(100% - '+vh+'px)');
+    }
+    require(['wechatcore','TcPlayer','appsocket','TXLivePlayer','hls','fulldm','swiper','qnrtplayer',(XCV3Config.clienttype=='2'?'DouyinOpenJSBridge':'template')],function (wechatcore,TcPlayer,appsocket,TXLivePlayer,Hls,fulldm,Swiper,QNRTPlayer,DouyinOpenJSBridge) {
+        $('.adv-lists').length && new Swiper('.adv-lists',{
+            watchOverflow: true,
+            observer: true,
+            observeParents: true,
+            autoplay: {
+                delay: parseInt("{$appconfig['bannerconfig']['pageseconds']??6}") * 1e3,
+                stopOnLastSlide: false,
+                disableOnInteraction: false,
+            },
+            pagination: {
+                el: $('.adv-lists .swiper-slide').length > 1 ? '.swiper-pagination' : null,
+                type:"{if $appconfig['bannerconfig']['pagetype']=='2'}bullets{elseif $appconfig['bannerconfig']['pagetype']=='3'}fraction{else /}custom{/if}",
+            },
+            lazy: {
+                loadPrevNext: true,
+            },
+            loop: $('.adv-lists .swiper-slide').length > 1 ? true : false,
+            on:{
+                click: function(event){
+                    let linkurl = event.target.dataset.url||'';
+                    if(linkurl){
+                        window.location.href = linkurl;
+                    }
+                },
+            },
+        })
+        window.Hls = Hls;
+        window.TXLivePlayer = TXLivePlayer;
+        window.DouyinOpenJSBridge = DouyinOpenJSBridge;
+        var viewtimer;
+        appsocket.init({
+            onmessage:function(data){
+                if(data.type=='connected'){
+                    appsocket.isclose = false;
+                    wechatcore.connectsocket({clientid:data.clientid});
+                }else if(data.type=='goto'){
+                    changePage(data.r,data.url);
+                }else if(data.type=='addblack'){
+                    data.userid==XCV3Config.userid&&wechatcore.closewxwindow();
+                }else if(data.type=='luckeruserids'){
+                    wechatcore.layerAsklucker(data);
+                }else if(data.type=='screendm'){
+                    if(dmconfig && dmconfig.opendm=='1') {
+                        var messages = data.messages;
+                        if(messages){
+                            if($.isArray(messages)&&messages.length>0){
+                                $.each(messages,function(i, val){
+                                    fulldm.addBullet(val);
+                                });
+                            }
+                        }else{
+                            fulldm.addBullet(data);
+                        }
+                    }
+                }else if(data.type=='screendeldm'){
+                    if(dmconfig && dmconfig.opendm=='1') {
+                        if(!$.isArray(data.msgid)){
+                            fulldm.delBullet(data.msgid);
+                        }else{
+                            $.each(data.msgid,function(index,val){
+                                fulldm.delBullet(val);
+                            });
+                        }
+                    }
+                }else if(data.type=='screenresetdm'){
+                    if(dmconfig && dmconfig.opendm=='1') fulldm.resetBullet();
+                }else if(data.type=='pushmenu'){
+                    changemenu(data.menus,data.modules);
+                }
+            }
+        });
+        if($('.marker').length == 0) $('.video_wrap').append(wechatcore.tpl($("#marker-tpl"),{}));
+        if(playerstatus == '2' || (playerstatus == '4' && backurltype == '1')){
+            if(thirdtype == '2' && webrtcurl != ''){
+                $("#videoLive").append(`
+                    <div class="qiniuvideobox">
+                        <div class="qiniucover zam-app-flex-ajCenter">
+                            <span class="mxc-videofill startplay"></span>
+                            <div class="vcp-loading"></div>
+                        </div>
+                    </div>
+                `);
+                var qnplayer = new QNRTPlayer.QNRTPlayer();
+                qnplayer.init({
+                    className: 'qn-rtplayer-media',
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'contain',
+                    volumn: 0.6,
+                    controls: false,
+                    playsinline: true,
+                });
+                $(".video_wrap").on('click','.qiniucover span',function(e){
+                    e.stopPropagation();
+                    $(this).hide();
+                    $(".qiniucover .vcp-loading").show();
+                    qnplayer.play(
+                        webrtcurl,
+                        $(".video_wrap")[0]
+                    ).then(function(){
+                        $(".qiniuvideobox").addClass('hidden');
+                        qnplayer.mediaElement.setAttribute("controls", "true");
+                        qnplayer.mediaElement.setAttribute("x5-video-player-type", "h5-page")
+                        qnplayer.mediaElement.setAttribute("x5-video-player-fullscreen", "true")
+                    }, function(err){
+                    });
+                   
+                });
+                qnplayer.on('playerStateChanged',function(state){
+                    if(state=='3'){
+                        startliveseconds();
+                    }else if(state > 3){
+                        stopliveseconds();
+                    }
+                });
+                qnplayer.on('error', function(data){
+                    $(".qiniucover .vcp-loading").hide();
+                    $(".qiniucover span").show();
+                    $('.qiniuvideobox').removeClass('hidden');
+                    stopliveseconds();
+                });
+            }else{
+                var TcPlayerparams =  {
+                    "poster" : {"style": "stretch", "src":"{:tomedia($appconfig['liveconfig']['poster'])}"},
+                    "live":(playerstatus == '2'?true:false),
+                    "autoplay" :false,
+                    listener:function(msg){
+                        if(msg.type == 'load') {
+                            if($('.fulldmBox').length==0) $('.vcp-player').append(wechatcore.tpl($("#fulldmbox-tpl"),{}));
+                            if($(".bigicon").length==0){
+                                var _div = document.createElement('div');
+                                _div.className = 'bigicon';
+                                document.querySelector('.vcp-bigplay').appendChild(_div);
+                            } 
+                            if(dmconfig && dmconfig.opendm=='1' && $(".vcp-dm-toggle").length==0){
+                                $(".vcp-fullscreen-toggle").after('<div class="vcp-dm-toggle zam-app-flex-ajCenter2 hidden"><i class="mxc-subtitle_block_light"></i></div>');
+                                fulldm.init($(".fulldmBox"),dmconfig);
+                                fulldm.stop();
+                            }
+                            if($('.marker').length > 0){
+                                $(".marker").remove();
+                                $(".vcp-controls-panel").append(wechatcore.tpl($("#marker-tpl"),{}));
+                            }
+                        }else if(msg.type == 'error'){
+                            stopliveseconds();
+                            $(".vcp-bigplay").css("opacity",'0');
+                            if(playerstatus=='2'){
+                                $(".vcp-error-tips").text("{$appconfig['liveconfig']['liveurl']['errortxt']}");
+                            }else{
+                                $(".vcp-error-tips").text("{$appconfig['liveconfig']['backurl']['errortxt']}");
+                            }
+                            // $(".vcp-loading").show();
+                            // window.setTimeout(function(){
+                            //     player.load();
+                            // },5000);
+                        }else if(msg.type=='fullscreen'){
+                            if(dmconfig && dmconfig.opendm=='1' && wechatcore.device(1)){
+                                if(msg.detail.isFullscreen){
+                                    $('.fulldmBox').height($(window).height());
+                                    fulldm.dmmanager!=null && fulldm.dmmanager.resize();
+                                }else{
+                                    $('.fulldmBox').height($('video').height());
+                                    fulldm.dmmanager!=null && fulldm.dmmanager.resize();
+                                }
+                            }
+                        }else if(msg.type=='playing'){
+                            $(".vcp-loading").hide();
+                            $(".vcp-bigplay").css("opacity",'0');
+                            if(dmconfig && dmconfig.opendm=='1'){
+                                $(".vcp-dm-toggle").removeClass('hidden');
+                                fulldm.start();	
+                            }
+                            startliveseconds();
+                        }else if(msg.type=='pause'){
+                            $(".vcp-bigplay").css("opacity",'1');
+                            if(dmconfig && dmconfig.opendm=='1'){
+                                fulldm.stop();
+                            }
+                            stopliveseconds();
+                        }else if(msg.type=='ended'){
+                            stopliveseconds();
+                        }else if(msg.type=='waiting'){
+                            stopliveseconds();
+                        }
+                    },
+                    x5_player:true,
+                    x5_type:'h5-page',
+                    x5_fullscreen:true,
+                    x5_orientation:'landscape',
+                    systemFullscreen:true,
+                    pausePosterEnabled:true,
+                };
+                TcPlayerparams.m3u8 = liveurl;
+                if(playerstatus=='2' && webrtcurl!=''){
+                    TcPlayerparams.webrtc = webrtcurl;
+                }
+                var player = new TcPlayer.TcPlayer('videoLive',TcPlayerparams);
+            }
+        }else{
+            if(playerstatus=='1' && waitvideo!=''){
+                var TcPlayerparams =  {
+                    "poster" : {"style": "stretch", "src":"{:tomedia($appconfig['liveconfig']['poster'])}"},
+                    "live":(playerstatus=='2'?true:false),
+                    "autoplay" :false,
+                    listener:function(msg){
+                        if(msg.type == 'load') {
+                            if($('.fulldmBox').length==0) $('.vcp-player').append(wechatcore.tpl($("#fulldmbox-tpl"),{}));
+                            $(".vcp-player").addClass('hidden');
+                        }else if(msg.type == 'error'){
+                            $(".waitendbox").addClass('hidden');
+                            $(".vcp-player").removeClass('hidden');
+                        }else if(msg.type=='playing'){
+                            $(".waitendbox,.marker").addClass('hidden');
+                            $(".vcp-player").removeClass('hidden');
+                        }else if(msg.type=='pause'){
+                            $(".waitendbox,.marker").removeClass('hidden');
+                            $(".vcp-player").addClass('hidden');
+                        }
+                    },
+                    x5_player:true,
+                    x5_type:'h5-page',
+                    x5_fullscreen:true,
+                    x5_orientation:'landscape',
+                    m3u8:waitvideo
+                };
+                var player = new TcPlayer.TcPlayer('videoLive',TcPlayerparams);
+                $(".startplay").click(function(){
+                    $(".waitendbox").addClass('hidden');
+                    $(".vcp-player").removeClass('hidden');
+                    player.play();
+                });
+            }
+        }
+        if(playerstatus == '4' && backurltype=='2'){
+            var backiframeobj = $(".video_wrap iframe");
+            if(backiframeobj.length > 0){
+                backiframeobj.load(function(){
+                    startliveseconds();
+                });
+            }
+        }
+        function startliveseconds(){
+            clearInterval(viewtimer);
+            viewtimer = setInterval(function(){
+                if(playerstatus=='2' || playerstatus=='4'){
+                    wechatcore.ajaxSubmit('/wechat/wechatlive/ajaxviewtime',{iswechat:'1',type:(playerstatus=='2'?'1':'2')}).then(function(json){});
+                }
+            }, 3e3);
+        }
+        function stopliveseconds(){
+            window.clearInterval(viewtimer);
+        }
+        if($(".tab-nav li").length > 0){
+            $(".tab-nav").on('click','li a',function(){
+                var $this = $(this),$thisp = $this.parent(),mtype = $this.data('mtype'),mlink = $this.data('link'),loadingbox = $(".tab-content .loadingbox"),invitebox = $(".zam-app-invite-box"),yhbbox = $(".zam-app-invite-main"),nodatabox = $(".zam-app-nodata");
+                if(mtype=='1' || mtype=='3'){
+                    loadingbox.addClass('hidden');
+                    invitebox.addClass('hidden');
+                    $("#myframe").attr("src",mlink).removeClass('hidden');
+                    $thisp.addClass('tab-active').siblings().removeClass('tab-active');
+                }else{
+                    if(mtype=='4'){
+                        if(!$thisp.hasClass('tab-active')){
+                            $("#myframe").addClass('hidden');
+                            loadingbox.removeClass('hidden');
+                            $thisp.addClass('tab-active').siblings().removeClass('tab-active');
+                            wechatcore.ajaxSubmit('/wechat/wechatlive/ajaxqyb',{phbnum:$this.attr('data-phbnum')}).then(function(json){
+                                if(json.code==0){
+                                    var phb = json.msg;
+                                    if(phb.length > 0){
+                                        yhbbox.html(wechatcore.tpl($("#yqb-tpl"),{list:phb}));
+                                        nodatabox.addClass('hidden');
+                                        yhbbox.removeClass('hidden');
+                                    }else{
+                                        yhbbox.addClass('hidden');
+                                        nodatabox.removeClass('hidden');
+                                    }
+                                }else{
+                                    yhbbox.addClass('hidden');
+                                    nodatabox.removeClass('hidden');
+                                }
+                                loadingbox.addClass('hidden');
+                                invitebox.removeClass('hidden');
+                            },function(){
+                                loadingbox.addClass('hidden');
+                                yhbbox.addClass('hidden');
+                                nodatabox.removeClass('hidden');
+                                invitebox.removeClass('hidden');
+                            });
+                        }
+                    }else{
+                        window.location.href = mlink;
+                    }
+                }
+            });
+            $(".tab-nav li a").eq(0).click();
+            setTimeout(function(){
+                $(".tab-content .loadingbox").addClass('hidden');
+            },3e2);
+        }
+        var startX,startY,sX,sY,moveX,moveY;        
+        var winW = $(window).width();    
+        var winH = $(window).height();
+        $(".video_wrap").off('touchstart,touchmove').on({
+            touchstart:function(e){ 
+                 if($(this).hasClass('outpage')){
+                    startX = e.originalEvent.targetTouches[0].pageX;  
+                    startY = e.originalEvent.targetTouches[0].pageY;
+                    sX = $(this).offset().left;
+                    sY = $(this).offset().top;
+                    leftX = startX - sX;
+                    rightX = winW - $(this).width() + leftX;
+                    topY = startY-sY;
+                    bottomY = winH - $(this).height() + topY;
+                }
+            },
+            touchmove:function(e){
+                if($(this).hasClass('outpage')){
+                    e.preventDefault();
+                    moveX = e.originalEvent.targetTouches[0].pageX;
+                    moveY = e.originalEvent.targetTouches[0].pageY;
+                    if(moveX<leftX){moveX = leftX;}                                
+                    if(moveX>rightX){moveX = rightX;}
+                    if(moveY<topY){moveY = topY;}
+                    if(moveY>bottomY){moveY = bottomY;}
+                    $(this).css({"left":moveX+sX-startX,"top":moveY+sY-startY});
+                    //window.localStorage.setItem("videotop",moveY+sY-startY);
+                    //window.localStorage.setItem("videoleft",moveX+sX-startX);
+                }
+            },
+        });
+        if(showjoin=='1'){
+            setInterval(function(){
+                wechatcore.ajaxSubmit('/wechat/wechatlive/ajaxjoined',{}).then(function(json){
+                    if(json.code==0){
+                        $(".playjoined span").text(json.msg);
+                    }
+                });
+            },10e3);
+        }
+        $(function(){
+            //中奖消息订阅
+            if($("#subscribe-btn").length > 0){
+                var subbtn = document.getElementById('subscribe-btn');
+                subbtn.addEventListener('success', function (e) {
+                  if(e.detail.errMsg=='subscribe:ok'){
+                      var isreject = false,subdetails = $.parseJSON(e.detail.subscribeDetails);
+                      $.each(subdetails,function(i,v){
+                          if(v.indexOf('reject')!=-1){
+                              isreject = true;
+                          }
+                      });
+                      if(isreject){
+                          wechatcore.msg('取消订阅将无法收到中奖通知');
+                      }else{
+                          wechatcore.ajaxSubmit('/wechat/common/subnoticetpl',{type:'1',tplid:"{$subtplid}"}).then(function(data){
+                             if(data.code==0){
+                                wechatcore.msg('订阅成功');
+                                  $(".subbox").addClass('hidden');
+                                  setTimeout(function(){
+                                      $(".tab-nav .tab-active a").trigger('click');
+                                  },1e3);
+                             }else{
+                                wechatcore.msg(data.msg);
+                             }
+                        }, function(){
+                              wechatcore.msg('网络太差，请稍后重试');
+                        });
+                      }
+                  }
+                });   
+                subbtn.addEventListener('error',function (e) {             
+                  wechatcore.msg(wechatcore.subnoticeErrormsg(e.detail.errCode));
+                });
+            }
+               // 直播订阅
+               if($("#subscribe-livebtn").length > 0){
+                   var subbtn = document.getElementById('subscribe-livebtn');
+                subbtn.addEventListener('success', function (e) {
+                  if(e.detail.errMsg=='subscribe:ok'){
+                      var isreject = false,subdetails = $.parseJSON(e.detail.subscribeDetails);
+                      $.each(subdetails,function(i,v){
+                          if(v.indexOf('reject')!=-1){
+                              isreject = true;
+                          }
+                      });
+                      if(isreject){
+                          wechatcore.msg('取消订阅将无法收到直播开播通知');
+                      }else{
+                          wechatcore.ajaxSubmit('/wechat/common/subnoticetpl',{type:'2',tplid:"{$sublivetplid}"}).then(function(data){
+                             if(data.code==0){
+                                wechatcore.msg('订阅成功');
+                                  $(".sublivebox").addClass('hidden');
+                             }else{
+                                wechatcore.msg(data.msg);
+                             }
+                        }, function(){
+                              wechatcore.msg('网络太差，请稍后重试');
+                        });
+                      }
+                  }
+                });   
+                subbtn.addEventListener('error',function (e) {             
+                    wechatcore.msg(wechatcore.subnoticeErrormsg(e.detail.errCode));
+                });
+            }
+            document.getElementById('myframe').addEventListener('load', function(){
+                   var hassub = $("#myframe").contents().find("#subscribe-btn");
+                   if(hassub.length > 0){
+                       $(".subbox").removeClass('hidden');
+                   }else{
+                       $(".subbox").addClass('hidden');
+                   }
+               }, true);
+        });
+    })
+    window.addEventListener('message',function(e){
+        if(typeof(e.data.msg) != "undefined"){
+            {/*微信端点击子模块转跳*/}
+            if(typeof(e.data.msg.module) != "undefined" && e.data.msg.module!=''){
+                var dmodule = e.data.msg.module,$dataUrl = e.data.msg.url;
+                if(dmodule=='h5-touchimg'){
+                    if($dataUrl==''){
+                        $(".h5-touchimg").attr('src','');
+                        $(".h5-touchimg").css({display:'none',zIndex:'-1'});
+    
+                    }else{
+                        var iframe = document.getElementById("myframe");
+                        $(".h5-touchimg").attr('src',$dataUrl);
+                        $(".h5-touchimg").css({
+                            display:'block',
+                            top:(e.data.msg.top + iframe.getBoundingClientRect().y)+'px',
+                            left:(e.data.msg.left + iframe.getBoundingClientRect().x)+'px',
+                            width:e.data.msg.width+'px',
+                            height:e.data.msg.height+'px',
+                            zIndex:'10',
+                        });
+                    }
+                }else{
+                    if($dataUrl.indexOf('wechatlive')==-1){
+                        changePage(dmodule,$dataUrl);
+                    }else{
+                        $(".video_wrap").removeClass('outpage');
+                        $(".video_wrap .vcp-player,.video_wrap video").css({"width":$(".video_wrap").width(),"height":$(".video_wrap").height()});
+                        $(".tab-nav,.vcp-timelabel").removeClass('hidden');
+                        $(".main-live,.tab-content").removeClass('full');
+                        $(".tab-nav li").eq(0).find('a').trigger('click');
+                    }
+                }
+            }
+        }
+    });
+    function changePage(dmodule,url){
+        require(['fulldm'],function (fulldm) {
+            var isfind = false;
+            if(menumodules.length > 0){
+                $.each(menumodules,function(i,v){
+                    if(v.module==dmodule && v.status=='1'){
+                        if(!$(".video_wrap").hasClass('outpage') && $(".tab-nav li").eq(v.mkey).length > 0 && $(".tab-nav li").eq(v.mkey).hasClass('tab-active')){
+                            //var activeurl = $(".tab-nav li").eq(v.mkey).find('a').attr('data-link');
+                            //if(activeurl.indexOf(url) ==-1){
+                                $("#myframe").attr("src",url);
+                            //}
+                            isfind = true;
+                            return false;
+                        }
+                        $(".video_wrap").removeClass('outpage');
+                        $(".video_wrap .vcp-player,.video_wrap video").css({"width":$(".video_wrap").width(),"height":$(".video_wrap").height()});
+                        $(".tab-nav,.vcp-timelabel").removeClass('hidden');
+                        $(".main-live,.tab-content").removeClass('full');
+                        $(".tab-nav li").eq(v.mkey).find('a').trigger('click');
+                        isfind = true;
+                        if(dmconfig && dmconfig.opendm=='1'){
+                            fulldm.dmmanager!=null && fulldm.dmmanager.resize();
+                        }
+                        return false;
+                    }
+                });
+            }
+            if(isfind) return;
+            $(".video_wrap").addClass('outpage');
+            $(".video_wrap .vcp-player,.video_wrap video").css({"width":$(".video_wrap").width(),"height":$(".video_wrap").height()});
+            $(".tab-nav,.vcp-timelabel").addClass('hidden');
+            $(".main-live,.tab-content").addClass('full');
+            $("#myframe").attr("src",url);
+            if(dmconfig && dmconfig.opendm=='1'){
+                fulldm.dmmanager!=null && fulldm.dmmanager.resize();
+            }
+        });
+    }
+    function changemenu(newmenus,modules){
+        //切换菜单时获取当前已经激活的菜单
+        menumodules = modules;
+        var activemenu = $(".tab-nav li.tab-active");
+        var activeindex = '',activelink = '',activetype = '';
+        if(activemenu.length > 0){
+            activelink = activemenu.find('a').attr('data-link')||'';
+            activetype = activemenu.find('a').attr('data-mtype');
+            activephbnum = activemenu.find('a').attr('data-phbnum')||'';
+        }
+        var html = "";
+        $.each(newmenus,function(i,v){
+            var ishidden = '';
+            if(v.mstatus && v.mstatus=='2'){
+                ishidden += ' hidden';
+            }
+            if(!v.mstatus || v.mstatus=='1'){
+                if(activetype=='1'){
+                    //内链
+                    if(v.mtype=='1' && v.minurl==activelink){
+                        activeindex = i;
+                    }
+                }else if(activetype=='2'){
+                    if(v.mtype=='2' && v.mouturl==activelink){
+                        activeindex = i;
+                    }
+                }else if(activetype=='3'){
+                    if(v.mtype=='3' && v.arturl==activelink){
+                        activeindex = i;
+                    }
+                }else{
+                    if(v.mtype=='4' && v.phbnum==activephbnum){
+                        activeindex = i;
+                    }
+                }
+            }
+            var datalink = '';
+            if(v.mtype=='1'){
+                datalink += v.minurl;
+            }else if(v.mtype=='2'){
+                datalink += v.mouturl;
+            }else if(v.mtype=='3'){
+                datalink += v.arturl;
+            }
+            var phbnumtext = '';
+            if(v.mtype=='4'){
+                phbnumtext += 'data-phbnum='+v.phbnum||'20';
+            }
+            html +='<li class="tab-nav-item'+ishidden+'"><a href="javascript:void(0)" data-link="'+datalink+'" data-mtype="'+v.mtype+'" '+phbnumtext+'>'+v.mname+'</a></li>';
+        });
+        $(".tab-nav").html(html);
+        if(activeindex!=''){
+            $(".tab-nav li").eq(activeindex).addClass('tab-active');
+        }else{
+            $(".tab-nav li a").eq(0).click();
+        }
+    }
+    var remainSec;
+    if(djsstatus=='1'){
+        $(function(){
+            remainSec = parseInt("{$djs['remaintime']}");
+            timerun(remainSec);
+        })
+    }
+    function timerun(remainSec){
+        var t = setInterval(function(){
+            var day = 0,hour = 0,minute = 0,second = 0;		
+            if(remainSec > 0){
+                day = Math.floor(remainSec / (60 * 60 * 24));
+                hour = Math.floor(remainSec / (60 * 60)) - (day * 24);
+                minute = Math.floor(remainSec / 60) - (day * 24 * 60) - (hour * 60);
+                second = Math.floor(remainSec) - (day * 24 * 60 * 60) - (hour * 60 * 60) - (minute * 60);
+            }
+            if (minute <= 9) minute = '0' + minute;
+            if (second <= 9) second = '0' + second;
+            $('#timeremain-day').html(day+"天");
+            $('#timeremain-hour').html(hour+'时');
+            $('#timeremain-min').html(minute+'分');
+            $('#timeremain-sec').html(second+'秒');
+            remainSec--;
+            if(remainSec<0){
+                clearInterval(t);
+                window.location.reload();
+            }
+        }, 1e3);
+    }
+    
+    </script>

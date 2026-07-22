@@ -1,0 +1,204 @@
+{include file='$Wpath/common/header'}
+<div class="form-inline zam-inline-searchbar">
+    <div class="form-group">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">本地数据</span>
+        <input type="text" class="form-control" value="" id="keyword" name="username" placeholder="请输入本地数据相关信息">
+      </div>
+    </div>
+    <a class="btn btn-primary btn-sm btn-search" href="javascript:void(0)"><i class="mdi mdi-magnify"></i> 搜索</a>
+</div>
+{include file='$Wpath/common/tabletoolbar'}
+<table id="listtable" class="zam-btable"></table>
+<script>    
+require(['webcore','webtable','jconfirmBox','zamnotice','clipboard','layerBox','jcode'],function(webcore,webtable,jconfirmBox,zamnotice,Clipboard,layerBox){
+var initConfig = {
+    tableId:'#listtable',
+    url:"{:gohdmanage('configimportcj/datas',['hdid'=>$hdid])}",
+    columnoperate:{
+        btns:{
+            edit:true,
+            del:true,
+        },
+        func:{
+            edit:function(value, row, index){
+                var confirmObj = jconfirmBox.ajaxconfirm("编辑数据","{:gohdmanage('configimportcj/editdata',['hdid'=>$hdid])}",{ishtml:'1',dataid:row.id},'html','col-lg-10 col-lg-offset-1',function(e){
+                    var postData = webcore.serializeObject(e.find('form'));
+                    postData.dataid = row.id;
+                    webcore.ajaxSubmit("{:gohdmanage('configimportcj/editdata',['hdid'=>$hdid])}",postData).then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','保存成功');
+                            confirmObj.close();
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                            return false;
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                        return false;
+                    });
+                });
+            },
+            del:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','删除操作将删除当前数据与其中的中奖数据并且无法恢复，您确定要删除么？',function(){
+                        webcore.ajaxSubmit("{:gohdmanage('configimportcj/deldata',['hdid'=>$hdid])}",{dataid:row.id}).then(function(json){
+                            if(json.code==0){
+                                webtable.refresh();
+                                zamnotice.showTips('success','删除成功');
+                            }else{
+                                zamnotice.showTips('error',json.msg);
+                            }
+                        }, function(json){
+                            zamnotice.showTips('error','网络差。操作失败');
+                        });
+                });
+            },
+        }
+    },
+    columns:[{
+            checkbox: true,
+        }, 
+        {
+            field: 'id',
+            title: 'id',
+            align: 'center',
+            visible: false
+        },
+        {foreach $fieldconfig as $fkey=>$fval}
+        {
+            field: "datafield{$fkey+1}",
+            title: "{$fval['fieldname']}",
+            align: 'center',
+        },
+        {/foreach}
+        {
+            field: "groupname",
+            title: "数据分组",
+            align: 'center',
+            formatter: function(value, row, index){
+                var html = row.groupid!='0'?'<div><span class="label label-primary">'+value+'</span></div>':'-';
+                html += "<i class='mdi mdi-pencil m-l-5 cursor changegroupid' data-dataid="+row.id+" data-groupid="+row.groupid+"></i>";
+                return html;
+            },
+        }
+    ],
+    searchParamas:[{'type':'1','id':'keyword'}],
+    toolbar:{
+        add:function(){
+            var confirmObj = jconfirmBox.ajaxconfirm("新增数据","{:gohdmanage('configimportcj/editdata',['hdid'=>$hdid])}",{ishtml:'1'},'html','col-lg-10 col-lg-offset-1',function(e){
+                var postData = webcore.serializeObject(e.find('form'));
+                webcore.ajaxSubmit("{:gohdmanage('configimportcj/editdata',['hdid'=>$hdid])}",postData).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','保存成功');
+                        confirmObj.close();
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                         return false;
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差。操作失败');
+                    return false;
+                });
+            });
+        },
+        del:function(){
+            var getSelects = webtable.getSelections();
+            if(!getSelects.length){
+                return zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+            jconfirmBox.confirm('温馨提示','删除将删除所选数据将会同时删除其中的中奖数据并且无法恢复，您确定要删除么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('configimportcj/deldata',['hdid'=>$hdid])}",{dataid:getSelects}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','删除成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+        },
+        reset:function(){
+            jconfirmBox.confirm('温馨提示','清空将删除所有本地数据和产生的中奖数据并且无法恢复，您确定要清空么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('configimportcj/resetalldata',['hdid'=>$hdid])}",{}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','清空成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+        },
+        other:function(){
+            var getSelects = webtable.getSelections();
+            if(!getSelects.length){
+                return zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+            var confirmObj = jconfirmBox.ajaxconfirm("加入分组","{:gohdmanage('configimportcj/showgroup',['hdid'=>$hdid])}",{},'html','col-lg-8 col-lg-offset-2',function(e){
+                var groupid = e.find("option:selected").val()||'0';
+                webcore.ajaxSubmit("{:gohdmanage('configimportcj/changedatagroupid',['hdid'=>$hdid])}",{groupid:groupid,dataid:getSelects},'正在设置分组...').then(function(json){
+                    if(json.code==0){
+                        confirmObj.close();
+                        zamnotice.showTips('success','操作成功');
+                        webtable.refresh();
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差，操作失败');
+                });
+            });
+        },
+        import:function(){
+            webcore.importxls({title:'导入数据',url:"{:gohdmanage('configimportcj/importdata',['hdid'=>$hdid])}",moban:"/{:SYSIMGURL}excel/importcj.xls?t=21",uptxt:"点击上传数据",xlstxt:"注:请务必严格按照模板内容制作xls文件"},function(){
+                webtable.refresh();
+            });
+        },
+        shenhe:function(){
+            var confirmobj = jconfirmBox.ajaxconfirm("重复数据检查结果","{:gohdmanage('configimportcj/checkdata',['hdid'=>$hdid])}",{},'html','col-lg-8 col-lg-offset-2',function(e){},false,'2');
+        },
+    },
+};
+webtable.init(initConfig);
+$("#listtable").on('click','.changegroupid',function(){
+    var dataid = $(this).attr('data-dataid'),imggroupid = $(this).attr('data-groupid');
+    var confirmObj = jconfirmBox.ajaxconfirm((imggroupid=='0'?"加入分组":"修改分组"),"{:gohdmanage('configimportcj/showgroup',['hdid'=>$hdid])}",{dataid:dataid},'html','col-lg-8 col-lg-offset-2',function(e){
+        var groupid = e.find("option:selected").val()||'0';
+        webcore.ajaxSubmit("{:gohdmanage('configimportcj/changedatagroupid',['hdid'=>$hdid])}",{groupid:groupid,dataid:dataid},'正在新增数据到分组...').then(function(json){
+            if(json.code==0){
+                confirmObj.close();
+                zamnotice.showTips('success','操作成功');
+                webtable.refresh();
+            }else{
+                zamnotice.showTips('error',json.msg);
+            }
+        }, function(json){
+            zamnotice.showTips('error','网络差。操作失败');
+        });
+    });
+});
+$("body").on('click','.btn-samedetail',function() {
+    var field = $(this).attr('data-field');
+    var confirmobj = jconfirmBox.ajaxconfirm("重复数据明细","{:gohdmanage('configimportcj/repeatdata',['hdid'=>$hdid])}",{yhfield:field},'html','col-md-10 col-md-offset-1',function(e){},false,'2');
+});
+$("body").on('click','.btn-delsame',function(){
+    var $this = $(this),dataid = $this.attr('data-id');
+    jconfirmBox.confirm('温馨提示','删除所选数据将同步删除相关的中奖结果数据，并且无法恢复，您确定要删除么？',function(){
+        webcore.ajaxSubmit("{:gohdmanage('configimportcj/deldata',['hdid'=>$hdid])}",{dataid:dataid}).then(function(json){
+            $this.parent().parent().remove();
+            webtable.refresh();
+            zamnotice.showTips('success','删除成功');
+        }, function(json){
+            zamnotice.showTips('error','网络差。操作失败');
+        });
+    });
+});
+});
+</script>
+{include file='$Wpath/common/footer'}

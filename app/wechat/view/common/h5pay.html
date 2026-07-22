@@ -1,0 +1,48 @@
+{include file="common/header_base" /}
+<style type="text/css">
+.payendBox{
+	height: 100%;
+}
+.payendBox .tipicon{
+	font-size:1.4rem;
+	color:#00aeff;
+	margin-bottom: 0.32rem;
+}
+.payendBox .tiptxt{
+	font-size:0.32rem;
+	margin-bottom: 0.32rem;
+}
+.payendBox a{
+	width:62%!important;
+}
+</style>
+{if $hadpay=='1'}
+<section class="payendBox zam-app-flex-ajCenter">
+	<div class="tipicon"><i class="mxc mxc-roundcheckfill"></i></div>
+	<p class="tiptxt">您已完成支付</p>
+	<a class="btn-block btn-primary" href="{$returnUrl}">返回</a>
+</section>
+{else /}
+<section class="payendBox zam-app-flex-ajCenter">
+	<div class="tipicon"><i class="mxc mxc-infofill"></i></div>
+	<p class="tiptxt">请确认支付是否已经完成</p>
+	<a class="btn-block btn-primary btn-checkpay" href="javascript:void(0)">已完成支付</a>
+	<a class="btn-block btn-hollow" href="{$returnUrl}">已取消支付</a>
+</section>
+{/if}
+<script>
+require(['wechatcore'],function (wechatcore) {
+	$(".btn-checkpay").click(function(){
+		wechatcore.ajaxSubmit('/wechat/common/paycheck',{orderid:"{$orderid}"},'正在查询支付结果..').then(function(json){
+			if(json.code==0){
+				window.location.href = "{$returnUrl}";
+			}else{
+				wechatcore.msg(json.msg);
+			}
+		}, function(){
+			wechatcore.msg('网络太差，请稍后重试');
+		});
+	});
+});
+</script>
+{include file='common/footer_base' /}

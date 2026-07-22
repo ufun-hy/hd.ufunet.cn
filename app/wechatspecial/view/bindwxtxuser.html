@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>绑定提现微信用户</title>
+    <meta content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0" name="viewport"/>
+    <meta content="yes" name="apple-mobile-web-app-capable"/>
+    <meta content="black" name="apple-mobile-web-app-status-bar-style"/>
+    <meta content="telephone=no" name="format-detection"/>
+	<link rel="shortcut icon" href="" />
+    <link rel="stylesheet" href="__STATIC__/js/ydui/css/ydui.css"/>
+	<link rel="stylesheet" href="__STATIC__/css/zam-icon.css" media="all" />
+	<link rel="stylesheet" href="__STATIC__/css/mxc-icon.css" media="all" />
+	<link rel="stylesheet" href="__STATIC__/css/wechat/style.css" />
+	<link rel="stylesheet" href="__STATIC__/css/animate.css"/>
+	<script src="https://res.wx.qq.com/open/js/jweixin-1.6.0.js" type="text/javascript" charset="utf-8"></script>
+    <script src="__STATIC__/js/ydui/js/ydui.flexible.js"></script>
+	<script src="__STATIC__/js/jquery.2.1.4.js"></script>
+	<script src="__STATIC__/js/jquery.extend.js"></script>
+	<script type="text/javascript"  src="__STATIC__/js/require.js"></script>
+	<script type="text/javascript">
+		require.config({
+			baseUrl: "__STATIC__/js",
+			urlArgs:'v=21',//+(new Date()).getTime(),
+			waitSeconds:0,
+			paths: {
+				 css: "css.min",
+				 jquery:"jquery.2.1.4",
+				 fastclick:'wechatjs/fastclick',
+				 mobileselect:"mobileselect/mobileselect",
+				 ionrangeslider:'ionrangeslider/ionrangeslider',
+				 ydui: "ydui/js/ydui",
+				 template:"template/template",
+				 layer:"layer/mobile/layer",
+				 laytpl:"laytpl/laytpl",
+				 howler:"howler/howler.min",
+				 cropper:"cropper/cropper",
+				 "jquery.shake":'wechatjs/jquery.shake',
+				 jform:'jquery.form',
+				 touch:'wechatjs/touch',
+				 slideBox:'wechatjs/slideBox',
+				 wechatcore:"wechatjs/wechatcore",
+				 marqueen:"wechatjs/marqueen",
+				 bscroll:'wechatjs/bscroll/bscroll',
+				 swiper:'swiper/swiper.min',
+				 emojicore:"wechatjs/emojicore",
+				 appsocket:"wechatjs/appsocket",
+				 appmsg:"wechatjs/appmsg",
+				 appgame:"wechatjs/appgame",
+				 appdgshake:"wechatjs/appdgshake",
+				 appshuqian:"wechatjs/appshuqian",
+				 appmonkey:"wechatjs/appmonkey",
+				 appcar:"wechatjs/appcar",
+				 apphorse:"wechatjs/apphorse",
+				 appmls:"wechatjs/appmls",
+				 appbike:"wechatjs/appbike",
+				 appswim:"wechatjs/appswim",
+				 apptug:"wechatjs/apptug",
+				 appanswerbs:"wechatjs/appanswerbs",
+				 appjjb:"wechatjs/appjjb",
+				 appcutfruit:"wechatjs/appcutfruit",
+				 appdzqy:"wechatjs/appdzqy",
+				 videojs:'videojs/video',
+				 plupload:'plupload/plupload',
+				 uploader:'plupload/uploader',
+				 phaser:'wechatjs/phaser.min',
+				 dialog:'dialog/js/dialog',
+				 directoss:'directupload/aliyun',
+				 directqiniu:'directupload/qiniu',
+				 directcos:'directupload/cos',
+				 DouyinOpenJSBridge:'wechatjs/douyin.open',
+				 glightbox:'glightbox/glightbox.min',
+			},
+			shim:{
+				"ydui": {
+					exports:"YDUI"
+				},
+				'template':{
+					exports: 'template',
+				},
+				'layer':{
+					exports: 'layer',
+					deps: ['css!../js/layer/mobile/need/layer.css']
+				},
+				'mobileselect':{
+					exports:'MobileSelect',
+					deps: ['css!../js/mobileselect/mobileselect.css']
+				},
+				'ionrangeslider':{
+					deps:['css!../js/ionrangeslider/ionrangeslider.css'],
+				},
+				'wechatcore':{
+					exports:'wechatcore',
+				},
+				'marqueen':{
+					exports:'marqueen',
+				},
+				'laytpl':{
+					exports: 'laytpl',
+				},
+				'jquery.shake':{
+					exports: 'Shake',
+					deps: ['jquery']
+				},
+				'jform':{
+					deps: ['jquery']
+				},
+				'touch':{
+					exports:'touch',
+				},
+				'bscroll':{
+					exports:'BScroll',
+				},
+				'swiper':{
+					exports:'Swiper',
+					deps: ['css!../js/swiper/swiper.min.css']
+				},
+				'cropper':{
+					exports:'cropper',
+					deps: ['css!../js/cropper/cropper.css']
+				},
+				'glightbox':{
+					exports:'GLightbox',
+					deps: ['css!../js/glightbox/glightbox.min.css'],
+				},
+				'appsocket':{
+					exports:'appsocket',
+				},
+				'appgame':{
+					exports:'appgame',
+				},
+				'appdgshake':{
+					exports:'appdgshake',
+				},
+				'appshuqian':{
+					exports:'appshuqian',
+				},
+				'appmonkey':{
+					exports:'appmonkey',
+				},
+				'appcar':{
+					exports:'appcar',
+				},
+				'apphorse':{
+					exports:'apphorse',
+				},
+				'appmls':{
+					exports:'appmls',
+				},
+				'appbike':{
+					exports:'appbike',
+				},
+				'appswim':{
+					exports:'appswim',
+				},
+				'apptug':{
+					exports:'apptug',
+				},
+				'appanswerbs':{
+					exports:'appanswerbs',
+				},
+				'appdzqy':{
+					exports:'appdzqy',
+				},
+				'appjjb':{
+					exports:'appjjb',
+				},
+				'appcutfruit':{
+					exports:'appcutfruit',
+				},
+				'videojs':{
+					exports:'videojs',
+					deps:['css!../js/videojs/video.css'],
+				},
+				'plupload':{
+					exports:'plupload',
+				},
+				'uploader':{
+					exports:'uploader',
+					deps: ['jquery','plupload'],
+				},
+				'dialog':{
+					exports:'dialog',
+					deps:['css!../js/dialog/css/dialog.css'],
+				},
+			},
+		});
+		define("jquery", [], function () {
+			return jQuery;
+		});
+</script>
+<style type="text/css">
+.zam-app-bindtxuser{position: absolute;top:0;left:0;width: 100%;height: 100%}
+.zam-app-bindtxuser-content{width: 100%;height: 100%}
+.zam-app-bindtxuser img{width:1.56rem;height:1.56rem;border-radius:50%;margin-bottom: 0.4rem;}
+.zam-app-bindtxuser .nickname{font-size:0.32rem;margin-bottom:0.2rem;}
+.btn-sq{width:72%;}
+</style>
+</head>
+<body>
+<section class="zam-app-bindtxuser g-flexview zam-app-flex-ajCenter">
+	<div class="zam-app-bindtxuser-content zam-app-flex-ajCenter">
+		<img src="{$wxuser['headimgurl']}" />
+		<div class="nickname">{$wxuser['nickname']}</div>
+		<button type="button" class="btn-block btn-primary btn-sq">确认授权</button>
+	</div>
+</section>
+</body>
+<script>
+var XCV3Config = {
+	staticurl:"__STATIC__/",
+	amconfig:{:json_encode(amconfig())},
+	clienttype:"{if isset($clienttype)}{$clienttype}{else}1{/if}",
+};
+require(['wechatcore'],function (wechatcore) {
+	wechatcore.hidewxmenu();
+	$(".btn-sq").click(function(){
+		var $this = $(this);
+		var postData = {
+			userid:"{$userid}",
+			token:"{$token}",
+			openid:"{$wxuser['openid']}",
+			nickname:"{$wxuser['nickname']}",
+			avatar:"{$wxuser['headimgurl']}",
+		};
+		wechatcore.ajaxSubmit("{:gowechatspecial('bindwxtxuser/squser')}",postData,'授权中...').then(function(data){
+			if(data.code==0){
+				wechatcore.showtopmsg('授权成功',5e2,function(){
+					wechatcore.closewxwindow();
+				});
+			}else{
+				wechatcore.showtopmsg(data.msg);
+			}
+		}, function(){
+			wechatcore.msg('网络太差，请稍后重试');
+		});
+	});
+});  
+</script>
+</html>

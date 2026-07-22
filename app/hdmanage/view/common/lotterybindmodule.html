@@ -1,0 +1,139 @@
+<div class="form-group">
+    <label class="col-lg-3 control-label">* 绑定模块</label>
+    <div class="col-lg-8">
+      {:tpl_switch('bindmodule[open]', $config['bindmodule']['open']??'2','openbindmodule')}
+      <span class="help-block">开启后用户组内设置无效</span>
+    </div>
+</div>
+<div class="bindmodulebox{if !isset($config['bindmodule']['open']) || $config['bindmodule']['open']=='2'} hidden{/if}">
+    <div class="form-group bindmodule">
+        <label class="col-lg-3  control-label">选择模块</label>
+        <div class="col-lg-8">   
+            <select name="bindmodule[module]" class="form-control">
+                <option value="" {if !isset($config['bindmodule']['module']) || $config['bindmodule']['module']==''}selected="selected"{/if}>请选择模块</option>
+                <option value="vote" {if isset($config['bindmodule']['module']) && $config['bindmodule']['module']=='vote'}selected="selected"{/if}>投票</option>
+                <!-- <option value="dhh" {if isset($config['bindmodule']['module']) && $config['bindmodule']['module']=='dhh'}selected="selected"{/if}>订货会</option> -->
+            </select>
+        </div>
+    </div>
+    <div class="bindmodule-wrap{if !isset($config['bindmodule']['module']) || $config['bindmodule']['module']==''} hidden{/if}">
+        <div class="form-group bindmoduleround">
+            <label class="col-lg-3 control-label">选择轮次</label>
+            <div class="col-lg-8">   
+                <select name="bindmodule[rotateid]" class="form-control">
+                    <option value="" {if !isset($config['bindmodule']['rotateid']) || $config['bindmodule']['rotateid']==''}selected="selected"{/if}>全部轮次</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group bindmoduleitem{if !isset($config['bindmodule']['rotateid']) || $config['bindmodule']['rotateid']==''} hidden{/if}">
+            <label class="col-lg-3 control-label">选择项目</label>
+            <div class="col-lg-8">   
+                <select name="bindmodule[itemid]" class="form-control">
+                    <option value="" {if !isset($config['bindmodule']['rank']) || $config['bindmodule']['rank']==''}selected="selected"{/if}>全部项目</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group bindmodulerank{if isset($config['bindmodule']['module']) && $config['bindmodule']['module']=='vote'} hidden{/if}">
+            <label class="col-lg-3 control-label">* 前多少名内可中奖</label>
+            <div class="col-lg-6">
+                <input type="text" class="form-control numberincdec" name="bindmodule[rank]" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="null"
+                data-bts-step="1"
+                data-bts-postfix="名"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['bindmodule']['rank']??10}">
+                <span class="help-block">最少是前1名</span>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+var bindmodule = {:json_encode($config['bindmodule']??[])};
+function openbindmodule(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".bindmodulebox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".bindmodulebox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function ajaxroundrotates(module){
+    var bindrotateid = bindmodule.rotateid||'';
+    require(['webcore','zamnotice'],function(webcore,zamnotice){
+        webcore.ajaxSubmit("{:gohdmanage('common/ajaxbindmodulerotates',['hdid'=>$hdid])}",{module:module},'加载轮次中...').then(function(json){
+            if(json.code==0){
+                var findkey = 0,html = `<option value="">全部轮次</option>`;
+                $.each(json.msg,function(k,v){
+                    html += `<option value="${v.id}">${v.title}</option>`;
+                    if(v.id == bindrotateid){
+                        findkey = k+1;
+                    }
+                })
+                $(".bindmodule-wrap").removeClass('hidden').find('.bindmoduleround select').html(html);
+                //无论轮次id选中哪个都去加载轮次下的所有项目
+                $('.bindmoduleround').find('option').eq(findkey).prop('selected',true);
+                //加载轮次下的项目
+                $(".bindmoduleround select").trigger('change');
+            }else{
+                zamnotice.showTips('error',json.msg);
+            }
+        }, function(json){
+            zamnotice.showTips('error','网络差。操作失败');
+        });
+    });
+}
+function ajaxrounditems(rotateid){
+    var binditemid = bindmodule.itemid||'';
+    require(['webcore','zamnotice'],function(webcore,zamnotice){
+        webcore.ajaxSubmit("{:gohdmanage('common/ajaxbindmoduleitems',['hdid'=>$hdid])}",{module:$('.bindmodule select').val(),rotateid:rotateid},'加载项目中...').then(function(json){
+            if(json.code==0){
+                var findkey = 0,html = `<option value="">全部项目</option>`;
+                $.each(json.msg,function(k,v){
+                    html += `<option value="${v.id}">${v.goodsname??(v.votename||'')}</option>`;
+                    if(v.id == binditemid){
+                        findkey = k+1;
+                    }
+                })
+                $(".bindmoduleitem").removeClass('hidden').find('select').html(html);
+                $('.bindmoduleitem').find('option').eq(findkey).prop('selected',true);
+            }else{
+                zamnotice.showTips('error',json.msg);
+            }
+        }, function(json){
+            zamnotice.showTips('error','网络差。操作失败');
+        });
+    });
+}
+$(function(){
+    $(".bindmodule select").on('change',function(){
+        var module = $(this).val()||'';
+        $(".bindmoduleitem").addClass('hidden')
+        if(module == ''){
+            $(".bindmodule-wrap").addClass('hidden')
+        }else{
+            if(module == 'dhh'){
+                $('.bindmodulerank').removeClass('hidden')
+            }else{
+                $('.bindmodulerank').addClass('hidden')
+            }
+            ajaxroundrotates(module)
+        }
+    });
+    $(".bindmoduleround select").on('change',function(){
+        var rotateid = $(this).val()||'';
+        if(rotateid == ''){
+            $(".bindmoduleitem").addClass('hidden')
+        }else{
+            ajaxrounditems(rotateid);
+        }
+    });
+    if(bindmodule.module){
+        $(".bindmodule select").trigger('change');
+    }
+})
+</script>

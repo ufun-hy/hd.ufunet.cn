@@ -1,0 +1,188 @@
+{include file="common/header" /}
+<style>
+::-webkit-scrollbar {
+    width: 6px;
+    border-radius: 6px;
+}
+::-webkit-scrollbar-track {
+    background-color: #666;
+    border-radius: 6px;
+}
+::-webkit-scrollbar-thumb {
+    border-radius: 6px;
+    outline-offset: -2px;
+    background-color: #dedede;
+}
+.headerTitle{opacity: 0}
+.joinPeople{display: none}
+.sign-mainbox{
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	top:0;
+	left: 0;
+	padding: 0;
+}
+.sign-mainbox .title{
+	width: 100%;
+	height: 90px;
+	line-height: 90px;
+	text-align: center;
+	font-size: 46px;
+	font-weight: bold;
+	color:#fff;
+	letter-spacing: 5px;
+}
+.sign-mainbox .content{
+	position: relative;
+	display: flex;
+    justify-content: flex-end;
+    top: 100px;
+}
+.bangbox{
+	position: absolute;
+	left: 50%;
+	transform: translateX(-50%);
+	top: -80px;
+	width: 800px;
+	border-radius: 10px;
+    color: #fff;
+}
+.bangmoney{
+	height: 60px;
+	line-height: 60px;
+	font-size: 24px;
+	display: flex;
+	text-align: center;
+	padding: 0 10px;
+	width: 58%;
+}
+.bangperson{
+	height: 60px;
+	line-height: 60px;
+	text-align: center;
+	font-size: 24px;
+	display: flex;
+	padding: 0 10px;
+	padding-left: 0;
+	width: 42%;
+}
+.bangmoney div span, .bangperson div span {
+    margin-right: 10px;
+}
+.bangListbox{
+	width: 80%;
+	height: 620px;
+    
+}
+.bangListbox .bang-left{
+	height: 100%;
+	width: 45%;
+	border-radius: 10px;
+    padding: 20px;
+    box-sizing: border-box;
+}
+.bangListbox .bang-right{
+	height: 100%;
+	width: 45%;
+	border-radius: 10px;
+    padding: 20px;
+    box-sizing: border-box;
+}
+.bangListbox ul{
+	color: #fff;
+}
+.bangListbox ul li{
+	display: flex;
+}
+.bangListbox ul li div{
+	width: 25%;
+	text-align: left;
+	font-size: 20px;
+	height: 38px;
+	line-height: 38px;
+	padding: 0 4px;
+	box-sizing: border-box;
+}
+.bangListbox ul li div:first-child{
+	text-align: center;
+	width: 20%;
+}
+.bangListbox ul li div:nth-child(2){
+	width: 40%;
+}
+.bangListbox ul li div:nth-child(3){
+	width: 20%;
+}
+.bangListbox ul li div:last-child{
+	width: 30%;
+	text-align: right;
+}
+.bangListbox .yuyue-body li{
+	border-bottom: 1px solid #eceeef;
+}
+.bangListbox ul.yuyue-header li div{
+	font-size: 22px;
+	height: 38px;
+	line-height: 38px;
+}
+.yuyue-rollbox{height: calc(100% - 38px);overflow: hidden;overflow-y: overlay;}
+</style>
+<section class="sign-mainbox normal-box">
+	<div class="title">{$pcconfig['title']}</div>
+	<div class="content">
+		<div class="bangbox zam-app-flex">
+			<div class="bangmoney">
+				<div style="width: 40%">目标总业绩:</div>
+				<div style="width: 60%"><span>0</span>{$pcconfig['tongjiconfig']['unit']??''}</div>
+			</div>
+			<div class="bangperson">
+				<div style="width: 40%">押注人数:</div>
+				<div style="width: 60%"><span>0</span>人</div>
+			</div>
+		</div>
+		<div class="bangListbox zam-app-flex zam-app-alignCenter zam-app-justifyspacearound">
+			<div class="bang-left">
+				<ul class="yuyue-header">
+					<li>
+						<div>排名</div>
+						{foreach $pcconfig['phbconfig'] as $pitem}
+						<div>{$pitem['title']}</div>
+						{/foreach}
+					</li>
+				</ul>
+				<div class="yuyue-rollbox">
+					<ul class="yuyue-body"></ul>
+				</div>
+			</div>
+			<div class="bang-right">
+				<ul class="yuyue-header">
+					<li>
+						<div>排名</div>
+						{foreach $pcconfig['phbconfig'] as $pitem}
+						<div>{$pitem['title']}</div>
+						{/foreach}
+					</li>
+				</ul>
+				<div class="yuyue-rollbox">
+					<ul class="yuyue-body"></ul>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+<script type="text/html" id="sign-tpl">
+	<li>
+		<div>{{ xuhao }}</div>
+		{foreach $pcconfig['phbconfig'] as $pitem}
+		<div>{{ {$pitem['zd']} }}{if $pitem['type']=='number'}{$pitem['unit']??''}{/if}</div>
+		{/foreach}
+	</li>
+</script>
+<script>
+var canroll = "{$pcconfig['tongjiconfig']['canroll']??1}",isdz = "{$isdz}";
+require(['screenyuyuedj','screencore'],function (screenyuyuedj,screencore) {
+	screenyuyuedj.init();
+});
+</script>
+{include file="common/footer" /}

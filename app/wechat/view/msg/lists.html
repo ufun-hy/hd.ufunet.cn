@@ -1,0 +1,116 @@
+<style>
+    .msgwordlist{
+        position: absolute;
+        bottom: 1rem;
+        left: 0;
+        width: 100%;
+        border-radius: 0.16rem;
+        background-color:#fff;
+    }
+    .msgwordlist-title{
+        max-width: 100%;
+        padding: 0.12rem 0.32rem;
+        font-weight: 700;
+        font-size: 0.3rem;
+        color:#333;
+    }
+    .msgwordlist ul{
+        text-align: left;
+        margin: 0.1rem 0;
+        padding: 0 0.2rem;
+        box-sizing: border-box;
+        overflow: hidden;
+        overflow-y:auto;
+        max-height:5rem;
+        color:#696767;
+        -webkit-overflow-scrolling: touch;
+    }
+    .msgwordlist ul li{
+        word-break: break-all;
+        font-weight: bold;
+        padding:0.14rem;
+        margin-bottom: 0.12rem;
+        border-radius: 3px;
+        font-size: 12px;
+        background-color:rgba(0,0,0,0.05);
+    }
+    .msgwordlist ul li:last-child{
+        margin-bottom: 0;
+    }
+    </style>
+    <div class="msgwordlist hidden">
+        <div class="msgwordlist-title limitbox">选择您想要说的话</div>
+        <ul>
+        {foreach $appconfig['stabletxts'] as $notice}
+            <li>{$notice}</li>
+        {/foreach}
+        </ul>
+    </div>
+    <script>
+    require(['wechatcore','anime'],function(wechatcore,anime){
+        var msgwordlist = $(".msgwordlist");
+        $(".btn-showpoplits").click(function(){
+            msgwordlist.css({
+                'bottom':($(".zam-app-msg-footerbar").outerHeight() + 10)+'px',
+                'width':"calc(100% - 20px)",
+                'left':'10px',
+            });
+            if(msgwordlist.hasClass('hidden')){
+                msgwordlist.removeClass('hidden');
+                anime({
+                    targets: msgwordlist[0],
+                    translateY:[100,0],
+                    opacity:[0, 1],
+                    transformY:[-100,0],
+                    easing: 'linear',
+                    duration: 3e2,
+                    complete:function(){
+                        msgwordlist.focus();
+                    },
+                });
+            }else{
+                anime({
+                    targets: msgwordlist[0],
+                    opacity:[1, 0],
+                    translateY:[0,100],
+                    easing: 'linear',
+                    duration: 3e2,
+                    complete:function(){
+                        msgwordlist.find('ul')[0].scrollTop = 0;
+                        msgwordlist.addClass('hidden');
+                    }
+                });
+            }
+        });
+        msgwordlist.find("li").click(function(){
+            $('.app-msg-txtInput').val($(this).text());
+            anime({
+                targets: msgwordlist[0],
+                opacity:[1, 0],
+                translateY:[0,100],
+                easing: 'linear',
+                duration: 3e2,
+                complete:function(){
+                    msgwordlist.find('ul')[0].scrollTop = 0;
+                    msgwordlist.addClass('hidden');
+                }
+            });
+        });
+        $(document).click(function(event) {
+            var clickTarget = $(event.target);
+            if (!clickTarget.hasClass('btn-showpoplits') && !clickTarget.closest('.msgwordlist').length) {
+                anime({
+                    targets: msgwordlist[0],
+                    opacity:[1, 0],
+                    translateY:[0,100],
+                    easing: 'linear',
+                    duration: 3e2,
+                    complete:function(){
+                        msgwordlist.find('ul')[0].scrollTop = 0;
+                        msgwordlist.addClass('hidden');
+                    }
+                });
+            }
+        });
+    });
+    </script>

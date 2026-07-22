@@ -1,0 +1,125 @@
+{include file='$Wpath/common/header'}
+<div class="row">
+<div class="col-lg-12">
+    <div class="card need-loading">
+        <div class="card-header"><h4>活动用户列表</h4></div>
+        <div class="card-body">
+            <div class="form-inline zam-inline-searchbar">
+                <div class="form-group">
+                  <div class="input-group input-group-sm">
+                    <span class="input-group-addon">用户名</span>
+                    <input type="text" class="form-control" value="" id="keyword" name="username" placeholder="请输入用户名">
+                  </div>
+                </div>
+                <a class="btn btn-success btn-search" href="javascript:void(0)"><i class="mdi mdi-magnify"></i> 搜索</a>
+                <a class="btn btn-warning btn-sm btn-export" href="javascript:void(0)"><i class="mdi mdi-export"></i> 导出</a>
+           </div>
+            {notempty name="ajaxurls"}
+            <div id="toolbar" class="toolbar-btn-action zam-toolbar">
+                  {volist name="ajaxurls" id='urls'}
+                    {:getBtnHtml($urls)}
+                  {/volist}
+            </div>
+            {/notempty}
+            <table id="listtable" class="zam-btable"></table>
+        </div>
+    </div>
+</div>
+</div>
+<script>
+require(['webcore','webtable','jconfirmBox','zamnotice'],function(webcore,webtable,jconfirmBox,zamnotice){
+var initConfig = {
+	tableId:'#listtable',
+	url:"{:goweb('attachmanage/index')}",
+	columnoperate:{
+        btns:{
+            data:{title:"预览文件",icon:"mdi-eye"},
+            del:true,
+        },
+	    func:{
+    	    del:function(value, row, index){
+            	jconfirmBox.confirm('温馨提示','您确定要删除么？',function(){
+                    webcore.ajaxSubmit("{:goweb('attachmanage/del')}",{attid:row.id},'处理中..').then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','删除成功');
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                    });
+            	});
+    	    },
+            data:function(value, row, index){
+                webcore.showVideos([row.filesrc],row.type);
+            }
+	    }
+	},
+	columns:[{
+			checkbox: true,
+		}, 
+		{
+			field: 'id',
+			title: 'ID',
+			align: 'center',
+            width:'6%',
+			//visible: false
+		}, {
+            field: 'user_name',
+            title: '上传用户',
+            align:'center',
+            width:'10%',
+            formatter: function (value, row, index) {
+                var html = "<div><span class=\"label label-"+(value==null?'danger':'success')+"\">"+(value==null?"已删除":value)+"</span></div><div class='m-t-5'><span class='label label-warning'>id:"+row.user_id+"</span></div>";
+                return html;
+            },
+        }, {
+            field: 'typehtml',
+            title: '文件类型',
+            align:'center',
+            width:'10%',
+            
+        }, {
+            field: 'filename',
+            title: '上传文件名',
+            align:'center',
+            width:'20%',
+        },  {
+			field: 'filepath',
+			title: '文件路径',
+			align: 'center',
+            width:'24%',
+		},  {
+            field: 'create_time',
+            title: '上传时间',
+            align: 'center',
+            width:'10%',
+        }
+	],
+	searchParamas:[{'type':'1','id':'keyword'},{'type':'2','id':'atttype'}],
+	toolbar:{
+	    del:function(ajaxurl){
+	        var getSelects = webtable.getSelections();
+            if(!getSelects.length){
+                return zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+            jconfirmBox.confirm('温馨提示','您确定要删除选中的数据么？',function(){
+                webcore.ajaxSubmit(ajaxurl,{attid:getSelects},'处理中..').then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','删除成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+	    },
+	},
+};
+webtable.init(initConfig);
+});
+</script>
+{include file='$Wpath/common/footer'}

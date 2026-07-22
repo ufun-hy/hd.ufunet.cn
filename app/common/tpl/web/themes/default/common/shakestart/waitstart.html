@@ -1,0 +1,46 @@
+ <div id="waitstart" class="collapse in">
+	{include file="$Wpath/common/configscreencommon" /}
+	{include file="$Wpath/common/configscreenmusic" /}
+	<div class="form-group">
+        <label class="col-lg-2 control-label text-right">* 用户头像弹出效果</label>
+        <div class="col-lg-8">
+            {:tpl_switch('waitconfig[showjoin]',$config['waitconfig']['showjoin'],'openshowjoin')}
+            <span class="help-block">开启则显示微信用户弹出效果</span>
+        </div>
+    </div>
+    <div class="joinbox{if $config['waitconfig']['showjoin']!='1'} hidden{/if}">
+    	<div class="form-group">
+            <label class="col-lg-2 control-label">* 头像大小</label>
+            <div class="col-lg-4">
+                <input type="text" class="form-control numberincdec" name="waitconfig[joinconfig][imgsize]" value="{$config['waitconfig']['joinconfig']['imgsize']}"
+                data-bts-min="20" data-bts-replacement-val="20"
+                data-bts-max="null"
+                data-bts-step="1"
+                data-bts-postfix="px"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                >
+                <span class="help-block">注:必须是个大于20的整数</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 昵称大小</label>
+            <div class="col-lg-4">
+                <input type="text" class="form-control numberincdec" name="waitconfig[joinconfig][namesize]" value="{$config['waitconfig']['joinconfig']['namesize']}"
+                data-bts-min="10" data-bts-replacement-val="10"
+                data-bts-max="null"
+                data-bts-step="1"
+                data-bts-postfix="px"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                >
+                <span class="help-block">注:必须是个大于10的整数</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 昵称颜色</label>
+            <div class="col-lg-3">
+                {:tpl_color('waitconfig[joinconfig][namecolor]',$config['waitconfig']['joinconfig']['namecolor'])}
+                <span class="help-block">默认白色</span>
+            </div>
+        </div>
+    </div>
+</div>

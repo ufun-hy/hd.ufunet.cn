@@ -1,0 +1,40 @@
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 背景音效</label>
+    <div class="col-lg-3">
+        {:tpl_switch('bgmusicoff',$config['bgmusicoff'],'openbgmusic')}
+    </div>
+</div>
+<div class="bgmusicbox screenmusicoffbox{if $config['bgmusicoff']=='2'} hidden{/if}">
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 背景音效类型</label>
+    <div class="col-lg-8">
+      <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.screenmusicbox').addClass('hidden')">
+       <input type="radio" name="bgmusictype" value="1" {if $config['bgmusictype']=='1'}checked{/if}><span>风格背景音效</span>
+      </label>
+      <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.screenmusicbox').removeClass('hidden')">
+       <input type="radio" name="bgmusictype" value="2" {if $config['bgmusictype']=='2'}checked{/if}><span>自定义</span>
+      </label>
+      <span class="help-block">一般使用系统风格内自带背景音乐</span>
+    </div>
+ </div>
+<div class="form-group screenmusicbox{if $config['bgmusictype']=='1'} hidden{/if}">
+    <label class="col-lg-2 control-label">* 背景音效</label>
+    <div class="col-lg-8">
+        {:tpl_audio('bgmusic',$config['bgmusic'])}
+    </div>
+</div>
+</div>
+<script type="text/javascript">
+function openbgmusic(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".screenmusicoffbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".screenmusicoffbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+</script>

@@ -1,0 +1,184 @@
+{include file='$Wpath/common/header'}
+<div class="alert alert-danger">
+注意事项：<br>
+1 键盘方向键右键用于切换到下一轮，方向键左键用于切换上一轮<br>
+2 键盘空格键是用于开启/关闭投票状态<br>
+3 键盘问号键用于开启/关闭投票项目自动翻页<br>
+</div>
+{include file='$Wpath/common/tabletoolbar'}
+<table id="listtable" class="zam-btable"></table>
+<script>    
+require(['webcore','webtable','jconfirmBox','zamnotice','clipboard','layerBox','jcode'],function(webcore,webtable,jconfirmBox,zamnotice,Clipboard,layerBox){
+var initConfig = {
+    tableId:'#listtable',
+    url:"{:gohdmanage('configvote/rotate',['hdid'=>$hdid])}",
+    columnoperate:{
+        btns:{
+            edit:true,
+            del:true,
+            data:true,
+            reset:{title:"重置",icon:"mdi-gavel"},
+        },
+        func:{
+            edit:function(value, row, index){
+                var confirmObj = jconfirmBox.ajaxconfirm("编辑轮次","{:gohdmanage('configvote/editrotate',['hdid'=>$hdid])}",{rotateid:row.id},'html','col-lg-10 col-lg-offset-1',function(e){
+                    var postData = webcore.serializeObject(e.find('form'));
+                    postData.rotateid = row.id;
+                    webcore.ajaxSubmit("{:gohdmanage('configvote/saverotate',['hdid'=>$hdid])}",postData).then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','保存成功');
+                            confirmObj.close();
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                             return false;
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                         return false;
+                    });
+                });
+            },
+            del:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','删除将删除当前轮次下面的所有投票项目以及投票数据并且无法恢复，您确定要删除么？',function(){
+                        webcore.ajaxSubmit("{:gohdmanage('configvote/delrotate',['hdid'=>$hdid])}",{rotateid:row.id}).then(function(json){
+                            if(json.code==0){
+                                webtable.refresh();
+                                zamnotice.showTips('success','删除成功');
+                            }else{
+                                zamnotice.showTips('error',json.msg);
+                            }
+                        }, function(json){
+                            zamnotice.showTips('error','网络差。操作失败');
+                        });
+                });
+            },
+            reset:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','重置轮次将清空轮次内所有投票数据并且无法恢复，您确定要重置当前轮次么？',function(){
+                        webcore.ajaxSubmit("{:gohdmanage('configvote/resetrotate',['hdid'=>$hdid])}",{rotateid:row.id}).then(function(json){
+                            webtable.refresh();
+                            zamnotice.showTips('success','重置成功');
+                        }, function(json){
+                            zamnotice.showTips('error','网络差。操作失败');
+                        });
+                });
+            },
+            data:function(value, row, index){
+                window.location.href = "{:gohdmanage('datavote/index',['hdid'=>$hdid])}&rotateid="+row.id;
+            },
+        }
+    },
+    columns:[
+        {
+            checkbox: true,
+        },{
+            field: 'id',
+            title: 'Id',
+            align: 'center',
+            visible: false
+        },{
+            field: 'title',
+            title: '轮次',
+            align: 'center',
+        },{
+            field: 'status',
+            title: '状态',
+            align: 'center',
+            width:'15%',
+            formatter: function(value, row, index){
+                var html = row.votenum > 0 ? '<span class="text-danger">有投票数据</span>' : '<span class="text-success">未产生投票数据</span>';
+                html += row.isshow == '1' ? '<span class="text-primary">(展示中)</span>' : '';
+                return html;
+            }
+        },{
+            field: 'starttime',
+            title: '投票起止时间',
+            align: 'center',
+            formatter: function(value, row, index){
+                return `${value} - ${row.endtime}`;
+            }
+        },{
+            field: 'usernum',
+            title: '投票项目(个)',
+            align: 'center',
+        },{
+            field: 'create_time',
+            title: '创建时间',
+            align: 'center',
+        }
+    ],
+    searchParamas:[],
+    toolbar:{
+        add:function(){
+            var confirmObj = jconfirmBox.ajaxconfirm("新增轮次","{:gohdmanage('configvote/editrotate',['hdid'=>$hdid])}",{},'html','col-lg-10 col-lg-offset-1',function(e){
+	            var postData = webcore.serializeObject(e.find('form'));
+	            webcore.ajaxSubmit("{:gohdmanage('configvote/saverotate',['hdid'=>$hdid])}",postData,'正在创建轮次...').then(function(json){
+	                if(json.code==0){
+	                    webtable.refresh();
+	                    zamnotice.showTips('success','创建成功');
+	                    confirmObj.close();
+	                }else{
+	                    zamnotice.showTips('error',json.msg);
+	                     return false;
+	                }
+	            }, function(json){
+	                zamnotice.showTips('error','网络差。操作失败');
+	                 return false;
+	            });
+	        });
+        },
+        del:function(){
+            var getSelects = webtable.getSelections();
+            if(!getSelects.length){
+                return zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+            jconfirmBox.confirm('温馨提示','删除将删除所选轮次下的的投票项目以及投票数据并且无法恢复，您确定要删除么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('configvote/delrotate',['hdid'=>$hdid])}",{rotateid:getSelects}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','删除成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+        },
+        reset:function(){
+            jconfirmBox.confirm('温馨提示','清空将删除所有轮次下的的轮次以及投票数据并且无法恢复，您确定要清空么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('configvote/resetallrotate',['hdid'=>$hdid])}",{}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','清空成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+        },
+        {/*
+         当成重置
+        */}
+        shenhe:function(){
+            var getSelects = webtable.getSelections();
+            if(!getSelects.length){
+                return zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+            jconfirmBox.confirm('温馨提示','重置将删除所选轮次下投票数据，并且无法恢复，您确定要重置么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('configvote/resetrotate',['hdid'=>$hdid])}",{rotateid:getSelects}).then(function(json){
+                    webtable.refresh();
+                    zamnotice.showTips('success','重置成功');
+                }, function(json){
+                    zamnotice.showTips('error','网络差。操作失败');
+                });
+            });
+        },
+    },
+};
+webtable.init(initConfig);
+});
+</script>
+{include file='$Wpath/common/footer'}

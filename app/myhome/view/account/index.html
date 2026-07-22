@@ -1,0 +1,540 @@
+{include file='$Wpath/common/header'}
+<style type="text/css">
+	.useraccount-item .card{border-radius: 6px;}
+	.useraccount-item .topitem{height:48px;line-height: 48px;font-size:1.2em;}
+	.useraccount-item .bottomitem{padding-left: 48px}
+	.useraccount-item .bottomitem div.moneybox {
+	    height: 60px;
+	    font-size: 32px;
+	    font-weight:600;
+	}
+	.useraccount-item .bottomitem .moneybox span{
+		display: inline-block;
+		margin-left:5px;
+	    font-size: 16px;
+	    font-weight:0;
+	}
+	.useraccount-item .bottomitem .moneymx{
+		padding-left:5px;
+	}
+	.useraccount-item .btn-control{position: absolute;right:38px;bottom:50px;}
+	{/*
+		tx
+	*/}
+	.confirmbox-pop{
+		    font: 400 13.3333px Arial!important;
+	}
+	.confirmbox-pop .onlytxt{
+		font-size:14px;
+	}
+	.confirmbox-pop .only-one{
+		height:38px;
+		line-height: 38px;
+	}
+</style>
+<section class="row useraccount-box">
+	<div class="col-sm-6 col-lg-6 useraccount-item">
+        <div class="card bg-primary">
+          <div class="card-body">
+			<div class="topitem text-white m-t-10">
+				<span class="img-avatar img-avatar-48 bg-translucent"><i class="mdi mdi-currency-cny fa-1-5x"></i></span>
+				<span class="m-l-5">收入账户</span>
+				&nbsp;&nbsp;|&nbsp;&nbsp;
+				<span class="account-des">该账户为活动收入</span>
+			</div>
+			<div class="bottomitem text-white m-t-10">
+				<div class="moneybox">{$txremain}<span>&nbsp;元</span></div>
+				<div class="moneymx"><a class="text-white cursor" href="{:gomyhome('account/income')}">收入明细</a></div>
+			</div>
+			<div class="btn-control btn-tx"> 
+				<a href="javascript:void(0)" class="btn btn-warning">立即提现</a> 
+			</div>
+          </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-6 useraccount-item">
+        <div class="card bg-danger">
+          <div class="card-body">
+			<div class="topitem text-white m-t-10">
+				<span class="img-avatar img-avatar-48 bg-translucent"><i class="mdi mdi-cash fa-1-5x"></i></span>
+				<span class="m-l-5">红包账户</span>
+				&nbsp;&nbsp;|&nbsp;&nbsp;
+				<span class="account-des">该账户用于活动发放微信红包</span>
+			</div>
+			<div class="bottomitem text-white m-t-10">
+				<div class="moneybox">{$hbremain}<span>&nbsp;元</span></div>
+				<div class="moneymx"><a class="text-white cursor" href="{:gomyhome('account/hbdetail')}">发放明细</a></div>
+			</div>
+			<div class="btn-control btn-cz"> 
+				<a href="javascript:void(0)" class="btn btn-brown">立即充值</a> 
+			</div>
+          </div>
+        </div>
+    </div>
+</section>
+<section class="txrecords">
+	<div class="config-titlebox">
+        <span class="config-titlename">提现记录</span>
+    </div>
+	<div class="form-inline zam-inline-searchbar">
+	    <div class="form-group">
+	      <div class="input-group input-group-sm">
+	        <span class="input-group-addon">提现类型</span>
+	          <select id="txtype" class="form-control js_select2">
+	            {foreach $txtypes as $tkey=>$ttype} 
+	                <option value="{$tkey}">{$ttype}</option>
+	            {/foreach}
+	          </select>
+	        </div>
+	    </div>
+	    <div class="form-group">
+	      <div class="input-group input-group-sm">
+	        <span class="input-group-addon">提现状态</span>
+	          <select id="txstatus" class="form-control js_select2">
+	            {foreach $txstatus as $skey=>$statu} 
+	                <option value="{$skey}">{$statu}</option>
+	            {/foreach}
+	          </select>
+	        </div>
+	    </div>
+	    <a class="btn btn-primary btn-sm btn-search" href="javascript:void(0)"><i class="mdi mdi-magnify"></i> 搜索</a>
+	</div>
+	<table id="listtable" class="zam-btable"></table>
+</section>
+<script id='tx-tpl' type="text/template">
+	<div class="form-horizontal confirmbox-pop">
+		<div class="form-group m-b-5">
+	      <label class="col-lg-3 control-label">收入余额：</label>
+	      <div class="col-lg-7">
+	        <span class="onlytxt only-one text-danger"><% d.incomemoney %>元</span>
+	      </div>
+	    </div>
+	    <div class="form-group m-b-5">
+	      <label class="col-lg-3 control-label">提现金额：</label>
+	      <div class="col-lg-7">
+				<input type="text" class="form-control numberincdec txmoney" name="txmoney" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="null"
+                data-bts-decimals="2"
+                data-bts-step="1"
+                data-bts-postfix="元"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                data-bts-force-step-divisibility="xstwo"
+                value="0">
+            
+	        <div class="help-block" style="font-size:12px;">单次提现金额必须大于等于<span class="text-error"><% d.txmin %></span>元<%# if(d.txmax > 0){ %>，小于等于<span class="text-error"><% d.txmax %></span>元<%# } %></div>
+	      </div>
+	    </div>
+	    <div class="form-group m-b-5">
+	      <label class="col-lg-3 control-label">提现方式：</label>
+	      <div class="col-lg-7">
+	         <select id="txtype" class="form-control" name="txtype">
+	         	<%# if(d.txaccount.wx=='1'){ %>
+	            	<option value="1">微信提现</option>
+	            <%# } %>
+	            <%# if(d.txaccount.ali=='1'){ %>
+	            	<option value="2">支付宝提现</option>
+	            <%# } %>
+	        </select>
+	         <div class="help-block" style="font-size:12px;">必须选择</div>
+	      </div>
+	    </div>
+	    <div class="form-group m-b-5">
+	      <label class="col-lg-3 control-label">提现手续费：</label>
+	      <div class="col-lg-7">
+	      	<div class="input-group">
+                <input type="text" class="form-control txsxf" name="txsxf" value="0.00" readonly>
+                <div class="input-group-addon">元</div>
+            </div>
+	        <div class="help-block" style="font-size:12px;">
+	        	<%# if(d.txfl > 0){ %>
+	        	提现金额的 <span class="text-danger"><% d.txfl %>%</span>
+	        	<%# }else{ %>
+	        	无提现手续费
+	        	<%# } %>
+	        </div>
+	      </div>
+	    </div>
+	    <div class="form-group m-b-5">
+	      <label class="col-lg-3 control-label">注意事项：</label>
+	      <div class="col-lg-7">
+	      	<div class="form-control-static">
+		        <span class="onlytxt text-danger">
+		        	提现审核周期一般为3个工作日<%# if(d.txjg > 0){ %>，提现打款成功<% d.txjg %>小时后可以发起新的提现申请<%# } %>
+		        </span>
+	    	</div>
+	      </div>
+	    </div>
+	</div>
+</script>
+<script id='hbcz-tpl' type="text/template">
+	<div class="form-horizontal confirmbox-pop">
+		<div class="form-group m-b-5">
+	      <label class="col-lg-3 control-label">账户余额：</label>
+	      <div class="col-lg-7">
+	        <span class="onlytxt only-one text-danger"><% d.hbmoney %>元</span>
+	      </div>
+	    </div>
+	    <div class="form-group m-b-5">
+	      <label class="col-lg-3 control-label">充值金额：</label>
+	      <div class="col-lg-7">
+	        <div class="input-group">
+                <input type="text" class="form-control czmoney" name="czmoney" value="">
+                <div class="input-group-addon">元</div>
+            </div>
+	        <div class="help-block" style="font-size:12px;">
+	        	单次充值金额必须大于等于<span class="text-error"><% d.czhbmin %></span>元
+	        	<%# if(d.czhbmax > 0){ %>
+	        	，小于等于<span class="text-error"><% d.czhbmax %></span>元</div>
+	        	<%# } %>
+	      </div>
+	    </div>
+	    <div class="form-group m-b-5">
+	      <label class="col-lg-3 control-label">充值手续费：</label>
+	      <div class="col-lg-7">
+	      	<div class="input-group">
+                <input type="text" class="form-control czsxf" name="czsxf" value="0.00" readonly>
+                <div class="input-group-addon">元</div>
+            </div>
+	        <div class="help-block" style="font-size:12px;">
+	        	<%# if(d.czhbfl > 0){ %>
+	        		充值金额的 <span class="text-danger"><% d.czhbfl %>%</span>
+	        	<%# }else{ %>
+	        		无充值手续费
+	        	<%# } %>
+	        </div>
+	      </div>
+	    </div>
+	    <div class="form-group m-b-5">
+	      <label class="col-lg-3 control-label">实付金额：</label>
+	      <div class="col-lg-7">
+	        <div class="input-group">
+                <input type="text" class="form-control paymoney" name="paymoney" value="0.00" readonly>
+                <div class="input-group-addon">元</div>
+            </div>
+	        <div class="help-block" style="font-size:12px;">充值金额 + 充值手续费</div>
+	      </div>
+	    </div>
+	    <div class="form-group m-b-5">
+	      <label class="col-lg-3 control-label">支付方式</label>
+	      <div class="col-lg-9">
+			{include file='$Wpath/common/paytype'}
+		  </div>
+		</div>
+		{if $openczxieyi=='1'}
+		<div class="form-group m-b-5">
+	      <label class="col-lg-3 control-label">代收代付协议</label>
+	      <div class="col-lg-9">
+			<label class="lyear-checkbox checkbox-primary m-t-10">
+	           <input type="checkbox" name="argreexieyi" class="argreexieyi" value='1'><span>我已阅读并同意<a target="__blank" href="{:goweb('register/czhbxieyi')}">{$czxieyiname}</a></span>
+	        </label>
+		  </div>
+		</div>
+		{/if}
+	</div>
+</script>
+<script>
+var alipayopen = "{if isset($paytypes['alipay']) && $paytypes['alipay']['open']=='1' && $paytypes['alipay']['payredpack']=='2'}2{else /}1{/if}";
+require(['webcore','webtable','jconfirmBox','zamnotice',"bootstrap-touchspin"],function(webcore,webtable,jconfirmBox,zamnotice){
+	var initConfig = {
+	    tableId:'#listtable',
+	    url:"{:gomyhome('account/index')}",
+	    columnoperate:false,
+	    columns:[{
+	            checkbox: true,
+	        }, 
+	        {
+	            field: 'id',
+	            title: 'id',
+	            align: 'center',
+	            visible: false
+	        },{
+	            field: 'user_name',
+	            title: '用户',
+	            align: 'center',
+	            formatter:function(value,row,index){
+	                var html = "<div><span>"+(value==null?"已删除":value)+"</span></div>";
+                	return html;
+	            }
+	        }, {
+	            field: 'statushtml',
+	            title: '状态',
+	            align: 'center',
+	            formatter:function(value,row,index){
+	                var html = value;
+	                if(row.status=='3') html += "<div class='text-error m-t-10'>"+row.refusereason+"</div>";
+                	return html;
+	            }
+	        }, {
+	            field: 'typehtml',
+	            title: '提现类型',
+	            align: 'center',
+	            formatter:function(value,row,index){
+	                var html = value;
+	                if(row.type=='3') html += "<div class='text-error m-t-10'>"+row.beizhu+"</div>";
+                	return html;
+	            }
+	        },  {
+	            field: 'txmoney',
+	            title: '提现金额',
+	            align: 'center',
+	            formatter:function(value,row,index){
+	                return value.toFixed(2)+'元';
+	            }
+	        },  {
+	            field: 'txsxf',
+	            title: '提现手续费',
+	            align: 'center',
+	            formatter:function(value,row,index){
+	                return value.toFixed(2)+'元';
+	            }
+	        }
+	        ,{
+	            field: 'create_time',
+	            title: '提现时间',
+	            align: 'center',
+	        }
+	    ],
+	    onload:function(){
+	        
+	    },
+	    editsave: function (field, row, oldvalue, $el) {
+	       
+	    },
+	    searchParamas:[{'type':'2','id':'txtype'},{'type':'2','id':'txstatus'}],
+	    toolbar:{
+	    },
+	};
+	webtable.init(initConfig);
+	$('.zam-inline-searchbar select').change(function(e) {
+		webtable.refresh();
+	});
+	$(".useraccount-box").on('click','.btn-tx',function() {
+		//先来查是否开启了短信验证 开了则先打开短信验证码
+		webcore.ajaxSubmit("{:gomyhome('account/checktx')}",{}).then(function(json){
+			if(json.code==0){
+				var confirmobj = jconfirmBox.confirm('收入提现申请',webcore.tpl($("#tx-tpl"),json.msg),function(e){
+					var $thisp = e.$content,txmoney = $thisp.find('.txmoney').val(),txsxf = webcore.toFixed((parseFloat(txmoney) * parseFloat(json.msg.txfl/100)), 2),txtype = $thisp.find('select option:selected').val();
+					if(txmoney=='') return zamnotice.showTips('error','请输入提现金额');
+					if(txmoney <= 0) return zamnotice.showTips('error','提现金额必须大于0');
+					webcore.ajaxSubmit("{:gomyhome('account/txapply')}",{txmoney:txmoney,txsxf:txsxf,txtype:txtype},'正在发起提现申请...').then(function(json){
+						 if(json.code==0){
+							confirmobj.close();
+							zamnotice.showTips('success','提现成功',1e3,function(){
+								window.location.reload();
+							});
+						 }else{
+							if(json.code==-2){
+								zamnotice.showTips('error',json.msg,1e3,function(){
+									window.location.href = "{:gomyhome('profile/txaccount')}";
+								});
+							}else if(json.code==-3){
+								var confirmobj2 = jconfirmBox.confirm('发起提现短信验证',webcore.tpl($("#mobile-tpl"),{mobile:json.msg}),function(e){
+						          var mobile = e.$content.find(".mobile").val();
+						          if(mobile=='') return zamnotice.showTips('error','请填写手机号');
+						          var mobilecode = e.$content.find(".mobilecode").val();
+						          if(mobilecode=='') return zamnotice.showTips('error','请填写手机验证码');
+						          webcore.ajaxSubmit("{:gomyhome('account/postsms')}",{type:'1',code:mobilecode},'正在处理..').then(function(json){
+						               if(json.code==0){
+						                  confirmobj2.close();
+						                  zamnotice.showTips('success','验证成功');
+						               }else{
+						                  zamnotice.showTips('error',json.msg);
+						               }
+						          })
+						        },false,false,true,[{'hidden':false,'txt':'确定'},{'hidden':false,'txt':'取消'}],function(){
+						          var $thiss = confirmobj2.$content;
+						          $thiss.find(".sendmobilecode").click(function(){
+						            var $this = $(this);
+						            var mobile = $thiss.find('.mobile').val();
+						            if(mobile==''){
+						              return zamnotice.showTips('error','请先填写手机号码');
+						            }else{
+						              if(!mobile.match(/^[1][3,4,5,6,7,8,9][0-9]{9}$/)) return zamnotice.showTips('error','请填写正确的手机号码');
+						              $this.addClass('disabled');
+						              webcore.ajaxSubmit("{:gomyhome('account/sendsms')}",{type:'1',mobile:mobile}).then(function(json){
+						                if(json.code==0){
+						                  zamnotice.showTips('success','手机验证码下发成功，请查收');
+						                  $this.text('60s');
+						                  webcore.countdown(60,function(t){
+						                    $this.text(t+'s');
+						                  },function(){
+						                    $this.removeClass('disabled').text('发送验证码');
+						                  },1e3);
+						                }else{
+						                  $this.removeClass('disabled').text('发送验证码');
+						                  zamnotice.showTips('error',json.msg);
+						                  return false;
+						                }
+						              }, function(json){
+						                $this.removeClass('disabled').text('发送验证码');
+						                zamnotice.showTips('error','网络差,操作失败');
+						              });
+						            }
+						          });
+						        });
+							}else{
+								zamnotice.showTips('error',json.msg);
+							}
+						 }
+					},'json')
+				},false,false,true,[{'hidden':false,'txt':'确定提现'},{'hidden':false,'txt':'取消'}],function(){
+						var $this = confirmobj.$content;
+					    $this.find(".txmoney").on('blur',function(){
+					    	var txmoney = $(this).val()==''?0:$(this).val(), txsxf = webcore.toFixed((parseFloat(txmoney) * parseFloat(json.msg.txfl/100)),2);
+							$this.find(".txsxf").val(txsxf);
+						});
+						$(".txmoney").TouchSpin().on("change", function(){
+							var txmoney = $(this).val()==''?0:$(this).val(), txsxf = webcore.toFixed((parseFloat(txmoney) * parseFloat(json.msg.txfl/100)),2);
+							$this.find(".txsxf").val(txsxf);
+						});
+				});
+			}else{
+			    if(json.code==-2){
+					zamnotice.showTips('error',json.msg,1e3,function(){
+						window.location.href = "{:gomyhome('profile/txaccount')}";
+					});
+				}else if(json.code==-3){
+					zamnotice.showTips('error',json.msg,2e3,function(){
+						window.location.href = "{:gomyhome('profile/index',['needsm'=>'1'])}";
+					});
+				}else{
+					zamnotice.showTips('error',json.msg);
+			    }
+			}
+		}, function(json){
+			zamnotice.showTips('error','网络差。操作失败');
+		});
+	});
+	$(".useraccount-box").on('click','.btn-cz',function() {
+		webcore.ajaxSubmit("{:gomyhome('account/checkcz')}",{}).then(function(json){
+			if(json.code==0){
+				var tpldata = json.msg;
+				var confirmobj = jconfirmBox.confirm('红包账号充值',webcore.tpl($("#hbcz-tpl"),tpldata),function(e){
+						var $this = e.$content,czmoney = $this.find('.czmoney').val(),czsxf = webcore.toFixed((parseFloat(czmoney) * parseFloat(tpldata.czhbfl/100)), 2),paymoney = (parseFloat(czmoney) + parseFloat(czsxf)).toFixed(2),paytype = $this.find('.paytype').val()||'1';
+						if(czmoney=='') return zamnotice.showTips('error','请输入充值金额');
+						if(czmoney <= 0) return zamnotice.showTips('error','充值金额必须大于0');
+						if($(".argreexieyi").length > 0){
+							var argreexieyi = $this.find('input[name="argreexieyi"]:checked').val();
+							if(argreexieyi!='1'){
+								return zamnotice.showTips('error','请勾选同意代收代付协议');
+							}
+						}
+						webcore.ajaxSubmit("{:gomyhome('account/checkcz')}",{czmoney:czmoney,czsxf:czsxf,paymoney:paymoney},'正在发起支付...').then(function(json){
+							confirmobj.close();
+							 if(json.code==0){
+								var confirmobj2 = jconfirmBox.ajaxconfirm("充值红包账号","{:gomyhome('account/payhbcz')}",{czmoney:czmoney,czsxf:czsxf,paymoney:paymoney,paytype:paytype},'html','col-lg-6 col-lg-offset-3',function(e){
+									var payBox = e.find(".payInfoBox");
+									if(payBox.length>0){
+										var orderid = payBox.attr('data-id');
+										webcore.ajaxSubmit("{:gomyhome('account/queryorder')}",{orderid:orderid}).then(function(json){
+											if(json.code!=0){
+												zamnotice.showNotice('提示',json.msg,2e3,false,'info','info');
+											}else{
+												confirmobj2.close();
+												zamnotice.showTips('success','支付成功',500,function(){
+													window.location.reload();
+												});
+											}
+										});
+									}else{
+										confirmobj2.close();
+									}
+								},false,'1',[{'hidden':false,'txt':'已完成支付'},{'hidden':false,'txt':'取消'}]);
+							 }else{
+								zamnotice.showTips('error',json.msg);
+							 }
+						})
+				},false,false,true,[{'hidden':false,'txt':'确定充值'},{'hidden':false,'txt':'取消'}],function(){
+					var $this = confirmobj.$content;
+				    $this.find(".czmoney").on('blur',function(){
+				    	var czmoney = $(this).val()==''?0:$(this).val(), czsxf = webcore.toFixed((parseFloat(czmoney) * parseFloat(tpldata.czhbfl/100)), 2);
+						$this.find(".czsxf").val(czsxf);
+						var paymoney = (parseFloat(czsxf) + parseFloat(czmoney)).toFixed(2);
+						$this.find(".paymoney").val(paymoney);
+					});
+					/*
+					if(alipayopen=='2'){
+						$this.find('li').eq(1).remove();
+					}
+					*/
+				});
+			}else{
+				if(json.code==-2){
+					zamnotice.showTips('error',json.msg,2e3,function(){
+						window.location.href = "{:gomyhome('profile/index',['needsm'=>'1'])}";
+					});
+				}else if(json.code==-3){
+					var confirmobj2 = jconfirmBox.confirm('充值红包账户短信验证',webcore.tpl($("#mobile-tpl"),{mobile:json.msg}),function(e){
+			          var mobile = e.$content.find(".mobile").val();
+			          if(mobile=='') return zamnotice.showTips('error','请填写手机号');
+			          var mobilecode = e.$content.find(".mobilecode").val();
+			          if(mobilecode=='') return zamnotice.showTips('error','请填写手机验证码');
+			          webcore.ajaxSubmit("{:gomyhome('account/postsms')}",{type:'2',code:mobilecode},'正在处理..').then(function(json){
+			               if(json.code==0){
+			                  confirmobj2.close();
+			                  zamnotice.showTips('success','验证成功');
+			                  $(".useraccount-box .btn-cz").trigger('click');
+			               }else{
+			                  zamnotice.showTips('error',json.msg);
+			               }
+			          })
+			        },false,false,true,[{'hidden':false,'txt':'确定'},{'hidden':false,'txt':'取消'}],function(){
+			          var $thiss = confirmobj2.$content;
+			          $thiss.find(".sendmobilecode").click(function(){
+			            var $this = $(this);
+			            var mobile = $thiss.find('.mobile').val();
+			            if(mobile==''){
+			              return zamnotice.showTips('error','请先填写手机号码');
+			            }else{
+			              if(!mobile.match(/^[1][3,4,5,6,7,8,9][0-9]{9}$/)) return zamnotice.showTips('error','请填写正确的手机号码');
+			              $this.addClass('disabled');
+			              webcore.ajaxSubmit("{:gomyhome('account/sendsms')}",{type:'2',mobile:mobile}).then(function(json){
+			                if(json.code==0){
+			                  zamnotice.showTips('success','手机验证码下发成功，请查收');
+			                  $this.text('60s');
+			                  webcore.countdown(60,function(t){
+			                    $this.text(t+'s');
+			                  },function(){
+			                    $this.removeClass('disabled').text('发送验证码');
+			                  },1e3);
+			                }else{
+			                  $this.removeClass('disabled').text('发送验证码');
+			                  zamnotice.showTips('error',json.msg);
+			                  return false;
+			                }
+			              }, function(json){
+			                $this.removeClass('disabled').text('发送验证码');
+			                zamnotice.showTips('error','网络差,操作失败');
+			              });
+			            }
+			          });
+			        });
+				}else{
+					zamnotice.showTips('error',json.msg);
+				}
+			}
+		}, function(json){
+			zamnotice.showTips('error','网络差。操作失败');
+		});
+	});
+});
+</script>
+<script id='mobile-tpl' type="text/template">
+<div class="form-horizontal">
+  <div class="form-group">
+    <label class="col-lg-3 control-label">* 手机号</label>
+    <div class="col-lg-8">
+      <input class="form-control mobile" type="text"  name="mobile" placeholder="请输入手机号" value="<% d.mobile %>" readonly>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-lg-3 control-label">* 验证码</label>
+    <div class="col-lg-8">
+      <div class="input-group"> 
+        <input type="text" name="mobilecode" class="form-control mobilecode" maxlength="4"> <span class="input-group-addon btn btn-primary sendmobilecode">发送验证码</span> </div>
+    </div>
+  </div>
+</div>
+</script>
+{include file='$Wpath/common/footer'}

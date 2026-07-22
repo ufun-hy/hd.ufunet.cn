@@ -1,0 +1,171 @@
+{include file='$Wpath/common/header'}
+<div class="form-inline zam-inline-searchbar">
+    <div class="form-group m-l-5">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">选择轮次</span>
+          <select id="rotateid" class="form-control js_select2">
+            {if empty($rotates)}
+                <option value="0">暂无轮次</option>
+            {/if}
+            {foreach $rotates as $k=>$r} 
+                <option value="{$r['id']}" {if $rotateid == $r['id']}selected{/if}>{$r['title']}</option>
+            {/foreach}
+          </select>
+        </div>
+    </div>
+    <a class="btn btn-primary btn-sm btn-search" href="javascript:void(0)"><i class="mdi mdi-magnify"></i> 搜索</a>
+    <a class="btn btn-warning btn-sm btn-exportitem" href="javascript:void(0)"><i class="mdi mdi-export"></i> 导出项目</a>
+    <a class="btn btn-success btn-sm btn-export" href="javascript:void(0)"><i class="mdi mdi-export"></i> 导出明细</a>
+</div>
+{include file='$Wpath/common/tabletoolbar'}
+<table id="listtable" class="zam-btable"></table>
+<script>
+require(['webcore','webtable','jconfirmBox','zamnotice'],function(webcore,webtable,jconfirmBox,zamnotice){
+var initConfig = {
+    tableId:'#listtable',
+    url:"{:gohdmanage('datavote/index',['hdid'=>$hdid])}",
+    columnoperate:{
+        btns:{
+            data:true,
+            shenhe:{title:"清空记录",icon:"mdi-gavel",class:"danger"},
+        },
+        func:{
+            shenhe:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','您确定要清空该投票项的所有投票记录么？',function(){
+                    webcore.ajaxSubmit("{:gohdmanage('datavote/deldata',['hdid'=>$hdid])}",{rotateid:$("#rotateid option:selected").val(),voteid:row.id}).then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','删除成功');
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                    });
+                });
+            },
+            data:function(value, row, index){
+                var confirmobj = jconfirmBox.ajaxconfirm(
+                    "投票明细",
+                    "{:gohdmanage('datavote/votedetail',['hdid'=>$hdid])}",
+                    {rotateid: $("#rotateid option:selected").val(),voteid: row.id},
+                    'html',
+                    'col-lg-8 col-lg-offset-2',
+                    function(e){},false,'2');
+            },
+        }
+    },
+    columns:[
+        {
+            checkbox: true,
+        }, 
+        {
+            field: 'id',
+            title: 'id',
+            align: 'center',
+            visible: false
+        },{
+            field: 'groupname',
+            title: '项目分组',
+            align: 'center',
+        },{
+            field: 'votename',
+            title: '投票项目',
+            align: 'center',
+            formatter:function(value,row,index){
+                return `
+                    <div class='zam-flex-column-center'>
+                        ${row.voteimg ? `<img src="${row.voteimg}" class="avatarImg" />` : ``}
+                        <span>${value}</span>
+                    </div>
+                `;
+            }
+        },{
+            field: 'totalnums',
+            title: '票数',
+            align: 'center',
+            formatter:function(value,row,index){
+                return `
+                    <div>共：${value} 票</div>
+                    <div class="m-t-5">投票 ${row.votenums} 票，手动${row.addnums >= 0 ? '加票' : '减票'} ${row.addnums} 票</div>
+                `;
+            }
+        },{
+            field: 'voteperson',
+            title: '投票人数',
+            align: 'center',
+        }
+    ],
+    searchParamas:[{'type':'2','id':'rotateid'}],
+    toolbar:{
+        del:function(){
+            var getSelects = webtable.getSelections();
+            if(!getSelects.length){
+                return zamnotice.showTips('info','请先选择您要操作的数据');
+            }
+            jconfirmBox.confirm('温馨提示','您确定要删除选中的投票项的所有投票记录么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('datavote/deldata',['hdid'=>$hdid])}",{rotateid:$("#rotateid option:selected").val(),voteid:getSelects}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','删除成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+        },
+        reset:function(){
+            jconfirmBox.confirm('温馨提示','清空将删除所选轮次内的所有投票记录并且无法恢复，您确定要清空么？',function(){
+                webcore.ajaxSubmit("{:gohdmanage('datavote/resetdata',['hdid'=>$hdid])}",{rotateid:$("#rotateid option:selected").val()}).then(function(json){
+                    if(json.code==0){
+                        webtable.refresh();
+                        zamnotice.showTips('success','清空成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差,操作失败');
+                });
+            });
+        },
+    },
+};
+webtable.init(initConfig);
+$('#rotateid').change(function(e) {
+    webtable.refresh();
+});
+$('.btn-exportitem').on('click',function(){
+    var rotateid = $("#rotateid option:selected").val()||'';
+    if(!rotateid) {
+        return zamnotice.showTips('error','请先选择轮次');
+    }
+    webcore.ajaxSubmit("{:gohdmanage('datavote/exportitems',['hdid'=>$hdid])}",{rotateid:rotateid}).then(function(json){
+        if(json.code != 0){
+            zamnotice.showTips('error',json.msg);
+        }else{
+            window.location.href = `{:gohdmanage('datavote/exportitems',['hdid'=>$hdid])}&rotateid=${rotateid}`;
+        }
+    }, function(json){
+        zamnotice.showTips('error','网络差,操作失败');
+    });
+});
+$('.btn-export').on('click',function(){
+    var rotateid = $("#rotateid option:selected").val()||'';
+    if(!rotateid) {
+        return zamnotice.showTips('error','请先选择轮次');
+    }
+    webcore.ajaxSubmit("{:gohdmanage('datavote/exportdata',['hdid'=>$hdid])}",{rotateid:rotateid}).then(function(json){
+        if(json.code != 0){
+            zamnotice.showTips('error',json.msg);
+        }else{
+            window.location.href = `{:gohdmanage('datavote/exportdata',['hdid'=>$hdid])}&rotateid=${rotateid}`;
+        }
+    }, function(json){
+        zamnotice.showTips('error','网络差,操作失败');
+    });
+});
+});
+</script>
+{include file='$Wpath/common/footer'}

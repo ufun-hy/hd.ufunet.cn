@@ -1,0 +1,129 @@
+{php}
+if(!isset($config['tsinfo']) || empty($config['tsinfo'])){
+	$config['tsinfo'] = [
+		'open'=>'2',
+        'type'=>'1',
+		'title'=>'恭喜您中奖了',
+		'des'=>'请到指定地点领取奖品',
+	];
+}
+$syshdconfig = \app\common\service\web\huodongService::getsyshdconfig('all');
+$wxmini = $syshdconfig['miniconfig']??[];
+$wxsubtplid = $wxmini['subtplid']??'';
+$tsqrimg = $syshdconfig['accountqrimg']??'';
+$realhdid = request()->realhdid;
+$issysqr = '1';
+$hdqrtype = '1';
+if(!empty($realhdid)){
+   $hdconfig = request()->hdinfo;
+   $hdqrtype = $hdconfig['qrtype']??'1';
+   if(!empty($hdconfig) && !empty($hdconfig['oauthconfig']) && $hdconfig['oauthconfig']['open']=='1'){
+        $issysqr = '3';
+        if($hdconfig['oauthconfig']['type']=='1'){
+            $issysqr = '2';
+            $wxaccountInfo = \app\common\service\web\userwxaccountService::getwxaccount($hdconfig['oauthconfig']['wechatid']);
+            if(!empty($wxaccountInfo)){
+                $tsqrimg = $wxaccountInfo['qrcode']??'';
+            }
+        }
+   }
+}
+{/php}
+<div class="config-titlebox">
+    <span class="config-titlename">用户中奖通知</span>
+    <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#tsbox" aria-expanded="false"><span>展开</span> <i class="mdi mdi-chevron-double-down"></i></span>
+</div>
+<div id="tsbox" class="collapse">
+    <div class="form-group{if $issysqr=='3'} hidden{/if}">
+        <label class="col-lg-2 control-label">* 开启通知</label>
+        <div class="col-lg-10">
+            {:tpl_switch('tsinfo[open]',$config['tsinfo']['open'],'openwxts')}
+        </div>
+    </div>
+    <div class="tsbox{if $config['tsinfo']['open']=='2' || $issysqr=='3'} hidden{/if}">
+        
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 通知类型</label>
+            <div class="col-lg-8">
+              <label class="lyear-radio radio-inline radio-primary">
+                <input type="radio" name="tsinfo[type]" value="1" {if !isset($config['tsinfo']['type']) || $config['tsinfo']['type']=='1'}checked{/if} onclick="javascript:$('.mnbox').removeClass('hidden'),$('.dybox,.dysubbox').addClass('hidden');"><span>公众号模板消息</span>
+              </label>
+              <label class="lyear-radio radio-inline radio-primary{if !dzsubmessage() || $hdqrtype=='4'} hidden{/if}">
+                <input type="radio" name="tsinfo[type]" value="2" {if isset($config['tsinfo']['type']) && $config['tsinfo']['type']=='2'}checked{/if}  onclick="javascript:$('.mnbox,.dysubbox').addClass('hidden'),$('.dybox').removeClass('hidden');"><span>公众号一次性订阅消息</span>
+              </label>
+              <label class="lyear-radio radio-inline radio-primary{if !dzsubnotice() || $hdqrtype=='4'} hidden{/if}">
+                <input type="radio" name="tsinfo[type]" value="3" {if isset($config['tsinfo']['type']) && $config['tsinfo']['type']=='3'}checked{/if}  onclick="javascript:$('.mnbox,.dybox').addClass('hidden'),$('.dysubbox').removeClass('hidden');"><span>公众号订阅通知</span>
+              </label>
+              <label class="lyear-radio radio-inline radio-primary{if $hdqrtype < 4 || empty($wxsubtplid) || !dznormalrequest('wxminisubnotice')} hidden{/if}">
+                <input type="radio" name="tsinfo[type]" value="4" {if isset($config['tsinfo']['type']) && $config['tsinfo']['type']=='4'}checked{/if}  onclick="javascript:$('.mnbox,.dybox,.dysubbox').addClass('hidden')"><span>小程序订阅消息</span>
+              </label>
+              <div class="help-block">
+                <div>公众号模板消息必须先关注公众号才可以接收到中奖通知{if $issysqr < 3}<a class="btn btn-primary btn-xs m-l-10" href="javascript:void(0)" onclick="showqr()">点击扫码关注公众号{if $issysqr=='2'}({$wxaccountInfo['accountname']??""}){/if}</a>{/if}</div>
+                {if dzsubmessage() && $hdqrtype < 4 }
+                    <div>公众号一次性订阅消息无需关注公众号，但微信用户扫码后需同意授权接受消息</div>
+                {/if}
+                {if dzsubnotice() && $hdqrtype < 4 }
+                    <div>公众号订阅通知无需关注公众号，但微信用户扫码后需授权允许接收订阅通知</div>
+                {/if}
+                {if dznormalrequest('wxminisubnotice') && $hdqrtype == '4'}
+                    <div>小程序订阅消息：微信用户扫码后需授权允许接收订阅中奖通知</div>
+                {/if}
+                {if $issysqr == '2'}
+                    {if (!isset($wxaccountInfo['zjtplid']) || empty($wxaccountInfo['zjtplid']))}
+                    <div class="mnbox m-t-5{if (!isset($config['tsinfo']['type']) || $config['tsinfo']['type']=='1')}{else /} hidden{/if}">检测到公众号（{$wxaccountInfo['accountname']??""}）未设置中奖模板id，选择公众号模板通知将无效，<a href="{:gomyhome('wxaccount/index')}">点击去设置</a></div>
+                    {/if}
+                    {if dzsubmessage() && (!isset($wxaccountInfo['subtplid']) || empty($wxaccountInfo['subtplid']))}
+                        <div class="dybox m-t-5{if isset($config['tsinfo']['type']) && $config['tsinfo']['type']=='2'}{else /} hidden{/if}">检测到公众号（{$wxaccountInfo['accountname']??""}）未设置公众号一次性订阅消息模板id，选择公众号一次性订阅消息将无效，<a href="{:gomyhome('wxaccount/index')}">点击去设置</a></div>
+                    {/if}
+                    {if dzsubnotice() && (!isset($wxaccountInfo['subnoticetplid']) || empty($wxaccountInfo['subnoticetplid']))}
+                        <div class="dysubbox m-t-5{if isset($config['tsinfo']['type']) && $config['tsinfo']['type']=='3'}{else /} hidden{/if}">检测到公众号（{$wxaccountInfo['accountname']??""}）未设置公众号订阅通知中奖模板id，选择公众号订阅通知将无效，<a href="{:gomyhome('wxaccount/index')}">点击去设置</a></div>
+                    {/if}
+                {/if}
+              </div>
+            </div>
+        </div>
+        <div class="form-group">
+        	<label class="col-lg-2 control-label">* 中奖主题</label>
+        	<div class="col-lg-8">
+        	  <input type="text" class="form-control"  name="tsinfo[title]"  value="{$config['tsinfo']['title']}">
+        	</div>
+        </div>
+        <div class="form-group">
+        	<label class="col-lg-2 control-label">* 中奖简介(领奖地点等内容)</label>
+        	<div class="col-lg-8">
+        	  <input type="text" class="form-control"  name="tsinfo[des]"  value="{$config['tsinfo']['des']}">
+        	</div>
+        </div>
+    </div>
+    {if $issysqr=='3'}
+    <div class="form-group">
+        <label class="col-lg-2 control-label"></label>
+        <div class="col-lg-8">
+            <div class="form-control-static text-danger">当前活动已开启私有oauth -> 自定义oauth，暂不支持中奖推送，请选择授权接入的认证服务号oauth</div>  
+        </div>
+    </div>
+    {/if}
+</div>
+<script type="text/javascript">
+function openwxts(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".tsbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".tsbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function showqr(){
+    require(['webcore'],function(webcore){
+        var qrimg = "{if !empty($tsqrimg)}{:tomedia($tsqrimg)}{/if}";
+        if(qrimg==''){
+            return webcore.showMsg('公众号二维码未设置');
+        }
+        webcore.showVideos([qrimg],'1');
+    });
+}
+</script>

@@ -1,0 +1,36 @@
+<div class="form-horizontal">
+  <div class="form-group">
+	<label class="col-md-3 control-label text-right">* 显示状态</label>
+	<div class="col-md-8">
+		{:tpl_switch("isopen",$config['isopen'])}
+		<span class="zam-help-block">注:活动一览内关闭的功能，无法显示</span>
+	</div>
+  </div>
+  <div class="form-group">
+	<label class="col-md-3 control-label text-right">* 功能名</label>
+	<div class="col-md-8">
+	  <input type="text" class="form-control modulename"  name="modulename"  value="{$config['modulename']}">
+	  <input type="hidden" name="modulefield"  value="{$config['modulefield']}">
+	</div>
+  </div>
+  <div class="form-group">
+		<label class="col-md-3 control-label text-right">* 功能图(60*60px)</label>
+		<div class="col-md-8">
+			{:tpl_image_one('moduleimg', $config['moduleimg'])}
+		</div>
+  </div>
+  {if $config['ishandadd']=='1'}
+  <div class="form-group">
+		<label class="col-md-3 control-label text-right">* 功能链接</label>
+		<div class="col-md-8">
+			 <input type="text" class="form-control moduleurl"  name="moduleurl"  value="{$config['moduleurl']}">
+		</div>
+  </div>
+  {else}
+  <input type="hidden" class="form-control moduleurl"  name="moduleurl"  value="{$config['moduleurl']}">
+  {/if}
+  <input type="hidden" name="handadd"  value="{$config['ishandadd']}">
+</div>
+<script type="text/javascript">
+tpl_switch();
+</script>

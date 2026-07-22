@@ -1,0 +1,177 @@
+<div id="endstart" class="collapse in">
+	<div class="form-group">
+	    <label class="col-lg-2 control-label">* 开启logo</label>
+	    <div class="col-lg-8">
+	        {:tpl_switch('endconfig[showlogo]',$config['endconfig']['showlogo'],'showlogo')}
+	        <span class="help-block">开启则启动结束后展示商家logo</span>
+	    </div>
+	</div>
+	<div class="logobox{if $config['endconfig']["showlogo"]=="2"} hidden{/if}">
+		<div class="form-group">
+		    <label class="col-lg-2 control-label">* 商家logo</label>
+		    <div class="col-lg-8">
+		        {:tpl_image_one('endconfig[logoconfig][imgurl]',$config['endconfig']['logoconfig']['imgurl'])}
+		        <span class="help-block">规格:400*200px，具体尺寸需结合屏幕实际尺寸设计</span>
+		    </div>
+		</div>
+		<div class="form-group">
+            <label class="col-lg-2 control-label">* logo宽</label>
+            <div class="col-lg-4">
+                <input type="text" class="form-control numberincdec" name="endconfig[logoconfig][width]" value="{$config['endconfig']['logoconfig']['width']}"
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="null"
+                data-bts-step="1"
+                data-bts-postfix="px"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                >
+                <span class="help-block">注:填写0即为展示logo原图宽</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* logo高</label>
+            <div class="col-lg-4">
+                <input type="text" class="form-control numberincdec" name="endconfig[logoconfig][height]" value="{$config['endconfig']['logoconfig']['height']}"
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="null"
+                data-bts-step="1"
+                data-bts-postfix="px"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                >
+                <span class="help-block">注:填写0即为展示logo原图高</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* logo飞入方式</label>
+            <div class="col-lg-8">
+                <select id="aniname" name="endconfig[logoconfig][aniname]" class="form-control js_select2">
+	            {foreach $config['logoanis'] as $k=>$v } 
+	            <option value="{$k}" {if $k == $config['endconfig']['logoconfig']['aniname']}selected{/if}>{$v}</option>
+	            {/foreach}
+	          </select>
+            </div>
+        </div>
+	</div>
+	<div class="form-group">
+	    <label class="col-lg-2 control-label">* 自定义背景</label>
+	    <div class="col-lg-8">
+	        {:tpl_switch('endconfig[bgdiy]',$config['endconfig']['bgdiy'],'bgdiy')}
+	        <span class="help-block"><span class="text-danger">关闭则继续展示启动中的背景</span></span>
+	    </div>
+	</div>
+	<div class="diyendbg{if $config['endconfig']["bgdiy"]=="2"} hidden{/if}">
+ 		<div class="form-group">
+		    <label class="col-lg-2 control-label">* 背景类型</label>
+		    <div class="col-lg-8">
+		        <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.bgimgbox3').removeClass('hidden'),$('.bgvideobox3').addClass('hidden');">
+		            <input type="radio" name="endconfig[bgtype]" {if $config['endconfig']["bgtype"]=="1"}checked{/if} value="1"><span>图片</span>
+		        </label>
+		        <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.bgimgbox3').addClass('hidden'),$('.bgvideobox3').removeClass('hidden');">
+		            <input type="radio" name="endconfig[bgtype]" {if $config['endconfig']["bgtype"]=="2"}checked{/if} value="2" ><span>视频</span>
+		        </label>
+		    </div>
+		</div>
+		<div class="form-group bgimgbox3{if $config['endconfig']["bgtype"]=="2"} hidden{/if}">
+		    <label class="col-lg-2 control-label">* 背景图片</label>
+		    <div class="col-lg-8">
+		        {:tpl_image_one('endconfig[bgimg]',$config['endconfig']['bgimg'])}
+		        <span class="help-block">规格:1400*800px，具体尺寸需结合屏幕实际尺寸设计</span>
+		    </div>
+		</div>
+		<div class="form-group bgvideobox3{if $config['endconfig']["bgtype"]=="1"} hidden{/if}">
+		    <label class="col-lg-2 control-label">* 背景视频</label>
+		    <div class="col-lg-8">
+		        {:tpl_video('endconfig[bgvideo]',$config['endconfig']['bgvideo'])}
+		    </div>
+		</div>
+		<div class="form-group bgvideobox3{if $config['endconfig']["bgtype"]=="1"} hidden{/if}"">
+			<label class="col-lg-2 control-label">* 背景视频播放完毕自动暂停</label>
+			<div class="col-lg-8">
+				{:tpl_switch('endconfig[pausevideo]',$config['endconfig']['pausevideo']??'2')}
+				<span class="help-block">注:开启后视频播放完毕后会自动暂停，您也可通过键盘大于号键来手动暂停播放</span>
+			</div>
+		</div>
+	</div>
+    <div class="form-group">
+	    <label class="col-lg-2 control-label">* 背景音效开关</label>
+	    <div class="col-lg-8">
+	        {:tpl_switch('endconfig[bgmusicoff]',$config['endconfig']['bgmusicoff'],'openbgmusic3')}
+	        <span class="help-block">
+	        	<span class="text-danger">注:关闭背景音效后大屏播放的音效可能有两种情况</span>
+	        	<div>如果开启了启动后背景视频则使用视频内的音效</div>
+	        	<div>如果关闭启动后自定义背景 或 启动后自定义背景选择了背景图片 则继续播放启动中的音效</div>
+	        </span>
+	    </div>
+	</div>
+	<div class="form-group musicinputbox3{if $config['endconfig']['bgmusicoff']=='2'} hidden{/if}">
+	    <label class="col-lg-2 control-label">* 背景音效</label>
+	    <div class="col-lg-8">
+	        {:tpl_audio('endconfig[bgmusic]',$config['endconfig']['bgmusic'])}
+	    </div>
+	</div>
+	<div class="form-group">
+	    <label class="col-lg-2 control-label">* 星星飞跃效果</label>
+	    <div class="col-lg-8">
+	        {:tpl_switch('endconfig[showstars]',$config['endconfig']['showstars'])}
+	    </div>
+	</div>
+	<div class="form-group">
+	    <label class="col-lg-2 control-label">* 礼花掉落效果</label>
+	    <div class="col-lg-8">
+	        {:tpl_switch('endconfig[showflower]',$config['endconfig']['showflower'],'showflower')}
+	    </div>
+	</div>
+	<div class="showflowerbox{if $config['endconfig']['showflower']=='2'} hidden{/if}">
+		<div class="form-group">
+		    <label class="col-lg-2 control-label">* 礼花类型</label>
+		    <div class="col-lg-8">
+		        <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.diycd').addClass('hidden');">
+		            <input type="radio" name="endconfig[flowertype]" {if $config['endconfig']["flowertype"]=="1"}checked{/if} value="1"><span>默认彩带</span>
+		        </label>
+		        <label class="lyear-radio radio-inline radio-primary" onclick="javascript:$('.diycd').removeClass('hidden');">
+		            <input type="radio" name="endconfig[flowertype]" {if $config['endconfig']["flowertype"]=="2"}checked{/if} value="2" ><span>自定义</span>
+		        </label>
+		    </div>
+		</div>
+		<div class="form-group diycd{if $config['endconfig']["flowertype"]=="1"} hidden{/if}">
+		    <label class="col-lg-2 control-label">* 礼花图片</label>
+		    <div class="col-lg-8">
+		        {:tpl_image_one('endconfig[flowerimg]',$config['endconfig']['flowerimg'])}
+		        <span class="help-block">建议图片宽小于200px,大小控制在50kb</span>
+		    </div>
+		</div>
+	</div>
+	<div class="form-group">
+	    <label class="col-lg-2 control-label">* 排行榜</label>
+	    <div class="col-lg-8">
+	        {:tpl_switch('endconfig[showphb]',$config['endconfig']['showphb'],'showphb')}
+	        <span class="help-block">注:小于号键可以显示与隐藏成绩排行榜，不开启则小于号无法触发排行榜</span>
+	    </div>
+	</div>
+	<div class="form-group phbbox{if $config['endconfig']['showphb']!='1'} hidden{/if}">
+        <label class="col-lg-2 control-label">* 排行榜人数</label>
+        <div class="col-lg-3">
+            <input type="text" class="form-control numberincdec" name="endconfig[phbnum]" value="{$config['endconfig']['phbnum']}"
+            data-bts-min="1" data-bts-replacement-val="1"
+            data-bts-max="20"
+            data-bts-step="1"
+            data-bts-postfix="人"
+            data-bts-postfix-extra-class="touchspin-postfix"
+            >
+            <span class="help-block">注:最多20人</span>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+function showphb(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".phbbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".phbbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+</script>

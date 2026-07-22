@@ -1,0 +1,235 @@
+{include file='common/header' /}
+<style>
+audio{display: none}
+.hidden{display: none}
+.pcbgBox video.hidden{
+    display: block;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+}
+.shakestart-mainbox{
+	width: 100%;
+    height: 100%;
+    padding: 0;
+    overflow: hidden;
+}
+.ballBox {
+    position: relative;
+    width: {$pcconfig['startconfig']['ballconfig']['imgsize']}px;
+    height: {$pcconfig['startconfig']['ballconfig']['imgsize']}px;
+    border-radius: 100%;
+    background-image: url("{:tomedia($pcconfig['startconfig']['ballconfig']['imgurl'])}");
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+.ballBox .ball{position:absolute;z-index:-1;}
+.ballBox .ballpercent{
+	position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    cursor: pointer;
+    font-size:{$pcconfig['startconfig']['percentconfig']['size']}px;
+    color:{$pcconfig['startconfig']['percentconfig']['color']};
+    text-shadow: 2px 2px 5px #2997d8;
+    {if $pcconfig['startconfig']['showpercent']=='2'}display: none{/if};
+
+}
+.shakestart-mainbox .papers, .shakestart-mainbox .stars {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+.logoBox{position:absolute;top:0;left:0;height:100%;width:100%;overflow:hidden;}
+.logoBox img{
+	width:{if $pcconfig['endconfig']['logoconfig']['width'] > 0}{$pcconfig['endconfig']['logoconfig']['width']}px{else /}auto{/if};
+	height:{if $pcconfig['endconfig']['logoconfig']['height'] > 0}{$pcconfig['endconfig']['logoconfig']['height']}px{else /}auto{/if};
+	-webkit-animation-duration: 2s;
+	animation-duration: 2s;
+}
+{/*下落的叶子*/}
+#leafContainer {
+	position: absolute;
+	width:100%;
+	height: 800px;
+	top:0;
+	left: 0;
+}
+#leafContainer > div {
+    position: absolute;
+    max-width: 200px;
+    -webkit-animation-iteration-count: infinite, infinite;
+    -webkit-animation-direction: normal, normal;
+    -webkit-animation-timing-function: linear, ease-in;
+}
+#leafContainer > div > img {
+  /*   position: absolute;*/
+     width: 100%;
+     -webkit-animation-iteration-count: infinite;
+     -webkit-animation-direction: alternate;
+     -webkit-animation-timing-function: ease-in-out;
+     -webkit-transform-origin: 50% -100%;
+}
+@-webkit-keyframes fade{
+   
+    0%   { opacity: 1; }
+    95%  { opacity: 1; }
+    100% { opacity: 0; }
+}
+@-webkit-keyframes drop{
+       0%   { -webkit-transform: translate(0px, -50px); }
+    100% { -webkit-transform: translate(0px, 1000px); }
+}
+@-webkit-keyframes clockwiseSpin{
+    0%   { -webkit-transform: rotate(-50deg); }
+    100% { -webkit-transform: rotate(50deg); }
+}
+@-webkit-keyframes counterclockwiseSpinAndFlip {
+    
+    0%   { -webkit-transform: scale(-1, 1) rotate(50deg); }
+   
+    100% { -webkit-transform: scale(-1, 1) rotate(-50deg); }
+}
+{/* 头像进屏幕内部 */}
+.threeBox {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+}
+.threeBox div{width: 100%!important}
+.threeBox .nan,.threeBox .xi,.threeBox .zhong,.threeBox .dong,.threeBox .bei{position:absolute;width: 500px!important;height: 100%}
+.threeBox .nan div,.threeBox .xi div,.threeBox .zhong div,.threeBox .dong div,.threeBox .bei div{overflow:visible!important}
+.threeBox .nan{
+    left: 690px;
+}
+.threeBox .xi{
+    left: 1210px;
+}
+.threeBox .zhong{
+    left: 1760px;
+}
+.threeBox .dong{
+    left: 2295px;
+}
+.threeBox .bei{
+    left: 2840px;
+}
+.threeBox .headImg{
+	-webkit-box-shadow:0 0 18px 10px #2997d8;
+	box-shadow:0 0 18px 10px #2997d8;
+	border-radius:50%;
+	border:{$pcconfig['startconfig']['avatarsconfig']['bordersize']}px solid #200040;
+	width:{$pcconfig['startconfig']['avatarsconfig']['imgsize']}px;
+	height:{$pcconfig['startconfig']['avatarsconfig']['imgsize']}px;
+}
+.bgvideoboxCover {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    z-index: 10;
+    opacity: 0.5;
+}
+.videosbox{
+    width: 100%;
+    height: 100%;
+}
+.videosbox video{
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 0;
+	height: 0;
+}
+.new-sign{
+    width:300px;
+    position:absolute;
+    top:calc(50% - 140px);
+    left:calc(50% - 150px);
+    z-index:8;
+    
+}
+.new-sign .avatar{
+    width:{$pcconfig['waitconfig']['joinconfig']['imgsize']}px;
+    height:{$pcconfig['waitconfig']['joinconfig']['imgsize']}px;
+    -webkit-filter:brightness(1.2);
+    filter:brightness(1.2);
+    box-shadow:0 0 30px #000;
+    border-radius: 50%;
+    
+}
+.new-sign  .nickname{
+    width:300px;
+    text-align:center;
+    font-size:{$pcconfig['waitconfig']['joinconfig']['namesize']}px;
+    color:{$pcconfig['waitconfig']['joinconfig']['namecolor']};
+    padding:10px 0;
+}
+.scanqrbox{
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    font-size: 20px;
+    color: #fff;
+    background-color: rgba(0,0,0,0.21);
+}
+.scanqrbox .scanqrnum{
+    margin-bottom: 10px;
+    display:{if isset($pcconfig['scanqrconfig']) && !empty($pcconfig['scanqrconfig']) && isset($pcconfig['scanqrconfig']['showjoin']) && $pcconfig['scanqrconfig']['showjoin']=='1'}block{else /}none{/if};
+}
+.scanqrbox .scanqrnum span{display:inline-block;margin:0 5px;font-size: 28px;font-weight: 600;}
+.scanqrbox img{
+    border-radius: 10px;
+    width:{if isset($pcconfig['scanqrconfig']) && !empty($pcconfig['scanqrconfig']) && isset($pcconfig['scanqrconfig']['qrsize'])}{$pcconfig['scanqrconfig']['qrsize']}{else /}100{/if}px;
+    height:{if isset($pcconfig['scanqrconfig']) && !empty($pcconfig['scanqrconfig']) && isset($pcconfig['scanqrconfig']['qrsize'])}{$pcconfig['scanqrconfig']['qrsize']}{else /}100{/if}px;
+}
+</style>
+{if isset($pcconfig['startconfig']['djsbgmusicoff']) && isset($pcconfig['startconfig']['djsaudio']) && $pcconfig['startconfig']['djsbgmusicoff']=='1' && !empty($pcconfig['startconfig']['djsaudio'])}
+<audio id="djsaudio" src="{:tomedia($pcconfig['startconfig']['djsaudio'])}"  preload="preload"></audio>
+{/if}
+{if $pcconfig['startconfig']['bgmusicoff']=='1' && !empty($pcconfig['startconfig']['bgmusic'])}
+<audio id="startaudio" src="{:tomedia($pcconfig['startconfig']['bgmusic'])}"  preload="preload" loop="loop"></audio>
+{/if}
+{if $pcconfig['startconfig']['bgmusicoff']=='1' && !empty($pcconfig['startconfig']['bgmusic'])}
+<audio id="overaudio" src="{:tomedia($pcconfig['endconfig']['bgmusic'])}"  preload="preload"></audio>
+{/if}
+<section class="shakestart-mainbox normal-box zam-app-flex-ajCenter2">
+	<div class="ballBox hidden">
+		<div class="ballpercent">0.00%</div>
+		<canvas id="ball" class="ball" width="{$pcconfig['startconfig']['ballconfig']['imgsize']}" height="{$pcconfig['startconfig']['ballconfig']['imgsize']}">当前浏览器不支持canvas</canvas>
+	</div>
+	<div id="leafContainer"></div>
+	<canvas class="papers hidden">当前浏览器不支持canvas</canvas>
+	<div class="logoBox zam-app-flex-ajCenter2 hidden"><img src="{:tomedia($pcconfig['endconfig']['logoconfig']['imgurl'])}"></div>
+	<canvas class="stars hidden">当前浏览器不支持canvas</canvas>
+	<div class="threeBox zam-app-flex">
+        <div class="nan"></div>
+        <div class="xi"></div>
+        <div class="zhong"></div>
+        <div class="dong"></div>
+        <div class="bei"></div>
+    </div>
+    <div class="scanqrbox zam-app-flex-ajCenter hidden">
+        <div class="scanqrnum">当前参与人数<span class="animateNum">0</span>人</div>
+        <div class="scanqrimg">
+            <img src="{$qrcode}" />
+        </div>
+    </div>
+</section>
+<script>
+var fileLists = {:json_encode($fileLists)},startstatus = "{$pcconfig['startstatus']}",showjoin = "{$pcconfig['waitconfig']['showjoin']}",showball = "{$pcconfig['startconfig']['showball']}",ballsize = "{$pcconfig['startconfig']['ballconfig']['imgsize']}",watercolor = "{$pcconfig['startconfig']['ballconfig']['watercolor']}",showpercent = "{$pcconfig['startconfig']['showpercent']}",showavatars = "{$pcconfig['startconfig']['showavatars']}",avatarspeed = "{$pcconfig['startconfig']['avatarsconfig']['speed']}",showlogo = "{$pcconfig['endconfig']['showlogo']}",logoani = "{$pcconfig['endconfig']['logoconfig']['aniname']}",showstars = "{$pcconfig['endconfig']['showstars']}",showflower = "{$pcconfig['endconfig']['showflower']}",flowertype = "{$pcconfig['endconfig']['flowertype']}",flowerimg = "{:tomedia($pcconfig['endconfig']['flowerimg'])}",hasdjsvideo = "{$pcconfig['startconfig']['showdjs']}",hasstartvideo = "{if $pcconfig['startconfig']['bgtype']=='2'}1{else /}2{/if}",hasendvideo = "{if $pcconfig['endconfig']['bgdiy']=='1' && $pcconfig['startconfig']['bgtype']=='2'}1{else /}2{/if}",starttype = "{$pcconfig['startconfig']['type']}",totaltime = parseInt("{$pcconfig['startconfig']['time']}"),maxscore = parseInt("{$pcconfig['startconfig']['score']}"),showphb = parseInt("{$pcconfig['endconfig']['showphb']}"), phbnum = parseInt("{$pcconfig['endconfig']['phbnum']}"),scanqropen = "{if isset($pcconfig['scanqrconfig']) && !empty($pcconfig['scanqrconfig']) && isset($pcconfig['scanqrconfig']['open']) && $pcconfig['scanqrconfig']['open']=='1'}1{else /}2{/if}",scanqrfly = "{if isset($pcconfig['scanqrconfig']) && !empty($pcconfig['scanqrconfig']) && isset($pcconfig['scanqrconfig']['flyavatar']) && $pcconfig['scanqrconfig']['flyavatar']=='1'}1{else /}2{/if}";
+require(['screenshakestart2'],function (screenshakestart2) {
+	screenshakestart2.init();
+});
+</script>
+{include file="shakestart/rank" /}
+{include file='common/footer' /}

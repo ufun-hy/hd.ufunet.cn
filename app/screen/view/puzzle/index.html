@@ -1,0 +1,275 @@
+{include file='common/header' /}
+<style>
+/*.welcomeBox{display:none}*/
+.puzzle-mainbox{
+	width: 100%;
+    height: 100%;
+    margin: 0 auto;
+	padding:0;
+    overflow: hidden;
+}
+.puzzle-rank-list {
+    position: absolute;
+    bottom:50px;
+	left:40px;
+    width: calc(100% - 80px);
+    text-align: center;
+	display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-justify-content: space-around;
+    -ms-flex-pack: distribute;
+    justify-content: space-around;
+    -webkit-box-align: end;
+    -webkit-align-items: flex-end;
+    -ms-flex-align: end;
+    align-items: flex-end;
+}
+.puzzle-rank-list .puzzle-rank-item{
+	position: relative;
+	width: 90px;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -webkit-box-pack: end;
+    -webkit-justify-content: flex-end;
+    -ms-flex-pack: end;
+    justify-content: flex-end;
+}
+.puzzle-rank-list .puzzle-rank-item .puzzle-rank-item-cube{
+	position: relative;
+	width: 60px;
+	min-height: 40px;
+	margin: 0 auto;
+	transition: height 0.8s ease-in-out;
+	visibility: hidden;
+}
+{foreach $pcconfig['style']['showcolors'] as $c=>$v}
+.puzzle-rank-list .puzzle-rank-item:nth-child({$c + 1}) .puzzle-rank-item-cube{
+	background-image: linear-gradient(to top,{$v['scolor']},{$v['ecolor']});
+}
+{/foreach}
+.puzzle-rank-list .puzzle-rank-item .puzzle-rank-item-cube .item-avatar{
+	position: absolute;
+	top: -32px;
+	left: -5px;
+	width: 70px;
+	height: 70px;
+	border-radius: 50%;
+	box-sizing: border-box;
+	border: 5px solid {$pcconfig['style']['userbordercolor']??'#fbb600'};
+}
+.puzzle-rank-list .puzzle-rank-item .puzzle-rank-item-cube .item-avatar img{
+	width: 100%;
+	height: 100%;
+	border-radius: 50%;
+}
+.puzzle-rank-list .puzzle-rank-item .puzzle-rank-item-cube .item-icon{
+	position: absolute;
+    top: -20px;
+    left: -20px;
+    width: 42px;
+    height: 40px;
+    cursor: pointer;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+.puzzle-rank-list .puzzle-rank-item:nth-child(1) .puzzle-rank-item-cube .item-icon{
+	background-image:url("{:tomedia($pcconfig['style']['firsticon'])}");
+}
+.puzzle-rank-list .puzzle-rank-item:nth-child(2) .puzzle-rank-item-cube .item-icon{
+	background-image:url("{:tomedia($pcconfig['style']['secondicon'])}");
+}
+.puzzle-rank-list .puzzle-rank-item:nth-child(3) .puzzle-rank-item-cube .item-icon{
+	background-image:url("{:tomedia($pcconfig['style']['thirdicon'])}");
+}
+.item-canvas{position: absolute;bottom:0;left:0;width: 100%;height: 100%;}
+.item-canvas canvas{width: 100%;height: 100%;}
+.puzzle-rank-item .puzzle-rank-item-info{
+	margin-top: 10px;
+}
+.puzzle-rank-item .puzzle-rank-item-info .puzzle-rank-item-name{
+	height: 30px;
+	color:#fff;
+	font-size: 14px;
+	visibility: hidden;
+}
+.puzzle-rank-item .puzzle-rank-item-info .puzzle-rank-item-score{
+	height: 30px;
+	color: #fff;
+	visibility: hidden;
+}
+/*成绩文字过多，显示字体应小一些*/
+.banglist .banglist-item .banglist-score span{font-size:20px!important;}
+</style>
+<audio id="countaudio" src="/{:WIMGURL}shake/count.mp3"  preload="preload"  style="display:none"></audio>
+<audio id="overaudio" src="/{:SIMGURL}shake/over.mp3"  preload="preload"  style="display:none"></audio>
+<audio id="joinaudio" src="/{:SIMGURL}shake/join.mp3"  preload="preload" style="display:none"></audio>
+<section class="puzzle-mainbox normal-box">
+	<div class="puzzle-wrapper display-none">
+		<div class="puzzle-rank-list">
+			<div class="puzzle-rank-item">
+				<div class="puzzle-rank-item-cube">
+					<div class="item-canvas"><canvas></canvas></div>
+					<div class="item-avatar">
+						<span class="item-icon"></span>
+						<img src="{:tomedia($pcconfig['style']['userdefaultimg'])}" />
+					</div>
+					
+				</div>
+				<div class="puzzle-rank-item-info">
+					<div class="puzzle-rank-item-name limitbox"></div>
+					<div class="puzzle-rank-item-score">0</div>
+				</div>
+			</div>
+			<div class="puzzle-rank-item">
+				<div class="puzzle-rank-item-cube">
+					<div class="item-canvas"><canvas></canvas></div>
+					<div class="item-avatar">
+						<span class="item-icon"></span>
+						<img src="{:tomedia($pcconfig['style']['userdefaultimg'])}" />
+					</div>
+					
+				</div>
+				<div class="puzzle-rank-item-info">
+					<div class="puzzle-rank-item-name limitbox"></div>
+					<div class="puzzle-rank-item-score">0</div>
+				</div>
+			</div>
+			<div class="puzzle-rank-item">
+				<div class="puzzle-rank-item-cube">
+					<div class="item-canvas"><canvas></canvas></div>
+					<div class="item-avatar">
+						<span class="item-icon"></span>
+						<img src="{:tomedia($pcconfig['style']['userdefaultimg'])}" />
+					</div>
+				</div>
+				<div class="puzzle-rank-item-info">
+					<div class="puzzle-rank-item-name limitbox"></div>
+					<div class="puzzle-rank-item-score">0</div>
+				</div>
+			</div>
+			<div class="puzzle-rank-item">
+				<div class="puzzle-rank-item-cube">
+					<div class="item-canvas"><canvas></canvas></div>
+					<div class="item-avatar">
+						<img src="{:tomedia($pcconfig['style']['userdefaultimg'])}" />
+					</div>
+					<span class="item-icon"></span>
+				</div>
+				<div class="puzzle-rank-item-info">
+					<div class="puzzle-rank-item-name limitbox"></div>
+					<div class="puzzle-rank-item-score">0</div>
+				</div>
+			</div>
+			<div class="puzzle-rank-item">
+				<div class="puzzle-rank-item-cube">
+					<div class="item-canvas"><canvas></canvas></div>
+					<div class="item-avatar">
+						<img src="{:tomedia($pcconfig['style']['userdefaultimg'])}" />
+					</div>
+					<span class="item-icon"></span>
+				</div>
+				<div class="puzzle-rank-item-info">
+					<div class="puzzle-rank-item-name limitbox"></div>
+					<div class="puzzle-rank-item-score">0</div>
+				</div>
+			</div>
+			<div class="puzzle-rank-item">
+				<div class="puzzle-rank-item-cube">
+					<div class="item-canvas"><canvas></canvas></div>
+					<div class="item-avatar">
+						<img src="{:tomedia($pcconfig['style']['userdefaultimg'])}" />
+					</div>
+					<span class="item-icon"></span>
+				</div>
+				<div class="puzzle-rank-item-info">
+					<div class="puzzle-rank-item-name limitbox"></div>
+					<div class="puzzle-rank-item-score">0</div>
+				</div>
+			</div>
+			<div class="puzzle-rank-item">
+				<div class="puzzle-rank-item-cube">
+					<div class="item-canvas"><canvas></canvas></div>
+					<div class="item-avatar">
+						<img src="{:tomedia($pcconfig['style']['userdefaultimg'])}" />
+					</div>
+					<span class="item-icon"></span>
+				</div>
+				<div class="puzzle-rank-item-info">
+					<div class="puzzle-rank-item-name limitbox"></div>
+					<div class="puzzle-rank-item-score">0</div>
+				</div>
+			</div>
+			<div class="puzzle-rank-item">
+				<div class="puzzle-rank-item-cube">
+					<div class="item-canvas"><canvas></canvas></div>
+					<div class="item-avatar">
+						<img src="{:tomedia($pcconfig['style']['userdefaultimg'])}" />
+					</div>
+					<span class="item-icon"></span>
+				</div>
+				<div class="puzzle-rank-item-info">
+					<div class="puzzle-rank-item-name limitbox"></div>
+					<div class="puzzle-rank-item-score">0</div>
+				</div>
+			</div>
+			<div class="puzzle-rank-item">
+				<div class="puzzle-rank-item-cube">
+					<div class="item-canvas"><canvas></canvas></div>
+					<div class="item-avatar">
+						<img src="{:tomedia($pcconfig['style']['userdefaultimg'])}" />
+					</div>
+					<span class="item-icon"></span>
+				</div>
+				<div class="puzzle-rank-item-info">
+					<div class="puzzle-rank-item-name limitbox"></div>
+					<div class="puzzle-rank-item-score">0</div>
+				</div>
+			</div>
+			<div class="puzzle-rank-item">
+				<div class="puzzle-rank-item-cube">
+					<div class="item-canvas"><canvas></canvas></div>
+					<div class="item-avatar">
+						<img src="{:tomedia($pcconfig['style']['userdefaultimg'])}" />
+					</div>
+					<span class="item-icon"></span>
+				</div>
+				<div class="puzzle-rank-item-info">
+					<div class="puzzle-rank-item-name limitbox"></div>
+					<div class="puzzle-rank-item-score">0</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="emptybox zam-app-flex-ajCenter display-none">
+		<img src="/{:SIMGURL}common/empty.png">
+		<p style="padding:20px;">暂无可用轮次，请到后台添加</p>
+	</div>
+</section>
+<style>
+.start-btn{
+	width:232px;
+	height:70px;
+	background-size: 100%;
+	margin: auto;
+}
+</style>
+{include file='common/gamewelcome' /}
+{include file='common/gamecommon' /}
+{if !empty($pcconfig['style']['diycss'])}<style>{$pcconfig['style']['diycss']}</style>{/if}
+<script>
+var defaultImg = "{:tomedia($pcconfig['style']['userdefaultimg'])}",ppimg = "{:tomedia($pcconfig['style']['ppimg'])}";
+var defaultName = "{$pcconfig['style']['userdefaultname']??'虚位以待'}";
+require(['screencore','screenpuzzle'],function (screencore,screenpuzzle) {
+	screenpuzzle.init();
+});
+</script>
+{include file='common/footer' /}

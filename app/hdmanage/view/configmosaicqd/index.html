@@ -1,0 +1,668 @@
+{include file='$Wpath/common/header'}
+<style type="text/css">
+.bdItemlist li{margin-bottom:10px;border: 1px solid rgba(0,0,0,0.2);border-radius: 5px;padding: 5px;}
+.bdItemlist li .form-group{
+    margin: 0 10px 0 0;
+    padding:5px 2px;
+}
+.bdItemlist li .checkbox{margin-top:9px!important;}
+.selectItemlist li:first-child{margin-top:1px;}
+.selectItemlist .bdselectLi input{width:230px!important}
+.form-bd-special{
+    height:30px;
+}
+.ui-tooltip{position: absolute!important}
+.input-group-addon{font-size: 12px!important}
+</style>
+<form id="formBox" class="zam-formvalidation form-horizontal" method="post">
+    <div class="config-titlebox">
+        <span class="config-titlename">微信设置</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#wechatconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+    </div>
+    <div id="wechatconfigbox" class="collapse in">
+        <div class="usesignbox{if $config['appusesign']=='1'} hidden{/if}">
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 网页标题</label>
+                <div class="col-lg-8">
+                    <input class="form-control" type="text"  name="apptitle" value="{$config['apptitle']}">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 背景图片</label>
+                <div class="col-lg-8">
+                    {:tpl_image_one('appbgimg',$config['appbgimg'])}
+                    <span class="help-block">规格:640*1240px，ipad端尺寸:2048*1480px</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 签到审核</label>
+                <div class="col-lg-8">
+                    {:tpl_switch('appverify',$config['appverify'])}
+                    <div class="help-block">开启后审核通过的用户签到信息才会在大屏显示</div>
+                </div>
+            </div>
+            {if $managerhdrights['edit']=='1'}
+                <div class="form-group">
+                    <label class="col-lg-2 control-label">* 拍照上传人脸识别检测</label>
+                    <div class="col-lg-8">
+                        {:tpl_switch('appfaceverify',$config['appfaceverify']??'2')}
+                        <span class="zam-help-block">开启后上传头像将进行人脸检测，如果不含人脸会上传失败</span>
+                        <span class="help-block"><span class="text-danger">此项仅限管理员可更见</span></span>
+                    </div>
+                </div>
+                {if dzfacecomic()}
+                <div class="form-group">
+                    <label class="col-lg-2 control-label">* 拍照上传头像动漫化</label>
+                    <div class="col-lg-8">
+                        {:tpl_switch('appfacecomic',$config['appfacecomic']??'2')}
+                        <span class="zam-help-block">开启后上传头像将进行人脸检测并动漫化，如果不含人脸会动漫化失败</span>
+                        <span class="help-block"><span class="text-danger">此项仅限管理员可更见</span></span>
+                    </div>
+                </div>
+                {/if}
+            {/if}
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 显示切换摄像头按钮</label>
+                <div class="col-lg-8">
+                    {:tpl_switch('appstyle[modebtn]',$config['appstyle']['modebtn']??'2')}
+                    <div class="help-block">注：开启后摄像框下面会显示切换摄像头按钮，用于切换前设备前/后置摄像头</div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label text-right">* 摄像头</label>
+                <div class="col-lg-9">
+                    <div class="input-group">
+                        <div class="input-group-btn not-allow"><a class="btn btn-default">形状</a></div>
+                        <select class="form-control" name="appstyle[iscircle]">
+                            <option value="1" {if !isset($config['appstyle']['iscircle']) || $config['appstyle']['iscircle']=='1'}selected{/if}>圆形</option>
+                            <option value="2" {if isset($config['appstyle']['iscircle']) && $config['appstyle']['iscircle']=='2'}selected{/if}>正方形</option>
+                        </select>
+                        <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
+                        <div class="touchspin">
+                        <input type="text" class="form-control numberincdec" name="appstyle[width]" 
+                        data-bts-min="100" data-bts-replacement-val="100"
+                        data-bts-max="1000"
+                        data-bts-step="1"
+                        data-bts-postfix="%"
+                        data-bts-postfix-extra-class="touchspin-postfix"
+                        value="{$config['appstyle']['width']??300}">
+                        </div>
+                        
+                        <div class="input-group-btn not-allow"><a class="btn btn-default">边框大小</a></div>
+                        <div class="touchspin">
+                            <input type="text" class="form-control numberincdec" name="appstyle[bordersize]" 
+                            data-bts-min="0" data-bts-replacement-val="0"
+                            data-bts-max="20"
+                            data-bts-step="1"
+                            data-bts-postfix="px"
+                            data-bts-postfix-extra-class="touchspin-postfix"
+                            value="{$config['appstyle']['bordersize']??2}">
+                        </div>
+                        <div class="input-group-btn not-allow"><a class="btn btn-default">边框颜色</a></div>
+                        {:tpl_color('appstyle[bordercolor]',$config['appstyle']['bordercolor']??'#fff')}
+                        <div class="input-group-btn not-allow"><a class="btn btn-default">下边距</a></div>
+                        <div class="touchspin">
+                            <input type="text" class="form-control numberincdec" name="appstyle[margin]" 
+                            data-bts-min="10" data-bts-replacement-val="10"
+                            data-bts-max="100"
+                            data-bts-step="1"
+                            data-bts-postfix="px"
+                            data-bts-postfix-extra-class="touchspin-postfix"
+                            value="{$config['appstyle']['margin']??40}">
+                        </div>
+                    </div>
+                    <span class="help-block">下边距即为距离拍摄按钮的距离，请根据实际情况设置此值</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 签到表单</label>
+                <div class="col-lg-8">
+                    {:tpl_switch('appbd',$config['appbd'],'openbd')}
+                    <div class="help-block">注：开启后用户拍照确定后会弹窗填写表单信息</div>
+                </div>
+            </div>
+            <div class="bditemsbox{if $config['appbd']=='2'} hidden{/if}">
+                <div class="form-group">
+                    <label class="col-lg-2 control-label text-right">* 顶部主题</label>
+                    <div class="col-lg-8">
+                        <div class="input-group">
+                            <div class="input-group-btn not-allow"><a class="btn btn-default">文字</a></div>
+                            <input type="text" class="form-control" name="appstyle[title][txt]" value="{$config['appstyle']['title']['txt']??'填写信息'}">
+                            <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
+                            <div class="touchspin">
+                            <input type="text" class="form-control numberincdec" name="appstyle[title][size]" 
+                            data-bts-min="12" data-bts-replacement-val="12"
+                            data-bts-max="52"
+                            data-bts-step="1"
+                            data-bts-postfix="px"
+                            data-bts-postfix-extra-class="touchspin-postfix"
+                            value="{$config['appstyle']['title']['size']??24}">
+                            </div>
+                            <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+                            {:tpl_color('appstyle[title][color]',$config['appstyle']['title']['color']??'#fff')}
+                            <div class="input-group-btn not-allow"><a class="btn btn-default">下间距</a></div>
+                            <div class="touchspin">
+                            <input type="text" class="form-control numberincdec" name="appstyle[title][margin]" 
+                            data-bts-min="12" data-bts-replacement-val="12"
+                            data-bts-max="52"
+                            data-bts-step="1"
+                            data-bts-postfix="px"
+                            data-bts-postfix-extra-class="touchspin-postfix"
+                            value="{$config['appstyle']['title']['margin']??20}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group bdListsBox" style="margin-bottom: 0">
+                    <label class="col-lg-2 control-label">* 签到表单设置</label>
+                    <div class="col-lg-10">
+                        <ul class="bdItemlist">
+                        {volist name="config.appbddata" id="bditem"}
+                            <li class="form-inline">
+                            <div class="mustDom">
+                                <div class="form-group">
+                                    {:tpl_switch('appbddata[status][]',$bditem['status'],'openbdstatus')}
+                                </div>
+                                <input type="hidden" name="appbddata[zd][]" value="{$bditem['zd']}" />
+                                <div class="form-group bdnameInput">
+                                    <input type="text"  class="form-control" name="appbddata[title][]" value="{$bditem['title']}" readonly />
+                                </div>
+
+                                <div class="form-group form-control form-bd-special form-bdonly hidden">
+                                    <label class="lyear-checkbox checkbox-primary">
+                                        <input type="hidden" name="appbddata[only][]"  value="{$bditem['only']}"  />
+                                        <input type="checkbox" {if $bditem['only']=='1'}checked{/if} onclick="checkbdonly(this)"  />
+                                        <span>值唯一</span>
+                                    </label>
+                                </div>
+                                <div class="form-group form-control form-bd-special" style="height: auto;border: 0">
+                                    <select class="form-control" name="appbddata[isfloat][]" style="height: 30px;">
+                                        <option value="1" {if $bditem['isfloat']=='1'}selected{/if}>内容类型不限制</option>
+                                        <option value="2" {if $bditem['isfloat']=='2'}selected{/if}>汉字</option>
+                                        <option value="3" {if $bditem['isfloat']=='3'}selected{/if}>字母</option>
+                                        <option value="4" {if $bditem['isfloat']=='4'}selected{/if}>数字</option>
+                                        <option value="5" {if $bditem['isfloat']=='5'}selected{/if}>汉字字母组合</option>
+                                        <option value="6" {if $bditem['isfloat']=='6'}selected{/if}>汉字数字组合</option>
+                                        <option value="7" {if $bditem['isfloat']=='7'}selected{/if}>字母数字组合</option>
+                                        <option value="8" {if $bditem['isfloat']=='8'}selected{/if}>汉字或字母</option>
+                                        <option value="9" {if $bditem['isfloat']=='9'}selected{/if}>汉字或数字</option>
+                                        <option value="10" {if $bditem['isfloat']=='10'}selected{/if}>字母或数字</option>
+                                        <option value="11" {if $bditem['isfloat']=='11'}selected{/if}>手机号</option>
+                                    </select>
+                                </div>
+                                <div class="form-group form-control form-bd-special form-bdhidesome">
+                                    <label class="lyear-checkbox checkbox-primary">
+                                        <input type="hidden" name="appbddata[hidesome][]"  value="{$bditem['hidesome']??'2'}"  />
+                                        <input type="checkbox" {if isset($bditem['hidesome']) && $bditem['hidesome']=='1'}checked{/if} onclick="checkbdhide(this)"  />
+                                        <span>隐私</span>
+                                    </label>
+                                </div>
+                                <div class="form-bd-special" style="display: inline-block;">
+                                    <div class="input-group input-group-sm">                             
+                                        <div class="input-group-addon">最短</div>
+                                        <div class="touchspin" style="width: 140px">
+                                            <input type="text" class="form-control numberincdec" name="appbddata[min][]" 
+                                            data-bts-min="0" data-bts-replacement-val="0"
+                                            data-bts-max="null"
+                                            data-bts-step="1"
+                                            data-bts-postfix="个字符"
+                                            data-bts-postfix-extra-class="touchspin-postfix"
+                                            value="{$bditem['min']}">
+                                        </div>
+                                        <div class="input-group-addon">最长</div>
+                                        <div class="touchspin" style="width: 140px">
+                                            <input type="text" class="form-control numberincdec" name="appbddata[max][]" 
+                                            data-bts-min="0" data-bts-replacement-val="0"
+                                            data-bts-max="null"
+                                            data-bts-step="1"
+                                            data-bts-postfix="个字符"
+                                            data-bts-postfix-extra-class="touchspin-postfix"
+                                            value="{$bditem['max']}">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group bdnameInput">
+                                    <input type="text"  class="form-control" name="appbddata[defaulttip][]" value="{$bditem['defaulttip']}" placeholder="输入默认提示语"  />
+                                </div>
+                                <div class="form-group bdnameInput">
+                                    <input type="text"  class="form-control" name="appbddata[errortip][]" value="{$bditem['errortip']}" placeholder="错误提示语"  />
+                                </div>
+                            </div>
+                            </li>
+                        {/volist}
+                        </ul>
+                        <div class="help-block">姓名开启隐私会将部分文字替换为*，2个字隐藏第二个字，3个以上字隐藏中间所有字，手机号开启隐私会将中间4位数字替换位*</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-2 control-label text-right">* 单个表单项</label>
+                    <div class="col-lg-8">
+                        <div class="input-group">
+                            <div class="input-group-btn not-allow"><a class="btn btn-default">高度</a></div>
+                            <div class="touchspin">
+                            <input type="text" class="form-control numberincdec" name="appstyle[input][height]" 
+                            data-bts-min="10" data-bts-replacement-val="10"
+                            data-bts-max="100"
+                            data-bts-step="1"
+                            data-bts-postfix="px"
+                            data-bts-postfix-extra-class="touchspin-postfix"
+                            value="{$config['appstyle']['input']['height']}">
+                            </div>
+                            <div class="input-group-btn not-allow"><a class="btn btn-default">宽度</a></div>
+                            <div class="touchspin">
+                            <input type="text" class="form-control numberincdec" name="appstyle[input][width]" 
+                            data-bts-min="40" data-bts-replacement-val="40"
+                            data-bts-max="100"
+                            data-bts-step="1"
+                            data-bts-postfix="%"
+                            data-bts-postfix-extra-class="touchspin-postfix"
+                            value="{$config['appstyle']['input']['width']}">
+                            </div>
+                            <div class="input-group-btn not-allow"><a class="btn btn-default">背景色</a></div>
+                            {:tpl_color('appstyle[input][bgcolor]',$config['appstyle']['input']['bgcolor'])}
+                            <div class="input-group-btn not-allow"><a class="btn btn-default">文字色</a></div>
+                            {:tpl_color('appstyle[input][color]',$config['appstyle']['input']['color'])}
+                            <div class="input-group-btn not-allow"><a class="btn btn-default">文字大小</a></div>
+                            <div class="touchspin">
+                            <input type="text" class="form-control numberincdec" name="appstyle[input][size]" 
+                            data-bts-min="12" data-bts-replacement-val="12"
+                            data-bts-max="60"
+                            data-bts-step="1"
+                            data-bts-postfix="px"
+                            data-bts-postfix-extra-class="touchspin-postfix"
+                            value="{$config['appstyle']['input']['size']}">
+                            </div>
+                        </div>
+                        <span class="help-block">高度默认32px，宽度最大是100%，请根据实际情况设置此值</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-2 control-label text-right">* 单个表单项边距以及间距</label>
+                    <div class="col-lg-8">
+                        <div class="input-group">
+                            <div class="input-group-btn not-allow"><a class="btn btn-default">左右内边距</a></div>
+                            <div class="touchspin">
+                                <input type="text" class="form-control numberincdec" name="appstyle[input][padleft]" 
+                                data-bts-min="1" data-bts-replacement-val="1"
+                                data-bts-max="20"
+                                data-bts-step="1"
+                                data-bts-postfix="px"
+                                data-bts-postfix-extra-class="touchspin-postfix"
+                                value="{$config['appstyle']['input']['padleft']}">
+                            </div>
+                            <div class="input-group-btn not-allow"><a class="btn btn-default">上下内边距</a></div>
+                            <div class="touchspin">
+                                <input type="text" class="form-control numberincdec" name="appstyle[input][padtop]" 
+                                data-bts-min="1" data-bts-replacement-val="1"
+                                data-bts-max="20"
+                                data-bts-step="1"
+                                data-bts-postfix="px"
+                                data-bts-postfix-extra-class="touchspin-postfix"
+                                value="{$config['appstyle']['input']['padtop']}">
+                            </div>
+                            <div class="input-group-btn not-allow"><a class="btn btn-default">间距</a></div>
+                            <div class="touchspin">
+                                <input type="text" class="form-control numberincdec" name="appstyle[input][margin]" 
+                                data-bts-min="1" data-bts-replacement-val="1"
+                                data-bts-max="100"
+                                data-bts-step="1"
+                                data-bts-postfix="px"
+                                data-bts-postfix-extra-class="touchspin-postfix"
+                                value="{$config['appstyle']['input']['margin']??20}">
+                            </div>
+                        </div>
+                        <span class="help-block">请根据实际情况设置</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-2 control-label text-right">* 单个表单项边界圆角</label>
+                    <div class="col-lg-8">
+                        <div class="input-group">
+                            <div class="input-group-btn not-allow"><a class="btn btn-default">边界宽度</a></div>
+                            <div class="touchspin">
+                            <input type="text" class="form-control numberincdec" name="appstyle[input][bordersize]" 
+                            data-bts-min="0" data-bts-replacement-val="0"
+                            data-bts-max="10"
+                            data-bts-step="1"
+                            data-bts-postfix="px"
+                            data-bts-postfix-extra-class="touchspin-postfix"
+                            value="{$config['appstyle']['input']['bordersize']}">
+                            </div>
+                            <div class="input-group-btn not-allow"><a class="btn btn-default">边界色</a></div>
+                            {:tpl_color('appstyle[input][bordercolor]',$config['appstyle']['input']['bordercolor'])}
+                            <div class="input-group-btn not-allow"><a class="btn btn-default">表单项圆角大小</a></div>
+                            <div class="touchspin">
+                            <input type="text" class="form-control numberincdec" name="appstyle[input][borderraduis]" 
+                            data-bts-min="1" data-bts-replacement-val="1"
+                            data-bts-max="20"
+                            data-bts-step="1"
+                            data-bts-postfix="px"
+                            data-bts-postfix-extra-class="touchspin-postfix"
+                            value="{$config['appstyle']['input']['borderraduis']}">
+                            </div>
+                        </div>
+                        <span class="help-block">请根据实际情况设置</span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label text-right">* 自拍照片写入到用户数据</label>
+                <div class="col-lg-8">
+                    {:tpl_switch('savetouser',$config['savetouser']??'2','opensavetosign')}
+                    <div class="help-block">一般不需要开启，仅在需要用自拍照片参与大屏抽奖才开启</div>
+                </div>
+            </div>
+            <div class="form-group savesignbox{if isset($config['savetouser']) && $config['savetouser']=='1'}{else /} hidden{/if}">
+                <label class="col-lg-2 control-label text-right">* 自拍照片写入到签到数据</label>
+                <div class="col-lg-8">
+                    {:tpl_switch('savetosign',$config['savetosign']??'2')}
+                    <div class="help-block">特别注意:上面2个开关都打开才可以将自拍照片写入到签到数据，一般是需要用自拍照片展示在签到或3d签到大屏展示才需要开启，开启此项后建议签到功能关闭表单功能</div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 跟随签到功能微信设置</label>
+            <div class="col-lg-8">
+                {:tpl_switch('appusesign',$config['appusesign'],'openusesign')}
+                <div class="help-block">注：开启后需在微信签到里开启上传头像以及开启大屏显示上传头像</div>
+            </div>
+        </div>
+    </div>
+    <div class="config-titlebox">
+        <span class="config-titlename">大屏设置</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#screenconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+    </div>
+    <div id="screenconfigbox" class="collapse in">
+        {include file="$Wpath/common/configscreencommon" /}
+        {include file="$Wpath/common/configscreenmusic" /}
+        <div class="form-group">
+            <label class="col-lg-2 control-label text-right">* 马赛克区域</label>
+            <div class="col-lg-8">
+                <div class="input-group">
+                    <div class="input-group-btn not-allow"><a class="btn btn-default">宽</a></div>
+                    <div class="touchspin">
+                    <input type="text" class="form-control numberincdec" name="pcstyle[width]" 
+                    data-bts-min="1" data-bts-replacement-val="1"
+                    data-bts-max="null"
+                    data-bts-step="1"
+                    data-bts-postfix="px"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                    value="{$config['pcstyle']['width']}">
+                    </div>
+                    <div class="input-group-btn not-allow"><a class="btn btn-default">高</a></div>
+                    <div class="touchspin">
+                    <input type="text" class="form-control numberincdec" name="pcstyle[height]" 
+                    data-bts-min="1" data-bts-replacement-val="1"
+                    data-bts-max="800"
+                    data-bts-step="1"
+                    data-bts-postfix="px"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                    value="{$config['pcstyle']['height']}">
+                    </div>
+                </div>
+                <span class="help-block">请根据实际情况设置</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label text-right">* 头像墙单个头像</label>
+            <div class="col-lg-8">
+                <div class="input-group">
+                    <div class="input-group-btn not-allow"><a class="btn btn-default">宽</a></div>
+                    <div class="touchspin">
+                    <input type="text" class="form-control numberincdec" name="pcstyle[avatarbox][onew]" 
+                    data-bts-min="1" data-bts-replacement-val="1"
+                    data-bts-max="null"
+                    data-bts-step="1"
+                    data-bts-postfix="px"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                    value="{$config['pcstyle']['avatarbox']['onew']}">
+                    </div>
+                    <div class="input-group-btn not-allow"><a class="btn btn-default">高</a></div>
+                    <div class="touchspin">
+                    <input type="text" class="form-control numberincdec" name="pcstyle[avatarbox][oneh]" 
+                    data-bts-min="1" data-bts-replacement-val="1"
+                    data-bts-max="null"
+                    data-bts-step="1"
+                    data-bts-postfix="px"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                    value="{$config['pcstyle']['avatarbox']['oneh']}">
+                    </div>
+                    <div class="input-group-btn not-allow"><a class="btn btn-default">边界宽</a></div>
+                    <div class="touchspin">
+                    <input type="text" class="form-control numberincdec" name="pcstyle[avatarbox][bordersize]" 
+                    data-bts-min="1" data-bts-replacement-val="1"
+                    data-bts-max="10"
+                    data-bts-step="1"
+                    data-bts-postfix="px"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                    value="{$config['pcstyle']['avatarbox']['bordersize']}">
+                    </div>
+                    <div class="input-group-btn not-allow"><a class="btn btn-default">边界颜色</a></div>
+                    {:tpl_color('pcstyle[avatarbox][bordercolor]',$config['pcstyle']['avatarbox']['bordercolor'])}
+                </div>
+                <span class="help-block">请根据实际情况设置</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label text-right">* 头像墙蒙版层</label>
+            <div class="col-lg-8">
+                <div class="input-group">
+                    <div class="input-group-btn not-allow"><a class="btn btn-default">背景色</a></div>
+                    {:tpl_color('pcstyle[innercolor]',$config['pcstyle']['innercolor'])}
+                    <div class="input-group-btn not-allow"><a class="btn btn-default">透明度</a></div>
+                    <div class="touchspin">
+                    <input type="text" class="form-control numberincdec" name="pcstyle[innercoloropacity]" 
+                    data-bts-min="0" data-bts-replacement-val="0"
+                    data-bts-max="1"
+                    data-bts-decimals="2"
+                    data-bts-step="0.1"
+                    data-bts-postfix=""
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                    data-bts-force-step-divisibility="xstwo"
+                    value="{$config['pcstyle']['innercoloropacity']}">
+                    </div>
+                </div>
+                <span class="help-block">透明度为0会自动隐藏此蒙版，请根据实际情况设置</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label text-right">* 马赛克原图</label>
+            <div class="col-lg-8">
+                {:tpl_image_one('pcstyle[innerbg]',$config['pcstyle']['innerbg'])}
+                <span class="help-block">此图尺寸尽量与上面设置的马赛克区域大小保持一致</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 马赛克原图透明度</label>
+            <div class="col-lg-8">
+                <input type="text" class="form-control numberincdec" name="pcstyle[innerbgopacity]" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="1"
+                data-bts-decimals="2"
+                data-bts-step="0.1"
+                data-bts-postfix=""
+                data-bts-postfix-extra-class="touchspin-postfix"
+                data-bts-force-step-divisibility="xstwo"
+                value="{$config['pcstyle']['innerbgopacity']}">
+                <span class="help-block">透明度设置为0时系统将自动将马赛克原图作为头像层蒙版</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label text-right">* 马赛克方格占位图</label>
+            <div class="col-lg-4">
+                {:tpl_image_one('pcstyle[defaultimg]',$config['pcstyle']['defaultimg'])}
+                <span class="help-block">规格：100*100px</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 大屏加载历史签到用户人数</label>
+            <div class="col-lg-4">
+                <input type="text" class="form-control numberincdec" name="pcstyle[hisnum]" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="2000"
+                data-bts-step="1"
+                data-bts-postfix="人"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['pcstyle']['hisnum']??500}">
+                <div class="help-block">0即为加载所有历史签到用户</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 大屏历史头像排版方式</label>
+            <div class="col-lg-8">
+              <label class="lyear-radio radio-inline radio-primary">
+               <input type="radio" name="pcstyle[israndom]" value="2" {if !isset($config['pcstyle']['israndom']) || $config['pcstyle']['israndom']=='2'}checked{/if}><span>签到顺序排版</span>
+              </label>
+              <label class="lyear-radio radio-inline radio-primary">
+               <input type="radio" name="pcstyle[israndom]" value="1" {if isset($config['pcstyle']['israndom']) && $config['pcstyle']['israndom']=='1'}checked{/if}><span>随机顺序排版</span>
+              </label>
+              <div class="help-block">签到顺序即为按照签到的先后顺序排版；随机顺序即为将头像随机打乱排版</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 大屏复用历史签到头像</label>
+            <div class="col-lg-8">
+                {:tpl_switch('pcstyle[repeat]',$config['pcstyle']['repeat'])}
+                <div class="help-block">开启当历史签到用户数量不足以覆盖全部头像墙方格则会使用历史签到头像作为方格头像反之则使用占位图</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 大屏右上角显示签到人数</label>
+            <div class="col-lg-8">
+                {:tpl_switch('showjoinnum',$config['showjoinnum'])}
+                <div class="help-block">开启大屏右上角会展示已签到的人数</div>
+            </div>
+        </div>
+    </div>
+    <div class="config-titlebox">
+        <span class="config-titlename">大屏弹窗风格设置</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#popconfigbox" aria-expanded="false"><span>展开</span> <i class="mdi mdi-chevron-double-down"></i></span>
+    </div>
+    <div id="popconfigbox" class="collapse">
+        {include file="$Wpath/common/configmosaicqdpop" /}
+    </div>
+    <div class="config-titlebox">
+        <span class="config-titlename">拍照端风格设置</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#snashotconfigbox" aria-expanded="false"><span>展开</span> <i class="mdi mdi-chevron-double-down"></i></span>
+    </div>
+    <div id="snashotconfigbox" class="collapse">
+        {include file="$Wpath/common/configmosaicqdstyle" /}
+    </div>
+    {include file='$Wpath/common/configsavepanel'}
+</form>
+<script>
+require(['webcore','jconfirmBox','zamnotice','layerBox','zvalidator'],function(webcore,jconfirmBox,zamnotice,layerBox){
+    $('#formBox').formValidation({
+        framework: 'bootstrap',
+        excluded: [':disabled'],
+        message: '您填写的内容无效',
+        fields: {
+            apptitle:{
+                message: '请输入网页标题',
+                validators: {
+                    notEmpty: {
+                        message: '请输入网页标题'
+                    },
+                }
+            },
+        }
+    }).on('success.form.fv', function(e) {
+        e.preventDefault();
+        var $form = $(e.target);
+        var postData = webcore.serializeObject($form);
+        var bload = $form.find(".zam-fixedbottom button").lyearloading({opacity: 0.2,spinnerSize: 'nm'});
+        $form.formValidation('disableSubmitButtons', true);
+        webcore.ajaxSubmit("{:gohdmanage('configmosaicqd/index',['hdid'=>$hdid])}",postData).then(function(json){
+            bload.hide();
+            if(json.code==0){
+                $form.formValidation('disableSubmitButtons', false);
+                zamnotice.showTips('success','操作成功',2e3,function(){
+                    window.location.reload();
+                });
+            }else{
+                zamnotice.showTips('error',json.msg);
+                $form.formValidation('disableSubmitButtons', false);
+            }
+        }, function(json){
+            bload.hide();
+            zamnotice.showTips('error','网络差。操作失败');
+            $form.formValidation('disableSubmitButtons', false);
+        });
+    });
+    
+});
+function openbd(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".bditemsbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".bditemsbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openusesign(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".usesignbox").removeClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".usesignbox").addClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openbdstatus(obj,status,url){
+    require(['webcore','zamnotice'],function(webcore,zamnotice){
+        if(status=='1'){
+            var statusobj = $(".bdItemlist").find("input[name='appbddata[status][]']"),closelen = 0;
+            statusobj.each(function(){
+                if($(this).val() == '2') closelen++;
+            });
+            if(closelen > 0){
+                zamnotice.showTips('error','请至少开启一项');
+                return false;
+            }
+            obj.prev().val('2');
+            obj.attr('data-status','2');
+            
+        }else{
+            obj.prev().val('1');
+            obj.attr('data-status','1');
+        }
+        obj.prev().prev().prop("checked",status=='1'?false:true);
+    })
+}
+function checkbdonly(obj){ 
+    var status = $(obj).prop('checked');
+    if(status){
+        $(obj).prev().val('1');
+    }else{
+        $(obj).prev().val('2');
+    }
+}
+function checkbdhide(obj){ 
+    var status = $(obj).prop('checked');
+    if(status){
+        $(obj).prev().val('1');
+    }else{
+        $(obj).prev().val('2');
+    }
+}
+function opensavetosign(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".savesignbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".savesignbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+</script>
+{include file='$Wpath/common/footer'}

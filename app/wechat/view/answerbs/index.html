@@ -1,0 +1,271 @@
+{include file="common/header" /}
+<style>
+body{overflow-y: scroll!important;}
+.zam-app-answer-main{position:relative;top:0;left:0;width:100%;min-height:100%;overflow: hidden;overflow-y:auto;color:#333;}
+/*轮次信息box*/
+.roundInfo-box{width:100%;color:#fff}
+.roundInfo-box .roundInfo-title{
+	width:80%;
+	text-align:center;
+	font-size:0.42rem;
+	padding-top:0.2rem;
+}
+.roundInfo-box .roundInfo-quesnum{
+	font-size:0.36rem;
+	padding:0.2rem 0;
+}
+.roundInfo-box .roundInfo-quesnum span{
+	font-weight:500;
+	display:inline-block;
+	margin:0 0.1rem;
+}
+.roundInfo-box .roundInfo-status{
+	margin-top:0.5rem;
+	font-size:0.32rem;
+}
+.phb-btn{
+	width:3.6rem;
+	height:1.25rem;
+	margin-top:0.4rem;
+	background-image: url("{:tomedia($appconfig['style']['apppm'])}");
+    background-size: cover;   
+	background-repeat:no-repeat;
+	
+}
+/*题目盒子*/
+.options-box{
+	width: 90%;
+	margin: 1rem auto;
+	background: #FFF;
+	border-radius: 0.2rem;
+	padding: 0.3rem;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	padding-top: 0.8rem;
+	position: relative;
+}
+.tips{
+	position: absolute;
+	width: 130px;
+	height:40px;
+	line-height:40px;
+	left: 50%;
+	margin-left: -65px;
+	top: -11px;
+	background: url("{:tomedia($appconfig['style']['appquestionbg'])}") no-repeat;
+	background-size: 100% 100%; 
+	font-size: 0.32rem;
+	text-align:center;
+	color: #fff;
+}
+.options-box .title{
+	font-size: 0.36rem;
+	margin-bottom: 0.4rem;
+	font-weight:300;
+	color: #333;
+}
+.options-box .title img {
+    margin: 0 auto;
+    max-width: 100%;
+}
+.options-box ul li{
+	width:100%;
+	padding:0.16rem 0.1rem;
+	border-radius:0.1rem;
+	background-color:rgba(0,0,0,0.5);
+	font-size: 0.3rem;
+	color: #fff;
+	margin-bottom: 0.2rem;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	cursor:pointer;
+}
+.option-key{
+	width:0.6rem;
+	height:0.6rem;
+	line-height:0.6rem;
+	text-align:center;
+}
+.option-text{
+	width: calc(100% - 1rem);
+}
+.option-tag{
+	width:0.4rem;
+}
+/*选中项颜色*/
+.options-box ul li.is-active{
+	background-color: #72c00a;
+}
+/*题目类型*/
+.questiontype{
+	position: absolute;
+    left: 0;
+    top:-0.9rem;
+	min-width:2rem;
+	height:0.8rem;
+	line-height:0.8rem;
+	text-align:center;
+    color: #fff;
+	border-radius:0.1rem;
+    font-size:0.3rem;
+}
+/*题目剩余时间*/
+.questiontime{
+	position: absolute;
+    right: 0;
+    top: -0.9rem;
+	width:2rem;
+	height:0.8rem;
+	line-height:0.8rem;
+	text-align:center;
+    color: #fff;
+	border-radius:0.1rem;
+	font-size:0.4rem;
+}
+.questiontime i{
+	margin-right:0.3rem;
+}
+/*答题结束显示层*/
+.questionresult{font-size:0.3rem;text-align:center;color:red}
+/*排名弹窗*/
+.shake-banglist{
+	height:5.8rem;
+	overflow-x:hidden;
+	overflow-y:auto;
+}
+.shake-bangtitle{position:relative;font-size:0.32rem!important;text-align:center!important;}
+.shake-bangtitle i{position:absolute;right:0.3rem;font-size: 0.5rem;color:gray}
+.shake-banglist li {
+	height:1rem;
+    border-top: 1px solid #f0f0f0;
+}
+.shake-banglist li div{
+	height:100%;
+}
+.shake-banglist .banglist-tag {
+    width:0.6rem;
+}
+.shake-banglist .rolwnum {
+    display: inline-block;
+    width: 0.5rem;
+    text-align: center;
+    font-size: 0.32rem;
+	color:#666
+}
+.shake-banglist .banglist-avatar {
+    width: 0.7rem;
+    height: 0.7rem;
+    border-radius: 100%;
+}
+.shake-banglist .banglist-nickname {
+    width: 100%;
+	color:#666;
+	font-size:0.3rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.shake-banglist .banglist-score {
+    color: #0084ff;
+	font-size: 0.24rem;
+}
+.tijiao{text-align: center;}
+.tijiao a{padding: 0 0.8rem}
+</style>
+<audio id="djsaudio" src="/{:WIMGURL}shake/count.mp3"></audio>
+<div class="zam-app-answer-main zam-app-flex-ajCenter">
+	<section class="roundInfo-box zam-app-flex-ajCenter hidden">
+		<div class="roundInfo-img hidden">
+			<img src="{:tomedia($appconfig['style']['applogoimg'])}">
+		</div>
+		<div class="roundInfo-title limitbox hidden">答题</div>
+		<p class="roundInfo-quesnum hidden">{if $hdinfo['id'] == 'huoxingrendati'}<span>0</span> questions coming your way{else /}共<span>0</span>题{/if}</p>
+		<p class="roundInfo-status hidden">{if $hdinfo['id'] == 'huoxingrendati'}GET READY!{else /}游戏还未开始{/if}</p>
+		<a href="javascript:;" class="phb-btn hidden"></a>
+	</section>
+	<section class="options-box hidden"></section>
+</div>
+<script id="question-tpl" type="text/html">
+<div class="questiontype<%# if(d.isindefiniteterm == '1'){ %> hidden<%# } %>">{if $hdinfo['id'] == 'huoxingrendati'}<%# if(d.yesanswer.indexOf(",")!=-1){ %>Multiple<%# }else{ %>Simple<%# } %> choice{else /}<%# if(d.yesanswer.indexOf(",")!=-1){ %>多<%# }else{ %>单<%# } %>选题{/if}</div>
+<div class="tips">{if $hdinfo['id'] == 'huoxingrendati'}QUESTION [<% d.nownum %>/<% d.totalnum %>]{else /}第 <% d.nownum %> / <% d.totalnum %> 题{/if}</div>
+<div class="questiontime">
+	<i class="mxc-unie6b2"></i><span>0</span>
+</div>
+<div class="questionresult"></div>
+<div class="title"><% d.questitle %></div>
+<ul class="question-<% d.id %>" data-quesid = "<% d.id %>" data-yesanswer="<% d.yesanswer %>">
+	<%# if(d.answera!=''){ %>
+	<li class="zam-app-flex-ajCenter2" data-key="A">
+		<span class="option-key">A</span>
+		<span class="option-text"><% d.answera %></span>
+		<span class="option-tag"></span>
+	</li>
+	<%# } %>
+	<%# if(d.answerb!=''){ %>
+	<li class="zam-app-flex-ajCenter2"  data-key="B">
+		<span class="option-key">B</span>
+		<span class="option-text"><% d.answerb %></span>
+		<span class="option-tag"></span>
+	</li>
+	<%# } %>
+	<%# if(d.answerc!=''){ %>
+	<li class="zam-app-flex-ajCenter2"  data-key="C">
+		<span class="option-key">C</span>
+		<span class="option-text"><% d.answerc %></span>
+		<span class="option-tag"></span>
+	</li>
+	<%# } %>
+	<%# if(d.answerd!=''){ %>
+	<li class="zam-app-flex-ajCenter2"  data-key="D">
+		<span class="option-key">D</span>
+		<span class="option-text"><% d.answerd %></span>
+		<span class="option-tag"></span>
+	</li>
+	<%# } %>
+	<%# if(d.answere!=''){ %>
+	<li class="zam-app-flex-ajCenter2"  data-key="E">
+		<span class="option-key">E</span>
+		<span class="option-text"><% d.answere %></span>
+		<span class="option-tag"></span>
+	</li>
+	<%# } %>
+	<%# if(d.answerf){ %>
+		<li class="zam-app-flex-ajCenter2"  data-key="F">
+			<span class="option-key">F</span>
+			<span class="option-text"><% d.answerf %></span>
+			<span class="option-tag"></span>
+		</li>
+	<%# } %>
+	<div class="tijiao"><a class="btn btn-primary btn-disabled" href="javascript:;">{if $hdinfo['id'] == 'huoxingrendati'}Submit{else /}提交{/if}</a></div>
+</ul>
+</script>
+<script>
+require(['wechatcore','appanswerbs'],function (wechatcore,appanswerbs) {	
+	appanswerbs.init();
+	$("body").on('click','.title img',function(){
+		wechatcore.previewImage(this);
+	});
+	$(".phb-btn").on('click',function(){
+		var $this = $(this);
+		wechatcore.ajaxSubmit("{:gowechat('common/getphbdata')}",{gametype:XCV3Config.gametype,rotateid:$this.attr('data-rotateid'),gamephb:$this.attr('data-gamephb'),teamid:$this.attr('data-teamid')},'正在获取排行榜数据').then(function(data){
+			 if(data.code==0){
+				 if(data.msg.list.length>0){
+					 $("body").append(wechatcore.tpl($("#phb-tpl"),{list:data.msg.list,myrank:data.msg.myrank}));
+				 }else{
+					wechatcore.msg('暂无数据');
+				 }
+			 }else{
+				wechatcore.msg(data.msg);
+			 }
+		}, function(){
+			  wechatcore.msg('网络太差，请稍后重试');
+		});
+	});
+})
+</script>
+{if !empty($appconfig['style']['diycss'])}
+<style>{$appconfig['style']['diycss']}</style>
+{/if}
+{include file="common/gamecommon" /}
+{include file="common/footermenu" /}
+{include file="common/footer" /}

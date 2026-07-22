@@ -1,0 +1,52 @@
+<style>
+.welcomeBox{
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    z-index:3;
+    background-color:rgba(0,0,0,0.3);
+    color:#fff;
+}
+.welcomeBox-main{width:1000px;}
+.welcomeBox-logo{height:336px;}
+.welcomeBox-logo img{
+    height:100%;
+}
+.welcomeBox-join{width:100%;margin:15px auto;}
+.welcomeBox-nums{
+    flex:2;
+    -webkit-flex:2;
+    -mos-flex:2;
+    height:85px;
+    font-size:35px;
+}
+.welcomeBox-nums span{display:inline-block;margin-left:20px;font-size:50px;font-weight:800;}
+.start-btn{
+    text-align:center;
+    background-size:cover;
+    background-repeat:no-repeat;
+    background-image:url("{:tomedia($pcconfig['style']['startbtn'])}?=1");
+    cursor:pointer;
+}
+.welcomeBox-footer{
+    width: 100%;
+}
+</style>
+<div  class="welcomeBox zam-app-flex-ajCenter display-none">
+    <div class="welcomeBox-title welcomeBox-title-{$pcconfig['gametype']??'common'} display-none"></div>
+    <div class="welcomeBox-main zam-app-flex-ajCenter">
+        <div class="welcomeBox-logo">
+            <img src="{:tomedia($pcconfig['style']['welcometop']);}">
+        </div>
+        <div class="welcomeBox-join zam-app-flex">
+            <div class="welcomeBox-nums zam-app-flex zam-app-alignCenter"><div class="welcomeBox-desc">{if in_array(request()->host(true),['zam.miboxianchang.cn','v3.martian.net.cn']) && in_array($hdinfo['id'],['357','13929'])}Current No. of Participants{else/}当前在线人数{/if}</div><span>0</span></div>
+            <div class="start-btn zam-app-flex-ajCenter"></div>
+        </div>
+        <div class="welcomeBox-footer zam-app-flex">
+            {include file='common/gamewelcomeawards' /}
+            {include file='common/gamewelcomeusers' /}
+        </div>
+    </div>
+</div>

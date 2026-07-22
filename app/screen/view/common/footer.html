@@ -1,0 +1,431 @@
+			<footer class="footer">{if isset($hdinfo['copyright']['copyright']) && !empty($hdinfo['copyright']['copyright'])}{$hdinfo['copyright']['copyright']}{/if}</footer>
+		</div><!--main-box-->
+		{if !isset($pcconfig['islogin'])}
+			{if isset($hdinfo['loadtype']) && $hdinfo['loadtype']=='2'}
+				{include file='common/footer-help-box' /}
+			{else /}
+				{include file='common/footer_menu' /}
+			{/if}
+			{include file='common/footer_fulldm' /}
+			{include file='common/footer_qrbox' /}
+		{/if}
+	  </div><!--full-main-->
+ </div><!--pc-box-->
+ {if isset($pcconfig['gametype']) && $pcconfig['gametype']=='baping'}
+ {include file='baping/leftcontrol' /}
+ {/if}
+ <div class="pcbgBox">
+	<div class="main-bg">
+		{if isset($pcconfig['gametype']) && $pcconfig['gametype']=='baping'}
+		{else /}
+			{if $pcconfig['bgtype']=='2'}
+				<video class="videoBg" src="{:tomedia($pcconfig['bgvideo'])}" autoplay="autoplay" loop="loop" {if !empty($pcconfig['bgmusic'])}muted="muted"{/if} data-src="{:tomedia($pcconfig['bgvideo'])}"></video>
+			{elseif $pcconfig['bgtype']=='1'}
+				<style>
+					.pcbgBox .main-bg{background-image:url("{if !empty($pcconfig['bgimg'])}{:tomedia($pcconfig['bgimg'])}{else}__STATIC__/images/screen/common/bg.jpg{/if}");}
+				</style>
+			{/if}
+		{/if}
+	</div>
+	{if isset($pcconfig['gametype']) && $pcconfig['gametype']=='shakestart'}
+	<div class="videosbox">
+		{if $pcconfig['startconfig']['showdjs']=='1'}
+			{if isset($pcconfig['preload']) && $pcconfig['preload']=='2'}<video muted class="djsvideo hidden" src="{:tomedia($pcconfig['startconfig']['djsvideo'])}"></video>{/if}
+		{/if}
+		{if $pcconfig['startconfig']['bgtype']=='2'}
+			{if isset($pcconfig['preload']) && $pcconfig['preload']=='2'}<video muted class="startvideo hidden" src="{:tomedia($pcconfig['startconfig']['bgvideo'])}" loop="loop"></video>{/if}
+		{else /}
+			<img src="{:tomedia($pcconfig['startconfig']['bgimg'])}" class="startimg hidden" />
+		{/if}
+		{if $pcconfig['endconfig']['bgdiy']=='1'}
+			{if $pcconfig['endconfig']['bgtype']=='2'}
+				{if isset($pcconfig['preload']) && $pcconfig['preload']=='2'}<video muted class="endvideo hidden" src="{:tomedia($pcconfig['endconfig']['bgvideo'])}" loop="loop"></video>{/if}
+			{else /}
+				<img src="{:tomedia($pcconfig['endconfig']['bgimg'])}" class="endimg hidden" />
+			{/if}
+		{/if}
+	</div>
+	{/if}
+ </div>
+{if !empty($pcconfig['bgmusic'])}
+<audio id="bgmusic" src="{:tomedia($pcconfig['bgmusic'])}" autoload loop="loop"></audio>
+{/if}
+<div class="offlinebox" title="网络连接出现异常，请检查您的网络是否正常"></div>
+<div class="nopubtip{if (isset($hdinfo['ispub']) && $hdinfo['ispub']=='1') || (isset($hdinfo['hdmode']) && $hdinfo['hdmode']=='2') || strexists(request()->path(),'/screen/login/')} display-none{/if}"></div>
+<script type="text/html" id="google-tpl">
+<div class="broswer-tip zam-app-flex-ajCenter2">
+		<i class="mxc-infofill"></i> 
+		<p class="red">为了保证您的使用效果，强烈推荐使用</p> 
+		<a class="downgoogle" href="https://www.google.cn/intl/zh-CN/chrome/" target="_blank">
+			<div class="zam-app-flex-ajCenter2">
+				<img src="__STATIC__/images/screen/common/google.png"> 
+				<span>谷歌浏览器</span>
+			</div>
+		</a> 
+		<div class="close-broswer-tip" onclick="javascript:$('.broswer-tip').remove();">
+			<i class="mxc-close"></i>
+		</div>
+	</div>
+</div>
+</script>
+<script>
+var isselfsocket = "{if isselfsocket()}1{else /}2{/if}",needinitfulldm = "{if isset($menus['fulldm']) && !empty($dmconfig)}1{else /}2{/if}";
+require(['screencore','template','layerBox','marqueen','screensocket','fulldm','keyboard','dragqr'],function (screencore,template,layerBox,marqueen,screensocket,fulldm,keyboardJS,dragqr) {
+	if(isselfsocket=='2'){
+		screensocket.init({
+			onmessage:function(data){
+				if(data.type=='connected'){
+					screensocket.isclose = false;
+					screencore.connectsocket({clientid:data.clientid});
+				}else if(data.type=='screendm'){
+					var messages = data.messages;
+					if(messages){
+						if($.isArray(messages)&&messages.length>0){
+							$.each(messages,function(i, val){
+								fulldm.addBullet(val);
+							});
+						}
+					}else{
+						fulldm.addBullet(data);
+					}
+				}else if(data.type=='screendeldm'){
+					if(!$.isArray(data.msgid)){
+						fulldm.delBullet(data.msgid);
+					}else{
+						$.each(data.msgid,function(index,val){
+							fulldm.delBullet(val);
+						});
+					}
+				}else if(data.type=='screenresetdm'){
+					fulldm.resetBullet();
+				}
+			}
+		});
+	}
+	var ischrome =  navigator.userAgent.indexOf('Chrome') > -1;
+	if(!ischrome){
+		$("body").append(template('google-tpl',{}));
+	}
+	if(needinitfulldm=='1'){
+		fulldm.init($(".fulldmBox"),{:json_encode($dmconfig)});
+	}
+	if($(".headerTitle li").length > 1){
+		marqueen.init('.headerTitle',0.02,10e3);
+	}
+	Object.create(dragqr).init("hdQrbox1",true);
+	if($(".hdQrbox2").length){
+		Object.create(dragqr).init("hdQrbox2",true);
+	}
+	$(window).resize(function () {  
+		if($(".videoBg").length>0){
+			screencore.videofullScreen(".videoBg",screencore.getvideoData($(".videoBg")[0]));
+		}
+	});
+	$("body").on("mouseenter", "*[lay-tips]", function() {
+		var e = this;
+		layerBox.showTips($(e).attr("lay-tips"),e,$(e).attr('lay-direction'));
+	}).on("mouseleave", "*[lay-tips]", function() {
+		layerBox.close($(this).data("index"));
+	}).on("click", "*[lay-tips]", function() {
+		layerBox.close($(this).data("index"));
+	});
+	{// 单页加载模式}
+	{if !isset($hdinfo['loadtype']) || $hdinfo['loadtype']=='1'}
+		$('.footer-controlBox').on('mouseover',function(){
+			$('.footer-controlBox').removeClass('down').addClass('up');
+			$(".menuArrowbox-icon-up").removeClass("menuArrowbox-icon-up").addClass("menuArrowbox-icon-down");
+		})
+		$('.footer-controlBox').on('mouseleave',function(){
+			$(".menutooltip").remove();
+			$('.footer-controlBox').removeClass('up').addClass('down');
+			$(".menuArrowbox-icon-down").removeClass("menuArrowbox-icon-down").addClass("menuArrowbox-icon-up");
+		});
+		$('.footer-controlBox .menuArrowbox').on('click',function(){
+			if($(".menuArrowbox-icon-down").length){
+				$(".menuArrowbox-icon-down").removeClass("menuArrowbox-icon-down").addClass("menuArrowbox-icon-up");
+				$('.footer-controlBox').removeClass('down').addClass('up');
+			}else{
+				$(".menuArrowbox-icon-up").removeClass("menuArrowbox-icon-up").addClass("menuArrowbox-icon-down");
+				$('.footer-controlBox').removeClass('up').addClass('down');
+			}		
+		});
+		$(".control-module-list .icon-box").on('click',function(){
+			var $this = $(this);
+			if(XCV3Config.screenfollow == '1'){
+				screencore.ajaxSubmit('/screen/common/followurl',{module:$this.attr("data-module")}).then(function(data){
+					if(data.code!=0){
+						layerBox.showMsg(data.msg);
+					}
+				}, function(){
+					layerBox.showMsg('网络太差，请稍后重试');
+				});
+			}
+			window.location.href = $this.attr('data-href') + ($this.data('ishandadd')=='2' ? "?hdid={$hdinfo['hdid']}":"");
+		});
+		$(".control-module-list .icon-box").on('mouseenter',function(e) {
+			$(".menutooltip").remove();
+			var gamemodule = $(this).attr('data-module')||'';
+			var modulestyles = gamestyles[gamemodule]??[];
+			if($.isArray(modulestyles) && modulestyles.length){
+				var ParentOl = $(".control-module-list .wrapbox")[0].offsetLeft,plusW = 20;
+				$('.footer-controlBox').append(template('gamestyle-tpl',{
+					css:{
+						width: $(this).outerWidth(true) + plusW,
+						left: $(this)[0].offsetLeft + (ParentOl - plusW) / 2
+					},
+					styles: modulestyles
+				}));
+			}
+		});
+		$('.footer-controlBox').on('click','.menutooltip li',function(){
+			var $this = $(this),isactive = $this.hasClass('active')?'1':'2';
+			screencore.ajaxSubmit('/screen/common/changestyle',{module:$this.attr("data-module"),styleid:$this.attr("data-styleid"),isactive:isactive,rotateid:"{$rotateid??'0'}"}).then(function(data){
+				if(data.code==0){
+					screensocket.isclose = false;
+					window.location.href = data.msg;
+				}else{
+					layerBox.showMsg(data.msg);
+				}
+			}, function(){
+				console.log('网络太差，请稍后重试.');
+			});
+		});
+		$(".control-module-list .switch-next").on('click',function(){
+			$(".menutooltip").remove();
+			if(modulepage >= moduleallpage){
+				modulepage = 1;
+			}else{
+				modulepage++;
+			}
+			$(".control-module-list .wrap").css({"transform":`translateY(${-modulepage * 65 + 65}px)`});
+		});
+		$(".control-module-list .switch-prev").on('click',function(){
+			$(".menutooltip").remove();
+			if(modulepage==1){
+				modulepage = moduleallpage;
+			}else{
+				modulepage--;
+			}
+			$(".control-module-list .wrap").css({"transform":`translateY(${-modulepage * 65 + 65}px)`});
+		});
+		$(".control-normal-list .openqr").on('click',function(e,params){
+			var stopicon = $(this).find('.isstop');
+			if ($('.hdQrbox').is(':hidden')) {
+				$(".hdQrbox").fadeIn();
+				stopicon.hide();
+				params != '1' && window.localStorage.setItem("openqr"+XCV3Config.hdid,'1');
+			}else{
+				$(".hdQrbox").fadeOut();
+				stopicon.show();
+				params != '1' && window.localStorage.setItem("openqr"+XCV3Config.hdid,'2');
+			}
+		});
+		var nofootermenumodules = [
+			'dzqy',
+			'yaohao',
+			'ppqd',
+			'photocj',
+			'importcj',
+			'bigmenu',
+		],hdhidefootermenu = "{$hdinfo['screenconfig']['hidemenu']??2}",openqrstatus = window.localStorage.getItem("openqr"+XCV3Config.hdid);
+		if($.inArray(XCV3Config.gametype,nofootermenumodules)==-1){
+			if(hdhidefootermenu=='1'){
+				screencore.hideFootMenu();
+			}
+			if(openqrstatus != '2'){
+				$(".control-normal-list .openqr").trigger('click');
+			}
+		}else{
+			$('.footer-controlBox').trigger('mouseleave');
+		}
+		$(".control-normal-list .openfull").on('click',function(){
+			if ($(this).attr('data-open')=='2') {
+				screencore.fullScreen();
+				$(this).attr('data-open','1');
+			}else{
+				screencore.exitFullScreen();
+				$(this).attr('data-open','2');
+			}
+		});
+		$(".control-normal-list .openmusic").on('click',function(){
+			if(!$("#bgmusic").length) return;
+			var $this = $(this),stopicon = $this.find('.isstop'),videobgobj = $(".pcbgBox .videoBg");
+			if ($this.attr('data-open')=='1') {
+				stopicon.removeClass('display-none');
+				$("#bgmusic")[0].pause();
+				$this.attr('data-open','2');
+			}else{
+				$("#bgmusic")[0].play().then(() => {
+	           		stopicon.addClass('display-none');
+					$this.attr('data-open','1');
+		        }).catch(err => {
+		            console.log('您的浏览器暂不支持自动播放音频，请通过点击右下角的音频按钮播放');
+		        });
+		        if(videobgobj.length){
+					var videosrc = videobgobj.attr('data-src'), videosrcs = videosrc.split('.'), videotype = ( videosrcs[videosrcs.length-1] ? videosrcs[videosrcs.length-1] : '' );
+					if(videotype.indexOf('m3u8') != -1){
+						videobgobj[0].volume = 1;
+						videobgobj[0].play();
+					}
+				}
+			}
+		});
+		if(XCV3Config.gametype != 'baping' && XCV3Config.openbgmusic=='1' && $("#bgmusic").length){ 
+			$(".control-normal-list .openmusic").trigger('click');
+		}
+		keyboardJS.bind('1', function(e) {
+			$(".control-normal-list .openmusic").trigger('click');
+		});
+		keyboardJS.bind('2', function(e) {
+			$(".control-normal-list .opendm").trigger('click');
+		});
+		keyboardJS.bind('3', function(e) {
+			$(".control-normal-list .openqr").trigger('click');
+		});
+		keyboardJS.bind('4', function(e) {
+			$(".control-normal-list .openfull").trigger('click');
+		});
+		keyboardJS.bind('5', function(e) {
+			$(".hdQrbox img").trigger('dblclick');
+		});
+		{// 初始化模块快捷键}
+		{foreach $menus as $menu}
+			{if !in_array($menu['modulefield'],['fulldm']) && !empty($menu['modulekjj'])}
+				keyboardJS.bind('{$menu['modulekjj']}', function(e) {
+					$(".control-module-list .icon-box[data-module='{$menu['modulefield']}']").trigger('click');
+				});
+			{/if}
+		{/foreach}
+	{else /}
+		{// 非frame打开功能跳转到frame内}
+		{if !isset($pcconfig['islogin'])}
+			if(!XCV3Config.isiframe){	
+				window.location.href = "{:goscreen('frame/index',['hdid'=>$hdinfo['hdid']])}";
+			}
+		{/if}
+		{// frame加载模式 } 
+		if(XCV3Config.gametype != 'baping' && XCV3Config.openbgmusic == '1' && $("#bgmusic").length){ 
+			screencore.sendMsg2frame({'type':'bgmusicopen'});
+		}else{
+			screencore.sendMsg2frame({'type':'bgmusicclose'});
+		}
+		var nofootermenumodules = [
+			'dzqy',
+			'yaohao',
+			'ppqd',
+			'photocj',
+			'importcj',
+			'bigmenu',
+		],hdhidefootermenu = "{$hdinfo['screenconfig']['hidemenu']??2}",openqrstatus = window.localStorage.getItem("openqr"+XCV3Config.hdid);
+		{// 关闭二维码 } 
+		if($.inArray(XCV3Config.gametype,nofootermenumodules) == -1){
+			{// 默认折叠了菜单 }
+			if(hdhidefootermenu == '1') {
+				screencore.hideFootMenu();
+			}
+			{// 未关闭二维码默认开启 }
+			if(openqrstatus != '2'){
+				screencore.sendMsg2frame({'type':'qrboxopen'});
+			}
+		}else{
+			//部分功能自动关闭大屏 菜单和二维码
+			screencore.sendMsg2frame({'type':'qrboxclose'});
+			screencore.sendMsg2frame({'type':'controllboxhide'});
+		}
+		window.addEventListener('message', function(e){
+	        if (e.origin.indexOf(window.location.host)!=-1 && typeof e.data === 'string') {
+	            var fdata = JSON.parse(e.data);
+	            if(fdata.type=='fulldmopen'){
+	            	fulldm.start();
+	            }else if(fdata.type=='fulldmclose'){
+	            	fulldm.stop();
+	            }else if(fdata.type=='resetqrbox'){
+	            	$(".hdQrbox img").trigger('dblclick');
+	            }else if(fdata.type=='fkeyboardjs'){
+	            	var keycode = fdata.keycode;
+	            	keyboardJS.pressKey(keycode);
+					keyboardJS.releaseKey(keycode);
+					if(keycode=='esc' || keycode=='enter'){
+						if(keycode=='esc'){
+							$('.layui-layer-dialog .layui-layer-btn1').trigger('click');
+						}else{
+							$('.layui-layer-dialog .layui-layer-btn0').trigger('click');
+						}
+					}
+	            }
+	        }
+		});
+		keyboardJS.bind('1', function(e) {
+			screencore.sendMsg2frame({'type':'keyboardjs','keycode':'1'});
+		});
+		keyboardJS.bind('2', function(e) {
+			screencore.sendMsg2frame({'type':'keyboardjs','keycode':'2'});
+		});
+		keyboardJS.bind('3', function(e) {
+			screencore.sendMsg2frame({'type':'keyboardjs','keycode':'3'});
+		});
+		keyboardJS.bind('4', function(e) {
+			screencore.sendMsg2frame({'type':'keyboardjs','keycode':'4'});
+		});
+		keyboardJS.bind('5', function(e) {
+			screencore.sendMsg2frame({'type':'keyboardjs','keycode':'5'});
+		});
+		{// 初始化模块快捷键}
+		{foreach $menus as $menu}
+			{if !in_array($menu['modulefield'],['fulldm']) && !empty($menu['modulekjj'])}
+				keyboardJS.bind("{$menu['modulekjj']}", function(e) {
+					screencore.sendMsg2frame({'type':'keyboardjs','keycode':"{$menu['modulefield']}"});
+				});
+			{/if}
+		{/foreach}
+	{/if}
+});
+{// 背景视频加载完成后全屏并自动播放}
+var videobgobj = $(".pcbgBox .videoBg");
+if(videobgobj.length > 0){
+	var videosrc = videobgobj.attr('data-src'),videosrcs = videosrc.split('.'),videotype = (videosrcs[videosrcs.length-1] ? videosrcs[videosrcs.length-1] : '');
+	if(videotype.indexOf('m3u8')!=-1){
+		require(['hls'],function (Hls) {
+			var hls = new Hls();
+			hls.loadSource(videosrc);
+			hls.attachMedia(videobgobj[0]);
+			videobgobj[0].play().then(function(){}).catch(function(err){
+				videobgobj[0].volume = 0;
+	            videobgobj[0].play();
+	        });
+		});
+	}else{
+		videobgobj[0].oncanplaythrough = function(){
+			require(['screencore'],function (screencore) {
+				screencore.videofullScreen(".videoBg",screencore.getvideoData(videobgobj[0]));
+				videobgobj[0].play().then(function(){}).catch(function(err){
+					videobgobj[0].volume = 0;
+		            videobgobj[0].play();
+		        });
+		    });
+		};
+	}
+}
+{// 网络断开与连接上}
+window.addEventListener("offline", function (e) {
+  $(".offlinebox").fadeIn();
+});
+window.addEventListener("online", function (e) {
+  $(".offlinebox").fadeOut();
+});
+</script>
+{:globalcss()}
+{if !empty($hdinfo['diycss'])}
+<style type="text/css">{:$hdinfo['diycss']}</style>
+{/if}
+{if isset($pcconfig['style']) && isset($pcconfig['style']['diycss']) && !empty($pcconfig['style']['diycss'])}
+<style type="text/css">{$pcconfig['style']['diycss']}</style>
+{/if}
+{if isset($pcconfig['gametype']) && $pcconfig['gametype']=='baping'}
+<div class="screenlight"></div>
+{/if}
+{if isset($hdinfo['screenconfig']['hidemenu']) &&  $hdinfo['screenconfig']['hidemenu']== '3'}
+<style type="text/css">.footer-controlBox{display: none}</style>
+{/if}
+{include file="common/adv"}
+{include file='common/footer_base' /}

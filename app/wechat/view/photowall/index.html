@@ -1,0 +1,810 @@
+{include file="common/header" /}
+<style>
+.zam-app-bodyBg{background-image: none!important;background-color: #fff;}
+.btn{
+    height: auto;
+    line-height: inherit;
+    padding: 0.1rem 0.26rem;
+}
+.app-photowallbox{
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+.bscroll-vertical-scrollbar{width: 4px!important;}
+.bscroll-vertical-scrollbar .bscroll-indicator{border:0!important;}
+.pulldown-wrapper{
+    position: absolute;
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+    transform: translateY(-100%) translateZ(0);
+    text-align: center;
+    color: #999;
+}
+.pullup-tips{
+    color: #747474;
+    text-align: center;
+    padding: 0.2rem;
+    font-size: 0.24rem;
+    background-color: #fff;
+}
+.app-photowall{width: 100%; height:auto;}
+.app-photowall .photowall-slides{width:100%;}
+.app-photowall .photowall-slides img{width:100%; vertical-align:middle;}
+
+.photowall-des{
+    position: relative;
+    width: 100%;
+    box-sizing: border-box;
+}
+.photowall-des-box{
+    width: 100%;
+    padding: 0.2rem 0.28rem;
+    box-sizing: border-box;
+    background-color: #fff;
+    border-radius: 2px;
+    color: #a9a5a5;
+}
+.photowall-des .des-item{
+    color: #000;
+    font-weight: 700;
+    font-size: 0.3rem;
+    line-height: 0.48rem;
+}
+.photowall-des .des-item span{
+    margin-right: 0.2rem;
+}
+.des-calc{
+    margin: 0.28rem 0;
+    font-size: 0.26rem;
+}
+.des-calc .views{
+    margin-left: 0.2rem;
+}
+.des-calc span{font-size: 0.3rem;font-weight: bold;margin-right: 0.04rem;}
+.des-calc .pubtn{margin-left: auto;}
+.des-timeaddr{
+    border-top: 1px solid #f3f3f3;
+    padding-top: 0.24rem;
+}
+.des-timeaddr div{
+    padding: 0.1rem 0;
+    width: 100%;
+    word-break: break-all;
+}
+.des-timeaddr .timebox span:first-child,.des-timeaddr .addrbox span:first-child{margin-right: 0.1rem}
+
+/* 控制面板*/       
+.photowall-panel{
+    position: relative;
+    width: 100%;
+    box-sizing: border-box;
+    border-bottom: 1px solid #f5f6f7;
+}
+.photowall-panel.fixedpanel{
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 3;
+}
+.photowall-panel-box{
+    width: 100%;
+    padding: 0.2rem 0.28rem;
+    box-sizing: border-box;
+    background-color: #fff;
+    border-radius: 2px;
+    color: #000;
+    
+}
+.panel-tabs li{ 
+    width: 0.8rem;
+    font-size: 0.32rem;
+    font-weight: bold;
+}
+.photowall-panel-box .controlbox{
+    margin-left: auto;
+    font-size: 0.42rem;
+    font-weight: 800;
+    cursor: pointer;
+}
+.panel-pop{
+    position: absolute;
+    top: 100%;
+    width: 100%;
+    z-index: 1;
+    background-color: #fff;
+}
+.sortul{
+    margin: 0.2rem;
+}
+.sortul li{
+    width: 42%;
+    height: 0.82rem;
+    border-radius: 0.41rem;
+    border: 1px solid #f5f6f7;
+    color: #60646b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+.sortul li.active{
+    color: #006cff;
+    background: rgba(0,108,255,.05);
+    border: none;
+}
+.typeul{
+    margin: 0 0.2rem 0.2rem;
+    padding-top: 0.2rem;
+    border-top: 1px solid #f5f6f7;
+}
+.typeul li{
+    width: 42%;
+    height: 0.82rem;
+    border-radius: 0.41rem;
+    border: 1px solid #f5f6f7;
+    color: #60646b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+.typeul li.active{
+    color: #006cff;
+    background: rgba(0,108,255,.05);
+    border: none;
+}
+/*图片盒子*/
+.photowall-imgcontianer{
+    position: relative;
+    background: #fff;
+}
+.photowall-imgboxs{
+    width: 100%;
+    padding: 0 1vw;
+    box-sizing: border-box;
+}
+.photowall-imgboxs .img-item{
+    position: relative;
+    width: 32vw;
+    height: 32vw;
+    margin-right: 1vw;
+    margin-bottom: 1vw;
+    background: #ccc url(/static/images/wechat/photowall/wait.png) no-repeat 50%;
+    background-size: 50%;
+}
+.photowall-imgboxs .img-item:nth-of-type(3n){
+    margin-right: 0;
+}
+.photowall-imgboxs .img-item img{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(.7);
+    opacity: 0;
+    transition: all .3s;
+}
+.photowall-imgboxs .img-item img.loaded{
+    transform: scale(1);
+    opacity: 1;
+}
+.photowall-imgboxs .photowall-itembox{
+    flex: 1;
+}
+.photowall-imgboxs .photowall-left{
+    margin-right: 1vw;
+}
+.photowall-imgboxs .photowall-itembox .img-item{
+    width: calc(97vw / 2);
+    margin-right: 0;
+}
+/*发布*/
+.pubbox{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #fff;
+    padding: 0.32rem;
+    z-index: 99999;
+}
+.pubbox .btns a:nth-of-type(1){
+    background-color: #f3f3f3;
+}
+.pubbox .btns a:nth-of-type(2){
+    margin-left: auto;
+}
+.pubcontainer{
+    margin-top: 0.32rem;
+}
+.pubcontainer textarea{
+    padding: 0.1rem 0.2rem;
+    border-radius: 4px;
+    border: 1px solid #f3f3f3;
+}
+.upimgbox{
+    margin-top: 0.21rem;
+}
+.upimgbox .uploadbox{
+    width: 1.6rem;
+    height: 1.6rem;
+    border: 1px solid #f3f3f3;
+    border-radius: 2px;
+    background-color: #f3f3f3;
+}
+.upimgbox .uploadbox i{
+    font-size: 0.52rem;
+}
+.upimgbox .uploadbox img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+/*计数器*/
+.scrollcounter{
+    position: fixed;
+    top: 2.4rem;
+    left: 0;
+    z-index: 2;
+    padding: 0 0.18rem;
+    min-width: 1rem;
+    height: 0.72rem;
+    color: #fff;
+    background: rgba(32,33,36,.6);
+    border-radius: 0 0.25rem 0.25rem 0;
+    box-sizing: border-box;
+}
+.scrollcounter.opacity0{
+    opacity: 0;
+}
+.scrollcounter .scrollcountbox{
+    margin-right: 0.1rem;
+    font-size: 0.3rem;
+}
+.scrollcounter .scrolltop{
+    width: 0.32rem;
+    height: 0.32rem;
+    background-color: hsla(0, 0%, 100%, .2);
+    border-radius: 50%;
+    cursor: pointer;
+}
+.scrollcounter .scrolltop i {
+    font-size: 0.2rem;
+    transform: rotate(90deg);
+    
+}
+/*弹窗播放图*/
+.pswp-box .pswp__img--placeholder {
+    background-image: url(/static/images/wechat/photowall/loading.gif);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 1rem 1rem;
+}
+.pswp-box .pswp__custom-caption {
+  width: calc(100% - 0.6rem);
+  padding: 0.2rem;
+  border-radius: 0.1rem;
+  position: absolute;
+  left: 50%;
+  bottom: 0.2rem;
+  transform: translateX(-50%);
+  text-align: center;
+  display:{if $appconfig['appstyle']['poptxt']['open'] == '2'}none!important{else /}block{/if};
+  background: {$appconfig['appstyle']['poptxt']['bgcolor']};
+  border: 1px solid {$appconfig['appstyle']['poptxt']['bordercolor']};
+  font-size: {$appconfig['appstyle']['poptxt']['size']}px;
+  color: {$appconfig['appstyle']['poptxt']['color']};
+}
+.pswp-box .hidden-caption-content {
+  display: none;
+}
+</style>
+<div class="photowall-panel fixedpanel hidden">
+    <div class="photowall-panel-box zam-app-flex">
+        <ul class="panel-tabs zam-app-flex-ajCenter2">
+            <li>全部</li>
+            <li class="hidden">热门</li>
+        </ul>
+        <div class="controlbox zam-app-flex-ajCenter"><span class="mxc-sortlight"></span></div>
+    </div>
+    <div class="panel-pop zam-app-flex zam-app-justifyspacebetween zam-app-directionColumn hidden">
+        <ul class="sortul zam-app-flex zam-app-justifyspacebetween hidden">
+            <li>正序</li>
+            <li class="active">倒序</li>
+        </ul>
+        <ul class="typeul zam-app-flex zam-app-justifyspacebetween">
+            <li data-type="1" {if $appconfig['appstyle']['photosettype'] == '1'}class="active"{/if}>瀑布流</li>
+            <li data-type="2" {if $appconfig['appstyle']['photosettype'] == '2'}class="active"{/if}>九宫格</li>
+        </ul>
+    </div>
+</div>
+<section class="scrollcounter zam-app-flex-ajCenter2 hidden">
+    <div class="scrollcountbox"><span>0</span>/<span>0</span></div>
+    <span class="scrolltop zam-app-flex-ajCenter"><i class="mxc-back"></i></span>
+</section>
+<section class="app-photowallbox">
+<div class="app-photowall-scroller">
+    <div class="pulldown-wrapper">
+        <div class="waitPullDown">
+            <span>下拉加载</span>
+        </div>
+        <div class="isPullingDown hidden">
+            <div class="loading hidden">
+            <span>加载中...</span>
+            </div>
+            <div class="loadsuccess">
+            <span>加载完成</span>
+            </div>
+        </div>
+    </div>
+    <div class="app-photowall">
+        {if !empty($appconfig['appstyle']['banner'])}
+        <div class="photowall-slides">
+            <img src="{:tomedia($appconfig['appstyle']['banner'])}">
+        </div>
+        {/if}
+        <div class="photowall-des">
+            <div class="photowall-des-box">
+                {if !empty($appconfig['appstyle']['toptitle']['txt'])}
+                    <div class="des-item" style="color:{$appconfig['appstyle']['toptitle']['color']};font-size: {$appconfig['appstyle']['toptitle']['size']}px;">{$appconfig['appstyle']['toptitle']['txt']}</div>
+                {/if}
+                {if !empty($appconfig['appstyle']['toptitle2']['txt'])}
+                <div class="des-item" style="color:{$appconfig['appstyle']['toptitle2']['color']};font-size: {$appconfig['appstyle']['toptitle2']['size']}px;">{$appconfig['appstyle']['toptitle2']['txt']}</div>
+                {/if}
+                <div class="des-calc zam-app-flex zam-app-alignCenter">
+                    <div class="nums"><span>0</span>张照片</div>
+                    {if $appconfig['appstyle']['views']['open'] == '1'}
+                        <div class="views"><span>0</span>次浏览</div>
+                    {/if}
+                    {if $appconfig['appstyle']['pub']['open'] == '1' || $wxuser['ismanager'] == '1'}
+                        <div class="pubtn"><a class="btn btn-primary">发布</a></div>
+                    {/if}
+                </div>
+                {if !empty($appconfig['appstyle']['time']) || !empty($appconfig['appstyle']['area'])}
+                <div class="des-timeaddr">
+                    {if !empty($appconfig['appstyle']['time'])}
+                    <div class="timebox">
+                        <span class="mxc-timefill"></span><span>{$appconfig['appstyle']['time']}</span>
+                    </div>
+                    {/if}
+                    {if !empty($appconfig['appstyle']['area'])}
+                    <div class="addrbox">
+                        <span class="mxc-round_location_fill"></span><span>{$appconfig['appstyle']['area']}</span>
+                    </div>
+                    {/if}
+                </div>
+                {/if}
+            </div>
+        </div>
+        <div class="photowall-panel relativepanel">
+            <div class="photowall-panel-box zam-app-flex">
+                <ul class="panel-tabs zam-app-flex-ajCenter2">
+                    <li>全部</li>
+                    <li class="hidden">热门</li>
+                </ul>
+                <div class="controlbox zam-app-flex-ajCenter"><span class="mxc-sortlight"></span></div>
+            </div>
+            <div class="panel-pop zam-app-flex zam-app-justifyspacebetween zam-app-directionColumn hidden">
+                <ul class="sortul zam-app-flex zam-app-justifyspacebetween hidden">
+                    <li>正序</li>
+                    <li class="active">倒序</li>
+                </ul>
+                <ul class="typeul zam-app-flex zam-app-justifyspacebetween">
+                    <li data-type="1" {if $appconfig['appstyle']['photosettype'] == '1'}class="active"{/if}>瀑布流</li>
+                    <li data-type="2" {if $appconfig['appstyle']['photosettype'] == '2'}class="active"{/if}>九宫格</li>
+                </ul>
+            </div>
+        </div>
+        <div class="photowall-imgcontianer">
+            <div class="photowall-imgboxs zam-app-flex zam-app-flex-wrap">
+                <div class="photowall-itembox photowall-left"></div>
+                <div class="photowall-itembox photowall-right"></div>
+            </div>
+        </div>
+    </div>
+    <div class="pullup-tips hidden">
+        <div class="afterpullup">
+            <span class="pullup-txt">加载中...</span>
+        </div>
+    </div>
+</div>
+</section>
+<section class="pubbox hidden">
+    <div class="btns zam-app-flex">
+        <a class="btn btn-default btn-cancel">取消</a>
+        <a class="btn btn-primary btn-confirm">确定</a>
+    </div>
+    <div class="pubcontainer">
+        {if $appconfig['appstyle']['pub']['input'] == '1'}
+            <textarea class="cell-textarea" placeholder="说点什么吧{if $appconfig['appstyle']['pub']['maxlength'] > 0 }，{$appconfig['appstyle']['pub']['maxlength']}个字内{/if}" {if $appconfig['appstyle']['pub']['maxlength'] > 0 }maxlength="{$appconfig['appstyle']['pub']['maxlength']}"{/if}></textarea>
+        {/if}
+        <div class="upimgbox">
+            <div class="uploadbox zam-app-flex-ajCenter">
+                <i class="mxc-camera"></i>
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+var initload = false, maxid = 0, pindex = 0, observer = null,autoscale = "{$appconfig['appstyle']['autoscale']??2}";
+const vwToPx = function(value){
+    return value * (window.innerWidth / 100);
+};
+var onewidth = vwToPx(97/2), onewidth2 = vwToPx(32/2);
+function getTotalChildrenHeight(classname) {
+    var children = $(classname).find('.img-item'),totalHeight = 0;
+    children.each(function(i,v) {
+        totalHeight += $(v).height();
+    });
+    return totalHeight;
+}
+function scaleimg(src){
+    var scale = '', settype = $(".typeul li.active").attr('data-type') || '1', w = settype == '1' ? onewidth : onewidth2 * 2.5;
+    if(autoscale == '1' && src != '' && XCV3Config.amconfig.type != '0'){
+        if(XCV3Config.amconfig.type == '1'){
+            scale += '?x-oss-process=image/resize,w_'+ parseInt(w);
+        }else{
+            scale += '?imageMogr2/auto-orient/thumbnail/'+ parseInt(w) + 'x';
+        }
+    }
+    return src + scale;
+}
+if ('IntersectionObserver' in window) {
+    observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry){
+            var target = $(entry.target);
+            if (entry.intersectionRatio > 0) {
+                target.addClass('ob');
+            }else{
+                target.removeClass('ob');
+            }
+        });
+        var pindexArr = [ 0 ];
+        $(".photowall-imgboxs .ob").each(function(i,v){
+            pindexArr.push(parseInt($(v).attr('data-pindex'))  + 1);
+        });
+        $('.scrollcounter .scrollcountbox span').eq(0).text(Math.max(...pindexArr));
+    });
+}else{
+    $(".scrollcounter").addClass('opacity0');
+}
+require(['wechatcore','betterscroll','anime','photoswipe','photoswipelightbox'],function(wechatcore,BetterScroll,anime,PhotoSwipe,PhotoSwipeLightbox){
+    $(".controlbox").click(function(){
+        $(".panel-pop").toggleClass('hidden');
+    });
+    $(".pubtn").click(function(){
+        $(".pubbox").removeClass('hidden');
+    });
+    $(".pubbox .btn-cancel").click(function(){
+        $(".pubbox").addClass('hidden');
+    });
+    $(".pubcontainer .uploadbox").click(function(){
+        var $this = $(this);
+        wechatcore.uploadImg({posturl:'/wechat/photowall/upload',type:'photowall'},function(json){
+            if(json.code==0){
+                $this.html(`<img src="${json.msg.filesrc}" data-filepath="${json.msg.filepath}" />`);
+            }else{
+                wechatcore.msg(json.msg);
+            }
+        });
+    });
+    $(".pubbox .btn-confirm").click(function(){
+        var pictxt = $(".pubcontainer .cell-textarea").val() || '',filepath = $(".pubcontainer .uploadbox img").attr('data-filepath') || '';
+        if($(".pubcontainer .cell-textarea").length && pictxt == ''){
+            return wechatcore.msg('请说点什么吧');
+        }
+        if(filepath == ''){
+            return wechatcore.msg('请上传照片');
+        }
+        wechatcore.ajaxSubmit("/wechat/photowall/pubone",{pictxt:pictxt,filepath:filepath},'发布中...').then(function(json){
+            if(json.code==0){
+                wechatcore.msg('发布成功');
+                $(".pubcontainer .cell-textarea").val('');
+                $(".pubcontainer .uploadbox").html('<i class="mxc-camera"></i>');
+                $(".pubbox .btn-cancel").trigger('click');
+                $(".typeul li.active").trigger('click');
+            }else{
+                wechatcore.msg(json.msg);
+            }
+        },function(){
+            wechatcore.msg('网络异常，请稍后重试');
+        });
+    });
+    $(".scrollcounter i").click(function(){
+        bs.scrollTo(0,0,300);
+        $(".panel-pop").addClass('hidden');
+    });
+    $(".typeul li").click(function(e,isinit){
+        var $this = $(this),typeindex = $this.index(),pobj = $this.parent().parent().parent(),type = $this.attr('data-type') || '1';
+        $this.addClass('active').siblings().removeClass('active');
+        if(pobj.hasClass('relativepanel')){
+            $(".fixedpanel .typeul li").eq(typeindex).addClass('active').siblings().removeClass('active');
+        }else{
+            $(".relativepanel .typeul li").eq(typeindex).addClass('active').siblings().removeClass('active');
+        }
+        bs.scrollTo(0,0,300);
+        $(".panel-pop").addClass('hidden');
+        bs.scrollTo(0,0,300);
+        wechatcore.ajaxSubmit("/wechat/photowall/initphoto",{},'加载中...').then(function(json){
+            if(json.code == 0){
+                pindex = 0;
+                loadImages = json.msg.lists;
+                $(".des-calc .nums span").text(json.msg.count);
+                $(".des-calc .views span").text(json.msg.views);
+                $('.scrollcounter .scrollcountbox span').eq(1).text(json.msg.count);
+                if(json.msg.lists.length > 0){
+                    $(".photowall-imgboxs .img-item").each(function(){
+                        if(observer) observer.observe($(this)[0]);
+                        $(this).remove();
+                    });
+                    if(type == '1'){
+                        $(".photowall-imgboxs").html('<div class="photowall-itembox photowall-left"></div><div class="photowall-itembox photowall-right"></div>');
+                    }else{
+                        $(".photowall-imgboxs").empty();
+                    }
+                    maxid = json.msg.lists.slice(-1)[0].id;
+                    var obj,isfall = $(".photowall-left").length;
+                    if(isfall){
+                        var lheight = getTotalChildrenHeight(".photowall-left"), rheight = getTotalChildrenHeight(".photowall-right");
+                    }
+                    $.each(json.msg.lists,function(i, v){
+                        v.pindex = pindex;
+                        v.src = scaleimg(v.src);
+                        pindex++;
+                        if(isfall){
+                            v.h = parseInt(onewidth / (v.width / v.height));
+                            obj = $(wechatcore.tpl($("#img-tpl"),v));
+                            if(lheight <= rheight){
+                                lheight += v.h;
+                                $(".photowall-imgboxs .photowall-left").append(obj);
+                            }else{
+                                rheight += v.h;
+                                $(".photowall-imgboxs .photowall-right").append(obj);
+                            }
+                        }else{
+                            obj = $(wechatcore.tpl($("#img-tpl"),v));
+                            $(".photowall-imgboxs").append(obj);
+                        }
+                        if(observer) observer.observe(obj[0]);
+                    });
+                    setTimeout(function(){
+                        bs.refresh();
+                        bs.openPullUp();
+                        $(".pullup-tips").text('加载中').addClass('hidden');
+                    },1e2);
+                }else{
+                    bs.closePullUp();
+                    $(".pullup-tips").text('- 已经到底了 -').removeClass('hidden');
+                    bs.refresh();
+                }
+            }else{
+                wechatcore.msg(json.msg);
+            }
+            if(isinit) initload = true;
+        }, function(){
+            wechatcore.msg('网络太差，请稍后重试');
+        });
+    });
+    
+    let bs = BetterScroll.createBScroll('.app-photowallbox', {
+        click: true,
+        scrollY: true,
+        bounceTime: 4e2,
+        useTransition: false,
+        pullDownRefresh:{
+            threshold: 69,
+            stop: 56,
+        },
+        pullUpLoad: {
+            threshold: 10,
+        },
+        scrollbar: {
+            fade: true,
+            interactive: true,
+        }
+    });
+    bs.on('pullingDown', function(){
+        if(!initload) return false;
+        $(".waitPullDown").addClass('hidden');
+        $(".isPullingDown").removeClass('hidden');
+        $(".isPullingDown .loading").removeClass('hidden');
+        $(".isPullingDown .loadsuccess").addClass('hidden');
+        setTimeout(function(){
+            $(".isPullingDown .loading").addClass('hidden');
+            $(".isPullingDown .loadsuccess").removeClass('hidden');
+            wechatcore.ajaxSubmit("/wechat/photowall/initphoto",{},false).then(function(json){
+                if(json.code == 0){
+                    pindex = 0;
+                    loadImages = json.msg.lists;
+                    $(".des-calc .nums span").text(json.msg.count);
+                    $(".des-calc .views span").text(json.msg.views);
+                    $('.scrollcounter .scrollcountbox span').eq(1).text(json.msg.count);
+                    if(json.msg.lists.length > 0){
+                        $(".photowall-imgboxs .img-item").each(function(){
+                            if(observer) observer.observe($(this)[0]);
+                            $(this).remove();
+                        });
+                        maxid = json.msg.lists.slice(-1)[0].id;
+                        var obj,isfall = $(".photowall-left").length;
+                        if(isfall){
+                            var lheight = getTotalChildrenHeight(".photowall-left"), rheight = getTotalChildrenHeight(".photowall-right");
+                        }
+                        $.each(json.msg.lists,function(i, v){
+                            v.pindex = pindex;
+                            pindex++;
+                            if(isfall){
+                                v.h = parseInt(onewidth / (v.width / v.height));
+                                v.src = scaleimg(v.src);
+                                obj = $(wechatcore.tpl($("#img-tpl"),v));
+                                if(lheight <= rheight){
+                                    lheight += v.h;
+                                    $(".photowall-imgboxs .photowall-left").append(obj);
+                                }else{
+                                    rheight += v.h;
+                                    $(".photowall-imgboxs .photowall-right").append(obj);
+                                }
+                            }else{
+                                obj = $(wechatcore.tpl($("#img-tpl"),v));
+                                $(".photowall-imgboxs").append(obj);
+                            }
+                            if(observer) observer.observe(obj[0]);
+                        });
+                        setTimeout(function(){
+                            $(".isPullingDown").addClass('hidden');
+                            $(".waitPullDown").removeClass('hidden');
+                            bs.finishPullDown();
+                            bs.refresh();
+                            bs.openPullUp();
+                            $(".pullup-tips").text('加载中').addClass('hidden');
+                        },1e2);
+                    }else{
+                        setTimeout(function(){
+                            $(".isPullingDown").addClass('hidden');
+                            $(".waitPullDown").removeClass('hidden');
+                            bs.finishPullDown();
+                            bs.refresh();
+                        }, 50)
+                        bs.closePullUp();
+                        $(".pullup-tips").text('- 已经到底了 -').removeClass('hidden');
+                    }
+                }else{
+                    setTimeout(function(){
+                        $(".isPullingDown").addClass('hidden');
+                        $(".waitPullDown").removeClass('hidden');
+                        bs.finishPullDown();
+                        bs.refresh();
+                    }, 50)
+                    wechatcore.msg(json.msg);
+                }
+            }, function(){
+                $(".isPullingDown").addClass('hidden');
+                $(".waitPullDown").removeClass('hidden');
+                bs.finishPullDown();
+                bs.refresh();
+                wechatcore.msg('网络太差，请稍后重试');
+            });
+        },5e2);
+    });
+    bs.on('pullingUp', function(){
+        if(!initload) return false;
+        $(".pullup-tips").removeClass('hidden');
+        wechatcore.ajaxSubmit("/wechat/photowall/ajaxmore",{maxid:maxid}).then(function(json){
+			 if(json.code==0){
+                if(json.msg.length > 0){
+                    loadImages = loadImages.concat(json.msg);
+                    maxid = json.msg.slice(-1)[0].id;
+                    var obj,isfall = $(".photowall-left").length;
+                    if(isfall){
+                        var lheight = getTotalChildrenHeight(".photowall-left"), rheight = getTotalChildrenHeight(".photowall-right");
+                    }
+                    $.each(json.msg,function(i, v){
+                        v.pindex = pindex;
+                        pindex++;
+                        if(isfall){
+                            v.h = parseInt(onewidth / (v.width / v.height));
+                            v.src = scaleimg(v.src);
+                            obj = $(wechatcore.tpl($("#img-tpl"),v));
+                            if(lheight <= rheight){
+                                lheight += v.h;
+                                $(".photowall-imgboxs .photowall-left").append(obj);
+                            }else{
+                                rheight += v.h;
+                                $(".photowall-imgboxs .photowall-right").append(obj);
+                            }
+                        }else{
+                            obj = $(wechatcore.tpl($("#img-tpl"),v));
+                            $(".photowall-imgboxs").append(obj);
+                        }
+                        if(observer) observer.observe(obj[0]);
+                    });
+                    setTimeout(function(){
+                        bs.finishPullUp();
+                        bs.refresh();
+                        $(".pullup-tips").text('加载中').addClass('hidden');
+                    },1e2);
+                }else{
+                    bs.closePullUp();
+                    $(".pullup-tips").text('- 已经到底了 -').removeClass('hidden');
+                    bs.refresh();
+                }
+			 }else{
+                bs.finishPullUp();
+                bs.refresh();
+				wechatcore.msg(json.msg);
+			 }
+		}, function(){
+            bs.finishPullUp();
+            bs.refresh();
+			wechatcore.msg('网络太差，请稍后重试');
+		});
+    });
+    bs.on('scroll', function(pos){
+        if(pos.y + ($(".app-photowall .photowall-slides").height() + $(".photowall-des").outerHeight()) < 0){
+            $(".app-photowallbox .photowall-panel").addClass('hidden');
+            $(".photowall-panel.fixedpanel,.scrollcounter").removeClass('hidden');
+        }else{
+            $(".app-photowallbox .photowall-panel").removeClass('hidden');
+            $(".photowall-panel.fixedpanel,.scrollcounter").addClass('hidden');
+        }
+    });
+    //初始化加载一页
+    $(".fixedpanel .typeul .active").trigger('click',['1']);
+    const lightbox = new PhotoSwipeLightbox({
+        mainClass:'pswp-box',
+        showHideAnimationType: 'none',
+        pswpModule:PhotoSwipe,
+        loop:false,
+        bgOpacity:1,
+        errorMsg: '图片加载失败',
+        arrowPrev: false,
+        arrowNext: false,
+        zoom: false,
+        close: true,
+        counter: true,
+        indexIndicatorSep: ' / ',
+        preloaderDelay: 0,
+    });
+    lightbox.on('uiRegister', function() {
+        lightbox.pswp.ui.registerElement({
+            name: 'custom-caption',
+            order: 9,
+            isButton: false,
+            appendTo: 'root',
+            html: '',
+            onInit: function(el, pswp){
+                lightbox.pswp.on('change', function(){
+                    var txt = lightbox.pswp.currSlide.data.alt || '';
+                    if(txt != ''){
+                        el.innerHTML = txt;
+                        el.style.display = 'block';
+                    }else{
+                        el.style.display = 'none';
+                    }
+                });
+            }
+        });
+    });
+    lightbox.init();
+    $(".photowall-imgboxs").on('click','.img-item',function(){
+        $(".panel-pop").addClass('hidden');
+        var index = $(this).attr('data-pindex') || 0, photos = loadImages.map(function({ width, height, src, alt }){
+            var src = src.indexOf('?') > -1 ? src.split("?")[0] : src;
+            return { width, height, src, alt };
+        });
+        lightbox.loadAndOpen(parseInt(index), photos);
+    });
+});
+</script>
+<script id="img-tpl" type="text/html">
+<div class="img-item" <%# if(d.h){ %>style="height:<% d.h %>px"<%# } %> data-pindex="<% d.pindex %>">
+    <img src="<% d.src %>" onload="javascript:$(this).addClass('loaded');" />
+</div>
+</script>
+{include file="common/footermenu" /}
+{include file="common/footer" /}

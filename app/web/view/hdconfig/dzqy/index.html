@@ -1,0 +1,100 @@
+{include file='$Wpath/common/header'}
+<form id="formBox" class="zam-formvalidation form-horizontal" method="post">
+    <div class="config-titlebox">
+        <span class="config-titlename">微信设置<span class="text-danger" style="font-size:12px;">(标题与背景仅在活动无签约轮次时有效)</span></span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#wechatconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+    </div>
+    <div id="wechatconfigbox" class="collapse in">
+        {include file="$Wpath/common/configwechatcommon" /}
+    </div>
+    <div class="config-titlebox">
+        <span class="config-titlename">大屏设置<span class="text-danger" style="font-size:12px;">(标题与背景仅在活动无签约轮次时有效)</span></span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#screenconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+    </div>
+    <div id="screenconfigbox" class="collapse in">
+        {include file="$Wpath/common/configscreencommon" /}
+        {include file="$Wpath/common/configscreenmusic" /}
+    </div>
+    <div class="config-titlebox">
+        <span class="config-titlename">签约模式设置</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#qyconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+    </div>
+    <div id="qyconfigbox" class="collapse in">
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 签约方式</label>
+            <div class="col-lg-8">
+              <label class="lyear-radio radio-inline radio-primary">
+               <input type="radio" name="roundtype" value="1" {if $config['roundtype']=='1'}checked{/if}><span>一轮一轮有序签</span>
+              </label>
+              <label class="lyear-radio radio-inline radio-primary">
+               <input type="radio" name="roundtype" value="2" {if $config['roundtype']=='2'}checked{/if}><span>多轮同时签</span>
+              </label>
+              <span class="help-block">一轮一轮有序签，请点击键盘空格键结束一轮再点击键盘右方向键切换至下一轮；多轮同时签约，右方向键将失效</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 固定客户端</label>
+            <div class="col-lg-8">
+                {:tpl_switch('stableclient',$config['stableclient'])}
+                 <span class="help-block">开启后客户端将被固定，一般一轮一轮有续签，同一批人签约多个轮次，需要固定好对应的签约用户</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 客户端强制横屏</label>
+            <div class="col-lg-8">
+                {:tpl_switch('forcelandscape',$config['forcelandscape']??'2')}
+                 <span class="help-block">开启后手机端或者平板端必须横屏才可以参与签约</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 默认合约图</label>
+            <div class="col-lg-4">
+              {:tpl_image_one('defaultroundbg',$config['defaultroundbg']??SIMGURL . 'dzqy/bg.jpg')}
+              <span class="help-block">规格:1400 * 800px，创建新的签约轮次时默认合约图</span>
+            </div>
+        </div>
+    </div>
+    {include file='$Wpath/common/savepanel'}
+</form>
+<script>
+require(['webcore','jconfirmBox','zamnotice','layerBox','zvalidator'],function(webcore,jconfirmBox,zamnotice,layerBox){
+    $('#formBox').formValidation({
+        framework: 'bootstrap',
+        excluded: [':disabled'],
+        message: '您填写的内容无效',
+        fields: {
+            apptitle:{
+                message: '请输入网页标题',
+                validators: {
+                    notEmpty: {
+                        message: '请输入网页标题'
+                    },
+                }
+            },
+        }
+    }).on('success.form.fv', function(e) {
+        e.preventDefault();
+        var $form = $(e.target);
+        var postData = webcore.serializeObject($form);
+        var bload = $form.find(".zam-fixedbottom button").lyearloading({opacity: 0.2,spinnerSize: 'nm'});
+        $form.formValidation('disableSubmitButtons', true);
+        webcore.ajaxSubmit("{:goweb('hdconfig/dzqy')}",postData).then(function(json){
+            bload.hide();
+            if(json.code==0){
+                $form.formValidation('disableSubmitButtons', false);
+                zamnotice.showTips('success','保存成功',2e3,function(){
+                    window.location.reload();
+                });
+            }else{
+                zamnotice.showTips('error',json.msg);
+                $form.formValidation('disableSubmitButtons', false);
+            }
+        }, function(json){
+            bload.hide();
+            zamnotice.showTips('error','网络差。操作失败');
+            $form.formValidation('disableSubmitButtons', false);
+        });
+    });
+});
+</script>
+{include file='$Wpath/common/footer'}

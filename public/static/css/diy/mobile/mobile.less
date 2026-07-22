@@ -1,0 +1,614 @@
+* {
+    margin: 0;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body,
+html {
+    width: 100%;
+    height: 100%;
+    min-height: 100%;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+@media screen and (max-width: 820px) {
+
+    html,
+    body {
+        background-color: #fff;
+    }
+}
+
+@media screen and (min-width: 821px) {
+    body {
+        width: 825px;
+        height: 100%;
+        margin: 0 auto;
+        overflow: hidden;
+        transform: translate(0, 0);
+        background-image: url(/static/images/diy/body/3.jpg);
+        background-color: #fafafa;
+        backdrop-filter: blur(20px);
+        background-attachment: fixed;
+        background-size: 100% 100%;
+
+        #app {
+            overflow: hidden scroll;
+
+            .page {
+                min-height: 100vh;
+
+                .page-diy-container {
+                    background-size: 100% 100% !important;
+                }
+            }
+        }
+    }
+}
+
+::-webkit-scrollbar {
+    width: 0 !important;
+    height: 0 !important;
+    background-color: transparent !important;
+    display: none;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: rgba(144, 147, 153, .3);
+    border-radius: 5px;
+    display: none;
+}
+
+//loading
+@keyframes grow-line {
+    0% {
+        height: 0;
+    }
+
+    100% {
+        height: 75%;
+    }
+}
+
+@-webkit-keyframes grow-line {
+    0% {
+        height: 0;
+    }
+
+    100% {
+        height: 75%;
+    }
+}
+
+.app-loadding-box {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #fff;
+    z-index: 3;
+
+    .app-loading {
+        width: 28px;
+        height: 33px;
+
+        .app-loading-line {
+            width: 4px;
+            border-top-left-radius: 4px;
+            border-top-right-radius: 4px;
+            background-image: linear-gradient(top, #07c160, #5677fc);
+            background-image: -webkit-linear-gradient(top, #07c160, #5677fc);
+            animation: grow-line .5s ease alternate infinite;
+            -webkit-animation: grow-line .5s ease alternate infinite;
+
+            &:nth-child(2) {
+                animation-delay: 0.2s;
+                -webkit-animation-delay: 0.2s;
+            }
+
+            &:nth-child(3) {
+                animation-delay: 0.4s;
+                -webkit-animation-delay: 0.4s;
+            }
+        }
+    }
+}
+
+.nopub-tip {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 2;
+    height: 0.76rem;
+    line-height: 0.76rem;
+    background: #409EFF;
+    font-size: 0.3rem;
+    padding: 0 0.22rem;
+    color: #fff;
+    opacity: 0.92;
+    animation-delay: 0.1s;
+    -webkit-animation-delay: 0.1s;
+    animation-duration: 0.5s;
+    -webkit-animation-duration: 0.5s;
+
+    &::after {
+        content: "";
+        position: absolute;
+        right: -0.36rem;
+        height: 0;
+        width: 0;
+        border-top: 0.38rem solid #409EFF;
+        border-right: 0.38rem solid transparent;
+        border-bottom: 0.38rem solid #409EFF;
+    }
+}
+
+.hidden {
+    display: none !important;
+}
+
+.limitbox {
+    white-space: nowrap;
+    word-break: break-all;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.d-flex {
+    display: flex;
+}
+
+.flex-j-c-c {
+    justify-content: center;
+}
+
+.flex-j-c-s-a {
+    justify-content: space-around;
+}
+
+.flex-j-c-s-b {
+    justify-content: space-between;
+}
+
+.flex-a-i-c {
+    align-items: center;
+}
+
+.flex-a-i-f-e {
+    align-items: flex-end;
+}
+
+.flex-a-c-c {
+    align-content: center;
+}
+
+.flex-w-w {
+    flex-wrap: wrap;
+}
+
+.flex-d-c {
+    flex-direction: column;
+}
+
+.flex1 {
+    -webkit-box-flex: 1;
+    -ms-flex: 1;
+    flex: 1;
+}
+
+.fix1px {
+    margin-top: -1px;
+    padding-top: 1px;
+}
+
+@-webkit-keyframes rotate-round {
+    0% {
+        -webkit-transform: rotate(0deg)
+    }
+
+    25% {
+        -webkit-transform: rotate(90deg)
+    }
+
+    50% {
+        -webkit-transform: rotate(180deg)
+    }
+
+    75% {
+        -webkit-transform: rotate(270deg)
+    }
+
+    100% {
+        -webkit-transform: rotate(1turn)
+    }
+}
+
+@keyframes rotate-round {
+    0% {
+        -webkit-transform: rotate(0deg)
+    }
+
+    25% {
+        -webkit-transform: rotate(90deg)
+    }
+
+    50% {
+        -webkit-transform: rotate(180deg)
+    }
+
+    75% {
+        -webkit-transform: rotate(270deg)
+    }
+
+    100% {
+        -webkit-transform: rotate(1turn)
+    }
+}
+
+.van-image-preview__image--vertical {
+    max-height: 90%;
+}
+
+#app {
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+
+    .page {
+        width: 100%;
+        height: 100%;
+
+        .page-wrapper {
+            height: 100%;
+            position: relative;
+
+            .page-body {
+                box-sizing: border-box;
+                width: 100%;
+                height: 100%;
+                font-size: 16px;
+                font-family: -apple-system-font, Helvetica Neue, Helvetica, sans-serif;
+
+                .page-diy-container {
+                    min-height: 100vh;
+
+                    .page-diy-modules {
+                        line-height: 1.8;
+                    }
+
+                    .freecontainer {
+                        .freecontainer-area {
+                            position: relative;
+                            width: 100%;
+                            height: 100%;
+
+                            overflow: hidden scroll;
+
+                            .free-block {
+                                position: absolute;
+                                -webkit-box-sizing: border-box;
+                                box-sizing: border-box;
+                                -webkit-user-select: none !important;
+                                -moz-user-select: none !important;
+                                -ms-user-select: none !important;
+                                user-select: none !important;
+                                overflow: hidden;
+                            }
+
+                            .free-overflow-hidden {
+                                overflow: hidden !important;
+                            }
+
+                            .free-overflow-visible {
+                                overflow: visible !important;
+                            }
+
+                            .free-overflow-scroll {
+                                overflow: hidden scroll !important;
+                            }
+
+                            .freetext {
+                                width: 100%;
+
+                                .freetext-content {
+                                    width: 100%;
+
+                                    p {
+                                        margin: 10px 0;
+                                    }
+                                }
+                            }
+
+                            .freeimage {
+                                height: 100%;
+
+                                .freeimage-content {
+                                    width: 100%;
+                                    height: 100%;
+
+                                    div {
+                                        width: 100%;
+                                        height: 100%;
+                                        background-repeat: no-repeat;
+
+                                        &.fill {
+                                            background-position: 0% 0%;
+                                            background-size: 100% 100%;
+
+                                        }
+
+                                        &.contain {
+                                            background-position: center center;
+                                            background-size: contain;
+                                        }
+
+                                        &.cover {
+                                            background-position: center center;
+                                            background-size: cover;
+                                        }
+                                    }
+
+                                    img {
+                                        display: block;
+                                        position: absolute;
+                                        top: 0;
+                                        left: 0;
+                                        width: 100%;
+                                        height: 100%;
+                                        user-select: none;
+                                        -webkit-user-select: none;
+                                        opacity: 0;
+
+                                    }
+                                }
+                            }
+
+                            .freehot {
+                                div {
+                                    width: 100%;
+                                    height: 100%;
+                                }
+                            }
+
+                            .freeicon {
+                                >div {
+                                    width: 100%;
+                                    height: 100%;
+                                }
+                            }
+
+                            .freebtn {
+                                >div {
+                                    width: 100%;
+                                }
+                            }
+                        }
+                    }
+
+                    .module-box {
+                        box-sizing: content-box;
+                        -webkit-box-sizing: content-box;
+
+                        img {
+                            max-width: 100%;
+                            vertical-align: bottom;
+                        }
+                    }
+
+                    .baseline {
+                        border: 0 !important;
+
+                        div {
+                            width: 100%;
+                        }
+                    }
+
+                    //标题组件
+                    .basetitle {
+
+                        .basetitle-area {
+                            position: relative;
+                            width: 100%;
+                        }
+
+                        .basetitle-box {
+                            height: 100%;
+                        }
+                    }
+
+                    // 富文本内容
+                    .baserichtext {
+                        p {
+                            margin: 0;
+                        }
+                    }
+
+                    .baseswiper {
+
+                        .baseswiper-area {
+                            box-sizing: content-box;
+                            -webkit-box-sizing: content-box;
+                            overflow: hidden;
+
+                            .my-swipe {
+                                height: 100%;
+
+                                img {
+                                    width: 100%;
+                                    object-fit: cover;
+                                }
+                            }
+                        }
+
+                        &.free-block {
+                            .baseswiper-area {
+                                box-sizing: border-box;
+                                -webkit-box-sizing: border-box;
+                            }
+                        }
+                    }
+
+                    .basenotice {
+
+                        .basenotice-area {
+                            position: relative;
+                            width: 100%;
+                            text-decoration: inherit;
+
+                            .van-notice-bar {
+                                height: inherit;
+                                line-height: inherit;
+                                padding: inherit;
+                                background-color: inherit;
+                                color: inherit;
+                                font-size: inherit;
+                                text-decoration: inherit;
+
+                                i {
+                                    min-width: unset;
+                                    font-size: inherit;
+                                    font-weight: inherit;
+                                    margin-right: 5px;
+                                }
+
+                                .van-notice-bar__wrap,
+                                .van-notice-bar__content {
+                                    text-decoration: inherit;
+
+                                    .van-swipe-item {
+                                        max-width: 100%;
+                                        overflow: hidden;
+                                        white-space: nowrap;
+                                        text-overflow: ellipsis;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    .baseaudio {
+
+                        .music-icon {
+                            position: fixed;
+                            color: rgb(51, 51, 51);
+                            vertical-align: middle;
+                            line-height: 1;
+                            overflow: hidden;
+                            box-shadow: 0 0 10px rgba(0, 0, 0, .1);
+                            border-radius: 50%;
+                            z-index: 1;
+
+                            &.isplaying {
+                                -webkit-animation: rotate-round 3s linear infinite;
+                                animation: rotate-round 3s linear infinite
+                            }
+
+                            img {
+                                border-radius: 50%;
+                                object-fit: cover;
+                            }
+                        }
+
+                    }
+
+                    .basevideo {
+                        overflow: hidden;
+
+                        .tcp-skin {
+                            &.vjs-paused {
+                                .vjs-big-play-button {
+                                    display: block;
+                                }
+                            }
+
+                            .vjs-big-play-button {
+                                height: 6.8em;
+                                width: 6.8em;
+                                margin-left: -3.4em;
+                                margin-top: -3.4em;
+
+                                .playpauseBtn {
+                                    width: 100%;
+                                    height: 100%;
+
+                                    i {
+                                        font-size: 6.8em;
+                                    }
+                                }
+                            }
+
+                            .vjs-menu {
+                                display: none;
+                            }
+                        }
+
+                    }
+
+                    .basecountdown {
+                        line-height: unset;
+
+                        .basecountdown-format {
+                            .item {
+                                border-radius: 3px;
+                                white-space: nowrap;
+                                width: 36px;
+                                height: 36px;
+                                background: #409EFF;
+                            }
+
+                            .colon {
+                                margin: 0 2px;
+                                padding: 0 2.5px;
+                                line-height: 12px;
+                                font-size: 12px;
+                                color: rgb(0, 0, 0);
+                            }
+                        }
+                    }
+
+                    .basemenu {
+                        .van-grid-item__content {
+                            padding: 0;
+                            background: none;
+
+                            .menu-item {
+                                box-sizing: border-box;
+                            }
+                        }
+                    }
+                }
+
+            }
+        }
+    }
+
+    .tipbox {
+        .iframe {
+            position: fixed;
+            left: 50%;
+            top: 46%;
+            z-index: 9999;
+            -webkit-transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%);
+
+            .iframeclose {
+                position: fixed;
+                left: 50%;
+                -webkit-transform: translateX(-50%);
+                transform: translateX(-50%);
+                text-align: center;
+                color: #fff;
+                width: 1rem;
+                height: 1rem;
+
+                i {
+                    font-size: 0.72rem;
+                }
+            }
+        }
+
+
+    }
+}

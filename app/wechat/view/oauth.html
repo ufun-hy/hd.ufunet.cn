@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>登录参与活动</title>
+    <meta content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0" name="viewport"/>
+    <meta content="yes" name="apple-mobile-web-app-capable"/>
+    <meta content="black" name="apple-mobile-web-app-status-bar-style"/>
+    <meta content="telephone=no" name="format-detection"/>
+	<link rel="shortcut icon" href="" />
+    <link rel="stylesheet" href="__STATIC__/js/ydui/css/ydui.css"/>
+	<link rel="stylesheet" href="__STATIC__/css/wechat/style.css" />
+	<script src="__STATIC__/js/jquery.2.1.4.js"></script>
+	<style type="text/css">
+	.zam-app-login{position: absolute;top:0;left:0;width: 100%;height: 100%;background: rgba(0,0,0,0.12);}
+	.zam-app-login-content{padding: 40px 20px;border-radius: 14px;background-color: #fff;box-shadow: -3px 5px 15px #8c8c8c;}
+	.login-title{font-size: 16px;font-weight: bold;margin-bottom: 8px;}
+	.login-des{font-size: 12px;color:#333;margin-bottom: 20px;}
+	.wx-login {
+	    width: 62vw;
+	    height: 40px;
+	    background-color:#0CC161;
+	    color: #fff;
+	    border-radius: 20px;
+	    cursor: pointer;
+	}
+	.wx-login img {
+	    width: 28px;
+	    height:28px;
+	}
+	.wx-login span {
+	    font-size: 16px;
+	    color: #fff;
+	    display: inline-block;
+	    margin-left: 8px;
+	}
+	.wx-login.clicked{
+		pointer-events: none;
+	}
+	</style>
+</head>
+<body>
+{php}
+$myclient = clienttype($clienttype);
+{/php}
+<section class="zam-app-login zam-app-flex-ajCenter">
+<div class="zam-app-login-content zam-app-flex-ajCenter">
+	<p class="login-title">您还没有登录</p>
+	<div class="login-des">点击{$myclient['name']??''}键登录参与活动</div>
+	<a class="wx-login zam-app-flex-ajCenter2" href="javascript:;" {if isset($myclient['bgcolor']) && !empty($myclient['bgcolor'])}style="background-color:{$myclient['bgcolor']};"{/if}><img src="__STATIC__/images/wechat/login/{$myclient['field']??'weixin'}.png"><span>{$myclient['name']??''}一键登录</span></a>
+</div>
+</section>
+</body>
+<script>
+function onBridgeReady() {
+    WeixinJSBridge.call('hideOptionMenu');
+}
+if (typeof WeixinJSBridge == "undefined") {
+    if (document.addEventListener) {
+        document.addEventListener('WeixinJSBridgeReady', onBridgeReady, false);
+    } else if (document.attachEvent) {
+        document.attachEvent('WeixinJSBridgeReady', onBridgeReady);
+        document.attachEvent('onWeixinJSBridgeReady', onBridgeReady);
+    }
+} else {
+    onBridgeReady();
+}
+$(function(){
+	var oauthUrl = "{:$url}";
+	$('.wx-login').click(function(){
+		var $this = $(this);
+		if(oauthUrl == '' || $this.hasClass('clicked')){
+			return false;
+		}
+		$this.addClass('clicked');
+		window.location.href = oauthUrl;
+	});
+})
+</script>
+</html>

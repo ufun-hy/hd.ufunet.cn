@@ -1,0 +1,53 @@
+{if isset($clienttype) && $clienttype == '10'}
+	<script type="text/javascript" src="https://lf1-cdn-tos.bytegoofy.com/goofy/lark/op/h5-js-sdk-1.5.16.js"></script>
+{/if}
+{include file="common/header" /}
+<div class="zam-app-bodyBg" style="background-color:rgba(0,0,0,0.8)"></div>
+<script>
+if(XCV3Config.clienttype == '10'){
+	require(['wechatcore'],function (wechatcore) {
+		if (!window.h5sdk) {
+			wechatcore.msg('登录失败，请在飞书客户端打开链接');
+			return false;
+		}
+		window.h5sdk.ready(function() {
+			wechatcore.ajaxSubmit('/wechat/common/hxrecord',{recordid:"{$recordid}"},'正在拼命核销奖品..').then(function(e){
+					if(e.code==0){
+						wechatcore.ask(false,'<h2>('+e.msg.fromtypename+')</h2><div>'+e.msg.prizename+'</div><h2>核销成功</h2>','好的',function(){
+							tt.closeWindow();
+						});
+					}else{
+						wechatcore.ask('警告',e.msg,'好的',function(){
+							tt.closeWindow();
+						});
+					}		
+			},function(){
+				wechatcore.ask('警告','网络差，请稍后重试','好的',function(){
+					tt.closeWindow();
+				});
+			});
+		});
+		
+	});
+}else{
+	require(['wechatcore'],function (wechatcore) {
+		wechatcore.hidewxmenu();
+		wechatcore.ajaxSubmit('/wechat/common/hxrecord',{recordid:"{$recordid}"},'正在拼命核销奖品..').then(function(e){
+				if(e.code==0){
+					wechatcore.ask(false,'<h2>('+e.msg.fromtypename+')</h2><div>'+e.msg.prizename+'</div><h2>核销成功</h2>','好的',function(){
+						wechatcore.closewxwindow();
+					});
+				}else{
+					wechatcore.ask('警告',e.msg,'好的',function(){
+						wechatcore.closewxwindow();
+					});
+				}		
+		},function(){
+			wechatcore.ask('警告','网络差，请稍后重试','好的',function(){
+				wechatcore.closewxwindow();
+			});
+		});
+	});
+}
+</script>
+{include file="common/footer" /}

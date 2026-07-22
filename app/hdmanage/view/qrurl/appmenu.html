@@ -1,0 +1,260 @@
+{include file='$Wpath/common/header'}
+<style type="text/css">
+    .menu-lists img{width: 60px;height: 60px;border-radius: 50%}
+</style>
+<div class="alert alert-warning">
+开启，关闭，添加/删除/修改菜单必须点击保存才生效，如遇异常请点击重置菜单后保存
+</div>
+<div class="form-horizontal confirmbox-pop">
+  <form id="formBox" class="zam-formvalidation form-horizontal" method="post">
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 开启自定义菜单</label>
+        <div class="col-lg-8">
+            {:tpl_switch('openappmenu',$config['openappmenu'])}
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-lg-12">
+            <table class="table table-bordered">
+                <thead>
+                  <tr>
+                    <th style="width:20%;text-align:center;">状态</th>
+                    <th style="width:10%;text-align:center;">功能</th>
+                    <th style="width:20%;text-align:center;">图标</th>
+                    <th style="width:30%;text-align:center;">链接</th>
+                    <th style="width:20%;text-align:center;">操作</th>
+                  </tr>
+                </thead>
+                <tbody class="menu-lists">
+                    {volist name="config.appmenus" id="menu"}
+                    <tr>
+                      <td class="text-center">
+                        <span class="label label-{if $menu['isopen']=='1'}primary{else}danger{/if}">{if $menu['isopen']=='1'}显示{else}隐藏{/if}</span>
+                        <input type="hidden" name="isopen[]" value="{$menu['isopen']}">
+                        <input type="hidden" name="ishandadd[]" value="{$menu['ishandadd']}" >
+                      </td>
+                      <td class="text-center">
+                        <p>{$menu['modulename']}</p>
+                        <input type="hidden" name="modulename[]" value="{$menu['modulename']}">
+
+                        <input type="hidden" name="modulefield[]" value="{$menu['modulefield']}">
+                      </td>
+                      <td class="zam-flex-center">
+                        <div class="pmenuicon zam-flex-center">
+                          <img src="{:tomedia($menu['moduleimg'])}"  />
+                          <input type="hidden" name="moduleimg[]" value="{$menu['moduleimg']}">
+                        </div>
+                      </td>
+                      <td class="text-center" style="word-break: break-all;">
+                        {if $menu['ishandadd']=='2'}
+                          <span class="label label-success">系统内置</span>
+                        {else}
+                          {$menu['moduleurl']}
+                        {/if}
+                        <input type="hidden" name="moduleurl[]" value="{if isset($menu['moduleurl'])}{$menu['moduleurl']}{else}notneed{/if}">
+                      </td>
+                      
+                      <td class="text-center">
+                        {if $menu['modulefield']!='fulldm'}
+                        <a href="javascript:;"  class="btn btn-primary btn-sm btn-edit">
+                          <i class="mdi mdi-pencil"></i>
+                        </a>
+                        {/if}
+                        {if $menu['ishandadd']=='1'}
+                        <a href="javascript:;"  class="btn btn-danger btn-sm delmenu">
+                          <i class="mdi mdi-close"></i>
+                        </a>
+                        {/if}
+                        <a href="javascript:;"  class="btn btn-default btn-sm mousemove zam-sortable" lay-tips="拖动排序"><i class="mdi mdi mdi-arrow-all"></i></a>
+                      </td>
+                    </tr>
+                {/volist}
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td colspan="5">
+                      <a class="btn btn-primary btn-sm addmenu" href="javascript:;" > <i class="mdi mdi-plus"></i> 新增自定义菜单</a>
+                      <a class="btn btn-danger btn-sm resetmenu" href="javascript:;" > <i class="mdi mdi-gavel"></i> 重置菜单</a>
+                    </td>
+                  </tr>
+                </tfoot>
+            </table>
+        </div>
+        {include file='$Wpath/common/savepanel'}
+  </form>
+</div>
+<script>
+require(["webcore","zamnotice","layerBox","jconfirmBox",'zvalidator',"jquery.ui"],function(webcore,zamnotice,layerBox,jconfirmBox){
+$('#formBox').formValidation({
+      framework: 'bootstrap',
+      excluded: [':disabled'],
+      message: '您填写的内容无效',
+      fields: {}
+  }).on('success.form.fv', function(e) {
+    e.preventDefault();
+    var $form = $(e.target);
+    var postData = webcore.serializeObject($form);
+    var bload = $form.find(".zam-fixedbottom button").lyearloading({opacity: 0.2,spinnerSize: 'nm'});
+    $form.formValidation('disableSubmitButtons', true);
+    webcore.ajaxSubmit("{:gohdmanage('qrurl/appmenu',['hdid'=>$hdid])}",postData).then(function(json){
+      bload.hide();
+      if(json.code==0){
+          $form.formValidation('disableSubmitButtons', false);
+          zamnotice.showTips('success','操作成功',1e3,function(){
+            window.location.reload();
+          });
+        }else{
+            zamnotice.showTips('error',json.msg);
+            $form.formValidation('disableSubmitButtons', false);
+        }
+    }, function(json){
+      bload.hide();
+      zamnotice.showTips('error','网络差。操作失败');
+      $form.formValidation('disableSubmitButtons', false);
+    });
+  });      
+$('.menu-lists').sortable({handle: ".mousemove"});
+$(".menu-lists").disableSelection();
+//新增菜单
+$(".addmenu").on('click',function(){
+     var confirmObj = jconfirmBox.ajaxconfirm("新增自定义菜单","{:gohdmanage('qrurl/appmenu',['hdid'=>$hdid])}",{isshow:'1'},'html','col-lg-6 col-lg-offset-3',function(e){
+        var isopen = e.find("input[name='isopen']").val();
+        var modulename = e.find("input[name='modulename']").val();
+        if(modulename==''){
+            return zamnotice.showTips('error','请设置功能名.');
+        }
+        var modulefield = e.find("input[name='modulefield']").val();
+        if(modulefield==''){
+            return zamnotice.showTips('error','新增功能异常，请重试');
+        }
+        var moduleimg = e.find("input[name='moduleimg']").val();
+        if(moduleimg==''){
+            return zamnotice.showTips('error','模块图必须设置.');
+        }
+        var moduleprev = e.find('img').attr('src');
+        var modulehandadd = '1';
+        var moduleurl = e.find("input[name='moduleurl']").val();
+        if(moduleurl==''){
+            return zamnotice.showTips('error','自定义菜单链接必须设置.');
+        }
+        var newObj = {
+            modulename:modulename,
+            modulefield:modulefield,
+            moduleimg:moduleimg,
+            moduleprev:moduleprev,
+            moduleurl:moduleurl,
+            isopen:isopen,
+            modulehandadd:modulehandadd
+        };
+        var html = webcore.tpl($("#menu-template"),newObj);
+        $(".menu-lists").append("<tr>"+html+"</tr>");
+        confirmObj.close();
+    });
+});
+//编辑菜单
+$(".menu-lists").on('click','.btn-edit',function(){
+     var $this = $(this);
+     var menuinputs = $this.parent().parent().find('input');
+     var moduleData = {
+        isopen:menuinputs.eq(0).val(),
+        ishandadd:menuinputs.eq(1).val(),
+        modulename:menuinputs.eq(2).val(),
+        modulefield:menuinputs.eq(3).val(),
+        moduleimg:menuinputs.eq(4).val(),
+        moduleurl:menuinputs.eq(5).val(),
+     };
+     moduleData.isshow = '2';
+     var confirmObj = jconfirmBox.ajaxconfirm("编辑菜单","{:gohdmanage('qrurl/appmenu',['hdid'=>$hdid])}",moduleData,'html','col-md-6 col-md-offset-3',function(e){
+        var isopen = e.find("input[name='isopen']").val();
+        var modulename = e.find("input[name='modulename']").val();
+        if(modulename==''){
+            return zamnotice.showTips('error','请设置功能名.');
+        }
+        var modulefield = e.find("input[name='modulefield']").val();
+        if(modulefield==''){
+            return zamnotice.showTips('error','异常请重试.');
+        }
+        var moduleimg = e.find("input[name='moduleimg']").val();
+        if(moduleimg==''){
+            return zamnotice.showTips('error','模块图必须设置.');
+        }
+        var moduleprev = e.find('img').attr('src');
+        var modulehandadd = e.find("input[name='handadd']").val();
+        var moduleurl = e.find("input[name='moduleurl']").val();
+        if(modulehandadd=='1' && moduleurl==''){
+            return zamnotice.showTips('error','自定义菜单必须设置链接地址');
+        }
+        var newObj = {
+            modulename:modulename,
+            modulefield:modulefield,
+            moduleimg:moduleimg,
+            moduleprev:moduleprev,
+            moduleurl:moduleurl,
+            isopen:isopen,
+            modulehandadd:modulehandadd
+        };
+        var html = webcore.tpl($("#menu-template"),newObj);
+        $this.parent().parent().html(html);
+        confirmObj.close();
+    });
+});
+//删除菜单
+$(".menu-lists").on('click','.delmenu',function(){
+    var obj = this;
+    jconfirmBox.confirm('温馨提示','删除菜单将无法恢复，您确定要删除么？',function(){
+          $(obj).parent().parent().remove();
+    });
+});
+$(".resetmenu").on('click',function(){
+    jconfirmBox.confirm('温馨提示','重置大屏菜单，现有微信功能菜单数据将被删除，您确定要重置么？',function(){
+        webcore.ajaxSubmit("{:gohdmanage('qrurl/appmenu',['hdid'=>$hdid])}",{isshow:'4'},'正在重置，请勿关闭本页面..').then(function(json){
+            if(json.code==0){
+                zamnotice.showTips('success','操作成功',1e3,function(){
+                    window.location.reload();
+                });
+             }else{
+                zamnotice.showTips('error',json.msg);
+             }
+        });
+    });
+});
+})
+</script>
+<script id='menu-template' type="text/template">
+<td class="text-center">
+    <span class="label label-<%# if(d.isopen=='1'){ %>primary<%# }else{ %>warning<%# } %>"><%# if(d.isopen=='1'){ %>显示<%# }else{ %>隐藏<%# } %></span>
+    <input type="hidden" name="isopen[]" value="<%# if(d.isopen=='1'){ %>1<%# }else{ %>2<%# } %>">
+    <input type="hidden" name="ishandadd[]" value="<% d.modulehandadd %>" >
+</td>
+<td class="text-center">
+    <p><% d.modulename %></p>
+    <input type="hidden" name="modulename[]" value="<% d.modulename %>">
+    <input type="hidden" name="modulefield[]" value="<% d.modulefield %>">
+</td>
+<td class="zam-flex-center">
+    <div class="pmenuicon zam-flex-center">
+        <img src="<% d.moduleprev %>" />
+        <input type="hidden" name="moduleimg[]" value="<% d.moduleimg %>">
+    </div>
+</td>
+<td class="text-center" style="word-break: break-all;">
+    <%# if(d.modulehandadd=='2'){ %>
+        <span class="label label-success">系统内置</span>
+    <%# }else{ %>
+        <% d.moduleurl %>
+    <%# } %>
+    <input type="hidden" name="moduleurl[]" value="<% d.moduleurl %>">
+</td>
+<td class="text-center">
+  <a href="javascript:;"  class="btn btn-primary btn-sm btn-edit">
+      <i class="mdi mdi-pencil"></i>
+  </a>
+  <%# if(d.modulehandadd=='1'){ %>
+  <a href="javascript:;"  class="btn btn-danger btn-sm delmenu">
+      <i class="mdi mdi-close"></i>
+  </a>
+  <%# } %>
+  <a href="javascript:;"  class="btn btn-default btn-sm mousemove zam-sortable" lay-tips="拖动排序"><i class="mdi mdi-arrow-all"></i></a>
+</td>
+</script>
+{include file='$Wpath/common/footer'}

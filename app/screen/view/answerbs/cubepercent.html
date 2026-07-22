@@ -1,0 +1,134 @@
+<style type="text/css">
+.answer-items-list{
+	width: 100%;
+	height: calc(100% - 245px);
+	color: #fff;
+	--li-w:42px;
+	--li-right-w: 15px;
+	--li-up-h: 9px;
+	--li-up-top: -8.6px;
+	--li-up-left: 8px;
+    --cube-item-bgcolor: 255, 255, 255;
+}
+.answer-items-list li{
+	position: relative;
+	height:100%;
+}
+.answer-items-list li .cube-header { text-align: center; width:100%;font-size: 12px;color:#fff;margin-bottom: 20px;margin-left: 15px;}
+.answer-items-list li .cube-header .percentvalue{white-space: nowrap;}
+.answer-items-list li .cube-body{
+	position:relative;
+	width:var(--li-w);
+	height:82%;
+}
+.answer-items-list li .cube-item {
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+	height:100%;
+    transition: all 1s linear 0s;
+}
+.cube-item .cube-front {
+    position: absolute;
+    width: var(--li-w);
+    height: 100%;
+    bottom: 0;
+    left: 0;
+    box-sizing: border-box;
+    background-color: rgba(var(--cube-item-bgcolor), 0.08);
+    z-index: 4;
+}
+.cube-item .cube-front .itemname {
+    margin: 0 auto;
+    text-align: center;
+    word-break: break-all;
+    white-space: nowrap;
+    overflow: hidden;
+    margin-top: 20px;
+    font-weight: 600;
+    font-size: 16px;
+    color:#fff;
+}
+.cube-item .cube-right {
+    position: absolute;
+    left: var(--li-w);
+    top: calc(var(--li-right-w) * -0.3);
+    width: var(--li-right-w);
+    height: 100%;
+    transform: skewY(-30deg);
+    background-color: rgba(var(--cube-item-bgcolor), 0.12);
+    z-index: 5;
+}
+.cube-item .cube-up {
+    position: absolute;
+    width: var(--li-w);
+    height: var(--li-up-h);
+    top: var(--li-up-top);
+    left: var(--li-up-left);
+    transform:skewX(-60deg);
+    background-color: rgba(var(--cube-item-bgcolor), 0.13);
+    z-index: 6;
+}
+.answer-items-list li .cube-item.inner{height:0}
+.answer-items-list li .cube-item.inner .cube-front {
+    opacity: 1;
+    z-index: 2;
+    background: linear-gradient(180deg,rgba(255,20,0,1), rgba(255,20,0,0.05));
+}
+.answer-items-list li .cube-item.inner .cube-right {
+    opacity: 0.85;
+    z-index: 1;
+    background: linear-gradient(180deg,rgba(255,20,0,1), rgba(255,20,0,0.05));
+}
+.answer-items-list li .cube-item.inner .cube-up {
+    background-color: rgba(255,20,0,1);
+    opacity: 0.7;
+    z-index: 3;
+}
+.answer-items-list li .cube-item.inner .qipao {
+    background: url(/static/images/screen/dhh/qipao.png) no-repeat center bottom;
+    background-size: cover;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    overflow: hidden;
+}
+.answer-items-list li:nth-child(1) .inner .cube-right, .answer-items-list li:nth-child(1) .inner .cube-front { background: linear-gradient(180deg,rgba(255,20,0,1), rgba(255,20,0,0.05)); }
+.answer-items-list li:nth-child(1) .inner .cube-up { background-color: rgba(255,20,0,1); }
+
+.answer-items-list li:nth-child(2) .inner .cube-right, .answer-items-list li:nth-child(2) .inner .cube-front { background: linear-gradient(180deg,rgba(255,80,0,1), rgba(255,80,0,0.05)); }
+.answer-items-list li:nth-child(2) .inner .cube-up { background-color: rgba(255,80,0,1); }
+
+.answer-items-list li:nth-child(3) .inner .cube-right, .answer-items-list li:nth-child(3) .inner .cube-front { background: linear-gradient(180deg,rgba(255,200,0,1), rgba(255,200,0,0.05)); }
+.answer-items-list li:nth-child(3) .inner .cube-up { background-color: rgba(255,200,0,1); }
+
+.answer-items-list li:nth-child(4) .inner .cube-right, .answer-items-list li:nth-child(4) .inner .cube-front { background: linear-gradient(180deg,rgba(0,250,0,1), rgba(0,250,0,0.05)); }
+.answer-items-list li:nth-child(4) .inner .cube-up { background-color: rgba(0,250,0,1); }
+
+.answer-items-list li:nth-child(5) .inner .cube-right, .answer-items-list li:nth-child(5) .inner .cube-front { background: linear-gradient(180deg,rgba(0,220,255,1), rgba(0,220,255,0.05)); }
+.answer-items-list li:nth-child(5) .inner .cube-up { background-color: rgba(0,220,255,1); }
+</style>
+<div class='dzcubepercent display-none'></div>
+<script type="text/html" id="questionvote-tpl">
+<li class="zam-app-flex-ajCenter" style="width:{{ lwidth }}">
+  <div class="cube-header">
+	<div class="percentvalue">{{ percent }}</div>
+  </div>
+  <div class="cube-body">
+	  <div class="cube-item">
+			<div class="cube-front">
+				<div class="itemname">{{ itemname }}</div>
+			</div>
+			<div class="cube-right"></div>
+			<div class="cube-up"></div>
+	  </div>
+	  <div class="cube-item inner" style="height: {{ percent }};">
+			<div class="cube-front">
+			  <div class="qipao"></div>
+			</div>
+			<div class="cube-right"></div>
+			<div class="cube-up"></div>
+	  </div>
+  </div>
+</li>
+</script>

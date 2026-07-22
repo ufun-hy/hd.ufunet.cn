@@ -1,0 +1,280 @@
+<style>
+.rotate-pop .form-group{margin-bottom: 1px;}
+</style>
+<div class="form-horizontal confirmbox-pop rotate-pop">
+<form class="confirm-formbox" method="post">
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 轮次名</label>
+            <div class="col-lg-8">
+                <input class="form-control" type="text"  name="title" value="{$rotate['title']}">
+                <div class="help-block">轮次名称会在匹配记录顶部展示出来</div>
+            </div>
+        </div>
+        <div class="form-group">
+			<label class="col-lg-3 control-label">* 重复配对</label>
+			<div class="col-lg-8">
+				<label class="lyear-radio radio-inline radio-primary">
+                    <input type="radio" name="isexcept" value="1" {if $rotate['isexcept']=='1'}checked{/if}><span>配对成功自动剔除</span>
+                </label>
+                <label class="lyear-radio radio-inline radio-primary">
+                    <input type="radio" name="isexcept" value="2" {if $rotate['isexcept']=='2'}checked{/if}><span>独立配对</span>
+                </label>
+                <div class="help-block m-t-0">
+                	<div class="help-block m-b-0">配对成功自动剔除：本轮匹配的用户将自动剔除，且不可以参与后续对对碰</div>
+                	<div class="help-block m-b-0">独立配对:独立的轮次，无论之前是否配匹成功都可以参与本轮配对</div>
+                </div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-lg-3 control-label">* 配对类型</label>
+			<div class="col-lg-8">
+				<label class="lyear-radio radio-inline radio-primary">
+                    <input type="radio" name="sextype" value="1" {if $rotate['sextype']=='1'}checked{/if}><span>男女对对碰</span>
+                </label>
+                <label class="lyear-radio radio-inline radio-primary">
+                    <input type="radio" name="sextype" value="2" {if $rotate['sextype']=='2'}checked{/if}><span>男男对对碰</span>
+                </label>
+                <label class="lyear-radio radio-inline radio-primary">
+                    <input type="radio" name="sextype" value="3" {if $rotate['sextype']=='3'}checked{/if}><span>女女对对碰</span>
+                </label>
+                <label class="lyear-radio radio-inline radio-primary">
+                    <input type="radio" name="sextype" value="4" {if $rotate['sextype']=='4'}checked{/if}><span>随机对对碰</span>
+                </label>
+                
+                <div class="help-block m-t-0">
+                	<div class="help-block m-b-0">男女/男男/女女对对碰区分性别，需要使用签到功能配合收集用户性别</div>
+                	<div class="help-block m-b-0">随机对对碰不区分性别，随机对对碰</div>
+                </div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-lg-3 control-label">* 左右队伍</label>
+			<div class="col-lg-8">
+				<div class="pop-btns m-t-5 m-b-15">
+					<a class="btn btn-primary btn-sm" href="javascript:;">左侧配对队伍</a>
+					<a class="btn btn-default btn-sm"href="javascript:;">右侧配对队伍</a>
+				</div>
+			</div>
+		</div>
+		<div class="carditem">
+			<div class="form-group">
+				<label class="col-lg-3 control-label">* 队伍名称</label>
+				<div class="col-lg-3">
+					<input class="form-control" type="text"  name="leftgroupconfig[name]" value="{$rotate['leftgroupconfig']['name']??'男神队'}">
+					<div class="help-block">推荐6个字以内</div>
+				</div>
+			</div>
+			<div class="form-group lgrouptype">
+				<label class="col-lg-3 control-label">* 配对名单</label>
+				<div class="col-lg-8">
+					{foreach $groups as $g}
+					<label class="lyear-radio radio-inline radio-primary">
+	                    <input type="radio" name="leftgroupconfig[type]" value="{$g['id']}" {if $rotate['leftgroupconfig']['type']==$g['id']}checked{/if}><span>{$g['name']}</span>
+	                </label>
+					{/foreach}
+	                <div class="help-block">分组内的用户性别与配对类型内性别保持一致</div>
+				</div>
+			</div>
+			<div class="form-group lsigngroups{if $rotate['leftgroupconfig']['type']!='3'} hidden{/if}">
+				<label class="col-lg-3 control-label">* 参与分组</label>
+				<div class="col-lg-8">
+					<div class="zam-flex">
+						<div>
+							<select id="l_sign_group_id" name="leftgroupconfig[sign_groupid]" class="form-control js_select2">
+								<option value="">请选择一个分组</option>
+					            {if !empty($groups[2]['children'])}
+						            {foreach $groups[2]['children'] as $c}
+										 <option value="{$c['id']}"  {if isset($c['children']) && !empty($c['children'])}data-children={:json_encode($c['children'])}{/if}>{$c['name']}</option>
+									{/foreach}
+					            {/if}
+					        </select>
+				        </div>
+				        <div class="m-l-15 l_sign_group_id_val hidden">
+					        <select id="l_sign_group_val_id" name="leftgroupconfig[sign_groupid_val]" class="form-control js_select2">
+					        	<option value="">请选择一个分组</option>
+					        </select>
+				        </div>
+			        </div>
+			        <div class="help-block">必须选择一个分组</div>
+		    	</div>
+			</div>
+			<div class="form-group lselfgroups{if $rotate['leftgroupconfig']['type']!='4'} hidden{/if}">
+				<label class="col-lg-3 control-label">* 参与分组</label>
+				<div class="col-lg-8">
+					<select id="l_self_group_id" name="leftgroupconfig[self_groupid]" class="form-control js_select2">
+						<option value="">请选择一个分组</option>
+			            {if !empty($groups[3]['children'])}
+				            {foreach $groups[3]['children'] as $sc}
+								 <option value="{$sc['id']}">{$sc['name']}</option>
+							{/foreach}
+			            {/if}
+			        </select>
+			        <div class="help-block">必须选择一个分组</div>
+		    	</div>
+			</div>
+		</div>
+		<div class="carditem hidden">
+			<div class="form-group">
+				<label class="col-lg-3 control-label">* 队伍名称</label>
+				<div class="col-lg-3">
+					<input class="form-control" type="text"  name="rightgroupconfig[name]" value="{$rotate['rightgroupconfig']['name']??'女神队'}">
+					<div class="help-block">推荐6个字以内</div>
+				</div>
+			</div>
+			<div class="form-group rgrouptype">
+				<label class="col-lg-3 control-label">* 配对名单</label>
+				<div class="col-lg-8">
+					{foreach $groups as $g}
+					<label class="lyear-radio radio-inline radio-primary">
+	                    <input type="radio" name="rightgroupconfig[type]" value="{$g['id']}" {if $rotate['rightgroupconfig']['type']==$g['id']}checked{/if}><span>{$g['name']}</span>
+	                </label>
+					{/foreach}
+	                <div class="help-block">分组内的用户性别与配对类型内性别保持一致</div>
+				</div>
+			</div>
+			<div class="form-group rsigngroups{if $rotate['rightgroupconfig']['type']!='3'} hidden{/if}">
+				<label class="col-lg-3 control-label">* 参与分组</label>
+				<div class="col-lg-8">
+					<div class="zam-flex">
+						<div>
+							<select id="r_sign_group_id" name="rightgroupconfig[sign_groupid]" class="form-control js_select2">
+								<option value="">请选择一个分组</option>
+					            {if !empty($groups[2]['children'])}
+					            {foreach $groups[2]['children'] as $c}
+									<option value="{$c['id']}"  {if isset($c['children']) && !empty($c['children'])}data-children={:json_encode($c['children'])}{/if}>{$c['name']}</option>
+								{/foreach}
+					            {/if}
+					        </select>
+				        </div>
+				        <div class="m-l-15 r_sign_group_id_val hidden">
+					        <select id="r_sign_group_val_id" name="rightgroupconfig[sign_groupid_val]" class="form-control js_select2">
+					        	<option value="">请选择一个分组</option>
+					        </select>
+				        </div>
+			        </div>
+			        <div class="help-block">必须选择一个分组</div>
+		    	</div>
+			</div>
+			<div class="form-group rselfgroups{if $rotate['rightgroupconfig']['type']!='4'} hidden{/if}">
+				<label class="col-lg-3 control-label">* 参与分组</label>
+				<div class="col-lg-8">
+					<select id="r_self_group_id" name="rightgroupconfig[self_groupid]" class="form-control js_select2">
+						<option value="">请选择一个分组</option>
+			            {if !empty($groups[3]['children'])}
+				            {foreach $groups[3]['children'] as $sc}
+								<option value="{$sc['id']}">{$sc['name']}</option>
+							{/foreach}
+			            {/if}
+			        </select>
+			        <div class="help-block">必须选择一个分组</div>
+		    	</div>
+		    </div>
+		</div>
+		<div class="form-group">
+            <label class="col-lg-3 control-label">* 本轮最大匹配对数</label>
+			<div class="col-lg-4">
+				<input type="text" class="form-control numberincdec" name="plannum" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="null"
+                data-bts-step="1"
+                data-bts-postfix="对"
+	            data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$rotate['plannum']??'1'}">
+                <div class="help-block m-t-0">此项用于控制本轮最多匹配多少对名单，0为不限制</div>
+			</div>
+		</div>
+		<div class="form-group">
+            <label class="col-lg-3 control-label">* 每次默认匹配对数</label>
+			<div class="col-lg-4">
+				<input type="text" class="form-control numberincdec" name="outnum" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="null"
+                data-bts-step="1"
+                data-bts-postfix="对"
+	            data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$rotate['outnum']??'1'}">
+                <div class="help-block m-t-0">此项用于控制本轮默认单次抽出对数</div>
+			</div>
+		</div>
+</form>
+</div> 
+    
+<script>    
+require(['webcore','jconfirmBox','zamnotice','layerBox',"bootstrap-touchspin","select2-zhcn"],function(webcore,jconfirmBox,zamnotice,layerBox){
+	$(".js_select2").select2({width: '200px'});
+	//左侧用户
+	//签到分组
+	$("#l_sign_group_id").on("change",function(e){
+		var sign_groupid = $(this).val(),opt = $(e.target).find("option:selected").attr('data-children') || '',valData = [{id:'',text:'请选择'}];
+		if(opt != ''){
+			opt = $.parseJSON(opt);
+			$.each(opt,function(i,v){
+				valData.push({id:v.id,text:v.name})
+			});
+		}
+		$("#l_sign_group_val_id").empty().select2({width: '200px',data: valData});
+		$("#l_sign_group_val_id").val("{$rotate['leftgroupconfig']['sign_groupid_val']??''}").trigger("change");
+		$(".l_sign_group_id_val").removeClass('hidden');
+	});
+	$("#l_sign_group_id").val("{$rotate['leftgroupconfig']['sign_groupid']??''}").trigger("change");
+	//自定义分组
+	$("#l_self_group_id").val("{$rotate['leftgroupconfig']['self_groupid']??''}").trigger("change");
+	//右侧用户
+	//签到分组
+	$("#r_sign_group_id").on("change",function(e){
+		var sign_groupid = $(this).val(),opt = $(e.target).find("option:selected").attr('data-children') || '',valData = [{id:'',text:'请选择'}];
+		if(opt != ''){
+			opt = $.parseJSON(opt);
+			$.each(opt,function(i,v){
+				valData.push({id:v.id,text:v.name});
+			});
+		}
+		$("#r_sign_group_val_id").empty().select2({width: '200px',data: valData,});
+		$("#r_sign_group_val_id").val("{$rotate['rightgroupconfig']['sign_groupid_val']??''}").trigger("change");
+		$(".r_sign_group_id_val").removeClass('hidden');
+	});
+	$("#r_sign_group_id").val("{$rotate['rightgroupconfig']['sign_groupid']??''}").trigger("change");
+	//自定义分组
+	$("#r_self_group_id").val("{$rotate['rightgroupconfig']['self_groupid']??''}").trigger("change");
+	//左侧点击匹配类型
+	$(".lgrouptype label").click(function(){
+		var lgrouptype = $(this).find('input').val();
+		if(lgrouptype < 3){
+			$(".lsigngroups,.lselfgroups").addClass('hidden');
+		}else{
+			if(lgrouptype=='3'){
+				$(".lselfgroups").addClass('hidden');
+				$(".lsigngroups").removeClass('hidden');
+			}else{
+				$(".lsigngroups").addClass('hidden');
+				$(".lselfgroups").removeClass('hidden');
+			}
+		}
+	});
+	//右侧点击匹配类型
+	$(".rgrouptype label").click(function(){
+		var lgrouptype = $(this).find('input').val();
+		if(lgrouptype < 3){
+			$(".rsigngroups,.rselfgroups").addClass('hidden');
+		}else{
+			if(lgrouptype=='3'){
+				$(".rselfgroups").addClass('hidden');
+				$(".rsigngroups").removeClass('hidden');
+			}else{
+				$(".rsigngroups").addClass('hidden');
+				$(".rselfgroups").removeClass('hidden');
+			}
+		}
+	});
+    $(".rotate-pop .pop-btns a.btn").click(function(){
+        $(this).addClass('btn-primary').siblings().removeClass("btn-primary");
+        $(".rotate-pop .carditem").addClass('hidden').eq($(this).index()).removeClass('hidden');
+    });
+    $(".confirmbox-pop .numberincdec").TouchSpin().on("change", function(){
+        var $this = $(this),funcstr = $this.data('func');
+        var func = window[funcstr];
+        func && func();
+    });
+});
+
+</script>

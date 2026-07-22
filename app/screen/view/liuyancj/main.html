@@ -1,0 +1,642 @@
+{include file='common/header' /}
+<style>
+::-webkit-scrollbar {
+    width: 10px;
+    border-radius: 10px;
+}
+::-webkit-scrollbar-track {
+    background-color: #fff;
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    outline-offset: -2px;
+    background-color: {$pcconfig['welcomestyle']['color']};
+}
+::-webkit-scrollbar-thumb:hover {
+    background-color: {$pcconfig['welcomestyle']['color']};
+}
+.hidden{display: none}
+.opacity0{opacity: 0;}
+.header ul{visibility: hidden}
+.liuyancj-mainbox {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+}
+{/*视频效果*/}
+.firevideo1 {display:none;transform: translate(-50%, -50%) scale(1); object-fit: cover; mix-blend-mode: screen; width: 100%; height: 100%; left: 50%; top: 50%; position: absolute;}
+.firevideo2 { display: none; transform: translate(-50%, -50%) scale(2); object-fit: cover; mix-blend-mode: screen; width: 100%; height: 100%; left: 50%; top: 50%; position: absolute; }
+{/*抽奖弹窗*/}
+.liuyancj-lists {width: 100%; height: 100%; position: absolute;left: 0;right: 0;}
+{/*顶部*/}
+.liuyancj-lists .liuyancj-header .liuyancj-headerbg {width: 1034px;height: 76px;text-align: center;margin: 0 auto; background: url({:tomedia($pcconfig['welcomestyle']['topbg'])}) no-repeat; background-size: cover;}
+.liuyancj-lists .liuyancj-header .awardname {font-weight: bold; font-size: 30px;color: {$pcconfig['welcomestyle']['color']}; text-shadow: 0px 0px 3px #620700, 0px 0px 10px #ff9800, 0px 0px 15px #ffeb3b; }
+.liuyancj-lists .liuyancj-header .prizename {height:30px;line-height:30px;margin-bottom:8px;margin-top:-5px;text-align: center;font-size: 25px;font-weight: bold;color:{$pcconfig['welcomestyle']['color']};}
+.headerani { animation: headerani 0.6s ease-out 0s both; }
+@keyframes headerani { 
+    0% {
+        opacity:0;
+        transform: translateY(-100px)
+    }
+    50% {
+        opacity:1
+    }
+}
+{/*尾部*/}
+.liuyancj-lists .liuyancj-footer {position:relative;width: 1056px; height: 116px;}
+.footerani { animation: footerani 0.6s ease-out 0s both; }
+@keyframes footerani { 
+    0% {
+        opacity:0;
+        transform: translateY(100px)
+    }
+    50% {
+        opacity:1
+    }
+}
+.liuyancj-lists .liuyancj-footer-box {width: 100%; height: 100%; background: url({:tomedia($pcconfig['welcomestyle']['bottombg'])}) no-repeat center center; background-size: 100% 100%; box-sizing: border-box;color: {$pcconfig['welcomestyle']['color']}; font-size: 18px;}
+.liuyancj-lists .liuyancj-footer-box .select-prize{height: 45px; line-height: 45px; position: absolute; top:16px;left: 120px;}
+.liuyancj-lists .liuyancj-footer-box .select-prize .active-prize{padding:0 10px;width: 100px;text-align: center;}
+.liuyancj-lists .liuyancj-footer-box .select-prize span{font-size: 20px;font-weight: bold;cursor: pointer;}
+.liuyancj-lists .liuyancj-footer-box .select-box {position: absolute; top:-10px;left: 50%;transform: translate(-50%, 0%); width: 220px; height: 45px; line-height: 45px;display: flex; flex-wrap: nowrap; justify-content: center; font-size: 14px;}
+.liuyancj-lists .liuyancj-footer-box input{width:45px;line-height: 45px; font-size: 18px; height: 25px; margin: 10px 4px; border-radius: 6px; border: 0; text-align: center; color: {$pcconfig['welcomestyle']['color']}; background-color: rgba(255,235,59,0.15);}
+.liuyancj-lists .liuyancj-footer-box input:focus{outline: 0;border: 0;}
+.liuyancj-lists .liuyancj-footer-box .btn-start,.liuyancj-lists .liuyancj-footer-box .btn-close {width: 153px; height: 45px; line-height: 45px; position: absolute; top:50px;left: calc(50% - 153px/2);text-align: center; border-radius: 45px;cursor: pointer; color: #fff; font-size: 18px;font-weight:bold;letter-spacing: 3px;background-image: url({:tomedia($pcconfig['welcomestyle']['btn'])});backgroud-repeat: no-repeat; background-size: cover;}
+.liuyancj-lists .liuyancj-footer-box .btn-showalllucker {width: 200px; height: 45px; line-height: 45px; position: absolute; top:16px;right: 140px; text-align: center; cursor: pointer;}
+.liuyancj-lists .liuyancj-footer-box .btn-showalllucker .lucker-numbox{display: inline-block;margin-left: 10px;}
+.liuyancj-lists .liuyancj-footer-box .btn-showalllucker .lucker-numbox .lucker-num{display: inline-block;margin-right: 10px;}
+.liuyancj-lists .liuyancj-footer-box .btn-showalllucker .lucker-numbox .prize-num{display: inline-block;margin-left: 10px;}
+{/*底部提示词*/}
+.liuyancj-lists .liuyancj-tip { position: absolute; bottom: 80px; color:#fff;width: 300px; text-align: center; left: 50%; margin-left: -150px; font-size: 20px;display: none}
+.isdrawing .liuyancj-lists .liuyancj-body .liuyancj-awardbox .liuyancj-prizebg2 {display: block}
+.isdrawing .liuyancj-awardbox { animation: awardboxshine 2s ease-out 0s both;}
+@keyframes awardboxshine { 
+    0% {
+        opacity:1
+    }
+    20% {
+        opacity:1;
+        transform:scale(0);
+    }
+    60% {
+        opacity:1;
+        transform:scale(0);
+    }
+    100% {
+        opacity:1;
+        transform:scale(0.6);
+    }
+}
+.isdrawing .liuyancj-header {animation: headerhideani 0.5s ease-out 0s both; }
+@keyframes headerhideani { 
+    0% {
+        opacity:1;
+    }
+    100% {
+        opacity:0;
+        transform: translateY(-100px)
+    }
+}
+.isdrawing .liuyancj-footer{animation: footerhideani 0.5s ease-out 0s both;}
+@keyframes footerhideani { 
+    0% {
+        opacity:1;
+        transform: translateY(0px)
+    }
+    100% {
+        opacity:0;
+        transform: translateY(100px);
+    }
+}
+.isdrawing .liuyancj-tip {animation: opacityani 2s ease-in-out infinite backwards; display: block}
+@-webkit-keyframes opacityani{0%{opacity:.2}50%{opacity:0.6}to{opacity:.2}}
+/*中奖部分*/
+.liuyancj-lists .liuyancj-body{position:relative;width: 100%;height: 530px;}
+.liuyancj-lists .liuyancj-body .liuyancj-awardbox { 
+    position: relative;
+    width: 500px;
+    height: 500px;
+}
+.awardboxani {animation: awardboxani 1s ease-out 0s both;}
+@keyframes awardboxani { 
+    0% {
+        opacity:0;
+        transform: scale(0);
+    }
+    50% {
+        opacity:1;
+        transform: scale(1);
+    }
+}
+.liuyancj-lists .liuyancj-body .liuyancj-awardbox .liuyancj-prizeimg {width:500px; height: 500px;}
+.liuyancj-lists .liuyancj-body .liuyancj-awardbox .liuyancj-prizeimg img{width:250px; height: 250px;}
+.liuyancj-lists .liuyancj-body .liuyancj-awardbox .liuyancj-prizebg1 {position: absolute; left:0;top:0;width: 100%; height: 100%; background: url({:tomedia($pcconfig['welcomestyle']['prizebg'])}) no-repeat; background-size: cover;}
+.liuyancj-lists .liuyancj-body .liuyancj-awardbox .liuyancj-prizebg2 {position: absolute; left:0;top:0; width: 100%; height: 100%; background: url({:tomedia($pcconfig['welcomestyle']['prizebg2'])}) no-repeat; background-size: cover;display: none}
+/*中奖用户*/
+.liuyancj-lists .liuyancj-body .liuyancj-luckerbox {position:absolute;top:0;left:0;width: 100%;height: 562px; display: none}
+.liuyancj-lists .liuyancj-body .liuyancj-luckerbox .liuyancj-luckerbox-content {
+    width: calc(100% - 60px); 
+    height: 100%;margin:0 30px; 
+    overflow-x: hidden; overflow-y: auto;
+    transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+}
+/*抽奖结束时刻隐藏中间的奖品，切换奖品 以及 抽奖人数 以及中奖名单*/
+.isdrawed .liuyancj-lists{
+    background-color: rgba(0,0,0,0.32);
+}
+.isdrawed .liuyancj-lists .liuyancj-body .liuyancj-luckerbox{display: block}
+.isdrawed .liuyancj-lists .liuyancj-footer-box{background:none;}
+.isdrawed .liuyancj-awardbox,.isdrawed .liuyancj-footer-box .select-box,.isdrawed .liuyancj-footer-box .select-prize,.isdrawed .liuyancj-footer-box .btn-showalllucker{display: none}
+.liuyancj-luckerbox-lists {transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;text-align: center; min-height: 100%;box-sizing: border-box; display: flex; align-items: center; align-content: center; flex-wrap: wrap; justify-content: space-evenly}
+.liuyancj-luckerbox-lists li.liuyancj-luckerbox-item {
+    width: 20%;
+    min-width: 160px;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+    margin:15px 0;
+    margin-top: 30px;
+    transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+}
+.liuyancj-luckerbox-lists li.liuyancj-luckerbox-item .delphoto{position:absolute;top:0;left:0;width:100%;height:100%;color:#fff;font-size: 24px;font-weight:bold;display: none}
+.liuyancj-luckerbox-lists li.liuyancj-luckerbox-item .delphoto i{cursor:pointer}
+.liuyancj-luckerbox-lists li.liuyancj-luckerbox-item .lucker-one-box:hover .delphoto{
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-justify-content: center;
+    justify-content: center;
+}
+.userani { animation: userani 1s ease-out 0s both;}
+@keyframes userani {
+    0% {
+        opacity:0;
+        transform: translateZ(-1000px) scale(0);
+    }
+    60% {
+        opacity:1;
+        transform:translateZ(0) scale(1)
+    }
+}
+/*中奖记录卡片*/
+.liuyancj-luckerbox-lists .liuyancj-luckerbox-item .lucker-one-item {
+    width: 225px;
+    height: 152px;
+    padding: 7px;
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    background-image: url({:tomedia($pcconfig['welcomestyle']['luckerbg'])});
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-size: 100% 100%;
+}
+.liuyancj-luckerbox-lists .liuyancj-luckerbox-item .lucker-one-item .lucker-one-box{
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+.liuyancj-luckerbox-lists.txtsize1 .lucker-one-item{
+    width: 451px;
+    height: 304px;
+    padding:14px;
+}
+.liuyancj-luckerbox-lists.txtsize1 .liuyancj-luckerbox-item .lucker-one-item .lucker-one-box .liuyan-output-avatar{
+    width: 70px;
+    height: 70px;
+}
+.liuyancj-luckerbox-lists.txtsize1 .lucker-one-item  .lucker-one-box .liuyan-output-username{
+    font-size: {$pcconfig['welcomestyle']['name']['size1']??56}px;
+}
+.liuyancj-luckerbox-lists.txtsize1 .liuyancj-luckerbox-item .lucker-one-item .lucker-one-box .liuyan-output-content{
+    font-size:{$pcconfig['welcomestyle']['msg']['size1']??40}px;
+}
+.liuyancj-luckerbox-lists.txtsize1 .liuyancj-luckerbox-item .lucker-one-item .lucker-one-box .liuyan-output-content img{
+    width:{$pcconfig['welcomestyle']['msg']['size1']??40}px;
+}
+.liuyancj-luckerbox-lists.txtsize2 .lucker-one-item{
+    width: 338px;
+    height: 228px;
+    padding:7px;
+}
+.liuyancj-luckerbox-lists.txtsize2 .liuyancj-luckerbox-item .lucker-one-item .lucker-one-box .liuyan-output-avatar{
+    width: 60px;
+    height: 60px;
+}
+.liuyancj-luckerbox-lists.txtsize2 .lucker-one-item  .lucker-one-box .liuyan-output-username{
+    font-size: {$pcconfig['welcomestyle']['name']['size2']??50}px;
+}
+.liuyancj-luckerbox-lists.txtsize2 .liuyancj-luckerbox-item .lucker-one-item .lucker-one-box .liuyan-output-content{
+    font-size:{$pcconfig['welcomestyle']['msg']['size2']??36}px;
+}
+.liuyancj-luckerbox-lists.txtsize2 .liuyancj-luckerbox-item .lucker-one-item .lucker-one-box .liuyan-output-content img{
+    width:{$pcconfig['welcomestyle']['msg']['size2']??36}px;
+}
+{/* 无txtsize样式时 */}
+.liuyancj-luckerbox-lists .lucker-one-item  .lucker-one-box .liuyan-output-username{
+    font-size: {$pcconfig['welcomestyle']['name']['size3']??24}px;
+}
+.liuyancj-luckerbox-lists .liuyancj-luckerbox-item .lucker-one-item .lucker-one-box .liuyan-output-content{
+    font-size:{$pcconfig['welcomestyle']['msg']['size3']??20}px;
+}
+.liuyancj-luckerbox-lists .liuyancj-luckerbox-item .lucker-one-item .lucker-one-box .liuyan-output-content img{
+    width:{$pcconfig['welcomestyle']['msg']['size3']??20}px;
+}
+.liuyancj-luckerbox-lists .liuyancj-luckerbox-item .lucker-one-item .lucker-one-box .liuyan-output-avatar{
+    width: 50px;
+    height: 50px;
+}
+.liuyancj-luckerbox-lists .liuyancj-luckerbox-item .lucker-one-item .lucker-one-box .liuyan-output-avatar img{
+	width:100%;
+	height:100%;
+	border-radius:50%;
+    box-sizing: border-box;
+    border: 2px solid {$pcconfig['welcomestyle']['name']['color']};
+}
+.liuyancj-luckerbox-lists .liuyancj-luckerbox-item .lucker-one-item .lucker-one-box .liuyan-output-info{
+    max-height: 100%;
+	flex: 1;
+	padding-left:15px;
+	text-align:left;
+    overflow: hidden;
+}
+.liuyancj-luckerbox-lists .liuyancj-luckerbox-item .lucker-one-item .lucker-one-box .liuyan-output-username{
+	overflow:hidden;
+	font-weight:800;
+    color:{$pcconfig['welcomestyle']['name']['color']};
+}
+.liuyancj-luckerbox-lists .liuyancj-luckerbox-item .lucker-one-item .lucker-one-box .liuyan-output-username span{
+	display:inline-block;
+	margin-right:5px;
+}
+.liuyancj-luckerbox-lists .liuyancj-luckerbox-item .lucker-one-item .lucker-one-box .liuyan-output-content{
+	overflow:hidden;
+    color:{$pcconfig['welcomestyle']['msg']['color']};
+}
+{/* 显示停止按钮 */}
+{if $pcconfig['welcomestyle']['showstopbtn'] == '1'}
+.isdrawing .liuyancj-footer{animation:none!important}
+.isdrawing .liuyancj-footer-box .select-box,
+.isdrawing .liuyancj-footer-box .select-prize,
+.isdrawing .liuyancj-footer-box .btn-showalllucker,
+.isdrawing .liuyancj-tip{
+    display:none;
+}
+.isdrawing .liuyancj-footer-box{
+    background:none;
+}
+.isdrawing .liuyancj-footer .btn-start{
+    top: 12px;
+    animation:btnani 0.5s ease-out 3s both;
+}
+@keyframes btnani{
+    0%{opacity:0;transform: scale(0);}
+    100%{opacity:1;transform: scale(1);}
+}
+{/if}
+{/*弹幕-孔明灯效果*/}
+.liuyancj-wall{
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+    -webkit-user-drag: none;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    -webkit-perspective: 1200px;
+    perspective:1200px;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-transform: translateZ(0); 
+    transform: translateZ(0);
+}
+.liuyancj-dm {
+    position: relative;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+{/*孔明灯*/}
+.liuyancj-dm .lantern-box {
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+}
+.liuyancj-dm .lantern-box .lantern-item{
+  width: 150px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  will-change: transform;
+}
+.liuyancj-dm .lantern-box .lantern-header {
+  position: relative;
+  width: 150px;
+  height: 190px;
+  background: url("{:tomedia($pcconfig['lanternstyle']['lanterns'][0])}") no-repeat top center;
+  background-size: 100% 100%;
+}
+{foreach $pcconfig['lanternstyle']['lanterns'] as $key=>$one}
+.liuyancj-dm .lantern-box .lantern-header.bg{$key+1} {
+  background-image: url("{:tomedia($one)}");
+}
+{/foreach}
+.liuyancj-dm .lantern-box .lantern-header img {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 20px;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  box-shadow: 0 0 3px 3px #FFC107, 0 0 20px 0px #FFFDE7;
+  border: 2px solid #ffffff;
+  box-sizing: border-box;
+}
+.liuyancj-dm .lantern-box .lantern-header .name {
+  position: absolute;
+  top: 100px;
+  width: 100%;
+  padding: 0 20px;
+  box-sizing: border-box;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  text-align: center;
+  font-weight: 700;
+  /* text-shadow: 0px 0px 1px #b20c00, 0px 0px 2px #b01500, 0px 0px 3px #bd2d00; */
+  font-size: {$pcconfig['lanternstyle']['namesize']}px;
+  color: {$pcconfig['lanternstyle']['namecolor']};
+  max-height: {$pcconfig['lanternstyle']['namesize'] * 3}px;
+}
+.liuyancj-dm .lantern-box .lantern-header .info {
+    position: absolute;
+    top: 100px;
+    width: 100%;
+    padding: 0 20px;
+    box-sizing: border-box;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 700;
+    color: #ffff99;
+    text-shadow: 0px 0px 1px #b20c00, 0px 0px 2px #b01500, 0px 0px 3px #bd2d00;
+}
+.liuyancj-dm .lantern-box .lantern-header .info div{
+    margin-bottom: 3px;
+}
+.liuyancj-dm .lantern-box .lantern-body {
+  width: 82px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  flex-wrap: nowrap;
+}
+.liuyancj-dm .lantern-box .lantern-body .topline {
+  background: url("{:tomedia($pcconfig['lanternstyle']['top'])}") no-repeat top center;
+  background-size: 100% 100%;
+  width: 100%;
+  height: 5px;
+  z-index: 2;
+}
+.liuyancj-dm .lantern-box .lantern-body .bottomline {
+  background: url("{:tomedia($pcconfig['lanternstyle']['bottom'])}") no-repeat top center;
+  background-size: 100% 100%;
+  width: 100%;
+  height: 89px;
+  margin-top: -5px;
+  z-index: 2;
+  transform-origin: top right;
+  animation: bottomimgani 4s linear infinite both;
+}
+.liuyancj-dm .lantern-box .lantern-body .center {
+  width: 100%;
+  min-height: 40px;
+  background: url("{:tomedia($pcconfig['lanternstyle']['center'])}") no-repeat center center;
+  background-size: 100% 100%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  writing-mode: vertical-lr;
+  text-orientation: mixed;
+  font-weight: 700;
+  letter-spacing: 5px;
+  padding: 20px 0 10px 0;
+  overflow: hidden;
+  text-shadow: 0 0 10px rgba(255, 255, 153, 0.6);
+  display: flex;
+  align-items: center;
+  margin-top: -2px;
+  z-index: 1;
+  font-size: {$pcconfig['lanternstyle']['msgsize']}px;
+  color: {$pcconfig['lanternstyle']['msgcolor']};
+}
+.liuyancj-dm .lantern-box .lantern-body .center img{
+    width: {$pcconfig['lanternstyle']['msgsize']}px;
+    height:{$pcconfig['lanternstyle']['msgsize']}px;
+}
+{/*弹幕*/}
+.liuyancj-dm .barrage-box .barrage-one{
+	border-radius:8px;
+    padding: 10px 0;
+}
+.liuyancj-dm .barrage-box .barrage-one .barrage-avatar,.liuyancj-dm .barrage-box .barrage-one .barrage-info{
+	background-color:{if $pcconfig['dmstyle']['needbg']=='1'}{$pcconfig['dmstyle']['bgcolor']}{else}transparent{/if};
+}
+.liuyancj-dm .barrage-box .barrage-one .barrage-avatar {
+	height: 80px;
+	padding:0 15px;
+    border-radius: 10px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+.liuyancj-dm .barrage-box .barrage-one .barrage-avatar img {
+	width: 60px;
+	height: 60px;
+	display:inline-block;
+	border-radius: 50%;
+}
+.liuyancj-dm .barrage-box .barrage-one .barrage-info{
+    position: relative;
+    border-radius: 10px;
+    padding-right:10px;
+    {if $pcconfig['dmstyle']['needavatar']=='1'}
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    {else /}
+    padding-left:10px;
+	{/if}
+}
+.liuyancj-dm .barrage-box .barrage-one .barrage-info div{
+    height:80px;
+    line-height:80px;
+    white-space: nowrap;
+    color:{$pcconfig['dmstyle']['fontcolor']};
+	font-size:{$pcconfig['dmstyle']['fontsize']}px;
+    font-weight:bold;
+}
+.liuyancj-dm .barrage-box .barrage-one .barrage-info .barrage-msg .faceImg{
+	width:{$pcconfig['dmstyle']['fontsize']}px;
+	height:{$pcconfig['dmstyle']['fontsize']}px;
+	vertical-align:middle
+}
+</style>
+{if !empty($pcconfig['cjingmusic'])}
+<audio id="cjingmusic" src="{:tomedia($pcconfig['cjingmusic'])}" loop preload="preload" style="display:none"></audio>
+{/if}
+{if !empty($pcconfig['cjendmusic'])}
+<audio id="cjendmusic" src="{:tomedia($pcconfig['cjendmusic'])}" preload="preload" style="display:none"></audio>
+{/if}
+<div class="liuyancj-mainbox normalbox">
+<div class="emptybox zam-app-flex-ajCenter hidden">
+    <img src="/{:SIMGURL}common/empty.png">
+    <p style="padding:20px;">请到后台添加奖品</p>
+</div>
+<div class="liuyancj-wall">
+    <div class="liuyancj-dm"></div>
+</div>
+<div class="liuyancj-lists zam-app-flex-ajCenter hidden">
+    <div class="liuyancj-header zam-app-flex-ajCenter headerani">
+        <div class="liuyancj-headerbg"><span class="awardname">xxx</span></div>
+        <div class="prizename">xxx奖品</div>
+    </div>
+    <div class="liuyancj-body zam-app-flex-ajCenter">
+        <div class="liuyancj-awardbox zam-app-flex-ajCenter awardboxani">
+            <div class="liuyancj-prizeimg zam-app-flex-ajCenter">
+                <img src="/static/images/screen/photocj/prize.png">
+            </div>
+            <div class="liuyancj-prizebg1"></div>
+            <div class="liuyancj-prizebg2"></div>
+        </div>
+        <div class="liuyancj-luckerbox">
+            <div class="liuyancj-luckerbox-content">
+                <ul class="liuyancj-luckerbox-lists"></ul>
+            </div>
+        </div>
+    </div>
+    <div class="liuyancj-footer footerani">
+        <div class="liuyancj-footer-box">
+            <div class="select-prize zam-app-flex">
+                <div class="prev-prize"><span class="mxc-back"></span></div>
+                <div class="active-prize limitbox">一等奖</div>
+                <div class="next-prize"><span class="mxc-right"></span></div>
+            </div>
+            <div class="select-box">
+                <div class="select-txt">一次抽取</div>
+                <input class="onceout" type="text" value="1" placeholder="请输入抽取数量" onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}" onafterpaste="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}" />
+                <div class="txt">人</div>
+            </div>
+            <div class="btn-start">开始</div>
+            <div class="btn-close hidden">关闭</div>
+            <div class="btn-showalllucker">{$pcconfig['welcomestyle']['listname']??'中奖列表'}<span class="lucker-numbox"><span class="lucker-num">0</span>/<span class="prize-num">0</span></span></div>
+        </div>
+    </div>
+    <div class="liuyancj-tip">按空格键停止</div>
+</div>
+</div>
+<script type="text/javascript">
+var styletype = "{$pcconfig['styletype']??1}",isautoscroll = "{$pcconfig['autoscroll']??2}";
+var hidevideo = "{:tomedia($pcconfig['welcomestyle']['hidevideo']??'')}",baozhavideo = "{:tomedia($pcconfig['welcomestyle']['baozhavideo']??'')}";
+var lanternLen = {:count($pcconfig['lanternstyle']['lanterns']??[])};
+var dmstyle = {:json_encode($pcconfig['dmstyle']??[])};
+require(['screenliuyancjdm'],function(screenliuyancjdm){
+    var html = '';
+    if(hidevideo){
+        html += `<video src="${hidevideo}" class="firevideo1" preload="auto" muted="muted"></video>`;
+    }
+    if(baozhavideo){
+        html += `<video src="${baozhavideo}" class="firevideo2" preload="auto" muted="muted"></video>`;
+    }
+    if(html){
+        $("body").append(html);
+    }
+    screenliuyancjdm.init();
+});
+</script>
+<script id="lucker-tpl" type="html/javascript">
+<li class="liuyancj-luckerbox-item userani">
+    <div class="lucker-one-item">
+        <div class="lucker-one-box zam-app-flex zam-app-alignCenter">
+            <div class="liuyan-output-avatar">
+                <img src="{{ avatar }}">
+            </div>
+            <div class="liuyan-output-info">
+                <div class="liuyan-output-username">{{# nickname }}</div>
+                <div class="liuyan-output-content">{{# content }}</div>
+            </div>
+            <div class="delphoto"><i class="mxc-close" data-id="{{ luckerid }}"></i></div>
+        </div>
+    </div>
+</li>
+</script>
+<script id="lantern-tpl" type="html/javascript">
+    <div class="lantern-item" style="transform: scale({{ scale }});opacity: {{ scale }};">
+        <div class="lantern-header bg{{ type }}">
+            <img src="{{ avatar }}" />
+            {{ if typeof nickname === 'array' && nickname.length > 1 }}
+                <div class="info">
+                    {{ each nickname as item }}
+                        <div>{{item}}</div>
+                    {{ /each }}
+                </div>
+            {{ else }}
+                <div class="name">{{ typeof nickname === 'array' ? nickname[0] : nickname }}</div>
+            {{ /if }}
+        </div>
+        <div class="lantern-body">
+            <div class="topline"></div>
+            <div class="center">{{# content }}</div>
+            <div class="bottomline"></div>
+        </div>
+    </div>
+</script>
+<script id="barrage-tpl" type="html/javascript">
+    <div class="barrage-one zam-app-flex">
+        {if $pcconfig['dmstyle']['needavatar']=='1'}
+        <div class="barrage-avatar zam-app-flex-ajCenter2" style="background-color:{{ bgcolor }}">
+            <img src="{{ avatar }}" class="imgavatar">
+        </div>
+        {/if}
+        <div class="barrage-info zam-app-flex-ajCenter2" style="background-color:{{ bgcolor }}">
+            {if $pcconfig['dmstyle']['neednickname']=='1'}
+            {{ if typeof nickname === 'array' && nickname.length > 1 }}
+                <div class="barrage-son barrage-nickname" style="color:{{ fontcolor }}">
+                    {{ each nickname as item }}
+                        <div>{{item}}</div>
+                    {{ /each }}
+                </div>
+            {{ else }}
+                <div class="barrage-son barrage-nickname" style="color:{{ fontcolor }}">{{ typeof nickname === 'array' ? nickname[0] : nickname }}：</div>
+            {{ /if }}
+            {/if}
+            <div class="barrage-son barrage-msg" style="color:{{ fontcolor }}">{{# content }}</div>
+        </div>
+    </div>
+</script>
+{include file='common/footer' /}

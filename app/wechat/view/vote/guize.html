@@ -1,0 +1,30 @@
+{include file='vote/header' /}
+<section class="vote-rule"> 
+    <div class="rule-title"><i class="mxc-form_light"></i> 活动规则 </div>
+    <div class="rule-con">
+        {:html_entity_decode($rotate['guize'])}
+    </div>
+</section>
+<footer class="m-tabbar m-tabbar tabbar-fixed vote-ftab">
+    <a href="javascript:;" data-href="{:gowechat('vote/index',array('hdid'=>$hdinfo['hdid']))}" data-module="vote" class="tabbar-item">
+        <span class="tabbar-icon">
+            <i class="mxc-unie6cc"></i>
+        </span>
+        <span class="tabbar-txt">{$appconfig['votetxt']??'投票'}</span>
+    </a>
+    {if !isset($appconfig['apppageconfig']['openwxphb']) || (isset($appconfig['apppageconfig']['openwxphb']) && $appconfig['apppageconfig']['openwxphb']=='1')}
+    <a href="javascript:;" data-href="{:gowechat('vote/phb',array('hdid'=>$hdinfo['hdid']))}" data-module="vote" class="tabbar-item">
+        <span class="tabbar-icon">
+            <i class="mxc-unie722"></i>
+        </span>
+        <span class="tabbar-txt">排行榜</span>
+    </a>
+    {/if}
+    <a href="javascript:;" data-href="{:gowechat('vote/guize',array('hdid'=>$hdinfo['hdid']))}" data-module="vote" class="tabbar-item tabbar-active">
+        <span class="tabbar-icon">
+            <i class="mxc-unie699"></i>
+        </span>
+        <span class="tabbar-txt">规则</span>
+    </a>
+</footer>
+{include file='vote/footer' /}

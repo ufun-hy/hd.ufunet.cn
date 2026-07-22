@@ -1,0 +1,171 @@
+{include file='$Wpath/common/header'}
+<style type="text/css">
+.upgrade-content-box{
+max-height:200px;width:700px;overflow:auto;border:2px solid #e7e6eb;padding:10px;border-radius: 5px;
+}
+</style>
+<div id="formBox" class="zam-formvalidation form-horizontal" method="post">
+    <div class="form-group">
+        <label class="col-lg-2 control-label">当前版本:</label>
+        <div class="col-lg-8">
+          <div class="form-control-static">米波互动&nbsp;V{$version}</div>
+        </div>
+    </div>
+    <div class="form-group mx-box">
+        <label class="col-lg-2 control-label">最近更新时间:</label>
+        <div class="col-lg-8">
+          <div class="form-control-static mxdetail">{$updatedate}</div>
+        </div>
+    </div>
+    <div class="form-group endtime-box hidden">
+        <label class="col-lg-2 control-label">更新服务过期时间:</label>
+        <div class="col-lg-8">
+          <div class="form-control-static"></div>
+        </div>
+    </div>
+    <div class="form-group check-box hidden">
+        <label class="col-lg-2 control-label">更新内容</label>
+        <div class="col-lg-10">
+            <div class="form-control-static" id="check"></div>
+        </div>
+    </div>
+    <div class="form-group btn-box hidden">
+        <label class="col-sm-2 control-label"></label>
+        <div class="col-sm-9 col-xs-12">
+            <div class='form-control-static'>
+                <a id="upgradebtn" class="btn btn-primary" href="javascript:void(0)">立即更新</a>
+            </div>
+            <div class="help-block">
+                <span class="text-danger">注意：更新之前请先关闭当前站点的防火墙，一般是宝塔面板用户开启了当前站点的防火墙，必须先关闭防火墙更新完成后再去开启防火墙</span>
+            </div>
+        </div>
+    </div>
+</div>
+<script id='upgrade-tpl' type="text/template">
+    <%# if(d.filecount <= 0 && d.database <= 0){ %>
+    <span class='text-danger'>恭喜，您当前版本已是最新版本</span>
+    <%# }else{ %>
+        <div class="m-b-10" style="font-size:20px;">最新版: <span class="text-danger"><% d.versionname %></span></div>
+        <div class="m-b-10"><span  class="text-danger"><b>文件更新内容</b></div>
+        <%# if(d.filecount > 0){ %>
+            <div class="m-b-10">共检测到有 <span  class="text-danger"><% d.filecount %></span> 个文件需要更新.</div>
+        <%# }else{ %>
+            <div class="m-b-10">本次无文件需要更新</div>          
+        <%# } %>
+        <%# if(d.templatefiles != ''){ %>
+            <div class='upgrade-content-box m-b-10'><% d.templatefiles %></span></div>
+        <%# } %>
+        <div class="m-b-10"><span  class="text-danger"><b>数据表更新内容</b></div>
+        <div class="upgrade-content-box m-b-10">
+        <%# if(d.database > 0){ %>
+            <div>共检测到有 <span class="text-danger"><% d.database %></span> 个数据表需要更新</div>
+        <%# }else{ %>
+            <div>本次无数据表更新</div>
+        <%# } %>
+        </div>
+        <%# if(d.log != ''){ %>
+            <div class="m-b-10"><span  class="text-danger"><b>更新日志内容</b></b></div>
+            <div class='upgrade-content-box m-b-10'><% d.log %></span></div>
+        <%# } %>
+        <div class="m-b-10"><span class="text-danger"><b>同意本次更新</b></div>
+        <div class="upgrade-content-box m-b-10">
+            <label class="lyear-checkbox checkbox-primary">
+                <input type="checkbox" class="agreeupdate">
+                <span class="text-danger">我已经做好了相关文件及数据库的备份工作，并自愿承担更新所存在的风险</span>
+            </label>
+        </div>
+    <%# } %>
+    <div id='process'></div>
+</script>
+<script>
+require(['webcore','jconfirmBox','zamnotice'],function(webcore,jconfirmBox,zamnotice){
+{/*检查是否存在需要更新的数据库结构*/}
+$(function () {
+    var lshow = $('body').lyearloading({
+        opacity           : 0.6,              
+        backgroundColor   : '#ccc',           
+        imgUrl            : '',               
+        textColorClass    : 'text-primary',   
+        spinnerColorClass : 'text-primary',   
+        spinnerSize       : 'lg',
+        spinnerText       : '最新版检查中...',    
+        zindex            : 9999,   
+    });
+    webcore.ajaxSubmit("{:goweb('authmanage/upgrade')}",{}).then(function(json){
+        if(json.code==0){
+            var result = json.msg;
+            if(result.endtime){
+                $(".endtime-box .form-control-static").html(`<span style='color: #ed5565;'>${result.endtime}</span>`);
+                $(".endtime-box").removeClass("hidden");
+            }
+            $("#check").html(webcore.tpl($("#upgrade-tpl"),result));
+            if (result.filecount > 0 || result.database > 0) {
+                $('.btn-box').removeClass('hidden');
+                $("#upgradebtn").unbind('click').click(function () {
+                    var $this = $(this);
+                    if(!$(".agreeupdate").is(':checked')) return zamnotice.showTips('error','请到底部勾选同意更新');
+                    if ($this.attr('updating') == '1') {
+                        return;
+                    }
+                    jconfirmBox.confirm('温馨提示','更新后无法恢复到之前版本，您确定要更新么？',function(){
+                        $this.attr('updating', '1').text('正在更新中');
+                        if( result.database > 0 ){
+                            process('database');
+                        } else if(result.filecount > 0 ){
+                            process('file');
+                        }
+                    });
+                });
+            }
+        }else{
+            $(".btn-box").addClass('hidden');
+            $("#check").html(`<span class='text-danger'>${json.msg}</span>`);
+        }
+        $(".check-box").removeClass('hidden');
+        lshow.hide();
+    }, function(json){
+        lshow.hide();
+        zamnotice.showTips('error','网络差，操作失败');
+    });
+})
+});
+function process(type) {
+    require(['webcore','jconfirmBox','zamnotice'],function(webcore,jconfirmBox,zamnotice){
+        webcore.ajaxSubmit("{:goweb('authmanage/process')}",{type:type}).then(function(json){
+            if(json.code==0){
+                var result = json.msg;
+                if (result.type == 'database') {
+                    if (result.status == '1') {
+                        $('#process').html(`已更新<span class="text-danger m-l-5 m-r-5">${result.success}</span>个数据表 / 共 ${result.total} 个数据表`);
+                        process('database');
+                    } else {
+                        $('#process').html(`已成功更新<span class="text-danger m-l-5 m-r-5">${result.total}</span>个数据表`);
+                        process('file');
+                    }
+                } else if (result.type == 'file') {
+                    if (result.status == 1) {
+                        $('#process').html(`已更新<span class="text-danger m-l-5 m-r-5">${result.success}</span>个文件 / 共 ${result.total} 个文件`);
+                        var percent = (( result.success / result.total ) * 100);
+                        $("#upgradebtn").text(`正在更新中(${Math.floor(percent)}%)`);
+                        process('file');
+                    } else {
+                        $('#process').html(`已成功更新<span class="text-danger m-l-5 m-r-5">${result.total}</span>个文件`);
+                        process('complete');
+                    }
+                } else {
+                    zamnotice.showTips('success','恭喜，您已经更新到最新版',3e3,function(){
+                        window.location.reload();
+                    });
+                } 
+            }else{
+                $('#process').text(json.msg);
+                $("#upgradebtn").addClass('hidden');
+            }
+        }, function(json){
+            $('#process').text('网络差，操作失败');
+            $("#upgradebtn").addClass('hidden');
+        });
+    });
+}
+</script>
+{include file='$Wpath/common/footer'}

@@ -1,0 +1,212 @@
+{include file="common/header" /}
+<style type="text/css">
+.zam-app-bodyBg{min-height: 100%;height: auto;overflow:hidden;overflow-y: auto;background-position: center;}
+.hbwall-box{position: relative;}
+.rulebtn{
+	position: fixed;
+    right: .3rem;
+    top: .3rem;
+    z-index:1;
+    padding: 0 .24rem;
+    min-width: 1.58rem;
+    height: .6rem;
+    background: rgba(0,0,0,.3);
+    color: #fff;
+    border-radius: .5rem;
+}
+.rulebtn i{margin-right:0.08rem}
+.hbwall-list{
+	width: 100%;
+	max-height:100vh;
+	overflow: hidden;
+	overflow-y: auto;
+	padding-top: 1.1rem;
+	padding-bottom: 0.2rem;
+}
+.hbwall-list .hbwall-item {
+    position: relative;
+    width: 33.3vw;
+    overflow: hidden;
+    margin-bottom: 2vw;
+    cursor: pointer;
+    float: left;
+}
+.hbwall-list .hbwall-item .hbwall-box {
+	position: relative;
+	background-repeat: no-repeat;
+	background-size: 100% 100%;
+	width: {$rotate['hboneconfig']['appwidth']??'30'}vw;
+    height: {$rotate['hboneconfig']['appheight']??'41.4'}vw;
+    background-image: url("{:tomedia($rotate['hboneconfig']['frontbg'])}");
+}
+.hbwall-list .hbwall-item .hbwall-box .hbname{
+	position: absolute;
+	left: 0;
+	width: 100%;
+	padding: 0 0.2rem;
+	box-sizing: border-box;
+	text-align: center;
+	font-weight: 500;
+	top: {$rotate['apphbconfig']['titletop']??'24'}vw;
+	color: {$rotate['apphbconfig']['titlecolor']??'#ff9800'};
+	font-size: {$rotate['apphbconfig']['titlesize']??'0.28'}rem;
+	{if isset($rotate['apphbconfig']['opentitle']) && $rotate['apphbconfig']['opentitle']=='2'}
+	display:none;
+	{/if}
+}
+.hbwall-list .hbwall-item .hbwall-box .hbbtn{
+	position: absolute;
+	left: 0;
+	width:100%;
+	padding: 0 0.2rem;
+	box-sizing: border-box;
+	text-align: center;
+	top: {$rotate['apphbconfig']['btntop']??'30'}vw;
+	color: {$rotate['apphbconfig']['btncolor']??'#fff'};
+}
+.hbwall-list .hbwall-item .hbwall-box .btn{
+	padding: 0;
+	margin: 0 auto;
+	width: {$rotate['apphbconfig']['btnwidth']??'1.2'}rem;
+	height: {$rotate['apphbconfig']['btnheight']??'0.4'}rem;
+	line-height: {$rotate['apphbconfig']['btnheight']??'0.4'}rem;
+	font-size: {$rotate['apphbconfig']['btnsize']??'0.2'}rem;
+}
+.hbwall-list .hbwall-item .hbwall-box .btn-primary{
+	background-color: {$rotate['apphbconfig']['btnbgcolor']??'#00aeff'};
+	color:{$rotate['apphbconfig']['btncolor']??'#fff'};
+}
+.hbwall-list .hbwall-item .hbwall-box .btn-warning{pointer-events: none;}
+</style>
+<div class="rulebtn zam-app-flex-ajCenter2"><i class="mxc-calendar"></i><span>游戏规则</span></div>
+<div class="hbwall-box zam-app-flex-ajCenter">
+<div class="hbwall-list">
+	{foreach $rotate['prizes'] as $p}
+	<div class="hbwall-item zam-app-flex-ajCenter">
+		<div class="hbwall-box" {if $p['prizediy']=='1' && !empty($p['prizefrontbg'])}style="background-image: url({:tomedia($p['prizefrontbg'])});"{/if}>
+			<div class="hbname limitbox">{$p['prizetitle']}</div>
+			<div class="hbbtn"><a class="btn btn-primary{if isset($p['isselected']) && $p['isselected']=='1'} btn-warning{/if}" href="javascript:;" data-hbid="{$p['id']}">{if isset($p['isselected']) && $p['isselected']=='1'}已 选{else /}{$rotate['apphbconfig']['btntxt']??'选这个'}{/if}</a></div>
+		</div>
+	</div>
+	{/foreach}
+</div>
+</div>
+<style type="text/css">
+	/*抽奖规则*/
+.hbwall-rulebox{
+	position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: rgba(0,0,0,0.42);
+    z-index:2;
+}
+.hbwall-rulebox .popbg{
+	position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+	background-color: rgba(0,0,0,0.62);
+}
+.hbwall-rulebox .rulebox{
+	position: relative;
+	width: 5.2rem;
+	height: 7.17rem;
+	background-image: url("{:tomedia($appconfig['styleconfig']['rulebg'])}?t=3");
+	background-repeat: no-repeat;
+	background-size: cover;
+	color:#000;
+	opacity: 0;
+	animation: topbottomshow 0.4s ease 0s both;
+	-webkit-animation: topbottomshow 0.4s ease 0s both;
+}
+@keyframes topbottomshow {
+    0% {
+        transform: translateY(-15%);
+        -webkit-transform: translateY(-15%);
+    }
+    100% {
+    	opacity: 1;
+        transform:translateY(0);
+        -webkit-transform: translateY(0);
+    }
+}
+.rule-title{
+	position: absolute;
+    top: .68rem;
+    width: 100%;
+    text-align: center;
+    font-size: 0.36rem;
+    font-weight: 600;
+}
+.rule-content{
+	width: 100%;
+    height: 100%;
+    padding: 1.36rem 0.62rem 0.62rem;
+    box-sizing: border-box;
+}
+.rule-content .rule-des{
+	height: 100%;
+    font-size: 0.28rem;
+    line-height: 1.4;
+    word-wrap: break-word;
+    white-space: normal;
+     overflow: hidden;
+    overflow-y: scroll;
+}
+.hbwall-rulebox .rulebox .close-pop{
+	position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: -0.92rem;
+    font-size: 0.52rem;
+	cursor: pointer;
+	color: #fff;
+}
+</style>
+<section class="hbwall-rulebox zam-app-flex-ajCenter hidden">
+	<div class="popbg"></div>
+	<div class="rulebox zam-app-flex-ajCenter">
+		<div class="rule-content">
+			<div class="rule-des">{:html_entity_decode($rotate['ruledes']);}</div>
+		</div>
+		<span class="close-pop" onclick="javascript:$('.hbwall-rulebox').addClass('hidden');"><i class="mxc-roundclose"></i></span>
+	</div>
+</section>
+<script type="text/javascript">
+var clickopen = false;
+require(['wechatcore'],function (wechatcore) {
+wechatcore.gameInit(function(){
+	if($("#appbgmusic").length > 0 ){
+		wechatcore.playAudio($("#appbgmusic")[0]);
+	}
+});
+$(".rulebtn").click(function(){
+	$(".hbwall-rulebox").removeClass('hidden');
+});
+$(".hbwall-item .btn").click(function(){
+	var $this = $(this);
+	if(clickopen){
+		return false;
+	}
+	clickopen = true;
+	wechatcore.ajaxSubmit('/wechat/hbwall/selecthb',{rotateid:"{$rotateid}",hbid:$(this).attr('data-hbid')},'发起请求中..').then(function(json){
+		if(json.code==0){
+			wechatcore.msg('选择成功');
+			$this.addClass('btn-warning').text('已 选');
+		}else{
+			wechatcore.msg(json.msg);
+		}
+		clickopen = false;
+	},function(){
+		clickopen = false;
+		wechatcore.msg('网络异常，请稍后重试');
+	});
+});
+})
+</script>
+{include file="common/footermenu" /}
+{include file="common/footer" /}

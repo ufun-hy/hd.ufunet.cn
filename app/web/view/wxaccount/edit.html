@@ -1,0 +1,119 @@
+<form id="formBox" class="zam-formvalidation form-horizontal confirmbox-pop" method="post">
+  <div class="form-group bindwxuser">
+    <label class="col-lg-3 control-label">* 接入用户</label>
+    <div class="col-lg-8">
+      <input type="hidden" name="user_id" class="binduserid" value="{$config['user_id']}">
+      <a class="img-avatar img-avatar-pill img-avatar-36" href="javascript:void(0)">
+        <span>{$config['username']}</span>
+      </a>
+      <a href="javascript:void(0)" class="btn btn-danger btn-sm btn-binduser">点击选择用户</a>
+      <span class="help-block">每个公众号只能绑定一个用户</span>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-lg-3 control-label">* 公众号名称</label>
+    <div class="col-lg-8">
+      <input class="form-control" type="text" name="accountname" maxlength="30" value="{$config['accountname']}">
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-lg-3 control-label">* 公众号类型</label>
+    <div class="col-lg-8">
+      <select name="level" class='form-control js_select2 levelselect'>
+        {foreach $levels as $k=>$v}
+        <option value="{$k}" {if $config['level'] == $k }selected{/if}>{$v}</option>
+        {/foreach}
+      </select>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-lg-3 control-label">appid(不可修改)</label>
+    <div class="col-lg-8">
+      <input type="text" class="form-control" name="appid" readonly="true" value="{$config['appid']}">
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-lg-3 control-label">appsecret(不可修改)</label>
+    <div class="col-lg-8">
+      <input type="text" class="form-control" name="appsecret" readonly="true" value="{$config['appsecret']}">
+      <div class="help-block">注意：授权接入的公众号默认是没有appsecret的，系统也用不到这个appsecret</div>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-lg-3 control-label">公众号二维码</label>
+    <div class="col-lg-8">
+      {:tpl_image_one('qrcode',$config['qrcode'])}
+    </div>
+  </div>
+  {if isset($config['level']) && $config['level'] > 2}
+  <div class="form-group">
+    <label class="col-lg-3 control-label">中奖模板消息id</label>
+    <div class="col-lg-8">
+      <input type="text" class="form-control" name="zjtplid" value="{$config['zjtplid']}">
+      <div class="help-block"><span class="text-danger">注:仅仅认证服务号并且需要开启中奖模板推送的话才需要填写一下</span></div>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-lg-3 control-label">* 新版支付模板消息</label>
+    <div class="col-lg-8">
+      {:tpl_switch('paytplidtype',$config['paytplidtype']??'2')}
+      <div class="help-block">开启则为新版模板消息，请在“微信公众平台服务类目”选择行业为：“商业服务 >
+        软件/建站/技术开发”，在类目模板库中添加标题为：”订单支付成功提醒“，编号为：“51617”的模板，在关键词库中添加商户名称，客户名称，订单编号，订单金额，产品名称5个关键词。</div>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-lg-3 control-label">支付模板消息id</label>
+    <div class="col-lg-8">
+      <input type="text" class="form-control" name="paytplid" value="{$config['paytplid']??''}">
+      <div class="help-block"><span class="text-danger">注:仅仅认证服务号并且需要填写支付模板</span></div>
+    </div>
+  </div>
+  {if dzsubmessage()}
+  <div class="form-group">
+    <label class="col-lg-3 control-label">一次性订阅消息模板id</label>
+    <div class="col-lg-8">
+      <input type="text" class="form-control" name="subtplid" value="{$config['subtplid']??''}">
+      <div class="help-block"><span class="text-danger">注:仅仅认证服务号并且需要开启中奖一次性订阅消息推送的话才需要填写一下</span></div>
+    </div>
+  </div>
+  {/if}
+  {if dzsubnotice()}
+  <div class="form-group">
+    <label class="col-lg-3 control-label">订阅通知中奖模板id</label>
+    <div class="col-lg-8">
+      <input type="text" class="form-control" name="subnoticetplid" value="{$config['subnoticetplid']??''}">
+      <div class="help-block"><span class="text-danger">注:仅仅认证服务号并且需要开启中奖订阅通知推送的话才需要填写一下</span></div>
+    </div>
+  </div>
+  {/if}
+  {if dzpclive()}
+  <div class="form-group">
+    <label class="col-lg-3 control-label">订阅通知直播开播模板id</label>
+    <div class="col-lg-8">
+      <input type="text" class="form-control" name="subnoticelivetplid" value="{$config['subnoticelivetplid']??''}">
+      <div class="help-block"><span class="text-danger">注:仅仅认证服务号并且需要开启直播开播订阅通知推送的话才需要填写一下</span></div>
+    </div>
+  </div>
+  {/if}
+  {/if}
+</form>
+<script>
+  require(['webcore', 'jconfirmBox', 'zamnotice', 'zvalidator', 'pickcity', "bootstrap-touchspin"], function (webcore, jconfirmBox, zamnotice) {
+    $('.levelselect').select2({ width: 'resolve', placeholder: '请选择' });
+    $(".btn-binduser").click(function () {
+      var confirmobj = jconfirmBox.ajaxconfirm("绑定用户", "{:gocommon('basic/searchuser')}", { ishtml: '1' }, 'html', 'col-lg-6 col-lg-offset-3', function (e) {
+        var selectuser = e.find("input:checked");
+        if (!selectuser.length) {
+          return zamnotice.showTips('error', '请选择用户');
+        }
+        if (selectuser.length > 1) {
+          return zamnotice.showTips('error', '只能选择一个用户');
+        }
+        $(".binduserid").val(selectuser.val());
+        var username = selectuser.parent().parent().next().text();
+        $(".binduserid").next().find("span").html(username);
+        confirmobj.close();
+      });
+    });
+  });
+</script>

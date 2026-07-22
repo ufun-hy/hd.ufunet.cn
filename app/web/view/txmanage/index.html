@@ -1,0 +1,196 @@
+{include file='$Wpath/common/header'}
+<div class="alert alert-success" role="alert">
+	<i class="mdi mdi-bell-ring"></i> 微信提现即为控制活动用户在活动微信端个人中心我的余额发起提现
+</div>
+<form id="formBox" class="zam-formvalidation form-horizontal" method="post">
+<div class="zam-titleBox">活动个人中心微信提现(微信端)</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 单次提现最小金额</label>
+    <div class="col-lg-8">
+        <div class="input-group">
+            <input type="text" class="form-control" name="txmin" value="{$config['txmin']}">
+            <div class="input-group-addon">元</div>
+        </div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 单次提现最大金额</label>
+    <div class="col-lg-8">
+      <div class="input-group">
+            <input type="text" class="form-control" name="txmax" value="{$config['txmax']}">
+            <div class="input-group-addon">元</div>
+      </div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 单次提现费率</label>
+    <div class="col-lg-8">
+      <div class="input-group">
+            <input type="text" class="form-control" name="txfl" value="{$config['txfl']}">
+            <div class="input-group-addon">%</div>
+      </div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 提现冷却时间</label>
+    <div class="col-lg-8">
+      <div class="input-group">
+            <input type="text" class="form-control" name="txfrozenh" value="{$config['txfrozenh']}">
+            <div class="input-group-addon">小时</div>
+      </div>
+      <div class="help-block">冷却时间即为审核打款成功后，多少个小时后可以发起下一次提现</div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 打款红包模板</label>
+    <div class="col-lg-7">
+      <select class="form-control js_select2 wechattxtpl"  name="wechattx[tpl]">
+        <option value="">请选择</option>
+        {volist name="config.tpls" id="tpl"}
+          {if $tpl['issys']=='1'}
+          <option value="{$tpl['id']}">{$tpl['tplname']}</option>
+          {/if}
+        {/volist}
+      </select>
+      <div class="help-block">如果活动开启自定义支付并且选择了霸屏红包以及微信提现打款模板则自动会使用活动内选择的模板进行打款</div>
+    </div>
+</div>
+<div class="form-group">
+  <label class="col-lg-2 control-label">* 活动名</label>
+  <div class="col-lg-7">
+    <input class="form-control inputneedmax" type="text"  name="wechattx[act_name]" placeholder="" value="{$config['wechattx']['act_name']}" maxlength="10">
+  </div>
+</div>
+<div class="form-group">
+  <label class="col-lg-2 control-label">* 发放主办方</label>
+  <div class="col-lg-7">
+    <input class="form-control inputneedmax" type="text"  name="wechattx[send_name]" placeholder="" value="{$config['wechattx']['send_name']}" maxlength="10">
+  </div>
+</div>
+<div class="form-group">
+  <label class="col-lg-2 control-label">* 祝福</label>
+  <div class="col-lg-7">
+    <input class="form-control inputneedmax" type="text"  name="wechattx[wishing]" placeholder="" value="{$config['wechattx']['wishing']}" maxlength="42">
+  </div>
+</div>
+<div class="form-group">
+  <label class="col-lg-2 control-label">* 备注</label>
+  <div class="col-lg-7">
+    <input class="form-control inputneedmax" type="text"  name="wechattx[remark]" placeholder="" value="{$config['wechattx']['remark']}" maxlength="85">
+  </div>
+</div>
+<div class="form-group">
+  <label class="col-lg-2 control-label">* 企业付款或者商家转账备注</label>
+  <div class="col-lg-7">
+    <input class="form-control inputneedmax" type="text"  name="wechattx[desc]" placeholder="" value="{$config['wechattx']['desc']}" maxlength="33">
+    <div class="help-block"><span class="text-danger">企业付款或商家转账接口专用，仅此一项，其他信息用于现金红包</span></div>
+  </div>
+</div>
+<div class="alert alert-danger clearfixed" role="alert" style="margin-top: 50px;">
+  <i class="mdi mdi-bell-ring"></i> 后台提现最小，最大金额以及费率等设置请到后台管理->用户管理->用户组管理内设置
+</div>
+<div class="zam-titleBox">后台个人中心微信提现打款信息</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 提现红包模板</label>
+    <div class="col-lg-7">
+      <select class="form-control js_select2 webtxtpl"  name="webtx[tpl]">
+        <option value="">请选择</option>
+        {volist name="config.tpls" id="tpl"}
+          {if $tpl['issys']=='1'}
+          <option value="{$tpl['id']}">{$tpl['tplname']}</option>
+          {/if}
+        {/volist}
+      </select>
+      <div class="help-block">只能选择系统类红包模板</div>
+    </div>
+</div>
+<div class="form-group">
+  <label class="col-lg-2 control-label">* 活动名</label>
+  <div class="col-lg-7">
+    <input class="form-control inputneedmax" type="text"  name="webtx[act_name]" placeholder="" value="{$config['webtx']['act_name']}" maxlength="10">
+  </div>
+</div>
+<div class="form-group">
+  <label class="col-lg-2 control-label">* 发放主办方</label>
+  <div class="col-lg-7">
+    <input class="form-control inputneedmax" type="text"  name="webtx[send_name]" placeholder="" value="{$config['webtx']['send_name']}" maxlength="10">
+  </div>
+</div>
+<div class="form-group">
+  <label class="col-lg-2 control-label">* 祝福</label>
+  <div class="col-lg-7">
+    <input class="form-control inputneedmax" type="text"  name="webtx[wishing]" placeholder="" value="{$config['webtx']['wishing']}" maxlength="42">
+  </div>
+</div>
+<div class="form-group">
+  <label class="col-lg-2 control-label">* 备注</label>
+  <div class="col-lg-7">
+    <input class="form-control inputneedmax" type="text"  name="webtx[remark]" placeholder="" value="{$config['webtx']['remark']}" maxlength="85">
+  </div>
+</div>
+<div class="form-group">
+  <label class="col-lg-2 control-label">* 企业付款或者商家转账接口备注</label>
+  <div class="col-lg-7">
+    <input class="form-control inputneedmax" type="text"  name="webtx[desc]" placeholder="" value="{$config['webtx']['desc']}" maxlength="33">
+    <div class="help-block"><span class="text-danger">企业付款或者商家转账接口专用，仅此一项，其他信息用于现金红包</span></div>
+  </div>
+</div>
+<div class="zam-titleBox">后台个人中心支付宝提现打款信息</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 转账支付模板</label>
+    <div class="col-lg-7">
+      <select class="form-control js_select2 webalipaytx"  name="webalipaytx[tpl]">
+        <option value="">请选择</option>
+        {volist name="config.alitpls" id="tpl"}
+          {if $tpl['issys']=='1'}
+          <option value="{$tpl['id']}">{$tpl['tplname']}</option>
+          {/if}
+        {/volist}
+      </select>
+      <div class="help-block">只能选择系统类支付模板</div>
+    </div>
+</div>
+<div class="form-group">
+  <label class="col-lg-2 control-label">* 备注</label>
+  <div class="col-lg-7">
+    <input class="form-control inputneedmax" type="text"  name="webalipaytx[remark]" placeholder="" value="{$config['webtx']['remark']??'提现打款成功'}" maxlength="120">
+  </div>
+</div>
+{include file='$Wpath/common/savepanel'}
+</form>
+<script>
+require(['webcore','jconfirmBox','zamnotice','zvalidator'],function(webcore,jconfirmBox,zamnotice){
+  $(".wechattxtpl").val("{$config['wechattx']['tpl']}").trigger("change");
+  $(".webtxtpl").val("{$config['wechattx']['tpl']}").trigger("change");
+  $(".webalipaytx").val("{$config['webalipaytx']['tpl']??'0'}").trigger("change");
+    $('#formBox').formValidation({
+		framework: 'bootstrap',
+		excluded: [':disabled'],
+		message: '您填写的内容无效',
+		fields: {}
+	}).on('success.form.fv', function(e) {
+		e.preventDefault();
+		var $form = $(e.target);
+		var postData = webcore.serializeObject($form);
+		var bload = $form.find(".zam-fixedbottom button").lyearloading({opacity: 0.2,spinnerSize: 'nm'});
+		$form.formValidation('disableSubmitButtons', true);
+		webcore.ajaxSubmit("{:goweb('txmanage/index')}",postData).then(function(json){
+			bload.hide();
+			if(json.code==0){
+			    $form.formValidation('disableSubmitButtons', false);
+			    zamnotice.showTips('success','操作成功',2e3,function(){
+			    	window.location.reload();
+			    });
+		    }else{
+		        zamnotice.showTips('error',json.msg);
+		        $form.formValidation('disableSubmitButtons', false);
+		    }
+		}, function(json){
+			bload.hide();
+			zamnotice.showTips('error','网络差。操作失败');
+			$form.formValidation('disableSubmitButtons', false);
+		});
+	});
+});
+</script>
+{include file='$Wpath/common/footer'}

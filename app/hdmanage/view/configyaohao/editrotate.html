@@ -1,0 +1,258 @@
+<style>
+table tr td{text-align:center!important}
+.confirmbox-pop .zam-titleBox{font-weight: 600;padding:5px 0;}
+.userimgbox img{height:40px!important;}
+.catespan{
+	display: flex;
+	align-items: center;
+	border: 1px solid #dfe6ec;
+    margin: 0 5px 5px 0;
+	border-radius:5px;
+	padding:10px;
+}
+.catespan label{margin-top: 0!important}
+.catespan .personnum{position:absolute;right:60px;}
+.catespan input{margin:0;margin-right:5px;}
+.nditem-lists tr td{text-align: center!important}
+</style>
+<div class="form-horizontal confirmbox-pop rotate-pop">
+<form class="confirm-formbox" method="post">
+    <div class="text-center">
+        <div class="btn-group pop-btns" style="margin-bottom:10px;">
+          <a href="javascript:void(0)" class="btn btn-default btn-primary"><span>基础设置</span></a>
+          <a href="javascript:void(0)" class="btn btn-default"><span>高级设置</span></a>
+        </div>
+    </div>
+    <div class="carditem">
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 轮次名</label>
+            <div class="col-lg-8">
+                <input class="form-control" type="text"  name="rotatetitle" value="{$rotate['rotatetitle']}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 中奖数据标题</label>
+            <div class="col-lg-8">
+                <input class="form-control" type="text"  name="lucktitle" value="{$rotate['lucktitle']}">
+            </div>
+        </div>
+        <div class="form-group">
+			<label class="col-lg-3 control-label">* 摇号数量</label>
+			<div class="col-lg-5">
+				<input type="text" class="form-control numberincdec" name="yaonums" 
+	            data-bts-min="1" data-bts-replacement-val="1"
+	            data-bts-max="null"
+	            data-bts-step="1"
+	            value="{$rotate['yaonums']}">
+			</div>
+		</div>
+    </div>
+    <div class="carditem hidden">
+    	<div class="form-group">
+			<label class="col-lg-3 control-label">* 用户类型</label>
+			<div class="col-lg-8">
+				{foreach $rangetypes as $k=>$v}
+				<label class="lyear-radio radio-inline radio-primary" onclick="rangetype(this)">
+                    <input type="radio" name="rangetype" value="{$k}" {if $rotate['rangetype'] == $k}checked{/if}><span>{$v}</span>
+                </label>
+				{/foreach}
+			</div>
+		</div>
+		<div class="form-group cateBox{if $rotate['rangetype']=='1'} hidden{/if}">
+			<label class="col-lg-3 control-label text-right">* 选择分类</label>
+			<div class="col-lg-8">
+				{if !empty($cates)}
+				{volist name="cates" id="cate"}
+				<span class="catespan">
+					<label class="lyear-checkbox checkbox-inline checkbox-primary">
+			         <input type="checkbox" name="cateids[]" value="{$cate['id']}" {if in_array($cate['id'],$rotate['cateids'])}checked{/if}><span>{$cate['catename']}</span>
+			        </label>
+					<span class="personnum pull-right text-danger">{$cate['num']} 人</span>
+				</span>
+				{/volist}
+				{else /}
+                <div class="form-control-static">暂未添加分类，<a href="{:gohdmanage('configyaohao/cate',['hdid'=>$hdid])}">点我添加分类</a></div>
+                {/if}
+				<span class="help-block"><span class="text-error">选择了分类，本轮摇号的数据只能从所选的分类内的用户里摇出，请一定保证所选分类总人数大于等于本轮摇号人数</span></span>
+			</div>
+		  </div>
+    	<div class="form-group">
+			<label class="col-lg-3 control-label">* 自定义摇号区显示行数</label>
+			<div class="col-lg-3">
+				{:tpl_switch('lefttype',$rotate['lefttype'],'lefttype')}
+			 </div>
+		</div>
+		<div class="form-group leftnumBox{if $rotate['lefttype']=='2'} hidden{/if}">
+			<label class="col-lg-3 control-label">* 摇号区行数</label>
+			<div class="col-lg-5">
+				<input type="text" class="form-control numberincdec" name="leftnums" 
+	            data-bts-min="1" data-bts-replacement-val="1"
+	            data-bts-max="null"
+	            data-bts-step="1"
+	            value="{$rotate['leftnums']}">
+	            <span class="help-block">此处填写值必须大于等于摇号名额数，注:必须是大于0的整数</span>
+			</div>
+		</div>
+        <div class="form-group">
+			<label class="col-lg-3 control-label">* 内定</label>
+			<div class="col-lg-3">
+				{:tpl_switch('neednd',$rotate['neednd'],'neednd')}
+			 </div>
+		</div>
+		<div class="form-group ndlistBox{if $rotate['neednd']=='2'} hidden{/if}">
+			<label class="col-lg-0 control-label hidden">* 内定名单</label>
+			<div class="col-lg-12">
+				<table class="we7-table table" style="margin-bottom:0px;">
+					<thead>
+					  <tr>
+						<th style="width:10%;text-align:center;">id</th>
+						{volist name="fieldconfig" id="field"}
+						<th style="text-align:center;">{$field['fieldname']}</th>
+						{/volist}
+						<th style="width:10%;text-align:center;">操作</th>
+					  </tr>
+					</thead>
+					<tbody class="nditem-lists">
+						{volist name="rotate.ndids" id="ndval"}
+						<tr>
+							<td>
+							  <input type="hidden" name="ndids[]" value="{$ndval['id']}" />
+								{$ndval['id']}
+							</td>
+							<td>{$ndval['fieldone']}</td>
+							<td>{$ndval['fieldtwo']}</td>
+							<td>{$ndval['fieldthree']}</td>
+							<td>{$ndval['fieldfour']}</td>
+							<td>{$ndval['fieldfive']}</td>
+							<td>{$ndval['fieldsix']}</td>
+							<td>
+								<a class="btn btn-danger btn-sm delnd" href="javascript:;">删除</a>
+							</td>
+						</tr>
+						{/volist}
+					</tbody>
+					<tfoot style="border: 1px solid #efefef;">
+					  <tr>
+						<td colspan="8">
+						  <a  class="btn btn-primary btn-sm addnditem" href="javascript:;"> <i class="mdi mdi-plus"></i>&nbsp;<span>新增内定</span></a>
+						</td>
+					  </tr>
+					</tfoot>
+				</table>
+			</div>
+		</div>
+    </div>
+</form>
+</div>
+<script id='nditem-tpl' type="text/template">
+	<tr>
+		<td>
+			<input type="hidden" name="ndids[]" value="<% d.id %>" />
+			<% d.id %>
+		</td>
+		<td>
+			<% d.fieldone %>
+		</td>
+		<td>
+			<% d.fieldtwo %>
+		</td>
+		<td>
+			<% d.fieldthree %>
+		</td>
+		<td>
+			<% d.fieldfour %>
+		</td>
+		<td>
+			<% d.fieldfive %>
+		</td>
+		<td>
+			<% d.fieldsix %>
+		</td>
+		<td class="text-center">
+		  <a href="javascript:;"  class="btn btn-danger btn-sm delnd">
+			  删除
+		  </a>
+		</td>
+	</tr>
+</script>         
+<script>    
+require(['webcore','jconfirmBox','zamnotice','layerBox',"bootstrap-touchspin"],function(webcore,jconfirmBox,zamnotice,layerBox){
+	tpl_switch();
+    $(".rotate-pop .pop-btns a.btn").click(function(){
+        $(this).addClass('btn-primary').siblings().removeClass("btn-primary");
+        $(".rotate-pop .carditem").addClass('hidden').eq($(this).index()).removeClass('hidden');
+    });
+    $(".confirmbox-pop .numberincdec").TouchSpin().on("change", function(){
+        var $this = $(this),funcstr = $this.data('func');
+        var func = window[funcstr];
+        func && func();
+    });
+    var rotateid = "{if isset($rotate['id'])}{$rotate['id']}{else}{/if}";
+    $(".addnditem").on('click',function(){
+		var confirmObj = jconfirmBox.ajaxconfirm("新增内定名单","{:gohdmanage('configyaohao/editnditem',['hdid'=>$hdid])}",{rotateid:rotateid},'html','col-lg-10 col-lg-offset-1',function(e){
+			var selectuser = e.find("input:checked");
+			if(selectuser){
+				var html = '';
+				selectuser.each(function(){
+					var lis = $(this).parent().parent().parent().find('li');
+					var nuser = {
+						id:$(this).val(),
+						fieldone:lis.eq(1).find('span').text(),
+						fieldtwo:lis.eq(2).find('span').text(),
+						fieldthree:lis.eq(3).find('span').text(),
+						fieldfour:lis.eq(4).find('span').text(),
+						fieldfive:lis.eq(5).find('span').text(),
+						fieldsix:lis.eq(6).find('span').text(),
+					};
+					html += webcore.tpl($("#nditem-tpl"),nuser);
+				});
+				if(html==''){
+					zamnotice.showTips('error','请选择用户');
+				}else{
+					$(".nditem-lists").append(html);
+					confirmObj.close();
+				}
+			}else{
+				zamnotice.showTips('error','请选择用户');
+			}
+			
+		});
+	});
+	$(".nditem-lists").on('click','.delnd',function(){
+		$(this).parent().parent().remove();
+	});
+});
+function lefttype(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".leftnumBox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".leftnumBox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function neednd(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".ndlistBox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".ndlistBox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function rangetype(obj){
+    var type = $(obj).find('input').val();
+    if(type=='1'){
+    	$(".cateBox").addClass('hidden');
+    }else{
+    	$(".cateBox").removeClass('hidden');
+    }
+}
+
+</script>

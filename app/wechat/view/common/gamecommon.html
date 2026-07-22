@@ -1,0 +1,79 @@
+<div class="appstartdjs zam-app-flex-ajCenter2 hidden">
+	<div class="appstartdjsBox zam-app-flex-ajCenter2">
+		<span class="startdjsani">0</span>
+	</div>
+</div>
+{include file="common/gamerule" /}
+<style type="text/css">
+.myrank-userscore .myrank-score,.myrank-userscore .myrank-num{width: 3rem;}
+.myrank-userscore .myrank-score .myscore-title,.myrank-userscore .myrank-num .myrank-title{font-size: 0.26rem}
+.myrank-userscore .myrank-score div{line-height: 0.6rem}
+.myrank-userscore .myrank-score .myscore-num{font-size: 0.42rem}
+.myrank-userscore .myrank-num .myrank-title{line-height: 0.6rem}
+.myrank-userscore .myrank-num .myrank-geren{line-height: 0.6rem;font-size: 0.42rem}
+.myrank-userscore .myrank-num .myrank-team{line-height: 0.3rem;font-size: 0.24rem}
+.myrank-userscore .myrank-num .myrank-team span{margin-left: 0.1rem}
+.myrank-userscore .myrank-line span{width: 1px;height:0.6rem;background-color: #118fac}
+</style>
+<script id="phb-tpl" type="text/html">
+<div class="rankInfo zam-app-flex-ajCenter2">
+<div class="rankInfoBox">
+	<div class="rankTitle"></div>
+	<div class="rankCont">
+		<%# if(d.myrank){ %>
+		<div class="myrank zam-app-flex-ajCenter">
+			<div class="myrank-userinfo zam-app-flex-ajCenter hidden">
+				<img src="{$wxuser['avatar']}" />
+				<div class="myrank-myname limitbox">{$wxuser['nickname']}</div>
+			</div>
+			<div class="myrank-userscore zam-app-flex">
+				<div class="myrank-score zam-app-flex-ajCenter">
+					<div class="myscore-title">本轮成绩</div>
+					<div class="myscore-num"><% d.myrank.score %></div>
+				</div>
+				<div class="myrank-line zam-app-flex-ajCenter"><span></span></div>
+				<div class="myrank-num zam-app-flex-ajCenter">
+					<div class="myrank-title">本轮排名</div>
+					<div class="myrank-pm">
+						<%# if(d.myrank.isteam=='2'){ %>
+							<div class="myrank-geren"><%# if(d.myrank.rank=='暂无排名'){ %>暂无排名<%# }else{ %>NO.<% d.myrank.rank %><%# } %></div>
+						<%# }else{ %>
+							<div class="myrank-team">团队:<span><%# if(d.myrank.teamrank=='暂无排名'){ %>暂无排名<%# }else{ %>NO.<% d.myrank.teamrank %><%# } %></span></div>
+							<div class="myrank-team">个人:<span><%# if(d.myrank.teammyrank=='暂无排名'){ %>暂无排名<%# }else{ %>NO.<% d.myrank.teammyrank %><%# } %></span></div>
+						<%# } %>
+					</div>
+				</div>
+			</div>
+		</div>
+		<%# } %>
+		<div class="rankList">
+			<table cellspacing="0" cellpadding="0">
+				<thead>
+				<tr>
+					<th>排名</th>
+					<th><%# if(d.myrank.isteam=='2'){ %>用户<%# }else{ %>团队<%# } %></th>
+					<th>成绩</th>
+				</tr>
+				</thead>
+				<tbody>
+				<%#  $.each(d.list, function(index, item){ %>
+					<tr>
+						<td><div class="rankNum"><% index+1 %></div></td>
+						<td><div class="zam-app-flex zam-app-alignCenter"><img class="headImg" src="<% item.avatar %>"><div class="playerName limitbox"><% item.nickname %></div></div></td>
+						<td>{if !empty($appconfig) && isset($appconfig['gametype']) && $appconfig['gametype']=='answerbs'}答对:<% item.ddnum %>题，耗时:<% (item.ys / 1000).toFixed(3) %>秒{elseif !empty($appconfig) && isset($appconfig['gametype']) && $appconfig['gametype']=='puzzle' /}分数:<% item.ddnum %>，耗时:<% (item.ys / 1000).toFixed(3) %>秒{elseif !empty($appconfig) && isset($appconfig['gametype']) && $appconfig['gametype']=='shuqian'}<div class="voteNum"><% item.score * d.powernum %>元</div>{else}<div class="voteNum"><% item.score %>万</div>{/if}</td>
+					</tr>
+				<%# }) %>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<div class="rank-close" onclick="javascript:$('.rankInfo').remove();"></div>
+</div>
+</div>
+</script>
+<script id="payrotate-tpl" type="text/html">
+	<div class="app-paytitle">获取游戏参与资格</div>
+	<div class="app-paymoney"><i>￥</i> <span><% d.fee %></span></div>
+	<a href="javascript:;" class="btn btn-primary btn-payrotate">确认支付</a>
+</script>
+{include file="common/gameteam" /}

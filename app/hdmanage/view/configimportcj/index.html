@@ -1,0 +1,209 @@
+{include file='$Wpath/common/header'}
+<style type="text/css">.fieldlists tr td{text-align:center!important;}.lyear-checkbox span::before{border-color:gray;}</style>
+<form id="formBox" class="zam-formvalidation form-horizontal" method="post">
+    <div class="config-titlebox">
+        <span class="config-titlename">大屏设置</span>
+        <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#screenconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+    </div>
+    <div id="screenconfigbox" class="collapse in">
+        {include file="$Wpath/common/configscreencommon" /}
+        {include file="$Wpath/common/configscreenmusic" /}
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 数据结构</label>
+            <div class="col-lg-10">
+                 <table class="table table-bordered">
+                     <thead>
+                         <tr>
+                             <th style="width:15%;text-align:center;">数据名称</th>
+                             <th style="width:15%;text-align:center;">数据颜色</th>
+                             <th style="width:60%;text-align:center;">数据隐私</th>
+                             <th style="width:10%;text-align:center;">操作</th>
+                         </tr>
+                     </thead>
+                     <tbody class="fieldlists">
+                        {foreach $config['fieldconfig'] as $field}
+                         <tr>
+                             <td>
+                                 <input class="form-control" type="text" name="fieldname[]" value="{$field['fieldname']}">
+                             </td>
+                             <td>
+                                <div class="zam-flex-center">
+                                    {:tpl_color('fieldcolor[]',$field['fieldcolor'])}
+                                </div>
+                             </td>
+                             <td>
+                                <div class="zam-flex-center">
+                                    <label class="lyear-switch switch-primary normal-swith switch-solid" style="height:38px">
+                                        <input type="checkbox" {if $field['fieldsecret']=='1'}checked{/if}>
+                                        <input type="hidden" name="fieldsecret[]" value="{$field['fieldsecret']}">
+                                        <span data-status="{$field['fieldsecret']}" data-func="openfieldsecret" class="normal-span has-func" data-ajax=""></span>
+                                    </label>
+                                </div>
+                                <div class="input-group m-t-10 fieldsecretbox{if $field['fieldsecret']!='1'} hidden{/if}">
+                                    <div class="input-group-btn not-allow"><a class="btn btn-default">左侧保留</a></div>
+                                    <div class="touchspin">
+                                    <input type="text" class="form-control numberincdec" name="lefthand[]" 
+                                    data-bts-min="0" data-bts-replacement-val="0"
+                                    data-bts-max="999"
+                                    data-bts-step="1"
+                                    data-bts-postfix="个字符"
+                                    data-bts-postfix-extra-class="touchspin-postfix"
+                                    value="{$field['lefthand']}">
+                                    </div>
+                                    <div class="input-group-btn not-allow"><a class="btn btn-default">右侧保留</a></div>
+                                    <div class="touchspin">
+                                    <input type="text" class="form-control numberincdec" name="righthand[]" 
+                                    data-bts-min="0" data-bts-replacement-val="0"
+                                    data-bts-max="999"
+                                    data-bts-step="1"
+                                    data-bts-postfix="个字符"
+                                    data-bts-postfix-extra-class="touchspin-postfix"
+                                    value="{$field['righthand']}">
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                 <a href="javascript:;" class="btn btn-danger btn-xs btn-delone">删除</a>
+                             </td>
+                         </tr>
+                         {/foreach}
+                     </tbody>
+                     <tfoot>
+                         <tr>
+                             <td colspan="4">
+                                <a href="javascript:;" class="btn btn-primary btn-xs btn-addone"><i class="mdi mdi-plus"></i>新增</a>
+                                <div class="help-block">此处设置决定了后台导入数据以及大屏幕展示的数据种类，您需要几种数据就增加几种，最多可支持4种</div>
+                                <div class="help-block">新增或者修改后需点击底部保存按钮</div>
+                             </td>
+                         </tr>
+                     </tfoot>
+                 </table>
+                 
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 中奖数据列表是否自动滚动</label>
+            <div class="col-lg-8">
+                {:tpl_switch('autoscroll',$config['autoscroll']??'2')}
+                 <span class="help-block">注：仅中奖名单总高度超过外框总高度才可以自动滚动，如果您想停止自动滚动，将鼠标移动到某个中奖名单上将自动停止滚动，移开后将会自动重新开始滚动</span>
+            </div>
+        </div>
+        <div class="form-group">
+			<label class="col-lg-2 control-label">抽奖进行中背景音效</label>
+			<div class="col-lg-8">
+				{:tpl_audio('iscjingmusic',$config['iscjingmusic'])}
+				<span class="help-block">尽量控制在200KB内</span>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-lg-2 control-label">中奖弹窗时背景音效</label>
+			<div class="col-lg-8">
+				{:tpl_audio('iscjendmusic',$config['iscjendmusic'])}
+				<span class="help-block">尽量控制在200KB内</span>
+			</div>
+		</div>
+    </div>
+    {include file='$Wpath/common/importcjstyle'}
+    {include file='$Wpath/common/configsavepanel'}
+</form>
+{if dzroundcj() && isset($config['id']) && !empty($config['id'])}
+{include file='$Wpath/common/configroundcj'}
+{/if}
+<script>
+require(['webcore','jconfirmBox','zamnotice','layerBox','zvalidator'],function(webcore,jconfirmBox,zamnotice,layerBox){
+    $('#formBox').formValidation({
+        framework: 'bootstrap',
+        excluded: [':disabled'],
+        message: '您填写的内容无效',
+        fields: {
+            apptitle:{
+                message: '请输入网页标题',
+                validators: {
+                    notEmpty: {
+                        message: '请输入网页标题'
+                    },
+                }
+            },
+        }
+    }).on('success.form.fv', function(e) {
+        e.preventDefault();
+        var $form = $(e.target);
+        var postData = webcore.serializeObject($form);
+        var bload = $form.find(".zam-fixedbottom button").lyearloading({opacity: 0.2,spinnerSize: 'nm'});
+        $form.formValidation('disableSubmitButtons', true);
+        webcore.ajaxSubmit("{:gohdmanage('configimportcj/index',['hdid'=>$hdid])}",postData).then(function(json){
+            bload.hide();
+            if(json.code==0){
+                $form.formValidation('disableSubmitButtons', false);
+                zamnotice.showTips('success','操作成功',2e3,function(){
+                    window.location.reload();
+                });
+            }else{
+                zamnotice.showTips('error',json.msg);
+                $form.formValidation('disableSubmitButtons', false);
+            }
+        }, function(json){
+            bload.hide();
+            zamnotice.showTips('error','网络差。操作失败');
+            $form.formValidation('disableSubmitButtons', false);
+        });
+    });
+    $(".btn-addone").click(function(){
+        if($(".fieldlists tr").length > 3){
+            return zamnotice.showTips('error','最多只可加4种数据');
+        }
+        $(".fieldlists").append(webcore.tpl($("#fieldone-tpl"),{}));
+        tpl_colorpicker();
+        tpl_switch();
+    });
+    $(".fieldlists").on('click','.btn-delone',function(){
+        $(this).parent().parent().remove();
+    });
+});
+function openfieldsecret(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        obj.parent().parent().next().addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        obj.parent().parent().next().removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+</script>
+<script id='fieldone-tpl' type="text/template">
+    <tr>
+     <td>
+         <input class="form-control" type="text" name="fieldname[]" value="">
+     </td>
+     <td>
+        <div class="zam-flex-center">
+            <input type="hidden" class="js-colorpicker" name="fieldcolor[]" value="#000" style="display: none;">
+     </td>
+     <td>
+        <div class="zam-flex-center">
+            <label class="lyear-switch switch-primary normal-swith switch-solid" style="height:38px">
+                <input type="checkbox">
+                <input type="hidden" name="fieldsecret[]" value="2">
+                <span data-status="2" data-func="openfieldsecret" class="normal-span has-func" data-ajax=""></span>
+            </label>
+        </div>
+        <div class="input-group m-t-10 fieldsecretbox hidden">
+            <div class="input-group-btn not-allow"><a class="btn btn-default">左侧保留</a></div>
+            <div class="touchspin">
+            <div class="input-group  bootstrap-touchspin bootstrap-touchspin-injected"><input type="text" class="form-control numberincdec" name="lefthand[]" data-bts-min="0" data-bts-replacement-val="0" data-bts-max="999" data-bts-step="1" value="3"><span class="input-group-btn-vertical"><button class="btn btn-primary bootstrap-touchspin-up " type="button"><i class="mdi mdi-chevron-up"></i></button><button class="btn btn-primary bootstrap-touchspin-down " type="button"><i class="mdi mdi-chevron-down"></i></button></span></div>
+            </div>
+            <div class="input-group-btn not-allow"><a class="btn btn-default">位，右侧保留</a></div>
+            <div class="touchspin">
+            <div class="input-group  bootstrap-touchspin bootstrap-touchspin-injected"><input type="text" class="form-control numberincdec" name="righthand[]" data-bts-min="0" data-bts-replacement-val="0" data-bts-max="999" data-bts-step="1" value="4"><span class="input-group-btn-vertical"><button class="btn btn-primary bootstrap-touchspin-up " type="button"><i class="mdi mdi-chevron-up"></i></button><button class="btn btn-primary bootstrap-touchspin-down " type="button"><i class="mdi mdi-chevron-down"></i></button></span></div>
+            </div>
+        </div>
+    </td>
+    <td>
+         <a href="javascript:;" class="btn btn-danger btn-xs btn-delone">删除</a>
+     </td>
+ </tr>
+</script>
+{include file='$Wpath/common/footer'}

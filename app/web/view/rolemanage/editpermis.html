@@ -1,0 +1,40 @@
+<ul id="permisTree" class="ztree"></ul>
+<script>
+require(['jztree'],function(){
+    var setting = {
+      view: {
+          addHoverDom: false,
+          removeHoverDom: false,
+          selectedMulti: false
+      },
+      check: {
+          enable: true
+      },
+      data: {
+        simpleData: {
+          enable: true,
+          idKey: "id",
+          pIdKey: "fid",
+        },
+        key: {
+          name: "permis_name"
+        }
+      },
+      edit: {
+          enable: false
+      }
+  };
+  var zNodes = {:$permissions};
+  var $mypermission = {:$mypermission};
+  $(document).ready(function(){
+       var zTree = $.fn.zTree.init($("#permisTree"), setting, zNodes);
+       zTree.expandAll(true);
+       $.each($mypermission,function(i,v){
+          var node = zTree.getNodeByParam("id", v);
+      		if(node != null) {
+      			zTree.checkNode(node, true)
+      		} 
+       });
+  });
+});
+</script>

@@ -1,0 +1,593 @@
+<style>
+table tr td{text-align:center!important}
+.confirmbox-pop .zam-titleBox{font-weight: 600;padding:5px 0;}
+.userimgbox img{height:40px!important;}
+.edui-default .edui-toolbar .edui-for-fullscreen {
+    display: none!important
+}
+#edui_fixedlayer{z-index: 9999!important}
+</style>
+<div class="form-horizontal confirmbox-pop rotate-pop">
+<form class="confirm-formbox" method="post">
+    <div class="text-center">
+        <div class="btn-group pop-btns" style="margin-bottom:10px;">
+          <a href="javascript:void(0)" class="btn btn-default btn-primary"><span>基础设置</span></a>
+          <a href="javascript:void(0)" class="btn btn-default"><span>商品管理</span></a>
+        </div>
+    </div>
+    <div class="carditem">
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 轮次名</label>
+            <div class="col-lg-8">
+                <input class="form-control" type="text"  name="title" value="{$rotate['title']}">
+            </div>
+        </div>
+		<div class="form-group">
+		    <label class="col-lg-3 control-label">* 审核</label>
+		    <div class="col-lg-8">
+		        {:tpl_switch('shstatus',$rotate['shstatus']??'2')}
+		        <span class="help-block m-t-0">开启后订单需审核通过后大屏幕才可以展示</span>
+		    </div>
+		</div>
+		<div class="form-group">
+            <label class="col-lg-3 control-label">* 商品价格单位</label>
+            <div class="col-lg-8">
+                <input class="form-control" type="text"  name="priceunit" value="{$rotate['priceunit']??'元'}" maxlength="6">
+                <span class="help-block">此项将控制所有商品的价格单位，例如元，万，亿等，默认是元</span>
+            </div>
+        </div>
+        <div class="form-group goodsweightbox hidden">
+            <label class="col-lg-3 control-label">* 商品重量单位</label>
+            <div class="col-lg-8">
+                <input class="form-control" type="text"  name="weightunit" value="{$rotate['weightunit']??'吨'}" maxlength="6">
+                <span class="help-block">此项将控制所有商品的重量单位，例如克，千克，吨等，默认是吨</span>
+            </div>
+        </div>
+		<div class="form-group">
+            <label class="col-lg-3 control-label">* 单个用户下单次数</label>
+			<div class="col-lg-6">
+				<input type="text" class="form-control numberincdec" name="onemaxtimes" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="10000"
+                data-bts-step="1"
+                data-bts-postfix="次"
+	            data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$rotate['onemaxtimes']??'1'}">
+                <div class="help-block m-t-0">此项用于控制每个用户本轮下单总次数，0为不限制</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-lg-3 control-label">* 商品展示模式</label>
+			<div class="col-lg-8">
+				<label class="lyear-radio radio-inline radio-primary">
+					<input type="radio" name="goodsshowmode" value="1" {if !isset($rotate['goodsshowmode']) || $rotate['goodsshowmode']=='1'}checked{/if}><span>默认模式</span>
+				</label>
+				<label class="lyear-radio radio-inline radio-primary">
+					<input type="radio" name="goodsshowmode" value="2" {if isset($rotate['goodsshowmode']) && $rotate['goodsshowmode']=='2'}checked{/if}><span>排行模式</span>
+				</label>
+				<div class="help-block">注意:排行模式排行规则与下面的柱形图高度标准一致，可在大屏点击商品列表右上角的文字切换展示模式</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-lg-3 control-label">* 柱形图高度标准</label>
+			<div class="col-lg-8">
+				<label class="lyear-radio radio-inline radio-primary">
+                    <input type="radio" name="percenttype" value="1" {if $rotate['percenttype']=='1'}checked{/if}><span>以最大下单数量为标准</span>
+                </label>
+                <label class="lyear-radio radio-inline radio-primary">
+                    <input type="radio" name="percenttype" value="2" {if $rotate['percenttype']=='2'}checked{/if}><span>以最大下单金额为标准</span>
+                </label>
+                <div class="help-block m-t-0">
+                	<div class="help-block m-b-0">最大下单数量标准：即为所有商品中买的数量最多的商品作为标准</div>
+                	<div class="help-block m-b-0">最大下单金额标准：即为所有商品中买的金额最多的商品作为标准</div>
+                </div>
+			</div>
+		</div>
+		<div class="form-group">
+		    <label class="col-lg-3 control-label">* 达标弹层</label>
+		    <div class="col-lg-8">
+		        {:tpl_switch('reachconfig[open]',$rotate['reachconfig']['open']??'2','openreach')}
+		        <span class="help-block m-t-0">开启并设置规则后某一商品订货总额或者订货总量达标大屏幕会有弹窗提示</span>
+		    </div>
+		</div>
+		<div class="reachrulebox{if !isset($rotate['reachconfig']['open']) || $rotate['reachconfig']['open']=='2'} hidden{/if}">
+			<div class="form-group">
+				<label class="col-lg-3 control-label">* 标准</label>
+				<div class="col-lg-8">
+					<label class="lyear-radio radio-inline radio-primary">
+	                    <input type="radio" name="reachconfig[mode]" value="1" {if !isset($rotate['reachconfig']['mode']) || $rotate['reachconfig']['mode']=='1'}checked{/if}><span>商品订购总量</span>
+	                </label>
+	                <label class="lyear-radio radio-inline radio-primary">
+	                    <input type="radio" name="reachconfig[mode]" value="2" {if isset($rotate['reachconfig']['mode']) && $rotate['reachconfig']['mode']=='2'}checked{/if}><span>商品订购总额</span>
+	                </label>
+	                <div class="help-block">注意:具体的达标量需在添加商品内设置</div>
+				</div>
+			</div>
+			<div class="form-group hidden">
+			    <label class="col-lg-3 control-label">* 达标量</label>
+			    <div class="col-lg-8">
+			        <input type="text" class="form-control numberincdec" name="reachconfig[max]" 
+			        data-bts-min="1" data-bts-replacement-val="1"
+			        data-bts-max="null"
+			        data-bts-step="1"
+			        value="{$rotate['reachconfig']['max']??'1000'}">
+			        <div class="help-block">当某个商品的{if !isset($rotate['reachconfig']['mode']) || $rotate['reachconfig']['mode']=='1'}订购总量{else /}订购总额{/if}达到此值后会弹窗一次，注意每个商品仅播放一次，测试时可通过清理浏览器缓存达到再次播放的效果</div>
+			    </div>
+			</div>
+			<div class="form-group hidden">
+			    <label class="col-lg-3 control-label">* 弹窗话术</label>
+			    <div class="col-lg-8">
+			        <input type="text" class="form-control"  name="reachconfig[txt]" value="{$rotate['reachconfig']['txt']??'恭喜【商品图】【商品名】完成订购目标'}" placeholder="">
+			        <span class="help-block m-b-0">【商品名】代表达标的商品名称，【商品图】代表达标的商品图，【商品量】代表达标商品当前总量或者总额</span>
+			    </div>
+			</div>
+			<div class="form-group">
+		        <label class="col-lg-3 control-label text-right">* 弹窗文字设置</label>
+		        <div class="col-lg-5">
+		            <div class="input-group">
+		                <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+		                {:tpl_color('reachconfig[color]',$rotate['reachconfig']['color']??'#fff')}
+		                <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
+		                <div class="touchspin">
+		                <input type="text" class="form-control numberincdec" name="reachconfig[size]" 
+		                    data-bts-min="1" data-bts-replacement-val="1"
+		                    data-bts-max="100"
+		                    data-bts-step="1"
+		                    value="{$rotate['reachconfig']['size']??42}">
+		                </div>
+		            </div>
+		            <div class="help-block">注:弹窗达标话术请到商品内设置</div>
+		        </div>
+		    </div>
+		    <div class="form-group">
+		        <label class="col-lg-3 control-label text-right">* 弹窗背景色</label>
+		        <div class="col-lg-5">
+		            {:tpl_color('reachconfig[bgcolor]',$rotate['reachconfig']['bgcolor']??'rgba(0,0,0,0.6)')}
+		        </div>
+		    </div>
+			<div class="form-group">
+			    <label class="col-lg-3 control-label">* 弹窗时长(秒)</label>
+			    <div class="col-lg-8">
+			        <input type="text" class="form-control numberincdec" name="reachconfig[seconds]" 
+			        data-bts-min="1" data-bts-replacement-val="1"
+			        data-bts-max="null"
+			        data-bts-step="1"
+			        value="{$rotate['reachconfig']['seconds']??'6'}">
+			        <div class="help-block">最低是1秒</div>
+			    </div>
+			</div>
+		</div>
+	</div>
+    <div class="carditem hidden">
+        <div class="form-group col-lg-12" style="margin-right: 0;margin-left: 0">
+        	<table class="we7-table table table-bordered" style="margin-bottom:0px;">
+				<thead>
+				  <tr>
+					<th style="width:15%;text-align:center;">商品</th>
+					<th style="width:15%;text-align:center;">商品介绍</th>
+					<th style="width:10%;text-align:center;">单位</th>
+					<th style="width:10%;text-align:center;">起订量</th>
+					<th style="width:10%;text-align:center;">最小增量</th>
+					<th style="width:10%;text-align:center;">目标量</th>
+					<th style="width:10%;text-align:center;">阶梯递减</th>
+					<th style="width:20%;text-align:center;">操作</th>
+				  </tr>
+				</thead>
+				<tbody class="prize-list">
+					{volist name="rotate.goods" id="item"}
+						<tr>
+							<td>
+							   <input type="hidden" name="goodsid[]" value="{$item['id']}">
+					           <div>
+					            <div class="userimgbox"><img src="{:tomedia($item['goodsimg']);}"></div>
+					            <div>{$item['goodsname']}</div>
+					            <div>{$item['goodsprice']}{$rotate['priceunit']??'元'}</div>
+					           </div>
+					           <input type="hidden" name="goodsname[]" value="{$item['goodsname']}">
+					           <input type="hidden" name="goodsimg[]" value="{$item['goodsimg']}">
+					           <input type="hidden" name="goodsprice[]" value="{$item['goodsprice']}">
+					           <input type="hidden" name="goodsweight[]" value="{$item['goodsweight']}">
+					        </td>
+							<td>
+							  <input type="hidden" name="goodsdes[]" value="{$item['goodsdes']}">
+							  <p style="max-height: 40px;overflow: hidden auto;">{$item['goodsdes']}</p>
+							</td>
+							<td>
+							  <input type="hidden" name="goodsunit[]" value="{$item['goodsunit']}">
+							  <span>{$item['goodsunit']}</span>
+							</td>
+							<td>
+							  <input type="hidden" name="inputmin[]" value="{$item['inputmin']}">
+							  <input type="hidden" name="inputmax[]" value="{$item['inputmax']}">
+							  <input type="hidden" name="maxnum[]" value="{$item['maxnum']}">
+	  						  <input type="hidden" name="multiplenum[]" value="{$item['multiplenum']}">
+							  <span>{$item['inputmin']}</span>
+							</td>
+							
+							<td>
+							  <input type="hidden" name="inputadd[]" value="{$item['inputadd']}">
+							  <span>{$item['inputadd']}</span>
+							</td>
+							<td>
+							  <input type="hidden" name="dabiaonum[]" value="{$item['dabiaonum']??1000}">
+							  <input type="hidden" name="dabiaotxt[]" value="{$item['dabiaotxt']??'恭喜【商品名】完成订购目标'}">
+							  <span>{$item['dabiaonum']??1000}</span>
+							  {if isset($item['dabiaotxt']) && !empty($item['dabiaotxt'])}
+							  <div class="text-center" style="font-size:12px">达标话术：<span class="text-danger">{$item['dabiaotxt']}</span></div>
+							  {/if}
+							</td>
+							<td>
+							  <span class="label label-{if $item['isladder']=='1'}primary{else /}default{/if}">{if $item['isladder']=='1'}是{else /}否{/if}</span>
+							  <input type="hidden" name="isladder[]" value="{$item['isladder']}">
+							  <input type="hidden" name="ladderrules[]" value={if !empty($item['ladderrules'])}{:json_encode($item['ladderrules'])}{else /}0{/if}>
+							  <input type="hidden" name="isgiftquantity[]" value="{$item['isgiftquantity']??'2'}">
+							  <input type="hidden" name="giftquantityrules[]" value={if !empty($item['giftquantityrules'])}{:json_encode($item['giftquantityrules'])}{else /}0{/if}>
+							 <!--2025 11 17新增 方便处理--> 
+							  <input type="hidden" name="cateids[]" value="0" >
+							</td>
+							<td>
+							  <a href="javascript:;" data-goodsid="{$item['id']}" class="btn btn-primary btn-xs btn-editgoods">
+								  <i class="mdi mdi-pencil"></i>
+							  </a>
+							  <a href="javascript:;" data-goodsid="{$item['id']}" class="btn btn-danger btn-xs btn-delgoods">
+								  <i class="mdi mdi-close"></i>
+							  </a>
+							  <a href="javascript:;"  class="btn btn-default btn-sm mousemove zam-sortable" title="拖动排序"><i class="mdi mdi-arrow-all"></i></a>
+							</td>
+						</tr>
+					{/volist}
+				</tbody>
+				<tfoot style="border: 1px solid #efefef;">
+				  <tr>
+					<td colspan="8">
+					  <div class="m-b-10">
+					  	<a  class="btn btn-primary btn-sm addprizeitem" href="javascript:;"> <i class="mdi mdi-plus"></i>&nbsp;<span>新增商品</span></a>
+					  </div>
+					</td>
+				  </tr>
+				</tfoot>
+			</table>
+        </div>
+    </div>
+</form>
+</div> 
+<script id='onegoods-tpl' type="text/template">
+<tr>
+	<td>
+	   <input type="hidden" name="goodsid[]" value="<% d.id %>">
+       <div>
+        <div class="userimgbox"><img src="<% d.prevgoodsimg %>"></div>
+        <div><% d.goodsname %></div>
+        <div><% d.goodsprice %>{$rotate['priceunit']??'元'}</div>
+       </div>
+       <input type="hidden" name="goodsname[]" value="<% d.goodsname %>">
+       <input type="hidden" name="goodsimg[]" value="<% d.goodsimg %>">
+       <input type="hidden" name="goodsprice[]" value="<% d.goodsprice %>">
+       <input type="hidden" name="goodsweight[]" value="<% d.goodsweight %>">
+    </td>
+	<td>
+	  <input type="hidden" name="goodsdes[]" value="<% d.goodsdes %>">
+	  <p><% d.goodsdes %></p>
+	</td>
+	<td>
+	  <input type="hidden" name="goodsunit[]" value="<% d.goodsunit %>">
+	  <span><% d.goodsunit %></span>
+	</td>
+	<td>
+	  <input type="hidden" name="inputmin[]" value="<% d.inputmin %>">
+	  <input type="hidden" name="inputmax[]" value="<% d.inputmax %>">
+	  <input type="hidden" name="maxnum[]" value="<% d.maxnum %>">
+	  <input type="hidden" name="multiplenum[]" value="<% d.multiplenum %>">
+	  <span><% d.inputmin %></span>
+	  
+	</td>
+	<td>
+	  <input type="hidden" name="inputadd[]" value="<% d.inputadd %>">
+	  <span><% d.inputadd %></span>
+	</td>
+	<td>
+	  <input type="hidden" name="dabiaonum[]" value="<% d.dabiaonum %>">
+	  <input type="hidden" name="dabiaotxt[]" value="<% d.dabiaotxt %>">
+	  <span><% d.dabiaonum %></span>
+	  <%# if(d.dabiaotxt!=''){ %>
+		<div class="text-center" style="font-size:12px">达标话术：<span class="text-danger"><% d.dabiaotxt %></span></div>
+	  <%# } %>
+	</td>
+	<td>
+	  <span class="label label-<%# if(d.isladder=='1'){ %>primary<%# }else{ %>default<%# } %>"><%# if(d.isladder=='1'){ %>是<%# }else{ %>否<%# } %></span>
+	  <input type="hidden" name="isladder[]" value=<% d.isladder %> >
+	  <input type="hidden" name="ladderrules[]" value=<% d.ladderrules %> >
+	  <input type="hidden" name="isgiftquantity[]" value=<% d.isgiftquantity %> >
+	  <input type="hidden" name="giftquantityrules[]" value=<% d.giftquantityrules %> >
+	  <input type="hidden" name="cateids[]" value=<% d.cateids %> >
+	</td>
+	<td>
+	  <a href="javascript:;" data-goodsid="<% d.id %>" class="btn btn-primary btn-xs btn-editgoods">
+		  <i class="mdi mdi-pencil"></i>
+	  </a>
+	  <a href="javascript:;" data-goodsid="<% d.id %>" class="btn btn-danger btn-xs btn-delgoods">
+		  <i class="mdi mdi-close"></i>
+	  </a>
+	  <a href="javascript:;"  class="btn btn-default btn-sm mousemove zam-sortable" title="拖动排序"><i class="mdi mdi-arrow-all"></i></a>
+	</td>
+</tr>
+</script>        
+<script>    
+require(['webcore','jconfirmBox','zamnotice','layerBox',"ueditor","bootstrap-touchspin","jquery.ui"],function(webcore,jconfirmBox,zamnotice,layerBox,UE){
+	tpl_switch();
+	$('.prize-list').sortable({handle: ".mousemove"}).disableSelection();
+    $(".prize-list").disableSelection();
+    $(".rotate-pop .pop-btns a.btn").click(function(){
+        $(this).addClass('btn-primary').siblings().removeClass("btn-primary");
+        $(".rotate-pop .carditem").addClass('hidden').eq($(this).index()).removeClass('hidden');
+    });
+    $(".confirmbox-pop .numberincdec").TouchSpin().on("change", function(){
+        var $this = $(this),funcstr = $this.data('func');
+        var func = window[funcstr];
+        func && func();
+    });
+    if($("#edui_fixedlayer").length > 0) UE.getEditor('ruledes').destroy();
+    $(function(){
+      $(".sp-container").remove();
+      $(".js-colorpicker").each(function(){
+            tpl_colorpicker(this);
+      });
+      tpl_ueditor(); 
+    })
+    var rotateid = "{if isset($rotate['id'])}{$rotate['id']}{else}{/if}";
+	$(".addprizeitem").on('click',function(){
+		var confirmObj = jconfirmBox.ajaxconfirm("新增商品","{:gohdmanage('configdhh/editgoods',['hdid'=>$hdid])}",{rotateid:rotateid},'html','col-lg-10 col-lg-offset-1',function(e){
+			var goodsarr = webcore.serializeObject(e.find('form'));
+			goodsarr.prevgoodsimg = e.find('img').attr("src");
+			goodsarr.id = '';
+			if(goodsarr.goodsname=='') {
+				zamnotice.showTips('error','商品名必须设置');
+				return false;
+			}
+			if(goodsarr.goodsdes==''){
+				zamnotice.showTips('error','商品介绍必须设置');
+				return false;
+			}
+			if(goodsarr.goodsimg==''){
+				zamnotice.showTips('error','商品图必须设置');
+				return false;
+			}
+			if(goodsarr.goodsunit==''){
+				zamnotice.showTips('error','商品单位必须设置');
+				return false;
+			}
+			if(goodsarr.goodsprice==''){
+				zamnotice.showTips('error','商品单价必须设置');
+				return false;
+			}
+			goodsarr.ladderrules = '0';
+			if(goodsarr.isladder=='1'){
+				if(!goodsarr.hasOwnProperty('ladderrules[num][]')){
+					zamnotice.showTips('error','开启价格递减必须添加递减规则');
+					return false;
+				}
+			}
+			if(goodsarr.hasOwnProperty('ladderrules[num][]')){
+				var ladderrulenums = goodsarr['ladderrules[num][]'],ladderruleprices = goodsarr['ladderrules[price][]'],ladderrules = [];
+				if(!$.isArray(ladderrulenums)){
+					ladderrulenums = [ladderrulenums];
+					ladderruleprices = [ladderruleprices];
+				}
+				$.each(ladderrulenums,function(i,v){
+					ladderrules.push({
+						'num':v,
+						'price':ladderruleprices[i],
+					});
+				});
+				goodsarr.ladderrules = JSON.stringify(ladderrules);
+			}
+			//赠送规则
+			goodsarr.giftquantityrules = '0';
+			if(goodsarr.isgiftquantity=='1'){
+				if(!goodsarr.hasOwnProperty('giftquantityrules[num][]')){
+					zamnotice.showTips('error','开启赠送必须添加赠送规则');
+					return false;
+				}
+			}
+			if(goodsarr.hasOwnProperty('giftquantityrules[num][]')){
+				var giftquantityrulenums = goodsarr['giftquantityrules[num][]'],giftquantityrulesends = goodsarr['giftquantityrules[send][]'],giftquantityrules = [];
+				if(!$.isArray(giftquantityrulenums)){
+					giftquantityrulenums = [giftquantityrulenums];
+					giftquantityrulesends = [giftquantityrulesends];
+				}
+				$.each(giftquantityrulenums,function(i,v){
+					giftquantityrules.push({
+						'num':v,
+						'send':giftquantityrulesends[i],
+					});
+				});
+				goodsarr.giftquantityrules = JSON.stringify(giftquantityrules);
+			}
+			if(rotateid!=''){
+				if(goodsarr.hasOwnProperty('ladderrules[num][]')){
+					delete goodsarr['ladderrules[num][]'];
+				}
+				if(goodsarr.hasOwnProperty('ladderrules[price][]')){
+					delete goodsarr['ladderrules[price][]'];
+				}
+				if(goodsarr.hasOwnProperty('giftquantityrules[num][]')){
+					delete goodsarr['giftquantityrules[num][]'];
+				}
+				if(goodsarr.hasOwnProperty('giftquantityrules[send][]')){
+					delete goodsarr['giftquantityrules[send][]'];
+				}
+				if(goodsarr.hasOwnProperty('id')){
+					delete goodsarr['id'];
+				}
+				webcore.ajaxSubmit("{:gohdmanage('configdhh/savegoods',['hdid'=>$hdid])}",{rotateid:rotateid,goodsarr:goodsarr}).then(function(json){
+					if(json.code==0){
+						confirmObj.close();
+						goodsarr.id = json.msg;
+						$(".prize-list").append(webcore.tpl($("#onegoods-tpl"),goodsarr));
+						zamnotice.showTips('success','新增成功');
+					}else{
+						zamnotice.showTips('error',json.msg);
+					}
+				}, function(json){
+					zamnotice.showTips('error','网络差。操作失败');
+				});
+			}else{
+				if(!goodsarr.cateids){
+					goodsarr.cateids = '0';
+				}
+				$(".prize-list").append(webcore.tpl($("#onegoods-tpl"),goodsarr));
+				confirmObj.close();
+			}
+		},false,true,[{'hidden':false,'txt':'确定新增'},{'hidden':false,'txt':'取消'}],true,function(){
+			tpl_switch();
+		});
+	});
+	$(".prize-list").on('click','.btn-editgoods',function(){
+		var $this = $(this),fdom = $this.parent().parent();
+		var goodsid = $this.attr('data-goodsid')||'';
+		var editgoodsarr = {};
+		if(goodsid==''){
+			fdom.find("input").each(function(){
+				var $this = $(this),inputname = $this[0].name.replace("[]","");
+				editgoodsarr[inputname] = $this.val();
+			});
+		}
+		var confirmObj = jconfirmBox.ajaxconfirm("编辑商品","{:gohdmanage('configdhh/editgoods',['hdid'=>$hdid])}",{rotateid:rotateid,goodsid:goodsid,editgoodsarr:editgoodsarr},'html','col-lg-10 col-lg-offset-1',function(e){
+			var goodsarr = webcore.serializeObject(e.find('form'));
+			goodsarr.prevgoodsimg = e.find('img').attr("src");
+			if(goodsarr.goodsname=='') {
+				zamnotice.showTips('error','商品名必须设置');
+				return false;
+			}
+			if(goodsarr.goodsdes==''){
+				zamnotice.showTips('error','商品介绍必须设置');
+				return false;
+			}
+			if(goodsarr.goodsimg==''){
+				zamnotice.showTips('error','商品图必须设置');
+				return false;
+			}
+			if(goodsarr.goodsunit==''){
+				zamnotice.showTips('error','商品单位必须设置');
+				return false;
+			}
+			if(goodsarr.goodsprice==''){
+				zamnotice.showTips('error','商品单价必须设置');
+				return false;
+			}
+			goodsarr.ladderrules = '0';
+			if(goodsarr.isladder=='1'){
+				if(!goodsarr.hasOwnProperty('ladderrules[num][]')){
+					zamnotice.showTips('error','开启价格递减必须添加递减规则');
+					return false;
+				}
+			}
+			if(goodsarr.hasOwnProperty('ladderrules[num][]')){
+				var ladderrulenums = goodsarr['ladderrules[num][]'],ladderruleprices = goodsarr['ladderrules[price][]'],ladderrules = [];
+				if(!$.isArray(ladderrulenums)){
+					ladderrulenums = [ladderrulenums];
+					ladderruleprices = [ladderruleprices];
+				}
+				$.each(ladderrulenums,function(i,v){
+					ladderrules.push({
+						'num':v,
+						'price':ladderruleprices[i],
+					});
+				});
+				goodsarr.ladderrules = JSON.stringify(ladderrules);
+			}
+			//赠送规则
+			goodsarr.giftquantityrules = '0';
+			if(goodsarr.isgiftquantity=='1'){
+				if(!goodsarr.hasOwnProperty('giftquantityrules[num][]')){
+					zamnotice.showTips('error','开启赠送必须添加赠送规则');
+					return false;
+				}
+			}
+			if(goodsarr.hasOwnProperty('giftquantityrules[num][]')){
+				var giftquantityrulenums = goodsarr['giftquantityrules[num][]'],giftquantityrulesends = goodsarr['giftquantityrules[send][]'],giftquantityrules = [];
+				if(!$.isArray(giftquantityrulenums)){
+					giftquantityrulenums = [giftquantityrulenums];
+					giftquantityrulesends = [giftquantityrulesends];
+				}
+				$.each(giftquantityrulenums,function(i,v){
+					giftquantityrules.push({
+						'num':v,
+						'send':giftquantityrulesends[i],
+					});
+				});
+				goodsarr.giftquantityrules = JSON.stringify(giftquantityrules);
+			}
+			if(goodsid!=''){
+				if(goodsarr.hasOwnProperty('ladderrules[num][]')){
+					delete goodsarr['ladderrules[num][]'];
+				}
+				if(goodsarr.hasOwnProperty('ladderrules[price][]')){
+					delete goodsarr['ladderrules[price][]'];
+				}
+				if(goodsarr.hasOwnProperty('giftquantityrules[num][]')){
+					delete goodsarr['giftquantityrules[num][]'];
+				}
+				if(goodsarr.hasOwnProperty('giftquantityrules[send][]')){
+					delete goodsarr['giftquantityrules[send][]'];
+				}
+				if(goodsarr.hasOwnProperty('id')){
+					delete goodsarr['id'];
+				}
+				webcore.ajaxSubmit("{:gohdmanage('configdhh/savegoods',['hdid'=>$hdid])}",{rotateid:rotateid,goodsid:goodsid,goodsarr:goodsarr}).then(function(json){
+					if(json.code==0){
+						confirmObj.close();
+						goodsarr.id = goodsid;
+						fdom.html($(webcore.tpl($("#onegoods-tpl"),goodsarr)).html());
+						zamnotice.showTips('success','编辑成功');
+					}else{
+						zamnotice.showTips('error',json.msg);
+					}
+				}, function(json){
+					zamnotice.showTips('error','网络差。操作失败');
+				});
+			}else{
+				if(!goodsarr.cateids){
+					goodsarr.cateids = '0';
+				}
+				fdom.html($(webcore.tpl($("#onegoods-tpl"),goodsarr)).html());
+				confirmObj.close();
+			}
+		},false,true,[{'hidden':false,'txt':'确定保存'},{'hidden':false,'txt':'取消'}],true,function(){
+				tpl_switch();
+		});
+	});
+	$(".prize-list").on('click','.btn-delgoods',function(){
+		var $this = $(this);
+		var goodsid = $this.attr('data-goodsid');
+		jconfirmBox.confirm('温馨提示','删除将无法恢复，您确定要删除么？',function(){
+				if(goodsid){
+					webcore.ajaxSubmit("{:gohdmanage('configdhh/delgoods',['hdid'=>$hdid])}",{rotateid:rotateid,goodsid:goodsid}).then(function(json){
+						if(json.code==0){
+							zamnotice.showTips('success','删除成功');
+							$this.parent().parent().remove();
+						}else{
+							zamnotice.showTips('error',json.msg);
+						}
+					}, function(json){
+						zamnotice.showTips('error','网络差，操作失败');
+					});
+				}else{
+					$this.parent().parent().remove();
+				}
+		});
+	});
+});
+function openreach(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".reachrulebox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".reachrulebox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+</script>

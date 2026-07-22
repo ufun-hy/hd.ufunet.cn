@@ -1,0 +1,107 @@
+<div class="form-horizontal confirmbox-pop">
+    <form class="confirm-formbox" method="post">
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 排序序号</label>
+            <div class="col-lg-6">
+                <input type="text" class="form-control numberincdec" name="displayorder" 
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="99999"
+                data-bts-step="1"
+                value="{$config['displayorder']}">
+                <div class="help-block m-0">序号越大越显示在前面</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">页面预览图</label>
+            <div class="col-lg-8">
+              {:tpl_image_one('previewimg', $config['previewimg'])}
+              <div class="help-block m-0">推荐尺寸:375px * 734px，装修页面时可通过鼠标右键来截屏保存预览图</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 页面名称</label>
+            <div class="col-lg-7">
+              <input class="form-control" type="text" name="diydata[pageset][name]" placeholder="请输入页面名称" value="{$config['diydata']['pageset']['name']??'页面名称'}" maxlength="100">
+            </div>
+        </div>
+        <div class="form-group">
+          <label class="col-lg-3 control-label">* 页面标题</label>
+          <div class="col-lg-7">
+            <input class="form-control" type="text" name="diydata[pageset][title]" placeholder="请输入页面标题" value="{$config['diydata']['pageset']['title']}" maxlength="100">
+          </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 页面背景图</label>
+            <div class="col-lg-8">
+              {:tpl_image_one('diydata[pageset][background][image]', $config['diydata']['pageset']['background']['image'])}
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 仅限微信访问</label>
+            <div class="col-lg-8">
+                {:tpl_switch("diydata[pageset][browsertype]",$config['diydata']['pageset']['browsertype']??1)}
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 微信访问跳过登录</label>
+            <div class="col-lg-8">
+                {:tpl_switch("diydata[pageset][wxskiplogin]",$config['diydata']['pageset']['wxskiplogin']??2)}
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 微信分享</label>
+            <div class="col-lg-8">
+                {:tpl_switch("diydata[pageset][shareDetail][open]",$config['diydata']['pageset']['shareDetail']['open']??1,'opensharebox')}
+                <span class="help-block">关闭后微信内打开页面将无法通过右上角分享页面</span>
+            </div>
+        </div>
+        <div class="sharebox{if $config['diydata']['pageset']['shareDetail']['open']=='2'} hidden{/if}">
+            <div class="form-group">
+                <label class="col-lg-3 control-label">* 分享标题</label>
+                <div class="col-lg-7">
+                  <input class="form-control" type="text" name="diydata[pageset][shareDetail][title]" placeholder="请输入分享标题" value="{$config['diydata']['pageset']['shareDetail']['title']}">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-3 control-label">* 分享简介</label>
+                <div class="col-lg-7">
+                  <input class="form-control" type="text" name="diydata[pageset][shareDetail][desc]" placeholder="请输入分享简介" value="{$config['diydata']['pageset']['shareDetail']['desc']}">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-3 control-label">* 分享图标</label>
+                <div class="col-lg-8">
+                    {:tpl_image_one('diydata[pageset][shareDetail][icon]', $config['diydata']['pageset']['shareDetail']['icon'])}
+                    <div class="help-block m-0">推荐尺寸:50 * 50px</div>
+                  </div>
+            </div>
+        </div>
+        
+    </form>
+</div>
+<style>
+    .confirmbox-pop .form-group{
+        margin-bottom:8px;
+    }
+    .confirmbox-pop .form-group .input-group.image-one-detail img{
+        max-height: 100px!important;
+    }
+</style>
+<script type="text/javascript">
+require(['webcore',"bootstrap-touchspin"],function(webcore){
+    tpl_switch();
+    $(".confirmbox-pop .numberincdec").TouchSpin();
+});
+function opensharebox(obj,status){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".sharebox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".sharebox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+</script>

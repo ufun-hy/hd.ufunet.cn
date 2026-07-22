@@ -1,0 +1,393 @@
+<style>
+.client-lists tr td{text-align:center!important}
+.confirmbox-pop .zam-titleBox{font-weight:600;padding:5px 0}
+.pagefullBox span{cursor:pointer;color:#000}
+.pagecloseall{position:absolute;right:60px;top:20px;font-size:20px;border-radius:50%;background:#fff;width:30px;height:30px;line-height:30px;text-align:center}
+.pagefullscreen{position:absolute;right:20px;top:20px;font-size:20px;border-radius:50%;background:#fff;width:30px;height:30px;line-height:30px;text-align:center}
+.layui-layer-resize{width:30px;height:30px;text-align:center;color:#4886ff;font-size:20px;font-weight:500}
+.needflyBox{position:absolute;top:10px;right:5px;z-index:1}
+.needflyBox *{box-sizing:border-box;-webkit-box-sizing:border-box}
+</style>
+<div class="form-horizontal confirmbox-pop rotate-pop">
+<form class="confirm-formbox" method="post">
+    <div class="text-center">
+        <div class="btn-group pop-btns" style="margin-bottom:10px;">
+          <a href="javascript:void(0)" class="btn btn-default btn-primary"><span>基础设置</span></a>
+          <a href="javascript:void(0)" class="btn btn-default"><span>签约客户端</span></a>
+        </div>
+    </div>
+    <div class="carditem">
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 排序序号</label>
+            <div class="col-lg-8">
+                <input type="text" class="form-control numberincdec" name="displayorder" value="{$rotate['displayorder']??'0'}"
+                data-bts-min="0" data-bts-replacement-val="0"
+                data-bts-max="null"
+                data-bts-step="1"
+                >
+                <div class="help-block">按排序序号升序排序，序号越小越排在前面</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">* 轮次名</label>
+            <div class="col-lg-8">
+                <input class="form-control" type="text"  name="hytitle" value="{$rotate['hytitle']}">
+            </div>
+        </div>
+        <div class="form-group hybgBox">
+              <label class="col-lg-3 control-label">* 合约图</label>
+              <div class="col-lg-8">
+                <div class="input-group">
+                    <input type="text" class="form-control file-value" name="hyimg" value="{$rotate['hyimg']}" placeholder="图片地址">
+                    <div class="input-group-btn">
+                      <button class="btn btn-default" type="button" onclick="tpl_image_one(this,changehybg)" {if $canchangebg=='2'}disabled{/if}>选择图片</button>
+                    </div>
+                </div>
+                <div class="input-group image-one-detail">
+                      <img src="{:tomedia($rotate['hyimg'])}" style="max-width:150px;max-height:300px" onerror="javascript:this.src='/static/images/sys/nopic.jpg';this.title='暂无图片'" title="暂无图片">
+                      <i class="mdi mdi-close" onclick="javascript:$(this).parent().prev().find('input').val('');$(this).prev().attr('src','')" title="删除图片"></i>
+                </div>                
+                <span class="help-block">1400*800px，请根据屏幕尺寸合理设计</span>
+                {if $canchangebg=='2'}<span class="help-block text-danger">当前活动还未发布，合约图不可更改</span>{/if}
+              </div>
+        </div>
+        <script type="text/javascript">
+          function changehybg(imgurl,imgpath,obj){
+            var $this = $(obj);
+            require(['webcore','zamnotice'],function(webcore,zamnotice){
+                webcore.ajaxSubmit("{:gohdmanage('configdzqy/hybgdo',['hdid'=>$hdid])}",{imgurl:imgurl},'正在处理合约图片..').then(function(json){
+                    if(json.code==0){
+                        $this.parent().prev().val(json.msg.imgpath);
+                        $this.parent().parent().next().find("img").attr("src",json.msg.imgurl);
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差。操作失败.');
+                });
+            })
+          }
+        </script>
+    </div>
+    <div class="carditem hidden">
+        <div class="yautooverflow" style="width:100%">
+            <table class="table" style="margin-bottom:0px;">
+                <thead>
+                  <tr>
+                    <th style="text-align:center;">名称</th>
+                    <th style="text-align:center;">背景图</th>
+                    <th style="text-align:center;">字体笔迹</th>
+                    <th style="text-align:center;">缩放比</th>
+                    <th style="text-align:center;">大小与位置</th>
+                    <th style="text-align:center;">操作</th>
+                  </tr>
+                </thead>
+                <tbody class="client-lists">
+                    {volist name="rotate.clients" id="device"}
+                        <tr>
+                            <td>
+                               <p>{$device['apptitle']}{if $device['isfollowdraw']=='1'}<span class="text-danger">(跟随签名)</span>{/if}</p>
+                            </td>
+                            <td>
+                                <div class="bpimgbox cursor" data-src="{:tomedia($device['appbg']);}"><img src="{:tomedia($device['appbg']);}" class="uploadImg"></div>
+                            </td>
+                            <td>
+                              {if $device['isfollowdraw']=='1'}
+                                -
+                              {else}
+                               <p>
+                                <span class="label label-{if $device['drawtype']=='2'}danger{else}primary{/if}">
+                                    {if $device['drawtype']=='2'}毛笔字{else}普通字{/if}
+                                </span>
+                               </p>
+                               <p class="mt20">
+                                <span style="font-size:{$device['linewidth']}px;{if $device['drawtype']=='1'}color:{$device['linecolor']};{/if}">
+                                    {$device['linewidth']}px
+                                </span>
+                               </p>
+                              {/if}
+                            </td>
+                            <td>
+                              {if $device['isfollowdraw']=='1'}
+                                -
+                              {else}
+                               <p>{$device['scaleval']}</p>
+                              {/if}
+                            </td>
+                            <td>
+                               <p><span>宽:{$device['cwidth']}px</span>，<span>高:{$device['cheight']}px</span></p>
+                               <p><span>顶部偏移:{$device['toppos']}px</span>，<span>左侧偏移:{$device['leftpos']}px</span></p>
+                               <p class="btn-changeposition cursor mt10" data-clientid="{$device['id']}" data-width="{$device['cwidth']}px" data-height="{$device['cheight']}px" data-toppos="{$device['toppos']}px" data-leftpos="{$device['leftpos']}px" data-needfly="{$device['needfly']}" data-ftoppos="{$device['flytoppos']}px" data-fleftpos="{$device['flyleftpos']}px" data-flyzoom="{$device['flyzoom']}px"><a class="btn btn-primary btn-xs">更改位置与大小</a></p>
+                            </td>
+                            <td>
+                              <a href="javascript:;" data-clientid="{$device['id']}" class="btn btn-primary btn-xs btn-edit">
+                                  <i class="mdi mdi-pencil"></i>
+                              </a>
+                              <a href="javascript:;" data-clientid="{$device['id']}" class="btn btn-danger btn-xs btn-del">
+                                  <i class="mdi mdi-close"></i>
+                              </a>
+                            </td>
+                        </tr>
+                    {/volist}
+                </tbody>
+                <tfoot style="border: 1px solid #efefef;">
+                  <tr>
+                    <td colspan="4">
+                      <a  class="btn btn-primary btn-xs addclient" href="javascript:;"> <i class="mdi mdi-plus"></i>&nbsp;<span>新增客户端</span></a>
+                    </td>
+                  </tr>
+                </tfoot>
+            </table>
+            <span class="zam-help-block">注:客户端在非微信浏览器内也可以打开</span>
+        </div>
+    </div>
+</form>
+</div>
+<script id='client-tpl' type="text/template">
+<tr>
+        <td>
+            <p><% d.apptitle %><%# if(d.isfollowdraw=='1'){ %><span class="text-danger">(跟随签名)</span><%# } %></p>
+            <input type="hidden" name="apptitle[]" value="<% d.apptitle %>">
+        </td>
+        <td>
+           <div class="bpimgbox" data-src="<% d.clientbgimg %>"><img src="<% d.clientbgimg %>" class="uploadImg"></div>
+           <input type="hidden" name="appbg[]" value="<% d.appbg %>">
+        </td>
+        <td>
+            <%# if(d.isfollowdraw=='2'){ %>
+            <p>
+            <span class="label label-<%# if(d.drawtype=='2'){ %>danger<%# }else { %>primary<%# } %>"><%# if(d.drawtype=='2'){ %>毛笔字<%# }else { %>普通字<%# } %></span>
+            </p>
+            <p class="mt20">
+                <span style="font-size:<% d.linewidth %>px;<%# if(d.drawtype=='1'){ %>color:<% d.linecolor %><%# } %>">
+                    <% d.linewidth %>px
+                </span>
+            </p>
+            <%# }else { %>
+            -
+            <%# } %>
+            <input type="hidden" name="drawtype[]" value="<% d.drawtype %>">
+        </td>
+        <td>
+           <%# if(d.isfollowdraw=='2'){ %>
+           <p><% d.scaleval %></p>
+           <%# }else { %>
+            -
+            <%# } %>
+           <input type="hidden" name="scaleval[]" value="<% d.scaleval %>">
+        </td>
+        <td>
+           <p><span>宽:<% d.cwidth %>px</span>，<span>高:<% d.cheight %>px</span></p>
+           <p><span>顶部偏移:<% d.toppos %>px</span>，<span>左侧偏移:<% d.leftpos %>px</span></p>
+           <p class="btn-changeposition cursor mt10" <%# if(d.id){ %>data-clientid="<% d.id %>"<%# } %> data-width="<% d.cwidth %>px" data-height="<% d.cheight %>px" data-toppos="<% d.toppos %>px" data-leftpos="<% d.leftpos %>px" data-needfly="<% d.needfly %>" data-ftoppos="<% d.flytoppos %>px" data-fleftpos="<% d.flyleftpos %>px"  data-flyzoom="<% d.flyzoom %>px"><a class="btn btn-primary btn-xs">更改位置与大小</a></p>
+           <input type="hidden" name="cwidth[]" value="<% d.cwidth %>">
+           <input type="hidden" name="cheight[]" value="<% d.cheight %>">
+           <input type="hidden" name="toppos[]" value="<% d.toppos %>">
+           <input type="hidden" name="leftpos[]" value="<% d.leftpos %>">
+           <input type="hidden" name="linewidth[]" value="<% d.linewidth %>">
+           <input type="hidden" name="linecolor[]" value="<% d.linecolor %>">
+           <input type="hidden" name="readyimg[]" value="<% d.readyimg %>">
+           <input type="hidden" name="needfly[]" value="<% d.needfly %>">
+           <input type="hidden" name="flytoppos[]" value="<% d.flytoppos %>">
+           <input type="hidden" name="flyleftpos[]" value="<% d.flyleftpos %>">
+           <input type="hidden" name="flyzoom[]" value="<% d.flyzoom %>">
+           <input type="hidden" name="isfollowdraw[]" value="<% d.isfollowdraw %>">
+           <input type="hidden" name="followdeviceid[]" value="<% d.followdeviceid %>">
+           <input type="hidden" name="copyimg[]" value="<% d.copyimg %>">
+           <input type="hidden" name="copyimgrotate[]" value="<% d.copyimgrotate %>">
+           <input type="hidden" name="copyimgdeviceid[]" value="<% d.copyimgdeviceid %>">
+        </td>
+        <td>
+          <a href="javascript:;" <%# if(d.id){ %>data-clientid="<% d.id %>"<%# } %> class="btn btn-primary btn-xs btn-edit">
+              <i class="mdi mdi-pencil"></i>
+          </a>
+          <a href="javascript:;" <%# if(d.id){ %>data-clientid="<% d.id %>"<%# } %> class="btn btn-danger btn-xs btn-del">
+              <i class="mdi mdi-close"></i>
+          </a>
+        </td>
+    </tr>
+</script>                
+<script>    
+require(['webcore','jconfirmBox','zamnotice','layerBox',"bootstrap-touchspin"],function(webcore,jconfirmBox,zamnotice,layerBox){
+    $(".rotate-pop .pop-btns a.btn").click(function(){
+        $(this).addClass('btn-primary').siblings().removeClass("btn-primary");
+        $(".rotate-pop .carditem").addClass('hidden').eq($(this).index()).removeClass('hidden');
+    });
+    $(".confirmbox-pop .numberincdec").TouchSpin().on("change", function(){
+        var $this = $(this),funcstr = $this.data('func');
+        var func = window[funcstr];
+        func && func();
+    });
+    var rotateid = "{if isset($rotate['id'])}{$rotate['id']}{else}{/if}";
+    $(".addclient").on('click',function(){
+        var confirmObj = jconfirmBox.ajaxconfirm("新增客户端","{:gohdmanage('configdzqy/editclient',['hdid'=>$hdid])}",{rotateid:rotateid},'html','col-lg-10 col-lg-offset-1',function(e){
+            var clientarr = webcore.serializeObject(e.find('form'));
+            $(".useotherBox select").each(function(i,v){
+                if(i==0) clientarr.copyimgrotate = $(this).find('option:selected').val()||"0";
+                if(i==1) clientarr.copyimgdeviceid = $(this).find('option:selected').val()||"0";
+            });
+            if(!clientarr.hasOwnProperty("copyimgrotate")){
+              clientarr.copyimgrotate = "0";
+            }
+            if(!clientarr.hasOwnProperty("copyimgdeviceid")){
+              clientarr.copyimgdeviceid = "0";
+            }
+            if(clientarr.apptitle==''){
+                zamnotice.showTips('error','请设置客户端名称');
+                return false;
+            }
+            if(clientarr.appbg==''){
+                zamnotice.showTips('error','客户端背景图必须设置');
+                return false;
+            }
+            clientarr.clientbgimg = e.find(".clientbgimg img").attr('src');
+            if(clientarr.isfollowdraw=='1'&&clientarr.followdeviceid==''){
+                zamnotice.showTips('error','跟随签名必须选择跟随客户端');
+                return false;
+            }
+            if(clientarr.copyimg=='1'&&(clientarr.copyimgrotate=='0'||clientarr.copyimgdeviceid=='0')){
+                zamnotice.showTips('error','签名图选择调用其他轮次客户端签名必须选择调用轮次和调用客户端');
+                return false;
+            }
+            if(rotateid!=''){
+                webcore.ajaxSubmit("{:gohdmanage('configdzqy/saveclient',['hdid'=>$hdid])}",{rotateid:rotateid,clientarr:clientarr}).then(function(json){
+                    if(json.code==0){
+                        confirmObj.close();
+                        clientarr.id = json.msg;
+                        $(".client-lists").append(webcore.tpl($("#client-tpl"),clientarr));
+                        zamnotice.showTips('success','新增成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差。操作失败');
+                });
+            }else{
+                $(".client-lists").append(webcore.tpl($("#client-tpl"),clientarr));
+                confirmObj.close();
+            }
+        });
+    });
+    $(".client-lists").on('click','.btn-edit',function(){
+        var $this = $(this),fdom = $this.parent().parent(),clientid = $this.attr('data-clientid'),clientarr = {};
+        if(!clientid){
+            fdom.find('input').each(function(){
+                var ikey = $(this).attr('name').replace('[]','');
+                clientarr[ikey] = $(this).val();
+            });
+        }
+        var confirmObj2 = jconfirmBox.ajaxconfirm("编辑客户端","{:gohdmanage('configdzqy/editclient',['hdid'=>$hdid])}",{rotateid:rotateid,clientid:clientid,clientarr:clientarr},'html','col-lg-10 col-lg-offset-1',function(e){
+            var clientarr = webcore.serializeObject(e.find('form'));
+            $(".useotherBox select").each(function(i,v){
+                if(i==0) clientarr.copyimgrotate = $(this).find('option:selected').val()||"0";
+                if(i==1) clientarr.copyimgdeviceid = $(this).find('option:selected').val()||"0";
+            });
+            if(!clientarr.hasOwnProperty("copyimgrotate")){
+              clientarr.copyimgrotate = "0";
+            }
+            if(!clientarr.hasOwnProperty("copyimgdeviceid")){
+              clientarr.copyimgdeviceid = "0";
+            }
+            if(clientarr.apptitle==''){
+                zamnotice.showTips('error','请设置客户端名称');
+                return false;
+            }
+            if(clientarr.appbg==''){
+                zamnotice.showTips('error','客户端背景图必须设置');
+                return false;
+            }
+            if(clientarr.isfollowdraw=='1'&&clientarr.followdeviceid==''){
+                zamnotice.showTips('error','跟随签名必须选择跟随客户端');
+                return false;
+            }
+            if(clientarr.copyimg=='1'&&(clientarr.copyimgrotate=='0'||clientarr.copyimgdeviceid=='0')){
+                zamnotice.showTips('error','签名图选择调用其他轮次客户端签名必须选择调用轮次和调用客户端');
+                return false;
+            }
+            if(clientid){
+                webcore.ajaxSubmit("{:gohdmanage('configdzqy/saveclient',['hdid'=>$hdid])}",{rotateid:rotateid,clientid:clientid,clientarr:clientarr}).then(function(json){
+                    if(json.code==0){
+                        confirmObj2.close();
+                        clientarr.id = clientid;
+                        clientarr.clientbgimg = e.find(".clientbgimg img").attr('src');
+                        fdom.html($(webcore.tpl($("#client-tpl"),clientarr)).html());
+                        zamnotice.showTips('success','编辑成功');
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差。操作失败');
+                });
+            }else{
+                clientarr.clientbgimg = e.find(".clientbgimg img").attr('src');
+                fdom.html($(webcore.tpl($("#client-tpl"),clientarr)).html());
+                confirmObj2.close();
+            }
+        });
+    });
+    $(".client-lists").on('click','.btn-del',function(){
+        var $this = $(this),clientid = $this.attr('data-clientid');
+        jconfirmBox.confirm('温馨提示','删除将无法恢复，您确定要删除么？',function(){
+            if(clientid){
+                webcore.ajaxSubmit("{:gohdmanage('configdzqy/delclient',['hdid'=>$hdid])}",{rotateid:rotateid,clientid:clientid}).then(function(json){
+                    if(json.code==0){
+                        zamnotice.showTips('success','删除成功');
+                        $this.parent().parent().remove();
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差，操作失败');
+                });
+            }else{
+                $this.parent().parent().remove();
+            }
+        });
+    });
+    $(".client-lists").on('click','.btn-changeposition',function(){
+        var $this = $(this),$thisp = $this.parent(),clientid = $this.attr('data-clientid'),bgimg = $(".hybgBox img").attr("src");
+        if(bgimg==''||bgimg.indexOf("nopic.jpg") !== -1){
+            return zamnotice.showTips('error','请先设置合约图');
+        }
+        webcore.dzqyFullpage($this,bgimg,function(obj){
+               var w = obj.w.replace("px",''),h = obj.h.replace("px",''),t = obj.t.replace("px",''),l = obj.l.replace("px",''),ft = obj.ft.replace("px",''),fl = obj.fl.replace("px",'');
+               $thisp.find("p").eq(0).find("span").eq(0).text("宽:"+w+"px");
+               $thisp.find("p").eq(0).find("span").eq(1).text("高:"+h+"px");
+               $thisp.find("p").eq(1).find("span").eq(0).text("顶部偏移:"+t+"px");
+               $thisp.find("p").eq(1).find("span").eq(1).text("左侧偏移:"+l+"px");
+               $thisp.find("p").eq(2).attr({"data-width":w+'px',"data-height":h+'px',"data-toppos":t+'px',"data-leftpos":l+'px',"data-ftoppos":ft+'px',"data-fleftpos":fl+'px',"data-needfly":obj.needfly});
+               $thisp.find("input").eq(0).val(w);
+               $thisp.find("input").eq(1).val(h);
+               $thisp.find("input").eq(2).val(t);
+               $thisp.find("input").eq(3).val(l);
+               $thisp.find("input").eq(7).val(obj.needfly);
+               $thisp.find("input").eq(8).val(ft);
+               $thisp.find("input").eq(9).val(fl);
+               if(!clientid){
+                    layer.closeAll();
+                    zamnotice.showTips('success','修改成功，点击底部保存按钮提交');
+               }else{
+                    var clientarr = {
+                        cwidth:w,
+                        cheight:h,
+                        toppos:t,
+                        leftpos:l,
+                        needfly:obj.needfly,
+                        flytoppos:ft,
+                        flyleftpos:fl
+                    };
+                    webcore.ajaxSubmit("{:gohdmanage('configdzqy/saveclient',['hdid'=>$hdid])}",{rotateid:rotateid,clientid:clientid,clientarr:clientarr}).then(function(json){
+                        if(json.code==0){
+                            layer.closeAll();
+                            zamnotice.showTips('success','保存修改成功');
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差，操作失败');
+                    });
+               }
+        });
+    });
+});
+</script>

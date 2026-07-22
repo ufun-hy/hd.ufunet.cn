@@ -1,0 +1,262 @@
+{include file='$Wpath/common/header'}
+{if !empty($groups)}
+<style>
+.zam-hdusers-Box{
+    border: 1px solid #e8e9eb;
+    overflow: hidden;
+    padding:10px;
+    min-height: 460px;
+}
+.zam-hdusers-grouplist{
+    width: calc(18% - 10px);
+    height:100%;
+    float: left;
+    border: 1px solid #e8e9eb;
+    overflow: hidden;
+    margin-right:10px;
+}
+.zam-hdusers-grouplist-select .zam-hdusers-grouplist-selectname {
+    height: 40px;
+    line-height: 40px;
+    padding-left: 16px;
+    font-size: 16px;
+    max-width: calc(100% - 40px);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    border-top: 1px solid #e8e9eb
+}
+.zam-hdusers-grouplist dt.zam-hdusers-grouplist-item {
+    height:45px;
+    line-height: 45px;
+}
+.zam-hdusers-grouplist dd.zam-hdusers-grouplist-item {
+    height:40px;
+    line-height: 40px;
+    border-top: 1px solid #e8e9eb;
+}
+.zam-hdusers-grouplist-item span{
+    display:inline-block;
+}
+.zam-hdusers-grouplist dd.zam-hdusers-grouplist-item span.zam-hdusers-grouplist-name{
+    max-width: calc(100% - 40px);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+.zam-hdusers-grouplist dt a{
+    font-size:16px;
+    font-weight: 800;
+}
+.zam-hdusers-grouplist dd a{
+    position:relative;
+    padding-right:20px;
+}
+.zam-hdusers-grouplist dd a i{
+    display:none;
+    position:absolute;
+    right:10px;
+    top:12px;
+    z-index:1;
+}
+.zam-hdusers-grouplist dd a:hover i{
+    display:block;
+}
+.zam-hdusers-grouplist .zam-hdusers-grouplist-item a {
+    color: #252424;
+    font-weight: bold;
+}
+.zam-hdusers-grouplist .zam-hdusers-grouplist-item.active a {
+    background-color: rgb(245, 247, 250);
+    color: rgb(72, 134, 255);
+}
+
+.zam-hdusers-grouplist-add{padding-top:10px;text-align:center;border-top: 1px solid #e8e9eb;}
+.zam-hdusers-list {
+    width: 82%;
+    float: left;
+}
+#userlistTable .avatarImg{width:100px;height:100px;}
+</style>
+<div class="zam-hdusers-Box">
+    <div class="zam-hdusers-grouplist">
+        <dl>
+            <dt class="zam-hdusers-grouplist-item">
+                <a class="zam-flex-center" href="javascript:;">签到下拉表单项分组</a>
+            </dt>
+            {foreach $groups as $k=>$group}
+            <div class="zam-hdusers-grouplist-select">
+                <div class="zam-hdusers-grouplist-selectname">{$group['title']}</div>
+                {foreach $group['items'] as $k2=>$gval }
+                <dd class="zam-hdusers-grouplist-item {if $k == '0' && $k2=='0'}active{/if}">
+                    <a class="zam-flex-center" href="javascript:;" data-zdval="{$group['zd']}" data-inputval="{$gval}"><span class="zam-hdusers-grouplist-name">{$gval}</span><span></span></a>
+                </dd>
+                {/foreach}
+            </div>
+            {/foreach}
+        </dl>
+    </div>
+    <div class="zam-hdusers-list">
+        <div class="form-inline zam-inline-searchbar">
+            <div class="form-group">
+              <div class="input-group input-group-sm">
+                <span class="input-group-addon">用户信息</span>
+                <input type="text" class="form-control" value="" id="keyword" name="username" placeholder="请输入用户名或表单内容">
+              </div>
+            </div>
+            <a class="btn btn-primary btn-sm btn-search" href="javascript:void(0)"><i class="mdi mdi-magnify"></i> 搜索</a>
+        </div>
+        {include file='$Wpath/common/tabletoolbar'}
+        <table id="listtable" class="zam-btable"></table>
+    </div>
+</div>
+<script id='binddata-tpl' type="text/template">
+    <ul class="bddataUl">
+    <%#  $.each(d.bd, function(index, item){ %>
+        <li>
+          <span class="text-primary"><% item %>:</span>
+          <span>
+            <%#  if(d.list){ %>
+            <%#  if(index === 'uploadimg'){ %>
+                <%#  if(d.list[index]){ %>
+                <img style="max-width:120px;" onclick="prevshowattachs(this,1);"  src="<% d.list[index] %>"  />
+                <%#  }else{ %>
+                    -
+                <%# } %>
+            <%#  }else{ %>
+                <%#  if(d.list[index]){ %>
+                <% d.list[index] %>
+                <%#  }else{ %>
+                    -
+                <%# } %>
+            <%#  } %> 
+            <%#  } %> 
+          </span>
+       </li>
+    <%#  }); %>
+    </ul>
+</script>
+<script>
+var zdconfig = {:json_encode($zd2title)};  
+require(["zamnotice","layerBox","jconfirmBox","webcore","webtable"],function(zamnotice,layerBox,jconfirmBox,webcore,webtable){
+var initConfig = {
+    tableId:'#listtable',
+    url:"{:gohdmanage('datasigngroup/index',['hdid'=>$hdid])}",
+    columns:[
+        {
+            checkbox: true,
+        }, 
+        {
+            field: 'id',
+            title: 'ID',
+            align: 'center',
+            width:'4%',
+            visible:false,
+        }, {
+            field: 'nickname',
+            title: '昵称',
+            align: 'center',
+            width:'20%'
+        }, {
+            field: 'avatar',
+            title: '头像',
+            align: 'center',
+            width:'20%',
+            formatter: function(value, row, index){
+                return `<img src="${value}" style="width:100px;height:100px">`;
+            },
+        },{
+            field: 'sex',
+            title: '性别',
+            align: 'center',
+            width:'10%'
+        }, 
+        {if !empty($zd2title)}
+        {
+            field: 'bddata',
+            title: '签到表单',
+            align: 'center',
+            formatter: function(value, row, index){
+                if(value=='') return ''; 
+                return $.isEmptyObject(zdconfig)?'-':webcore.tpl($("#binddata-tpl"),{list:value,bd:zdconfig});
+            }
+        }
+        {/if}
+    ],
+    searchParamas:[
+        {'type':'1','id':'keyword'},
+        {'type':'3','items':
+            [
+                {
+                    'field':'zdval',
+                    'dom':".zam-hdusers-grouplist .active a",
+                    'isstable':false,
+                    'isdata':true,//是否为data属性值 不是则为val值
+                    'datasx':'data-zdval',//data属性值
+                    'val':'',
+                },
+                {
+                    'field':'inputval',
+                    'dom':".zam-hdusers-grouplist .active a",
+                    'isstable':false,
+                    'isdata':true,//是否为data属性值 不是则为val值
+                    'datasx':'data-inputval',//data属性值
+                    'val':'',
+                },
+            ]
+        },
+    ],
+    onload:function(data){
+    },
+    onloadsuccess:function(data){
+        var keyword = $("#keyword").val()||'';
+        if(!keyword) {
+            $(".zam-hdusers-grouplist .active a span").eq(1).text(`(${data.total}人)`);
+        }
+    },
+    toolbar:{
+        other:function(){
+            var getSelects = webtable.getSelections();
+            if(!getSelects.length){
+                return zamnotice.showTips('error','请先选择用户');
+            }
+            var confirmObj = jconfirmBox.ajaxconfirm("加入自定义分组","{:gohdmanage('common/pullusergroup',['hdid'=>$hdid])}",{ishtml:'1'},'html','col-lg-8 col-lg-offset-2',function(e){
+                var selectgroups = e.find("input:checked");
+                if(!selectgroups.length){
+                    return zamnotice.showTips('error','请选择用户组');
+                }
+                var selgroups = [];
+                selectgroups.each(function(){
+                    selgroups.push($(this).val());
+                });
+                webcore.ajaxSubmit("{:gohdmanage('common/pullusergroup',['hdid'=>$hdid])}",{issign:'1',groupid:selgroups,userid:getSelects},'正在新增用户到用户组...').then(function(json){
+                    if(json.code == 0){
+                        confirmObj.close();
+                        zamnotice.showTips('success','操作成功');
+                        webtable.refresh();
+                    }else{
+                        zamnotice.showTips('error',json.msg);
+                    }
+                }, function(json){
+                    zamnotice.showTips('error','网络差。操作失败');
+                });
+            });
+        },
+    },
+};
+webtable.init(initConfig);
+$(".zam-inline-searchbar .btn-search").on('click',function() {
+    webtable.refresh();
+});
+$(".zam-hdusers-grouplist dd.zam-hdusers-grouplist-item").on('click',function() {
+    $(".zam-hdusers-grouplist dd.zam-hdusers-grouplist-item").removeClass('active');
+    $(this).addClass('active');
+    $("#keyword").val('');
+    webtable.refresh();
+});
+});
+</script>
+{else}
+<div class="alert alert-danger text-center">当前活动签到表单项目中无下拉框表单项</div>
+{/if}
+{include file='$Wpath/common/footer'}

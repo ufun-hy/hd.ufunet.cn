@@ -1,0 +1,69 @@
+<style>
+/*方形选择框*/
+.fx-box .fx-item{
+	text-align:center;
+	min-width:25%;
+	float:left;
+	padding:8px;
+}
+.fx-box .fx-item.disable .fx-item-con{
+    background:rgba(0,0,0,0.1);
+    cursor:not-allowed;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+.fx-box .fx-item .fx-item-con{
+	position:relative;
+	font-size:15px;
+	background-color:#fff;
+	cursor:pointer;
+	border:1px solid #dfe6ec;
+	padding:0 10px;
+}
+.fx-item .fx-item-con:hover{
+	box-shadow: -3px 5px 15px rgba(64,102,178,.3);
+}
+.fx-item .fx-item-con .fx-title{
+	display:inline-block;
+	text-align:center;
+	width: 100%;
+	height: 40px;
+	line-height: 40px;
+}
+.fx-item .fx-item-con i{
+	position: absolute;
+    top: -5px;
+    right: 0px;
+	font-size: 12px;
+	color: #fff;
+	text-align: center;
+	display: none;
+}
+.fx-item .fx-item-con .fx-croner{
+	position: absolute;
+	top: -1px;
+	right: -1px;
+	border-top: 18px solid #4886ff;
+	border-left: 20px solid transparent;
+	display:none;
+}
+.fx-item.active .fx-croner,.fx-item.active i{
+	display:block
+}
+.fx-item.disable .fx-croner,.fx-item.disable i{
+	display:block;
+}
+</style>
+
+<ul class="fx-box clearfix">
+{volist name="roles" id="v"}
+<li class="fx-item{in name="$v['id']" value="$myroles"} active{/in}" data-roleid="{$v['id']}" onclick="javascript:$(this).toggleClass('active');" >
+	<div class="fx-item-con">
+		<span class="fx-croner"></span>
+		<i class="mdi mdi-check"></i>
+		<span class="fx-title">{$v['rolename']}</span>
+	</div>
+</li>
+{/volist}
+</ul>

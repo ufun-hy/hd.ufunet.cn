@@ -1,0 +1,129 @@
+<style type="text/css">
+.game-selteambox{
+	position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.82);
+    z-index: 3;
+}
+.game-selteambox .game-jointip{font-size:0.32rem;color: #fff;margin-bottom: 0.32rem}
+.game-selteambox .game-teams{
+	padding: 0 0.62rem;
+	max-height: 6rem;
+    overflow: hidden;
+    overflow-y: auto;
+    margin:0.32rem 0;
+}
+.game-selteambox .game-teams p{color:red;font-size: 0.34rem;margin: 1rem 0;}
+.game-selteambox .game-teams .game-team{
+	width:2rem;
+	margin-bottom: 0.32rem;
+	color: #fff;
+	font-size: 0.2rem;
+}
+.game-selteambox .game-teams .game-team .game-team-logo{
+	position: relative;
+	width:1.4rem;
+	height: 1.4rem;
+}
+.game-selteambox .game-teams .game-team .game-team-logo img{
+	width: 100%;
+	height: 100%;
+	border-radius: 3px;
+	border:2px solid #fff;
+}
+.game-selteambox .game-teams .game-team.issel .game-team-logo img{
+	border-color: #4886ff;
+}
+.game-selteambox .game-teams .game-team .game-team-name{
+	text-align:center;
+	margin-top: 10px;
+	width: 1.4rem;
+}
+.game-selteambox .game-teams .game-team.issel .game-team-name{
+	color: #4886ff;
+}
+.game-selteambox .game-teams .game-team .checkbox{
+	position: absolute;
+	top: 0;
+	right: 0;
+	border-top: 0.42rem solid #4886ff;
+    border-left: 0.56rem solid transparent;
+}
+.game-selteambox .game-teams .game-team .checkbox i{
+	position: absolute;
+	top:-0.42rem;
+	right: 0.05rem;
+	color: #fff;
+	font-size: 0.2rem;
+}
+.game-selteambox .game-team-join .btn{padding: 0 0.6rem!important;border-radius: 0.35rem;}
+/*我的队伍*/
+.game-myteambox{
+	position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.82);
+    z-index: 3;
+}
+.game-myteambox .game-myteam-status{font-size:0.32rem;color: #fff;margin-bottom: 1rem}
+.game-myteambox .game-myteam-title{font-size:0.32rem;color: #fff;}
+.game-myteambox .game-myteam{
+	margin: 0.2rem 0;
+	margin-bottom: 0.52rem;
+}
+.game-myteambox .game-myteam .game-myteam-logo{
+	width: 2rem;
+	height: 2rem;
+	padding: 0.1rem;
+    border: 2px solid #4886ff;
+    border-radius: 5px;
+}
+.game-myteambox .game-myteam .game-myteam-logo img{
+	width: 100%;
+	height: 100%;
+	border-radius: 5px;
+}
+.game-myteambox .game-myteam .game-myteam-name{
+	width: 2.4rem;
+	margin-top: 0.24rem;
+	text-align: center;
+	font-size:0.32rem;
+	color: #fff;
+}
+.game-myteambox .game-myteam-tuichu .btn{padding: 0 0.6rem!important;border-radius: 0.35rem;}
+</style>
+<div class="game-selteambox zam-app-flex-ajCenter hidden">
+	<p class="game-jointip"> - 请选择团队 - </p>
+	<div class="game-teams zam-app-flex-ajCenter2 zam-app-justifyspacebetween zam-app-flex-wrap"></div>
+	<div class="game-team-join">
+		<a href="javascript:;" class="btn btn-primary" style="padding: 0 .36rem;">加入团队</a>
+	</div>
+</div>
+<div class="game-myteambox zam-app-flex-ajCenter hidden">
+	<p class="game-myteam-status">游戏还未开始</p>
+	<p class="game-myteam-title">我的团队</p>
+	<div class="game-myteam zam-app-flex-ajCenter">
+		<div class="game-myteam-logo">
+			<img src="">
+		</div>
+		<div class="game-myteam-name limitbox">xxx</div>
+	</div>
+	<div class="game-myteam-tuichu">
+		<a href="javascript:;" class="btn btn-primary" style="padding: 0 .36rem;">重选团队</a>
+	</div>
+</div>
+<script id="team-tpl" type="text/html">
+<div class="game-team zam-app-flex-ajCenter" data-team="<% d.id %>">
+	<div class="game-team-join hidden"><span>0</span>人</div>
+	<div class="game-team-logo">
+		<img src="<% d.teamlogo %>" >
+		<span class="checkbox zam-app-flex-ajCenter hidden"><i class="mxc-check"></i></span>
+	</div>
+	<div class="game-team-name limitbox"><% d.teamname %></div>
+</div>
+</script>
