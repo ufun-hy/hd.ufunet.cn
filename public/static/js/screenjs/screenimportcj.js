@@ -4,7 +4,7 @@
 * @Last Modified by:   赞木
 * @Last Modified time: 2023-06-02 20:14:20
 */
-define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'anime', 'threejs2', 'tweenjs', 'snabbt'], function (screencore, layerBox, template, keyboardJS, anime, THREE, TWEEN) {
+define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'anime', 'threejs2', 'tweenjs', 'screenjs/screenimportcj-halo', 'screenjs/screenimportcj-danmaku', 'snabbt'], function (screencore, layerBox, template, keyboardJS, anime, THREE, TWEEN, screenimportcjHalo, screenimportcjDanmaku) {
 	THREE.CSS3DObject = function (element) { THREE.Object3D.call(this); this.element = element; this.element.style.position = "absolute"; this.addEventListener("removed", function () { if (this.element.parentNode !== null) { this.element.parentNode.removeChild(this.element) } }) }; THREE.CSS3DObject.prototype = Object.create(THREE.Object3D.prototype); THREE.CSS3DObject.prototype.constructor = THREE.CSS3DObject; THREE.CSS3DSprite = function (element) { THREE.CSS3DObject.call(this, element) }; THREE.CSS3DSprite.prototype = Object.create(THREE.CSS3DObject.prototype); THREE.CSS3DSprite.prototype.constructor = THREE.CSS3DSprite; THREE.CSS3DRenderer = function () { console.log("THREE.CSS3DRenderer", THREE.REVISION); var _width, _height; var _widthHalf, _heightHalf; var matrix = new THREE.Matrix4(); var cache = { camera: { fov: 0, style: "" }, objects: {} }; var domElement = document.createElement("div"); domElement.style.overflow = "hidden"; this.domElement = domElement; var cameraElement = document.createElement("div"); cameraElement.style.WebkitTransformStyle = "preserve-3d"; cameraElement.style.MozTransformStyle = "preserve-3d"; cameraElement.style.transformStyle = "preserve-3d"; domElement.appendChild(cameraElement); var isIE = /Trident/i.test(navigator.userAgent); this.setClearColor = function () { }; this.getSize = function () { return { width: _width, height: _height } }; this.setSize = function (width, height) { _width = width; _height = height; _widthHalf = _width / 2; _heightHalf = _height / 2; domElement.style.width = width + "px"; domElement.style.height = height + "px"; cameraElement.style.width = width + "px"; cameraElement.style.height = height + "px" }; function epsilon(value) { return Math.abs(value) < 1e-10 ? 0 : value } function getCameraCSSMatrix(matrix) { var elements = matrix.elements; return "matrix3d(" + epsilon(elements[0]) + "," + epsilon(-elements[1]) + "," + epsilon(elements[2]) + "," + epsilon(elements[3]) + "," + epsilon(elements[4]) + "," + epsilon(-elements[5]) + "," + epsilon(elements[6]) + "," + epsilon(elements[7]) + "," + epsilon(elements[8]) + "," + epsilon(-elements[9]) + "," + epsilon(elements[10]) + "," + epsilon(elements[11]) + "," + epsilon(elements[12]) + "," + epsilon(-elements[13]) + "," + epsilon(elements[14]) + "," + epsilon(elements[15]) + ")" } function getObjectCSSMatrix(matrix, cameraCSSMatrix) { var elements = matrix.elements; var matrix3d = "matrix3d(" + epsilon(elements[0]) + "," + epsilon(elements[1]) + "," + epsilon(elements[2]) + "," + epsilon(elements[3]) + "," + epsilon(-elements[4]) + "," + epsilon(-elements[5]) + "," + epsilon(-elements[6]) + "," + epsilon(-elements[7]) + "," + epsilon(elements[8]) + "," + epsilon(elements[9]) + "," + epsilon(elements[10]) + "," + epsilon(elements[11]) + "," + epsilon(elements[12]) + "," + epsilon(elements[13]) + "," + epsilon(elements[14]) + "," + epsilon(elements[15]) + ")"; if (isIE) { return "translate(-50%,-50%)" + "translate(" + _widthHalf + "px," + _heightHalf + "px)" + cameraCSSMatrix + matrix3d } return "translate(-50%,-50%)" + matrix3d } function renderObject(object, camera, cameraCSSMatrix) { if (object instanceof THREE.CSS3DObject) { var style; if (object instanceof THREE.CSS3DSprite) { matrix.copy(camera.matrixWorldInverse); matrix.transpose(); matrix.copyPosition(object.matrixWorld); matrix.scale(object.scale); matrix.elements[3] = 0; matrix.elements[7] = 0; matrix.elements[11] = 0; matrix.elements[15] = 1; style = getObjectCSSMatrix(matrix, cameraCSSMatrix) } else { style = getObjectCSSMatrix(object.matrixWorld, cameraCSSMatrix) } var element = object.element; var cachedStyle = cache.objects[object.id] && cache.objects[object.id].style; if (cachedStyle === undefined || cachedStyle !== style) { element.style.WebkitTransform = style; element.style.MozTransform = style; element.style.transform = style; cache.objects[object.id] = { style: style }; if (isIE) { cache.objects[object.id].distanceToCameraSquared = getDistanceToSquared(camera, object) } } if (element.parentNode !== cameraElement) { cameraElement.appendChild(element) } } for (var i = 0, l = object.children.length; i < l; i++) { renderObject(object.children[i], camera, cameraCSSMatrix) } } var getDistanceToSquared = function () { var a = new THREE.Vector3(); var b = new THREE.Vector3(); return function (object1, object2) { a.setFromMatrixPosition(object1.matrixWorld); b.setFromMatrixPosition(object2.matrixWorld); return a.distanceToSquared(b) } }(); function zOrder(scene) { var order = Object.keys(cache.objects).sort(function (a, b) { return cache.objects[a].distanceToCameraSquared - cache.objects[b].distanceToCameraSquared }); var zMax = order.length; scene.traverse(function (object) { var index = order.indexOf(object.id + ""); if (index !== -1) { object.element.style.zIndex = zMax - index } }) } this.render = function (scene, camera) { var fov = camera.projectionMatrix.elements[5] * _heightHalf; if (cache.camera.fov !== fov) { domElement.style.WebkitPerspective = fov + "px"; domElement.style.MozPerspective = fov + "px"; domElement.style.perspective = fov + "px"; cache.camera.fov = fov } scene.updateMatrixWorld(); if (camera.parent === null) { camera.updateMatrixWorld() } var cameraCSSMatrix = "translateZ(" + fov + "px)" + getCameraCSSMatrix(camera.matrixWorldInverse); var style = cameraCSSMatrix + "translate(" + _widthHalf + "px," + _heightHalf + "px)"; if (cache.camera.style !== style && !isIE) { cameraElement.style.WebkitTransform = style; cameraElement.style.MozTransform = style; cameraElement.style.transform = style; cache.camera.style = style } renderObject(scene, camera, cameraCSSMatrix); if (isIE) { zOrder(scene) } } };
 	var screenimportcj = {
 		datas: [],
@@ -22,6 +22,8 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 		flytype: '1',
 		flyspeed: 100,
 		flyspheretype: '1',
+		haloStage: null,
+		danmakuStage: null,
 		init: function (config) {
 			var self = this;
 			self.scrollSpeed = autoscrollspeed;
@@ -38,10 +40,25 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 			self.flyspheretype = config.flyspheretype || '1';
 			self.initdata(function () {
 				self.bindevent();
+				if (self.flytype == '6' && typeof window !== 'undefined' && window.addEventListener) {
+					window.addEventListener('pagehide', function () {
+						if (self.danmakuStage) self.danmakuStage.destroy();
+					});
+				}
 				setTimeout(function () {
 					self.getnewUser();
 				}, 10e3);
-				if (self.flytype > 1) {
+				if (self.flytype == '5') {
+					self.haloStage = screenimportcjHalo.create({
+						root: document.querySelector('.importcj-mainbox')
+					});
+				} else if (self.flytype == '6') {
+					self.danmakuStage = screenimportcjDanmaku.create({
+						root: document.querySelector('.importcj-mainbox')
+					});
+					self.danmakuStage.mount(self.getDanmakuCandidates());
+					self.danmakuStage.updatePrize(self.getDanmakuPrize());
+				} else if (self.flytype > 1) {
 					$("body").append('<ul class="importcj-wall hidden"></ul>');
 					if (self.flytype == '2') {
 						self.stageInit();
@@ -83,12 +100,16 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 			//奖品信息
 			$(".importcj-header .awardname").text(prizeOne.awardname);
 			$(".importcj-header .prizename").text(prizeOne.prizename);
-			$(".importcj-awardlist").html(template("prize-tpl", prizeOne));
+			var prizeTplData = $.extend({}, prizeOne, { showPrizeInfo: isroundcj == '1' || self.flytype == '6' });
+			$(".importcj-awardlist").html(template("prize-tpl", prizeTplData));
 			$(".importcj-body img").attr('src', prizeOne.prizeimg);
 			//底部参数
 			$(".importcj-footer .active-prize").text(prizeOne.awardname).attr("data-prizeid", prizeOne.id);
 			$(".select-box .onceout").val(prizeOne.onceout);
 			self.initprizeandluckernum();
+			if (self.flytype == '6' && self.danmakuStage) {
+				self.danmakuStage.updatePrize(prizeOne);
+			}
 			$(".importcj-lists").removeClass('hidden');
 			if (!isfirst) {
 				self.initprizedatas(prizeOne.id);
@@ -104,6 +125,9 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 			//底部参数
 			$(".importcj-footer .active-prize").text(roundOne.roundtitle).attr("data-prizeid", roundOne.id);
 			self.initOneround();
+			if (self.flytype == '6' && self.danmakuStage) {
+				self.danmakuStage.updatePrize(roundOne);
+			}
 			$(".importcj-lists").removeClass('hidden');
 			if (!isfirst) {
 				self.initprizedatas(roundOne.id);
@@ -644,7 +668,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 						var one = v.prize;
 						one.num = v.num;
 						one.isroundcj = '1';
-						html += template("prize-tpl", one);
+						html += template("prize-tpl", $.extend({}, one, { showPrizeInfo: true }));
 					});
 					$(".importcj-awardlist").html(html);
 					var pgap = prizestyle.gap || 20, pw = prizestyle.width || 300, ipw = pw - parseInt(pw / 2);
@@ -691,12 +715,74 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 			}
 			return str;
 		},
+		getHaloCandidates: function () {
+			var self = this, fieldIndex = -1;
+			for (var i = 0; i < 4; i++) {
+				if (self.fieldconfig[i]) {
+					fieldIndex = i;
+					break;
+				}
+			}
+			if (fieldIndex < 0) return ['嘉宾'];
+			var field = self.fieldconfig[fieldIndex], fieldName = 'datafield' + (fieldIndex + 1);
+			return $.map(self.datas, function (userInfo) {
+				return self.initonedata((userInfo || {})[fieldName] || '', field);
+			});
+		},
+		getDanmakuCandidates: function () {
+			var self = this;
+			return $.map(self.datas, function (userInfo) {
+				var values = [];
+				for (var i = 0; i < 4; i++) {
+					if (!self.fieldconfig[i]) continue;
+					var fieldName = 'datafield' + (i + 1);
+					var value = self.initonedata((userInfo || {})[fieldName] || '', self.fieldconfig[i]);
+					if (String(value).replace(/^\s+|\s+$/g, '') !== '') {
+						values.push(value);
+					}
+				}
+				if (!values.length) return null;
+				return { name: values.shift(), extras: values };
+			});
+		},
+		getDanmakuPrize: function () {
+			return this.prizeInfo[this.prizeIndex] || {};
+		},
+		startDrawingAnimation: function () {
+			var self = this;
+			if (self.isstart != '2') return;
+			if (self.flytype == '1') {
+				self.changerollitem();
+			} else if (self.flytype == '5') {
+				// 保留原滚动列表及其逐项停止计时器；星环只负责运行态呈现。
+				self.changerollitem();
+				if (self.haloStage) {
+					self.haloStage.start(self.getHaloCandidates());
+				}
+			} else if (self.flytype == '6') {
+				// 真实停止计时仍由原有滚动列表维护，弹幕只负责候选视觉流动。
+				self.changerollitem();
+				if (self.danmakuStage) {
+					self.danmakuStage.updateCandidates(self.getDanmakuCandidates());
+					self.danmakuStage.updatePrize(self.getDanmakuPrize());
+					self.danmakuStage.setDrawing(true);
+				}
+			} else {
+				self.initShapePR();
+				$(".importcj-wall").removeClass('hidden');
+				self.stageStop = false;
+			}
+			$(".importcj-luckerbox").show();
+		},
 		initprizedatas: function (prizeid) {
 			var self = this;
-			screencore.ajaxSubmit('/screen/importcj/ajaxdatas', { isroundcj: isroundcj, prizeid: prizeid }).then(function (json) {
+				screencore.ajaxSubmit('/screen/importcj/ajaxdatas', { isroundcj: isroundcj, prizeid: prizeid }).then(function (json) {
 				if (json.code == 0) {
 					self.datas = json.msg;
 					self.updateCardsData();
+					if (self.flytype == '6' && self.danmakuStage) {
+						self.danmakuStage.updateCandidates(self.getDanmakuCandidates());
+					}
 				} else {
 					layerBox.showMsg(json.msg);
 				}
@@ -714,6 +800,9 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 						self.maxid = newdatas[0].dataid;
 						if (self.datas.length > 800) {
 							self.datas.splice(0, (self.datas.length - 300));
+						}
+						if (self.flytype == '6' && self.danmakuStage) {
+							self.danmakuStage.updateCandidates(self.getDanmakuCandidates());
 						}
 					}
 				}
@@ -808,25 +897,11 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 									firevideo1[0].play();
 									firevideo1.unbind('ended').bind('ended', function () {
 										firevideo1.hide();
-										if (self.flytype == '1') {
-											self.changerollitem()
-										} else {
-											self.initShapePR();
-											$(".importcj-wall").removeClass('hidden');
-											self.stageStop = false;
-										}
-										$(".importcj-luckerbox").show();
-									});
-								} else {
-									if (self.flytype == '1') {
-										self.changerollitem()
-									} else {
-										self.initShapePR();
-										$(".importcj-wall").removeClass('hidden');
-										self.stageStop = false;
-									}
-									$(".importcj-luckerbox").show();
-								}
+									self.startDrawingAnimation();
+								});
+							} else {
+								self.startDrawingAnimation();
+							}
 							}, 50);
 							$(".importcj-mainbox").removeClass('isdrawed').addClass('isdrawing');
 							self.isstart = '2';
@@ -854,7 +929,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 					if ($this.text() == '开始') {
 						return false;
 					}
-					if (self.flytype == '1') {
+						if (self.flytype == '1' || self.flytype == '5' || self.flytype == '6') {
 						var prizeOne = self.prizeInfo[self.prizeIndex] || {}, stoptype = prizeOne.stoptype || '1';
 						//默认停止方式或者按轮次抽奖均不另外设置
 						if (stoptype == '1' || isroundcj == '1') {
@@ -866,6 +941,12 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 								return false;
 							}
 						}
+							if (self.flytype == '5' && self.haloStage) {
+								self.haloStage.stop();
+							}
+							if (self.flytype == '6' && self.danmakuStage) {
+								self.danmakuStage.setResult(luckerList, self.getDanmakuPrize());
+							}
 					} else {
 						$(".importcj-wall").addClass('hidden');
 						self.stageStop = true;
@@ -1065,6 +1146,9 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 						}
 					}, function (errmsg) {
 						self.isstart = '1';
+						if (self.flytype == '6' && self.danmakuStage) {
+							self.danmakuStage.setReady(self.getDanmakuCandidates());
+						}
 						layerBox.showMsg(errmsg);
 					});
 				} else if (self.isstart == '4') {

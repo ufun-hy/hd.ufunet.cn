@@ -19,7 +19,27 @@
 					{/if}
 				</div>
 			{/foreach}
+				<div data-val="5" class="zam-styleitem{if isset($config['styleconfig']['flytype']) && $config['styleconfig']['flytype'] == '5'} hadchecked{/if}">
+					<div class="zam-styleimg">
+						<img src="/static/images/sys/style/importcj/5.jpg" onerror="javascript:this.src='/static/images/sys/nopic.jpg';this.title='暂无图片'">
+					</div>
+					<div class="zam-stylename">星环名单抽奖</div>
+					<div class="zam-selected"><i class="mdi mdi-check"></i></div>
+					{if !request()->realhdid}
+					<input type="hidden" name="styleimg5" value="/static/images/sys/style/importcj/5.jpg">
+					{/if}
 			</div>
+				<div data-val="6" data-theme-key="danmaku" class="zam-styleitem{if isset($config['styleconfig']['flytype']) && $config['styleconfig']['flytype'] == '6'} hadchecked{/if}">
+					<div class="zam-styleimg">
+						<img src="/static/images/sys/style/importcj/6.svg" onerror="javascript:this.src='/static/images/sys/nopic.jpg';this.title='暂无图片'">
+					</div>
+					<div class="zam-stylename">弹幕星河</div>
+					<div class="zam-selected"><i class="mdi mdi-check"></i></div>
+					{if !request()->realhdid}
+					<input type="hidden" name="styleimg6" value="/static/images/sys/style/importcj/6.svg">
+					{/if}
+				</div>
+				</div>
 			<input type="hidden" name="styleconfig[flytype]" value="{$config['styleconfig']['flytype']??1}">
 			{if !request()->realhdid}
 			<div class="help-block">点击图片即可上传预览图，图片尺寸：180*101px</div>
@@ -31,15 +51,16 @@
 		var flytype = $(this).attr('data-val');
 		$(this).addClass('hadchecked').siblings().removeClass('hadchecked');
 		$(this).parent().next().val(flytype);
-		if(flytype == '1'){
+		if(flytype == '1' || flytype == '5' || flytype == '6'){
 			$(".flystylebox").addClass('hidden');
+			$(".flystylebox").children().addClass('hidden');
 		}else{
 			$(".flystylebox").removeClass('hidden');
 			if(flytype == '2'){
 				$(".flystylebox .one").removeClass('hidden').siblings().addClass('hidden');
 			}else if(flytype == '3'){
 				$(".flystylebox .grid").removeClass('hidden').siblings().addClass('hidden');
-			}else{
+			}else if(flytype == '4'){
 				$(".flystylebox .sphere").removeClass('hidden').siblings().addClass('hidden');
 			}
 		}
@@ -54,7 +75,7 @@
 	});
 	{/if}
 	</script>
-	<div class="flystylebox{if !isset($config['styleconfig']['flytype']) || $config['styleconfig']['flytype'] == '1'} hidden{/if}">
+	<div class="flystylebox{if !isset($config['styleconfig']['flytype']) || $config['styleconfig']['flytype'] == '1' || $config['styleconfig']['flytype'] == '5' || $config['styleconfig']['flytype'] == '6'} hidden{/if}">
 		<div class="one{if isset($config['styleconfig']['flytype']) && $config['styleconfig']['flytype'] != '2'} hidden{/if}">
 			<div class="form-group">
 				<label class="col-lg-2 control-label">* 文字大小</label>

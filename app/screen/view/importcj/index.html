@@ -1,4 +1,10 @@
 {include file='common/header' /}
+{if isset($pcconfig['styleconfig']['flytype']) && $pcconfig['styleconfig']['flytype'] == '5'}
+<link rel="stylesheet" href="/static/css/screencss/screenimportcj-halo.css">
+{/if}
+{if isset($pcconfig['styleconfig']['flytype']) && $pcconfig['styleconfig']['flytype'] == '6'}
+<link rel="stylesheet" href="/static/css/screencss/screenimportcj-danmaku.css">
+{/if}
 <style>
 ::-webkit-scrollbar {
     width: 10px;
@@ -440,21 +446,21 @@
 {if !empty($pcconfig['iscjendmusic'])}
 <audio id="cjendmusic" src="{:tomedia($pcconfig['iscjendmusic'])}" preload="preload" style="display:none"></audio>
 {/if}
-<div class="importcj-mainbox normalbox flybox{$pcconfig['styleconfig']['flytype']??1}{if isset($pcconfig['isroundcj']) && $pcconfig['isroundcj'] =='1'} isroundcj{/if}">
+<div class="importcj-mainbox normalbox flybox{$pcconfig['styleconfig']['flytype']??1}{if isset($pcconfig['isroundcj']) && $pcconfig['isroundcj'] =='1'} isroundcj{/if}"{if isset($pcconfig['styleconfig']['flytype']) && $pcconfig['styleconfig']['flytype'] == '6'} data-theme-key="danmaku"{/if}>
     <div class="emptybox zam-app-flex-ajCenter hidden">
         <img src="/{:SIMGURL}common/empty.png">
         <p style="padding:20px;">请到后台添加{if isset($pcconfig['isroundcj']) && $pcconfig['isroundcj']=='1'}轮次{else /}奖品{/if}</p>
     </div>
     <div class="importcj-lists zam-app-flex-ajCenter hidden">
-        <div class="importcj-header zam-app-flex-ajCenter headerani">
+        <div class="importcj-header importcj-legacy-visual zam-app-flex-ajCenter headerani">
             <div class="importcj-headerbg"><span class="awardname">xxx</span></div>
             <div class="prizename">xxx奖品</div>
         </div>
         <div class="importcj-body zam-app-flex-ajCenter">
-            <div class="importcj-awardlist"></div>
-            <div class="importcj-luckerbox">
+            <div class="importcj-awardlist importcj-legacy-visual"></div>
+            <div class="importcj-luckerbox importcj-legacy-visual">
                 <div class="importcj-luckerbox-content">
-                    <ul class="importcj-luckerbox-lists"></ul>
+                    <ul class="importcj-luckerbox-lists importcj-legacy-visual"></ul>
                     <div class="importcj-btip hidden">尽显公平与公正</div>
                 </div>
             </div>
@@ -495,8 +501,8 @@ require(['screenimportcj'],function(screenimportcj){
 </script>
 <script id="prize-tpl" type="html/javascript">
 <div class="importcj-awardbox zam-app-flex-ajCenter awardboxani">
-    <div class="importcj-prizeimg zam-app-flex-ajCenter"><img src="{{ prizeimg }}"></div>
-    {{ if isroundcj == '1' }}
+    <div class="importcj-prizeimg zam-app-flex-ajCenter"><img src="{{ prizeimg }}" onerror="this.classList.add('is-broken'); this.parentNode.classList.add('is-image-missing');"></div>
+    {{ if showPrizeInfo }}
     <div class="importcj-prizeinfo">
         <div class="importcj-prizename">{{ prizename }}</div>
         <div class="importcj-prizenum">{{ num }}个</div>
