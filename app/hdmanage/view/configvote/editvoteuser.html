@@ -22,10 +22,18 @@
 		</div>
 	</div>
 	<div class="form-group">
-		<label class="col-lg-3 control-label"> 项目图片</label>
+		<label class="col-lg-3 control-label"> 项目媒体</label>
 		<div class="col-lg-8">
-			{:tpl_image_one('voteimg', $config['voteimg'])}
-			<span class="zam-help-block">图片可不设置，如果设置了图片必须保证所有投票项的图片尺寸保持一致，推荐尺寸:200*200px</span>
+			<div class="vote-media-picker">
+				<input type="hidden" name="voteimg" value="{$config['voteimg']}">
+				<div class="btn-group">
+					<a href="javascript:;" class="btn btn-default btn-sm vote-select-image"><i class="mdi mdi-image"></i> 选择图片</a>
+					<a href="javascript:;" class="btn btn-default btn-sm vote-select-video"><i class="mdi mdi-video"></i> 选择视频</a>
+					<a href="javascript:;" class="btn btn-default btn-sm vote-clear-media">清除</a>
+				</div>
+				<div class="vote-media-preview" data-vote-media="{:tomedia($config['voteimg'])}"></div>
+			</div>
+			<span class="zam-help-block">可不设置，也可以选择图片或视频。图片推荐尺寸:200*200px；视频建议使用 mp4/webm，投票项尺寸尽量保持一致。</span>
 		</div>
 	</div>
 	<div class="form-group">
@@ -49,8 +57,58 @@
 	</div>
 </form>
 </div>
+<script type="text/javascript" src="__STATIC__/js/vote-media.js?v=20260813194922"></script>
+<style>
+.vote-media-picker .vote-media-preview {
+	 width: 200px;
+	 height: 120px;
+	 margin-top: 10px;
+	 background: #f5f5f5;
+	 overflow: hidden;
+	 display: flex;
+	 align-items: center;
+	 justify-content: center;
+}
+.vote-media-picker .vote-media-preview > img,
+.vote-media-picker .vote-media-preview > video {
+	 display: block;
+	 width: 100%;
+	 height: 100%;
+	 max-width: 100%;
+	 object-fit: contain;
+}
+</style>
 <script type="text/javascript">
 	require(['webcore'],function(webcore){
 		tpl_switch();
+		if(window.voteMedia){
+			window.voteMedia.renderAll($('.vote-media-picker'));
+		}
+		$('.vote-select-image').on('click',function(){
+			var button = this, picker = $(button).closest('.vote-media-picker');
+			tpl_image_one(button,function(src,path){
+				picker.find('input[name="voteimg"]').val(path);
+				picker.find('.vote-media-preview').attr('data-vote-media',src).removeData('vote-media-rendered');
+				window.voteMedia && window.voteMedia.renderAll(picker);
+			});
+		});
+		$('.vote-select-video').on('click',function(){
+			var button = this, picker = $(button).closest('.vote-media-picker'), form = $(button).closest('form');
+			tpl_video(button,function(preview,path,src){
+				picker.find('input[name="voteimg"]').val(path);
+				var posterInput = form.find('input[name="votebigimg"]');
+				if(preview && !posterInput.val()){
+					posterInput.val(preview);
+				}
+				picker.find('.vote-media-preview').attr('data-vote-media',src || path).removeData('vote-media-rendered');
+				window.voteMedia && window.voteMedia.renderAll(picker);
+			});
+		});
+		$('.vote-clear-media').on('click',function(){
+			var picker = $(this).closest('.vote-media-picker');
+			picker.find('input[name="voteimg"]').val('');
+			picker.find('.vote-media-preview').attr('data-vote-media','').removeData('vote-media-rendered');
+			window.voteMedia && window.voteMedia.renderAll(picker);
+		});
 	});
 </script>

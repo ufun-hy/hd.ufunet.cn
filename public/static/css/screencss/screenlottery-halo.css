@@ -1,0 +1,666 @@
+/*
+ * 星环头像抽奖 (Halo Avatar Lottery) 专属样式表
+ * 严格作用于 .lottery-halo-theme 根类之下
+ */
+
+.lottery-halo-theme {
+    --halo-bg: #05070e;
+    --halo-primary: #12b5ff;
+    --halo-secondary: #a93cff;
+    --halo-accent: #ff2970;
+    --halo-text: #ffffff;
+
+    overflow: hidden;
+    isolation: isolate;
+    background: transparent !important;
+}
+
+/* --- 1. 全局与降级降噪 --- */
+.lottery-halo-theme::before {
+    display: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+    .lottery-halo-theme * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* --- 2. 3D 墙粒子化 (深空背景) --- */
+.lottery-halo-theme .signthreed-wall-block {
+    z-index: 1;
+    pointer-events: none;
+}
+.lottery-halo-theme .wall3d ul li {
+    opacity: 0.15;
+    filter: grayscale(1) blur(2px);
+    box-shadow: 0 0 10px rgba(255,255,255,0.1);
+    border-radius: 50% !important;
+    pointer-events: none;
+}
+.lottery-halo-theme .wall3d ul li img {
+    border-radius: 50% !important;
+}
+
+/* --- 3. 基础组件透明化重构 --- */
+.lottery-halo-theme .lottery-left,
+.lottery-halo-theme .lottery-right {
+    box-shadow: none;
+    border: none;
+}
+.lottery-halo-theme .lottery-wrapper {
+    z-index: 5;
+    justify-content: center;
+    gap: 40px;
+}
+.lottery-halo-theme .left-prizeaward .left-prizename {
+    border: 1px solid rgba(18, 181, 255, 0.3);
+    border-radius: 30px;
+    box-shadow: 0 0 20px rgba(18,181,255,0.2);
+}
+.lottery-halo-theme .start-btn,
+.lottery-halo-theme .lottery-stop-btn,
+.lottery-halo-theme .lottery-close-btn {
+    filter: drop-shadow(0 0 12px rgba(18, 181, 255, 0.35));
+    transition: transform 0.2s ease, filter 0.2s ease;
+}
+.lottery-halo-theme .start-btn:hover:not(.stopclick),
+.lottery-halo-theme .lottery-stop-btn:hover,
+.lottery-halo-theme .lottery-close-btn:hover {
+    transform: scale(1.05);
+    filter: brightness(1.08) drop-shadow(0 0 18px rgba(18, 181, 255, 0.55));
+}
+
+/* --- 4. 运行态：显隐保护与容器适配 (映射到 lottery-userBox) --- */
+.lottery-halo-theme .lottery-userBox.hidden {
+    display: none !important;
+}
+.lottery-halo-theme .lottery-userBox {
+    z-index: 10;
+    background: transparent !important;
+    height: 100%;
+}
+.lottery-halo-theme .lottery-userBox-wrapper {
+    background: transparent !important;
+    box-shadow: none !important;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: clamp(15px, 2.5vw, 40px);
+    width: min(1200px, calc(100% - 40px));
+    padding: 20px;
+    max-height: calc(100% - 32px);
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+.lottery-halo-theme .box_angle { display: none !important; }
+
+.lottery-halo-theme .lottery-userBox-item {
+    margin: 0 !important;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* 消除与自带 frotate 样式的冲突：仅屏蔽原生背景图，确保自定义双层动画与光影完全生效 */
+.lottery-halo-theme .lottery-userBox-avatar.frotate::after,
+.lottery-halo-theme .lottery-userBox-avatar.frotate::before {
+    background-image: none !important;
+    background-color: transparent !important;
+}
+
+.lottery-halo-theme .lottery-userBox-avatar {
+    width: clamp(80px, 14vw, 220px) !important;
+    height: clamp(80px, 14vw, 220px) !important;
+    padding: 0 !important;
+    background: rgba(10, 15, 30, 0.8);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border: 4px solid rgba(255,255,255,0.05);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5), inset 0 0 20px rgba(255,255,255,0.1);
+    border-radius: 50%;
+    position: relative;
+    z-index: 2;
+    isolation: isolate;
+    overflow: visible;
+    animation: none !important;
+}
+.lottery-halo-theme .lottery-userBox-avatar img {
+    position: relative;
+    z-index: 2;
+    display: block;
+    object-fit: cover;
+}
+.lottery-halo-theme .lottery-userBox-avatar.frotate::before {
+    content: '';
+    position: absolute;
+    top: clamp(-40px, -3vw, -20px) !important;
+    right: clamp(-40px, -3vw, -20px) !important;
+    bottom: clamp(-40px, -3vw, -20px) !important;
+    left: clamp(-40px, -3vw, -20px) !important;
+    width: auto !important;
+    height: auto !important;
+    display: block !important;
+    border-radius: 50%;
+    border: 2px solid rgba(18, 181, 255, 0.2);
+    border-left-color: var(--halo-primary);
+    animation: halo-spin 6s linear infinite;
+    box-shadow: 0 0 40px rgba(18, 181, 255, 0.2);
+    z-index: 0;
+    pointer-events: none;
+}
+.lottery-halo-theme .lottery-userBox-avatar.frotate::after {
+    content: '';
+    position: absolute;
+    top: clamp(-20px, -1.5vw, -10px) !important;
+    right: clamp(-20px, -1.5vw, -10px) !important;
+    bottom: clamp(-20px, -1.5vw, -10px) !important;
+    left: clamp(-20px, -1.5vw, -10px) !important;
+    width: auto !important;
+    height: auto !important;
+    display: block !important;
+    border-radius: 50%;
+    border: 2px dashed rgba(169, 60, 255, 0.3);
+    border-right-color: var(--halo-secondary);
+    animation: halo-spin-reverse 10s linear infinite;
+    box-shadow: 0 0 25px rgba(169, 60, 255, 0.2);
+    z-index: 1;
+    pointer-events: none;
+}
+
+.lottery-halo-theme .lottery-userBox-item p {
+    margin-top: clamp(15px, 2vw, 30px);
+    font-size: clamp(14px, 1.8vw, 24px);
+    font-weight: bold;
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px rgba(18,181,255,0.8);
+    text-align: center;
+}
+
+/* --- 5. 结果态：多中奖人网格响应式适配 (映射到 lottery-luckers) --- */
+.lottery-halo-theme .lottery-luckers.hidden {
+    display: none !important;
+}
+.lottery-halo-theme .lottery-luckers {
+    background: transparent !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    overflow-y: auto;
+}
+
+/* 结果网格容器与头像尺寸安全缩放，适配 1024x576 等小分辨率及多人中奖 */
+.lottery-halo-theme .lottery-luckers-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-content: flex-start;
+    gap: clamp(10px, 2vw, 30px);
+    box-sizing: border-box;
+    padding: clamp(12px, 2vw, 28px);
+    overflow-y: auto;
+}
+.lottery-halo-theme .lottery-luckers-item {
+    width: clamp(82px, 12vw, 160px);
+    margin: 0 !important;
+    flex: 0 0 auto;
+}
+.lottery-halo-theme .lottery-luckers-img.frotate {
+    width: clamp(70px, 12vw, 160px) !important;
+    height: clamp(70px, 12vw, 160px) !important;
+    padding: clamp(4px, 0.7vw, 8px);
+    box-sizing: border-box;
+}
+.lottery-halo-theme .lottery-luckers-img.frotate::after,
+.lottery-halo-theme .prizelucklist .avatar.frotate::after {
+    border: 0;
+    box-shadow: none;
+}
+.lottery-halo-theme .lottery-luckers-name {
+    margin-top: 8px;
+    font-size: clamp(12px, 1.5vw, 18px) !important;
+}
+
+/* 轮次抽奖结果与小屏幕安全区 */
+.lottery-halo-theme .lottery-roundluckerbox {
+    max-width: calc(100% - 32px);
+    max-height: calc(100% - 32px);
+    background-size: 100% 100%;
+}
+.lottery-halo-theme .roundlucker-lists {
+    max-width: calc(100% - 32px);
+    max-height: calc(100% - 64px);
+}
+
+@media (max-width: 1280px), (max-height: 720px) {
+    .lottery-halo-theme .lottery-wrapper {
+        gap: clamp(16px, 3vw, 40px);
+        box-sizing: border-box;
+        padding: 0 16px;
+    }
+    .lottery-halo-theme .lottery-wrapper .lottery-left {
+        width: min(34vw, 425px);
+        height: min(100%, 620px);
+        overflow: hidden;
+    }
+    .lottery-halo-theme .lottery-left .left-main {
+        margin-top: clamp(16px, 6vh, 77px);
+        transform: scale(0.78);
+        transform-origin: top center;
+    }
+    .lottery-halo-theme .lottery-mainbox .lottery-right {
+        width: min(58vw, 688px);
+        height: min(100%, 620px);
+        margin-left: 0;
+        overflow: hidden;
+    }
+    .lottery-halo-theme .right-reward-box {
+        width: calc(100% - 24px);
+        height: calc(100% - 88px);
+        margin: 0 12px;
+    }
+    .lottery-halo-theme .right-lucker {
+        width: 25%;
+    }
+    .lottery-halo-theme .lottery-luckers {
+        width: calc(100% - 32px);
+        height: calc(100% - 48px);
+        top: 24px;
+        left: 16px;
+        box-sizing: border-box;
+    }
+    .lottery-halo-theme .lottery-roundluckerbox {
+        width: calc(100% - 32px);
+        height: calc(100% - 32px);
+        padding-top: 38px;
+    }
+    .lottery-halo-theme .roundlucker-lists {
+        width: calc(100% - 32px);
+        height: calc(100% - 64px);
+    }
+    .lottery-halo-theme .roundcj-box {
+        padding: 24px 20px 0;
+    }
+    .lottery-halo-theme .roundcj-box .roundcj-body .roundcj-prizelist .roundcj-item .prizeimgbox {
+        width: clamp(160px, 28vh, 300px);
+        height: clamp(160px, 28vh, 300px);
+    }
+}
+
+@keyframes halo-spin {
+    100% { transform: rotate(360deg); }
+}
+@keyframes halo-spin-reverse {
+    100% { transform: rotate(-360deg); }
+}
+
+/* --- 6. 真实大屏运行时：中央主头像 + 外围参与者 --- */
+.lottery-halo-theme .headerLogo img {
+    height: 46px !important;
+    max-width: 210px !important;
+    object-fit: contain;
+}
+
+.lottery-halo-theme .lottery-left,
+.lottery-halo-theme .lottery-right {
+    background-color: transparent;
+}
+
+/* 原 3D 球体会与中央星环重叠，新主题只保留真实参与者头像。 */
+.lottery-halo-theme .wall3d {
+    opacity: 0 !important;
+    visibility: hidden !important;
+}
+
+.lottery-halo-theme .lottery-userBox {
+    position: absolute;
+    background: transparent !important;
+}
+
+.lottery-halo-theme .lottery-userBox::before,
+.lottery-halo-theme .lottery-userBox::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 46%;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.lottery-halo-theme .lottery-userBox::before {
+    width: 470px;
+    height: 470px;
+    border: 1px solid rgba(18, 181, 255, 0.24);
+    border-left-color: var(--halo-primary);
+    border-right-color: rgba(169, 60, 255, 0.55);
+    box-shadow: 0 0 80px rgba(18, 181, 255, 0.08);
+    animation: halo-stage-orbit 9s linear infinite;
+}
+
+.lottery-halo-theme .lottery-userBox::after {
+    width: 600px;
+    height: 600px;
+    border: 1px dashed rgba(169, 60, 255, 0.15);
+    border-top-color: rgba(169, 60, 255, 0.5);
+    animation: halo-stage-orbit-reverse 16s linear infinite;
+}
+
+.lottery-halo-theme .lottery-userBox-wrapper {
+    position: relative !important;
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+}
+
+.lottery-halo-theme .lottery-userBox-item {
+    position: absolute !important;
+    width: auto !important;
+    margin: 0 !important;
+    z-index: 2;
+    transition: opacity 0.45s ease, transform 0.45s ease;
+}
+
+/* 前两个子节是旧主题装饰角，动态用户从第三个子节开始。 */
+.lottery-halo-theme .lottery-userBox-item:nth-child(3) {
+    left: 50%;
+    top: 46%;
+    transform: translate(-50%, -50%);
+    opacity: 1;
+    filter: none;
+    z-index: 4;
+}
+
+.lottery-halo-theme .lottery-userBox-item:nth-child(3) .lottery-userBox-avatar {
+    width: 200px !important;
+    height: 200px !important;
+}
+
+.lottery-halo-theme .lottery-userBox-item:nth-child(3) p {
+    width: 300px;
+    margin-top: 28px;
+    font-size: 30px;
+    line-height: 1.25;
+    background: linear-gradient(180deg, #fff, #9bdcff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 12px rgba(18, 181, 255, 0.5));
+}
+
+.lottery-halo-theme .lottery-userBox-item:nth-child(n+4) {
+    opacity: 0.38;
+    filter: saturate(0.65);
+}
+
+.lottery-halo-theme .lottery-userBox-item:nth-child(n+4) .lottery-userBox-avatar {
+    width: 58px !important;
+    height: 58px !important;
+    border-width: 2px;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.4), 0 0 24px rgba(18, 181, 255, 0.16);
+}
+
+.lottery-halo-theme .lottery-userBox-item:nth-child(n+4) .lottery-userBox-avatar::before,
+.lottery-halo-theme .lottery-userBox-item:nth-child(n+4) .lottery-userBox-avatar::after {
+    display: none !important;
+}
+
+.lottery-halo-theme .lottery-userBox-item:nth-child(n+4) p {
+    width: 140px;
+    margin-top: 9px;
+    font-size: 13px;
+    letter-spacing: 1px;
+    text-shadow: none;
+}
+
+.lottery-halo-theme .lottery-userBox-item:nth-child(4) { left: 13%; top: 19%; }
+.lottery-halo-theme .lottery-userBox-item:nth-child(5) { right: 13%; top: 18%; }
+.lottery-halo-theme .lottery-userBox-item:nth-child(6) { left: 17%; bottom: 15%; }
+.lottery-halo-theme .lottery-userBox-item:nth-child(7) { right: 17%; bottom: 14%; }
+.lottery-halo-theme .lottery-userBox-item:nth-child(8) {
+    left: 50%;
+    bottom: 12%;
+    transform: translateX(-50%);
+}
+
+.lottery-halo-theme .start-btn,
+.lottery-halo-theme .lottery-stop-btn,
+.lottery-halo-theme .lottery-close-btn {
+    background-color: transparent;
+}
+
+.lottery-halo-theme .start-btn::after,
+.lottery-halo-theme .lottery-stop-btn::after,
+.lottery-halo-theme .lottery-close-btn::after {
+    display: none !important;
+    pointer-events: none;
+}
+
+@keyframes halo-stage-orbit {
+    from { transform: translate(-50%, -50%) rotate(0deg); }
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+@keyframes halo-stage-orbit-reverse {
+    from { transform: translate(-50%, -50%) rotate(360deg); }
+    to { transform: translate(-50%, -50%) rotate(0deg); }
+}
+
+/* --- 4. 运行态 (抽奖中 .lottery-userBox) 抽奖中视觉复刻 --- */
+.lottery-halo-theme .lottery-userBox.hidden {
+    display: none !important;
+}
+.lottery-halo-theme .lottery-userBox:not(.hidden) {
+    display: block !important;
+}
+.lottery-halo-theme .lottery-userBox {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    background: transparent !important;
+    overflow: hidden;
+}
+
+/* 关闭外层 userBox 的伪元素星环 */
+.lottery-halo-theme .lottery-userBox::before,
+.lottery-halo-theme .lottery-userBox::after {
+    display: none !important;
+}
+
+/* 独立舞台配置：1920x1080 居中并支持缩放 */
+.lottery-halo-theme .lottery-userBox-wrapper {
+    position: absolute !important;
+    left: 50% !important;
+    top: 50% !important;
+    margin-left: -960px !important;
+    margin-top: -540px !important;
+    --halo-stage-scale: 0.74; /* 800px/1080px 默认安全缩放比 */
+    transform: scale(var(--halo-stage-scale)) !important;
+    transform-origin: center center;
+    display: block !important;
+    width: 1920px !important;
+    height: 1080px !important;
+    max-width: none !important;
+    max-height: none !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+}
+
+/* 复用内部元素作为同一坐标系下的三条星环 */
+.lottery-halo-theme .lottery-userBox-wrapper::before,
+.lottery-halo-theme .lottery-userBox-wrapper .box_angle_top,
+.lottery-halo-theme .lottery-userBox-wrapper .box_angle_bottom {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 1;
+    display: block !important;
+    background: transparent !important;
+}
+
+/* 350px 环 (ring 1) */
+.lottery-halo-theme .lottery-userBox-wrapper::before {
+    width: 350px;
+    height: 350px;
+    margin: -175px 0 0 -175px;
+    border: 4px solid;
+    border-color: var(--halo-primary) var(--halo-secondary) var(--halo-accent);
+    box-shadow: 0 0 80px rgba(18, 181, 255, 0.4);
+    animation: halo-spin 2s linear infinite;
+}
+
+/* 450px 环 (ring 2) */
+.lottery-halo-theme .lottery-userBox-wrapper .box_angle_top {
+    width: 450px;
+    height: 450px;
+    margin: -225px 0 0 -225px;
+    border: 3px solid;
+    border-color: var(--halo-secondary) transparent var(--halo-primary);
+    box-shadow: 0 0 40px rgba(169, 60, 255, 0.3);
+    animation: halo-spin-reverse 3s linear infinite;
+}
+
+/* 550px 环 (ring 3) */
+.lottery-halo-theme .lottery-userBox-wrapper .box_angle_bottom {
+    width: 550px;
+    height: 550px;
+    margin: -275px 0 0 -275px;
+    border: 1px solid;
+    border-color: var(--halo-accent) transparent;
+    box-shadow: 0 0 30px rgba(255, 41, 112, 0.2);
+    animation: halo-spin 4s linear infinite;
+    z-index: 1;
+}
+
+/* 覆盖可能影响星环的 box_angle 隐藏 */
+.lottery-halo-theme .box_angle { display: none !important; }
+.lottery-halo-theme .lottery-userBox-wrapper .box_angle_top,
+.lottery-halo-theme .lottery-userBox-wrapper .box_angle_bottom { display: block !important; }
+
+.lottery-halo-theme .lottery-userBox-wrapper .box_angle_top::before,
+.lottery-halo-theme .lottery-userBox-wrapper .box_angle_top::after,
+.lottery-halo-theme .lottery-userBox-wrapper .box_angle_bottom::before,
+.lottery-halo-theme .lottery-userBox-wrapper .box_angle_bottom::after { display: none !important; }
+
+/* 头像项通用 */
+.lottery-halo-theme .lottery-userBox-item {
+    position: absolute !important;
+    margin: 0 !important;
+    z-index: 2;
+}
+
+/* 中央焦点头像 (nth-child(3)) */
+.lottery-halo-theme .lottery-userBox-item:nth-child(3) {
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.lottery-halo-theme .lottery-userBox-item:nth-child(3) .lottery-userBox-avatar {
+    width: 240px !important;
+    height: 240px !important;
+    padding: 0 !important;
+    border-radius: 50%;
+    background: rgba(10, 15, 30, 0.8);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    border: 4px solid rgba(18, 181, 255, 0.6);
+    box-shadow: 0 0 60px rgba(18,181,255,0.4), inset 0 0 40px rgba(18,181,255,0.3);
+    position: relative;
+    z-index: 5;
+    overflow: hidden;
+    transform: scale(1.08);
+}
+
+.lottery-halo-theme .lottery-userBox-item:nth-child(3) .lottery-userBox-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.lottery-halo-theme .lottery-userBox-item:nth-child(3) .lottery-userBox-avatar.frotate::after,
+.lottery-halo-theme .lottery-userBox-item:nth-child(3) .lottery-userBox-avatar.frotate::before {
+    display: none !important;
+}
+
+.lottery-halo-theme .lottery-userBox-item:nth-child(3) p,
+.lottery-halo-theme .lottery-userBox-item:nth-child(3) > p + div {
+    display: none !important;
+}
+
+/* 外围浮动头像 (nth-child(n+4)) 使用 Orbit 方案 */
+.lottery-halo-theme .lottery-userBox-item:nth-child(n+4) {
+    left: 50%;
+    top: 50%;
+    margin: calc(var(--size, 60px) * -0.5) 0 0 calc(var(--size, 60px) * -0.5) !important;
+    animation: orbit-anim var(--dur, 20s) linear infinite;
+    animation-delay: var(--delay, 0s);
+    opacity: var(--opacity, 0.5) !important;
+    transform-origin: center;
+    right: auto !important;
+    bottom: auto !important;
+    filter: none;
+}
+
+.lottery-halo-theme .lottery-userBox-item:nth-child(n+4) .lottery-userBox-avatar {
+    width: var(--size, 60px) !important;
+    height: var(--size, 60px) !important;
+    padding: 0 !important;
+    border-radius: 50%;
+    background: rgba(10, 15, 30, 0.8);
+    border: 2px solid rgba(255,255,255,0.15);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5), 0 0 15px var(--color, rgba(18,181,255,0.6));
+    overflow: hidden;
+    filter: brightness(0.8) contrast(1.2) drop-shadow(0 0 15px var(--color, rgba(18,181,255,0.6))) !important;
+}
+
+.lottery-halo-theme .lottery-userBox-item:nth-child(n+4) .lottery-userBox-avatar.frotate::after,
+.lottery-halo-theme .lottery-userBox-item:nth-child(n+4) .lottery-userBox-avatar.frotate::before {
+    display: none !important;
+}
+
+.lottery-halo-theme .lottery-userBox-item:nth-child(n+4) img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.lottery-halo-theme .lottery-userBox-item:nth-child(n+4) p,
+.lottery-halo-theme .lottery-userBox-item:nth-child(n+4) > p + div {
+    display: none !important;
+}
+
+/* 外围头像换人过渡 */
+.lottery-halo-theme .lottery-userBox-item.halo-avatar-changing .lottery-userBox-avatar img {
+    animation: halo-avatar-update 0.3s ease-in-out;
+}
+
+@keyframes halo-avatar-update {
+    0% { opacity: 1; }
+    50% { opacity: 0.2; }
+    100% { opacity: 1; }
+}
+
+@keyframes orbit-anim {
+    0% { transform: rotate(0deg) translateX(var(--radius, 400px)) rotate(0deg) scale(var(--scale, 1)); }
+    100% { transform: rotate(360deg) translateX(var(--radius, 400px)) rotate(-360deg) scale(var(--scale, 1)); }
+}

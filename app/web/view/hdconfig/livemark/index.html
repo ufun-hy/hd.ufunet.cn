@@ -1,4 +1,5 @@
 {include file='$Wpath/common/header'}
+{php}$livemarkShowPwScore = \app\common\service\common\LivemarkJudgeScoreVisibilityService::get(request()->realhdid ?? 0);{/php}
 <form id="formBox" class="zam-formvalidation form-horizontal" method="post">
     <div class="config-titlebox">
         <span class="config-titlename">微信设置</span>
@@ -27,6 +28,13 @@
     <div id="screenconfigbox" class="collapse in">
         {include file="$Wpath/common/configscreencommon" /}
         {include file="$Wpath/common/configscreenmusic" /}
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 大屏显示评委分数</label>
+            <div class="col-lg-8">
+                {:tpl_switch('showpwscore',$livemarkShowPwScore)}
+                <span class="help-block">开启后显示专家评委提交的分数；关闭后不展示具体分值，仅用“打分中”和“已提交”显示评分状态</span>
+            </div>
+        </div>
         <div class="form-group">
             <label class="col-lg-2 control-label">* 显示扣分与最终得分</label>
             <div class="col-lg-8">

@@ -1,0 +1,78 @@
+[
+  {
+    "id": "AC-01",
+    "requirement": "Gemini Web produces six materially distinct front-end large-screen prompts: two for QR-code draw, two for imported-list draw, and two for interactive games; scenes, operation flows, and management backends are all excluded.",
+    "verification": [
+      "Final revised prompts are captured in deliveries/gemini-prompts-frontend-screen-only.md",
+      "Each prompt is dominated by a buyer-visible front-end draw/game screen, reserves a Chinese-copy area, and explicitly excludes people, venues, devices, arrows, steps, dashboards, tables, and settings"
+    ],
+    "status": "passed",
+    "evidence": [
+      "deliveries/gemini-prompts-frontend-screen-only.md contains exactly six named directions",
+      "Gemini Web Pro conversation https://gemini.google.com/app/f6acb6e1b14e1e40"
+    ],
+    "notes": "The earlier scene-heavy and management-dashboard prompt sets are rejected and excluded. Gemini is the prompt author only; it is not used to generate final pixels."
+  },
+  {
+    "id": "AC-02",
+    "requirement": "ChatGPT Web image generation creates six square buyer-visible front-end draw/game visual bases, one from each final Gemini-authored prompt.",
+    "verification": [
+      "ChatGPT surface/model label and stable conversation URL are recorded",
+      "Six downloaded non-empty image artifacts are stored under outputs/generated-frontend-only",
+      "All scene-heavy and management-dashboard images are listed in outputs/REJECTED.md and never used in final deliverables"
+    ],
+    "status": "passed",
+    "evidence": [
+      "outputs/generated-frontend-only contains six 1254x1254 PNG bases",
+      "ChatGPT Web Create Image conversation https://chatgpt.com/c/6a72cfed-6848-83ec-bf6f-f023ac8ae2d5",
+      "outputs/REJECTED.md excludes all prior scene-heavy and management-dashboard generations"
+    ],
+    "notes": "Luna is not used for image generation."
+  },
+  {
+    "id": "AC-03",
+    "requirement": "Every final image is centered on a buyer-visible front-end large-screen effect rather than an event atmosphere, operation flow, or management backend.",
+    "verification": [
+      "QR images visibly show participant pools and winner reveal on the large-screen front end",
+      "List images visibly show rolling name/photo cards and winner reveal on the large-screen front end",
+      "Game images visibly show identifiable running game screens and player-facing ranking/results",
+      "No dashboard, table, setting panel, arrows, numbered steps, or process layout remains"
+    ],
+    "status": "passed",
+    "evidence": [
+      "marketing/taobao-frontend-screen-20260805/contact-sheet-1260.jpg",
+      "test-results/verification.md records per-image front-end evidence and no-backend review"
+    ],
+    "notes": "Product-owned interface references may be composited deterministically after generation to preserve truthfulness."
+  },
+  {
+    "id": "AC-04",
+    "requirement": "Final Taobao images are 1:1, mobile-readable, and contain only deterministic approved Chinese copy.",
+    "verification": [
+      "Six final assets are exported at 1440x1440 or higher",
+      "Full-size and 360x360 contact-sheet inspection passes",
+      "No generated readable text, brand imitation, QR code, price, watermark, or unsupported claim remains"
+    ],
+    "status": "passed",
+    "evidence": [
+      "Six PNG and six JPG assets in marketing/taobao-frontend-screen-20260805/deliverables are 1440x1440",
+      "marketing/taobao-frontend-screen-20260805/contact-sheet-mobile-1080.jpg shows six 360x360 review renders",
+      "Chinese copy is defined in src/content.mjs and composited deterministically by src/generate-assets.mjs"
+    ],
+    "notes": "Chinese copy is added locally after the image model step."
+  },
+  {
+    "id": "AC-05",
+    "requirement": "External-model context remains public and sanitized.",
+    "verification": [
+      "Prompt files contain no credentials, account data, orders, customers, Qianniu/SYCM metrics, or private competitor estimates",
+      "Only public product facts and product-owned/public visual references are uploaded"
+    ],
+    "status": "passed",
+    "evidence": [
+      "deliveries/gemini-prompts-frontend-screen-only.md and final-report.md record only sanitized public/product-owned context",
+      "test-results/verification.md confirms no Qianniu/SYCM metrics, orders, customer records, credentials, or unpublished operational data was sent externally"
+    ],
+    "notes": "Dirty user worktree is preserved and unrelated files are not changed."
+  }
+]

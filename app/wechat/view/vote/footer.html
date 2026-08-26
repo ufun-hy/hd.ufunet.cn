@@ -2,6 +2,11 @@
 	<img class="footerbg" src="{:tomedia($appconfig['apppageconfig']['bottombg'])}">
 </div>
 <script>
+if(window.voteMedia){
+	window.voteMedia.renderAll(document,{mode:'cover'});
+}
+</script>
+<script>
 require(['wechatcore','swiper','appsocket'],function (wechatcore,Swiper,appsocket) {	
 		var wsConfig = {};
 		wsConfig.onmessage = function(data){

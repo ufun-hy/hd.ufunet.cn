@@ -1,0 +1,50 @@
+[
+  {
+    "id": "AC-01",
+    "requirement": "Gemini 在指定 gemini-lottery-effects-v2.html 中提供 3 套可切换、明显不同的外围头像运行态动画方案，中央候选头像保持视觉主角。",
+    "verification": ["浏览器分别运行三种方案并截图", "检查方案切换和动画类"],
+    "status": "pending",
+    "evidence": [],
+    "notes": "演示只用生成/占位人物，不发送真实活动参与者信息。"
+  },
+  {
+    "id": "AC-02",
+    "requirement": "星环主题不遮挡系统配置的图片或视频背景，并在背景上增加不影响可读性的深色星环氛围层。",
+    "verification": ["真实 DOM 注入本地 CSS 后读取背景层可见性", "1920x1080 截图"],
+    "status": "pending",
+    "evidence": [],
+    "notes": "不得把配置背景复制给外部模型。"
+  },
+  {
+    "id": "AC-03",
+    "requirement": "抽奖前页面完全重做为星环风格，原左右两块旧皮肤不再可见，同时保留奖项、奖品图片、奖品名称、参与/获奖数量、抽取数量、切换奖品和开始按钮。",
+    "verification": ["真实 DOM 待机态截图", "检查原有交互元素仍存在且可点击"],
+    "status": "pending",
+    "evidence": [],
+    "notes": "仅改主题层，不改业务 API。"
+  },
+  {
+    "id": "AC-04",
+    "requirement": "中奖结果页完全重做为星环风格，支持单人和多人结果，显示奖项、奖品和中奖人，并保留关闭入口。",
+    "verification": ["用本地模拟数据验证 1 人和多人结果态", "真实 DOM 结构映射检查"],
+    "status": "pending",
+    "evidence": [],
+    "notes": "不得在生产链接点击停止抽奖。"
+  },
+  {
+    "id": "AC-05",
+    "requirement": "复用现有 DOM 与 screenlottery.js 状态机，不修改抽奖、停止、中奖保存或后台接口。",
+    "verification": ["git diff 范围审核", "screenlottery.js 哈希保持不变"],
+    "status": "pending",
+    "evidence": [],
+    "notes": "JS 基线哈希 0b32fd4b2ba7e98609e71657e76416d193be3e8fa7de6068ca16e7ece1899103。"
+  },
+  {
+    "id": "AC-06",
+    "requirement": "1920x1080、1366x768、1024x576 三种视口无横纵溢出，动效支持 prefers-reduced-motion。",
+    "verification": ["三视口浏览器截图与 scrollWidth/scrollHeight 检查", "静态检查 reduced-motion 规则"],
+    "status": "pending",
+    "evidence": [],
+    "notes": "真实页面使用 CSS zoom，必须按真实结构复验。"
+  }
+]

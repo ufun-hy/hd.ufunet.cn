@@ -1,0 +1,199 @@
+--- app/screen/view/lottery/index.html
++++ app/screen/view/lottery/index.html
+@@ -439,6 +439,9 @@
+ .prizelucklist ul li .nickname div{
+ 	margin-top: 10px;
+ }
+ </style>
+ {if !empty($pcconfig['style']['diycss'])}<style>{$pcconfig['style']['diycss']}</style>{/if}
++{if isset($pcconfig['style']['stylename']) && $pcconfig['style']['stylename'] == '星环头像抽奖'}
++<link rel="stylesheet" href="/static/css/screencss/screenlottery-halo.css">
++{/if}
+ {if isset($pcconfig['styleconfig']['lotterymusic'])}
+ 	{if !empty($pcconfig['styleconfig']['lotterymusic'])}
+@@ -456,7 +459,7 @@
+ <audio id="cjend" src="/{:SIMGURL}bigcj/cjend.mp3"  preload="preload"  style="display:none"></audio>
+ {/if}
+-<section class="lottery-mainbox normal-box{if isset($pcconfig['isroundcj']) && $pcconfig['isroundcj']=='1'} lottery-roundcjbox{/if}">
++<section class="lottery-mainbox normal-box{if isset($pcconfig['isroundcj']) && $pcconfig['isroundcj']=='1'} lottery-roundcjbox{/if}{if isset($pcconfig['style']['stylename']) && $pcconfig['style']['stylename'] == '星环头像抽奖'} lottery-halo-theme{/if}">
+ 	<div class="emptybox zam-app-flex-ajCenter display-none">
+ 		<img src="/{:SIMGURL}common/empty.png">
+--- /dev/null
++++ public/static/css/screencss/screenlottery-halo.css
+@@ -0,0 +1,180 @@
++/* 
++ * 星环头像抽奖 (Halo Avatar Lottery) 专属样式表 
++ * 严格作用于 .lottery-halo-theme 根类之下
++ */
++
++:root {
++    --halo-bg: #05070e;
++    --halo-primary: #12b5ff;
++    --halo-secondary: #a93cff;
++    --halo-accent: #ff2970;
++    --halo-text: #ffffff;
++}
++
++/* --- 1. 全局与降级降噪 --- */
++.lottery-halo-theme {
++    background: radial-gradient(ellipse at 50% -20%, #1a163a 0%, var(--halo-bg) 70%) !important;
++    box-shadow: inset 0 0 100px rgba(0,0,0,0.8);
++}
++.lottery-halo-theme::before {
++    content: ''; 
++    position: absolute; 
++    inset: 0; 
++    background: url('data:image/svg+xml;utf8,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)"/%3E%3C/svg%3E'); 
++    opacity: 0.04; 
++    pointer-events: none; 
++    mix-blend-mode: overlay;
++    z-index: 0;
++}
++@media (prefers-reduced-motion: reduce) {
++    .lottery-halo-theme * {
++        animation-duration: 0.01ms !important;
++        animation-iteration-count: 1 !important;
++        transition-duration: 0.01ms !important;
++        scroll-behavior: auto !important;
++    }
++}
++
++/* --- 2. 3D 墙粒子化 (深空背景) --- */
++.lottery-halo-theme .signthreed-wall-block {
++    z-index: 1;
++}
++.lottery-halo-theme .wall3d ul li {
++    opacity: 0.15;
++    filter: grayscale(1) blur(2px);
++    box-shadow: 0 0 10px rgba(255,255,255,0.1);
++    border-radius: 50% !important;
++}
++.lottery-halo-theme .wall3d ul li img {
++    border-radius: 50% !important;
++}
++
++/* --- 3. 基础组件透明化重构 --- */
++.lottery-halo-theme .lottery-left, 
++.lottery-halo-theme .lottery-right {
++    background-image: none !important;
++    background: transparent !important;
++    box-shadow: none;
++    border: none;
++}
++.lottery-halo-theme .lottery-wrapper {
++    z-index: 5;
++    justify-content: center;
++    gap: 40px;
++}
++.lottery-halo-theme .left-prizeaward .left-prizename {
++    background: rgba(18, 181, 255, 0.1) !important;
++    border: 1px solid rgba(18, 181, 255, 0.3);
++    border-radius: 30px;
++    box-shadow: 0 0 20px rgba(18,181,255,0.2);
++}
++.lottery-halo-theme .start-btn,
++.lottery-halo-theme .lottery-stop-btn,
++.lottery-halo-theme .lottery-close-btn {
++    filter: hue-rotate(190deg) brightness(1.2);
++    transition: transform 0.2s ease, filter 0.2s ease;
++}
++.lottery-halo-theme .start-btn:hover:not(.stopclick),
++.lottery-halo-theme .lottery-stop-btn:hover,
++.lottery-halo-theme .lottery-close-btn:hover {
++    transform: scale(1.05);
++    filter: hue-rotate(190deg) brightness(1.5);
++}
++
++/* --- 4. 运行态：中心头像与星环 (映射到 lottery-userBox) --- */
++.lottery-halo-theme .lottery-userBox {
++    z-index: 10;
++    background: radial-gradient(circle at center, rgba(169, 60, 255, 0.1) 0%, transparent 60%);
++}
++.lottery-halo-theme .lottery-userBox-wrapper {
++    background: transparent !important;
++    box-shadow: none !important;
++}
++.lottery-halo-theme .box_angle { display: none !important; }
++
++.lottery-halo-theme .lottery-userBox-item {
++    margin: 30px;
++    position: relative;
++}
++/* 取消旧动画，引入新光环 */
++.lottery-halo-theme .lottery-userBox-avatar.frotate::after {
++    display: none !important; 
++}
++.lottery-halo-theme .lottery-userBox-avatar {
++    width: 280px !important; 
++    height: 280px !important;
++    padding: 0 !important;
++    background: rgba(10, 15, 30, 0.8);
++    backdrop-filter: blur(10px);
++    border: 4px solid rgba(255,255,255,0.05);
++    box-shadow: 0 20px 50px rgba(0,0,0,0.5), inset 0 0 20px rgba(255,255,255,0.1);
++    border-radius: 50%;
++    position: relative;
++    z-index: 2;
++    animation: none !important;
++}
++.lottery-halo-theme .lottery-userBox-avatar::before {
++    content: '';
++    position: absolute; 
++    inset: -40px;
++    border-radius: 50%;
++    border: 2px solid rgba(18, 181, 255, 0.1);
++    border-left-color: var(--halo-primary);
++    animation: halo-spin 6s linear infinite;
++    box-shadow: 0 0 40px rgba(18, 181, 255, 0.1);
++    z-index: -1;
++}
++.lottery-halo-theme .lottery-userBox-avatar::after {
++    content: '';
++    position: absolute; 
++    inset: -20px;
++    border-radius: 50%;
++    border: 2px dashed rgba(169, 60, 255, 0.2);
++    border-right-color: var(--halo-secondary);
++    animation: halo-spin-reverse 10s linear infinite;
++    z-index: -1;
++}
++
++.lottery-halo-theme .lottery-userBox-item p {
++    margin-top: 50px;
++    font-size: 28px;
++    font-weight: bold;
++    letter-spacing: 2px;
++    text-shadow: 0 0 10px rgba(18,181,255,0.8);
++}
++
++/* --- 5. 结果态：规整结果网格 (映射到 lottery-luckers) --- */
++.lottery-halo-theme .lottery-luckers {
++    background: rgba(5, 7, 14, 0.85) !important;
++    backdrop-filter: blur(24px);
++    border: 1px solid rgba(18, 181, 255, 0.2);
++    box-shadow: 0 0 120px rgba(18, 181, 255, 0.15) !important;
++}
++.lottery-halo-theme .lottery-poptitle {
++    color: var(--halo-primary) !important;
++    text-shadow: 0 0 10px rgba(18, 181, 255, 0.5);
++}
++.lottery-halo-theme .lottery-luckers-img.frotate::after {
++    background-image: none !important;
++    border: 2px solid var(--halo-accent);
++    border-radius: 50%;
++    box-shadow: 0 0 15px rgba(255, 41, 112, 0.4);
++}
++.lottery-halo-theme .lottery-luckers-name {
++    background: rgba(255,255,255,0.05) !important;
++    border: 1px solid rgba(255,255,255,0.1);
++    border-radius: 20px;
++    margin-top: 10px;
++    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
++}
++
++@keyframes halo-spin { 
++    100% { transform: rotate(360deg); } 
++}
++@keyframes halo-spin-reverse { 
++    100% { transform: rotate(-360deg); } 
++}

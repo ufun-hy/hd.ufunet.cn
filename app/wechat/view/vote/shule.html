@@ -1,4 +1,5 @@
 {include file="common/header" /}
+<script type="text/javascript" src="__STATIC__/js/vote-media.js?v=20260813194922"></script>
 <style type="text/css">
 .wechatbody{
 	padding-top: 0.76rem;
@@ -89,6 +90,13 @@
 	width: 2.6rem;
 	height: 2.6rem;
 }
+.vote-itemlists .vote-item .vote-imgbox video.vote-itemimg,
+.vote-itemlists .vote-item .vote-imgbox .vote-media,
+.vote-itemlists .vote-item .vote-imgbox .vote-media video{
+	width: 2.6rem;
+	height: 2.6rem;
+	object-fit: cover;
+}
 
 .btn-vote{
 	color: #fff;
@@ -171,7 +179,7 @@ function timerun(remainSec){
 	{foreach $rotate['items'] as $key=>$item}
 		<div class="vote-item zam-app-flex-ajCenter">
 			<div class="vote-imgbox">
-				<img class="vote-itemimg" src="{:tomedia($item['voteimg'])}">
+				<div class="vote-media vote-itemimg" data-vote-media="{:tomedia($item['voteimg'])}" {if isset($item['votebigimg']) && !empty($item['votebigimg'])}data-vote-poster="{:tomedia($item['votebigimg'])}"{/if} data-vote-media-mode="cover"></div>
 			</div>
 			{if $key==0}
 			<div class="sline2 zam-app-flex-ajCenter">
@@ -184,6 +192,11 @@ function timerun(remainSec){
 		</div>
 	{/foreach}
 </section>
+<script>
+if(window.voteMedia){
+	window.voteMedia.renderAll(document,{mode:'cover'});
+}
+</script>
 <script>
 var clicked = false,maxselect = parseInt("{$rotate['maxselect']}"),minselect = parseInt("{$rotate['minselect']}"),rotateid = "{$rotate['id']}",votetype = "{$rotate['votetype']}";
 require(['wechatcore','appsocket'],function(wechatcore,appsocket){

@@ -1,4 +1,5 @@
 {include file='common/header' /}
+{php}$livemarkShowPwScore = \app\common\service\common\LivemarkJudgeScoreVisibilityService::get(request()->realhdid ?? 0);{/php}
 <style>
 .headerTitle{opacity:0;}
 .livemark-mainbox{
@@ -1239,8 +1240,8 @@
 }
 .livemark-titleBox{
     position:absolute;
-    top:-74px;
-    right:0;
+    top:-80px;
+    right:-24px;
     z-index:7;
     display:flex;
     align-items:center;
@@ -1342,9 +1343,9 @@
 .livemark-userone{
     position:relative;
     /* 外层 full-main 已按 800px 高画布缩放，此处必须使用画布尺寸，避免 vw/vh 被二次缩放。 */
-    width:min(1560px, calc(100% - 180px));
-    height:590px;
-    margin:42px auto 0;
+    width:min(1680px, calc(100% - 96px));
+    height:620px;
+    margin:18px auto 0;
     border-radius:22px;
     background:none;
     border:1px solid rgba(255,255,255,.28);
@@ -1365,7 +1366,7 @@
     background:none;
 }
 .livemark-btns{
-    bottom:22px;
+    bottom:13px;
     height:40px;
     gap:16px;
 }
@@ -1395,7 +1396,7 @@
 /* 列表 / 排行 共用舞台 */
 .livemark-list .livemark-scrollbox{
     height:100%;
-    padding:34px 36px 84px;
+    padding:18px 20px 70px;
     box-sizing:border-box;
     background:transparent;
 }
@@ -1875,8 +1876,8 @@
 }
 .livemark-userone-topactions{
     position:absolute;
-    top:-56px;
-    right:0;
+    top:-72px;
+    right:-24px;
     z-index:7;
     display:flex;
     align-items:center;
@@ -2366,6 +2367,9 @@
     background:none;
     cursor:pointer;
 }
+.livemark-mainbox.livemark-hide-pw-score .livemark-user-pingwei .pingweione{
+    cursor:default;
+}
 .pingweione .pingwei-info{
     display:flex!important;
     flex-direction:column;
@@ -2536,6 +2540,9 @@
     grid-template-columns:minmax(0, 1.05fr) minmax(280px, .95fr);
     gap:16px;
     min-height:0;
+}
+.livemark-judge-detail-body.is-total-score{
+    grid-template-columns:minmax(0, 1fr);
 }
 .livemark-judge-detail-left,
 .livemark-judge-detail-right{
@@ -2776,7 +2783,7 @@
     background:linear-gradient(180deg, #4DB8FF 0%, #2F8CFF 100%);
 }
 </style>
-	<section class="livemark-mainbox normal-box zam-app-flex-ajCenter2">
+	<section class="livemark-mainbox normal-box zam-app-flex-ajCenter2{if $livemarkShowPwScore == '2'} livemark-hide-pw-score{/if}">
     <div class="livemark-title limitbox"></div>
     <div class="emptybox zam-app-flex-ajCenter display-none">
         <img src="/{:SIMGURL}common/empty.png">
@@ -3447,7 +3454,11 @@
         <div class="pingwei-name limitbox">{{ pwname }}</div>
         {{ if showpws == '1'}}
             <div class="pingwei-score zam-app-flex-ajCenter{{ if hadpf == '1'}} pingwei-hadpf{{ /if }}">
-                <span class="pingwei-score-value">{{ if hadpf == '1'}}{{ if showscore == '1'}}{{ totalscore }}{{ else }}已评分{{ /if }}{{ else }}评分中{{ /if }}</span>
+                {if $livemarkShowPwScore == '1'}
+                <span class="pingwei-score-value">{{ if hadpf == '1'}}{{ totalscore }}{{ else }}打分中{{ /if }}</span>
+                {else /}
+                <span class="pingwei-score-value">{{ if hadpf == '1'}}已提交{{ else }}打分中{{ /if }}</span>
+                {/if}
             </div>
         {{ else }}
             <div class="pingwei-score zam-app-flex-ajCenter">

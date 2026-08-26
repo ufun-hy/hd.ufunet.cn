@@ -90,6 +90,13 @@
 	width:72px;
 	height:72px;
 }
+.vote-avatar .vote-media,
+.vote-avatar .vote-media img,
+.vote-avatar .vote-media video{
+	width:72px;
+	height:72px;
+	object-fit:cover;
+}
 /*项目编号*/
 .vote-avatar .votenumber{
 	position: absolute;
@@ -322,7 +329,16 @@
     display: inline-block;
     width: 123px;
     height: 123px;
-    border-radius: 50%;
+	border-radius: 50%;
+}
+.circle-avatar .vote-media,
+.circle-avatar .vote-media img,
+.circle-avatar .vote-media video{
+	display:inline-block;
+	width:123px;
+	height:123px;
+	border-radius:50%;
+	object-fit:cover;
 }
 .circle-count{
 	display: inline-block;
@@ -381,7 +397,15 @@
     width: 100%;
     height: 100%;
     -o-object-position: center;
-    object-position: center;
+	object-position: center;
+}
+.single-header .vote-media,
+.single-header .vote-media img,
+.single-header .vote-media video{
+	display:block;
+	width:100%;
+	height:100%;
+	object-fit:cover;
 }
 .single-info{
 	-webkit-box-flex: 1;
@@ -499,7 +523,7 @@
 	<p class="vote-name vote-name-top">{{# votename }}</p>
 	<div class="vote-avatar zam-app-flex-ajCenter2 {{ if voteimg=='' }}display-none{{ /if }}">
 		<div style="position:relative;">
-			<img src="{{ voteimg }}" />
+			<div class="vote-media" data-vote-media="{{ voteimg }}" data-vote-poster="{{ votebigimg }}" data-vote-media-mode="cover"></div>
 			<div class="votenumber zam-app-flex-ajCenter">{{ votenumber }}</div>
 		</div>
 	</div>
@@ -555,7 +579,7 @@
 		{{ /if }}
 	</div>
 	<div class="vote-avatar zam-app-flex-ajCenter2 {{ if voteimg=='' }}display-none{{ /if }}">
-		<img src="{{ voteimg }}">
+		<div class="vote-media" data-vote-media="{{ voteimg }}" data-vote-poster="{{ votebigimg }}" data-vote-media-mode="cover"></div>
 	</div>
 	<p class="vote-name">{{# votename }}</p>
 </li>
@@ -566,7 +590,7 @@
 	<div class="circle-itembox zam-app-flex-ajCenter">
 		<div  class="circle-header {{ if voteimg==''}}display-none{{ /if }}">
 			<div  class="circle-avatar zam-app-flex-ajCenter2">
-				<img  src="{{ voteimg }}">
+				<div class="vote-media" data-vote-media="{{ voteimg }}" data-vote-poster="{{ votebigimg }}" data-vote-media-mode="cover"></div>
 			</div> 
 		</div> 
 		<div  class="circle-count">
@@ -592,7 +616,7 @@
 	<div  class="single-item zam-app-flex-alignCenter" id="vote-{{ id }}">
 		<div  class="single-box zam-app-flex">
 			<div class="single-header {{ if voteimg==''}}display-none{{ /if }}">
-				<img  src="{{ voteimg }}">
+				<div class="vote-media" data-vote-media="{{ voteimg }}" data-vote-poster="{{ votebigimg }}" data-vote-media-mode="cover"></div>
 			</div>
 			<div  class="single-info zam-app-flex-ajCenter">
 				<div  class="single-count">
@@ -686,7 +710,7 @@
 						{{ /if }}
 					</div>
 					<div class="vote-avatar zam-app-flex-ajCenter2 {{ if v.voteimg=='' }}display-none{{ /if }}">
-						<img src="{{ v.voteimg }}">
+						<div class="vote-media" data-vote-media="{{ v.voteimg }}" data-vote-poster="{{ v.votebigimg }}" data-vote-media-mode="cover"></div>
 					</div>
 					<p class="vote-name">{{# v.votename }}</p>
 				</li>    

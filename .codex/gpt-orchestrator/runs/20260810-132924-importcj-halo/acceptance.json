@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "items": [
+    {
+      "id": "AC-01",
+      "requirement": "导入名单抽奖新增可独立选择的“星环名单抽奖”效果，不替换现有四种效果。",
+      "verification": "静态检查后台风格项、保存字段和前台样式选择分支；必要时在本地页面回读配置。",
+      "status": "passed_with_backend_roundtrip_risk"
+    },
+    {
+      "id": "AC-02",
+      "requirement": "只修改抽奖中的运行态；开奖前和开奖结果继续使用导入抽奖原样式与组件。",
+      "verification": "浏览器分别检查 idle、drawing、drawed 三个状态。",
+      "status": "passed"
+    },
+    {
+      "id": "AC-03",
+      "requirement": "中央圆球显示首个已配置字段的完整值，并根据长度自动缩放或换行；不在圆球下方重复。",
+      "verification": "用 2、4、8、12+ 字符样例检查中央文字完整性和溢出。",
+      "status": "passed"
+    },
+    {
+      "id": "AC-04",
+      "requirement": "外围固定约 60 个视觉节点，与 onceout 无关，显示首字段首字/英文缩写，随机大小、半径、速度、透明度、景深并持续分批换人。",
+      "verification": "运行态 DOM、样式变量与计时器检查；观察节点数量稳定且内容持续更换。",
+      "status": "passed"
+    },
+    {
+      "id": "AC-05",
+      "requirement": "后台 /screen/importcj/savelucker 仍是唯一中奖权威，保留分组、奖品、轮次、onceout、逐项停止、键盘、删除、查看全部、自动滚动、音乐和视频行为。",
+      "verification": "审查业务 diff，不允许修改接口或响应结构；用模拟数据验证状态流和计时器清理。",
+      "status": "passed_by_diff_guard_and_mocked_lifecycle"
+    },
+    {
+      "id": "AC-06",
+      "requirement": "候选文字经过现有 initonedata 脱敏；不假设头像字段，不暴露原始字段。",
+      "verification": "代码路径检查和脱敏字段样例测试。",
+      "status": "passed"
+    },
+    {
+      "id": "AC-07",
+      "requirement": "星环层透明且局部作用，不切换默认静态素材、不增加黑色遮罩、不影响当前主题背景。",
+      "verification": "CSS 作用域审查和浏览器截图检查。",
+      "status": "passed"
+    },
+    {
+      "id": "AC-08",
+      "requirement": "支持 1024、1366、1920 宽度，反复开始/停止/关闭不会残留定时器、节点或 resize 监听。",
+      "verification": "浏览器多视口检查与模块生命周期测试。",
+      "status": "passed"
+    }
+  ]
+}

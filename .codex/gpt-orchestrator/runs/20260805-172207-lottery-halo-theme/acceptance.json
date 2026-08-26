@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "items": [
+    {
+      "id": "AC-01",
+      "requirement": "Only the 炫酷3D抽奖 style record named 星环头像抽奖 activates the new visual theme; all existing styles retain their current markup, behavior and assets.",
+      "verification": ["static template branch review", "legacy branch diff review"],
+      "status": "passed",
+      "evidence": [
+        "app/screen/view/lottery/index.html:825-833 activates only when stylename equals 星环头像抽奖",
+        "No unconditional markup or script branch was changed"
+      ],
+      "notes": "No new top-level module or menu item."
+    },
+    {
+      "id": "AC-02",
+      "requirement": "The theme reuses /screen/lottery/initdata, /getmoreuser and /savelucker; the browser never decides the real winner and contains no mockUsers winner path.",
+      "verification": ["JavaScript source review", "mocked endpoint contract test"],
+      "status": "passed",
+      "evidence": [
+        "public/static/js/screenjs/screenlottery.js is byte-for-byte unchanged from aaa80d3e",
+        "Existing server calls remain at initdata:25, savelucker:132 and getmoreuser:831"
+      ],
+      "notes": "Server-authoritative winner selection is protected."
+    },
+    {
+      "id": "AC-03",
+      "requirement": "Start, running, stop, result, close, prize switching, multi-winner and round-draw flows continue to use the existing screenlottery lifecycle, including sendLuckerTpl and QR/footer behavior.",
+      "verification": ["event binding review", "static interaction harness", "regression source review"],
+      "status": "passed",
+      "evidence": [
+        "Existing screenlottery lifecycle remains unchanged, including sendLuckerTpl at line 292",
+        "Browser harness verifies idle, running and result DOM states; round-result selectors are responsive and scoped"
+      ],
+      "notes": "No encrypted controller changes."
+    },
+    {
+      "id": "AC-04",
+      "requirement": "The visual follows the first Gemini avatar-halo direction: product-facing big-screen output only, crisp avatar focus, orbital light rings and participant depth, without admin UI or operation-flow content.",
+      "verification": ["browser screenshots at 1920x1080, 1366x768 and 1024x576", "visual review"],
+      "status": "passed",
+      "evidence": [
+        "test-results/running-1920x1080.png",
+        "test-results/running-1366x768.png",
+        "test-results/running-1024x576.png",
+        "Codex visual review confirms crisp product-facing avatar halos without admin or workflow content"
+      ],
+      "notes": "Visual assets must be local or CSS-generated."
+    },
+    {
+      "id": "AC-05",
+      "requirement": "Theme CSS and DOM are scoped, responsive, avoid horizontal/vertical overflow, preserve readable winner names and provide a reduced-motion fallback.",
+      "verification": ["CSS scope review", "viewport overflow checks", "prefers-reduced-motion inspection"],
+      "status": "passed",
+      "evidence": [
+        "test-results/browser-qa.json reports no document overflow in all five cases",
+        "CSSOM loaded 35 rules including responsive and prefers-reduced-motion media rules",
+        "Both halo pseudo-elements are display:block with non-zero dimensions at all running viewports"
+      ],
+      "notes": "Target is a 16:9 event screen, not a mobile admin page."
+    },
+    {
+      "id": "AC-06",
+      "requirement": "The patch adds no dependency, remote runtime asset, backend schema field, controller change, menu change or unrelated refactor.",
+      "verification": ["changed-file manifest", "git diff review", "secret scan"],
+      "status": "passed",
+      "evidence": [
+        "Task manifest contains only app/screen/view/lottery/index.html and public/static/css/screencss/screenlottery-halo.css",
+        "Theme stylesheet uses one embedded data URI and no remote runtime URL",
+        "No dependency, controller, schema or menu files changed"
+      ],
+      "notes": "Existing encrypted code is a protected boundary."
+    },
+    {
+      "id": "AC-07",
+      "requirement": "All available syntax/static checks pass; unavailable PHP runtime and production-only checks are reported rather than claimed.",
+      "verification": ["available local checks", "test log review"],
+      "status": "passed",
+      "evidence": [
+        "git diff --check passed for the tracked template change",
+        "Chromium CSSOM parsed 35 rules and rendered all target states",
+        "PHP runtime is unavailable and production style-record integration was not claimed"
+      ],
+      "notes": "Repository currently has no declared frontend build pipeline."
+    }
+  ]
+}

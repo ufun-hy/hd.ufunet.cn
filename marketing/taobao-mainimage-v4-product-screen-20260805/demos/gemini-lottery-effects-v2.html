@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>互动大屏演示</title>
+<style>
+:root {
+    --c-bg: #05070e;
+    --c-primary: #12b5ff;
+    --c-secondary: #a93cff;
+    --c-accent: #ff2970;
+    --c-text: #ffffff;
+    --font-main: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body { 
+    margin: 0; 
+    padding: 0;
+    background: #000; 
+    color: var(--c-text); 
+    font-family: var(--font-main); 
+    overflow: hidden; 
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100vw;
+    height: 100vh;
+}
+
+/* Scaling Container for unified 1920x1080 design */
+.screen-scaler {
+    flex: 0 0 auto;
+    width: 1920px;
+    height: 1080px;
+    transform-origin: center center;
+    position: relative;
+    overflow: hidden;
+    background: radial-gradient(ellipse at 50% -20%, #1a163a 0%, var(--c-bg) 70%);
+    box-shadow: 0 0 100px rgba(0,0,0,0.8);
+}
+
+/* Global Noise Texture (Base64 SVG for file:// offline support) */
+.noise-overlay { 
+    position: absolute; 
+    inset: 0; 
+    background: url('data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjAwIDIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZmlsdGVyIGlkPSJub2lzZUZpbHRlciI+PGZlVHVyYnVsZW5jZSB0eXBlPSJmcmFjdGFsTm9pc2UiIGJhc2VGcmVxdWVuY3k9IjAuOCIgbnVtT2N0YXZlcz0iMyIgc3RpdGNoVGlsZXM9InN0aXRjaCIvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbHRlcj0idXJsKCNub2lzZUZpbHRlcikiLz48L3N2Zz4='); 
+    opacity: 0.04; 
+    pointer-events: none; 
+    z-index: 999; 
+    mix-blend-mode: overlay;
+}
+
+/* Header */
+.top-header {
+    position: absolute;
+    top: 40px;
+    left: 60px;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+.top-header h1 {
+    margin: 0;
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    background: linear-gradient(90deg, #fff, rgba(255,255,255,0.7));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.badge {
+    background: rgba(18, 181, 255, 0.1);
+    border: 1px solid rgba(18, 181, 255, 0.3);
+    color: var(--c-primary);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+/* Scenes Base */
+.scene { 
+    position: absolute; 
+    inset: 0; 
+    opacity: 0; 
+    pointer-events: none; 
+    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1); 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    z-index: 1; 
+}
+.scene.active { 
+    opacity: 1; 
+    pointer-events: auto; 
+    z-index: 2; 
+}
+
+/* Control Panel */
+.controls { 
+    position: absolute; 
+    bottom: 60px; 
+    left: 50%; 
+    transform: translateX(-50%); 
+    z-index: 1000; 
+    background: rgba(15, 20, 35, 0.6); 
+    backdrop-filter: blur(24px); 
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.08); 
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    border-radius: 60px; 
+    padding: 12px 24px; 
+    display: flex; 
+    gap: 40px; 
+    align-items: center; 
+    width: max-content;
+    max-width: 90%;
+}
+.tabs, .schemes { display: flex; gap: 8px; background: rgba(0,0,0,0.3); padding: 6px; border-radius: 40px; border: 1px solid rgba(255,255,255,0.05); }
+.tab-btn, .scheme-btn { 
+    background: transparent; 
+    border: none; 
+    color: rgba(255,255,255,0.5); 
+    padding: 14px 28px; 
+    font-size: 18px; 
+    font-weight: 600;
+    border-radius: 30px; 
+    cursor: pointer; 
+    transition: all 0.3s ease; 
+}
+.tab-btn:hover, .scheme-btn:hover { color: rgba(255,255,255,0.8); }
+.tab-btn.active, .scheme-btn.active { 
+    background: rgba(18, 181, 255, 0.15); 
+    color: #fff; 
+    box-shadow: inset 0 0 15px rgba(18, 181, 255, 0.1); 
+    border: 1px solid rgba(18, 181, 255, 0.2);
+}
+.actions { display: flex; gap: 16px; }
+.action-btn { 
+    background: linear-gradient(135deg, var(--c-primary), var(--c-secondary)); 
+    border: none; 
+    color: #fff; 
+    padding: 16px 48px; 
+    font-size: 20px; 
+    font-weight: bold; 
+    border-radius: 30px; 
+    cursor: pointer; 
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+    box-shadow: 0 10px 20px rgba(18, 181, 255, 0.2); 
+    white-space: nowrap;
+}
+.action-btn:hover:not(:disabled) { 
+    transform: translateY(-2px) scale(1.02); 
+    box-shadow: 0 15px 30px rgba(18, 181, 255, 0.4); 
+    filter: brightness(1.1);
+}
+.action-btn:disabled {
+    background: rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.3);
+    box-shadow: none;
+    cursor: not-allowed;
+}
+.action-btn.outline { 
+    background: transparent; 
+    border: 2px solid rgba(255,255,255,0.2); 
+    box-shadow: none;
+}
+.action-btn.outline:hover:not(:disabled) {
+    background: rgba(255,255,255,0.05);
+    border-color: rgba(255,255,255,0.4);
+}
+
+@media (max-width: 1024px) {
+    .controls { gap: 20px; }
+}
+@media (max-width: 768px) {
+    .controls { width: calc(100% - 32px); bottom: 20px; flex-direction: column; border-radius: 24px; padding: 16px; gap: 12px; }
+    .tabs, .schemes { width: 100%; justify-content: center; gap: 4px; }
+    .tab-btn, .scheme-btn { flex: 1; padding: 10px 4px; font-size: 14px; text-align: center; }
+    .actions { width: 100%; gap: 12px; justify-content: center; }
+    .action-btn { flex: 1; padding: 14px 16px; font-size: 16px; }
+}
+
+
+/* =========================================
+   Scene 1: Avatar Lottery (星环头像抽奖)
+   ========================================= */
+#scene-avatar { background: radial-gradient(circle at center, rgba(169, 60, 255, 0.05) 0%, transparent 60%); }
+#avatar-bg-container { position: absolute; inset: 0; overflow: hidden; perspective: 1200px; }
+
+/* 动态背景头像 - 基础与共用态 */
+.bg-avatar {
+    background-size: cover;
+    background-position: center;
+    border: 2px solid rgba(255,255,255,0.15);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5), 0 0 15px var(--color);
+    will-change: transform, opacity, filter;
+    transition: filter 0.5s ease, opacity 0.5s ease;
+}
+
+/* 方案 A: 星际环绕 (Orbit) */
+#scene-avatar[data-scheme="orbit"] .bg-avatar {
+    position: absolute; left: 50%; top: 50%;
+    width: var(--size); height: var(--size);
+    margin: calc(var(--size) * -0.5) 0 0 calc(var(--size) * -0.5);
+    border-radius: 50%;
+    animation: orbit-anim var(--dur) linear infinite;
+    animation-delay: var(--delay);
+    opacity: var(--opacity);
+    filter: brightness(0.8) contrast(1.2);
+}
+@keyframes orbit-anim {
+    0% { transform: rotate(0deg) translateX(var(--radius)) rotate(0deg) scale(var(--scale)); }
+    100% { transform: rotate(360deg) translateX(var(--radius)) rotate(-360deg) scale(var(--scale)); }
+}
+
+/* 方案 B: 深海浮游 (Float) */
+#scene-avatar[data-scheme="float"] .bg-avatar {
+    position: absolute; left: var(--x); bottom: -150px;
+    width: var(--size); height: var(--size);
+    border-radius: 50%;
+    animation: float-anim var(--dur) ease-in-out infinite;
+    animation-delay: var(--delay);
+    opacity: 0;
+    filter: brightness(0.9);
+}
+@keyframes float-anim {
+    0% { transform: translateY(0) scale(var(--scale)) rotate(0deg); opacity: 0; }
+    15% { opacity: var(--opacity); }
+    85% { opacity: var(--opacity); }
+    100% { transform: translateY(var(--y-dist)) scale(var(--scale)) rotate(var(--rot)); opacity: 0; }
+}
+
+/* 方案 C: 星云漩涡 (Vortex) */
+#scene-avatar[data-scheme="vortex"] .bg-avatar {
+    position: absolute; left: 50%; top: 50%;
+    width: var(--size); height: var(--size);
+    margin: calc(var(--size) * -0.5) 0 0 calc(var(--size) * -0.5);
+    border-radius: 50%;
+    animation: vortex-anim var(--dur) ease-in infinite;
+    animation-delay: var(--delay);
+    opacity: 0;
+    filter: brightness(1);
+}
+@keyframes vortex-anim {
+    0% { transform: rotate(var(--start-deg)) translateX(0) scale(0); opacity: 0; }
+    30% { opacity: var(--opacity); }
+    70% { opacity: var(--opacity); }
+    100% { transform: rotate(var(--end-deg)) translateX(var(--vortex-radius)) scale(var(--vortex-scale)); opacity: 0; }
+}
+
+/* 背景头像加速增强 (抽奖中状态) */
+#scene-avatar.state-running #avatar-bg-container .bg-avatar {
+    --opacity: 0.8 !important;
+    filter: brightness(1.4) contrast(1.2) drop-shadow(0 0 15px var(--color)) !important;
+}
+
+/* 中心头像核 (Halo Core) */
+.lottery-halo-core {
+    position: relative;
+    width: 600px;
+    height: 600px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.halo-rings {
+    position: absolute; inset: 0;
+    pointer-events: none;
+    display: flex; align-items: center; justify-content: center;
+}
+
+.halo-ring {
+    position: absolute; border-radius: 50%;
+    transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.halo-ring-1 {
+    width: 320px; height: 320px;
+    border: 2px solid rgba(18, 181, 255, 0.2);
+    border-left-color: var(--c-primary);
+    border-right-color: var(--c-secondary);
+    animation: halo-spin 10s linear infinite;
+    box-shadow: 0 0 30px rgba(18, 181, 255, 0.15);
+}
+.halo-ring-2 {
+    width: 420px; height: 420px;
+    border: 2px dashed rgba(169, 60, 255, 0.25);
+    border-top-color: var(--c-secondary);
+    border-bottom-color: var(--c-accent);
+    animation: halo-spin-reverse 15s linear infinite;
+    box-shadow: 0 0 20px rgba(169, 60, 255, 0.1);
+}
+.halo-ring-3 {
+    width: 520px; height: 520px;
+    border: 1px solid rgba(255, 41, 112, 0.1);
+    border-right-color: var(--c-accent);
+    animation: halo-spin 22s linear infinite;
+}
+
+.avatar-display-wrapper {
+    width: 240px; height: 240px;
+    border-radius: 50%;
+    background: rgba(10, 15, 30, 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 4px solid rgba(255,255,255,0.08);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.6), inset 0 0 30px rgba(255,255,255,0.1);
+    position: relative;
+    z-index: 5;
+    overflow: hidden;
+    transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    display: flex; align-items: center; justify-content: center;
+}
+.avatar-display-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+
+.winner-info {
+    position: absolute; bottom: 10px; text-align: center; width: 100%;
+    opacity: 0; transform: translateY(30px);
+    transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    pointer-events: none; z-index: 20;
+}
+.winner-name {
+    font-size: 64px; font-weight: 900; letter-spacing: 6px;
+    background: linear-gradient(180deg, #ffffff 0%, #9bdcff 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 20px rgba(18, 181, 255, 0.8));
+}
+
+/* Halo Core 抽奖中 */
+.state-running .halo-ring-1 { width: 350px; height: 350px; border-width: 4px; border-color: var(--c-primary) var(--c-secondary) var(--c-accent); animation-duration: 2s; box-shadow: 0 0 80px rgba(18, 181, 255, 0.4); }
+.state-running .halo-ring-2 { width: 450px; height: 450px; border-width: 3px; border-color: var(--c-secondary) transparent var(--c-primary); animation-duration: 3s; box-shadow: 0 0 40px rgba(169, 60, 255, 0.3); }
+.state-running .halo-ring-3 { width: 550px; height: 550px; border-color: var(--c-accent) transparent; animation-duration: 4s; box-shadow: 0 0 30px rgba(255, 41, 112, 0.2); }
+.state-running .avatar-display-wrapper { transform: scale(1.08); border-color: rgba(18, 181, 255, 0.6); box-shadow: 0 0 60px rgba(18,181,255,0.4), inset 0 0 40px rgba(18,181,255,0.3); }
+
+/* Halo Core 结果展示 */
+.state-finished.lottery-halo-core { transform: scale(1.15); }
+.state-finished .avatar-display-wrapper { border-color: var(--c-primary); box-shadow: 0 0 100px rgba(18, 181, 255, 0.6), inset 0 0 50px rgba(18, 181, 255, 0.4); }
+.state-finished .winner-info { opacity: 1; transform: translateY(0); }
+.state-finished .halo-ring-1 { width: 400px; height: 400px; border-color: var(--c-primary); box-shadow: 0 0 80px rgba(18, 181, 255, 0.5); animation-duration: 15s; }
+.state-finished .halo-ring-2 { width: 560px; height: 560px; border-color: var(--c-secondary); opacity: 0.6; animation-duration: 20s; }
+.state-finished .halo-ring-3 { width: 720px; height: 720px; border-color: var(--c-primary); opacity: 0.3; animation-duration: 25s; }
+
+@keyframes halo-spin { 100% { transform: rotate(360deg); } }
+@keyframes halo-spin-reverse { 100% { transform: rotate(-360deg); } }
+
+
+/* =========================================
+   Scene 2: List Lottery (导入名单抽奖)
+   ========================================= */
+#scene-list { background: radial-gradient(ellipse at top, rgba(18, 181, 255, 0.05) 0%, transparent 70%); }
+.slot-machine { 
+    display: flex; 
+    gap: 40px; 
+    height: 600px; 
+    padding: 0 60px; 
+    border-radius: 40px; 
+    position: relative; 
+    overflow: hidden; 
+    background: rgba(15, 20, 35, 0.4); 
+    backdrop-filter: blur(30px); 
+    -webkit-backdrop-filter: blur(30px);
+    border: 1px solid rgba(255, 255, 255, 0.05); 
+    box-shadow: 0 40px 80px rgba(0,0,0,0.6), inset 0 0 0 1px rgba(255,255,255,0.02);
+}
+.slot-machine::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(to bottom, var(--c-bg) 0%, transparent 20%, transparent 80%, var(--c-bg) 100%);
+    pointer-events: none; z-index: 10;
+}
+.slot-col-wrapper { width: 360px; height: 100%; overflow: hidden; position: relative; }
+.slot-col { 
+    display: flex; 
+    flex-direction: column; 
+    transition: transform 0s; 
+    will-change: transform; 
+}
+.slot-item { 
+    height: 120px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    font-size: 42px; 
+    font-weight: bold; 
+    color: rgba(255,255,255,0.3); 
+    opacity: 0.6; 
+    transition: all 0.4s ease; 
+    letter-spacing: 2px;
+}
+.slot-highlight { 
+    position: absolute; 
+    top: 240px; /* (600 - 120)/2 */
+    left: 0; 
+    right: 0; 
+    height: 120px; 
+    background: linear-gradient(90deg, transparent, rgba(18, 181, 255, 0.1), transparent); 
+    border-top: 1px solid rgba(18, 181, 255, 0.2); 
+    border-bottom: 1px solid rgba(18, 181, 255, 0.2); 
+    pointer-events: none; 
+    z-index: 5; 
+}
+.slot-highlight::before, .slot-highlight::after { 
+    content:''; 
+    position:absolute; 
+    top:0; bottom:0; width:4px; 
+    background: var(--c-primary); 
+    box-shadow: 0 0 15px var(--c-primary); 
+}
+.slot-highlight::before { left: 0; }
+.slot-highlight::after { right: 0; }
+
+.state-finished .slot-item.is-winner { 
+    color: #fff; 
+    opacity: 1; 
+    text-shadow: 0 0 20px rgba(18, 181, 255, 0.8); 
+    transform: scale(1.15); 
+    background: linear-gradient(90deg, transparent, rgba(18, 181, 255, 0.2), transparent);
+}
+
+
+/* =========================================
+   Scene 3: Race (大屏多人竞速游戏)
+   ========================================= */
+#scene-race { perspective: 1200px; }
+.grid-floor { 
+    position: absolute; 
+    bottom: -10%; 
+    left: -20%; 
+    right: -20%; 
+    height: 70vh; 
+    background: linear-gradient(transparent 0%, rgba(18, 181, 255, 0.03) 100%); 
+    transform: rotateX(60deg); 
+    transform-origin: center bottom; 
+    pointer-events: none; 
+    z-index: 0;
+}
+.grid-floor::before { 
+    content:''; 
+    position:absolute; 
+    inset:0; 
+    background-image: 
+        linear-gradient(rgba(18, 181, 255, 0.2) 1px, transparent 1px), 
+        linear-gradient(90deg, rgba(18, 181, 255, 0.2) 1px, transparent 1px); 
+    background-size: 60px 60px; 
+    animation: gridMove 2s linear infinite; 
+}
+@keyframes gridMove { 0% { background-position: 0 0; } 100% { background-position: 0 60px; } }
+
+.race-track-board { 
+    width: 85%; 
+    max-width: 1500px; 
+    display: flex; 
+    flex-direction: column; 
+    gap: 32px; 
+    position: relative;
+    z-index: 10;
+    margin-bottom: 80px;
+}
+.track-row { 
+    display: flex; 
+    align-items: center; 
+    gap: 30px; 
+    position: relative; 
+}
+.racer-info { 
+    width: 260px; 
+    display: flex; 
+    align-items: center; 
+    gap: 20px; 
+    background: rgba(255,255,255,0.03);
+    padding: 10px 20px;
+    border-radius: 40px;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+.racer-avatar { 
+    width: 60px; 
+    height: 60px; 
+    border-radius: 50%; 
+    border: 2px solid rgba(255,255,255,0.1); 
+}
+.racer-name { 
+    font-size: 26px; 
+    font-weight: 600; 
+    white-space: nowrap; 
+    letter-spacing: 1px;
+}
+.track-line-bg { 
+    flex: 1; 
+    height: 28px; 
+    background: rgba(0,0,0,0.5); 
+    border-radius: 14px; 
+    position: relative; 
+    box-shadow: inset 0 4px 10px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.05); 
+}
+.track-finish-line { 
+    position: absolute; 
+    right: 0; 
+    top: -15px; 
+    bottom: -15px; 
+    width: 4px; 
+    background: var(--c-accent); 
+    box-shadow: 0 0 20px var(--c-accent), 0 0 40px var(--c-accent); 
+    z-index: 5; 
+    border-radius: 2px;
+}
+.track-finish-line::after {
+    content: 'FINISH';
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 14px;
+    font-weight: 900;
+    color: var(--c-accent);
+    letter-spacing: 2px;
+}
+.track-row:not(:first-child) .track-finish-line::after { display: none; }
+
+.track-fill { 
+    height: 100%; 
+    width: 0%; 
+    border-radius: 14px; 
+    position: relative; 
+    transition: width 0.1s linear; 
+}
+
+.racer-car {
+    position: absolute;
+    right: -40px; 
+    top: 50%;
+    transform: translateY(-50%);
+    width: 80px;
+    height: 32px;
+    z-index: 10;
+    filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5));
+}
+.racer-car svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.rank-display { 
+    width: 100px; 
+    text-align: center; 
+    font-size: 48px; 
+    font-weight: 900; 
+    font-style: italic; 
+    color: transparent; 
+    font-family: Impact, sans-serif;
+}
+.rank-display.r-1 { color: #FFD700; filter: drop-shadow(0 0 15px rgba(255,215,0,0.6)); transform: scale(1.2); }
+.rank-display.r-2 { color: #E0E0E0; filter: drop-shadow(0 0 15px rgba(224,224,224,0.6)); transform: scale(1.1); }
+.rank-display.r-3 { color: #CD7F32; filter: drop-shadow(0 0 15px rgba(205,127,50,0.6)); transform: scale(1.05); }
+.rank-display.r-4, .rank-display.r-5, .rank-display.r-6 { color: rgba(255,255,255,0.3); font-size: 36px; }
+
+/* Reduced Motion Compatibility */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+    #scene-avatar .bg-avatar {
+        opacity: 0.3 !important;
+        animation: none !important;
+        transform: translate(-50%, -50%) scale(1) !important;
+        left: var(--x, 50%) !important;
+        top: var(--y, 50%) !important;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="screen-scaler">
+    <div class="noise-overlay"></div>
+    
+    <header class="top-header">
+        <h1>互动大屏演示</h1>
+        <span class="badge">现场版</span>
+    </header>
+
+    <!-- Scene 1: Avatar Halo -->
+    <div class="scene active" id="scene-avatar" data-scheme="orbit">
+        <div id="avatar-bg-container"></div>
+        <div class="lottery-halo-core" id="avatar-core">
+            <div class="halo-rings">
+                <div class="halo-ring halo-ring-1"></div>
+                <div class="halo-ring halo-ring-2"></div>
+                <div class="halo-ring halo-ring-3"></div>
+            </div>
+            <div class="avatar-display-wrapper">
+                <img src="" id="avatar-img" alt="Avatar" />
+            </div>
+            <div class="winner-info">
+                <div class="winner-name" id="avatar-name">等待抽取</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scene 2: List -->
+    <div class="scene" id="scene-list">
+        <div class="slot-machine">
+            <div class="slot-highlight"></div>
+            <div class="slot-col-wrapper"><div class="slot-col" id="slot-col-1"></div></div>
+            <div class="slot-col-wrapper"><div class="slot-col" id="slot-col-2"></div></div>
+            <div class="slot-col-wrapper"><div class="slot-col" id="slot-col-3"></div></div>
+        </div>
+    </div>
+
+    <!-- Scene 3: Race -->
+    <div class="scene" id="scene-race">
+        <div class="grid-floor"></div>
+        <div class="race-track-board" id="race-board">
+            <!-- Generated by JS -->
+        </div>
+    </div>
+</div>
+
+<div class="controls">
+    <div class="tabs">
+        <button class="tab-btn active" data-target="scene-avatar">扫码头像</button>
+        <button class="tab-btn" data-target="scene-list">导入名单</button>
+        <button class="tab-btn" data-target="scene-race">多人竞速</button>
+    </div>
+    
+    <!-- Only visible in scene-avatar -->
+    <div class="schemes" id="avatar-schemes">
+        <button class="scheme-btn active" data-scheme="orbit">星际环绕</button>
+        <button class="scheme-btn" data-scheme="float">深海浮游</button>
+        <button class="scheme-btn" data-scheme="vortex">星云漩涡</button>
+    </div>
+
+    <div class="actions">
+        <button class="action-btn outline" id="btn-sub" style="display: none;">重置</button>
+        <button class="action-btn" id="btn-main">开始演示</button>
+    </div>
+</div>
+
+<script>
+/** 
+ * Screen Scaling Logic
+ */
+function resize() {
+    const scaler = document.querySelector('.screen-scaler');
+    const scale = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+    scaler.style.transform = `scale(${scale})`;
+}
+window.addEventListener('resize', resize);
+resize();
+
+/**
+ * Mock Data Generator
+ */
+const firstNames = ['伟', '芳', '娜', '敏', '静', '强', '磊', '军', '洋', '勇', '杰', '娟', '涛', '明', '超', '秀英', '霞', '平', '刚', '云', '化腾', '一鸣', '兴', '峥', '彦宏', '雷', '建林'];
+const lastNames = ['赵', '钱', '孙', '李', '周', '吴', '郑', '王', '冯', '陈', '褚', '卫', '蒋', '沈', '韩', '杨', '朱', '秦', '尤', '许', '马', '张', '黄', '林'];
+const colors = [ 
+    ['12b5ff', 'a93cff'], ['ff2970', 'ffaa00'], ['00ff88', '00aaff'], 
+    ['ff00ff', '5500ff'], ['ffcc00', 'ff2970'], ['00e5ff', '0055ff'] 
+];
+
+function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+function getRandomName() { return lastNames[randInt(0, lastNames.length-1)] + firstNames[randInt(0, firstNames.length-1)]; }
+
+function getAvatarSVG(name, c1, c2) {
+    const init = name.charAt(0);
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#${c1}"/><stop offset="100%" stop-color="#${c2}"/></linearGradient></defs><circle cx="50" cy="50" r="50" fill="url(#g)"/><text x="50" y="54" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="44" font-family="sans-serif" font-weight="bold">${init}</text></svg>`;
+    return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+}
+
+function generateUsers(count) {
+    let users = [];
+    for(let i=0; i<count; i++) {
+        let name = getRandomName();
+        let colorPair = colors[randInt(0, colors.length-1)];
+        users.push({ name: name, avatar: getAvatarSVG(name, colorPair[0], colorPair[1]) });
+    }
+    return users;
+}
+function hexToRgb(hex) {
+    let bigint = parseInt(hex, 16);
+    return `${(bigint >> 16) & 255}, ${(bigint >> 8) & 255}, ${bigint & 255}`;
+}
+
+const mockUsers = generateUsers(200);
+
+/**
+ * Global State & Controls
+ */
+let currentScene = 'scene-avatar';
+const stateMap = {
+    'scene-avatar': { state: 0 }, // 0: idle, 1: running, 2: finished
+    'scene-list': { state: 0 },
+    'scene-race': { state: 0 }
+};
+
+const btnMain = document.getElementById('btn-main');
+const btnSub = document.getElementById('btn-sub');
+const schemesEl = document.getElementById('avatar-schemes');
+
+document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        e.target.classList.add('active');
+        const target = e.target.dataset.target;
+        
+        document.querySelectorAll('.scene').forEach(s => s.classList.remove('active'));
+        document.getElementById(target).classList.add('active');
+        
+        currentScene = target;
+        updateControls();
+    });
+});
+
+document.querySelectorAll('.scheme-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        document.querySelectorAll('.scheme-btn').forEach(b => b.classList.remove('active'));
+        e.target.classList.add('active');
+        document.getElementById('scene-avatar').setAttribute('data-scheme', e.target.dataset.scheme);
+    });
+});
+
+function updateControls() {
+    let s = stateMap[currentScene].state;
+    btnMain.disabled = false;
+    
+    if(currentScene === 'scene-avatar') {
+        btnSub.style.display = 'none';
+        schemesEl.style.display = 'flex';
+        if(s === 0) btnMain.innerText = '开始抽奖';
+        if(s === 1) btnMain.innerText = '停止抽取';
+        if(s === 2) btnMain.innerText = '重新抽奖';
+    } 
+    else if (currentScene === 'scene-list') {
+        btnSub.style.display = 'none';
+        schemesEl.style.display = 'none';
+        if(s === 0) btnMain.innerText = '开始滚动';
+        if(s === 1) btnMain.innerText = '锁定结果';
+        if(s === 1.5) { btnMain.innerText = '减速中...'; btnMain.disabled = true; }
+        if(s === 2) btnMain.innerText = '重新滚动';
+    } 
+    else if (currentScene === 'scene-race') {
+        schemesEl.style.display = 'none';
+        if(s === 0) { btnMain.innerText = '开始比赛'; btnSub.style.display = 'none'; }
+        if(s === 1) { btnMain.innerText = '比赛进行中'; btnMain.disabled = true; btnSub.style.display = 'block'; }
+        if(s === 2) { btnMain.innerText = '重新比赛'; btnMain.disabled = false; btnSub.style.display = 'block'; }
+    }
+}
+
+btnMain.addEventListener('click', () => {
+    let s = stateMap[currentScene].state;
+    if(currentScene === 'scene-avatar') {
+        if(s === 0 || s === 2) avatarApp.start();
+        else if(s === 1) avatarApp.stop();
+    } else if (currentScene === 'scene-list') {
+        if(s === 0 || s === 2) listApp.start();
+        else if(s === 1) listApp.stop();
+    } else if (currentScene === 'scene-race') {
+        if(s === 0 || s === 2) raceApp.start();
+    }
+});
+
+btnSub.addEventListener('click', () => {
+    if(currentScene === 'scene-race') raceApp.reset();
+});
+
+/**
+ * Avatar Halo App Logic
+ */
+const avatarApp = {
+    timer: null,
+    elScene: document.getElementById('scene-avatar'),
+    elCore: document.getElementById('avatar-core'),
+    elImg: document.getElementById('avatar-img'),
+    elName: document.getElementById('avatar-name'),
+    bgContainer: document.getElementById('avatar-bg-container'),
+    init() {
+        for(let i=0; i<60; i++) {
+            let u = mockUsers[randInt(0, mockUsers.length-1)];
+            let el = document.createElement('div');
+            el.className = 'bg-avatar';
+            el.style.backgroundImage = `url("${u.avatar}")`;
+            
+            // Shared config
+            el.style.setProperty('--size', randInt(40, 90) + 'px');
+            let c1 = colors[randInt(0, colors.length-1)][0];
+            el.style.setProperty('--color', `rgba(${hexToRgb(c1)}, 0.6)`);
+            el.style.setProperty('--y', randInt(5, 95) + '%'); 
+
+            // Orbit config
+            el.style.setProperty('--radius', randInt(200, 950) + 'px');
+            el.style.setProperty('--scale', (Math.random() * 1.5 + 0.3).toFixed(2));
+            el.style.setProperty('--dur', randInt(20, 50) + 's');
+            el.style.setProperty('--delay', '-' + randInt(0, 50) + 's');
+            el.style.setProperty('--opacity', (Math.random() * 0.5 + 0.15).toFixed(2));
+            
+            // Float config
+            el.style.setProperty('--x', randInt(2, 98) + '%');
+            el.style.setProperty('--y-dist', '-' + randInt(120, 180) + 'vh');
+            el.style.setProperty('--rot', randInt(-90, 90) + 'deg');
+            
+            // Vortex config
+            let sDeg = randInt(0, 360);
+            el.style.setProperty('--start-deg', sDeg + 'deg');
+            el.style.setProperty('--end-deg', (sDeg + (Math.random()>0.5? 360:-360)) + 'deg');
+            el.style.setProperty('--vortex-radius', randInt(800, 1600) + 'px');
+            el.style.setProperty('--vortex-scale', (Math.random() * 3 + 1.5).toFixed(2));
+
+            this.bgContainer.appendChild(el);
+        }
+        this.reset();
+    },
+    reset() {
+        this.elScene.classList.remove('state-running', 'state-finished');
+        this.elCore.className = 'lottery-halo-core';
+        this.elImg.src = getAvatarSVG('?', '333333', '666666');
+        this.elName.innerText = '等待抽取';
+        stateMap['scene-avatar'].state = 0;
+        updateControls();
+    },
+    start() {
+        stateMap['scene-avatar'].state = 1;
+        updateControls();
+        this.elScene.classList.add('state-running');
+        this.elScene.classList.remove('state-finished');
+        this.elCore.className = 'lottery-halo-core state-running';
+        
+        let counter = 0;
+        this.timer = setInterval(() => {
+            let u = mockUsers[counter % mockUsers.length];
+            this.elImg.src = u.avatar;
+            counter++;
+        }, 60);
+    },
+    stop() {
+        clearInterval(this.timer);
+        let winner = mockUsers[randInt(0, mockUsers.length-1)];
+        this.elImg.src = winner.avatar;
+        this.elName.innerText = winner.name;
+        
+        this.elScene.classList.remove('state-running');
+        this.elScene.classList.add('state-finished');
+        this.elCore.className = 'lottery-halo-core state-finished';
+        stateMap['scene-avatar'].state = 2;
+        updateControls();
+    }
+};
+
+/**
+ * List App Logic
+ */
+const listApp = {
+    cols: [
+        { el: document.getElementById('slot-col-1'), items: [] },
+        { el: document.getElementById('slot-col-2'), items: [] },
+        { el: document.getElementById('slot-col-3'), items: [] }
+    ],
+    itemHeight: 120,
+    init() {
+        this.cols.forEach(col => {
+            let html = '';
+            for(let i=0; i<1000; i++) {
+                let name = getRandomName();
+                col.items.push(name);
+                html += `<div class="slot-item" id="${col.el.id}-item-${i}">${name}</div>`;
+            }
+            col.el.innerHTML = html;
+        });
+        this.reset();
+    },
+    reset() {
+        this.cols.forEach(col => {
+            col.el.style.transition = 'none';
+            col.el.style.transform = `translateY(0px)`;
+            col.el.querySelectorAll('.is-winner').forEach(el => el.classList.remove('is-winner'));
+        });
+        stateMap['scene-list'].state = 0;
+        updateControls();
+    },
+    start() {
+        this.reset();
+        stateMap['scene-list'].state = 1;
+        updateControls();
+        
+        // Force reflow
+        void document.body.offsetHeight;
+
+        this.cols.forEach((col, i) => {
+            col.el.style.transition = 'transform 120s linear';
+            col.el.style.transform = `translateY(-${(col.items.length - 15) * this.itemHeight}px)`;
+        });
+    },
+    stop() {
+        stateMap['scene-list'].state = 1.5; 
+        updateControls();
+        
+        let maxTime = 0;
+        this.cols.forEach((col, i) => {
+            let delay = i * 600;
+            setTimeout(() => {
+                let style = window.getComputedStyle(col.el);
+                let matrix = new WebKitCSSMatrix(style.transform);
+                let currentY = matrix.m42;
+                
+                let currentIndex = Math.floor(Math.abs(currentY) / this.itemHeight);
+                // Staggered stop distance, bounded to valid indices
+                let targetIndex = currentIndex + 8 + (i * 4); 
+                targetIndex = Math.min(targetIndex, col.items.length - 3);
+                
+                // offset by 2 to align target item in the middle highlight box (600px / 2 = 300 - 60 = 240px offset)
+                let targetY = - (targetIndex - 2) * this.itemHeight;
+                
+                col.el.style.transition = 'transform 3.5s cubic-bezier(0.15, 0.85, 0.2, 1)';
+                col.el.style.transform = `translateY(${targetY}px)`;
+                
+                setTimeout(() => {
+                    let winnerEl = document.getElementById(`${col.el.id}-item-${targetIndex}`);
+                    if(winnerEl) winnerEl.classList.add('is-winner');
+                }, 3500);
+                
+            }, delay);
+            maxTime = delay + 3500;
+        });
+        
+        setTimeout(() => {
+            stateMap['scene-list'].state = 2;
+            updateControls();
+        }, maxTime + 200);
+    }
+};
+
+/**
+ * Race App Logic
+ */
+const raceApp = {
+    racers: [],
+    raf: null,
+    init() {
+        const board = document.getElementById('race-board');
+        let html = '';
+        for(let i=0; i<6; i++) {
+            let u = mockUsers[i];
+            let c = colors[i % colors.length];
+            html += `
+            <div class="track-row">
+                <div class="racer-info">
+                    <img class="racer-avatar" src="${u.avatar}">
+                    <div class="racer-name">${u.name}</div>
+                </div>
+                <div class="track-line-bg">
+                    <div class="track-finish-line"></div>
+                    <div class="track-fill" id="racer-fill-${i}" style="background: linear-gradient(90deg, #${c[0]}, #${c[1]}); box-shadow: 0 0 15px #${c[1]};">
+                        <div class="racer-car">
+                            <svg viewBox="0 0 100 40" xmlns="http://www.w3.org/2000/svg">
+                                <ellipse cx="50" cy="38" rx="40" ry="4" fill="rgba(0,0,0,0.4)"/>
+                                <path d="M 15 25 C 20 10, 40 10, 55 10 L 75 10 C 90 10, 95 20, 95 28 C 95 35, 90 35, 85 35 L 10 35 C 5 35, 5 30, 15 25 Z" fill="#${c[1]}"/>
+                                <path d="M 40 13 L 65 13 C 75 13, 80 20, 83 25 L 30 25 C 33 18, 35 13, 40 13 Z" fill="rgba(255,255,255,0.7)"/>
+                                <path d="M 10 10 L 25 10 L 20 20 L 5 20 Z" fill="#${c[0]}"/>
+                                <circle cx="25" cy="35" r="9" fill="#1a1a1a" stroke="#ffffff" stroke-width="2"/>
+                                <circle cx="75" cy="35" r="9" fill="#1a1a1a" stroke="#ffffff" stroke-width="2"/>
+                                <circle cx="25" cy="35" r="3" fill="#${c[0]}"/>
+                                <circle cx="75" cy="35" r="3" fill="#${c[0]}"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="rank-display" id="racer-rank-${i}"></div>
+            </div>`;
+            this.racers.push({ id: i, progress: 0, finished: false, rank: 0, speed: 0 });
+        }
+        board.innerHTML = html;
+        this.reset();
+    },
+    reset() {
+        cancelAnimationFrame(this.raf);
+        this.racers.forEach(r => {
+            r.progress = 0;
+            r.finished = false;
+            r.rank = 0;
+            r.speed = Math.random() * 0.15 + 0.1;
+            document.getElementById(`racer-fill-${r.id}`).style.width = '0%';
+            let rankEl = document.getElementById(`racer-rank-${r.id}`);
+            rankEl.innerText = '';
+            rankEl.className = 'rank-display';
+        });
+        stateMap['scene-race'].state = 0;
+        updateControls();
+    },
+    start() {
+        this.reset();
+        stateMap['scene-race'].state = 1;
+        updateControls();
+        
+        let currentRank = 1;
+        let lastTime = performance.now();
+        
+        const loop = (time) => {
+            let dt = time - lastTime;
+            lastTime = time;
+            let allFinished = true;
+            
+            this.racers.forEach(r => {
+                if(!r.finished) {
+                    allFinished = false;
+                    r.speed += (Math.random() - 0.5) * 0.04;
+                    r.speed = Math.max(0.08, Math.min(0.35, r.speed));
+                    
+                    r.progress += r.speed * (dt / 16);
+                    if(r.progress >= 100) {
+                        r.progress = 100;
+                        r.finished = true;
+                        r.rank = currentRank++;
+                        
+                        let rankEl = document.getElementById(`racer-rank-${r.id}`);
+                        rankEl.innerText = r.rank;
+                        rankEl.classList.add(`r-${r.rank}`);
+                    }
+                    document.getElementById(`racer-fill-${r.id}`).style.width = r.progress + '%';
+                }
+            });
+            
+            if(!allFinished) {
+                this.raf = requestAnimationFrame(loop);
+            } else {
+                stateMap['scene-race'].state = 2;
+                updateControls();
+            }
+        };
+        this.raf = requestAnimationFrame(loop);
+    }
+};
+
+// Initialize apps
+avatarApp.init();
+listApp.init();
+raceApp.init();
+
+</script>
+</body>
+</html>

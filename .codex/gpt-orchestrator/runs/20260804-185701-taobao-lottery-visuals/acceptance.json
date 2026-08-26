@@ -1,0 +1,49 @@
+[
+  {
+    "id": "AC-01",
+    "requirement": "Create two materially distinct visual directions for each of QR-code lottery, imported-list lottery, and large-screen interactive games",
+    "verification": ["Six individual square assets exist and each has a named positioning direction"],
+    "status": "passed",
+    "evidence": [
+      "outputs/final contains six individual 1440x1440 PNG files",
+      "outputs/visual-direction-matrix.md names and differentiates all six directions"
+    ],
+    "notes": "No collages or contact sheets as final assets"
+  },
+  {
+    "id": "AC-02",
+    "requirement": "Use exact approved Chinese copy and avoid invented product claims",
+    "verification": ["Copy is added deterministically and compared against the copy manifest"],
+    "status": "passed",
+    "evidence": [
+      "outputs/copy-manifest.json",
+      "scripts/render-main-images.mjs",
+      "outputs/visual-qa.md"
+    ],
+    "notes": "Generated imagery must not contain additional readable text"
+  },
+  {
+    "id": "AC-03",
+    "requirement": "Deliver publish-ready square images with strong mobile-search hierarchy",
+    "verification": ["Each export is square, visually inspected at full size and thumbnail scale, and saved in the durable output directory"],
+    "status": "passed",
+    "evidence": [
+      "outputs/final/*.png are 1440x1440",
+      "outputs/thumbnails/*.png are 360x360",
+      "outputs/preview-six-directions.png and outputs/visual-qa.md"
+    ],
+    "notes": "Target 1440x1440 or higher-resolution square source with final square export"
+  },
+  {
+    "id": "AC-04",
+    "requirement": "Keep provider context sanitized and independently verify ChatGPT and Gemini recommendations",
+    "verification": ["Secret scan passes; provider/model labels and conversation URLs are recorded; Codex reconciles the directions"],
+    "status": "passed",
+    "evidence": [
+      "prompts/sanitized-visual-brief.md",
+      "state.json records verified provider labels and URLs",
+      "deliveries/chatgpt-visual-strategy.md and deliveries/gemini-visual-strategy.md document rejected incomplete outputs"
+    ],
+    "notes": "No Qianniu/SYCM private metrics or account data may leave the local browser"
+  }
+]

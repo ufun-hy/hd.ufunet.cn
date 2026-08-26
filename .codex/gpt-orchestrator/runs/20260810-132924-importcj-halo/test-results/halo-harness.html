@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>ImportCJ Halo Verification</title>
+    <link rel="stylesheet" href="file:///Users/ufun/code/2026/hd.ufunet.cn/public/static/css/screencss/screenimportcj-halo.css">
+    <style>
+        html,body{width:100%;height:100%;margin:0;overflow:hidden}
+        body{background:linear-gradient(135deg,#ff8a00 0%,#b91d73 44%,#211356 100%);font-family:Arial,"Microsoft YaHei",sans-serif}
+        .static-theme{position:absolute;inset:0;background:radial-gradient(circle at 20% 18%,rgba(255,255,255,.32),transparent 24%),radial-gradient(circle at 82% 76%,rgba(255,211,0,.42),transparent 22%)}
+        .static-theme::before{content:"现有导入抽奖主题背景（应保持可见）";position:absolute;left:32px;top:24px;color:#fff;font-size:22px;font-weight:700;text-shadow:0 2px 8px rgba(0,0,0,.45)}
+        .importcj-mainbox{position:absolute;inset:0}
+        .importcj-tip,.importcj-footer{position:absolute;z-index:1;color:#fff}
+        .importcj-tip{left:50%;bottom:24px;transform:translateX(-50%)}
+        .importcj-footer{right:30px;bottom:24px}
+    </style>
+</head>
+<body>
+    <div class="static-theme"></div>
+    <div class="importcj-mainbox flybox5 isdrawing">
+        <div class="importcj-header">原顶部</div>
+        <div class="importcj-awardlist">原奖品</div>
+        <div class="importcj-luckerbox">原名单滚动层</div>
+        <div class="importcj-tip">按空格键停止</div>
+        <div class="importcj-footer">原底部控制区</div>
+    </div>
+    <script src="file:///Users/ufun/code/2026/hd.ufunet.cn/public/static/js/require.js"></script>
+    <script>
+        require.config({baseUrl:'file:///Users/ufun/code/2026/hd.ufunet.cn/public/static/js/'});
+        require(['screenjs/screenimportcj-halo'],function(halo){
+            var values=['张伟','褚秀英','欧阳娜娜','Customer Success Team','这是一个超过十二个字符的完整姓名测试','周子涵','李明宇','陈思远','王嘉诚','赵可欣'];
+            window.__haloModule=halo;
+            window.__haloStage=halo.create({root:document.querySelector('.importcj-mainbox')});
+            window.__haloStage.start(values);
+            window.__haloReady=true;
+        });
+    </script>
+</body>
+</html>

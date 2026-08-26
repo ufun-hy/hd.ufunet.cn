@@ -4,7 +4,7 @@
 * @Last Modified by:   赞木
 * @Last Modified time: 2023-06-02 20:14:20
 */
-define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'anime', 'threejs2', 'tweenjs', 'screenjs/screenimportcj-halo', 'screenjs/screenimportcj-danmaku', 'snabbt'], function (screencore, layerBox, template, keyboardJS, anime, THREE, TWEEN, screenimportcjHalo, screenimportcjDanmaku) {
+define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'anime', 'threejs2', 'tweenjs', 'screenjs/screenimportcj-halo', 'screenjs/screenimportcj-danmaku', 'screenjs/screenimportcj-prize', 'snabbt'], function (screencore, layerBox, template, keyboardJS, anime, THREE, TWEEN, screenimportcjHalo, screenimportcjDanmaku, screenimportcjPrize) {
 	THREE.CSS3DObject = function (element) { THREE.Object3D.call(this); this.element = element; this.element.style.position = "absolute"; this.addEventListener("removed", function () { if (this.element.parentNode !== null) { this.element.parentNode.removeChild(this.element) } }) }; THREE.CSS3DObject.prototype = Object.create(THREE.Object3D.prototype); THREE.CSS3DObject.prototype.constructor = THREE.CSS3DObject; THREE.CSS3DSprite = function (element) { THREE.CSS3DObject.call(this, element) }; THREE.CSS3DSprite.prototype = Object.create(THREE.CSS3DObject.prototype); THREE.CSS3DSprite.prototype.constructor = THREE.CSS3DSprite; THREE.CSS3DRenderer = function () { console.log("THREE.CSS3DRenderer", THREE.REVISION); var _width, _height; var _widthHalf, _heightHalf; var matrix = new THREE.Matrix4(); var cache = { camera: { fov: 0, style: "" }, objects: {} }; var domElement = document.createElement("div"); domElement.style.overflow = "hidden"; this.domElement = domElement; var cameraElement = document.createElement("div"); cameraElement.style.WebkitTransformStyle = "preserve-3d"; cameraElement.style.MozTransformStyle = "preserve-3d"; cameraElement.style.transformStyle = "preserve-3d"; domElement.appendChild(cameraElement); var isIE = /Trident/i.test(navigator.userAgent); this.setClearColor = function () { }; this.getSize = function () { return { width: _width, height: _height } }; this.setSize = function (width, height) { _width = width; _height = height; _widthHalf = _width / 2; _heightHalf = _height / 2; domElement.style.width = width + "px"; domElement.style.height = height + "px"; cameraElement.style.width = width + "px"; cameraElement.style.height = height + "px" }; function epsilon(value) { return Math.abs(value) < 1e-10 ? 0 : value } function getCameraCSSMatrix(matrix) { var elements = matrix.elements; return "matrix3d(" + epsilon(elements[0]) + "," + epsilon(-elements[1]) + "," + epsilon(elements[2]) + "," + epsilon(elements[3]) + "," + epsilon(elements[4]) + "," + epsilon(-elements[5]) + "," + epsilon(elements[6]) + "," + epsilon(elements[7]) + "," + epsilon(elements[8]) + "," + epsilon(-elements[9]) + "," + epsilon(elements[10]) + "," + epsilon(elements[11]) + "," + epsilon(elements[12]) + "," + epsilon(-elements[13]) + "," + epsilon(elements[14]) + "," + epsilon(elements[15]) + ")" } function getObjectCSSMatrix(matrix, cameraCSSMatrix) { var elements = matrix.elements; var matrix3d = "matrix3d(" + epsilon(elements[0]) + "," + epsilon(elements[1]) + "," + epsilon(elements[2]) + "," + epsilon(elements[3]) + "," + epsilon(-elements[4]) + "," + epsilon(-elements[5]) + "," + epsilon(-elements[6]) + "," + epsilon(-elements[7]) + "," + epsilon(elements[8]) + "," + epsilon(elements[9]) + "," + epsilon(elements[10]) + "," + epsilon(elements[11]) + "," + epsilon(elements[12]) + "," + epsilon(elements[13]) + "," + epsilon(elements[14]) + "," + epsilon(elements[15]) + ")"; if (isIE) { return "translate(-50%,-50%)" + "translate(" + _widthHalf + "px," + _heightHalf + "px)" + cameraCSSMatrix + matrix3d } return "translate(-50%,-50%)" + matrix3d } function renderObject(object, camera, cameraCSSMatrix) { if (object instanceof THREE.CSS3DObject) { var style; if (object instanceof THREE.CSS3DSprite) { matrix.copy(camera.matrixWorldInverse); matrix.transpose(); matrix.copyPosition(object.matrixWorld); matrix.scale(object.scale); matrix.elements[3] = 0; matrix.elements[7] = 0; matrix.elements[11] = 0; matrix.elements[15] = 1; style = getObjectCSSMatrix(matrix, cameraCSSMatrix) } else { style = getObjectCSSMatrix(object.matrixWorld, cameraCSSMatrix) } var element = object.element; var cachedStyle = cache.objects[object.id] && cache.objects[object.id].style; if (cachedStyle === undefined || cachedStyle !== style) { element.style.WebkitTransform = style; element.style.MozTransform = style; element.style.transform = style; cache.objects[object.id] = { style: style }; if (isIE) { cache.objects[object.id].distanceToCameraSquared = getDistanceToSquared(camera, object) } } if (element.parentNode !== cameraElement) { cameraElement.appendChild(element) } } for (var i = 0, l = object.children.length; i < l; i++) { renderObject(object.children[i], camera, cameraCSSMatrix) } } var getDistanceToSquared = function () { var a = new THREE.Vector3(); var b = new THREE.Vector3(); return function (object1, object2) { a.setFromMatrixPosition(object1.matrixWorld); b.setFromMatrixPosition(object2.matrixWorld); return a.distanceToSquared(b) } }(); function zOrder(scene) { var order = Object.keys(cache.objects).sort(function (a, b) { return cache.objects[a].distanceToCameraSquared - cache.objects[b].distanceToCameraSquared }); var zMax = order.length; scene.traverse(function (object) { var index = order.indexOf(object.id + ""); if (index !== -1) { object.element.style.zIndex = zMax - index } }) } this.render = function (scene, camera) { var fov = camera.projectionMatrix.elements[5] * _heightHalf; if (cache.camera.fov !== fov) { domElement.style.WebkitPerspective = fov + "px"; domElement.style.MozPerspective = fov + "px"; domElement.style.perspective = fov + "px"; cache.camera.fov = fov } scene.updateMatrixWorld(); if (camera.parent === null) { camera.updateMatrixWorld() } var cameraCSSMatrix = "translateZ(" + fov + "px)" + getCameraCSSMatrix(camera.matrixWorldInverse); var style = cameraCSSMatrix + "translate(" + _widthHalf + "px," + _heightHalf + "px)"; if (cache.camera.style !== style && !isIE) { cameraElement.style.WebkitTransform = style; cameraElement.style.MozTransform = style; cameraElement.style.transform = style; cache.camera.style = style } renderObject(scene, camera, cameraCSSMatrix); if (isIE) { zOrder(scene) } } };
 	var screenimportcj = {
 		datas: [],
@@ -24,6 +24,214 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 		flyspheretype: '1',
 		haloStage: null,
 		danmakuStage: null,
+		unifiedPrize: null,
+		unifiedRoundItems: [],
+		danmakuPrizeStats: null,
+		danmakuVisualState: 'ready',
+		danmakuFooterObserver: null,
+		danmakuFooterMutationObserver: null,
+		danmakuFooterWindow: null,
+		danmakuRecordsRequestId: 0,
+		danmakuRecordsPrizeId: null,
+		mountUnifiedPrize: function (config) {
+			var self = this;
+			if (!screenimportcjPrize) return;
+			self.unifiedPrize = screenimportcjPrize.create({
+				root: document.querySelector('.importcj-mainbox'),
+				callbacks: {
+					onPrizePrev: function () { $('.importcj-footer .prev-prize').trigger('click'); },
+					onPrizeNext: function () { $('.importcj-footer .next-prize').trigger('click'); },
+					onPrizeSelect: function (prize, index) { self.selectDanmakuPrize(index); },
+					onDrawCountChange: function (value) { self.setDanmakuDrawCount(value); }
+				}
+			});
+			self.unifiedPrize.mount();
+			self.unifiedPrize.setAccent(config && config.color);
+			self.syncDanmakuControls();
+		},
+		destroyUnifiedPrize: function () {
+			if (this.unifiedPrize) this.unifiedPrize.destroy();
+			this.unifiedPrize = null;
+		},
+		invalidateDanmakuRecords: function () {
+			this.danmakuRecordsRequestId++;
+			this.danmakuRecordsPrizeId = null;
+		},
+		syncDanmakuPrizeStats: function (total, used) {
+			var self = this;
+			if (total === undefined || total === null || used === undefined || used === null) {
+				self.danmakuPrizeStats = null;
+				if (self.unifiedPrize || self.danmakuStage) self.syncDanmakuControls();
+				return;
+			}
+			var totalStr = String(total).replace(/^\s+|\s+$/g, '');
+			var usedStr = String(used).replace(/^\s+|\s+$/g, '');
+			if (totalStr === '' || usedStr === '') {
+				self.danmakuPrizeStats = null;
+				if (self.unifiedPrize || self.danmakuStage) self.syncDanmakuControls();
+				return;
+			}
+			var totalNum = Number(totalStr);
+			var usedNum = Number(usedStr);
+			if (isNaN(totalNum) || isNaN(usedNum) || !isFinite(totalNum) || !isFinite(usedNum)) {
+				self.danmakuPrizeStats = null;
+				if (self.unifiedPrize || self.danmakuStage) self.syncDanmakuControls();
+				return;
+			}
+			var remaining = Math.max(totalNum - usedNum, 0);
+			self.danmakuPrizeStats = {
+				total: totalNum,
+				used: usedNum,
+				remaining: remaining
+			};
+			if (self.unifiedPrize || self.danmakuStage) self.syncDanmakuControls();
+		},
+		getDanmakuSpeedStorageKey: function () {
+			return 'importcj:danmaku-speed:' + ((typeof XCV3Config != 'undefined' && XCV3Config.hdid) || 'default');
+		},
+		getDanmakuSpeedPreset: function () {
+			var value = 'normal';
+			try {
+				value = window.localStorage.getItem(this.getDanmakuSpeedStorageKey()) || 'normal';
+			} catch (e) {}
+			return $.inArray(value, ['slow', 'normal', 'fast']) > -1 ? value : 'normal';
+		},
+		getDanmakuAvailableCount: function () {
+			var self = this;
+			if (!self.danmakuPrizeStats || typeof self.danmakuPrizeStats.remaining != 'number' || !isFinite(self.danmakuPrizeStats.remaining)) {
+				return null;
+			}
+			return Math.max(0, Math.min(self.danmakuPrizeStats.remaining, self.datas.length));
+		},
+		getDanmakuPrizeOptions: function () {
+			var self = this;
+			return $.map(self.prizeInfo || [], function (prize, index) {
+				var copy = $.extend({}, prize);
+				if (index == self.prizeIndex && self.danmakuPrizeStats) {
+					copy.remaining = self.danmakuPrizeStats.remaining;
+				}
+				return copy;
+			});
+		},
+		getDanmakuVisualState: function () {
+			if (this.danmakuVisualState) return this.danmakuVisualState;
+			return this.isstart == '2' ? 'drawing' : (this.isstart == '3' ? 'result' : (this.isstart == '4' ? 'records' : 'ready'));
+		},
+		setDanmakuVisualState: function (state) {
+			this.danmakuVisualState = state || 'ready';
+			this.syncDanmakuControls();
+		},
+		getDanmakuControlSnapshot: function () {
+			var self = this;
+			var available = self.getDanmakuAvailableCount();
+			var onceout = $('.select-box .onceout').val();
+			var onceoutNum = parseInt(onceout, 10);
+			var validCount = !isNaN(onceoutNum) && onceoutNum > 0 && (available === null || onceoutNum <= available);
+			var statsReady = available !== null;
+			var canStart = self.getDanmakuVisualState() == 'ready' && statsReady && available > 0 && self.datas.length > 0 && validCount;
+			return {
+				state: self.getDanmakuVisualState(),
+				prize: self.getDanmakuPrize(),
+				prizes: self.getDanmakuPrizeOptions(),
+				prizeIndex: self.prizeIndex,
+				onceout: onceout || 1,
+				maxDrawCount: available === null ? 999 : Math.max(1, available),
+				canStart: canStart,
+				primaryEnabled: canStart || self.getDanmakuVisualState() == 'drawing' || self.getDanmakuVisualState() == 'result',
+				primaryText: self.getDanmakuVisualState() == 'drawing' ? '停止抽奖' : (self.getDanmakuVisualState() == 'result' ? '关闭结果' : (self.getDanmakuVisualState() == 'records' ? '记录查看中' : '开始抽奖')),
+				speedPreset: self.getDanmakuSpeedPreset()
+			};
+		},
+		syncDanmakuControls: function () {
+			var self = this;
+			var snapshot = self.getDanmakuControlSnapshot();
+			if (self.unifiedPrize) self.unifiedPrize.update(snapshot);
+			if (self.flytype == '6' && self.danmakuStage) self.danmakuStage.updateControls(snapshot);
+		},
+		setDanmakuDrawCount: function (value) {
+			var self = this;
+			if (self.isstart != '1' || self.danmakuVisualState != 'ready') return false;
+			var available = self.getDanmakuAvailableCount();
+			var count = parseInt(value, 10);
+			if (isNaN(count) || count < 1) count = 1;
+			if (available !== null && available > 0) count = Math.min(count, available);
+			$('.select-box .onceout').val(count);
+			self.syncDanmakuControls();
+			return true;
+		},
+		validateDanmakuDrawCount: function () {
+			var self = this;
+			var count = parseInt($('.select-box .onceout').val(), 10);
+			var available = self.getDanmakuAvailableCount();
+			if (isNaN(count) || count < 1) return { ok: false, message: '请输入大于 0 的抽取人数' };
+			if (available === null) return { ok: false, message: '正在读取当前奖项名额，请稍候' };
+			if (available <= 0) return { ok: false, message: '当前奖项已无可抽取名额' };
+			if (count > available) return { ok: false, message: '抽取人数不能超过当前剩余名额或候选人数' };
+			return { ok: true, value: count };
+		},
+		bindDanmakuFooterOffset: function () {
+			var self = this;
+			if (self.flytype != '6' || !self.danmakuStage) return;
+			var root = document.querySelector('.importcj-mainbox.flybox6');
+			var footer = null;
+			try { footer = screencore.getdom('.footer-controlBox'); } catch (e) {}
+			var footerElement = footer && footer.length ? footer[0] : null;
+			var sync = function () {
+				if (!root) return;
+				var safeBottom = 24;
+				if (footerElement) {
+					var style = null;
+					try {
+						var ownerWindow = footerElement.ownerDocument && footerElement.ownerDocument.defaultView;
+						style = (ownerWindow || window).getComputedStyle(footerElement);
+					} catch (e) {}
+					if (style && style.display != 'none' && style.visibility != 'hidden') {
+						var footerHeight = footerElement.offsetHeight || 90;
+						if (footerElement.classList.contains('up')) {
+							safeBottom = footerHeight + 16;
+						} else if (!footerElement.classList.contains('down')) {
+							safeBottom = footerHeight + 16;
+						} else {
+							safeBottom = Math.max(24, Math.min(56, footerHeight + 10));
+						}
+					}
+				}
+				root.style.setProperty('--danmaku-action-bottom', safeBottom + 'px');
+				root.style.setProperty('--danmaku-field-bottom', Math.max(126, safeBottom + 74) + 'px');
+			};
+			self.danmakuFooterWindow = window;
+			self._danmakuFooterSync = sync;
+			window.addEventListener('resize', sync);
+			if (footerElement && typeof MutationObserver != 'undefined') {
+				self.danmakuFooterMutationObserver = new MutationObserver(sync);
+				try { self.danmakuFooterMutationObserver.observe(footerElement, { attributes: true, attributeFilter: ['class', 'style'] }); } catch (e) {}
+			}
+			if (footerElement && typeof ResizeObserver != 'undefined') {
+				self.danmakuFooterObserver = new ResizeObserver(sync);
+				try { self.danmakuFooterObserver.observe(footerElement); } catch (e) {}
+			}
+			sync();
+		},
+		unbindDanmakuFooterOffset: function () {
+			if (this.danmakuFooterObserver) this.danmakuFooterObserver.disconnect();
+			if (this.danmakuFooterMutationObserver) this.danmakuFooterMutationObserver.disconnect();
+			if (this.danmakuFooterWindow && this._danmakuFooterSync) this.danmakuFooterWindow.removeEventListener('resize', this._danmakuFooterSync);
+			this.danmakuFooterObserver = null;
+			this.danmakuFooterMutationObserver = null;
+			this.danmakuFooterWindow = null;
+			this._danmakuFooterSync = null;
+		},
+		selectDanmakuPrize: function (index) {
+			var self = this;
+			if (self.isstart != '1' || !self.prizeInfo.length) return false;
+			index = parseInt(index, 10);
+			if (isNaN(index) || index < 0 || index >= self.prizeInfo.length) return false;
+			self.invalidateDanmakuRecords();
+			self.prizeIndex = index;
+			if (isroundcj == '1') self.initroundinfo();
+			else self.initprize();
+			return true;
+		},
 		init: function (config) {
 			var self = this;
 			self.scrollSpeed = autoscrollspeed;
@@ -40,8 +248,10 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 			self.flyspheretype = config.flyspheretype || '1';
 			self.initdata(function () {
 				self.bindevent();
-				if (self.flytype == '6' && typeof window !== 'undefined' && window.addEventListener) {
+				if (typeof window !== 'undefined' && window.addEventListener) {
 					window.addEventListener('pagehide', function () {
+						self.destroyUnifiedPrize();
+						self.unbindDanmakuFooterOffset();
 						if (self.danmakuStage) self.danmakuStage.destroy();
 					});
 				}
@@ -54,10 +264,31 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 					});
 				} else if (self.flytype == '6') {
 					self.danmakuStage = screenimportcjDanmaku.create({
-						root: document.querySelector('.importcj-mainbox')
+						root: document.querySelector('.importcj-mainbox'),
+						prizes: self.getDanmakuPrizeOptions(),
+						prizeIndex: self.prizeIndex,
+						prize: self.getDanmakuPrize(),
+						onceout: $('.select-box .onceout').val() || 1,
+						speedPreset: self.getDanmakuSpeedPreset(),
+						callbacks: {
+							onPrizePrev: function () { self.invalidateDanmakuRecords(); $('.importcj-footer .prev-prize').trigger('click'); },
+							onPrizeNext: function () { self.invalidateDanmakuRecords(); $('.importcj-footer .next-prize').trigger('click'); },
+							onPrizeSelect: function (prize, index) { self.selectDanmakuPrize(index); },
+							onDrawCountChange: function (value) { self.setDanmakuDrawCount(value); },
+							onPrimaryAction: function () {
+								if (self.isstart == '1' || self.isstart == '2' || self.isstart == '3') $('.btn-start').trigger('click');
+							},
+							onRecords: function () { $('.btn-showalllucker').trigger('click'); },
+							onRecordsClose: function () { self.closeDanmakuRecords(); },
+							onRecordsRetry: function () { if (self.isstart == '4') { self.openDanmakuRecords(true); return true; } },
+							onSpeedChange: function (preset) {
+								try { window.localStorage.setItem(self.getDanmakuSpeedStorageKey(), preset); } catch (e) {}
+							}
+						}
 					});
 					self.danmakuStage.mount(self.getDanmakuCandidates());
-					self.danmakuStage.updatePrize(self.getDanmakuPrize());
+					self.danmakuStage.updateControls(self.getDanmakuControlSnapshot());
+					self.bindDanmakuFooterOffset();
 				} else if (self.flytype > 1) {
 					$("body").append('<ul class="importcj-wall hidden"></ul>');
 					if (self.flytype == '2') {
@@ -66,6 +297,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 						self.sceneInit(config);
 					}
 				}
+				self.mountUnifiedPrize(config);
 			});
 		},
 		initdata: function (fn) {
@@ -97,6 +329,9 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 			isfirst = isfirst || false;
 			var self = this, prizeOne = self.prizeInfo[self.prizeIndex];
 			if (!prizeOne) return;
+			self.invalidateDanmakuRecords();
+			self.unifiedRoundItems = [];
+			self.danmakuPrizeStats = null;
 			//奖品信息
 			$(".importcj-header .awardname").text(prizeOne.awardname);
 			$(".importcj-header .prizename").text(prizeOne.prizename);
@@ -108,8 +343,9 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 			$(".select-box .onceout").val(prizeOne.onceout);
 			self.initprizeandluckernum();
 			if (self.flytype == '6' && self.danmakuStage) {
-				self.danmakuStage.updatePrize(prizeOne);
+				self.danmakuStage.updatePrize(self.getDanmakuPrize());
 			}
+			if (self.unifiedPrize || self.danmakuStage) self.syncDanmakuControls();
 			$(".importcj-lists").removeClass('hidden');
 			if (!isfirst) {
 				self.initprizedatas(prizeOne.id);
@@ -119,6 +355,9 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 			isfirst = isfirst || false;
 			var self = this, roundOne = self.prizeInfo[self.prizeIndex];
 			if (!roundOne) return;
+			self.invalidateDanmakuRecords();
+			self.unifiedRoundItems = [];
+			self.danmakuPrizeStats = null;
 			//轮次信息
 			$(".importcj-header .awardname").text(roundOne.roundtitle);
 			$(".importcj-header .prizename").text("");
@@ -126,8 +365,9 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 			$(".importcj-footer .active-prize").text(roundOne.roundtitle).attr("data-prizeid", roundOne.id);
 			self.initOneround();
 			if (self.flytype == '6' && self.danmakuStage) {
-				self.danmakuStage.updatePrize(roundOne);
+				self.danmakuStage.updatePrize(self.getDanmakuPrize());
 			}
+			if (self.unifiedPrize || self.danmakuStage) self.syncDanmakuControls();
 			$(".importcj-lists").removeClass('hidden');
 			if (!isfirst) {
 				self.initprizedatas(roundOne.id);
@@ -653,6 +893,11 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 				if (json.code == 0) {
 					$(".lucker-numbox .prize-num").text(json.msg.prizenum);
 					$(".lucker-numbox .lucker-num").text(json.msg.luckernum);
+						self.syncDanmakuPrizeStats(json.msg.prizenum, json.msg.luckernum);
+						if (self.flytype == '6' && self.danmakuStage) {
+							self.danmakuStage.updatePrize(self.getDanmakuPrize());
+						}
+						if (self.unifiedPrize || self.danmakuStage) self.syncDanmakuControls();
 				} else {
 					layerBox.showMsg(json.msg);
 				}
@@ -664,6 +909,9 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 			screencore.ajaxSubmit('/screen/importcj/initoneround', { roundid: roundid }).then(function (json) {
 				if (json.code == 0) {
 					var html = '', round = json.msg.round || {}, prizes = round.roundawards || [], prizestyle = round.style || { cols: 5, width: 300, gap: 20, prizecolor: '#FF9800', prizesize: 18, namecolor: '#fff', namesize: 18 };
+					self.unifiedRoundItems = $.map(prizes, function (item) {
+						return $.extend({}, item.prize || {}, { num: item.num });
+					});
 					$.each(prizes, function (i, v) {
 						var one = v.prize;
 						one.num = v.num;
@@ -703,6 +951,11 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 					$(".lucker-numbox .prize-num").text(json.msg.prizenum);
 					$(".lucker-numbox .lucker-num").text(json.msg.luckernum);
 					$(".select-box").hide().find('.onceout').val(json.msg.prizenum);
+					self.syncDanmakuPrizeStats(json.msg.prizenum, json.msg.luckernum);
+					if (self.flytype == '6' && self.danmakuStage) {
+						self.danmakuStage.updatePrize(self.getDanmakuPrize());
+					}
+					if (self.unifiedPrize || self.danmakuStage) self.syncDanmakuControls();
 				} else {
 					layerBox.showMsg(json.msg);
 				}
@@ -745,8 +998,55 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 				return { name: values.shift(), extras: values };
 			});
 		},
-		getDanmakuPrize: function () {
-			return this.prizeInfo[this.prizeIndex] || {};
+		getDanmakuPrize: function (remaining) {
+			var self = this, prize = self.prizeInfo[self.prizeIndex] || {};
+			var copy = $.extend({}, prize);
+			if (isroundcj == '1') copy.items = self.unifiedRoundItems || [];
+			if (remaining !== undefined && remaining !== null && remaining !== '') {
+				copy.remaining = remaining;
+			} else if (self.danmakuPrizeStats && typeof self.danmakuPrizeStats.remaining === 'number' && isFinite(self.danmakuPrizeStats.remaining)) {
+				copy.remaining = self.danmakuPrizeStats.remaining;
+			} else {
+				copy.remaining = '—';
+			}
+			return copy;
+		},
+		openDanmakuRecords: function (retry) {
+			var self = this;
+			if (self.flytype != '6' || !self.danmakuStage || (self.isstart != '1' && self.isstart != '4')) return false;
+			var id = self.prizeInfo[self.prizeIndex] && self.prizeInfo[self.prizeIndex].id;
+			var requestedPrizeIndex = self.prizeIndex;
+			var requestId = ++self.danmakuRecordsRequestId;
+			self.danmakuRecordsPrizeId = id;
+			if (self.isstart == '1') self.isstart = '4';
+			self.setDanmakuVisualState('records');
+			self.danmakuStage.setRecords(null, 'loading');
+			var ajaxdata = { isroundcj: isroundcj };
+			if (isroundcj == '1') ajaxdata.roundid = id;
+			else ajaxdata.prizeid = id;
+			screencore.ajaxSubmit('/screen/importcj/ajaxlucker', ajaxdata, '正在加载中奖记录..').then(function (json) {
+				if (requestId != self.danmakuRecordsRequestId || self.isstart != '4' || self.prizeIndex != requestedPrizeIndex) return;
+				if (json.code == 0) {
+					self.danmakuStage.setRecords(json.msg || [], 'ready');
+					self.syncDanmakuControls();
+				} else {
+					self.danmakuStage.setRecords(json.msg || '中奖记录加载失败', 'error');
+					self.syncDanmakuControls();
+				}
+			}, function () {
+				if (requestId != self.danmakuRecordsRequestId || self.isstart != '4' || self.prizeIndex != requestedPrizeIndex) return;
+				self.danmakuStage.setRecords('网络异常，请重试', 'error');
+				self.syncDanmakuControls();
+			});
+			return true;
+		},
+		closeDanmakuRecords: function () {
+			var self = this;
+			var recordsActive = self.isstart == '4' || self.danmakuVisualState == 'records' || (self.danmakuStage && self.danmakuStage.state == 'records');
+			if (self.flytype != '6' || !recordsActive) return false;
+			self.invalidateDanmakuRecords();
+			$('.btn-close').trigger('click');
+			return true;
 		},
 		startDrawingAnimation: function () {
 			var self = this;
@@ -764,7 +1064,6 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 				self.changerollitem();
 				if (self.danmakuStage) {
 					self.danmakuStage.updateCandidates(self.getDanmakuCandidates());
-					self.danmakuStage.updatePrize(self.getDanmakuPrize());
 					self.danmakuStage.setDrawing(true);
 				}
 			} else {
@@ -783,6 +1082,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 					if (self.flytype == '6' && self.danmakuStage) {
 						self.danmakuStage.updateCandidates(self.getDanmakuCandidates());
 					}
+					if (self.unifiedPrize || self.danmakuStage) self.syncDanmakuControls();
 				} else {
 					layerBox.showMsg(json.msg);
 				}
@@ -801,9 +1101,10 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 						if (self.datas.length > 800) {
 							self.datas.splice(0, (self.datas.length - 300));
 						}
-						if (self.flytype == '6' && self.danmakuStage) {
-							self.danmakuStage.updateCandidates(self.getDanmakuCandidates());
-						}
+							if (self.flytype == '6' && self.danmakuStage) {
+								self.danmakuStage.updateCandidates(self.getDanmakuCandidates());
+							}
+							if (self.unifiedPrize || self.danmakuStage) self.syncDanmakuControls();
 					}
 				}
 				setTimeout(function () {
@@ -830,12 +1131,30 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 						layerBox.showMsg('奖品来源数据不存在');
 						return false;
 					}
+					if (self.flytype == '6' || self.unifiedPrize) {
+						var drawValidation = self.validateDanmakuDrawCount();
+						if (!drawValidation.ok) {
+							self.syncDanmakuControls();
+							layerBox.showMsg(drawValidation.message);
+							return false;
+						}
+						onceout = String(drawValidation.value);
+						$('.select-box .onceout').val(onceout);
+					}
 					self.initrollitem(onceout > maxrollnum ? maxrollnum : onceout);
 					clickstart = true;
+					if (self.flytype == '6' || self.unifiedPrize) self.setDanmakuVisualState('requesting');
 					screencore.ajaxSubmit('/screen/importcj/savelucker', { isroundcj: isroundcj, prizeid: $(".active-prize").attr('data-prizeid'), onceout: onceout }).then(function (e) {
 						if (e.code == 0) {
 							luckerHtml = '';
 							luckerList = e.msg.list;
+							if (e.msg && e.msg.lucker) {
+								self.syncDanmakuPrizeStats(e.msg.lucker.prizenum, e.msg.lucker.luckernum);
+							}
+							if (self.flytype == '6' && self.danmakuStage) {
+								self.danmakuStage.updatePrize(self.getDanmakuPrize());
+							}
+							if (self.unifiedPrize || self.danmakuStage) self.syncDanmakuControls();
 							if (isroundcj == '1') {
 								$.each(e.msg.list, function (i, l) {
 									$.each(l.luckers, function (j, v) {
@@ -889,7 +1208,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 									luckerHtml += template("lucker-tpl", v);
 								});
 							}
-							screencore.hideFootAndQr();
+							if (self.flytype != '6') screencore.hideFootAndQr();
 							setTimeout(function () {
 								var firevideo1 = $(".firevideo1");
 								if (firevideo1.length) {
@@ -904,7 +1223,8 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 							}
 							}, 50);
 							$(".importcj-mainbox").removeClass('isdrawed').addClass('isdrawing');
-							self.isstart = '2';
+								self.isstart = '2';
+								if (self.flytype == '6' || self.unifiedPrize) self.setDanmakuVisualState('drawing');
 							setTimeout(function () {
 								$this.text('停止');
 								$(".lucker-numbox .prize-num").text(e.msg.lucker.prizenum);
@@ -914,8 +1234,9 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 							if ($("#cjingmusic").length > 0) {
 								$("#cjingmusic")[0].play();
 							}
-						} else {
-							layerBox.showMsg(e.msg);
+							} else {
+								if (self.flytype == '6' || self.unifiedPrize) self.setDanmakuVisualState('ready');
+								layerBox.showMsg(e.msg);
 						}
 						setTimeout(function () {
 							clickstart = false;
@@ -923,6 +1244,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 
 					}, function () {
 						clickstart = false;
+						if (self.flytype == '6' || self.unifiedPrize) self.setDanmakuVisualState('ready');
 						layerBox.showMsg('出现异常，请稍后重试');
 					})
 				} else if (self.isstart == '2') {
@@ -977,7 +1299,8 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 							firevideo2.hide();
 						});
 					}
-					self.isstart = '3';
+						self.isstart = '3';
+						if (self.flytype == '6' || self.unifiedPrize) self.setDanmakuVisualState('result');
 					if ($("#cjingmusic").length) {
 						$("#cjingmusic")[0].currentTime = 0;
 						$("#cjingmusic")[0].pause();
@@ -1001,6 +1324,10 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 					}
 					$this.text('开始');
 					self.isstart = '1';
+					if (self.flytype == '6' || self.unifiedPrize) self.setDanmakuVisualState('ready');
+					if (self.flytype == '6' && self.danmakuStage) {
+						self.danmakuStage.setReady(self.getDanmakuCandidates(), self.getDanmakuPrize());
+					}
 					if ($("#cjendmusic").length) {
 						$("#cjendmusic")[0].currentTime = 0;
 						if (!$("#cjendmusic")[0].paused) {
@@ -1046,13 +1373,20 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 					});
 				});
 			});
-			var allluckerclicked = false;
-			$(".btn-showalllucker").click(function () {
-				var $this = $(this);
-				if (self.isstart == '1') {
+				var allluckerclicked = false;
+				$(".btn-showalllucker").click(function () {
+					var $this = $(this);
+					if (self.flytype == '6') {
+						if (self.isstart == '1' || self.isstart == '4') {
+							self.openDanmakuRecords(self.isstart == '4');
+						}
+						return false;
+					}
+					if (self.isstart == '1') {
 					if (allluckerclicked) return false;
 					allluckerclicked = true;
 					self.isstart = '4';
+					if (self.unifiedPrize) self.setDanmakuVisualState('records');
 					self.getprizelucker(self.prizeInfo[self.prizeIndex].id, function (lucker) {
 						var html = '';
 						if (isroundcj == '1') {
@@ -1138,6 +1472,9 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 								"font-size": (style.namesize || 18) + 'px'
 							});
 						}
+						if (self.flytype == '6' && self.danmakuStage) {
+							self.danmakuStage.setResult(lucker, self.getDanmakuPrize());
+						}
 						allluckerclicked = false;
 						if (isautoscroll == '1') {
 							setTimeout(function () {
@@ -1146,8 +1483,9 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 						}
 					}, function (errmsg) {
 						self.isstart = '1';
+						if (self.unifiedPrize) self.setDanmakuVisualState('ready');
 						if (self.flytype == '6' && self.danmakuStage) {
-							self.danmakuStage.setReady(self.getDanmakuCandidates());
+							self.danmakuStage.setReady(self.getDanmakuCandidates(), self.getDanmakuPrize());
 						}
 						layerBox.showMsg(errmsg);
 					});
@@ -1157,6 +1495,11 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 			});
 			$(".btn-close").click(function () {
 				self.isstart = '1';
+				if (self.unifiedPrize) self.setDanmakuVisualState('ready');
+				if (self.flytype == '6') {
+					self.invalidateDanmakuRecords();
+					if (!self.unifiedPrize) self.setDanmakuVisualState('ready');
+				}
 				if (isautoscroll == '1') {
 					self.removeautoScroll('.importcj-luckerbox-content');
 					setTimeout(function () {
@@ -1167,6 +1510,9 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 				}
 				$(".btn-start").removeClass('hidden');
 				$(this).addClass('hidden');
+				if (self.flytype == '6' && self.danmakuStage) {
+					self.danmakuStage.setReady(self.getDanmakuCandidates(), self.getDanmakuPrize());
+				}
 			});
 			keyboardJS.bind('/', function (e) {
 				if (self.isstart == '2') return false;
@@ -1232,6 +1578,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 					denum = self.prizeInfo[self.prizeIndex].prizenum;
 				}
 				$(".onceout").val(denum);
+				if (self.flytype == '6' || self.unifiedPrize) self.syncDanmakuControls();
 			});
 			keyboardJS.bind('down', function (e) {
 				if (self.isstart != '1' || isroundcj == '1') return false;
@@ -1242,6 +1589,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 					denum = 1;
 				}
 				$(".onceout").val(denum);
+				if (self.flytype == '6' || self.unifiedPrize) self.syncDanmakuControls();
 			});
 			keyboardJS.bind('shift', function (e) {
 				$(".btn-showalllucker").trigger('click');

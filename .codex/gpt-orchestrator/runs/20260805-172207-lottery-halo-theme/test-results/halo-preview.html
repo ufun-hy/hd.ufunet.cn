@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>星环头像抽奖审核预览</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: #03050a; font-family: Arial, "Microsoft YaHei", sans-serif; }
+    .main-box { position: relative; width: 100%; height: 100%; color: #fff; }
+    .normal-box { position: absolute; inset: 8% 0 5%; }
+    .hidden { display: none !important; }
+    .center { display: flex; align-items: center; justify-content: center; }
+    .lottery-wrapper { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+    .lottery-left { position: relative; width: 425px; height: 620px; border-radius: 16px; background: rgba(255,255,255,.06); }
+    .left-main { margin-top: 77px; text-align: center; }
+    .left-award { height: 54px; line-height: 54px; font-size: 22px; }
+    .left-prizeimg { height: 200px; display: flex; align-items: center; justify-content: center; }
+    .prizeimg img { width: 200px; height: 200px; border-radius: 18px; object-fit: cover; }
+    .left-prizename { width: 240px; height: 64px; line-height: 64px; margin: 15px auto 0; font-size: 22px; }
+    .left-joinnums { height: 40px; line-height: 40px; }
+    .prize_number { margin-top: 10px; }
+    .prize_number_box { width: 60px; height: 60px; border: 0; border-radius: 50%; text-align: center; color: #fff; background: #18203b; font-size: 20px; }
+    .start-btn, .lottery-stop-btn, .lottery-close-btn { border: 1px solid #27c8ff; background: linear-gradient(135deg,#166fe4,#a93cff); box-shadow: 0 0 22px rgba(18,181,255,.35); }
+    .start-btn { width: 200px; height: 52px; margin: 10px auto 0; border-radius: 26px; }
+    .start-btn::after { content: '开始抽奖'; display: block; line-height: 50px; }
+    .lottery-right { position: relative; width: 688px; height: 620px; margin-left: 50px; border-radius: 16px; background: rgba(255,255,255,.04); }
+    .lottery-title { height: 80px; display: flex; justify-content: space-between; align-items: center; padding: 0 24px; font-size: 20px; }
+    .right-reward-box { width: 658px; height: 520px; margin: 0 18px; overflow: auto; }
+    .right-lucker { float: left; width: 162px; min-height: 160px; text-align: center; }
+    .right-luckeravatar img { width: 110px; height: 110px; border-radius: 50%; object-fit: cover; }
+    .signthreed-wall-block, .lottery-userBox { position: fixed; inset: 0; }
+    .lottery-userBox { display: flex; align-items: center; justify-content: center; }
+    .lottery-userBox-wrapper { min-height: 240px; max-width: 1200px; max-height: 560px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-around; }
+    .lottery-userBox-item { text-align: center; }
+    .lottery-userBox-avatar { position: relative; width: 150px; height: 150px; padding: 8px; }
+    .lottery-userBox-avatar img, .lottery-luckers-img img, .avatar img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+    .lottery-userBox-item p { width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .lottery-luckers { position: absolute; width: 1200px; height: 680px; top: 5%; left: calc(50% - 600px); border-radius: 10px; text-align: center; }
+    .lottery-poptitle { height: 40px; line-height: 40px; font-size: 26px; }
+    .lottery-popBox-prize { height: 40px; line-height: 40px; font-size: 20px; }
+    .lottery-luckers-wrapper { width: 100%; height: calc(100% - 80px); display: flex; flex-wrap: wrap; align-items: center; justify-content: center; }
+    .lottery-luckers-item { width: 150px; margin: 10px 30px; }
+    .lottery-luckers-img { position: relative; width: 150px; height: 150px; padding: 8px; }
+    .lottery-luckers-name { width: 100%; min-height: 42px; display: flex; align-items: center; justify-content: center; }
+    .lottery-close-btn { position: absolute; right: 18px; top: 12px; width: 78px; height: 36px; border-radius: 18px; }
+    .lottery-close-btn::after { content: '关闭'; line-height: 34px; }
+  </style>
+  <link rel="stylesheet" href="/public/static/css/screencss/screenlottery-halo.css">
+</head>
+<body>
+<main class="main-box lottery-halo-theme">
+  <section class="lottery-mainbox normal-box">
+    <div class="lottery-wrapper" id="idle">
+      <div class="lottery-left">
+        <div class="left-main">
+          <div class="left-award">一等奖</div>
+          <div class="left-prizeimg"><div class="prizeimg"><img alt="奖品" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cdefs%3E%3CradialGradient id='g'%3E%3Cstop stop-color='%2342dfff'/%3E%3Cstop offset='1' stop-color='%236330ef'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect rx='30' width='240' height='240' fill='url(%23g)'/%3E%3Cpath d='M70 155l50-85 50 85z' fill='white' fill-opacity='.85'/%3E%3C/svg%3E"></div></div>
+          <div class="left-prizeaward"><div class="left-prizename">智能科技礼盒</div><div class="left-joinnums">参与人数: <span>288</span></div></div>
+          <div class="prize_number"><input class="prize_number_box" value="3" aria-label="抽奖人数"></div>
+          <div class="start-btn"></div>
+        </div>
+      </div>
+      <div class="lottery-right">
+        <div class="lottery-title"><span>奖品数量: 3</span><span>已获奖人数: 8</span></div>
+        <div class="right-reward-box" id="history"></div>
+      </div>
+    </div>
+  </section>
+  <div class="signthreed-wall-block" id="running">
+    <div class="lottery-userBox"><div class="lottery-userBox-wrapper" id="running-grid"></div></div>
+  </div>
+  <div class="lottery-luckers" id="result">
+    <div class="lottery-poptitle">获奖名单</div>
+    <div class="lottery-popBox-prize"><span>一等奖</span> - <span>智能科技礼盒</span></div>
+    <div class="lottery-luckers-wrapper" id="result-grid"></div>
+    <div class="lottery-close-btn"></div>
+  </div>
+</main>
+<script>
+  const palette = [['12b5ff','193d78'],['a93cff','4e1c76'],['ff2970','741f46'],['28e8c4','14635b'],['f5c451','70541a'],['5a7cff','222c71']];
+  const names = ['林晓雨','陈星辰','周子墨','许安然','沈清和','陆开阳','宋嘉乐','程远航'];
+  const avatar = (i) => `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cdefs%3E%3ClinearGradient id='g' x2='1' y2='1'%3E%3Cstop stop-color='%23${palette[i%6][0]}'/%3E%3Cstop offset='1' stop-color='%23${palette[i%6][1]}'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='240' height='240' fill='url(%23g)'/%3E%3Ccircle cx='120' cy='94' r='42' fill='white' fill-opacity='.88'/%3E%3Cpath d='M48 220c8-55 36-82 72-82s64 27 72 82' fill='white' fill-opacity='.88'/%3E%3C/svg%3E`;
+  const history = document.querySelector('#history');
+  const runningGrid = document.querySelector('#running-grid');
+  const resultGrid = document.querySelector('#result-grid');
+  names.forEach((name, i) => {
+    history.insertAdjacentHTML('beforeend', `<div class="right-lucker"><div class="right-luckeravatar"><img src="${avatar(i)}"></div><div class="right-luckername">${name}</div></div>`);
+    runningGrid.insertAdjacentHTML('beforeend', `<div class="lottery-userBox-item"><div class="lottery-userBox-avatar frotate"><img src="${avatar(i)}"></div><p>${name}</p></div>`);
+    resultGrid.insertAdjacentHTML('beforeend', `<div class="lottery-luckers-item"><div class="lottery-luckers-img frotate"><img src="${avatar(i)}"></div><div class="lottery-luckers-name">${name}</div></div>`);
+  });
+  const state = new URLSearchParams(location.search).get('state') || 'running';
+  document.querySelector('#idle').classList.toggle('hidden', state !== 'idle');
+  document.querySelector('#running').classList.toggle('hidden', state !== 'running');
+  document.querySelector('#result').classList.toggle('hidden', state !== 'result');
+</script>
+</body>
+</html>

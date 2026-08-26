@@ -1,0 +1,53 @@
+[
+  {
+    "id": "AC-01",
+    "requirement": "Gemini web generates one candidate each for QR lottery, imported-list lottery, and big-screen interactive game.",
+    "verification": ["Three accepted non-empty local image files exist under marketing/taobao-mainimage-v4-product-screen-20260805/source/gemini"],
+    "status": "passed",
+    "evidence": [
+      "source/gemini/01-qr-lottery.png",
+      "source/gemini/02-imported-list-lottery.png",
+      "source/gemini/03-interactive-game.png"
+    ],
+    "notes": "Primary images were generated with visibly verified Gemini Pro. A later optional correction request encountered a peak-load fallback to Flash Extended; that fallback did not produce an accepted image and was not used."
+  },
+  {
+    "id": "AC-02",
+    "requirement": "ChatGPT web generates the same three product directions without Luna.",
+    "verification": ["Three accepted non-empty local image files exist under marketing/taobao-mainimage-v4-product-screen-20260805/source/chatgpt"],
+    "status": "passed",
+    "evidence": [
+      "source/chatgpt/01-qr-lottery.png",
+      "source/chatgpt/02-imported-list-lottery.png",
+      "source/chatgpt/03-interactive-game.png"
+    ],
+    "notes": "ChatGPT web visibly showed 5.6 Sol with high reasoning. Luna was not used."
+  },
+  {
+    "id": "AC-03",
+    "requirement": "Every accepted candidate is a buyer-visible front-end event screen, not an admin dashboard, tutorial, or scene illustration.",
+    "verification": ["Visual review of the 3×2 contact sheet and each full-size source image"],
+    "status": "passed",
+    "evidence": ["deliverables/contact-sheet-6-directions.png"],
+    "notes": "No browser chrome, management navigation, settings forms, phones, workflow arrows, presenter, crowd, venue, or physical monitor is present in the accepted set."
+  },
+  {
+    "id": "AC-04",
+    "requirement": "Generated layers contain no readable Chinese copy, logos, QR codes, prices, watermarks, or unsupported claims.",
+    "verification": ["Visual review at full size; three small ranking numerals in the Gemini game image were deterministically masked locally"],
+    "status": "passed",
+    "evidence": [
+      "source/gemini/03-interactive-game.png",
+      "src/prepare-deliverables.mjs"
+    ],
+    "notes": "Abstract placeholder lines and generic UI symbols remain, but there is no readable selling copy or brand/price/QR content."
+  },
+  {
+    "id": "AC-05",
+    "requirement": "Outputs are square and at least 1024 by 1024 pixels.",
+    "verification": ["File metadata check for all six accepted images"],
+    "status": "passed",
+    "evidence": ["All six accepted PNG files are 1024×1024"],
+    "notes": "ChatGPT originals were normalized from 1254×1254 to the user-approved 1024×1024 delivery size."
+  }
+]

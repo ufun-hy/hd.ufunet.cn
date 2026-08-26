@@ -1,0 +1,611 @@
+diff --git a/app/common/tpl/web/themes/default/common/importcjstyle.html b/app/common/tpl/web/themes/default/common/importcjstyle.html
+index 72a539af26511f7ad47982adab392a21cf2d8de6..e9ed5f129604e9108fb65df72e200c67d427c630 100644
+--- a/app/common/tpl/web/themes/default/common/importcjstyle.html
++++ b/app/common/tpl/web/themes/default/common/importcjstyle.html
+@@ -1,3 +1,10 @@
++<style>
++.importcj-halo-style-preview{position:relative;overflow:hidden;background:radial-gradient(circle at center,rgba(18,181,255,.24),#10152a 66%,#070a13)}
++.importcj-halo-style-preview::before,.importcj-halo-style-preview::after{content:"";position:absolute;left:50%;top:50%;border-radius:50%;transform:translate(-50%,-50%)}
++.importcj-halo-style-preview::before{width:58px;height:58px;border:2px solid #12b5ff;box-shadow:0 0 14px rgba(18,181,255,.75)}
++.importcj-halo-style-preview::after{width:82px;height:82px;border:1px dashed #a93cff}
++.importcj-halo-style-preview span{position:absolute;left:50%;top:50%;z-index:1;transform:translate(-50%,-50%);color:#fff;font-size:22px;font-weight:bold;text-shadow:0 0 8px #12b5ff}
++</style>
+ <div class="config-titlebox">
+     <span class="config-titlename">风格设置</span>
+     <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#styleconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
+@@ -19,6 +26,11 @@
+ 					{/if}
+ 				</div>
+ 			{/foreach}
++				<div data-val="5" class="zam-styleitem{if isset($config['styleconfig']['flytype']) && $config['styleconfig']['flytype'] == '5'} hadchecked{/if}">
++					<div class="zam-styleimg importcj-halo-style-preview"><span>星环</span></div>
++					<div class="zam-stylename">星环名单抽奖</div>
++					<div class="zam-selected"><i class="mdi mdi-check"></i></div>
++				</div>
+ 			</div>
+ 			<input type="hidden" name="styleconfig[flytype]" value="{$config['styleconfig']['flytype']??1}">
+ 			{if !request()->realhdid}
+@@ -31,15 +43,16 @@
+ 		var flytype = $(this).attr('data-val');
+ 		$(this).addClass('hadchecked').siblings().removeClass('hadchecked');
+ 		$(this).parent().next().val(flytype);
+-		if(flytype == '1'){
++		if(flytype == '1' || flytype == '5'){
+ 			$(".flystylebox").addClass('hidden');
++			$(".flystylebox").children().addClass('hidden');
+ 		}else{
+ 			$(".flystylebox").removeClass('hidden');
+ 			if(flytype == '2'){
+ 				$(".flystylebox .one").removeClass('hidden').siblings().addClass('hidden');
+ 			}else if(flytype == '3'){
+ 				$(".flystylebox .grid").removeClass('hidden').siblings().addClass('hidden');
+-			}else{
++			}else if(flytype == '4'){
+ 				$(".flystylebox .sphere").removeClass('hidden').siblings().addClass('hidden');
+ 			}
+ 		}
+@@ -54,7 +67,7 @@
+ 	});
+ 	{/if}
+ 	</script>
+-	<div class="flystylebox{if !isset($config['styleconfig']['flytype']) || $config['styleconfig']['flytype'] == '1'} hidden{/if}">
++	<div class="flystylebox{if !isset($config['styleconfig']['flytype']) || $config['styleconfig']['flytype'] == '1' || $config['styleconfig']['flytype'] == '5'} hidden{/if}">
+ 		<div class="one{if isset($config['styleconfig']['flytype']) && $config['styleconfig']['flytype'] != '2'} hidden{/if}">
+ 			<div class="form-group">
+ 				<label class="col-lg-2 control-label">* 文字大小</label>
+diff --git a/app/screen/view/importcj/index.html b/app/screen/view/importcj/index.html
+index 43c97003ebd4fb905cfefbd2eeb3230729aac7da..e9cc0e68b82896ab92523b5c4a076424f761aed1 100644
+--- a/app/screen/view/importcj/index.html
++++ b/app/screen/view/importcj/index.html
+@@ -1,4 +1,7 @@
+ {include file='common/header' /}
++{if isset($pcconfig['styleconfig']['flytype']) && $pcconfig['styleconfig']['flytype'] == '5'}
++<link rel="stylesheet" href="/static/css/screencss/screenimportcj-halo.css">
++{/if}
+ <style>
+ ::-webkit-scrollbar {
+     width: 10px;
+diff --git a/public/static/css/screencss/screenimportcj-halo.css b/public/static/css/screencss/screenimportcj-halo.css
+new file mode 100644
+index 0000000000000000000000000000000000000000..f836d0465e36db27ee06f7f3de77083178440b2a
+--- /dev/null
++++ b/public/static/css/screencss/screenimportcj-halo.css
+@@ -0,0 +1,194 @@
++/*
++ * 星环名单抽奖运行态样式。
++ * 所有规则均限定在 flybox5.isdrawing 下，不改变页面根背景、静态主题素材或结果态。
++ */
++.importcj-mainbox.flybox5.isdrawing {
++    isolation: isolate;
++}
++
++/* 原滚动列表继续运行以维护停止计数，仅在星环运行态视觉隐藏。 */
++.importcj-mainbox.flybox5.isdrawing .importcj-header,
++.importcj-mainbox.flybox5.isdrawing .importcj-awardlist,
++.importcj-mainbox.flybox5.isdrawing .importcj-luckerbox {
++    opacity: 0;
++}
++
++.importcj-mainbox.flybox5.isdrawing .importcj-tip,
++.importcj-mainbox.flybox5.isdrawing .importcj-footer {
++    z-index: 30;
++}
++
++.importcj-mainbox.flybox5.isdrawing .importcj-halo-stage {
++    --halo-primary: #12b5ff;
++    --halo-secondary: #a93cff;
++    --halo-accent: #ff2970;
++    --halo-stage-scale: 1;
++    position: absolute;
++    left: 50%;
++    top: 50%;
++    z-index: 20;
++    width: 1920px;
++    height: 1080px;
++    overflow: hidden;
++    pointer-events: none;
++    background: transparent;
++    transform: translate(-50%, -50%) scale(var(--halo-stage-scale));
++    transform-origin: center center;
++}
++
++.importcj-mainbox.flybox5.isdrawing .importcj-halo-rings,
++.importcj-mainbox.flybox5.isdrawing .importcj-halo-nodes {
++    position: absolute;
++    inset: 0;
++}
++
++.importcj-mainbox.flybox5.isdrawing .importcj-halo-ring {
++    position: absolute;
++    left: 50%;
++    top: 50%;
++    display: block;
++    border-radius: 50%;
++    box-sizing: border-box;
++}
++
++.importcj-mainbox.flybox5.isdrawing .importcj-halo-ring-1 {
++    width: 350px;
++    height: 350px;
++    margin: -175px 0 0 -175px;
++    border: 4px solid;
++    border-color: var(--halo-primary) var(--halo-secondary) var(--halo-accent);
++    box-shadow: 0 0 80px rgba(18, 181, 255, .4);
++    animation: importcj-halo-spin 2s linear infinite;
++}
++
++.importcj-mainbox.flybox5.isdrawing .importcj-halo-ring-2 {
++    width: 450px;
++    height: 450px;
++    margin: -225px 0 0 -225px;
++    border: 3px solid;
++    border-color: var(--halo-secondary) transparent var(--halo-primary);
++    box-shadow: 0 0 40px rgba(169, 60, 255, .3);
++    animation: importcj-halo-spin-reverse 3s linear infinite;
++}
++
++.importcj-mainbox.flybox5.isdrawing .importcj-halo-ring-3 {
++    width: 550px;
++    height: 550px;
++    margin: -275px 0 0 -275px;
++    border: 1px solid;
++    border-color: var(--halo-accent) transparent;
++    box-shadow: 0 0 30px rgba(255, 41, 112, .2);
++    animation: importcj-halo-spin 4s linear infinite;
++}
++
++.importcj-mainbox.flybox5.isdrawing .importcj-halo-center {
++    position: absolute;
++    left: 50%;
++    top: 50%;
++    z-index: 12;
++    width: 240px;
++    height: 240px;
++    padding: 24px;
++    border: 4px solid rgba(18, 181, 255, .64);
++    border-radius: 50%;
++    box-sizing: border-box;
++    display: flex;
++    align-items: center;
++    justify-content: center;
++    color: #fff;
++    background: radial-gradient(circle at 45% 35%, rgba(28, 59, 98, .82), rgba(10, 15, 30, .76) 68%, rgba(5, 8, 17, .72));
++    box-shadow: 0 0 60px rgba(18, 181, 255, .42), inset 0 0 42px rgba(18, 181, 255, .25);
++    transform: translate(-50%, -50%) scale(1.08);
++}
++
++.importcj-mainbox.flybox5.isdrawing .importcj-halo-center::before {
++    content: '';
++    position: absolute;
++    inset: 12px;
++    border: 1px solid rgba(255, 255, 255, .1);
++    border-radius: 50%;
++}
++
++.importcj-mainbox.flybox5.isdrawing .importcj-halo-center-value {
++    position: relative;
++    z-index: 1;
++    display: block;
++    width: 184px;
++    color: #fff;
++    font-weight: 800;
++    line-height: 1.12;
++    letter-spacing: .02em;
++    text-align: center;
++    overflow-wrap: anywhere;
++    word-break: break-all;
++    white-space: normal;
++    text-shadow: 0 0 12px rgba(18, 181, 255, .9), 0 4px 18px rgba(0, 0, 0, .65);
++}
++
++.importcj-mainbox.flybox5.isdrawing .importcj-halo-node {
++    position: absolute;
++    left: 50%;
++    top: 50%;
++    z-index: var(--halo-node-z, 2);
++    width: var(--halo-node-size, 60px);
++    height: var(--halo-node-size, 60px);
++    margin: calc(var(--halo-node-size, 60px) * -.5) 0 0 calc(var(--halo-node-size, 60px) * -.5);
++    border: 2px solid rgba(255, 255, 255, .16);
++    border-radius: 50%;
++    box-sizing: border-box;
++    display: flex;
++    align-items: center;
++    justify-content: center;
++    color: rgba(255, 255, 255, .96);
++    font-size: calc(var(--halo-node-size, 60px) * .38);
++    font-weight: 800;
++    line-height: 1;
++    letter-spacing: -.02em;
++    opacity: var(--halo-node-opacity, .5);
++    background: radial-gradient(circle at 38% 30%, rgba(255, 255, 255, .16), rgba(10, 15, 30, .86) 72%);
++    box-shadow: 0 5px 18px rgba(0, 0, 0, .52), 0 0 18px var(--halo-node-color, rgba(18, 181, 255, .68));
++    filter: blur(var(--halo-node-blur, 0)) drop-shadow(0 0 14px var(--halo-node-color, rgba(18, 181, 255, .68)));
++    animation: importcj-halo-orbit var(--halo-node-duration, 30s) linear infinite;
++    animation-delay: var(--halo-node-delay, 0s);
++    will-change: transform, opacity;
++}
++
++.importcj-mainbox.flybox5.isdrawing .importcj-halo-node.is-changing {
++    animation-name: importcj-halo-orbit, importcj-halo-value-change;
++    animation-duration: var(--halo-node-duration, 30s), .32s;
++    animation-timing-function: linear, ease-in-out;
++    animation-iteration-count: infinite, 1;
++    animation-delay: var(--halo-node-delay, 0s), 0s;
++}
++
++@keyframes importcj-halo-spin {
++    from { transform: rotate(0deg); }
++    to { transform: rotate(360deg); }
++}
++
++@keyframes importcj-halo-spin-reverse {
++    from { transform: rotate(360deg); }
++    to { transform: rotate(0deg); }
++}
++
++@keyframes importcj-halo-orbit {
++    from {
++        transform: rotate(0deg) translateX(var(--halo-node-radius, 400px)) rotate(0deg) scale(var(--halo-node-scale, 1));
++    }
++    to {
++        transform: rotate(360deg) translateX(var(--halo-node-radius, 400px)) rotate(-360deg) scale(var(--halo-node-scale, 1));
++    }
++}
++
++@keyframes importcj-halo-value-change {
++    0%, 100% { color: rgba(255, 255, 255, .96); }
++    50% { color: transparent; }
++}
++
++@media (prefers-reduced-motion: reduce) {
++    .importcj-mainbox.flybox5.isdrawing .importcj-halo-ring,
++    .importcj-mainbox.flybox5.isdrawing .importcj-halo-node {
++        animation-duration: .01ms !important;
++        animation-iteration-count: 1 !important;
++    }
++}
+diff --git a/public/static/js/screenjs/screenimportcj-halo.js b/public/static/js/screenjs/screenimportcj-halo.js
+new file mode 100644
+index 0000000000000000000000000000000000000000..7924e5e02d00af7ee3c4b1a45d4790d6dfe6029b
+--- /dev/null
++++ b/public/static/js/screenjs/screenimportcj-halo.js
+@@ -0,0 +1,219 @@
++/*
++ * 星环名单抽奖运行态。
++ * 该模块只接收已经由 screenimportcj.initonedata 处理过的首字段文本，
++ * 不参与中奖计算、停止规则或结果渲染。
++ */
++define('screenimportcj-halo', [], function () {
++	'use strict';
++
++	var PERIPHERAL_NODE_COUNT = 60;
++	var COLORS = [
++		'18,181,255',
++		'169,60,255',
++		'255,41,112',
++		'255,170,0',
++		'0,255,136',
++		'0,170,255'
++	];
++
++	function normalizeValue(value) {
++		value = value === null || value === undefined ? '' : String(value);
++		value = value.replace(/^\s+|\s+$/g, '');
++		return value || '嘉宾';
++	}
++
++	function initialsFor(value) {
++		value = normalizeValue(value);
++		var chinese = value.match(/[\u3400-\u9fff\uf900-\ufaff]/);
++		if (chinese) return chinese[0];
++
++		var latinWords = value.match(/[A-Za-z]+/g);
++		if (latinWords && latinWords.length > 1) {
++			return (latinWords[0].charAt(0) + latinWords[1].charAt(0)).toUpperCase();
++		}
++		if (latinWords && latinWords.length === 1) {
++			return latinWords[0].slice(0, 2).toUpperCase();
++		}
++
++		return value.slice(0, 2);
++	}
++
++	function centerFontSize(value) {
++		var length = Array.from(normalizeValue(value)).length;
++		if (length <= 2) return 72;
++		if (length <= 4) return 52;
++		if (length <= 8) return 38;
++		if (length <= 12) return 30;
++		return Math.max(12, Math.floor(30 * Math.sqrt(12 / length)));
++	}
++
++	function randomInt(min, max) {
++		return Math.floor(Math.random() * (max - min + 1)) + min;
++	}
++
++	function HaloStage(options) {
++		options = options || {};
++		this.root = options.root || null;
++		this.stage = null;
++		this.centerValue = null;
++		this.peripheralNodes = [];
++		this.candidates = ['嘉宾'];
++		this.centerTimer = null;
++		this.peripheralTimer = null;
++		this.resizeBound = false;
++		this.boundResize = this.resize.bind(this);
++	}
++
++	HaloStage.prototype.start = function (values) {
++		this.destroy();
++		this.candidates = (values || []).map(normalizeValue);
++		if (!this.candidates.length) this.candidates = ['嘉宾'];
++		if (!this.root) return;
++
++		this.build();
++		this.resize();
++		if (typeof window !== 'undefined' && window.addEventListener) {
++			window.addEventListener('resize', this.boundResize);
++			this.resizeBound = true;
++		}
++
++		var self = this;
++		this.centerTimer = setInterval(function () {
++			self.refreshCenter();
++		}, 60);
++		this.peripheralTimer = setInterval(function () {
++			self.refreshPeripheralBatch();
++		}, 900);
++	};
++
++	HaloStage.prototype.build = function () {
++		var doc = this.root.ownerDocument || document;
++		var stage = doc.createElement('div');
++		stage.className = 'importcj-halo-stage';
++		stage.setAttribute('aria-hidden', 'true');
++
++		var rings = doc.createElement('div');
++		rings.className = 'importcj-halo-rings';
++		for (var ringIndex = 1; ringIndex <= 3; ringIndex++) {
++			var ring = doc.createElement('i');
++			ring.className = 'importcj-halo-ring importcj-halo-ring-' + ringIndex;
++			rings.appendChild(ring);
++		}
++		stage.appendChild(rings);
++
++		var nodes = doc.createElement('div');
++		nodes.className = 'importcj-halo-nodes';
++		var center = doc.createElement('div');
++		center.className = 'importcj-halo-center';
++		var centerValue = doc.createElement('span');
++		centerValue.className = 'importcj-halo-center-value';
++		center.appendChild(centerValue);
++		nodes.appendChild(center);
++		this.centerValue = centerValue;
++
++		for (var index = 0; index < PERIPHERAL_NODE_COUNT; index++) {
++			var node = this.createPeripheralNode(doc, index);
++			this.peripheralNodes.push(node);
++			nodes.appendChild(node);
++		}
++		stage.appendChild(nodes);
++		this.root.appendChild(stage);
++		this.stage = stage;
++
++		this.refreshCenter();
++		for (var i = 0; i < this.peripheralNodes.length; i++) {
++			this.setPeripheralValue(this.peripheralNodes[i]);
++		}
++	};
++
++	HaloStage.prototype.createPeripheralNode = function (doc, index) {
++		var node = doc.createElement('span');
++		node.className = 'importcj-halo-node';
++		node.setAttribute('data-halo-node', String(index));
++		var color = COLORS[randomInt(0, COLORS.length - 1)];
++		var depth = Math.random();
++		node.style.setProperty('--halo-node-size', randomInt(40, 90) + 'px');
++		node.style.setProperty('--halo-node-radius', randomInt(200, 950) + 'px');
++		node.style.setProperty('--halo-node-scale', (0.3 + depth * 1.5).toFixed(2));
++		node.style.setProperty('--halo-node-duration', randomInt(20, 50) + 's');
++		node.style.setProperty('--halo-node-delay', '-' + randomInt(0, 50) + 's');
++		node.style.setProperty('--halo-node-opacity', (0.15 + depth * 0.5).toFixed(2));
++		node.style.setProperty('--halo-node-blur', ((1 - depth) * 1.8).toFixed(2) + 'px');
++		node.style.setProperty('--halo-node-color', 'rgba(' + color + ',.68)');
++		node.style.setProperty('--halo-node-z', String(2 + Math.floor(depth * 6)));
++		return node;
++	};
++
++	HaloStage.prototype.pickValue = function () {
++		return this.candidates[randomInt(0, this.candidates.length - 1)] || '嘉宾';
++	};
++
++	HaloStage.prototype.refreshCenter = function () {
++		if (!this.centerValue) return;
++		var value = this.pickValue();
++		this.centerValue.textContent = value;
++		this.centerValue.style.fontSize = centerFontSize(value) + 'px';
++	};
++
++	HaloStage.prototype.setPeripheralValue = function (node) {
++		node.textContent = initialsFor(this.pickValue());
++		node.classList.remove('is-changing');
++		void node.offsetWidth;
++		node.classList.add('is-changing');
++	};
++
++	HaloStage.prototype.refreshPeripheralBatch = function () {
++		if (!this.peripheralNodes.length) return;
++		var count = Math.min(5, this.peripheralNodes.length);
++		var used = {};
++		for (var i = 0; i < count; i++) {
++			var index;
++			do {
++				index = randomInt(0, this.peripheralNodes.length - 1);
++			} while (used[index]);
++			used[index] = true;
++			this.setPeripheralValue(this.peripheralNodes[index]);
++		}
++	};
++
++	HaloStage.prototype.resize = function () {
++		if (!this.stage || !this.root) return;
++		var rect = this.root.getBoundingClientRect();
++		var width = rect.width || (typeof window !== 'undefined' ? window.innerWidth : 1920);
++		var height = rect.height || (typeof window !== 'undefined' ? window.innerHeight : 1080);
++		var scale = Math.min(width / 1920, height / 1080);
++		this.stage.style.setProperty('--halo-stage-scale', Math.max(scale, 0.1).toFixed(4));
++	};
++
++	HaloStage.prototype.stop = function () {
++		this.destroy();
++	};
++
++	HaloStage.prototype.destroy = function () {
++		clearInterval(this.centerTimer);
++		clearInterval(this.peripheralTimer);
++		this.centerTimer = null;
++		this.peripheralTimer = null;
++
++		if (this.resizeBound && typeof window !== 'undefined' && window.removeEventListener) {
++			window.removeEventListener('resize', this.boundResize);
++		}
++		this.resizeBound = false;
++		if (this.stage && this.stage.parentNode) {
++			this.stage.parentNode.removeChild(this.stage);
++		}
++		this.stage = null;
++		this.centerValue = null;
++		this.peripheralNodes = [];
++	};
++
++	return {
++		PERIPHERAL_NODE_COUNT: PERIPHERAL_NODE_COUNT,
++		normalizeValue: normalizeValue,
++		initialsFor: initialsFor,
++		centerFontSize: centerFontSize,
++		create: function (options) {
++			return new HaloStage(options);
++		}
++	};
++});
+diff --git a/public/static/js/screenjs/screenimportcj.js b/public/static/js/screenjs/screenimportcj.js
+index 591682e42e21cfc6d510a543d2210e24888b6287..5103d1bad166736b0f7ee599518ce3a0f38aa185 100644
+--- a/public/static/js/screenjs/screenimportcj.js
++++ b/public/static/js/screenjs/screenimportcj.js
+@@ -4,7 +4,7 @@
+ * @Last Modified by:   赞木
+ * @Last Modified time: 2023-06-02 20:14:20
+ */
+-define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'anime', 'threejs2', 'tweenjs', 'snabbt'], function (screencore, layerBox, template, keyboardJS, anime, THREE, TWEEN) {
++define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'anime', 'threejs2', 'tweenjs', 'screenimportcj-halo', 'snabbt'], function (screencore, layerBox, template, keyboardJS, anime, THREE, TWEEN, screenimportcjHalo) {
+ 	THREE.CSS3DObject = function (element) { THREE.Object3D.call(this); this.element = element; this.element.style.position = "absolute"; this.addEventListener("removed", function () { if (this.element.parentNode !== null) { this.element.parentNode.removeChild(this.element) } }) }; THREE.CSS3DObject.prototype = Object.create(THREE.Object3D.prototype); THREE.CSS3DObject.prototype.constructor = THREE.CSS3DObject; THREE.CSS3DSprite = function (element) { THREE.CSS3DObject.call(this, element) }; THREE.CSS3DSprite.prototype = Object.create(THREE.CSS3DObject.prototype); THREE.CSS3DSprite.prototype.constructor = THREE.CSS3DSprite; THREE.CSS3DRenderer = function () { console.log("THREE.CSS3DRenderer", THREE.REVISION); var _width, _height; var _widthHalf, _heightHalf; var matrix = new THREE.Matrix4(); var cache = { camera: { fov: 0, style: "" }, objects: {} }; var domElement = document.createElement("div"); domElement.style.overflow = "hidden"; this.domElement = domElement; var cameraElement = document.createElement("div"); cameraElement.style.WebkitTransformStyle = "preserve-3d"; cameraElement.style.MozTransformStyle = "preserve-3d"; cameraElement.style.transformStyle = "preserve-3d"; domElement.appendChild(cameraElement); var isIE = /Trident/i.test(navigator.userAgent); this.setClearColor = function () { }; this.getSize = function () { return { width: _width, height: _height } }; this.setSize = function (width, height) { _width = width; _height = height; _widthHalf = _width / 2; _heightHalf = _height / 2; domElement.style.width = width + "px"; domElement.style.height = height + "px"; cameraElement.style.width = width + "px"; cameraElement.style.height = height + "px" }; function epsilon(value) { return Math.abs(value) < 1e-10 ? 0 : value } function getCameraCSSMatrix(matrix) { var elements = matrix.elements; return "matrix3d(" + epsilon(elements[0]) + "," + epsilon(-elements[1]) + "," + epsilon(elements[2]) + "," + epsilon(elements[3]) + "," + epsilon(elements[4]) + "," + epsilon(-elements[5]) + "," + epsilon(elements[6]) + "," + epsilon(elements[7]) + "," + epsilon(elements[8]) + "," + epsilon(-elements[9]) + "," + epsilon(elements[10]) + "," + epsilon(elements[11]) + "," + epsilon(elements[12]) + "," + epsilon(-elements[13]) + "," + epsilon(elements[14]) + "," + epsilon(elements[15]) + ")" } function getObjectCSSMatrix(matrix, cameraCSSMatrix) { var elements = matrix.elements; var matrix3d = "matrix3d(" + epsilon(elements[0]) + "," + epsilon(elements[1]) + "," + epsilon(elements[2]) + "," + epsilon(elements[3]) + "," + epsilon(-elements[4]) + "," + epsilon(-elements[5]) + "," + epsilon(-elements[6]) + "," + epsilon(-elements[7]) + "," + epsilon(elements[8]) + "," + epsilon(elements[9]) + "," + epsilon(elements[10]) + "," + epsilon(elements[11]) + "," + epsilon(elements[12]) + "," + epsilon(elements[13]) + "," + epsilon(elements[14]) + "," + epsilon(elements[15]) + ")"; if (isIE) { return "translate(-50%,-50%)" + "translate(" + _widthHalf + "px," + _heightHalf + "px)" + cameraCSSMatrix + matrix3d } return "translate(-50%,-50%)" + matrix3d } function renderObject(object, camera, cameraCSSMatrix) { if (object instanceof THREE.CSS3DObject) { var style; if (object instanceof THREE.CSS3DSprite) { matrix.copy(camera.matrixWorldInverse); matrix.transpose(); matrix.copyPosition(object.matrixWorld); matrix.scale(object.scale); matrix.elements[3] = 0; matrix.elements[7] = 0; matrix.elements[11] = 0; matrix.elements[15] = 1; style = getObjectCSSMatrix(matrix, cameraCSSMatrix) } else { style = getObjectCSSMatrix(object.matrixWorld, cameraCSSMatrix) } var element = object.element; var cachedStyle = cache.objects[object.id] && cache.objects[object.id].style; if (cachedStyle === undefined || cachedStyle !== style) { element.style.WebkitTransform = style; element.style.MozTransform = style; element.style.transform = style; cache.objects[object.id] = { style: style }; if (isIE) { cache.objects[object.id].distanceToCameraSquared = getDistanceToSquared(camera, object) } } if (element.parentNode !== cameraElement) { cameraElement.appendChild(element) } } for (var i = 0, l = object.children.length; i < l; i++) { renderObject(object.children[i], camera, cameraCSSMatrix) } } var getDistanceToSquared = function () { var a = new THREE.Vector3(); var b = new THREE.Vector3(); return function (object1, object2) { a.setFromMatrixPosition(object1.matrixWorld); b.setFromMatrixPosition(object2.matrixWorld); return a.distanceToSquared(b) } }(); function zOrder(scene) { var order = Object.keys(cache.objects).sort(function (a, b) { return cache.objects[a].distanceToCameraSquared - cache.objects[b].distanceToCameraSquared }); var zMax = order.length; scene.traverse(function (object) { var index = order.indexOf(object.id + ""); if (index !== -1) { object.element.style.zIndex = zMax - index } }) } this.render = function (scene, camera) { var fov = camera.projectionMatrix.elements[5] * _heightHalf; if (cache.camera.fov !== fov) { domElement.style.WebkitPerspective = fov + "px"; domElement.style.MozPerspective = fov + "px"; domElement.style.perspective = fov + "px"; cache.camera.fov = fov } scene.updateMatrixWorld(); if (camera.parent === null) { camera.updateMatrixWorld() } var cameraCSSMatrix = "translateZ(" + fov + "px)" + getCameraCSSMatrix(camera.matrixWorldInverse); var style = cameraCSSMatrix + "translate(" + _widthHalf + "px," + _heightHalf + "px)"; if (cache.camera.style !== style && !isIE) { cameraElement.style.WebkitTransform = style; cameraElement.style.MozTransform = style; cameraElement.style.transform = style; cache.camera.style = style } renderObject(scene, camera, cameraCSSMatrix); if (isIE) { zOrder(scene) } } };
+ 	var screenimportcj = {
+ 		datas: [],
+@@ -22,6 +22,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
+ 		flytype: '1',
+ 		flyspeed: 100,
+ 		flyspheretype: '1',
++		haloStage: null,
+ 		init: function (config) {
+ 			var self = this;
+ 			self.scrollSpeed = autoscrollspeed;
+@@ -41,7 +42,11 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
+ 				setTimeout(function () {
+ 					self.getnewUser();
+ 				}, 10e3);
+-				if (self.flytype > 1) {
++				if (self.flytype == '5') {
++					self.haloStage = screenimportcjHalo.create({
++						root: document.querySelector('.importcj-mainbox')
++					});
++				} else if (self.flytype > 1) {
+ 					$("body").append('<ul class="importcj-wall hidden"></ul>');
+ 					if (self.flytype == '2') {
+ 						self.stageInit();
+@@ -691,6 +696,38 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
+ 			}
+ 			return str;
+ 		},
++		getHaloCandidates: function () {
++			var self = this, fieldIndex = -1;
++			for (var i = 0; i < 4; i++) {
++				if (self.fieldconfig[i]) {
++					fieldIndex = i;
++					break;
++				}
++			}
++			if (fieldIndex < 0) return ['嘉宾'];
++			var field = self.fieldconfig[fieldIndex], fieldName = 'datafield' + (fieldIndex + 1);
++			return $.map(self.datas, function (userInfo) {
++				return self.initonedata((userInfo || {})[fieldName] || '', field);
++			});
++		},
++		startDrawingAnimation: function () {
++			var self = this;
++			if (self.isstart != '2') return;
++			if (self.flytype == '1') {
++				self.changerollitem();
++			} else if (self.flytype == '5') {
++				// 保留原滚动列表及其逐项停止计时器；星环只负责运行态呈现。
++				self.changerollitem();
++				if (self.haloStage) {
++					self.haloStage.start(self.getHaloCandidates());
++				}
++			} else {
++				self.initShapePR();
++				$(".importcj-wall").removeClass('hidden');
++				self.stageStop = false;
++			}
++			$(".importcj-luckerbox").show();
++		},
+ 		initprizedatas: function (prizeid) {
+ 			var self = this;
+ 			screencore.ajaxSubmit('/screen/importcj/ajaxdatas', { isroundcj: isroundcj, prizeid: prizeid }).then(function (json) {
+@@ -808,24 +845,10 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
+ 									firevideo1[0].play();
+ 									firevideo1.unbind('ended').bind('ended', function () {
+ 										firevideo1.hide();
+-										if (self.flytype == '1') {
+-											self.changerollitem()
+-										} else {
+-											self.initShapePR();
+-											$(".importcj-wall").removeClass('hidden');
+-											self.stageStop = false;
+-										}
+-										$(".importcj-luckerbox").show();
++										self.startDrawingAnimation();
+ 									});
+ 								} else {
+-									if (self.flytype == '1') {
+-										self.changerollitem()
+-									} else {
+-										self.initShapePR();
+-										$(".importcj-wall").removeClass('hidden');
+-										self.stageStop = false;
+-									}
+-									$(".importcj-luckerbox").show();
++									self.startDrawingAnimation();
+ 								}
+ 							}, 50);
+ 							$(".importcj-mainbox").removeClass('isdrawed').addClass('isdrawing');
+@@ -854,7 +877,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
+ 					if ($this.text() == '开始') {
+ 						return false;
+ 					}
+-					if (self.flytype == '1') {
++					if (self.flytype == '1' || self.flytype == '5') {
+ 						var prizeOne = self.prizeInfo[self.prizeIndex] || {}, stoptype = prizeOne.stoptype || '1';
+ 						//默认停止方式或者按轮次抽奖均不另外设置
+ 						if (stoptype == '1' || isroundcj == '1') {
+@@ -866,6 +889,9 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
+ 								return false;
+ 							}
+ 						}
++						if (self.flytype == '5' && self.haloStage) {
++							self.haloStage.stop();
++						}
+ 					} else {
+ 						$(".importcj-wall").addClass('hidden');
+ 						self.stageStop = true;

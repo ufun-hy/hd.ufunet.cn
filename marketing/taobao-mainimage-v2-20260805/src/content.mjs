@@ -1,0 +1,51 @@
+export const items = [
+  {
+    id: '01-current-upgrade',
+    source: 'source/01-current-upgrade-source.png',
+    title: '年会抽奖大屏互动',
+    subtitle: '头像滚动开奖 · 奖品结果同步展示',
+    tags: ['扫码参与', '多轮抽奖', '奖品展示'],
+    badge: '升级现有主图方向',
+    palette: {
+      title: '#FFFFFF',
+      subtitle: '#DDEBFF',
+      accent: '#FFD36A',
+      chipStroke: '#FFD36A',
+      chipFill: 'rgba(4, 18, 45, 0.62)',
+      scrim: 'rgba(0, 8, 24, 0.52)',
+    },
+  },
+  {
+    id: '02-lottery-screen',
+    source: 'source/02-lottery-screen-source.png',
+    title: '大屏抽奖系统',
+    subtitle: '名单头像滚动 · 中榜结果集中呈现',
+    tags: ['名单抽奖', '头像墙', '结果展示'],
+    badge: '前端大屏效果',
+    palette: {
+      title: '#FFFFFF',
+      subtitle: '#DCEBFF',
+      accent: '#56D9FF',
+      chipStroke: '#56D9FF',
+      chipFill: 'rgba(2, 18, 54, 0.66)',
+      scrim: 'rgba(0, 12, 42, 0.5)',
+    },
+  },
+  {
+    id: '03-game-screen',
+    source: 'source/03-game-screen-source.png',
+    title: '大屏互动游戏',
+    subtitle: '摇一摇 · 赛马竞速 · 红包雨 · 排名',
+    tags: ['赛马竞速', '红包雨', '实时排行'],
+    badge: '互动游戏矩阵',
+    palette: {
+      title: '#FFFFFF',
+      subtitle: '#E9E2FF',
+      accent: '#B985FF',
+      chipStroke: '#B985FF',
+      chipFill: 'rgba(18, 8, 58, 0.64)',
+      scrim: 'rgba(10, 0, 42, 0.52)',
+    },
+  },
+]
+

@@ -1,4 +1,5 @@
 {include file='$Wpath/common/header'}
+<script type="text/javascript" src="__STATIC__/js/vote-media.js"></script>
 <div class="form-inline zam-inline-searchbar">
     <div class="form-group m-l-5">
       <div class="input-group input-group-sm">
@@ -24,6 +25,11 @@ require(['webcore','webtable','jconfirmBox','zamnotice'],function(webcore,webtab
 var initConfig = {
     tableId:'#listtable',
     url:"{:gohdmanage('datavote/index',['hdid'=>$hdid])}",
+    onload:function(){
+        if(window.voteMedia){
+            window.voteMedia.renderAll($('#listtable'));
+        }
+    },
     columnoperate:{
         btns:{
             data:true,
@@ -75,7 +81,7 @@ var initConfig = {
             formatter:function(value,row,index){
                 return `
                     <div class='zam-flex-column-center'>
-                        ${row.voteimg ? `<img src="${row.voteimg}" class="avatarImg" />` : ``}
+                        ${row.voteimg ? `<div class="avatarImg vote-media" data-vote-media="${row.voteimg}"></div>` : ``}
                         <span>${value}</span>
                     </div>
                 `;

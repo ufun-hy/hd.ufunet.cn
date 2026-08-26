@@ -1,0 +1,64 @@
+[
+  {
+    "id": "AC-01",
+    "requirement": "Produce three visual directions for Taobao main images: current-main-image upgrade, lottery big-screen UI, and interactive game big-screen UI.",
+    "verification": [
+      "Check prompt brief and generated image manifest"
+    ],
+    "status": "passed",
+    "evidence": [
+      "marketing/taobao-mainimage-v2-20260805/contact-sheet-2048.jpg",
+      "marketing/taobao-mainimage-v2-20260805/manifest.json"
+    ],
+    "notes": "Final selected outputs are three ChatGPT web image directions: existing-main upgrade, lottery screen, and interactive game screen."
+  },
+  {
+    "id": "AC-02",
+    "requirement": "Use existing product images and local screen assets only as structural references, not as direct final image layers.",
+    "verification": [
+      "Inspect prompts and final source notes"
+    ],
+    "status": "passed",
+    "evidence": [
+      "marketing/taobao-mainimage-v2-20260805/source/"
+    ],
+    "notes": "Existing Taobao images and local system screenshots were used as structural references only. Final images are regenerated front-end UI bases."
+  },
+  {
+    "id": "AC-03",
+    "requirement": "Final generation prompts must avoid backend/admin pages, operation flows, people-heavy event scenes, readable generated text, QR codes, logos, watermarks, prices, and unsupported claims.",
+    "verification": [
+      "Review prompt negative constraints and visual outputs"
+    ],
+    "status": "passed",
+    "evidence": [
+      "marketing/taobao-mainimage-v2-20260805/deliverables/"
+    ],
+    "notes": "Selected ChatGPT outputs contain no backend/admin pages, no operation flows, no QR codes, no prices, and no generated readable text in the base layer; final Chinese copy is deterministic overlay."
+  },
+  {
+    "id": "AC-04",
+    "requirement": "Generated visuals should be high-pixel, product-related, and close to buyer-visible front-end big-screen effects rather than abstract glowing concept art.",
+    "verification": [
+      "Visual inspection of downloaded outputs or screenshots"
+    ],
+    "status": "passed",
+    "evidence": [
+      "file check: final JPGs are 1440x1440 and 2048x2048 exports; source images are 1254x1254 from ChatGPT"
+    ],
+    "notes": "User confirmed 1024 is acceptable. Final exports include upscaled upload-ready 1440 versions."
+  },
+  {
+    "id": "AC-05",
+    "requirement": "Gemini and ChatGPT web generation attempts must be recorded with provider URL, verified surface label when visible, and any fallback or limitation.",
+    "verification": [
+      "Review state.json and final-report.md"
+    ],
+    "status": "passed",
+    "evidence": [
+      "Gemini conversation: https://gemini.google.com/app/797adf08cb6e3637",
+      "ChatGPT conversation: https://chatgpt.com/c/6a72d9ca-94c8-83ec-b295-0c2f2b92ca37"
+    ],
+    "notes": "Gemini Pro image tool showed Nano Banana 2 and produced 1024 images but was rejected for readable text/real-avatar issues. ChatGPT web used GPT-5.6 Sol with Create Image enabled and produced the accepted set."
+  }
+]

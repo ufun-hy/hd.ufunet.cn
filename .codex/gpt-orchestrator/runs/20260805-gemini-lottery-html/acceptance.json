@@ -1,0 +1,58 @@
+[
+  {
+    "id": "AC-01",
+    "requirement": "One complete standalone HTML contains three distinct buyer-visible modes: scan/avatar lottery, imported-name lottery, and multiplayer race game.",
+    "verification": ["Opened the final HTML and switched among all three modes at 1366×768"],
+    "status": "passed",
+    "evidence": [
+      "marketing/taobao-mainimage-v4-product-screen-20260805/demos/gemini-lottery-effects-v2.html",
+      "demos/previews/01-avatar-lottery.png",
+      "demos/previews/02-list-lottery.png",
+      "demos/previews/03-race-game.png"
+    ],
+    "notes": "The page contains only front-end display scenes and a compact buyer-visible demo control dock."
+  },
+  {
+    "id": "AC-02",
+    "requirement": "Each mode has a real animated draw lifecycle rather than a static image.",
+    "verification": [
+      "Avatar state changed 0→1→2 and produced a winner name",
+      "List state changed 0→1→1.5→2 and produced three winner elements",
+      "All six race cars changed x-position, reached 100%, and produced ranks 1–6"
+    ],
+    "status": "passed",
+    "evidence": ["test-results/browser-qa.json"],
+    "notes": "Animations use inline HTML, CSS, SVG, and JavaScript; no video or GIF is used."
+  },
+  {
+    "id": "AC-03",
+    "requirement": "Visual morphology follows the corresponding selected Gemini image.",
+    "verification": ["Reviewed full desktop previews against the three selected Gemini PNG references"],
+    "status": "passed",
+    "evidence": [
+      "demos/previews/01-avatar-lottery.png",
+      "demos/previews/02-list-lottery.png",
+      "demos/previews/03-race-game.png"
+    ],
+    "notes": "Avatar pool, rolling-name slots, six colored lanes, moving cars, finish line, and ranking are all recognizable."
+  },
+  {
+    "id": "AC-04",
+    "requirement": "The demo is responsive and remains usable at common desktop and mobile viewports.",
+    "verification": [
+      "1366×768 screen canvas measured 1365.33×768 with no desktop black-side shrink defect",
+      "390×844 controls measured 351×148; tabs measured 99×40 at 14px; body scroll size remained 390×844"
+    ],
+    "status": "passed",
+    "evidence": ["test-results/browser-qa.json"],
+    "notes": "Desktop remains the primary presentation. Mobile provides a non-overflowing preview with readable controls."
+  },
+  {
+    "id": "AC-05",
+    "requirement": "No production application behavior or external business data is changed.",
+    "verification": ["Scoped git status shows only the standalone demo directory and run evidence as new work for this task"],
+    "status": "passed",
+    "evidence": ["baseline.json", "final-report.md"],
+    "notes": "No backend, API, authentication, order, QianNiu, product publishing, or advertising files were modified by this task."
+  }
+]

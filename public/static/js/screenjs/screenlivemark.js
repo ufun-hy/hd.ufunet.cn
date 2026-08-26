@@ -10,7 +10,7 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 					currentPwMap: {},
 					currentPwList: [],
 					currentPfItems: [],
-					currentPfMax: 10,
+					currentPfMax: 100,
 					currentAvgPfItemHtml: '',
 					detailViewMode: 'judge',
 					activePwId: null,
@@ -75,10 +75,11 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 				self.initautoScroll('.livemark-users');
 			}, 2e3);
 		},
-			ajaxdata: function (fn) {
+		ajaxdata: function (fn) {
 				screencore.ajaxSubmit('/screen/livemark/getnormaldata', {}, '正在获取轮次数据').then(function (json) {
 					if (json.code == 0) {
 						if (json.msg != false) {
+							screenlivemark.syncScoreConfig(json.msg);
 							var pfuser = json.msg.pfusers;
 							$(".livemark-title").text(json.msg.title);
 							screenlivemark.renderNormalUsers(pfuser, json.msg.scoretype);
@@ -105,6 +106,7 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 				screencore.ajaxSubmit('/screen/livemark/getnormaldata', {}).then(function (json) {
 					if (json.code == 0) {
 						if (json.msg != false) {
+							self.syncScoreConfig(json.msg);
 							var pfuser = json.msg.pfusers, visibleUsers = [], len = $(".livemark-users .livemark-user-item").length;
 							if (pfuser.length > 0) {
 								$.each(pfuser, function (k, v) {
@@ -154,7 +156,12 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 							if (pfuser.length != len) {
 								self.removeautoScroll('.livemark-phbs');
 								$('.livemark-phbs').scrollTop(0);
-						}
+								setTimeout(function () {
+									if (!$('.livemark-phbs').hasClass('display-none')) {
+										self.initautoScroll('.livemark-phbs', true);
+									}
+								}, 0);
+							}
 						json.msg.openzan == '2' ? $(".livemark-btns").addClass('display-none') : $(".livemark-btns").removeClass('display-none');
 					}
 				} else {
@@ -408,11 +415,19 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 						}
 						$(".livemark-zanmain").addClass('display-none');
 					}
-							var showpws = json.msg.showpws || '2';
+							var configuredPws = $.isArray(json.msg.pws) ? json.msg.pws : [];
+							// 详情页默认先展示本轮配置的全部专家评委，尚未提交的评委也保留在列表中。
+							var visiblePws = configuredPws;
+							if (visiblePws.length <= 0) {
+								// 兼容旧接口：pfusers 只包含已提交记录，补齐状态后仍走统一展示模板。
+								visiblePws = $.map(json.msg.pfusers || [], function (pw) {
+									return $.extend({}, pw, { hadpf: '1' });
+								});
+							}
+							var showpws = visiblePws.length > 0 ? '1' : '2';
 							self.currentPwMap = {};
-							self.currentPwList = (showpws == '1' ? json.msg.pws : json.msg.pfusers) || [];
-							self.currentPfItems = $.isArray(json.msg.pfitem) ? json.msg.pfitem : [];
-							self.currentPfMax = json.msg.pfmax || self.currentPfMax || 10;
+							self.currentPwList = visiblePws;
+							self.syncScoreConfig(json.msg);
 							$.each(self.currentPwList, function (i, v) {
 								if (v && v.id !== undefined) {
 									self.currentPwMap[String(v.id)] = v;
@@ -460,11 +475,8 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 						$('.livemark-user-score').removeClass('hidden');
 						$('.openpubpw').addClass('hidden');
 						$(".livemark-user-score .scoretype").text('得分：');
-						var scorenumtxt = finalScoreText;
-						if (showpws == '1' && json.msg.hadpwnum < json.msg.totalpwnum) {
-							scorenumtxt = '评分中';
-						}
-						$(".livemark-user-score .scorenum").text(scorenumtxt);
+						// 右上角展示接口实时汇总分；评委是否提交只影响下方评委卡片状态。
+						$(".livemark-user-score .scorenum").text(finalScoreText);
 						$(".livemark-user-score .pwbox .hadpwnum span").text(json.msg.hadpwnum || 0);
 						$(".livemark-user-score .pwbox .pwnums span").text(json.msg.totalpwnum || 0);
 					}
@@ -518,7 +530,7 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 						}
 						if (showpws == '1') {
 						var pwhtml = '';
-						$.each(json.msg.pws, function (i, v) {
+						$.each(visiblePws, function (i, v) {
 							v.showpws = '1';
 							pwhtml += template("pwpfItem", v);
 						});
@@ -616,6 +628,8 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 			var self = this;
 			$(".livemark-btns div").on('click', function () {
 				var $this = $(this);
+				var activeScrollClass = $(".livemark-scrollbox > div:not(.display-none)").hasClass('livemark-phbs') ? '.livemark-phbs' : '.livemark-users';
+				self.removeautoScroll(activeScrollClass);
 				$(".livemark-scrollbox>div").addClass('display-none');
 				if ($this.hasClass('btn-mark')) {
 					if ($(".livemark-topbtn").attr('data-view') == 'list') {
@@ -625,6 +639,9 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 							self.loadNormaldata();
 						}, 3e3);
 						$(".livemark-scrollbox .livemark-users").removeClass('display-none');
+						setTimeout(function () {
+							self.initautoScroll('.livemark-users', true);
+						}, 0);
 					} else {
 						self.clearAll();
 						self.loadScoredata();
@@ -632,6 +649,9 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 							self.loadScoredata();
 						}, 3e3);
 						$(".livemark-scrollbox .livemark-phbs").removeClass('display-none');
+						setTimeout(function () {
+							self.initautoScroll('.livemark-phbs', true);
+						}, 0);
 					}
 					$(".livemark-topbtn").removeClass('display-none');
 				} else {//点击了人气
@@ -658,6 +678,9 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 					}, 3e3);
 					$(".livemark-scrollbox .livemark-users").addClass('display-none');
 					$(".livemark-scrollbox .livemark-phbs").removeClass('display-none').scrollTop(0);
+					setTimeout(function () {
+						self.initautoScroll('.livemark-phbs', true);
+					}, 0);
 					$this.attr('data-view', 'rank').text("返回列表");
 				} else {//点击返回列表
 					$(".livemark-phb-top .rank2,.livemark-phb-top .rank1,.livemark-phb-top .rank3,.livemark-phb-others").empty();
@@ -676,6 +699,7 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 				var $this = $(this);
 				self.pfuserid = $this.attr('data-pfuserid');
 				self.resetDetailViewMode();
+				self.removeautoScroll('.livemark-users');
 				self.clearAll();
 				self.loadUserdata();
 				self.otimeout = setInterval(function () {
@@ -701,6 +725,7 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 				var $this = $(this);
 				self.pfuserid = $this.attr('data-pfuserid');
 				self.resetDetailViewMode();
+				self.removeautoScroll('.livemark-phbs');
 				self.clearAll();
 				self.loadUserdata();
 				self.otimeout = setInterval(function () {
@@ -720,11 +745,17 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 					self.ntimeout = setInterval(function () {
 						self.loadNormaldata();
 					}, 3e3);
+					setTimeout(function () {
+						self.initautoScroll('.livemark-users', true);
+					}, 0);
 				} else if (showboxClass == 'livemark-phbs') {
 					self.loadScoredata();
 					self.stimeout = setInterval(function () {
 						self.loadScoredata();
 					}, 3e3);
+					setTimeout(function () {
+						self.initautoScroll('.livemark-phbs', true);
+					}, 0);
 				} else {
 					self.loadZandata();
 					self.ztimeout = setInterval(function () {
@@ -739,6 +770,7 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 						self.setDetailViewMode(self.detailViewMode == 'judge' ? 'avg' : 'judge');
 					});
 					$(".livemark-user-pingwei").on('click', '.pingweione', function () {
+						if ($(".livemark-mainbox").hasClass('livemark-hide-pw-score')) return false;
 						self.setDetailViewMode('judgeDetail', $(this).attr('data-prid'));
 					});
 					$(".livemark-user-single").on('click', '.livemark-judge-detail-back', function () {
@@ -851,8 +883,20 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 						if ($.isArray(parsed)) return parsed;
 					} catch (e) { }
 				}
-				return [];
-			},
+					return [];
+				},
+				syncScoreConfig: function (msg) {
+					if (!msg) return;
+					if (msg.pfmax !== undefined && msg.pfmax !== null && msg.pfmax !== '') {
+						this.currentPfMax = msg.pfmax;
+					}
+					if (String(msg.pftype) == '1') {
+						// 单项模式仍可能带有历史多项配置，不能让它污染单项满分。
+						this.currentPfItems = [];
+					} else if ($.isArray(msg.pfitem)) {
+						this.currentPfItems = msg.pfitem;
+					}
+				},
 				setDetailViewMode: function (mode, pwid) {
 					if (mode == 'avg') {
 						this.detailViewMode = 'avg';
@@ -938,7 +982,7 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 						var score = self.pickFirst(item, ['score', 'totalscore', 'dfscore', 'value', 'num', 'point']);
 						var max = self.pickFirst(item, ['dfmax', 'maxscore', 'fullscore', 'total', 'max']) || meta.dfmax || 0;
 						if (!max && field == 'normal_01') {
-							max = self.pickFirst(pw, ['dfmax', 'maxscore', 'pfmax']) || self.currentPfMax || 10;
+							max = self.pickFirst(pw, ['dfmax', 'maxscore', 'pfmax']) || self.currentPfMax || 100;
 						}
 						var scoreNum = parseFloat(score);
 						var maxNum = parseFloat(max);
@@ -982,13 +1026,20 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 					var pw = self.currentPwMap[String(prid)] || {};
 					var name = self.getPwName(pw);
 					var score = self.pickFirst(pw, ['totalscore', 'score', 'dfscore', 'tw']);
+					var isTotalScoreMode = String(self.detailPftype) == '1';
 					var itemhtml = '';
-					$.each(self.getPwDetailItems(pw), function (i, item) {
-						itemhtml += self.renderJudgeScoreItem(item);
-					});
-					if (itemhtml === '') {
-						itemhtml = '<div class="livemark-judge-score-empty">暂无评分细项</div>';
+					if (!isTotalScoreMode) {
+						$.each(self.getPwDetailItems(pw), function (i, item) {
+							itemhtml += self.renderJudgeScoreItem(item);
+						});
+						if (itemhtml === '') {
+							itemhtml = '<div class="livemark-judge-score-empty">暂无评分细项</div>';
+						}
 					}
+					var scoreItemsHtml = isTotalScoreMode ? '' : '<div class="livemark-judge-detail-left">'
+						+ '<div class="livemark-judge-detail-title">评分细项</div>'
+						+ itemhtml
+						+ '</div>';
 					var html = '<div class="livemark-judge-detail">'
 						+ '<div class="livemark-judge-detail-head">'
 						+ '<div><span class="livemark-judge-detail-label">当前评委</span><span class="livemark-judge-detail-name">' + self.escapeHtml(name) + '</span></div>'
@@ -997,11 +1048,8 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 						+ '<button type="button" class="livemark-judge-detail-back">返回评分列表</button>'
 						+ '</div>'
 						+ '</div>'
-						+ '<div class="livemark-judge-detail-body">'
-						+ '<div class="livemark-judge-detail-left">'
-						+ '<div class="livemark-judge-detail-title">评分细项</div>'
-						+ itemhtml
-						+ '</div>'
+						+ '<div class="livemark-judge-detail-body' + (isTotalScoreMode ? ' is-total-score' : '') + '">'
+						+ scoreItemsHtml
 						+ '<div class="livemark-judge-detail-right">'
 						+ '<div class="livemark-judge-detail-title">当前评委评分意见</div>'
 						+ '<div class="livemark-judge-comment-list">' + self.renderJudgeComment(pw) + '</div>'
@@ -1072,6 +1120,10 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 			if ($(classname).length <= 0) {
 				return false;
 			}
+			if (self.animescrollobj) {
+				self.animescrollobj.pause();
+				self.animescrollobj = null;
+			}
 			anime.remove(classname);
 			var scrollHeight = $(classname)[0].scrollHeight, height = $(classname).outerHeight(), maxscrollH = Math.ceil(scrollHeight - height);
 			if (maxscrollH > 0) {
@@ -1085,7 +1137,7 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 					targets: classname,
 					scrollTop: [currentTop, maxscrollH],
 					duration: duration,
-					autoplay: true,
+					autoplay: !$(classname).is(':hover'),
 					easing: 'linear',
 					complete: function () {
 						$(classname).scrollTop(0);
@@ -1095,29 +1147,30 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 						}
 					},
 				});
-				$(classname).unbind("mouseenter").bind("mouseenter", function () {
+				$(classname).off('.livemarkAutoScroll').on('mouseenter.livemarkAutoScroll', function () {
 					if (self.animescrollobj) {
 						self.animescrollobj.pause();
 						self.startScrollY = $(classname).scrollTop();
 					}
 				});
-				$(classname).unbind("mouseleave").bind("mouseleave", function () {
+				$(classname).on('mouseleave.livemarkAutoScroll', function () {
 					self.startScrollY = $(classname).scrollTop();
 					self.initautoScroll(classname, true);
 				});
+			} else {
+				$(classname).off('.livemarkAutoScroll');
 			}
 		},
 		removeautoScroll: function (classname) {
 			var self = this;
 			if (self.animescrollobj) {
 				self.animescrollobj.pause();
-				if (classname) {
-					self.animescrollobj.remove(classname);
-					$(classname).scrollTop(0);
-					$(classname).unbind("mouseenter");
-					$(classname).unbind("mouseleave");
-				}
 				self.animescrollobj = null;
+			}
+			if (classname) {
+				anime.remove(classname);
+				$(classname).scrollTop(0);
+				$(classname).off('.livemarkAutoScroll');
 			}
 			self.startScrollY = 0;
 			self.scrollReset = false;

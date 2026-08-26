@@ -1,12 +1,13 @@
 <style>
 table tr td{text-align:center!important}
 .confirmbox-pop .zam-titleBox{font-weight: 600;padding:5px 0;}
-.userimgbox img{height:40px!important;}
+.userimgbox img,.userimgbox video{height:40px!important;max-width:80px;object-fit:cover;}
 .edui-default .edui-toolbar .edui-for-fullscreen {
     display: none!important
 }
 #edui_fixedlayer{z-index: 1037!important}
 </style>
+<script type="text/javascript" src="__STATIC__/js/vote-media.js"></script>
 <div class="form-horizontal confirmbox-pop rotate-pop">
 <form class="confirm-formbox" method="post">
     <div class="text-center">
@@ -303,7 +304,7 @@ table tr td{text-align:center!important}
 				  	<th style="width:10%;text-align:center;">微信状态</th>
 				  	<th style="width:10%;text-align:center;">大屏状态</th>
 					<th style="width:20%;text-align:center;">项目名</th>
-					<th style="width:20%;text-align:center;">项目图</th>
+						<th style="width:20%;text-align:center;">项目媒体</th>
 					<th style="width:20%;text-align:center;">分组</th>
 					<th style="width:20%;text-align:center;">操作</th>
 				  </tr>
@@ -333,7 +334,7 @@ table tr td{text-align:center!important}
 							<td>
 							  <input type="hidden" name="voteimg[]" value="{$item['voteimg']}">
 							  <input type="hidden" name="votebigimg[]" value="{$item['votebigimg']??''}">
-							  <div class="userimgbox"><img src="{:tomedia($item['voteimg'])}"></div>
+					  <div class="userimgbox" data-vote-media="{:tomedia($item['voteimg'])}"></div>
 							</td>
 							<td>
 							  <input type="hidden" name="groupid[]" value="{$item['groupid']}">
@@ -385,7 +386,7 @@ table tr td{text-align:center!important}
 	<td>
 	  <input type="hidden" name="voteimg[]" value="<% d.voteimg %>">
 	  <input type="hidden" name="votebigimg[]" value="<% d.votebigimg %>">
-	  <div class="userimgbox"><img src="<% d.userimgprev %>"></div>
+		  <div class="userimgbox" data-vote-media="<% d.userimgprev %>"></div>
 	</td>
 	<td>
 	  <input type="hidden" name="groupid[]" value="<% d.groupid %>">
@@ -408,8 +409,11 @@ table tr td{text-align:center!important}
 </tr>
 </script>        
 <script> 
-require(['webcore','jconfirmBox','zamnotice','layerBox',"bootstrap-touchspin","bootstrap-daterangepicker","jquery.ui"],function(webcore,jconfirmBox,zamnotice,layerBox){
-	if($('[data-tooltip="laytip"]').length) {
+	require(['webcore','jconfirmBox','zamnotice','layerBox',"bootstrap-touchspin","bootstrap-daterangepicker","jquery.ui"],function(webcore,jconfirmBox,zamnotice,layerBox){
+		if(window.voteMedia){
+			window.voteMedia.renderAll($('.vote-lists'));
+		}
+		if($('[data-tooltip="laytip"]').length) {
         var tipindex;
         $('[data-tooltip="laytip"]').on({
             mouseover : function(){
@@ -495,7 +499,7 @@ require(['webcore','jconfirmBox','zamnotice','layerBox',"bootstrap-touchspin","b
 			if(userarr.groupid){
 				userarr.groupname = e.find('form').find("option:selected").text()||'';
 			}
-			userarr.userimgprev = e.find('img').attr("src");
+			userarr.userimgprev = e.find('.vote-media-preview').attr('data-vote-media') || '';
 			if(userarr.votename=='') {
 				zamnotice.showTips('error','项目名必须设置');
 				return false;
@@ -506,6 +510,9 @@ require(['webcore','jconfirmBox','zamnotice','layerBox',"bootstrap-touchspin","b
 						confirmObj.close();
 						userarr.id = json.msg;
 						$(".vote-lists").append(webcore.tpl($("#newitem-tpl"),userarr));
+						if(window.voteMedia){
+							window.voteMedia.renderAll($('.vote-lists'));
+						}
 						setTimeout(function(){
 					        tpl_switch();
 					    },1e2);
@@ -518,6 +525,9 @@ require(['webcore','jconfirmBox','zamnotice','layerBox',"bootstrap-touchspin","b
 				});
 			}else{
 				$(".vote-lists").append(webcore.tpl($("#newitem-tpl"),userarr));
+				if(window.voteMedia){
+					window.voteMedia.renderAll($('.vote-lists'));
+				}
 				setTimeout(function(){
 			        tpl_switch();
 			    },1e2);
@@ -528,15 +538,19 @@ require(['webcore','jconfirmBox','zamnotice','layerBox',"bootstrap-touchspin","b
 	$(".importvoteitem").on('click',function(){
 		webcore.importxls({title:'导入投票项',url:"{:gohdmanage('configvote/importuser',['hdid'=>$hdid])}&rotateid="+rotateid,moban:"/{:SYSIMGURL}excel/voteuser.xls",uptxt:"点击上传投票项xls文件",xlstxt:"注:请务必严格按照模板内容制作xls文件"},function(data){
 			var html = '';
-			if(data.length > 0){
-				$.each(data,function(i,v){
-					html += webcore.tpl($("#newitem-tpl"),v);
+				if(data.length > 0){
+					$.each(data,function(i,v){
+						v.userimgprev = v.userimgprev || v.voteimg || '';
+						html += webcore.tpl($("#newitem-tpl"),v);
 				});
 				setTimeout(function(){
 			        tpl_switch();
 			    },1e3);
 			}
-			$(".vote-lists").append(html);
+				$(".vote-lists").append(html);
+				if(window.voteMedia){
+					window.voteMedia.renderAll($('.vote-lists'));
+				}
         });
 	});
 	$(".vote-lists").on('click','.btn-edituser',function(){
@@ -556,7 +570,7 @@ require(['webcore','jconfirmBox','zamnotice','layerBox',"bootstrap-touchspin","b
 			if(userarr.groupid){
 				userarr.groupname = e.find('form').find("option:selected").text()||'';
 			}
-			userarr.userimgprev = e.find('img').attr("src");
+			userarr.userimgprev = e.find('.vote-media-preview').attr('data-vote-media') || '';
 			if(userarr.votename=='') {
 				zamnotice.showTips('error','项目名必须设置');
 				return false;
@@ -565,8 +579,11 @@ require(['webcore','jconfirmBox','zamnotice','layerBox',"bootstrap-touchspin","b
 				webcore.ajaxSubmit("{:gohdmanage('configvote/savevoteuser',['hdid'=>$hdid])}",{rotateid:rotateid,voteid:voteid,userarr:userarr}).then(function(json){
 					if(json.code==0){
 						confirmObj.close();
-						userarr.id = voteid;
-						fdom.html($(webcore.tpl($("#newitem-tpl"),userarr)).html());
+							userarr.id = voteid;
+							fdom.html($(webcore.tpl($("#newitem-tpl"),userarr)).html());
+							if(window.voteMedia){
+								window.voteMedia.renderAll(fdom);
+							}
 						setTimeout(function(){
 					        tpl_switch();
 					    },1e2);
@@ -578,7 +595,10 @@ require(['webcore','jconfirmBox','zamnotice','layerBox',"bootstrap-touchspin","b
 					zamnotice.showTips('error','网络差。操作失败');
 				});
 			}else{
-				fdom.html($(webcore.tpl($("#newitem-tpl"),userarr)).html());
+					fdom.html($(webcore.tpl($("#newitem-tpl"),userarr)).html());
+					if(window.voteMedia){
+						window.voteMedia.renderAll(fdom);
+					}
 				setTimeout(function(){
 			        tpl_switch();
 			    },1e2);
@@ -757,7 +777,7 @@ $(function(){
 	<td>
 	  <input type="hidden" name="voteimg[]" value="<% d.voteimg %>">
 	  <input type="hidden" name="votebigimg[]" value="<% d.votebigimg %>">
-	  <div class="userimgbox"><img src="<% d.userimgprev %>"></div>
+	  <div class="userimgbox" data-vote-media="<% d.userimgprev %>"></div>
 	</td>
 	<td>
 	  <input type="hidden" name="groupid[]" value="<% d.groupid %>">

@@ -1,0 +1,16 @@
+diff --git a/app/screen/view/lottery/index.html b/app/screen/view/lottery/index.html
+index a1b2c3d..e4f5g6h 100644
+--- a/app/screen/view/lottery/index.html
++++ b/app/screen/view/lottery/index.html
+@@ -438,3 +438,6 @@
+ {if !empty($pcconfig['style']['diycss'])}<style>{$pcconfig['style']['diycss']}</style>{/if}
++{if isset($pcconfig['style']['stylename']) && $pcconfig['style']['stylename'] == '星环头像抽奖'}
++<link rel="stylesheet" href="__STATIC__/css/screencss/screenlottery-halo.css">
++{/if}
+ {if isset($pcconfig['styleconfig']['lotterymusic'])}
+ 	{if !empty($pcconfig['styleconfig']['lotterymusic'])}
+@@ -456,3 +459,3 @@
+ {/if}
+-<section class="lottery-mainbox normal-box{if isset($pcconfig['isroundcj']) && $pcconfig['isroundcj']=='1'} lottery-roundcjbox{/if}">
++<section class="lottery-mainbox normal-box{if isset($pcconfig['isroundcj']) && $pcconfig['isroundcj']=='1'} lottery-roundcjbox{/if}{if isset($pcconfig['style']['stylename']) && $pcconfig['style']['stylename'] == '星环头像抽奖'} lottery-halo-theme{/if}">
+ 	<div class="emptybox zam-app-flex-ajCenter display-none">

@@ -1,273 +1,957 @@
 {include file="common/header" /}
 <style>
-.hbwall-mainbox{
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	padding: 0;
+/* ==========================================================================
+   红包墙 v2 作用域覆盖样式 (hbwall-v2)
+   遵循 Apple iOS 极简玻璃拟态与高端大屏质感，不干扰公共 Header / Footer 框架
+   ========================================================================== */
+
+/* 隐去公共 Header 的可视区域与 Footer；公共 Footer 仍负责二维码初始化。 */
+body.screenbody .header,
+body.screenbody .headerTips,
+body.screenbody .headerLogo,
+body.screenbody .headerTitle,
+body.screenbody .footer,
+body.screenbody .footer-controlBox {
+  display: none !important;
 }
-.hbwall-container{
-	width: 100%;
-	height: 100%;
+
+{if $rotate['openmode']=='1'}
+/* 屏蔽公共二维码残留（仅自由模式）。 */
+body.screenbody .hdQrbox {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
 }
-.hbwall-box{
-	max-height: 90%;
-	padding: 30px;
-	box-sizing: border-box;
-	overflow: hidden;
-	overflow-y: auto;
-	display: grid;
-	grid-template-columns: repeat({$rotate['hboneconfig']['colnum']??'1'}, {$rotate['hboneconfig']['width']??'140'}px);
-	grid-gap:{$rotate['hboneconfig']['rowgap']??'20'}px {$rotate['hboneconfig']['colgap']??'20'}px;
+{/if}
+
+/* 主页面重构容器：不叠加遮罩，完整显示后台活动背景图。 */
+.hbwall-mainbox.hbwall-v2 {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: 65px 24px 20px 24px;
+  box-sizing: border-box;
+  background: none;
+  color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+  overflow: hidden;
 }
-.hbwall-box .hbwall-item{
-	position: relative;
-	-webkit-perspective: 1000;
-    perspective: 1000;
-   -webkit-transform-style: preserve-3d;
-    transform-style: preserve-3d;
-    {if $rotate['openmode']=='1'}
-		cursor: pointer;
-	{else /}
-		pointer-events:none;
-	{/if}
+
+/* 顶部独立活动 Header */
+.hbwall-topbar {
+  position: absolute;
+  top: 12px;
+  left: 24px;
+  right: 24px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 10;
 }
-.hbwall-box .hbwall-item.hasopen{
-	cursor: inherit;
+.hbwall-topbar__title {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  background: linear-gradient(90deg, #ffffff 0%, #ffd700 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
-.hbwall-box .hbwall-item .frontback{
-	position: relative;
-	width: {$rotate['hboneconfig']['width']??'140'}px;
-	height: {$rotate['hboneconfig']['height']??'193'}px;
+.hbwall-topbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
-.hbwall-box .hbwall-item .frontback .stars{
-    position: absolute;
-    bottom: 0;
-    left:0;
+/* 页面 20% / 80% 主体布局 */
+.hbwall-layout {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  gap: 20px;
+  box-sizing: border-box;
+  position: relative;
+}
+
+/* --------------------------------------------------------------------------
+   左侧礼品展示区：保持原有 20% / 80% 主体宽度比例。
+   -------------------------------------------------------------------------- */
+.hbwall-gifts {
+  flex: 0 0 20%;
+  width: 20%;
+  min-width: 220px;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 16px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+}
+
+/* 1366x768 屏下的精细缩微，保持 20% 比例不变 */
+@media (max-width: 1400px), (max-height: 800px) {
+  .hbwall-gifts {
+    padding: 12px;
+  }
+  .hbwall-gifts__header {
+    font-size: 15px;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+  }
+  .hbwall-gift-card {
+    padding: 6px 8px;
+    gap: 8px;
+  }
+  .hbwall-gift-card .gift-img {
+    width: 36px;
+    height: 36px;
+  }
+  .hbwall-gift-card .gift-name {
+    font-size: 12px;
+  }
+}
+
+.hbwall-gifts__header {
+  font-size: 17px;
+  font-weight: 700;
+  color: #ffffff;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.hbwall-gifts__container {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.hbwall-gifts__container::-webkit-scrollbar {
+  width: 4px;
+}
+.hbwall-gifts__container::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+/* 主推礼品卡片：按奖品原始 displayorder 固定第 1 款，不受红包随机排序影响。 */
+.hbwall-gift-card--featured {
+  width: 100%;
+  min-height: 126px;
+  aspect-ratio: 2.5 / 1;
+  background: url('/static/images/screen/hbwall-theme-v2/gift/feature.png') center/100% 100% no-repeat;
+  border: 0;
+  border-radius: 14px;
+  padding: 10px 12px 8px;
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 48% 52%;
+  align-items: center;
+  flex: 0 0 auto;
+  box-shadow: 0 8px 24px rgba(31, 4, 1, 0.3), 0 0 12px rgba(255, 188, 87, 0.16);
+}
+.hbwall-gift-card--featured .gift-tag {
+  position: static;
+  align-self: center;
+  max-width: 92%;
+  min-width: 72px;
+  padding: 4px 12px;
+  box-sizing: border-box;
+  border: 1px solid rgba(255, 248, 215, 0.68);
+  border-radius: 999px;
+  background: rgba(126, 45, 20, 0.2);
+  color: #8f3b20;
+  font-size: 13px;
+  line-height: 1.15;
+  font-weight: 800;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.hbwall-gift-card--featured .gift-img {
+  position: absolute;
+  left: 1%;
+  bottom: 8%;
+  width: 46%;
+  height: 92%;
+  max-width: none;
+  max-height: none;
+  object-fit: contain;
+  object-position: center bottom;
+  margin: 0;
+  z-index: 1;
+  filter: drop-shadow(0 9px 14px rgba(91, 35, 10, 0.35));
+  transition: transform 0.3s ease;
+}
+.hbwall-gift-card--featured .gift-img.is-landscape {
+  bottom: 20%;
+  height: 72%;
+}
+.hbwall-gift-card--featured:hover .gift-img {
+  transform: scale(1.05);
+}
+.hbwall-gift-card--featured .gift-feature-content {
+  grid-column: 2;
+  min-width: 0;
+  height: 86%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 2px 4px 2px 0;
+  box-sizing: border-box;
+}
+.hbwall-gift-card--featured .gift-name {
+  width: 100%;
+  color: #572615;
+  font-family: "STKaiti", "KaiTi", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: clamp(15px, 1.1vw, 22px);
+  line-height: 1.25;
+  font-weight: 800;
+  text-align: center;
+  text-shadow: 0 1px 1px rgba(255, 248, 224, 0.48);
+  white-space: normal;
+  word-break: break-word;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+@media (max-width: 1400px), (max-height: 800px) {
+  .hbwall-gift-card--featured {
+    min-height: 116px;
+    padding: 8px 9px 6px;
+  }
+  .hbwall-gift-card--featured .gift-feature-content {
+    gap: 7px;
+  }
+  .hbwall-gift-card--featured .gift-tag {
+    min-width: 62px;
+    padding: 3px 8px;
+    font-size: 10px;
+  }
+  .hbwall-gift-card--featured .gift-name {
+    font-size: 14px;
+  }
+}
+
+/* 其它礼品列表卡片 */
+.hbwall-gift-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  min-height: 58px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: background 0.2s ease;
+}
+.hbwall-gift-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+.hbwall-gift-card .gift-img {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 3px;
+  box-sizing: border-box;
+}
+.hbwall-gift-card .gift-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+}
+.hbwall-gift-card .gift-title {
+  font-size: 12px;
+  color: #ffd700;
+}
+.hbwall-gift-card .gift-name {
+  font-size: 14px;
+  line-height: 1.3;
+  font-weight: 600;
+  color: #fff;
+  white-space: normal;
+  word-break: break-word;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+/* --------------------------------------------------------------------------
+   右侧红包墙舞台 (约 80%)
+   -------------------------------------------------------------------------- */
+.hbwall-stage {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.hbwall-history-toggle {
+  background: rgba(255, 215, 0, 0.15);
+  border: 1px solid rgba(255, 215, 0, 0.4);
+  color: #ffd700;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  backdrop-filter: blur(10px);
+  transition: all 0.2s ease;
+}
+.hbwall-history-toggle:hover {
+  background: rgba(255, 215, 0, 0.25);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.2);
+}
+
+.hbwall-stage__viewport {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  position: relative;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+/* 缩放后的真实占位画布：高度由 JS 写入，保证超长红包墙可纵向滚动。 */
+.hbwall-scale-canvas {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+/* --------------------------------------------------------------------------
+   红包网格与多行编号重叠修复
+   保留后台 colnum, width, height, rowgap, colgap 配置
+   -------------------------------------------------------------------------- */
+.hbwall-box {
+  display: grid;
+  grid-template-columns: repeat({$rotate['hboneconfig']['colnum']??'1'}, {$rotate['hboneconfig']['width']??'140'}px);
+  grid-gap: {$rotate['hboneconfig']['rowgap']??'20'}px {$rotate['hboneconfig']['colgap']??'20'}px;
+  width: -moz-max-content;
+  width: max-content;
+  margin: 0;
+  transform-origin: top left;
+}
+
+.hbwall-box .hbwall-item {
+  position: relative;
+  width: {$rotate['hboneconfig']['width']??'140'}px;
+  height: {$rotate['hboneconfig']['height']??'193'}px;
+  -webkit-perspective: 1000px;
+  perspective: 1000px;
+  -webkit-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+  {if $rotate['openmode']=='1'}
+    cursor: pointer;
+  {else /}
     pointer-events: none;
-    z-index: 1;
-    background-image: url({if isset($pcconfig['styleconfig']['starsimg']) && !empty($pcconfig['styleconfig']['starsimg'])}{:tomedia($pcconfig['styleconfig']['starsimg'])}{else /}/{:SIMGURL}hbwall/stars.png{/if});
-    background-repeat:no-repeat;
-    background-size:cover;
-    width: {$rotate['hboneconfig']['width']??'140'}px;
-    height: calc({$rotate['hboneconfig']['width']??'140'}px / 0.6356);
-    {if isset($rotate['hboneconfig']['starani']) && $rotate['hboneconfig']['starani']=='2'}
-    display:none;
-    {/if}
+  {/if}
 }
-.hbwall-box .hbwall-item .frontback .front{
-	position: relative;
-	width: 100%;
-	height: 100%;
-	background-image: url("{:tomedia($rotate['hboneconfig']['frontbg'])}");
-	background-repeat: no-repeat;
-	background-size: 100% 100%;
-	-webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-    -webkit-transition: all 1s cubic-bezier(0.68,-.55,.265,1.55);
-    transition: all 1s cubic-bezier(0.68,-.55,.265,1.55);
-    {if !isset($rotate['hboneconfig']['scaleani']) || $rotate['hboneconfig']['scaleani']=='1'}
-    animation: scaleani 2s linear infinite alternate;
-    {/if}
+.hbwall-box .hbwall-item.hasopen {
+  cursor: default;
 }
+
+.hbwall-box .hbwall-item .frontback {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  -webkit-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+}
+
+/* 星光层 (恢复后台 starani 配置) */
+.hbwall-box .hbwall-item .frontback .stars {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 1;
+  background-image: url({if isset($pcconfig['styleconfig']['starsimg']) && !empty($pcconfig['styleconfig']['starsimg'])}{:tomedia($pcconfig['styleconfig']['starsimg'])}{else /}/{:SIMGURL}hbwall/stars.png{/if});
+  background-repeat: no-repeat;
+  background-size: cover;
+  width: {$rotate['hboneconfig']['width']??'140'}px;
+  height: calc({$rotate['hboneconfig']['width']??'140'}px / 0.6356);
+  {if isset($rotate['hboneconfig']['starani']) && $rotate['hboneconfig']['starani']=='2'}
+  display: none;
+  {/if}
+}
+
+/* 红包正面 (未开启状态) - 恢复 scaleani 呼吸动画 */
 @keyframes scaleani {
-	0%{
-		transform: scaleX(1);
-	}
-	50%{
-		transform: scaleX(0.95);
-	}
-	100%{
-		transform: scaleX(1);
-	}
+  0% { transform: scaleX(1); }
+  50% { transform: scaleX(0.96); }
+  100% { transform: scaleX(1); }
 }
-.hbwall-box .hbwall-item .frontback .front .front-name{
-	position: absolute;
-	left:0;
-	top: {$rotate['titleconfig']['margintop']??'80'}px;
-	width:100%;
-	padding:0 10px;
-	box-sizing:border-box;
-	text-align:center;
-	color: {$rotate['titleconfig']['color']??'#ff9800'};
-    font-size: {$rotate['titleconfig']['size']??'20'}px;
-    font-weight: 600;
-    {if $rotate['titleconfig']['open']=='2'}
-    display:none
-    {/if}
+
+.hbwall-box .hbwall-item .frontback .front {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("{:tomedia($rotate['hboneconfig']['frontbg'])}");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 145% 130%;
+  border: 0;
+  border-radius: 12px;
+  box-sizing: border-box;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.44), 0 0 9px rgba(255, 84, 44, 0.28);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-transition: all 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  transition: all 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  overflow: hidden;
+  {if !isset($rotate['hboneconfig']['scaleani']) || $rotate['hboneconfig']['scaleani']=='1'}
+  animation: scaleani 2s linear infinite alternate;
+  {/if}
 }
+.hbwall-box .hbwall-item.hasopen .front,
+.hbwall-box .hbwall-item .front.noanimation {
+  animation: none;
+}
+
+.hbwall-box .hbwall-item .frontback .front .front-name {
+  display: none;
+}
+
 .hbwall-box .hbwall-item.hasopen .front {
-    -webkit-transform: rotateY(180deg);
-    transform: rotateY(180deg);
+  -webkit-transform: rotateY(180deg);
+  transform: rotateY(180deg);
 }
-.hbwall-box .hbwall-item.hasopen .front.noanimation{
-	animation: none;
-}
-.hbwall-box .hbwall-item .back{
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	-webkit-transform: rotateY(180deg);
-    transform: rotateY(180deg);
-	-webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-    -webkit-transition: all 1s cubic-bezier(0.68,-.55,.265,1.55);
-    transition: all 1s cubic-bezier(0.68,-.55,.265,1.55);
+
+/* 红包背面 (已开启状态) */
+.hbwall-box .hbwall-item .back {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: 12px;
+  box-sizing: border-box;
+  background-image: url("{:tomedia($rotate['hboneconfig']['backbg'])}");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 145% 130%;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4), 0 0 10px rgba(255, 198, 78, 0.3);
+  -webkit-transform: rotateY(180deg);
+  transform: rotateY(180deg);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-transition: all 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  transition: all 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  overflow: hidden;
 }
 .hbwall-box .hbwall-item.hasopen .back {
-    -webkit-transform: rotateY(0deg);
-    transform: rotateY(0deg);
+  -webkit-transform: rotateY(0deg);
+  transform: rotateY(0deg);
 }
-.back{
-	background-image: url("{:tomedia($rotate['hboneconfig']['backbg'])}");
-	background-repeat: no-repeat;
-	background-size: 100% 100%;
-}
-.back .prizetitle{
-	color: {$rotate['backtitleconfig']['color']??'#ff9800'};
-    font-size: {$rotate['backtitleconfig']['size']??'20'}px;
-    margin-bottom: {$rotate['backtitleconfig']['marginbottom']??'20'}px;
-    {if $rotate['backtitleconfig']['open']=='2'}
-    	display:none
-    {/if}
-}
-.back .prizeimg{
-	width: {$rotate['awardconfig']['picsize']??'80'}px;
-    height: {$rotate['awardconfig']['picsize']??'80'}px;
-    {if $rotate['awardconfig']['open']=='2'}
-		display:none;
-	{/if}
-}
-.back .prizename{
-	width: 100%;
-    padding: 0 20px;
-    text-align: center;
-    box-sizing: border-box;
-	font-size: {$rotate['awardconfig']['size']??'20'}px;
-    margin-top: {$rotate['awardconfig']['margintop']??'20'}px;
-    color: {$rotate['awardconfig']['color']??'#ff9800'};
-    {if $rotate['awardconfig']['open']=='2'}
-		display:none;
-	{/if}
-}
-.hbwall-box .hbwall-item .xuhao{
-	text-align: center;
-	{if $rotate['openmode']=='1'}
-	    color: {$rotate['numberconfig']['color']??'#ff9800'};
-	    font-size: {$rotate['numberconfig']['size']??'20'}px;
-	    {if $rotate['numberconfig']['open']=='2'}
-    		display:none;
-    	{/if}
-	{else /}
-		color: {$rotate['joinconfig']['color']??'#ff9800'};
-	    font-size: {$rotate['joinconfig']['size']??'20'}px;
-	    {if $rotate['joinconfig']['open']=='2'}
-    		display:none;
-    	{/if}
-	{/if}
-    font-weight: 600;
-}
-.popbox{
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	background-color: rgba(0,0,0,0.42);
-}
-.popbox.hidden{display: none}
-.popbox .lightbox{
-	position: relative;
-	-webkit-perspective: 1000;
-    perspective: 1000;
-   -webkit-transform-style: preserve-3d;
-    transform-style: preserve-3d;
-}
-.popbox .lightbox.small{
-	position: absolute;
-}
-.popbox .lightbox:before {
-    content: " ";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-image: url("{:tomedia($pcconfig['styleconfig']['lightimg'])}");
-    animation: foreverrotate 20s linear infinite;
-    z-index: -1;
-}
-@keyframes foreverrotate {
-    0% {
-        transform: rotate(0)
-    }
 
-    to {
-        transform: rotate(-1turn)
-    }
+.hbwall-box .hbwall-item .back .win-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: linear-gradient(135deg, #ffd700, #ff9800);
+  color: #5c3800;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
-.popbox .lightbox .back{
-	position: relative;
+
+.back .prizetitle {
+  color: {$rotate['backtitleconfig']['color']??'#ff9800'};
+  font-size: {$rotate['backtitleconfig']['size']??'16'}px;
+  margin-bottom: {$rotate['backtitleconfig']['marginbottom']??'10'}px;
+  font-weight: 700;
+  {if $rotate['backtitleconfig']['open']=='2'}
+    display: none;
+  {/if}
 }
-.popbox .lightbox .closebtn{
-	position: absolute;
-	bottom: -30px;
-	color: #fff;
-	font-size: 20px;
-	cursor: pointer;
+.back .prizeimg {
+  width: {$rotate['awardconfig']['picsize']??'70'}px;
+  height: {$rotate['awardconfig']['picsize']??'70'}px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+  {if $rotate['awardconfig']['open']=='2'}
+    display: none;
+  {/if}
 }
-.popbox .lightbox.small .closebtn{display: none}
+.back .prizename {
+  width: 100%;
+  padding: 0 10px;
+  text-align: center;
+  box-sizing: border-box;
+  font-size: {$rotate['awardconfig']['size']??'16'}px;
+  margin-top: {$rotate['awardconfig']['margintop']??'10'}px;
+  color: {$rotate['awardconfig']['color']??'#ffffff'};
+  font-weight: 700;
+  {if $rotate['awardconfig']['open']=='2'}
+    display: none;
+  {/if}
+}
+
+.hbwall-box .hbwall-item .xuhao {
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  z-index: 5;
+  width: min(44%, 70px);
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  border: 0;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-sizing: border-box;
+  background-image: url('/static/images/screen/hbwall-theme-v2/packet/number.png');
+  background-position: center;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  filter: drop-shadow(0 3px 4px rgba(58, 0, 0, 0.48));
+  font-family: "Arial Narrow", Arial, "Helvetica Neue", "Microsoft YaHei", sans-serif;
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings: "tnum" 1, "lnum" 1;
+  font-synthesis: none;
+  text-rendering: geometricPrecision;
+  -webkit-font-smoothing: antialiased;
+  text-align: center;
+  line-height: 1;
+  text-shadow: 0 2px 3px rgba(66, 0, 0, 0.76);
+  font-weight: 900;
+  {if $rotate['openmode']=='1'}
+    color: {$rotate['numberconfig']['color']??'#ffd700'};
+    font-size: {$rotate['numberconfig']['size']??'16'}px;
+    {if $rotate['numberconfig']['open']=='2'}
+      display: none;
+    {/if}
+  {else /}
+    color: {$rotate['joinconfig']['color']??'#ffd700'};
+    font-size: {$rotate['joinconfig']['size']??'16'}px;
+    {if $rotate['joinconfig']['open']=='2'}
+      display: none;
+    {/if}
+  {/if}
+}
+.hbwall-box .hbwall-item .xuhao .xuhao-number {
+  min-width: 2ch;
+  height: 1em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font: inherit;
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings: "tnum" 1, "lnum" 1;
+  line-height: 1;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+.hbwall-box .hbwall-item.hasopen .xuhao {
+  display: none;
+}
+
+/* --------------------------------------------------------------------------
+   中奖弹窗：绝对定位在统一缩放的大屏画布内，避免混用浏览器 viewport 坐标。
+   -------------------------------------------------------------------------- */
+.hbwall-modal-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 32px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.hbwall-modal-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.hbwall-modal-card {
+  --hb-pop-scale: 1;
+  width: 520px;
+  height: 395px;
+  background: url('/static/images/screen/hbwall-theme-v2/modal/bg.png') center/100% 100% no-repeat;
+  border: none;
+  border-radius: 24px;
+  padding: 40px 30px;
+  box-sizing: border-box;
+  text-align: center;
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.7), 0 0 40px rgba(255, 215, 0, 0.2);
+  transform: scale(calc(var(--hb-pop-scale) * 0.85));
+  transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+}
+.hbwall-modal-overlay.active .hbwall-modal-card {
+  transform: scale(var(--hb-pop-scale));
+}
+
+.hbwall-modal-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+.hbwall-modal-glow {
+  background: url('/static/images/screen/hbwall-theme-v2/modal/glow.png') center/cover no-repeat;
+  mix-blend-mode: screen;
+}
+.hbwall-modal-particles {
+  background: url('/static/images/screen/hbwall-theme-v2/modal/particle.png') center/cover no-repeat;
+}
+.hbwall-modal-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.hbwall-modal-header {
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: #fff;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+}
+.hbwall-modal-header__ornament {
+  color: #f8cb75;
+  font-size: 25px;
+  line-height: 1;
+  text-shadow: 0 0 12px rgba(255, 194, 79, 0.45);
+}
+.hbwall-modal-header__ornament:last-child {
+  transform: scaleX(-1);
+}
+.hbwall-modal-img-wrap {
+  width: 160px;
+  height: 160px;
+  margin: 0 auto 16px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.hbwall-modal-prize-img {
+  max-width: 140px;
+  max-height: 140px;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
+}
+.hbwall-modal-prize-title {
+  font-size: 16px;
+  color: #ffd700;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.hbwall-modal-prize-name {
+  font-size: 24px;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 12px 0;
+}
+.hbwall-modal-hb-no {
+  display: inline-block;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 16px;
+}
+.hbwall-modal-close-x {
+  position: absolute;
+  top: 28px;
+  right: 42px;
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 30px;
+  font-weight: 300;
+  line-height: 32px;
+  text-align: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: color 0.2s ease;
+  padding: 0;
+}
+.hbwall-modal-close-x:hover {
+  color: #fff;
+}
+
+/* --------------------------------------------------------------------------
+   中奖记录抽屉 (Winning History Drawer)
+   -------------------------------------------------------------------------- */
+.hbwall-history {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 380px;
+  height: 100vh;
+  background: rgba(18, 5, 10, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-left: 1px solid rgba(255, 215, 0, 0.2);
+  z-index: 900;
+  transform: translateX(100%);
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: -10px 0 40px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+}
+.hbwall-history.active {
+  transform: translateX(0);
+}
+
+.hbwall-history__inner {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 30px 20px;
+  box-sizing: border-box;
+}
+.hbwall-history__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 20px;
+}
+.hbwall-history__title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #ffd700;
+}
+.hbwall-history__close {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: #fff;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 16px;
+  cursor: pointer;
+}
+.hbwall-history__list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.hbwall-history-item {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.hbwall-history-item .h-no {
+  background: rgba(255, 215, 0, 0.2);
+  color: #ffd700;
+  font-weight: 800;
+  font-size: 13px;
+  padding: 4px 8px;
+  border-radius: 8px;
+}
+.hbwall-history-item .h-img {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+}
+.hbwall-history-item .h-info {
+  flex: 1;
+}
+.hbwall-history-item .h-title {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+}
+.hbwall-history-item .h-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+}
+.hbwall-history-empty {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.4);
+  margin-top: 60px;
+  font-size: 14px;
+}
 </style>
-<section class="hbwall-mainbox normal-box">
-	<div class="hbwall-container zam-app-flex-ajCenter">
-		<div class="hbwall-box">
-			{foreach $rotate['prizes'] as $pk=>$p}
-			<div class="hbwall-item hb{$p['id']}{if $p['opened']=='1'} hasopen{/if}" data-hbid="{$p['id']}">
-				<div class="frontback">
-					<div class="stars"></div>
-					<div class="front zam-app-flex-ajCenter{if $p['opened']=='1'} noanimation{/if}" {if $p['prizediy']=='1' && !empty($p['prizefrontbg'])}style="background-image: url({:tomedia($p['prizefrontbg'])});"{/if}>
-						<div class="front-name">{$p['prizetitle']}</div>
-					</div>
-					<div class="back zam-app-flex-ajCenter" {if $p['prizediy']=='1' && !empty($p['prizebackbg'])}style="background-image: url({:tomedia($p['prizebackbg'])});"{/if}>
-						<div class="prizetitle">{$p['prizetitle']}</div>
-						<img class="prizeimg" src="{:tomedia($p['prizeimg'])}">
-						<div class="prizename">{$p['prizename']}</div>
-					</div>
-				</div>
-				<div class="xuhao">
-					{if $rotate['openmode']=='1'}
-						{$rotate['numberconfig']['prevtxt']}{$pk+1}
-					{else /}
-						<span>0</span>人
-					{/if}
-				</div>
-			</div>
-			{/foreach}
-		</div>
-	</div>
-	<div class="emptybox zam-app-flex-ajCenter display-none">
-	    <img src="/{:SIMGURL}common/empty.png">
-	    <p style="padding:20px;">暂无可用轮次，请到后台添加</p>
-	</div>
+
+<!-- 顶部活动 Header -->
+<div class="hbwall-topbar">
+  <div class="hbwall-topbar__title">
+    <span>{$pcconfig['title']??'幸运红包墙'}</span>
+  </div>
+  <div class="hbwall-topbar__actions">
+    <button class="hbwall-history-toggle" id="hbHistoryToggle" type="button" aria-expanded="false">
+      <i class="mxc-trophy"></i> 中奖记录
+    </button>
+  </div>
+</div>
+
+<section class="hbwall-mainbox normal-box hbwall-v2">
+  <div class="hbwall-layout">
+    <!-- 左侧礼品展示区 (严格 20% 比例) -->
+    <aside class="hbwall-gifts">
+      <div class="hbwall-gifts__header">
+        <span>本轮礼品</span>
+      </div>
+      <div class="hbwall-gifts__container" id="hbwallGiftsList">
+        <!-- 由 JS 根据 $rotate['prizes'] 动态安全聚合渲染 -->
+      </div>
+    </aside>
+
+    <!-- 右侧红包墙舞台 (约 80%) -->
+    <main class="hbwall-stage">
+      <div class="hbwall-stage__viewport" id="hbStageViewport">
+        <div class="hbwall-scale-canvas" id="hbwallScaleCanvas">
+          <div class="hbwall-box" id="hbwallBox">
+            {foreach $rotate['prizes'] as $pk=>$p}
+            <div class="hbwall-item hb{$p['id']}{if $p['opened']=='1'} hasopen{/if}"
+                 data-hbid="{$p['id']}"
+                 data-packet-index="{$pk+1}"
+                 data-displayorder="{$p['displayorder']}"
+                 data-prizeid="{$p['source_prize_id']??''}"
+                 data-prizename="{$p['prizename']}"
+                 data-prizetitle="{$p['prizetitle']}"
+                 data-prizeimg="{:tomedia($p['prizeimg'])}"
+                 data-xuhao="{if $rotate['openmode']=='1'}{$rotate['numberconfig']['prevtxt']}{:sprintf('%02d',$pk+1)}{else /}0人{/if}">
+              <div class="frontback">
+                <div class="stars"></div>
+                <div class="front zam-app-flex-ajCenter{if $p['opened']=='1'} noanimation{/if}" {if $p['prizediy']=='1' && !empty($p['prizefrontbg'])}style="background-image: url({:tomedia($p['prizefrontbg'])});"{/if}>
+                  <div class="front-name">{$p['prizetitle']}</div>
+                </div>
+                <div class="back zam-app-flex-ajCenter" {if $p['prizediy']=='1' && !empty($p['prizebackbg'])}style="background-image: url({:tomedia($p['prizebackbg'])});"{/if}>
+                  <div class="win-badge">已中奖</div>
+                  <img class="prizeimg" src="{:tomedia($p['prizeimg'])}">
+                  <div class="prizename">{$p['prizename']}</div>
+                </div>
+              </div>
+                <div class="xuhao">
+                {if $rotate['openmode']=='1'}
+                  <span class="xuhao-number">{$rotate['numberconfig']['prevtxt']}{:sprintf('%02d',$pk+1)}</span>
+                {else /}
+                  <span class="xuhao-number">0</span>人
+                {/if}
+              </div>
+            </div>
+            {/foreach}
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="emptybox zam-app-flex-ajCenter display-none">
+      <img src="/{:SIMGURL}common/empty.png">
+      <p style="padding:20px;">暂无可用轮次，请到后台添加</p>
+  </div>
+
+    <!-- 位于 .hbwall-mainbox 内，随公共大屏统一缩放。 -->
+  <div class="hbwall-modal-overlay" id="hbwallModalOverlay">
+    <div class="hbwall-modal-card" id="hbwallModalCard">
+      <button class="hbwall-modal-close-x" id="hbModalCloseBtn" type="button" aria-label="关闭中奖弹窗">×</button>
+      <div class="hbwall-modal-layer hbwall-modal-glow"></div>
+      <div class="hbwall-modal-layer hbwall-modal-particles"></div>
+      <div class="hbwall-modal-content">
+        <div class="hbwall-modal-header"><span class="hbwall-modal-header__ornament" aria-hidden="true">❧</span><span>恭喜中奖</span><span class="hbwall-modal-header__ornament" aria-hidden="true">❧</span></div>
+        <div class="hbwall-modal-img-wrap">
+          <img class="hbwall-modal-prize-img" id="hbModalPrizeImg" alt="奖品图片">
+        </div>
+        <div class="hbwall-modal-prize-title" id="hbModalPrizeTitle"></div>
+        <div class="hbwall-modal-prize-name" id="hbModalPrizeName"></div>
+        <div class="hbwall-modal-hb-no" id="hbModalHbNo"></div>
+      </div>
+    </div>
+  </div>
 </section>
-<section class="popbox zam-app-flex-ajCenter hidden">
-	<div class="lightbox zam-app-flex-ajCenter"></div>
-</section>
+
+<!-- 中奖记录抽屉 Drawer -->
+<aside class="hbwall-history" id="hbwallHistory" aria-hidden="true">
+  <div class="hbwall-history__inner">
+    <div class="hbwall-history__header">
+      <span class="hbwall-history__title">中奖记录</span>
+      <button class="hbwall-history__close" id="hbHistoryClose" type="button">✕</button>
+    </div>
+    <div class="hbwall-history__list" id="hbHistoryList">
+      <div class="hbwall-history-empty">暂无中奖记录</div>
+    </div>
+  </div>
+</aside>
+
 <script>
 require(['screenhbwall'],function(screenhbwall){
-	screenhbwall.init({
-		rotateid:"{$rotate['id']??'0'}",
-		mode:"{$rotate['openmode']??'1'}",
-		needpop:"{$rotate['awardconfig']['needpop']??'2'}",
-		popscale:parseFloat("{$rotate['awardconfig']['scale']??'1.4'}"),
-		speakText:"{$rotate['speaktext']??'2'}",
-	});
+  screenhbwall.init({
+    rotateid:"{$rotate['id']??'0'}",
+    mode:"{$rotate['openmode']??'1'}",
+    needpop:"{$rotate['awardconfig']['needpop']??'2'}",
+    popscale:parseFloat("{$rotate['awardconfig']['scale']??'1.4'}"),
+    speakText:"{$rotate['speaktext']??'2'}",
+    colnum: parseInt("{$rotate['hboneconfig']['colnum']??'1'}"),
+    itemWidth: parseInt("{$rotate['hboneconfig']['width']??'140'}"),
+    itemHeight: parseInt("{$rotate['hboneconfig']['height']??'193'}"),
+    rowGap: parseInt("{$rotate['hboneconfig']['rowgap']??'20'}"),
+    colGap: parseInt("{$rotate['hboneconfig']['colgap']??'20'}")
+  });
 })
 </script>
 {include file="common/footer" /}

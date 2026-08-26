@@ -822,6 +822,15 @@
 }
 </style>
 {if !empty($pcconfig['style']['diycss'])}<style>{$pcconfig['style']['diycss']}</style>{/if}
+{if isset($pcconfig['style']['stylename']) && $pcconfig['style']['stylename'] == '星环头像抽奖'}
+<link rel="stylesheet" href="__STATIC__/css/screencss/screenlottery-halo.css?v=202608071726">
+<script>
+(function () {
+	var themeRoot = document.querySelector('.main-box');
+	if (themeRoot) themeRoot.classList.add('lottery-halo-theme');
+})();
+</script>
+{/if}
 {if isset($pcconfig['styleconfig']['lotterymusic'])}
 	{if !empty($pcconfig['styleconfig']['lotterymusic'])}
 	<audio id="cjing" src="{:tomedia($pcconfig['styleconfig']['lotterymusic'])}"  preload="preload"  style="display:none"></audio>

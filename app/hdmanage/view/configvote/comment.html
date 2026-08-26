@@ -1,4 +1,5 @@
 {include file='$Wpath/common/header'}
+<script type="text/javascript" src="__STATIC__/js/vote-media.js"></script>
 <div class="form-inline zam-inline-searchbar">
     <div class="form-group m-l-5">
       <div class="input-group input-group-sm">
@@ -49,6 +50,11 @@ var searchParamas = [{'type':'2','id':'rotateid'},{'type':'2','id':'voteid'},{'t
 var initConfig = {
     tableId:'#listtable',
     url:"{:gohdmanage('configvote/comment',['hdid'=>$hdid])}",
+    onload:function(){
+        if(window.voteMedia){
+            window.voteMedia.renderAll($('#listtable'));
+        }
+    },
     columnoperate:{
         btns:{
             del:true,
@@ -99,7 +105,7 @@ var initConfig = {
             formatter:function(value,row,index){
                 var html = `
                 <div class='zam-flex-column-center'>
-                    <img src="${row.voteimg}" class="avatarImg" />
+                    <div class="avatarImg vote-media" data-vote-media="${row.voteimg}"></div>
                     <span>${value||'已删除'}</span>
                 </div>
                 `;
