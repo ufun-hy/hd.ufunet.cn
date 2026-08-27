@@ -4,7 +4,7 @@
 * @Last Modified by:   赞木
 * @Last Modified time: 2023-06-02 20:14:20
 */
-define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'anime', 'threejs2', 'tweenjs', 'screenjs/screenimportcj-halo', 'screenjs/screenimportcj-danmaku', 'screenjs/screenimportcj-prize', 'snabbt'], function (screencore, layerBox, template, keyboardJS, anime, THREE, TWEEN, screenimportcjHalo, screenimportcjDanmaku, screenimportcjPrize) {
+define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'anime', 'threejs2', 'tweenjs', 'screenjs/screenimportcj-halo', 'screenjs/screenimportcj-danmaku', 'screenjs/screenimportcj-prize', 'screenjs/screenimportcj-stage-ui', 'snabbt'], function (screencore, layerBox, template, keyboardJS, anime, THREE, TWEEN, screenimportcjHalo, screenimportcjDanmaku, screenimportcjPrize, screenimportcjStageUi) {
 	THREE.CSS3DObject = function (element) { THREE.Object3D.call(this); this.element = element; this.element.style.position = "absolute"; this.addEventListener("removed", function () { if (this.element.parentNode !== null) { this.element.parentNode.removeChild(this.element) } }) }; THREE.CSS3DObject.prototype = Object.create(THREE.Object3D.prototype); THREE.CSS3DObject.prototype.constructor = THREE.CSS3DObject; THREE.CSS3DSprite = function (element) { THREE.CSS3DObject.call(this, element) }; THREE.CSS3DSprite.prototype = Object.create(THREE.CSS3DObject.prototype); THREE.CSS3DSprite.prototype.constructor = THREE.CSS3DSprite; THREE.CSS3DRenderer = function () { console.log("THREE.CSS3DRenderer", THREE.REVISION); var _width, _height; var _widthHalf, _heightHalf; var matrix = new THREE.Matrix4(); var cache = { camera: { fov: 0, style: "" }, objects: {} }; var domElement = document.createElement("div"); domElement.style.overflow = "hidden"; this.domElement = domElement; var cameraElement = document.createElement("div"); cameraElement.style.WebkitTransformStyle = "preserve-3d"; cameraElement.style.MozTransformStyle = "preserve-3d"; cameraElement.style.transformStyle = "preserve-3d"; domElement.appendChild(cameraElement); var isIE = /Trident/i.test(navigator.userAgent); this.setClearColor = function () { }; this.getSize = function () { return { width: _width, height: _height } }; this.setSize = function (width, height) { _width = width; _height = height; _widthHalf = _width / 2; _heightHalf = _height / 2; domElement.style.width = width + "px"; domElement.style.height = height + "px"; cameraElement.style.width = width + "px"; cameraElement.style.height = height + "px" }; function epsilon(value) { return Math.abs(value) < 1e-10 ? 0 : value } function getCameraCSSMatrix(matrix) { var elements = matrix.elements; return "matrix3d(" + epsilon(elements[0]) + "," + epsilon(-elements[1]) + "," + epsilon(elements[2]) + "," + epsilon(elements[3]) + "," + epsilon(elements[4]) + "," + epsilon(-elements[5]) + "," + epsilon(elements[6]) + "," + epsilon(elements[7]) + "," + epsilon(elements[8]) + "," + epsilon(-elements[9]) + "," + epsilon(elements[10]) + "," + epsilon(elements[11]) + "," + epsilon(elements[12]) + "," + epsilon(-elements[13]) + "," + epsilon(elements[14]) + "," + epsilon(elements[15]) + ")" } function getObjectCSSMatrix(matrix, cameraCSSMatrix) { var elements = matrix.elements; var matrix3d = "matrix3d(" + epsilon(elements[0]) + "," + epsilon(elements[1]) + "," + epsilon(elements[2]) + "," + epsilon(elements[3]) + "," + epsilon(-elements[4]) + "," + epsilon(-elements[5]) + "," + epsilon(-elements[6]) + "," + epsilon(-elements[7]) + "," + epsilon(elements[8]) + "," + epsilon(elements[9]) + "," + epsilon(elements[10]) + "," + epsilon(elements[11]) + "," + epsilon(elements[12]) + "," + epsilon(elements[13]) + "," + epsilon(elements[14]) + "," + epsilon(elements[15]) + ")"; if (isIE) { return "translate(-50%,-50%)" + "translate(" + _widthHalf + "px," + _heightHalf + "px)" + cameraCSSMatrix + matrix3d } return "translate(-50%,-50%)" + matrix3d } function renderObject(object, camera, cameraCSSMatrix) { if (object instanceof THREE.CSS3DObject) { var style; if (object instanceof THREE.CSS3DSprite) { matrix.copy(camera.matrixWorldInverse); matrix.transpose(); matrix.copyPosition(object.matrixWorld); matrix.scale(object.scale); matrix.elements[3] = 0; matrix.elements[7] = 0; matrix.elements[11] = 0; matrix.elements[15] = 1; style = getObjectCSSMatrix(matrix, cameraCSSMatrix) } else { style = getObjectCSSMatrix(object.matrixWorld, cameraCSSMatrix) } var element = object.element; var cachedStyle = cache.objects[object.id] && cache.objects[object.id].style; if (cachedStyle === undefined || cachedStyle !== style) { element.style.WebkitTransform = style; element.style.MozTransform = style; element.style.transform = style; cache.objects[object.id] = { style: style }; if (isIE) { cache.objects[object.id].distanceToCameraSquared = getDistanceToSquared(camera, object) } } if (element.parentNode !== cameraElement) { cameraElement.appendChild(element) } } for (var i = 0, l = object.children.length; i < l; i++) { renderObject(object.children[i], camera, cameraCSSMatrix) } } var getDistanceToSquared = function () { var a = new THREE.Vector3(); var b = new THREE.Vector3(); return function (object1, object2) { a.setFromMatrixPosition(object1.matrixWorld); b.setFromMatrixPosition(object2.matrixWorld); return a.distanceToSquared(b) } }(); function zOrder(scene) { var order = Object.keys(cache.objects).sort(function (a, b) { return cache.objects[a].distanceToCameraSquared - cache.objects[b].distanceToCameraSquared }); var zMax = order.length; scene.traverse(function (object) { var index = order.indexOf(object.id + ""); if (index !== -1) { object.element.style.zIndex = zMax - index } }) } this.render = function (scene, camera) { var fov = camera.projectionMatrix.elements[5] * _heightHalf; if (cache.camera.fov !== fov) { domElement.style.WebkitPerspective = fov + "px"; domElement.style.MozPerspective = fov + "px"; domElement.style.perspective = fov + "px"; cache.camera.fov = fov } scene.updateMatrixWorld(); if (camera.parent === null) { camera.updateMatrixWorld() } var cameraCSSMatrix = "translateZ(" + fov + "px)" + getCameraCSSMatrix(camera.matrixWorldInverse); var style = cameraCSSMatrix + "translate(" + _widthHalf + "px," + _heightHalf + "px)"; if (cache.camera.style !== style && !isIE) { cameraElement.style.WebkitTransform = style; cameraElement.style.MozTransform = style; cameraElement.style.transform = style; cache.camera.style = style } renderObject(scene, camera, cameraCSSMatrix); if (isIE) { zOrder(scene) } } };
 	var screenimportcj = {
 		datas: [],
@@ -25,6 +25,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 		haloStage: null,
 		danmakuStage: null,
 		unifiedPrize: null,
+		stageUi: null,
 		unifiedRoundItems: [],
 		danmakuPrizeStats: null,
 		danmakuVisualState: 'ready',
@@ -53,6 +54,39 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 			if (this.unifiedPrize) this.unifiedPrize.destroy();
 			this.unifiedPrize = null;
 		},
+		mountStageUi: function () {
+			var self = this;
+			if (!screenimportcjStageUi) return;
+			self.stageUi = screenimportcjStageUi.create({
+				root: document.querySelector('.importcj-mainbox'),
+				speedEnabled: self.flytype == '6',
+				speedPreset: self.getDanmakuSpeedPreset(),
+				callbacks: {
+					onPrimaryAction: function () {
+						if (self.isstart == '1' || self.isstart == '2' || self.isstart == '3') $('.btn-start').trigger('click');
+					},
+					onRecords: function () { $('.btn-showalllucker').trigger('click'); },
+					onRecordsClose: function () { self.closeDanmakuRecords(); },
+					onRecordsRetry: function () {
+						if (self.isstart == '4') {
+							self.openDanmakuRecords(true);
+							return true;
+						}
+					},
+					onSpeedChange: function (preset) {
+						try { window.localStorage.setItem(self.getDanmakuSpeedStorageKey(), preset); } catch (e) {}
+						if (self.danmakuStage) self.danmakuStage.setSpeedPreset(preset);
+					}
+				}
+			});
+			self.stageUi.mount();
+			self.syncDanmakuControls();
+			self.bindDanmakuFooterOffset();
+		},
+		destroyStageUi: function () {
+			if (this.stageUi) this.stageUi.destroy();
+			this.stageUi = null;
+		},
 		invalidateDanmakuRecords: function () {
 			this.danmakuRecordsRequestId++;
 			this.danmakuRecordsPrizeId = null;
@@ -61,21 +95,21 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 			var self = this;
 			if (total === undefined || total === null || used === undefined || used === null) {
 				self.danmakuPrizeStats = null;
-				if (self.unifiedPrize || self.danmakuStage) self.syncDanmakuControls();
+				if (self.unifiedPrize || self.stageUi || self.danmakuStage) self.syncDanmakuControls();
 				return;
 			}
 			var totalStr = String(total).replace(/^\s+|\s+$/g, '');
 			var usedStr = String(used).replace(/^\s+|\s+$/g, '');
 			if (totalStr === '' || usedStr === '') {
 				self.danmakuPrizeStats = null;
-				if (self.unifiedPrize || self.danmakuStage) self.syncDanmakuControls();
+				if (self.unifiedPrize || self.stageUi || self.danmakuStage) self.syncDanmakuControls();
 				return;
 			}
 			var totalNum = Number(totalStr);
 			var usedNum = Number(usedStr);
 			if (isNaN(totalNum) || isNaN(usedNum) || !isFinite(totalNum) || !isFinite(usedNum)) {
 				self.danmakuPrizeStats = null;
-				if (self.unifiedPrize || self.danmakuStage) self.syncDanmakuControls();
+				if (self.unifiedPrize || self.stageUi || self.danmakuStage) self.syncDanmakuControls();
 				return;
 			}
 			var remaining = Math.max(totalNum - usedNum, 0);
@@ -84,7 +118,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 				used: usedNum,
 				remaining: remaining
 			};
-			if (self.unifiedPrize || self.danmakuStage) self.syncDanmakuControls();
+			if (self.unifiedPrize || self.stageUi || self.danmakuStage) self.syncDanmakuControls();
 		},
 		getDanmakuSpeedStorageKey: function () {
 			return 'importcj:danmaku-speed:' + ((typeof XCV3Config != 'undefined' && XCV3Config.hdid) || 'default');
@@ -138,7 +172,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 				maxDrawCount: available === null ? 999 : Math.max(1, available),
 				canStart: canStart,
 				primaryEnabled: canStart || self.getDanmakuVisualState() == 'drawing' || self.getDanmakuVisualState() == 'result',
-				primaryText: self.getDanmakuVisualState() == 'drawing' ? '停止抽奖' : (self.getDanmakuVisualState() == 'result' ? '关闭结果' : (self.getDanmakuVisualState() == 'records' ? '记录查看中' : '开始抽奖')),
+				primaryText: self.getDanmakuVisualState() == 'drawing' ? '停止抽奖' : (self.getDanmakuVisualState() == 'result' ? '关闭结果' : (self.getDanmakuVisualState() == 'records' ? '记录查看中' : (self.getDanmakuVisualState() == 'requesting' ? '正在准备...' : (self.getDanmakuVisualState() == 'starting' ? '抽奖启动中...' : '开始抽奖')))),
 				speedPreset: self.getDanmakuSpeedPreset()
 			};
 		},
@@ -146,6 +180,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 			var self = this;
 			var snapshot = self.getDanmakuControlSnapshot();
 			if (self.unifiedPrize) self.unifiedPrize.update(snapshot);
+			if (self.stageUi) self.stageUi.update(snapshot);
 			if (self.flytype == '6' && self.danmakuStage) self.danmakuStage.updateControls(snapshot);
 		},
 		setDanmakuDrawCount: function (value) {
@@ -171,8 +206,9 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 		},
 		bindDanmakuFooterOffset: function () {
 			var self = this;
-			if (self.flytype != '6' || !self.danmakuStage) return;
-			var root = document.querySelector('.importcj-mainbox.flybox6');
+			if (!self.stageUi && (self.flytype != '6' || !self.danmakuStage)) return;
+			self.unbindDanmakuFooterOffset();
+			var root = document.querySelector('.importcj-mainbox');
 			var footer = null;
 			try { footer = screencore.getdom('.footer-controlBox'); } catch (e) {}
 			var footerElement = footer && footer.length ? footer[0] : null;
@@ -251,6 +287,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 				if (typeof window !== 'undefined' && window.addEventListener) {
 					window.addEventListener('pagehide', function () {
 						self.destroyUnifiedPrize();
+						self.destroyStageUi();
 						self.unbindDanmakuFooterOffset();
 						if (self.danmakuStage) self.danmakuStage.destroy();
 					});
@@ -270,25 +307,10 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 						prize: self.getDanmakuPrize(),
 						onceout: $('.select-box .onceout').val() || 1,
 						speedPreset: self.getDanmakuSpeedPreset(),
-						callbacks: {
-							onPrizePrev: function () { self.invalidateDanmakuRecords(); $('.importcj-footer .prev-prize').trigger('click'); },
-							onPrizeNext: function () { self.invalidateDanmakuRecords(); $('.importcj-footer .next-prize').trigger('click'); },
-							onPrizeSelect: function (prize, index) { self.selectDanmakuPrize(index); },
-							onDrawCountChange: function (value) { self.setDanmakuDrawCount(value); },
-							onPrimaryAction: function () {
-								if (self.isstart == '1' || self.isstart == '2' || self.isstart == '3') $('.btn-start').trigger('click');
-							},
-							onRecords: function () { $('.btn-showalllucker').trigger('click'); },
-							onRecordsClose: function () { self.closeDanmakuRecords(); },
-							onRecordsRetry: function () { if (self.isstart == '4') { self.openDanmakuRecords(true); return true; } },
-							onSpeedChange: function (preset) {
-								try { window.localStorage.setItem(self.getDanmakuSpeedStorageKey(), preset); } catch (e) {}
-							}
-						}
+						callbacks: {}
 					});
 					self.danmakuStage.mount(self.getDanmakuCandidates());
 					self.danmakuStage.updateControls(self.getDanmakuControlSnapshot());
-					self.bindDanmakuFooterOffset();
 				} else if (self.flytype > 1) {
 					$("body").append('<ul class="importcj-wall hidden"></ul>');
 					if (self.flytype == '2') {
@@ -298,6 +320,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 					}
 				}
 				self.mountUnifiedPrize(config);
+				self.mountStageUi();
 			});
 		},
 		initdata: function (fn) {
@@ -345,7 +368,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 			if (self.flytype == '6' && self.danmakuStage) {
 				self.danmakuStage.updatePrize(self.getDanmakuPrize());
 			}
-			if (self.unifiedPrize || self.danmakuStage) self.syncDanmakuControls();
+			if (self.unifiedPrize || self.stageUi || self.danmakuStage) self.syncDanmakuControls();
 			$(".importcj-lists").removeClass('hidden');
 			if (!isfirst) {
 				self.initprizedatas(prizeOne.id);
@@ -367,7 +390,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 			if (self.flytype == '6' && self.danmakuStage) {
 				self.danmakuStage.updatePrize(self.getDanmakuPrize());
 			}
-			if (self.unifiedPrize || self.danmakuStage) self.syncDanmakuControls();
+			if (self.unifiedPrize || self.stageUi || self.danmakuStage) self.syncDanmakuControls();
 			$(".importcj-lists").removeClass('hidden');
 			if (!isfirst) {
 				self.initprizedatas(roundOne.id);
@@ -897,7 +920,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 						if (self.flytype == '6' && self.danmakuStage) {
 							self.danmakuStage.updatePrize(self.getDanmakuPrize());
 						}
-						if (self.unifiedPrize || self.danmakuStage) self.syncDanmakuControls();
+						if (self.unifiedPrize || self.stageUi || self.danmakuStage) self.syncDanmakuControls();
 				} else {
 					layerBox.showMsg(json.msg);
 				}
@@ -955,7 +978,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 					if (self.flytype == '6' && self.danmakuStage) {
 						self.danmakuStage.updatePrize(self.getDanmakuPrize());
 					}
-					if (self.unifiedPrize || self.danmakuStage) self.syncDanmakuControls();
+					if (self.unifiedPrize || self.stageUi || self.danmakuStage) self.syncDanmakuControls();
 				} else {
 					layerBox.showMsg(json.msg);
 				}
@@ -1013,37 +1036,38 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 		},
 		openDanmakuRecords: function (retry) {
 			var self = this;
-			if (self.flytype != '6' || !self.danmakuStage || (self.isstart != '1' && self.isstart != '4')) return false;
+			var recordsView = self.stageUi || (self.flytype == '6' ? self.danmakuStage : null);
+			if (!recordsView || (self.isstart != '1' && self.isstart != '4')) return false;
 			var id = self.prizeInfo[self.prizeIndex] && self.prizeInfo[self.prizeIndex].id;
 			var requestedPrizeIndex = self.prizeIndex;
 			var requestId = ++self.danmakuRecordsRequestId;
 			self.danmakuRecordsPrizeId = id;
 			if (self.isstart == '1') self.isstart = '4';
 			self.setDanmakuVisualState('records');
-			self.danmakuStage.setRecords(null, 'loading');
+			recordsView.setRecords(null, 'loading');
 			var ajaxdata = { isroundcj: isroundcj };
 			if (isroundcj == '1') ajaxdata.roundid = id;
 			else ajaxdata.prizeid = id;
 			screencore.ajaxSubmit('/screen/importcj/ajaxlucker', ajaxdata, '正在加载中奖记录..').then(function (json) {
 				if (requestId != self.danmakuRecordsRequestId || self.isstart != '4' || self.prizeIndex != requestedPrizeIndex) return;
 				if (json.code == 0) {
-					self.danmakuStage.setRecords(json.msg || [], 'ready');
+					recordsView.setRecords(json.msg || [], 'ready');
 					self.syncDanmakuControls();
 				} else {
-					self.danmakuStage.setRecords(json.msg || '中奖记录加载失败', 'error');
+					recordsView.setRecords(json.msg || '中奖记录加载失败', 'error');
 					self.syncDanmakuControls();
 				}
 			}, function () {
 				if (requestId != self.danmakuRecordsRequestId || self.isstart != '4' || self.prizeIndex != requestedPrizeIndex) return;
-				self.danmakuStage.setRecords('网络异常，请重试', 'error');
+				recordsView.setRecords('网络异常，请重试', 'error');
 				self.syncDanmakuControls();
 			});
 			return true;
 		},
 		closeDanmakuRecords: function () {
 			var self = this;
-			var recordsActive = self.isstart == '4' || self.danmakuVisualState == 'records' || (self.danmakuStage && self.danmakuStage.state == 'records');
-			if (self.flytype != '6' || !recordsActive) return false;
+			var recordsActive = self.isstart == '4' || self.danmakuVisualState == 'records' || (self.stageUi && self.stageUi.state == 'records') || (self.danmakuStage && self.danmakuStage.state == 'records');
+			if (!recordsActive) return false;
 			self.invalidateDanmakuRecords();
 			$('.btn-close').trigger('click');
 			return true;
@@ -1082,7 +1106,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 					if (self.flytype == '6' && self.danmakuStage) {
 						self.danmakuStage.updateCandidates(self.getDanmakuCandidates());
 					}
-					if (self.unifiedPrize || self.danmakuStage) self.syncDanmakuControls();
+					if (self.unifiedPrize || self.stageUi || self.danmakuStage) self.syncDanmakuControls();
 				} else {
 					layerBox.showMsg(json.msg);
 				}
@@ -1104,7 +1128,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 							if (self.flytype == '6' && self.danmakuStage) {
 								self.danmakuStage.updateCandidates(self.getDanmakuCandidates());
 							}
-							if (self.unifiedPrize || self.danmakuStage) self.syncDanmakuControls();
+							if (self.unifiedPrize || self.stageUi || self.danmakuStage) self.syncDanmakuControls();
 					}
 				}
 				setTimeout(function () {
@@ -1154,7 +1178,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 							if (self.flytype == '6' && self.danmakuStage) {
 								self.danmakuStage.updatePrize(self.getDanmakuPrize());
 							}
-							if (self.unifiedPrize || self.danmakuStage) self.syncDanmakuControls();
+							if (self.unifiedPrize || self.stageUi || self.danmakuStage) self.syncDanmakuControls();
 							if (isroundcj == '1') {
 								$.each(e.msg.list, function (i, l) {
 									$.each(l.luckers, function (j, v) {
@@ -1224,9 +1248,10 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 							}, 50);
 							$(".importcj-mainbox").removeClass('isdrawed').addClass('isdrawing');
 								self.isstart = '2';
-								if (self.flytype == '6' || self.unifiedPrize) self.setDanmakuVisualState('drawing');
+								if (self.flytype == '6' || self.unifiedPrize || self.stageUi) self.setDanmakuVisualState('starting');
 							setTimeout(function () {
 								$this.text('停止');
+								if (self.isstart == '2' && (self.flytype == '6' || self.unifiedPrize || self.stageUi)) self.setDanmakuVisualState('drawing');
 								$(".lucker-numbox .prize-num").text(e.msg.lucker.prizenum);
 								$(".lucker-numbox .lucker-num").text(e.msg.lucker.luckernum);
 							}, 3e3);
@@ -1268,6 +1293,9 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 							}
 							if (self.flytype == '6' && self.danmakuStage) {
 								self.danmakuStage.setResult(luckerList, self.getDanmakuPrize());
+							}
+							if (self.stageUi) {
+								self.stageUi.setResult(luckerList, self.getDanmakuPrize());
 							}
 					} else {
 						$(".importcj-wall").addClass('hidden');
@@ -1376,7 +1404,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 				var allluckerclicked = false;
 				$(".btn-showalllucker").click(function () {
 					var $this = $(this);
-					if (self.flytype == '6') {
+					if (self.stageUi || self.flytype == '6') {
 						if (self.isstart == '1' || self.isstart == '4') {
 							self.openDanmakuRecords(self.isstart == '4');
 						}

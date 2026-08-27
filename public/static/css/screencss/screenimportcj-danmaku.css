@@ -1572,6 +1572,61 @@
 }
 
 /* ===========================================================================
+   flytype1–6 共享舞台 UI。
+   中奖结果、控制坞和记录抽屉沿用本文件前版结构与视觉，不采用 screenimportcj-ui。
+   =========================================================================== */
+.importcj-stage-ui {
+    --danmaku-ink: #effaff;
+    --danmaku-muted: rgba(214, 238, 255, .72);
+    --danmaku-gold: #f6c860;
+    --danmaku-teal: #5ce6b6;
+    --danmaku-cyan: #58e6ff;
+    position: absolute;
+    inset: 0;
+    z-index: 16;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.importcj-stage-ui[data-state="ready"] .importcj-danmaku-result,
+.importcj-stage-ui[data-state="requesting"] .importcj-danmaku-result,
+.importcj-stage-ui[data-state="starting"] .importcj-danmaku-result,
+.importcj-stage-ui[data-state="drawing"] .importcj-danmaku-result,
+.importcj-stage-ui[data-state="records"] .importcj-danmaku-result {
+    opacity: 0;
+    visibility: hidden;
+    transform: translate(-50%, -50%) scale(.92);
+    pointer-events: none;
+}
+
+.importcj-stage-ui[data-state="result"] .importcj-danmaku-result {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: translate(-50%, -50%) scale(1) !important;
+    pointer-events: auto;
+    transition: opacity .36s cubic-bezier(.22, 1, .36, 1),
+                transform .36s cubic-bezier(.22, 1, .36, 1),
+                visibility .36s cubic-bezier(.22, 1, .36, 1);
+}
+
+.importcj-stage-ui .importcj-danmaku-dock-btn.is-speed[hidden],
+.importcj-stage-ui .importcj-danmaku-speed-popover[hidden] {
+    display: none !important;
+}
+
+/* 新共享组件接管视觉；旧节点继续供业务、计时和测量使用。 */
+.importcj-mainbox.importcj-stage-ui-enabled .importcj-footer,
+.importcj-mainbox.importcj-stage-ui-enabled.isdrawed .importcj-luckerbox,
+.importcj-mainbox.importcj-stage-ui-enabled .importcj-danmaku-stage > .importcj-danmaku-result,
+.importcj-mainbox.importcj-stage-ui-enabled .importcj-danmaku-stage > .importcj-danmaku-floating-bar,
+.importcj-mainbox.importcj-stage-ui-enabled .importcj-danmaku-stage > .importcj-danmaku-speed-popover,
+.importcj-mainbox.importcj-stage-ui-enabled .importcj-danmaku-stage > .importcj-danmaku-drawer {
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+/* ===========================================================================
    旧业务节点保留但不参与 flytype=6 视觉输出。
    screenimportcj.js 仍通过这些节点处理计时、接口和状态；新舞台控件通过
    callbacks 代理它们，避免旧 footer 与主题悬浮组产生第二份像素。
