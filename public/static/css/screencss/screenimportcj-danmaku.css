@@ -1,0 +1,245 @@
+/*
+ * 弹幕星河 flytype=6 专属样式。
+ * 公共奖品、控制坞、结果和中奖记录样式位于 screenimportcj-prize.css /
+ * screenimportcj-stage-ui.css，本文件不再创建公共 UI 的视觉副本。
+ */
+.importcj-mainbox.flybox6 {
+    --danmaku-ink: #effaff;
+    --danmaku-muted: rgba(214, 238, 255, .72);
+    --danmaku-gold: #f6c860;
+    --danmaku-teal: #5ce6b6;
+    --danmaku-cyan: #58e6ff;
+    --danmaku-field-bottom: 126px;
+    isolation: isolate;
+    overflow: hidden;
+    background: transparent !important;
+}
+
+.importcj-mainbox.flybox6::before,
+.importcj-mainbox.flybox6::after {
+    content: none !important;
+    display: none !important;
+}
+
+.importcj-danmaku-stage {
+    position: absolute;
+    inset: 0;
+    z-index: 11;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    pointer-events: none;
+    transform: none !important;
+}
+
+.importcj-danmaku-field {
+    position: absolute;
+    inset: 0 0 var(--danmaku-field-bottom, 126px) 0;
+    width: 100%;
+    overflow: hidden;
+    mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 90%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 90%, transparent 100%);
+}
+
+.importcj-danmaku-field::before,
+.importcj-danmaku-field::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 46%;
+    border-radius: 50%;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+}
+
+.importcj-danmaku-field::before {
+    width: min(640px, 60vw);
+    height: min(640px, 60vw);
+    border: 1px solid rgba(103, 213, 255, .12);
+    box-shadow: 0 0 90px rgba(57, 174, 255, .08), inset 0 0 60px rgba(57, 174, 255, .04);
+}
+
+.importcj-danmaku-field::after {
+    width: min(440px, 42vw);
+    height: min(440px, 42vw);
+    border: 1px dashed rgba(246, 200, 96, .14);
+}
+
+.importcj-danmaku-item {
+    position: absolute;
+    left: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 150px;
+    max-width: min(420px, 32vw);
+    box-sizing: border-box;
+    padding: 8px 18px 8px 8px;
+    overflow: hidden;
+    border: 1px solid rgba(140, 221, 255, .28);
+    border-radius: 999px;
+    color: var(--danmaku-ink);
+    background: linear-gradient(110deg, rgba(20, 52, 83, .88), rgba(10, 23, 48, .92));
+    box-shadow: 0 10px 28px rgba(0, 0, 0, .28), inset 0 1px rgba(255, 255, 255, .15);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    will-change: transform;
+}
+
+.importcj-danmaku-avatar {
+    display: grid;
+    width: 40px;
+    height: 40px;
+    flex: 0 0 40px;
+    place-items: center;
+    border: 1px solid rgba(255, 255, 255, .45);
+    border-radius: 50%;
+    color: #061525;
+    background: linear-gradient(145deg, var(--danmaku-color-start, #58e6ff), var(--danmaku-color-end, #7189ff));
+    box-shadow: 0 0 18px rgba(88, 230, 255, .32);
+    font-size: 17px;
+    font-style: normal;
+    font-weight: 900;
+}
+
+.importcj-danmaku-content {
+    display: flex;
+    min-width: 0;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.importcj-danmaku-name {
+    display: block;
+    max-width: 200px;
+    overflow: hidden;
+    color: #f5fbff;
+    font-size: 18px;
+    font-weight: 800;
+    line-height: 1.2;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.importcj-danmaku-extra {
+    max-width: 110px;
+    overflow: hidden;
+    padding: 3px 8px;
+    border: 1px solid rgba(255, 255, 255, .16);
+    border-radius: 999px;
+    color: var(--danmaku-muted);
+    font-size: 11px;
+    line-height: 1.1;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.importcj-danmaku-item.is-static {
+    position: absolute;
+    opacity: .6;
+}
+
+.importcj-danmaku-focus {
+    position: absolute;
+    left: 50%;
+    top: 46%;
+    z-index: 5;
+    display: flex;
+    width: min(440px, 32vw);
+    min-height: min(170px, 18vh);
+    box-sizing: border-box;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 18px 24px;
+    border: 1px solid rgba(246, 200, 96, .35);
+    border-radius: 30px;
+    color: var(--danmaku-ink);
+    background: radial-gradient(circle at center, rgba(21, 65, 94, .55), rgba(8, 22, 45, .82));
+    box-shadow: 0 0 70px rgba(79, 203, 255, .12), inset 0 0 30px rgba(246, 200, 96, .08);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    opacity: 0;
+    visibility: hidden;
+    transform: translate(-50%, -50%) scale(.88);
+    transition: opacity .2s cubic-bezier(.22, 1, .36, 1), transform .2s cubic-bezier(.22, 1, .36, 1), visibility .2s cubic-bezier(.22, 1, .36, 1);
+}
+
+.importcj-danmaku-stage[data-state="drawing"] .importcj-danmaku-focus {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, -50%) scale(1);
+    pointer-events: auto;
+    transition-duration: .28s;
+}
+
+.importcj-danmaku-focus::before {
+    content: "";
+    position: absolute;
+    inset: -18px;
+    border: 1px dashed rgba(97, 232, 255, .24);
+    border-radius: 38px;
+    animation: importcj-danmaku-orbit 18s linear infinite;
+    pointer-events: none;
+}
+
+.importcj-danmaku-focus-kicker {
+    color: var(--danmaku-gold);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .24em;
+}
+
+.importcj-danmaku-focus-value {
+    max-width: 92%;
+    overflow: hidden;
+    color: #f3fbff;
+    font-size: clamp(22px, 2.2vw, 36px);
+    font-weight: 800;
+    line-height: 1.18;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.importcj-danmaku-stage[data-state="ready"] .importcj-danmaku-focus,
+.importcj-danmaku-stage[data-state="requesting"] .importcj-danmaku-focus,
+.importcj-danmaku-stage[data-state="starting"] .importcj-danmaku-focus,
+.importcj-danmaku-stage[data-state="result"] .importcj-danmaku-focus,
+.importcj-danmaku-stage[data-state="records"] .importcj-danmaku-focus {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.importcj-danmaku-stage[data-state="drawing"] .importcj-danmaku-focus-value {
+    color: var(--danmaku-gold);
+}
+
+@keyframes importcj-danmaku-orbit {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@media (max-width: 1366px) {
+    .importcj-danmaku-item { max-width: 34vw; padding-right: 14px; }
+    .importcj-danmaku-name { font-size: 16px; }
+    .importcj-danmaku-extra { max-width: 84px; }
+    .importcj-danmaku-avatar { width: 36px; height: 36px; flex-basis: 36px; font-size: 15px; }
+    .importcj-danmaku-focus { width: min(390px, 42vw); min-height: 140px; }
+}
+
+@media (max-width: 768px) {
+    .importcj-danmaku-name { font-size: 14px; }
+    .importcj-danmaku-focus { width: 86vw; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .importcj-danmaku-item,
+    .importcj-danmaku-focus,
+    .importcj-danmaku-focus::before {
+        animation: none !important;
+        transition: opacity .12s linear, visibility .12s linear !important;
+    }
+}

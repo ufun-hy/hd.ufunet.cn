@@ -1,4 +1,7 @@
 {include file='common/header' /}
+{if isset($pcconfig['styleconfig']['flytype']) && $pcconfig['styleconfig']['flytype'] == '5'}
+<link rel="stylesheet" href="/static/css/screencss/screenimportcj-halo.css">
+{/if}
 <style>
 ::-webkit-scrollbar {
     width: 10px;
@@ -270,7 +273,7 @@
 .isdrawed .importcj-lists .importcj-footer{height: 58px;}
 .isdrawed .importcj-lists .importcj-footer .btn-start,.isdrawed .importcj-lists .importcj-footer .btn-close{top: 10px;}
 .isdrawed .importcj-lists .importcj-body .importcj-luckerbox{display: block!important}
-.isdrawed .importcj-lists .importcj-footer-box{background:none;}
+.isdrawed:not(.flybox6) .importcj-lists .importcj-footer-box{background:none;}
 .isdrawed .importcj-awardbox,.isdrawed .importcj-footer-box .select-box,.isdrawed .importcj-footer-box .select-prize,.isdrawed .importcj-footer-box .btn-showalllucker{display: none}
 .importcj-luckerbox-lists {transform-style: preserve-3d;
     -webkit-transform-style: preserve-3d;
@@ -421,7 +424,7 @@
 .isdrawing .importcj-awardbox,.isdrawing .importcj-footer-box .select-box,.isdrawing .importcj-footer-box .select-prize,.isdrawing .importcj-footer-box .btn-showalllucker,.isdrawing .importcj-tip{
     display:none;
 }
-.isdrawing .importcj-footer-box{
+.isdrawing:not(.flybox6) .importcj-footer-box{
     background:none;
 }
 .isdrawing .importcj-footer .btn-start{
@@ -434,6 +437,11 @@
 }
 {/if}
 </style>
+<link rel="stylesheet" href="/static/css/screencss/screenimportcj-prize.css">
+<link rel="stylesheet" href="/static/css/screencss/screenimportcj-stage-ui.css">
+{if isset($pcconfig['styleconfig']['flytype']) && $pcconfig['styleconfig']['flytype'] == '6'}
+<link rel="stylesheet" href="/static/css/screencss/screenimportcj-danmaku.css">
+{/if}
 {if !empty($pcconfig['iscjingmusic'])}
 <audio id="cjingmusic" src="{:tomedia($pcconfig['iscjingmusic'])}" loop preload="preload" style="display:none"></audio>
 {/if}
@@ -446,20 +454,20 @@
         <p style="padding:20px;">请到后台添加{if isset($pcconfig['isroundcj']) && $pcconfig['isroundcj']=='1'}轮次{else /}奖品{/if}</p>
     </div>
     <div class="importcj-lists zam-app-flex-ajCenter hidden">
-        <div class="importcj-header zam-app-flex-ajCenter headerani">
+        <div class="importcj-header importcj-legacy-visual zam-app-flex-ajCenter headerani">
             <div class="importcj-headerbg"><span class="awardname">xxx</span></div>
             <div class="prizename">xxx奖品</div>
         </div>
         <div class="importcj-body zam-app-flex-ajCenter">
-            <div class="importcj-awardlist"></div>
-            <div class="importcj-luckerbox">
+            <div class="importcj-awardlist importcj-legacy-visual"></div>
+            <div class="importcj-luckerbox importcj-legacy-visual">
                 <div class="importcj-luckerbox-content">
-                    <ul class="importcj-luckerbox-lists"></ul>
+                    <ul class="importcj-luckerbox-lists importcj-legacy-visual"></ul>
                     <div class="importcj-btip hidden">尽显公平与公正</div>
                 </div>
             </div>
         </div>
-        <div class="importcj-footer footerani">
+        <div class="importcj-footer{if isset($pcconfig['styleconfig']['flytype']) && $pcconfig['styleconfig']['flytype'] == '6'} importcj-legacy-visual{/if} footerani"{if isset($pcconfig['styleconfig']['flytype']) && $pcconfig['styleconfig']['flytype'] == '6'} aria-hidden="true"{/if}>
             <div class="importcj-footer-box">
                 <div class="select-prize zam-app-flex">
                     <div class="prev-prize"><span class="mxc-back"></span></div>
@@ -473,7 +481,7 @@
                 </div>
                 <div class="btn-start">开始</div>
                 <div class="btn-close hidden">关闭</div>
-                <div class="btn-showalllucker">{$pcconfig['styleconfig']['listname']??'中奖列表'}<span class="lucker-numbox"><span class="lucker-num">0</span>/<span class="prize-num">0</span></span></div>
+                <div class="btn-showalllucker">{$pcconfig['styleconfig']['listname']??'中奖列表'} · <span class="lucker-numbox">已中奖 <span class="lucker-num">0</span> / 总名额 <span class="prize-num">0</span></span></div>
             </div>
         </div>
         <div class="importcj-tip">按空格键停止</div>
@@ -495,8 +503,8 @@ require(['screenimportcj'],function(screenimportcj){
 </script>
 <script id="prize-tpl" type="html/javascript">
 <div class="importcj-awardbox zam-app-flex-ajCenter awardboxani">
-    <div class="importcj-prizeimg zam-app-flex-ajCenter"><img src="{{ prizeimg }}"></div>
-    {{ if isroundcj == '1' }}
+    <div class="importcj-prizeimg zam-app-flex-ajCenter"><img src="{{ prizeimg }}" onerror="this.classList.add('is-broken'); this.parentNode.classList.add('is-image-missing');"></div>
+    {{ if showPrizeInfo }}
     <div class="importcj-prizeinfo">
         <div class="importcj-prizename">{{ prizename }}</div>
         <div class="importcj-prizenum">{{ num }}个</div>
