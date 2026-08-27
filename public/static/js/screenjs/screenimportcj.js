@@ -1282,7 +1282,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 					if ($this.text() == '开始') {
 						return false;
 					}
-						if (self.flytype == '1' || self.flytype == '5' || self.flytype == '6') {
+					if (self.flytype == '1' || self.flytype == '5' || self.flytype == '6') {
 						var prizeOne = self.prizeInfo[self.prizeIndex] || {}, stoptype = prizeOne.stoptype || '1';
 						//默认停止方式或者按轮次抽奖均不另外设置
 						if (stoptype == '1' || isroundcj == '1') {
@@ -1294,18 +1294,18 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 								return false;
 							}
 						}
-							if (self.flytype == '5' && self.haloStage) {
-								self.haloStage.stop();
-							}
-							if (self.flytype == '6' && self.danmakuStage) {
-								self.danmakuStage.setResult(luckerList, self.getPrize());
-							}
-							if (self.stageUi) {
-								self.stageUi.setResult(luckerList, self.getPrize());
-							}
+						if (self.flytype == '5' && self.haloStage) {
+							self.haloStage.stop();
+						}
+						if (self.flytype == '6' && self.danmakuStage) {
+							self.danmakuStage.setResult(luckerList, self.getPrize());
+						}
 					} else {
 						$(".importcj-wall").addClass('hidden');
 						self.stageStop = true;
+					}
+					if (self.stageUi) {
+						self.stageUi.setResult(luckerList, self.getPrize());
 					}
 					$(".importcj-luckerbox-lists").html(luckerHtml);
 					if (isroundcj == '1') {
@@ -1334,7 +1334,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 						});
 					}
 						self.isstart = '3';
-						if (self.flytype == '6' || self.unifiedPrize) self.setVisualState('result');
+						if (self.stageUi || self.flytype == '6') self.setVisualState('result');
 					if ($("#cjingmusic").length) {
 						$("#cjingmusic")[0].currentTime = 0;
 						$("#cjingmusic")[0].pause();
@@ -1358,7 +1358,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 					}
 					$this.text('开始');
 					self.isstart = '1';
-					if (self.flytype == '6' || self.unifiedPrize) self.setVisualState('ready');
+					if (self.stageUi || self.flytype == '6') self.setVisualState('ready');
 					if (self.flytype == '6' && self.danmakuStage) {
 						self.danmakuStage.setReady(self.getDanmakuCandidates(), self.getPrize());
 					}
