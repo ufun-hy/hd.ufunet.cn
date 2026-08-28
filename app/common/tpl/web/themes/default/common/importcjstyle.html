@@ -51,17 +51,20 @@
 		var flytype = $(this).attr('data-val');
 		$(this).addClass('hadchecked').siblings().removeClass('hadchecked');
 		$(this).parent().next().val(flytype);
-		if(flytype == '1' || flytype == '5' || flytype == '6'){
+		if(flytype == '1' || flytype == '5'){
 			$(".flystylebox").addClass('hidden');
 			$(".flystylebox").children().addClass('hidden');
 		}else{
 			$(".flystylebox").removeClass('hidden');
+			$(".flystylebox").children().addClass('hidden');
 			if(flytype == '2'){
 				$(".flystylebox .one").removeClass('hidden').siblings().addClass('hidden');
 			}else if(flytype == '3'){
 				$(".flystylebox .grid").removeClass('hidden').siblings().addClass('hidden');
 			}else if(flytype == '4'){
 				$(".flystylebox .sphere").removeClass('hidden').siblings().addClass('hidden');
+			}else if(flytype == '6'){
+				$(".flystylebox .danmaku").removeClass('hidden').siblings().addClass('hidden');
 			}
 		}
 	});
@@ -75,7 +78,7 @@
 	});
 	{/if}
 	</script>
-	<div class="flystylebox{if !isset($config['styleconfig']['flytype']) || $config['styleconfig']['flytype'] == '1' || $config['styleconfig']['flytype'] == '5' || $config['styleconfig']['flytype'] == '6'} hidden{/if}">
+	<div class="flystylebox{if !isset($config['styleconfig']['flytype']) || $config['styleconfig']['flytype'] == '1' || $config['styleconfig']['flytype'] == '5'} hidden{/if}">
 		<div class="one{if isset($config['styleconfig']['flytype']) && $config['styleconfig']['flytype'] != '2'} hidden{/if}">
 			<div class="form-group">
 				<label class="col-lg-2 control-label">* 文字大小</label>
@@ -186,6 +189,56 @@
 					data-bts-postfix="速度"
 					data-bts-postfix-extra-class="touchspin-postfix"
 					>
+				</div>
+			</div>
+		</div>
+		<div class="danmaku{if !isset($config['styleconfig']['flytype']) || $config['styleconfig']['flytype'] != '6'} hidden{/if}">
+			<div class="form-group">
+				<label class="col-lg-2 control-label">* 弹幕文字大小</label>
+				<div class="col-lg-4">
+					<input type="text" class="form-control numberincdec" name="styleconfig[danmakusize]"
+						data-bts-min="12" data-bts-replacement-val="18" data-bts-max="40" data-bts-step="1"
+						data-bts-postfix="px" data-bts-postfix-extra-class="touchspin-postfix"
+						value="{$config['styleconfig']['danmakusize']??18}">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-lg-2 control-label">* 弹幕密度</label>
+				<div class="col-lg-4">
+					<select class="form-control" name="styleconfig[danmakudensity]">
+						<option value="sparse" {if ($config['styleconfig']['danmakudensity']??'normal') == 'sparse'}selected{/if}>稀疏</option>
+						<option value="normal" {if !isset($config['styleconfig']['danmakudensity']) || $config['styleconfig']['danmakudensity'] == 'normal'}selected{/if}>标准</option>
+						<option value="dense" {if isset($config['styleconfig']['danmakudensity']) && $config['styleconfig']['danmakudensity'] == 'dense'}selected{/if}>密集</option>
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-lg-2 control-label">* 默认弹幕速度</label>
+				<div class="col-lg-4">
+					<select class="form-control" name="styleconfig[danmakuspeed]">
+						<option value="slow" {if isset($config['styleconfig']['danmakuspeed']) && $config['styleconfig']['danmakuspeed'] == 'slow'}selected{/if}>舒缓</option>
+						<option value="normal" {if !isset($config['styleconfig']['danmakuspeed']) || $config['styleconfig']['danmakuspeed'] == 'normal'}selected{/if}>标准</option>
+						<option value="fast" {if isset($config['styleconfig']['danmakuspeed']) && $config['styleconfig']['danmakuspeed'] == 'fast'}selected{/if}>热烈</option>
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-lg-2 control-label">弹幕主色</label>
+				<div class="col-lg-8">
+					{:tpl_color('styleconfig[danmakucolor]',$config['styleconfig']['danmakucolor']??'#58e6ff')}
+					<span class="help-block">仅影响弹幕头像、边框和轻微高光，不改变奖品和中奖结果区域</span>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-lg-2 control-label">显示首字头像</label>
+				<div class="col-lg-8">
+					{:tpl_switch('styleconfig[danmakuavatar]',$config['styleconfig']['danmakuavatar']??'1')}
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-lg-2 control-label">显示附加字段</label>
+				<div class="col-lg-8">
+					{:tpl_switch('styleconfig[danmakuextra]',$config['styleconfig']['danmakuextra']??'1')}
 				</div>
 			</div>
 		</div>

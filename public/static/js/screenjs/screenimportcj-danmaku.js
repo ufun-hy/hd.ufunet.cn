@@ -1,18 +1,15 @@
 /*
  * 弹幕星河 flytype=6 渲染器。
- * 只负责候选人流动、focus、速度和舞台生命周期；公共控制/结果/记录由 stage-ui 管理。
+ * 只负责候选人流动、速度和舞台生命周期；公共控制/结果/记录由 stage-ui 管理。
  */
 define([], function () {
     'use strict';
 
-    var MAX_ITEMS = 36;
-    var LANE_COUNT = 6;
-    var COLORS = [
-        ['#58e6ff', '#7189ff'],
-        ['#ffd477', '#f39b54'],
-        ['#ff8fc8', '#a879ff'],
-        ['#83f1c1', '#48b9ed']
-    ];
+    var DENSITY_PRESETS = {
+        sparse: { lanes: 4, maxItems: 20 },
+        normal: { lanes: 6, maxItems: 36 },
+        dense: { lanes: 8, maxItems: 52 }
+    };
     var SPEED_PRESETS = {
         slow: { key: 'slow', label: '舒缓', factor: 0.6, interval: 620 },
         normal: { key: 'normal', label: '标准', factor: 1.0, interval: 420 },
@@ -37,19 +34,34 @@ define([], function () {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
+    function normalizeStyleConfig(value) {
+        value = value || {};
+        var fontSize = parseInt(value.fontSize, 10);
+        if (isNaN(fontSize)) fontSize = 18;
+        var density = DENSITY_PRESETS[value.density] ? value.density : 'normal';
+        var color = asText(value.color);
+        if (!color || color.length > 64 || /[;"'{}]/.test(color)) color = '#58e6ff';
+        return {
+            fontSize: Math.max(12, Math.min(40, fontSize)),
+            density: density,
+            color: color,
+            showAvatar: value.showAvatar !== false,
+            showExtras: value.showExtras !== false
+        };
+    }
+
     function DanmakuStage(options) {
         options = options || {};
         this.root = options.root || null;
+        this.styleConfig = normalizeStyleConfig(options.styleConfig);
         this.speedPreset = SPEED_PRESETS[options.speedPreset] ? options.speedPreset : 'normal';
         this.speedFactor = SPEED_PRESETS[this.speedPreset].factor;
         this.state = 'ready';
         this.stage = null;
         this.field = null;
-        this.focus = null;
         this.candidates = [];
         this.items = [];
         this.spawnTimer = null;
-        this.focusTimer = null;
         this.rafId = null;
         this.resizeObserver = null;
         this.resizeBound = false;
@@ -57,7 +69,6 @@ define([], function () {
         this.boundVisibility = this.handleVisibility.bind(this);
         this.paused = false;
         this.reducedMotion = typeof window !== 'undefined' && window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)').matches : false;
-        this.focusIndex = 0;
         this.laneHeight = 76;
         this.laneIndex = 0;
     }
@@ -68,25 +79,15 @@ define([], function () {
         var doc = this.root.ownerDocument || document;
         var stage = doc.createElement('div');
         stage.className = 'importcj-danmaku-stage';
+        stage.style.setProperty('--danmaku-font-size', this.styleConfig.fontSize + 'px');
+        stage.style.setProperty('--danmaku-accent', this.styleConfig.color);
         var field = doc.createElement('div');
         field.className = 'importcj-danmaku-field';
         field.setAttribute('aria-hidden', 'true');
-        var focus = doc.createElement('div');
-        focus.className = 'importcj-danmaku-focus';
-        var kicker = doc.createElement('span');
-        kicker.className = 'importcj-danmaku-focus-kicker';
-        kicker.textContent = '正在抽取';
-        var value = doc.createElement('strong');
-        value.className = 'importcj-danmaku-focus-value';
-        value.textContent = '名单已就绪';
-        focus.appendChild(kicker);
-        focus.appendChild(value);
         stage.appendChild(field);
-        stage.appendChild(focus);
         this.root.appendChild(stage);
         this.stage = stage;
         this.field = field;
-        this.focus = value;
         this.updateCandidates(values || []);
         this.bindLifecycle();
         this.resize();
@@ -115,7 +116,6 @@ define([], function () {
         if (!this.stage) return this;
         this.stage.setAttribute('data-state', this.state);
         this.stage.classList.toggle('is-drawing', this.state === 'drawing');
-        if (this.state !== 'drawing') this.stopFocusRoll();
         return this;
     };
 
@@ -124,40 +124,19 @@ define([], function () {
         this.candidates = (values || []).map(normalizeCandidate).filter(function (item) { return item.name !== ''; });
         if (!this.candidates.length) {
             this.clearItems();
-            this.stopFocusRoll();
-            if (this.focus) this.focus.textContent = '等待导入名单';
             return this;
         }
-        if (this.state !== 'drawing' && this.focus) this.focus.textContent = '名单已就绪';
         if (this.reducedMotion && this.field) {
             this.clearItems();
-            this.candidates.slice(0, Math.min(12, this.candidates.length)).forEach(function () { self.spawnItem(true); });
+            this.candidates.slice(0, Math.min(this.getDensityConfig().maxItems, 12)).forEach(function () { self.spawnItem(true); });
         }
         return this;
-    };
-
-    DanmakuStage.prototype.startFocusRoll = function () {
-        this.stopFocusRoll();
-        if (!this.focus || !this.candidates.length || this.reducedMotion) return;
-        var self = this;
-        this.focus.textContent = this.candidates[this.focusIndex % this.candidates.length].name;
-        this.focusTimer = window.setInterval(function () {
-            if (!self.candidates.length || !self.focus) return;
-            self.focusIndex = (self.focusIndex + 1) % self.candidates.length;
-            self.focus.textContent = self.candidates[self.focusIndex].name;
-        }, 70);
-    };
-
-    DanmakuStage.prototype.stopFocusRoll = function () {
-        if (this.focusTimer) window.clearInterval(this.focusTimer);
-        this.focusTimer = null;
     };
 
     DanmakuStage.prototype.setDrawing = function (drawing) {
         if (drawing) {
             this.setState('drawing');
             this.startSpawn();
-            this.startFocusRoll();
         } else {
             this.setState('ready');
             this.startSpawn();
@@ -175,14 +154,12 @@ define([], function () {
     DanmakuStage.prototype.setControls = DanmakuStage.prototype.updateControls;
     DanmakuStage.prototype.setRecords = function () { return this; };
     DanmakuStage.prototype.setResult = function () {
-        this.stopFocusRoll();
         this.stopSpawn();
         this.clearItems();
         this.setState('result');
         return this;
     };
     DanmakuStage.prototype.setReady = function (values) {
-        this.stopFocusRoll();
         this.clearItems();
         this.updateCandidates(values || []);
         this.setState('ready');
@@ -210,17 +187,22 @@ define([], function () {
 
     DanmakuStage.prototype.startSpawn = function () {
         var self = this;
+        var density = this.getDensityConfig();
         this.stopSpawn();
         if (this.reducedMotion || this.state === 'result') return;
         this.spawnTimer = window.setInterval(function () {
-            if (self.paused || (typeof document !== 'undefined' && document.hidden) || !self.candidates.length || self.items.length >= MAX_ITEMS) return;
+            if (self.paused || (typeof document !== 'undefined' && document.hidden) || !self.candidates.length || self.items.length >= density.maxItems) return;
             self.spawnItem(false);
         }, SPEED_PRESETS[this.speedPreset].interval);
     };
 
+    DanmakuStage.prototype.getDensityConfig = function () {
+        return DENSITY_PRESETS[this.styleConfig.density] || DENSITY_PRESETS.normal;
+    };
+
     DanmakuStage.prototype.getLaneCount = function () {
         var height = this.field ? this.field.clientHeight : (this.root ? this.root.clientHeight : 660);
-        return Math.max(3, Math.min(LANE_COUNT, Math.floor(Math.max(160, height - 60) / this.laneHeight)));
+        return Math.max(3, Math.min(this.getDensityConfig().lanes, Math.floor(Math.max(160, height - 60) / this.laneHeight)));
     };
 
     DanmakuStage.prototype.getLaneTop = function (lane) {
@@ -236,25 +218,26 @@ define([], function () {
         var doc = this.field.ownerDocument || document;
         var item = doc.createElement('span');
         item.className = 'importcj-danmaku-item';
-        var color = COLORS[randomInt(0, COLORS.length - 1)];
-        item.style.setProperty('--danmaku-color-start', color[0]);
-        item.style.setProperty('--danmaku-color-end', color[1]);
-        var avatar = doc.createElement('i');
-        avatar.className = 'importcj-danmaku-avatar';
-        avatar.textContent = candidate.name.charAt(0);
+        item.classList.toggle('is-no-avatar', !this.styleConfig.showAvatar);
+        var avatar;
+        if (this.styleConfig.showAvatar) {
+            avatar = doc.createElement('i');
+            avatar.className = 'importcj-danmaku-avatar';
+            avatar.textContent = candidate.name.charAt(0);
+        }
         var content = doc.createElement('span');
         content.className = 'importcj-danmaku-content';
         var name = doc.createElement('strong');
         name.className = 'importcj-danmaku-name';
         name.textContent = candidate.name;
         content.appendChild(name);
-        candidate.extras.forEach(function (extra) {
-            var node = doc.createElement('small');
-            node.className = 'importcj-danmaku-extra';
-            node.textContent = extra;
-            content.appendChild(node);
-        });
-        item.appendChild(avatar);
+        if (this.styleConfig.showExtras) candidate.extras.forEach(function (extra) {
+                var node = doc.createElement('small');
+                node.className = 'importcj-danmaku-extra';
+                node.textContent = extra;
+                content.appendChild(node);
+            });
+        if (avatar) item.appendChild(avatar);
         item.appendChild(content);
         var width = this.field.clientWidth || (this.root ? this.root.clientWidth : 1920);
         var lane = (this.laneIndex++) % this.getLaneCount();
@@ -310,7 +293,6 @@ define([], function () {
     };
 
     DanmakuStage.prototype.destroy = function () {
-        this.stopFocusRoll();
         this.stopSpawn();
         if (this.rafId !== null && typeof window !== 'undefined' && window.cancelAnimationFrame) window.cancelAnimationFrame(this.rafId);
         this.rafId = null;
@@ -323,12 +305,12 @@ define([], function () {
         if (this.stage && this.stage.parentNode) this.stage.parentNode.removeChild(this.stage);
         this.stage = null;
         this.field = null;
-        this.focus = null;
         return this;
     };
 
     return {
         create: function (options) { return new DanmakuStage(options); },
-        normalizeCandidate: normalizeCandidate
+        normalizeCandidate: normalizeCandidate,
+        normalizeStyleConfig: normalizeStyleConfig
     };
 });
