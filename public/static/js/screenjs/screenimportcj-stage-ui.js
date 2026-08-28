@@ -111,7 +111,7 @@ define([], function () {
 
         var kicker = doc.createElement('span');
         kicker.className = 'importcj-stage-result-kicker';
-        kicker.textContent = 'RESULT · 中奖揭晓';
+        kicker.textContent = '中奖揭晓';
         var summary = doc.createElement('div');
         summary.className = 'importcj-stage-result-summary';
         var imageWrap = doc.createElement('div');
@@ -123,7 +123,7 @@ define([], function () {
         title.className = 'importcj-stage-result-prize-title';
         var count = doc.createElement('span');
         count.className = 'importcj-stage-result-prize-count';
-        count.textContent = '剩余 ';
+        count.textContent = '中奖 ';
         var countValue = doc.createElement('strong');
         countValue.className = 'importcj-stage-result-prize-count-value';
         countValue.textContent = '-';
@@ -412,6 +412,117 @@ define([], function () {
         this.bindImage(this.resultPanel._imageWrap, this.resultPanel._image, prize.prizeimg || prize.image);
     };
 
+    StageUi.prototype.normalizeWinnerGroups = function (data, fallbackPrize) {
+        var self = this;
+        var list = Object.prototype.toString.call(data) === '[object Array]' ? data : (data ? [data] : []);
+        var fallback = fallbackPrize || {};
+        var groups = [];
+        var grouped = false;
+
+        function numberValue(value) {
+            if (value === undefined || value === null || asText(value) === '') return null;
+            var number = Number(value);
+            return isFinite(number) && number >= 0 && Math.floor(number) === number ? number : null;
+        }
+
+        function addGroup(value, inheritedPrize) {
+            value = value || {};
+            if (value.roundawards && value.roundawards.length) {
+                grouped = true;
+                value.roundawards.forEach(function (child) {
+                    addGroup(child, value.prize || inheritedPrize || fallback);
+                });
+                return;
+            }
+
+            var prize = value.prize || value.award || inheritedPrize || fallback || {};
+            var luckers = value.luckers || value.winners || [];
+            var hasGroupShape = Object.prototype.toString.call(luckers) === '[object Array]' || !!value.prize || !!value.award;
+            if (!hasGroupShape) return;
+            grouped = true;
+
+            var winnerList = self.flattenWinners(luckers);
+            var awardname = asText(prize.awardname || prize.roundtitle || value.awardname || value.roundtitle || fallback.awardname || fallback.roundtitle || '');
+            var prizename = asText(prize.prizename || value.prizename || fallback.prizename || '');
+            var planned = numberValue(value.num);
+            if (planned === null) planned = numberValue(prize.num);
+            groups.push({
+                awardname: awardname,
+                prizename: prizename,
+                prizeimg: prize.prizeimg || prize.image || value.prizeimg || value.image || '',
+                planned: planned,
+                winners: winnerList
+            });
+        }
+
+        list.forEach(function (value) {
+            if (value && (value.roundawards || value.luckers || value.winners || value.prize || value.award)) {
+                addGroup(value, fallback);
+            }
+        });
+
+        if (!grouped) {
+            groups = [{
+                awardname: asText(fallback.awardname || fallback.roundtitle || ''),
+                prizename: asText(fallback.prizename || ''),
+                prizeimg: fallback.prizeimg || fallback.image || '',
+                planned: numberValue(fallback.num),
+                winners: self.flattenWinners(list)
+            }];
+        }
+
+        return { grouped: grouped, groups: groups.filter(function (group) { return group.winners.length > 0; }) };
+    };
+
+    StageUi.prototype.createResultWinnerCard = function (doc, winner) {
+        var card = doc.createElement('div');
+        card.className = 'importcj-stage-result-card';
+        var name = doc.createElement('strong');
+        name.textContent = winner.name;
+        card.appendChild(name);
+        winner.extras.forEach(function (extra) {
+            var node = doc.createElement('small');
+            node.textContent = extra;
+            card.appendChild(node);
+        });
+        return card;
+    };
+
+    StageUi.prototype.createResultGroup = function (doc, group) {
+        var section = doc.createElement('section');
+        section.className = 'importcj-stage-result-group';
+        var header = doc.createElement('header');
+        header.className = 'importcj-stage-result-group-header';
+        var prize = doc.createElement('div');
+        prize.className = 'importcj-stage-result-group-prize';
+        var imageWrap = doc.createElement('span');
+        imageWrap.className = 'importcj-stage-result-group-image is-missing';
+        var image = doc.createElement('img');
+        image.alt = '奖品图片';
+        imageWrap.appendChild(image);
+        var title = doc.createElement('strong');
+        title.className = 'importcj-stage-result-group-title';
+        title.textContent = group.prizename || group.awardname || '中奖奖品';
+        prize.appendChild(imageWrap);
+        prize.appendChild(title);
+        var meta = doc.createElement('span');
+        meta.className = 'importcj-stage-result-group-meta';
+        var actual = group.winners.length + ' 人中奖';
+        if (group.planned !== null && group.planned !== undefined) actual = '计划 ' + group.planned + ' 名 · ' + actual;
+        meta.textContent = actual;
+        header.appendChild(prize);
+        header.appendChild(meta);
+        var winners = doc.createElement('div');
+        winners.className = 'importcj-stage-result-group-winners';
+        group.winners.forEach(function (winner) {
+            winners.appendChild(this.createResultWinnerCard(doc, winner));
+        }, this);
+        section.appendChild(header);
+        section.appendChild(winners);
+        this.bindImage(imageWrap, image, group.prizeimg);
+        return section;
+    };
+
     StageUi.prototype.flattenWinners = function (values) {
         var winners = [];
         var list = Object.prototype.toString.call(values) === '[object Array]' ? values : (values ? [values] : []);
@@ -432,28 +543,29 @@ define([], function () {
     StageUi.prototype.setResult = function (values, prize) {
         this.updatePrize(prize || {});
         this.resultList.textContent = '';
-        var winners = this.flattenWinners(values || []);
+        var normalized = this.normalizeWinnerGroups(values || [], prize || {});
+        var groups = normalized.groups;
+        var winners = [];
+        groups.forEach(function (group) { winners = winners.concat(group.winners); });
         var doc = this.resultList.ownerDocument || document;
+        this.resultList.className = 'importcj-stage-result-list';
         if (!winners.length) {
             var empty = doc.createElement('span');
             empty.className = 'importcj-stage-result-empty';
             empty.textContent = '暂无中奖记录';
             this.resultList.appendChild(empty);
+        } else if (normalized.grouped) {
+            this.resultList.classList.add('is-grouped');
+            if (groups.length > 3) this.resultList.classList.add('is-dense');
+            groups.forEach(function (group) {
+                this.resultList.appendChild(this.createResultGroup(doc, group));
+            }, this);
         } else {
             winners.forEach(function (winner) {
-                var card = doc.createElement('div');
-                card.className = 'importcj-stage-result-card';
-                var name = doc.createElement('strong');
-                name.textContent = winner.name;
-                card.appendChild(name);
-                winner.extras.forEach(function (extra) {
-                    var node = doc.createElement('small');
-                    node.textContent = extra;
-                    card.appendChild(node);
-                });
-                this.resultList.appendChild(card);
+                this.resultList.appendChild(this.createResultWinnerCard(doc, winner));
             }, this);
         }
+        this.resultPanel._count.textContent = String(winners.length);
         this.setState('result');
         return this;
     };
@@ -503,7 +615,10 @@ define([], function () {
             this.openRecords();
             return this;
         }
-        var winners = this.flattenWinners(data || []);
+        var normalized = this.normalizeWinnerGroups(data || [], this.currentPrize || {});
+        var groups = normalized.groups;
+        var winners = [];
+        groups.forEach(function (group) { winners = winners.concat(group.winners); });
         this.recordsTotalCount.textContent = String(winners.length);
         if (!winners.length) {
             this.recordsEmptyState.style.display = 'flex';
@@ -514,27 +629,24 @@ define([], function () {
         this.recordsListWrap.textContent = '';
         var doc = this.recordsListWrap.ownerDocument || document;
         var self = this;
-        var grouped = Object.prototype.toString.call(data) === '[object Array]' && data.length && (data[0].luckers || data[0].roundawards);
-        if (grouped) {
-            data.forEach(function (group) {
-                var groupWinners = self.flattenWinners(group.luckers || group.roundawards || []);
-                if (!groupWinners.length) return;
+        if (normalized.grouped) {
+            groups.forEach(function (group) {
                 var section = doc.createElement('div');
                 section.className = 'importcj-stage-records-section';
                 var sectionHeader = doc.createElement('div');
                 sectionHeader.className = 'importcj-stage-records-section-header';
                 var sectionTitle = doc.createElement('strong');
-                var award = asText(group.awardname || group.roundtitle || '');
+                var award = asText(group.awardname || '');
                 var prize = asText(group.prizename || '');
-                sectionTitle.textContent = award && prize && award !== prize ? award + ' · ' + prize : (award || prize || '中奖奖项');
+                sectionTitle.textContent = award && prize && award !== prize ? award + ' · ' + prize : (prize || award || '中奖奖项');
                 var sectionCount = doc.createElement('span');
-                sectionCount.textContent = groupWinners.length + '人';
+                sectionCount.textContent = group.winners.length + '人';
                 sectionHeader.appendChild(sectionTitle);
                 sectionHeader.appendChild(sectionCount);
                 section.appendChild(sectionHeader);
                 var grid = doc.createElement('div');
                 grid.className = 'importcj-stage-records-grid';
-                groupWinners.forEach(function (winner, index) {
+                group.winners.forEach(function (winner, index) {
                     grid.appendChild(self.createWinnerCard(doc, winner, index + 1));
                 });
                 section.appendChild(grid);

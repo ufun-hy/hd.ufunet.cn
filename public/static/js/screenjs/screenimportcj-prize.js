@@ -22,6 +22,13 @@ define([], function () {
         return node;
     }
 
+    function displayQuota(value) {
+        if (value === undefined || value === null || String(value).replace(/^\s+|\s+$/g, '') === '') return '';
+        var number = Number(value);
+        if (!isFinite(number) || number <= 0 || Math.floor(number) !== number) return '';
+        return String(value).replace(/^\s+|\s+$/g, '');
+    }
+
     function UnifiedPrize(options) {
         options = options || {};
         this.root = options.root || null;
@@ -225,6 +232,8 @@ define([], function () {
             var name = createElement(doc, 'strong', '', asText(item.prizename || item.awardname || '奖品'));
             card.appendChild(imageWrap);
             card.appendChild(name);
+            var quota = displayQuota(item.num);
+            if (quota) card.appendChild(createElement(doc, 'span', 'importcj-unified-prize-round-quota', '抽取 ' + quota + ' 名'));
             list.appendChild(card);
             this.bindImage(imageWrap, image, item.prizeimg || item.image);
         }, this);
@@ -243,7 +252,7 @@ define([], function () {
         this.refs.count.textContent = remaining;
         this.panel.classList.toggle('is-round', roundItems.length > 0);
         if (roundItems.length) {
-            this.refs.name.textContent = roundItems.length + ' 项奖品';
+            this.refs.name.textContent = '';
             this.renderRoundItems(roundItems);
         } else {
             this.refs.name.textContent = prizeName;
