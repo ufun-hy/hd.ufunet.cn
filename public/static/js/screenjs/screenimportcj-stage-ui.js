@@ -123,7 +123,7 @@ define([], function () {
         title.className = 'importcj-stage-result-prize-title';
         var count = doc.createElement('span');
         count.className = 'importcj-stage-result-prize-count';
-        count.textContent = '中奖 ';
+        count.textContent = '';
         var countValue = doc.createElement('strong');
         countValue.className = 'importcj-stage-result-prize-count-value';
         countValue.textContent = '-';
@@ -406,9 +406,8 @@ define([], function () {
         var award = asText(prize.awardname || prize.roundtitle || '');
         var name = asText(prize.prizename || '');
         var title = award && name && award !== name ? award + ' · ' + name : (name || award || '等待奖项');
-        var remaining = prize.remaining === undefined || prize.remaining === null || asText(prize.remaining) === '' ? '—' : asText(prize.remaining);
         this.resultPanel._title.textContent = title;
-        this.resultPanel._count.textContent = remaining;
+        this.resultPanel._count.textContent = '';
         this.bindImage(this.resultPanel._imageWrap, this.resultPanel._image, prize.prizeimg || prize.image);
     };
 
@@ -505,13 +504,7 @@ define([], function () {
         title.textContent = group.prizename || group.awardname || '中奖奖品';
         prize.appendChild(imageWrap);
         prize.appendChild(title);
-        var meta = doc.createElement('span');
-        meta.className = 'importcj-stage-result-group-meta';
-        var actual = group.winners.length + ' 人中奖';
-        if (group.planned !== null && group.planned !== undefined) actual = '计划 ' + group.planned + ' 名 · ' + actual;
-        meta.textContent = actual;
         header.appendChild(prize);
-        header.appendChild(meta);
         var winners = doc.createElement('div');
         winners.className = 'importcj-stage-result-group-winners';
         group.winners.forEach(function (winner) {
@@ -565,7 +558,6 @@ define([], function () {
                 this.resultList.appendChild(this.createResultWinnerCard(doc, winner));
             }, this);
         }
-        this.resultPanel._count.textContent = String(winners.length);
         this.setState('result');
         return this;
     };

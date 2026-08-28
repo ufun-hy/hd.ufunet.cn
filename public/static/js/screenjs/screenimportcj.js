@@ -36,6 +36,8 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 		stageFooterWindow: null,
 		recordsRequestId: 0,
 		recordsPrizeId: null,
+		recordsReturnState: null,
+		recordsReturnIsstart: null,
 		drawRequestPending: false,
 		currentLuckerHtml: '',
 		currentLuckerList: [],
@@ -1082,12 +1084,16 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 		openRecords: function (retry) {
 			var self = this;
 			var recordsView = self.stageUi || (self.flytype == '6' ? self.danmakuStage : null);
-			if (!recordsView || (self.isstart != '1' && self.isstart != '4')) return false;
+			if (!recordsView || (self.isstart != '1' && self.isstart != '3' && self.isstart != '4')) return false;
 			var id = self.prizeInfo[self.prizeIndex] && self.prizeInfo[self.prizeIndex].id;
 			var requestedPrizeIndex = self.prizeIndex;
 			var requestId = ++self.recordsRequestId;
 			self.recordsPrizeId = id;
-			if (self.isstart == '1') self.isstart = '4';
+			if (self.isstart != '4') {
+				self.recordsReturnState = self.getVisualState();
+				self.recordsReturnIsstart = self.isstart;
+				self.isstart = '4';
+			}
 			self.setVisualState('records');
 			recordsView.setRecords(null, 'loading');
 			var ajaxdata = { isroundcj: isroundcj };
@@ -1114,7 +1120,14 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 			var recordsActive = self.isstart == '4' || self.visualState == 'records' || (self.stageUi && self.stageUi.state == 'records') || (self.danmakuStage && self.danmakuStage.state == 'records');
 			if (!recordsActive) return false;
 			self.invalidateRecords();
-			return self.closeResult();
+			if (self.stageUi && self.stageUi.closeRecords) self.stageUi.closeRecords();
+			var returnState = self.recordsReturnState || 'ready';
+			var returnIsstart = self.recordsReturnIsstart || (returnState == 'result' ? '3' : '1');
+			self.recordsReturnState = null;
+			self.recordsReturnIsstart = null;
+			self.isstart = returnIsstart;
+			self.setVisualState(returnState);
+			return true;
 		},
 		startDrawingAnimation: function () {
 			var self = this;
@@ -1318,8 +1331,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 		},
 		closeResult: function () {
 			var self = this;
-			var recordsActive = self.isstart == '4' || self.visualState == 'records';
-			if (!recordsActive && self.isstart != '3' && self.visualState != 'result') return false;
+			if (self.isstart != '3' && self.visualState != 'result') return false;
 			if (isautoscroll == '1') {
 				self.removeautoScroll('.importcj-luckerbox-content');
 				setTimeout(function () { $(".importcj-mainbox").removeClass('isdrawed'); }, 20);
