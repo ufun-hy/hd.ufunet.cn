@@ -47,6 +47,15 @@
 		</div>
 	</div>
 	<script>
+	function syncDanmakuColorMode(){
+		var mode = $(".danmaku input[name='styleconfig[danmakucolormode]']:checked").val() || 'fixed';
+		$(".danmaku-color-picker").toggleClass('hidden', mode == 'random');
+	}
+	function syncImportcjMainColorCopy(flytype){
+		var danmaku = flytype == '6';
+		$(".importcj-main-color-label").text(danmaku ? '弹幕名单文字颜色' : '主色调');
+		$(".importcj-main-color-help").text(danmaku ? '仅控制弹幕名单姓名文字颜色。' : '奖品名，奖项名，中奖列表等文字均会生效');
+	}
 	$(".zam-stylewrapper .zam-styleitem").click(function(){
 		var flytype = $(this).attr('data-val');
 		$(this).addClass('hadchecked').siblings().removeClass('hadchecked');
@@ -67,6 +76,7 @@
 				$(".flystylebox .danmaku").removeClass('hidden').siblings().addClass('hidden');
 			}
 		}
+		syncImportcjMainColorCopy(flytype);
 	});
 	{if !request()->realhdid}
 	$(".zam-stylewrapper .zam-styleitem img").click(function(e){
@@ -77,6 +87,11 @@
 		});
 	});
 	{/if}
+	$(function(){
+		syncDanmakuColorMode();
+		syncImportcjMainColorCopy($(".zam-stylewrapper .zam-styleitem.hadchecked").attr('data-val') || '1');
+		$(".danmaku input[name='styleconfig[danmakucolormode]']").on('change', syncDanmakuColorMode);
+	});
 	</script>
 	<div class="flystylebox{if !isset($config['styleconfig']['flytype']) || $config['styleconfig']['flytype'] == '1' || $config['styleconfig']['flytype'] == '5'} hidden{/if}">
 		<div class="one{if isset($config['styleconfig']['flytype']) && $config['styleconfig']['flytype'] != '2'} hidden{/if}">
@@ -213,20 +228,26 @@
 				</div>
 			</div>
 			<div class="form-group">
-				<label class="col-lg-2 control-label">* 默认弹幕速度</label>
-				<div class="col-lg-4">
-					<select class="form-control" name="styleconfig[danmakuspeed]">
-						<option value="slow" {if isset($config['styleconfig']['danmakuspeed']) && $config['styleconfig']['danmakuspeed'] == 'slow'}selected{/if}>舒缓</option>
-						<option value="normal" {if !isset($config['styleconfig']['danmakuspeed']) || $config['styleconfig']['danmakuspeed'] == 'normal'}selected{/if}>标准</option>
-						<option value="fast" {if isset($config['styleconfig']['danmakuspeed']) && $config['styleconfig']['danmakuspeed'] == 'fast'}selected{/if}>热烈</option>
-					</select>
+				<label class="col-lg-2 control-label">弹幕色彩模式</label>
+				<div class="col-lg-8">
+					<label class="lyear-radio radio-inline radio-primary">
+						<input type="radio" name="styleconfig[danmakucolormode]" value="fixed" {if !isset($config['styleconfig']['danmakucolormode']) || $config['styleconfig']['danmakucolormode'] == 'fixed'}checked{/if}><span>固定色</span>
+					</label>
+					<label class="lyear-radio radio-inline radio-primary">
+						<input type="radio" name="styleconfig[danmakucolormode]" value="random" {if isset($config['styleconfig']['danmakucolormode']) && $config['styleconfig']['danmakucolormode'] == 'random'}checked{/if}><span>随机色</span>
+					</label>
 				</div>
 			</div>
-			<div class="form-group">
+			<div class="form-group danmaku-color-picker">
 				<label class="col-lg-2 control-label">弹幕主色</label>
 				<div class="col-lg-8">
 					{:tpl_color('styleconfig[danmakucolor]',$config['styleconfig']['danmakucolor']??'#58e6ff')}
-					<span class="help-block">仅影响弹幕头像、边框和轻微高光，不改变奖品和中奖结果区域</span>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-lg-2 control-label">显示弹幕背景与边框</label>
+				<div class="col-lg-8">
+					{:tpl_switch('styleconfig[danmakubox]',$config['styleconfig']['danmakubox']??'1')}
 				</div>
 			</div>
 			<div class="form-group">
@@ -244,10 +265,10 @@
 		</div>
 	</div>
 	<div class="form-group">
-		<label class="col-lg-2 control-label">主色调</label>
+		<label class="col-lg-2 control-label importcj-main-color-label">{if isset($config['styleconfig']['flytype']) && $config['styleconfig']['flytype'] == '6'}弹幕名单文字颜色{else /}主色调{/if}</label>
 		<div class="col-lg-8">
 			{:tpl_color('styleconfig[color]',$config['styleconfig']['color']??'#feca00')}
-			<span class="help-block">奖品名，奖项名，中奖列表等文字均会生效</span>
+			<span class="help-block importcj-main-color-help">{if isset($config['styleconfig']['flytype']) && $config['styleconfig']['flytype'] == '6'}仅控制弹幕名单姓名文字颜色。{else /}奖品名，奖项名，中奖列表等文字均会生效{/if}</span>
 		</div>
 	</div>
 	<div class="form-group">

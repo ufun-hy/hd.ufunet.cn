@@ -56,7 +56,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 				}
 			});
 			self.unifiedPrize.mount();
-			self.unifiedPrize.setAccent(config && config.color);
+			if (self.flytype != '6') self.unifiedPrize.setAccent(config && config.color);
 			self.syncSharedControls();
 		},
 		destroyUnifiedPrize: function () {
@@ -158,33 +158,42 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 			return self.prizeIndex;
 		},
 		getDanmakuStyleConfig: function (config) {
-			var source = config || {}, fontSize = parseInt(source.danmakusize, 10), density = source.danmakudensity, speed = source.danmakuspeed, color = source.danmakucolor;
+			var source = config || {}, fontSize = parseInt(source.danmakusize, 10), density = source.danmakudensity, colorMode = source.danmakucolormode, accentColor = source.danmakucolor, textColor = source.color;
 			if (isNaN(fontSize)) fontSize = 18;
 			fontSize = Math.max(12, Math.min(40, fontSize));
 			if ($.inArray(density, ['sparse', 'normal', 'dense']) < 0) density = 'normal';
-			if ($.inArray(speed, ['slow', 'normal', 'fast']) < 0) speed = 'normal';
-			if (typeof color != 'string' || color.length > 64) color = '';
-			if (color && typeof document != 'undefined') {
+			if ($.inArray(colorMode, ['fixed', 'random']) < 0) colorMode = 'fixed';
+			if (typeof accentColor != 'string' || accentColor.length > 64) accentColor = '';
+			if (accentColor && typeof document != 'undefined') {
 				var probe = document.createElement('span');
 				probe.style.color = '';
-				probe.style.color = color;
-				if (!probe.style.color) color = '';
+				probe.style.color = accentColor;
+				if (!probe.style.color) accentColor = '';
 			}
-			if (!color) color = '#58e6ff';
+			if (!accentColor) accentColor = '#58e6ff';
+			if (typeof textColor != 'string' || textColor.length > 64) textColor = '';
+			if (textColor && typeof document != 'undefined') {
+				var textProbe = document.createElement('span');
+				textProbe.style.color = '';
+				textProbe.style.color = textColor;
+				if (!textProbe.style.color) textColor = '';
+			}
+			if (!textColor) textColor = '#f5fbff';
 			return {
 				fontSize: fontSize,
 				density: density,
-				defaultSpeed: speed,
-				color: color,
+				colorMode: colorMode,
+				accentColor: accentColor,
+				textColor: textColor,
 				showAvatar: source.danmakuavatar === undefined ? true : String(source.danmakuavatar) == '1',
-				showExtras: source.danmakuextra === undefined ? true : String(source.danmakuextra) == '1'
+				showExtras: source.danmakuextra === undefined ? true : String(source.danmakuextra) == '1',
+				showBox: source.danmakubox === undefined ? true : String(source.danmakubox) == '1'
 			};
 		},
 		getDanmakuSpeedPreset: function () {
-			var value = null, fallback = this.danmakuStyleConfig && this.danmakuStyleConfig.defaultSpeed;
-			if ($.inArray(fallback, ['slow', 'normal', 'fast']) < 0) fallback = 'normal';
+			var value = null;
 			try { value = window.localStorage.getItem(this.getDanmakuSpeedStorageKey()); } catch (e) {}
-			return $.inArray(value, ['slow', 'normal', 'fast']) > -1 ? value : fallback;
+			return $.inArray(value, ['slow', 'normal', 'fast']) > -1 ? value : 'normal';
 		},
 		getAvailableCount: function () {
 			var self = this;

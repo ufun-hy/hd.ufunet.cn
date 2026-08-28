@@ -10,6 +10,10 @@ define([], function () {
         normal: { lanes: 6, maxItems: 36 },
         dense: { lanes: 8, maxItems: 52 }
     };
+    var ACCENT_PALETTE = [
+        '#58e6ff', '#ff8a65', '#a879ff', '#5ce6b6',
+        '#ffd166', '#ff8fc8', '#7fb3ff', '#ff6f61'
+    ];
     var SPEED_PRESETS = {
         slow: { key: 'slow', label: '舒缓', factor: 0.6, interval: 620 },
         normal: { key: 'normal', label: '标准', factor: 1.0, interval: 420 },
@@ -39,14 +43,19 @@ define([], function () {
         var fontSize = parseInt(value.fontSize, 10);
         if (isNaN(fontSize)) fontSize = 18;
         var density = DENSITY_PRESETS[value.density] ? value.density : 'normal';
-        var color = asText(value.color);
-        if (!color || color.length > 64 || /[;"'{}]/.test(color)) color = '#58e6ff';
+        var accentColor = asText(value.accentColor);
+        var textColor = asText(value.textColor);
+        if (!accentColor || accentColor.length > 64 || /[;"'{}]/.test(accentColor)) accentColor = '#58e6ff';
+        if (!textColor || textColor.length > 64 || /[;"'{}]/.test(textColor)) textColor = '#f5fbff';
         return {
             fontSize: Math.max(12, Math.min(40, fontSize)),
             density: density,
-            color: color,
+            colorMode: value.colorMode === 'random' ? 'random' : 'fixed',
+            accentColor: accentColor,
+            textColor: textColor,
             showAvatar: value.showAvatar !== false,
-            showExtras: value.showExtras !== false
+            showExtras: value.showExtras !== false,
+            showBox: value.showBox !== false
         };
     }
 
@@ -80,7 +89,8 @@ define([], function () {
         var stage = doc.createElement('div');
         stage.className = 'importcj-danmaku-stage';
         stage.style.setProperty('--danmaku-font-size', this.styleConfig.fontSize + 'px');
-        stage.style.setProperty('--danmaku-accent', this.styleConfig.color);
+        stage.style.setProperty('--danmaku-accent', this.styleConfig.accentColor);
+        stage.style.setProperty('--danmaku-text-color', this.styleConfig.textColor);
         var field = doc.createElement('div');
         field.className = 'importcj-danmaku-field';
         field.setAttribute('aria-hidden', 'true');
@@ -200,6 +210,11 @@ define([], function () {
         return DENSITY_PRESETS[this.styleConfig.density] || DENSITY_PRESETS.normal;
     };
 
+    DanmakuStage.prototype.pickAccent = function () {
+        if (this.styleConfig.colorMode !== 'random') return this.styleConfig.accentColor;
+        return ACCENT_PALETTE[randomInt(0, ACCENT_PALETTE.length - 1)];
+    };
+
     DanmakuStage.prototype.getLaneCount = function () {
         var height = this.field ? this.field.clientHeight : (this.root ? this.root.clientHeight : 660);
         return Math.max(3, Math.min(this.getDensityConfig().lanes, Math.floor(Math.max(160, height - 60) / this.laneHeight)));
@@ -219,6 +234,8 @@ define([], function () {
         var item = doc.createElement('span');
         item.className = 'importcj-danmaku-item';
         item.classList.toggle('is-no-avatar', !this.styleConfig.showAvatar);
+        item.classList.toggle('is-plain', !this.styleConfig.showBox);
+        item.style.setProperty('--danmaku-item-accent', this.pickAccent());
         var avatar;
         if (this.styleConfig.showAvatar) {
             avatar = doc.createElement('i');
