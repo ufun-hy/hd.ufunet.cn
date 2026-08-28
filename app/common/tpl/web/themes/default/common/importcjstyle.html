@@ -19,7 +19,27 @@
 					{/if}
 				</div>
 			{/foreach}
+				<div data-val="5" class="zam-styleitem{if isset($config['styleconfig']['flytype']) && $config['styleconfig']['flytype'] == '5'} hadchecked{/if}">
+					<div class="zam-styleimg">
+						<img src="/static/images/sys/style/importcj/5.jpg" onerror="javascript:this.src='/static/images/sys/nopic.jpg';this.title='暂无图片'">
+					</div>
+					<div class="zam-stylename">星环名单抽奖</div>
+					<div class="zam-selected"><i class="mdi mdi-check"></i></div>
+					{if !request()->realhdid}
+					<input type="hidden" name="styleimg5" value="/static/images/sys/style/importcj/5.jpg">
+					{/if}
 			</div>
+				<div data-val="6" data-theme-key="danmaku" class="zam-styleitem{if isset($config['styleconfig']['flytype']) && $config['styleconfig']['flytype'] == '6'} hadchecked{/if}">
+					<div class="zam-styleimg">
+						<img src="/static/images/sys/style/importcj/6.svg" onerror="javascript:this.src='/static/images/sys/nopic.jpg';this.title='暂无图片'">
+					</div>
+					<div class="zam-stylename">弹幕星河</div>
+					<div class="zam-selected"><i class="mdi mdi-check"></i></div>
+					{if !request()->realhdid}
+					<input type="hidden" name="styleimg6" value="/static/images/sys/style/importcj/6.svg">
+					{/if}
+				</div>
+				</div>
 			<input type="hidden" name="styleconfig[flytype]" value="{$config['styleconfig']['flytype']??1}">
 			{if !request()->realhdid}
 			<div class="help-block">点击图片即可上传预览图，图片尺寸：180*101px</div>
@@ -27,22 +47,34 @@
 		</div>
 	</div>
 	<script>
+	function syncDanmakuColorMode(){
+		var mode = $(".danmaku input[name='styleconfig[danmakucolormode]']:checked").val() || 'fixed';
+		$(".danmaku-color-picker").toggleClass('hidden', mode == 'random');
+	}
+	function syncImportcjMainColorCopy(flytype){
+		$(".importcj-main-color-group").toggleClass('hidden', flytype == '6');
+	}
 	$(".zam-stylewrapper .zam-styleitem").click(function(){
 		var flytype = $(this).attr('data-val');
 		$(this).addClass('hadchecked').siblings().removeClass('hadchecked');
 		$(this).parent().next().val(flytype);
-		if(flytype == '1'){
+		if(flytype == '1' || flytype == '5'){
 			$(".flystylebox").addClass('hidden');
+			$(".flystylebox").children().addClass('hidden');
 		}else{
 			$(".flystylebox").removeClass('hidden');
+			$(".flystylebox").children().addClass('hidden');
 			if(flytype == '2'){
 				$(".flystylebox .one").removeClass('hidden').siblings().addClass('hidden');
 			}else if(flytype == '3'){
 				$(".flystylebox .grid").removeClass('hidden').siblings().addClass('hidden');
-			}else{
+			}else if(flytype == '4'){
 				$(".flystylebox .sphere").removeClass('hidden').siblings().addClass('hidden');
+			}else if(flytype == '6'){
+				$(".flystylebox .danmaku").removeClass('hidden').siblings().addClass('hidden');
 			}
 		}
+		syncImportcjMainColorCopy(flytype);
 	});
 	{if !request()->realhdid}
 	$(".zam-stylewrapper .zam-styleitem img").click(function(e){
@@ -53,8 +85,13 @@
 		});
 	});
 	{/if}
+	$(function(){
+		syncDanmakuColorMode();
+		syncImportcjMainColorCopy($(".zam-stylewrapper .zam-styleitem.hadchecked").attr('data-val') || '1');
+		$(".danmaku input[name='styleconfig[danmakucolormode]']").on('change', syncDanmakuColorMode);
+	});
 	</script>
-	<div class="flystylebox{if !isset($config['styleconfig']['flytype']) || $config['styleconfig']['flytype'] == '1'} hidden{/if}">
+	<div class="flystylebox{if !isset($config['styleconfig']['flytype']) || $config['styleconfig']['flytype'] == '1' || $config['styleconfig']['flytype'] == '5'} hidden{/if}">
 		<div class="one{if isset($config['styleconfig']['flytype']) && $config['styleconfig']['flytype'] != '2'} hidden{/if}">
 			<div class="form-group">
 				<label class="col-lg-2 control-label">* 文字大小</label>
@@ -168,8 +205,65 @@
 				</div>
 			</div>
 		</div>
+		<div class="danmaku{if !isset($config['styleconfig']['flytype']) || $config['styleconfig']['flytype'] != '6'} hidden{/if}">
+			<div class="form-group">
+				<label class="col-lg-2 control-label">* 弹幕文字大小</label>
+				<div class="col-lg-4">
+					<input type="text" class="form-control numberincdec" name="styleconfig[danmakusize]"
+						data-bts-min="12" data-bts-replacement-val="18" data-bts-max="40" data-bts-step="1"
+						data-bts-postfix="px" data-bts-postfix-extra-class="touchspin-postfix"
+						value="{$config['styleconfig']['danmakusize']??18}">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-lg-2 control-label">* 弹幕密度</label>
+				<div class="col-lg-4">
+					<select class="form-control" name="styleconfig[danmakudensity]">
+						<option value="sparse" {if ($config['styleconfig']['danmakudensity']??'normal') == 'sparse'}selected{/if}>稀疏</option>
+						<option value="normal" {if !isset($config['styleconfig']['danmakudensity']) || $config['styleconfig']['danmakudensity'] == 'normal'}selected{/if}>标准</option>
+						<option value="dense" {if isset($config['styleconfig']['danmakudensity']) && $config['styleconfig']['danmakudensity'] == 'dense'}selected{/if}>密集</option>
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-lg-2 control-label">弹幕色彩模式</label>
+				<div class="col-lg-8">
+					<label class="lyear-radio radio-inline radio-primary">
+						<input type="radio" name="styleconfig[danmakucolormode]" value="fixed" {if !isset($config['styleconfig']['danmakucolormode']) || $config['styleconfig']['danmakucolormode'] == 'fixed'}checked{/if}><span>固定色</span>
+					</label>
+					<label class="lyear-radio radio-inline radio-primary">
+						<input type="radio" name="styleconfig[danmakucolormode]" value="random" {if isset($config['styleconfig']['danmakucolormode']) && $config['styleconfig']['danmakucolormode'] == 'random'}checked{/if}><span>随机色</span>
+					</label>
+				</div>
+			</div>
+			<div class="form-group danmaku-color-picker">
+				<label class="col-lg-2 control-label">弹幕强调色</label>
+				<div class="col-lg-8">
+					{:tpl_color('styleconfig[danmakucolor]',$config['styleconfig']['danmakucolor']??'#58e6ff')}
+					<span class="help-block">用于头像、边框和轻微高光，不影响姓名文字颜色</span>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-lg-2 control-label">显示弹幕背景与边框</label>
+				<div class="col-lg-8">
+					{:tpl_switch('styleconfig[danmakubox]',$config['styleconfig']['danmakubox']??'1')}
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-lg-2 control-label">显示首字头像</label>
+				<div class="col-lg-8">
+					{:tpl_switch('styleconfig[danmakuavatar]',$config['styleconfig']['danmakuavatar']??'1')}
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-lg-2 control-label">显示附加字段</label>
+				<div class="col-lg-8">
+					{:tpl_switch('styleconfig[danmakuextra]',$config['styleconfig']['danmakuextra']??'1')}
+				</div>
+			</div>
+		</div>
 	</div>
-	<div class="form-group">
+	<div class="form-group importcj-main-color-group{if isset($config['styleconfig']['flytype']) && $config['styleconfig']['flytype'] == '6'} hidden{/if}">
 		<label class="col-lg-2 control-label">主色调</label>
 		<div class="col-lg-8">
 			{:tpl_color('styleconfig[color]',$config['styleconfig']['color']??'#feca00')}

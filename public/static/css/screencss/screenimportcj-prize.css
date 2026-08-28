@@ -1,0 +1,506 @@
+/* 导入名单抽奖 flytype1–6 统一奖品展示组件。 */
+.importcj-unified-prize {
+    --importcj-prize-accent: #d6ab55;
+    --importcj-prize-text: #f4f6f9;
+    --importcj-prize-muted: rgba(228, 234, 243, .65);
+    --importcj-prize-surface: rgba(11, 16, 26, .80);
+    --importcj-prize-surface-subtle: rgba(255, 255, 255, .04);
+    --importcj-prize-surface-control: rgba(0, 0, 0, .32);
+    --importcj-prize-border: rgba(255, 255, 255, .10);
+    --importcj-prize-border-strong: rgba(255, 255, 255, .20);
+    position: absolute;
+    left: 50%;
+    top: 48%;
+    z-index: 13;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-areas:
+        "heading"
+        "media"
+        "info"
+        "controls";
+    width: min(580px, 50vw);
+    min-height: 0;
+    box-sizing: border-box;
+    column-gap: 0;
+    row-gap: 18px;
+    padding: 24px 30px 26px;
+    border: 1px solid var(--importcj-prize-border);
+    border-radius: 22px;
+    background: var(--importcj-prize-surface);
+    box-shadow: 0 16px 40px -8px rgba(0, 0, 0, .55), 0 0 0 1px var(--importcj-prize-border);
+    color: var(--importcj-prize-text);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    opacity: 1;
+    visibility: visible;
+    transform: translate3d(-50%, -50%, 0);
+    pointer-events: auto;
+    transition: opacity .28s ease, transform .28s ease, visibility .28s ease;
+}
+
+.importcj-unified-prize-heading {
+    grid-area: heading;
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--importcj-prize-border);
+}
+
+.importcj-unified-prize-label {
+    color: var(--importcj-prize-muted);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: .5px;
+    white-space: nowrap;
+}
+
+.importcj-unified-prize-award {
+    overflow: hidden;
+    color: var(--importcj-prize-accent);
+    font-size: 16px;
+    font-weight: 650;
+    line-height: 1.35;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.importcj-unified-prize-media {
+    grid-area: media;
+    display: grid;
+    min-width: 0;
+    min-height: 160px;
+    place-items: center;
+}
+
+.importcj-unified-prize-single {
+    position: relative;
+    display: grid;
+    width: 100%;
+    height: 176px;
+    place-items: center;
+    overflow: hidden;
+    border: 1px solid var(--importcj-prize-border);
+    border-radius: 16px;
+    background: var(--importcj-prize-surface-subtle);
+    box-shadow: inset 0 1px 0 var(--importcj-prize-border);
+}
+
+.importcj-unified-prize-single img {
+    display: block;
+    max-width: 90%;
+    max-height: 144px;
+    object-fit: contain;
+    filter: drop-shadow(0 12px 20px rgba(0, 0, 0, .38));
+}
+
+.importcj-unified-prize-placeholder {
+    display: none;
+    width: 48px;
+    height: 48px;
+    border: 1px solid var(--importcj-prize-border-strong);
+    border-radius: 10px;
+    color: var(--importcj-prize-accent);
+    font-size: 20px;
+    line-height: 48px;
+    text-align: center;
+    opacity: .55;
+}
+
+.importcj-unified-prize-single.is-missing img {
+    display: none;
+}
+
+.importcj-unified-prize-single.is-missing .importcj-unified-prize-placeholder {
+    display: block;
+}
+
+.importcj-unified-prize-round-list {
+    display: none;
+    width: 100%;
+    max-height: 190px;
+    grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+    gap: 8px;
+    overflow: auto;
+}
+
+.importcj-unified-prize.is-round {
+    grid-template-columns: 1fr;
+}
+
+.importcj-unified-prize.is-round .importcj-unified-prize-single {
+    display: none;
+}
+
+.importcj-unified-prize.is-round .importcj-unified-prize-round-list {
+    display: grid;
+}
+
+.importcj-unified-prize-round-item {
+    display: grid;
+    min-width: 0;
+    gap: 6px;
+    padding: 8px;
+    border: 1px solid var(--importcj-prize-border);
+    border-radius: 10px;
+    background: var(--importcj-prize-surface-subtle);
+    text-align: center;
+}
+
+.importcj-unified-prize-round-image {
+    display: grid;
+    height: 88px;
+    place-items: center;
+}
+
+.importcj-unified-prize-round-image img {
+    display: block;
+    max-width: 100%;
+    max-height: 84px;
+    object-fit: contain;
+}
+
+.importcj-unified-prize-round-image.is-missing::after {
+    content: "礼";
+    display: grid;
+    width: 34px;
+    height: 34px;
+    place-items: center;
+    border: 1px solid rgba(255, 255, 255, .18);
+    border-radius: 8px;
+    color: var(--importcj-prize-accent);
+    opacity: .5;
+}
+
+.importcj-unified-prize-round-image.is-missing img {
+    display: none;
+}
+
+.importcj-unified-prize-round-item strong {
+    display: block;
+    overflow: hidden;
+    color: var(--importcj-prize-text);
+    font-size: 12px;
+    line-height: 1.3;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.importcj-unified-prize-round-quota {
+    display: block;
+    color: var(--importcj-prize-muted);
+    font-size: 11px;
+    line-height: 1.3;
+    white-space: nowrap;
+}
+
+.importcj-unified-prize-info {
+    grid-area: info;
+    align-self: center;
+    min-width: 0;
+    padding-left: 0;
+    text-align: center;
+}
+
+.importcj-unified-prize-name {
+    display: -webkit-box;
+    overflow: hidden;
+    margin: 0;
+    color: var(--importcj-prize-text);
+    font-size: clamp(24px, 2vw, 34px);
+    font-weight: 750;
+    line-height: 1.25;
+    word-break: break-word;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+.importcj-unified-prize-count {
+    margin: 20px 0 0;
+    color: var(--importcj-prize-muted);
+    font-size: 13px;
+}
+
+.importcj-unified-prize.is-round .importcj-unified-prize-name {
+    display: none;
+}
+
+.importcj-unified-prize.is-round .importcj-unified-prize-count {
+    margin-top: 0;
+}
+
+.importcj-unified-prize-count strong {
+    margin-left: 5px;
+    color: var(--importcj-prize-text);
+    font-size: 18px;
+    font-variant-numeric: tabular-nums;
+}
+
+.importcj-unified-prize-controls {
+    grid-area: controls;
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(260px, 1fr) auto;
+    gap: 10px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255, 255, 255, .06);
+}
+
+.importcj-unified-prize-switcher,
+.importcj-unified-prize-stepper {
+    display: flex;
+    min-height: 44px;
+    align-items: center;
+    border: 1px solid var(--importcj-prize-border);
+    border-radius: 10px;
+    background: var(--importcj-prize-surface-control);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, .2);
+}
+
+.importcj-unified-prize-stepper.is-readonly {
+    cursor: default;
+}
+
+.importcj-unified-prize-stepper.is-readonly .importcj-unified-prize-input {
+    color: var(--importcj-prize-muted);
+    cursor: default;
+}
+
+.importcj-unified-prize-arrow,
+.importcj-unified-prize-select,
+.importcj-unified-prize-step,
+.importcj-unified-prize-input,
+.importcj-unified-prize-option {
+    border: 0;
+    outline: 0;
+    color: inherit;
+    background: transparent;
+    font: inherit;
+}
+
+.importcj-unified-prize-arrow,
+.importcj-unified-prize-step {
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
+    padding: 0;
+    cursor: pointer;
+    transition: background 140ms ease, color 140ms ease;
+}
+
+.importcj-unified-prize-arrow {
+    color: var(--importcj-prize-muted);
+    font-size: 26px;
+}
+
+.importcj-unified-prize-select {
+    min-width: 0;
+    height: 44px;
+    flex: 1;
+    overflow: hidden;
+    border-right: 1px solid var(--importcj-prize-border);
+    border-left: 1px solid var(--importcj-prize-border);
+    cursor: pointer;
+    font-size: 13.5px;
+    font-weight: 550;
+    text-align: center;
+    transition: background 140ms ease, color 140ms ease;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.importcj-unified-prize-stepper-label,
+.importcj-unified-prize-stepper-unit {
+    padding: 0 10px;
+    color: var(--importcj-prize-muted);
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.importcj-unified-prize-step {
+    border-right: 1px solid var(--importcj-prize-border);
+    border-left: 1px solid var(--importcj-prize-border);
+    cursor: pointer;
+    color: var(--importcj-prize-text);
+    font-size: 18px;
+}
+
+.importcj-unified-prize-input {
+    width: 46px;
+    height: 44px;
+    padding: 0;
+    color: var(--importcj-prize-text);
+    font-size: 15px;
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    text-align: center;
+}
+
+.importcj-unified-prize button:hover:not(:disabled) {
+    background: rgba(255, 255, 255, .08);
+    color: var(--importcj-prize-text);
+}
+
+.importcj-unified-prize button:active:not(:disabled) {
+    background: rgba(255, 255, 255, .12);
+}
+
+.importcj-unified-prize button:focus-visible,
+.importcj-unified-prize input:focus-visible {
+    outline: 2px solid var(--importcj-prize-accent);
+    outline-offset: 2px;
+}
+
+.importcj-unified-prize button:disabled,
+.importcj-unified-prize input:disabled {
+    cursor: not-allowed;
+    opacity: .38;
+}
+
+.importcj-unified-prize-menu {
+    position: absolute;
+    left: 0;
+    bottom: 58px;
+    z-index: 4;
+    display: grid;
+    width: min(380px, 70vw);
+    max-height: 280px;
+    box-sizing: border-box;
+    padding: 6px;
+    overflow: auto;
+    border: 1px solid var(--importcj-prize-border-strong);
+    border-radius: 10px;
+    background: rgba(7, 11, 18, .96);
+    box-shadow: 0 16px 36px -6px rgba(0, 0, 0, .6), 0 0 0 1px var(--importcj-prize-border-strong);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(6px);
+    transition: opacity .14s ease, transform .14s ease, visibility .14s ease;
+}
+
+.importcj-unified-prize-menu.is-open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.importcj-unified-prize-option {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, .9fr);
+    min-height: 44px;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 11px;
+    border-radius: 6px;
+    cursor: pointer;
+    text-align: left;
+}
+
+.importcj-unified-prize-option.is-active {
+    background: rgba(255, 255, 255, .08);
+    box-shadow: inset 3px 0 var(--importcj-prize-accent);
+}
+
+.importcj-unified-prize-option strong,
+.importcj-unified-prize-option small {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.importcj-unified-prize-option strong {
+    color: var(--importcj-prize-text);
+    font-size: 13.5px;
+    font-weight: 600;
+}
+
+.importcj-unified-prize-option small {
+    color: var(--importcj-prize-muted);
+    font-size: 12px;
+    text-align: right;
+}
+
+.importcj-unified-prize-menu-empty {
+    margin: 0;
+    padding: 18px;
+    color: var(--importcj-prize-muted);
+    text-align: center;
+}
+
+.importcj-unified-prize[data-state="requesting"] {
+    opacity: .68;
+    pointer-events: none;
+}
+
+.importcj-unified-prize[data-state="starting"],
+.importcj-unified-prize[data-state="drawing"],
+.importcj-unified-prize[data-state="result"],
+.importcj-unified-prize[data-state="records"] {
+    opacity: 0;
+    visibility: hidden;
+    transform: translate3d(-50%, calc(-50% + 12px), 0);
+    pointer-events: none;
+}
+
+/* 旧节点继续参与业务、计时和测量，只取消视觉输出。 */
+.importcj-mainbox.importcj-unified-prize-enabled .importcj-header.importcj-legacy-visual,
+.importcj-mainbox.importcj-unified-prize-enabled .importcj-awardlist.importcj-legacy-visual,
+.importcj-mainbox.importcj-unified-prize-enabled .importcj-footer .select-prize,
+.importcj-mainbox.importcj-unified-prize-enabled .importcj-footer .select-box {
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+@media (max-width: 1366px) {
+    .importcj-unified-prize {
+        grid-template-columns: 1fr;
+        left: 50%;
+        width: min(540px, 56vw);
+        min-height: 0;
+        column-gap: 0;
+        row-gap: 16px;
+        padding: 20px;
+    }
+
+    .importcj-unified-prize-single {
+        height: 140px;
+    }
+
+    .importcj-unified-prize-single img {
+        max-height: 126px;
+    }
+
+    .importcj-unified-prize-name {
+        font-size: clamp(21px, 2vw, 28px);
+    }
+
+    .importcj-unified-prize-controls {
+        padding-top: 12px;
+    }
+}
+
+@media (max-width: 900px) {
+    .importcj-unified-prize,
+    .importcj-unified-prize.is-round {
+        grid-template-columns: 1fr;
+        left: 50%;
+        width: 90vw;
+        column-gap: 0;
+        padding: 16px;
+    }
+
+    .importcj-unified-prize-controls {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .importcj-unified-prize,
+    .importcj-unified-prize-menu {
+        transition: opacity .12s linear, visibility .12s linear;
+    }
+}

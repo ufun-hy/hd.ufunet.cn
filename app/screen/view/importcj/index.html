@@ -1,4 +1,7 @@
 {include file='common/header' /}
+{if isset($pcconfig['styleconfig']['flytype']) && $pcconfig['styleconfig']['flytype'] == '5'}
+<link rel="stylesheet" href="/static/css/screencss/screenimportcj-halo.css">
+{/if}
 <style>
 ::-webkit-scrollbar {
     width: 10px;
@@ -11,10 +14,14 @@
 ::-webkit-scrollbar-thumb {
     border-radius: 10px;
     outline-offset: -2px;
+    {if !isset($pcconfig['styleconfig']['flytype']) || $pcconfig['styleconfig']['flytype'] != '6'}
     background-color: {$pcconfig['styleconfig']['color']};
+    {/if}
 }
 ::-webkit-scrollbar-thumb:hover {
+    {if !isset($pcconfig['styleconfig']['flytype']) || $pcconfig['styleconfig']['flytype'] != '6'}
     background-color: {$pcconfig['styleconfig']['color']};
+    {/if}
 }
 .hidden{display: none}
 .header{pointer-events: none;}
@@ -49,7 +56,9 @@
     -webkit-align-items: center;
     -ms-flex-align: center;
     align-items: center;
+    {if !isset($pcconfig['styleconfig']['flytype']) || $pcconfig['styleconfig']['flytype'] != '6'}
     color:{$pcconfig['styleconfig']['color']};
+    {/if}
     transform-style: preserve-3d;
     will-change: transform;
 }
@@ -114,8 +123,8 @@
     top: 18px;
 }
 .importcj-lists .importcj-header .importcj-headerbg {width: 1034px;height: 76px;text-align: center;margin: 0 auto; background: url({:tomedia($pcconfig['styleconfig']['topbg'])}) no-repeat; background-size: cover;}
-.importcj-lists .importcj-header .awardname {font-weight: bold; font-size: {$pcconfig['styleconfig']['awardsize']??30}px;color: {$pcconfig['styleconfig']['color']};line-height:1}
-.importcj-lists .importcj-header .prizename {height:30px;text-align: center;font-size: {$pcconfig['styleconfig']['prizesize']??25}px;font-weight: bold;color:{$pcconfig['styleconfig']['color']};line-height: 1;}
+.importcj-lists .importcj-header .awardname {font-weight: bold; font-size: {$pcconfig['styleconfig']['awardsize']??30}px;{if !isset($pcconfig['styleconfig']['flytype']) || $pcconfig['styleconfig']['flytype'] != '6'}color: {$pcconfig['styleconfig']['color']};{/if}line-height:1}
+.importcj-lists .importcj-header .prizename {height:30px;text-align: center;font-size: {$pcconfig['styleconfig']['prizesize']??25}px;font-weight: bold;{if !isset($pcconfig['styleconfig']['flytype']) || $pcconfig['styleconfig']['flytype'] != '6'}color:{$pcconfig['styleconfig']['color']};{/if}line-height: 1;}
 .isroundcj .importcj-header .prizename{display: none;}
 .headerani { animation: headerani 0.6s ease-out 0s both; }
 @keyframes headerani { 
@@ -139,12 +148,12 @@
         opacity:1
     }
 }
-.importcj-lists .importcj-footer-box {width: 100%; height: 100%; background: url({:tomedia($pcconfig['styleconfig']['bottombg'])}) no-repeat center center; background-size: 100% 100%; box-sizing: border-box;color: {$pcconfig['styleconfig']['color']}; font-size: 18px;}
+.importcj-lists .importcj-footer-box {width: 100%; height: 100%; background: url({:tomedia($pcconfig['styleconfig']['bottombg'])}) no-repeat center center; background-size: 100% 100%; box-sizing: border-box;{if !isset($pcconfig['styleconfig']['flytype']) || $pcconfig['styleconfig']['flytype'] != '6'}color: {$pcconfig['styleconfig']['color']};{/if} font-size: 18px;}
 .importcj-lists .importcj-footer-box .select-prize{height: 45px; line-height: 45px; position: absolute; top:16px;left: 120px;}
 .importcj-lists .importcj-footer-box .select-prize .active-prize{padding:0 10px;width: 100px;text-align: center;}
 .importcj-lists .importcj-footer-box .select-prize span{font-size: 20px;font-weight: bold;cursor: pointer;}
 .importcj-lists .importcj-footer-box .select-box {position: absolute; top:-10px;left: 50%;transform: translate(-50%, 0%); width: 220px; height: 45px; line-height: 45px;display: flex; flex-wrap: nowrap; justify-content: center; font-size: 14px;}
-.importcj-lists .importcj-footer-box input{width:45px;line-height: 45px; font-size: 18px; height: 25px; margin: 10px 4px; border-radius: 6px; border: 0; text-align: center; color: {$pcconfig['styleconfig']['color']}; background-color: rgba(255,235,59,0.15);}
+.importcj-lists .importcj-footer-box input{width:45px;line-height: 45px; font-size: 18px; height: 25px; margin: 10px 4px; border-radius: 6px; border: 0; text-align: center;{if !isset($pcconfig['styleconfig']['flytype']) || $pcconfig['styleconfig']['flytype'] != '6'}color: {$pcconfig['styleconfig']['color']};{/if} background-color: rgba(255,235,59,0.15);}
 .importcj-lists .importcj-footer-box input:focus{outline: 0;border: 0;}
 .importcj-lists .importcj-footer-box .btn-start,.importcj-lists .importcj-footer-box .btn-close {width: 153px; height: 45px; line-height: 45px; position: absolute; top:50px;left: calc(50% - 153px/2);text-align: center; border-radius: 45px;cursor: pointer; color: #fff; font-size: 18px;font-weight:bold;letter-spacing: 3px;background-image: url({:tomedia($pcconfig['styleconfig']['btn'])});backgroud-repeat: no-repeat; background-size: cover;}
 .importcj-lists .importcj-footer-box .btn-showalllucker {width: 200px; height: 45px; line-height: 45px; position: absolute; top:16px;right: 140px; text-align: center; cursor: pointer;}
@@ -270,7 +279,7 @@
 .isdrawed .importcj-lists .importcj-footer{height: 58px;}
 .isdrawed .importcj-lists .importcj-footer .btn-start,.isdrawed .importcj-lists .importcj-footer .btn-close{top: 10px;}
 .isdrawed .importcj-lists .importcj-body .importcj-luckerbox{display: block!important}
-.isdrawed .importcj-lists .importcj-footer-box{background:none;}
+.isdrawed:not(.flybox6) .importcj-lists .importcj-footer-box{background:none;}
 .isdrawed .importcj-awardbox,.isdrawed .importcj-footer-box .select-box,.isdrawed .importcj-footer-box .select-prize,.isdrawed .importcj-footer-box .btn-showalllucker{display: none}
 .importcj-luckerbox-lists {transform-style: preserve-3d;
     -webkit-transform-style: preserve-3d;
@@ -298,7 +307,9 @@
     -webkit-transform-style: preserve-3d;
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
+    {if !isset($pcconfig['styleconfig']['flytype']) || $pcconfig['styleconfig']['flytype'] != '6'}
     color:{$pcconfig['styleconfig']['color']};
+    {/if}
 }
 .importcj-luckerbox-lists li.importcj-luckerbox-item .lucker-one-item {
     padding: {$pcconfig['styleconfig']['padding']??7}px;
@@ -421,7 +432,7 @@
 .isdrawing .importcj-awardbox,.isdrawing .importcj-footer-box .select-box,.isdrawing .importcj-footer-box .select-prize,.isdrawing .importcj-footer-box .btn-showalllucker,.isdrawing .importcj-tip{
     display:none;
 }
-.isdrawing .importcj-footer-box{
+.isdrawing:not(.flybox6) .importcj-footer-box{
     background:none;
 }
 .isdrawing .importcj-footer .btn-start{
@@ -434,6 +445,11 @@
 }
 {/if}
 </style>
+<link rel="stylesheet" href="/static/css/screencss/screenimportcj-prize.css">
+<link rel="stylesheet" href="/static/css/screencss/screenimportcj-stage-ui.css">
+{if isset($pcconfig['styleconfig']['flytype']) && $pcconfig['styleconfig']['flytype'] == '6'}
+<link rel="stylesheet" href="/static/css/screencss/screenimportcj-danmaku.css">
+{/if}
 {if !empty($pcconfig['iscjingmusic'])}
 <audio id="cjingmusic" src="{:tomedia($pcconfig['iscjingmusic'])}" loop preload="preload" style="display:none"></audio>
 {/if}
@@ -446,20 +462,20 @@
         <p style="padding:20px;">请到后台添加{if isset($pcconfig['isroundcj']) && $pcconfig['isroundcj']=='1'}轮次{else /}奖品{/if}</p>
     </div>
     <div class="importcj-lists zam-app-flex-ajCenter hidden">
-        <div class="importcj-header zam-app-flex-ajCenter headerani">
+        <div class="importcj-header importcj-legacy-visual zam-app-flex-ajCenter headerani">
             <div class="importcj-headerbg"><span class="awardname">xxx</span></div>
             <div class="prizename">xxx奖品</div>
         </div>
         <div class="importcj-body zam-app-flex-ajCenter">
-            <div class="importcj-awardlist"></div>
-            <div class="importcj-luckerbox">
+            <div class="importcj-awardlist importcj-legacy-visual"></div>
+            <div class="importcj-luckerbox importcj-legacy-visual">
                 <div class="importcj-luckerbox-content">
-                    <ul class="importcj-luckerbox-lists"></ul>
+                    <ul class="importcj-luckerbox-lists importcj-legacy-visual"></ul>
                     <div class="importcj-btip hidden">尽显公平与公正</div>
                 </div>
             </div>
         </div>
-        <div class="importcj-footer footerani">
+        <div class="importcj-footer{if isset($pcconfig['styleconfig']['flytype']) && $pcconfig['styleconfig']['flytype'] == '6'} importcj-legacy-visual{/if} footerani"{if isset($pcconfig['styleconfig']['flytype']) && $pcconfig['styleconfig']['flytype'] == '6'} aria-hidden="true"{/if}>
             <div class="importcj-footer-box">
                 <div class="select-prize zam-app-flex">
                     <div class="prev-prize"><span class="mxc-back"></span></div>
@@ -473,7 +489,7 @@
                 </div>
                 <div class="btn-start">开始</div>
                 <div class="btn-close hidden">关闭</div>
-                <div class="btn-showalllucker">{$pcconfig['styleconfig']['listname']??'中奖列表'}<span class="lucker-numbox"><span class="lucker-num">0</span>/<span class="prize-num">0</span></span></div>
+                <div class="btn-showalllucker">{$pcconfig['styleconfig']['listname']??'中奖列表'} · <span class="lucker-numbox">已中奖 <span class="lucker-num">0</span> / 总名额 <span class="prize-num">0</span></span></div>
             </div>
         </div>
         <div class="importcj-tip">按空格键停止</div>
@@ -495,8 +511,8 @@ require(['screenimportcj'],function(screenimportcj){
 </script>
 <script id="prize-tpl" type="html/javascript">
 <div class="importcj-awardbox zam-app-flex-ajCenter awardboxani">
-    <div class="importcj-prizeimg zam-app-flex-ajCenter"><img src="{{ prizeimg }}"></div>
-    {{ if isroundcj == '1' }}
+    <div class="importcj-prizeimg zam-app-flex-ajCenter"><img src="{{ prizeimg }}" onerror="this.classList.add('is-broken'); this.parentNode.classList.add('is-image-missing');"></div>
+    {{ if showPrizeInfo }}
     <div class="importcj-prizeinfo">
         <div class="importcj-prizename">{{ prizename }}</div>
         <div class="importcj-prizenum">{{ num }}个</div>

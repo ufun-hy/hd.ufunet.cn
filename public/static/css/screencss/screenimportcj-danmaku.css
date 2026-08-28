@@ -1,0 +1,137 @@
+/*
+ * 弹幕星河 flytype=6 专属样式。
+ * 公共奖品、控制坞、结果和中奖记录样式位于 screenimportcj-prize.css /
+ * screenimportcj-stage-ui.css，本文件不再创建公共 UI 的视觉副本。
+ */
+.importcj-mainbox.flybox6 {
+    --danmaku-ink: #effaff;
+    --danmaku-muted: rgba(214, 238, 255, .72);
+    --danmaku-gold: #f6c860;
+    --danmaku-teal: #5ce6b6;
+    --danmaku-field-bottom: 126px;
+    isolation: isolate;
+    overflow: hidden;
+    background: transparent !important;
+}
+
+.importcj-mainbox.flybox6::before,
+.importcj-mainbox.flybox6::after {
+    content: none !important;
+    display: none !important;
+}
+
+.importcj-danmaku-stage {
+    position: absolute;
+    inset: 0;
+    z-index: 11;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    pointer-events: none;
+    transform: none !important;
+}
+
+.importcj-danmaku-field {
+    position: absolute;
+    inset: 0 0 var(--danmaku-field-bottom, 126px) 0;
+    width: 100%;
+    overflow: hidden;
+    mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 90%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 90%, transparent 100%);
+}
+
+.importcj-danmaku-item {
+    position: absolute;
+    left: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 150px;
+    max-width: min(420px, 32vw);
+    box-sizing: border-box;
+    padding: 8px 18px 8px 8px;
+    overflow: hidden;
+    border: 1px solid rgba(140, 221, 255, .28);
+    border-color: color-mix(in srgb, var(--danmaku-item-accent, var(--danmaku-accent, #58e6ff)) 45%, transparent);
+    border-radius: 999px;
+    color: var(--danmaku-ink);
+    background: rgba(10, 23, 48, .92);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, .28), inset 0 1px rgba(255, 255, 255, .15), 0 0 14px color-mix(in srgb, var(--danmaku-item-accent, var(--danmaku-accent, #58e6ff)) 18%, transparent);
+    will-change: transform;
+}
+
+.importcj-danmaku-item.is-no-avatar {
+    padding-inline: 18px;
+}
+
+.importcj-danmaku-item.is-plain {
+    border-color: transparent;
+    background: transparent;
+    box-shadow: none;
+}
+
+.importcj-danmaku-avatar {
+    display: grid;
+    width: 40px;
+    height: 40px;
+    flex: 0 0 40px;
+    place-items: center;
+    border: 1px solid rgba(255, 255, 255, .45);
+    border-color: color-mix(in srgb, var(--danmaku-item-accent, var(--danmaku-accent, #58e6ff)) 70%, white);
+    border-radius: 50%;
+    color: #061525;
+    background: var(--danmaku-item-accent, var(--danmaku-accent, #58e6ff));
+    box-shadow: 0 0 18px color-mix(in srgb, var(--danmaku-item-accent, var(--danmaku-accent, #58e6ff)) 34%, transparent);
+    font-size: 17px;
+    font-style: normal;
+    font-weight: 900;
+}
+
+.importcj-danmaku-content {
+    display: flex;
+    min-width: 0;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.importcj-danmaku-name {
+    display: block;
+    max-width: 200px;
+    overflow: hidden;
+    color: var(--danmaku-name-color, #f5fbff);
+    font-size: var(--danmaku-font-size, 18px);
+    font-weight: 800;
+    line-height: 1.2;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.importcj-danmaku-extra {
+    max-width: 110px;
+    overflow: hidden;
+    padding: 3px 8px;
+    border: 1px solid rgba(255, 255, 255, .16);
+    border-radius: 999px;
+    color: var(--danmaku-extra-color, var(--danmaku-muted));
+    font-size: 11px;
+    line-height: 1.1;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.importcj-danmaku-item.is-static {
+    position: absolute;
+    opacity: .6;
+}
+
+@media (max-width: 1366px) {
+    .importcj-danmaku-item { max-width: 34vw; padding-right: 14px; }
+    .importcj-danmaku-extra { max-width: 84px; }
+    .importcj-danmaku-avatar { width: 36px; height: 36px; flex-basis: 36px; font-size: 15px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .importcj-danmaku-item {
+        animation: none !important;
+    }
+}
