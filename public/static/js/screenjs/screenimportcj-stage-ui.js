@@ -539,6 +539,7 @@ define([], function () {
         var normalized = this.normalizeWinnerGroups(values || [], prize || {});
         var groups = normalized.groups;
         var winners = [];
+        this.resultPanel.classList.toggle('is-grouped', normalized.grouped);
         groups.forEach(function (group) { winners = winners.concat(group.winners); });
         var doc = this.resultList.ownerDocument || document;
         this.resultList.className = 'importcj-stage-result-list';
