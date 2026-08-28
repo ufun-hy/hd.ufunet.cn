@@ -425,12 +425,17 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 					}
 					self.prizeInfo = json.msg.prizelist;
 					if (self.prizeInfo.length) {
-						self.restoreLastPrize();
+						var restoredPrizeIndex = self.restoreLastPrize();
+						if (restoredPrizeIndex > 0) {
+							self.datas = [];
+							self.maxid = 0;
+						}
 						if (isroundcj == '1') {
 							self.initroundinfo(true);
 						} else {
 							self.initprize(true);
 						}
+						if (restoredPrizeIndex > 0) self.initprizedatas(self.getCurrentPrizeId());
 						fn && fn();
 					} else {
 						$(".importcj-mainbox .emptybox").removeClass('hidden');
@@ -1215,6 +1220,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 				screencore.ajaxSubmit('/screen/importcj/ajaxdatas', { isroundcj: isroundcj, prizeid: prizeid }).then(function (json) {
 				if (json.code == 0) {
 					self.datas = json.msg;
+					if (self.datas.length) self.maxid = self.datas[0].dataid;
 					self.updateCardsData();
 					self.normalizeCurrentDrawCount();
 					if (self.flytype == '6' && self.danmakuStage) {
