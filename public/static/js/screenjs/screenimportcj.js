@@ -1276,7 +1276,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 		},
 		stopLottery: function () {
 			var self = this, luckerList = self.currentLuckerList, luckerHtml = self.currentLuckerHtml;
-			if (self.isstart != '2') return false;
+			if (self.isstart != '2' || self.getVisualState() != 'drawing') return false;
 			if (self.flytype == '1' || self.flytype == '5' || self.flytype == '6') {
 				var prizeOne = self.prizeInfo[self.prizeIndex] || {}, stoptype = prizeOne.stoptype || '1';
 				if (stoptype == '1' || isroundcj == '1') {
@@ -1337,9 +1337,10 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 			return true;
 		},
 		handlePrimaryAction: function () {
-			if (this.isstart == '1') return this.startLottery();
-			if (this.isstart == '2') return this.stopLottery();
-			if (this.isstart == '3') return this.closeResult();
+			var state = this.getVisualState();
+			if (this.isstart == '1' && state == 'ready') return this.startLottery();
+			if (this.isstart == '2' && state == 'drawing') return this.stopLottery();
+			if (this.isstart == '3' && state == 'result') return this.closeResult();
 			return false;
 		},
 		handleCloseAction: function () {
