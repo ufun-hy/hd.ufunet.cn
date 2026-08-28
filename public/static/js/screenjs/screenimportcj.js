@@ -28,6 +28,8 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 		stageUi: null,
 		unifiedRoundItems: [],
 		prizeStats: null,
+		drawCount: null,
+		roundDrawCount: null,
 		visualState: 'ready',
 		stageFooterObserver: null,
 		stageFooterMutationObserver: null,
@@ -120,6 +122,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 				used: usedNum,
 				remaining: remaining
 			};
+			self.normalizeCurrentDrawCount();
 			if (self.unifiedPrize || self.stageUi || self.danmakuStage) self.syncSharedControls();
 		},
 		getDanmakuSpeedStorageKey: function () {
@@ -138,6 +141,33 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 				return null;
 			}
 			return Math.max(0, Math.min(self.prizeStats.remaining, self.datas.length));
+		},
+		normalizeDrawCount: function (value) {
+			var self = this, count = parseInt(value, 10);
+			if (isNaN(count) || count < 1) count = 1;
+			if (isroundcj == '1') {
+				return self.roundDrawCount !== null && self.roundDrawCount !== undefined ? self.roundDrawCount : count;
+			}
+			var available = self.getAvailableCount();
+			if (available !== null && available > 0) count = Math.min(count, available);
+			return count;
+		},
+		syncLegacyDrawCount: function () {
+			if (this.drawCount !== null && this.drawCount !== undefined) {
+				$('.select-box .onceout').val(this.drawCount);
+			}
+		},
+			normalizeCurrentDrawCount: function (value) {
+				var self = this;
+				if (isroundcj == '1') {
+					if (self.roundDrawCount !== null && self.roundDrawCount !== undefined) self.drawCount = self.roundDrawCount;
+					else self.drawCount = value !== undefined ? self.normalizeDrawCount(value) : null;
+			} else {
+				var source = value !== undefined ? value : (self.drawCount !== null && self.drawCount !== undefined ? self.drawCount : $('.select-box .onceout').val());
+				self.drawCount = self.normalizeDrawCount(source);
+			}
+			self.syncLegacyDrawCount();
+			return self.drawCount;
 		},
 		getPrizeOptions: function () {
 			var self = this;
@@ -160,9 +190,9 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 		getControlSnapshot: function () {
 			var self = this;
 			var available = self.getAvailableCount();
-			var onceout = $('.select-box .onceout').val();
+			var onceout = self.drawCount !== null && self.drawCount !== undefined ? self.drawCount : (isroundcj == '1' ? null : $('.select-box .onceout').val());
 			var onceoutNum = parseInt(onceout, 10);
-			var validCount = !isNaN(onceoutNum) && onceoutNum > 0 && (available === null || onceoutNum <= available);
+			var validCount = !isNaN(onceoutNum) && onceoutNum > 0 && (isroundcj == '1' || available === null || onceoutNum <= available);
 			var statsReady = available !== null;
 			var canStart = self.getVisualState() == 'ready' && statsReady && available > 0 && self.datas.length > 0 && validCount;
 			return {
@@ -170,7 +200,11 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 				prize: self.getPrize(),
 				prizes: self.getPrizeOptions(),
 				prizeIndex: self.prizeIndex,
+				drawCount: onceout || 1,
 				onceout: onceout || 1,
+				drawCountReadonly: isroundcj == '1',
+				drawCountLabel: isroundcj == '1' ? '本轮抽取' : '单次抽取',
+				drawCountUnit: isroundcj == '1' ? '名' : '人',
 				maxDrawCount: available === null ? 999 : Math.max(1, available),
 				canStart: canStart,
 				primaryEnabled: canStart || self.getVisualState() == 'drawing' || self.getVisualState() == 'result',
@@ -180,6 +214,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 		},
 		syncSharedControls: function () {
 			var self = this;
+			self.syncLegacyDrawCount();
 			var snapshot = self.getControlSnapshot();
 			if (self.unifiedPrize) self.unifiedPrize.update(snapshot);
 			if (self.stageUi) self.stageUi.update(snapshot);
@@ -187,23 +222,19 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 		},
 		setDrawCount: function (value) {
 			var self = this;
-			if (self.isstart != '1' || self.visualState != 'ready') return false;
-			var available = self.getAvailableCount();
-			var count = parseInt(value, 10);
-			if (isNaN(count) || count < 1) count = 1;
-			if (available !== null && available > 0) count = Math.min(count, available);
-			$('.select-box .onceout').val(count);
+			if (isroundcj == '1' || self.isstart != '1' || self.visualState != 'ready') return false;
+			self.normalizeCurrentDrawCount(value);
 			self.syncSharedControls();
 			return true;
 		},
 		validateDrawCount: function () {
 			var self = this;
-			var count = parseInt($('.select-box .onceout').val(), 10);
+			var count = parseInt(self.drawCount, 10);
 			var available = self.getAvailableCount();
 			if (isNaN(count) || count < 1) return { ok: false, message: '请输入大于 0 的抽取人数' };
 			if (available === null) return { ok: false, message: '正在读取当前奖项名额，请稍候' };
 			if (available <= 0) return { ok: false, message: '当前奖项已无可抽取名额' };
-			if (count > available) return { ok: false, message: '抽取人数不能超过当前剩余名额或候选人数' };
+			if (isroundcj != '1' && count > available) return { ok: false, message: '抽取人数不能超过当前剩余名额或候选人数' };
 			return { ok: true, value: count };
 		},
 		bindStageFooterOffset: function () {
@@ -311,7 +342,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 						prizes: self.getPrizeOptions(),
 						prizeIndex: self.prizeIndex,
 						prize: self.getPrize(),
-						onceout: $('.select-box .onceout').val() || 1,
+						onceout: self.drawCount || 1,
 						speedPreset: self.getDanmakuSpeedPreset(),
 						callbacks: {}
 					});
@@ -361,6 +392,8 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 			self.invalidateRecords();
 			self.unifiedRoundItems = [];
 			self.prizeStats = null;
+			self.roundDrawCount = null;
+			self.normalizeCurrentDrawCount(prizeOne.onceout);
 			//奖品信息
 			$(".importcj-header .awardname").text(prizeOne.awardname);
 			$(".importcj-header .prizename").text(prizeOne.prizename);
@@ -369,7 +402,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 			$(".importcj-body img").attr('src', prizeOne.prizeimg);
 			//底部参数
 			$(".importcj-footer .active-prize").text(prizeOne.awardname).attr("data-prizeid", prizeOne.id);
-			$(".select-box .onceout").val(prizeOne.onceout);
+			self.syncLegacyDrawCount();
 			self.initprizeandluckernum();
 			if (self.flytype == '6' && self.danmakuStage) {
 				self.danmakuStage.updatePrize(self.getPrize());
@@ -387,6 +420,8 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 			self.invalidateRecords();
 			self.unifiedRoundItems = [];
 			self.prizeStats = null;
+			self.roundDrawCount = null;
+			self.drawCount = null;
 			//轮次信息
 			$(".importcj-header .awardname").text(roundOne.roundtitle);
 			$(".importcj-header .prizename").text("");
@@ -941,6 +976,9 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 					self.unifiedRoundItems = $.map(prizes, function (item) {
 						return $.extend({}, item.prize || {}, { num: item.num });
 					});
+					self.roundDrawCount = parseInt(json.msg.prizenum, 10);
+					if (isNaN(self.roundDrawCount) || self.roundDrawCount < 1) self.roundDrawCount = null;
+					self.normalizeCurrentDrawCount();
 					$.each(prizes, function (i, v) {
 						var one = v.prize;
 						one.num = v.num;
@@ -979,7 +1017,8 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 					});
 					$(".lucker-numbox .prize-num").text(json.msg.prizenum);
 					$(".lucker-numbox .lucker-num").text(json.msg.luckernum);
-					$(".select-box").hide().find('.onceout').val(json.msg.prizenum);
+					$(".select-box").hide();
+					self.syncLegacyDrawCount();
 					self.syncPrizeStats(json.msg.prizenum, json.msg.luckernum);
 					if (self.flytype == '6' && self.danmakuStage) {
 						self.danmakuStage.updatePrize(self.getPrize());
@@ -1109,6 +1148,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 				if (json.code == 0) {
 					self.datas = json.msg;
 					self.updateCardsData();
+					self.normalizeCurrentDrawCount();
 					if (self.flytype == '6' && self.danmakuStage) {
 						self.danmakuStage.updateCandidates(self.getDanmakuCandidates());
 					}
@@ -1131,6 +1171,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 						if (self.datas.length > 800) {
 							self.datas.splice(0, (self.datas.length - 300));
 						}
+						self.normalizeCurrentDrawCount();
 							if (self.flytype == '6' && self.danmakuStage) {
 								self.danmakuStage.updateCandidates(self.getDanmakuCandidates());
 							}
@@ -1169,7 +1210,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 							return false;
 						}
 						onceout = String(drawValidation.value);
-						$('.select-box .onceout').val(onceout);
+						self.syncLegacyDrawCount();
 					}
 					self.initrollitem(onceout > maxrollnum ? maxrollnum : onceout);
 					clickstart = true;
@@ -1610,24 +1651,11 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 			});
 			keyboardJS.bind('up', function (e) {
 				if (self.isstart != '1' || isroundcj == '1') return false;
-				var denum = parseInt($(".onceout").val());
-				denum++;
-				if (denum >= self.prizeInfo[self.prizeIndex].prizenum) {
-					denum = self.prizeInfo[self.prizeIndex].prizenum;
-				}
-				$(".onceout").val(denum);
-				if (self.flytype == '6' || self.unifiedPrize) self.syncSharedControls();
+				self.setDrawCount((parseInt(self.drawCount, 10) || 1) + 1);
 			});
 			keyboardJS.bind('down', function (e) {
 				if (self.isstart != '1' || isroundcj == '1') return false;
-				var denum = parseInt($(".onceout").val());
-				if (denum > 1) {
-					denum--;
-				} else {
-					denum = 1;
-				}
-				$(".onceout").val(denum);
-				if (self.flytype == '6' || self.unifiedPrize) self.syncSharedControls();
+				self.setDrawCount(Math.max(1, (parseInt(self.drawCount, 10) || 1) - 1));
 			});
 			keyboardJS.bind('shift', function (e) {
 				$(".btn-showalllucker").trigger('click');

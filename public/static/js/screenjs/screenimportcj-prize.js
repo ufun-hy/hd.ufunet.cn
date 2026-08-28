@@ -39,6 +39,9 @@ define([], function () {
         this.prizeIndex = 0;
         this.drawCount = 1;
         this.maxDrawCount = 999;
+        this.drawCountReadonly = false;
+        this.drawCountLabel = '单次抽取';
+        this.drawCountUnit = '人';
         this.state = 'ready';
         this.refs = {};
         this.boundDocumentClick = this.handleDocumentClick.bind(this);
@@ -106,7 +109,8 @@ define([], function () {
         var stepper = createElement(doc, 'div', 'importcj-unified-prize-stepper');
         stepper.setAttribute('role', 'group');
         stepper.setAttribute('aria-label', '单次抽取人数');
-        stepper.appendChild(createElement(doc, 'span', 'importcj-unified-prize-stepper-label', '单次抽取'));
+        var stepperLabel = createElement(doc, 'span', 'importcj-unified-prize-stepper-label', '单次抽取');
+        stepper.appendChild(stepperLabel);
         var decrease = createElement(doc, 'button', 'importcj-unified-prize-step', '−');
         decrease.type = 'button';
         decrease.setAttribute('aria-label', '减少抽取人数');
@@ -121,7 +125,8 @@ define([], function () {
         stepper.appendChild(decrease);
         stepper.appendChild(input);
         stepper.appendChild(increase);
-        stepper.appendChild(createElement(doc, 'span', 'importcj-unified-prize-stepper-unit', '人'));
+        var stepperUnit = createElement(doc, 'span', 'importcj-unified-prize-stepper-unit', '人');
+        stepper.appendChild(stepperUnit);
 
         var menu = createElement(doc, 'div', 'importcj-unified-prize-menu');
         menu.setAttribute('role', 'listbox');
@@ -152,6 +157,9 @@ define([], function () {
             decrease: decrease,
             input: input,
             increase: increase,
+            stepper: stepper,
+            stepperLabel: stepperLabel,
+            stepperUnit: stepperUnit,
             menu: menu
         };
         this.bindEvents();
@@ -183,20 +191,20 @@ define([], function () {
             if (!self.disabled(this)) self.commitDrawCount(self.drawCount + 1);
         });
         this.refs.input.addEventListener('input', function () {
-            if (!this.disabled) this.value = this.value.replace(/\D/g, '');
+            if (!this.disabled && !self.drawCountReadonly) this.value = this.value.replace(/\D/g, '');
         });
         this.refs.input.addEventListener('change', function () {
-            if (!this.disabled) self.commitDrawCount(this.value);
+            if (!this.disabled && !self.drawCountReadonly) self.commitDrawCount(this.value);
         });
         this.refs.input.addEventListener('blur', function () {
-            if (!this.disabled) self.commitDrawCount(this.value);
+            if (!this.disabled && !self.drawCountReadonly) self.commitDrawCount(this.value);
         });
         this.refs.input.addEventListener('keydown', function (event) {
             if (event.key === ' ' || event.key === 'ArrowUp' || event.key === 'ArrowDown') event.stopPropagation();
             if (event.key === 'Enter') {
                 event.preventDefault();
                 event.stopPropagation();
-                self.commitDrawCount(this.value);
+                if (!self.drawCountReadonly) self.commitDrawCount(this.value);
                 this.blur();
             }
         });
@@ -294,7 +302,6 @@ define([], function () {
         if (this.state !== 'ready') return;
         var count = parseInt(value, 10);
         if (isNaN(count) || count < 1) count = 1;
-        if (this.maxDrawCount > 0) count = Math.min(count, this.maxDrawCount);
         this.drawCount = count;
         this.refs.input.value = String(count);
         this.trigger('onDrawCountChange', count);
@@ -350,12 +357,22 @@ define([], function () {
         this.panel.setAttribute('data-state', this.state);
         var ready = this.state === 'ready';
         var singlePrize = this.prizes.length < 2;
+        var readonly = !!this.drawCountReadonly;
         this.refs.prev.disabled = !ready || singlePrize;
         this.refs.next.disabled = !ready || singlePrize;
         this.refs.select.disabled = !ready || singlePrize;
-        this.refs.decrease.disabled = !ready;
+        this.refs.decrease.disabled = !ready || readonly;
         this.refs.input.disabled = !ready;
-        this.refs.increase.disabled = !ready;
+        this.refs.input.readOnly = readonly;
+        this.refs.input.setAttribute('aria-readonly', readonly ? 'true' : 'false');
+        this.refs.increase.disabled = !ready || readonly;
+        this.refs.decrease.hidden = readonly;
+        this.refs.increase.hidden = readonly;
+        this.refs.input.classList.toggle('is-readonly', readonly);
+        this.refs.stepper.classList.toggle('is-readonly', readonly);
+        this.refs.stepperLabel.textContent = this.drawCountLabel || (readonly ? '本轮抽取' : '单次抽取');
+        this.refs.stepperUnit.textContent = this.drawCountUnit || (readonly ? '名' : '人');
+        this.refs.stepper.setAttribute('aria-label', readonly ? '本轮抽取人数（只读）' : '单次抽取人数');
         if (!ready) this.closeMenu();
     };
 
@@ -365,9 +382,12 @@ define([], function () {
         if (data.prizes !== undefined) this.prizes = data.prizes || [];
         if (data.prizeIndex !== undefined) this.prizeIndex = Math.max(0, parseInt(data.prizeIndex, 10) || 0);
         if (data.maxDrawCount !== undefined) this.maxDrawCount = Math.max(1, parseInt(data.maxDrawCount, 10) || 1);
+        if (data.drawCountReadonly !== undefined) this.drawCountReadonly = !!data.drawCountReadonly;
+        if (data.drawCountLabel !== undefined) this.drawCountLabel = String(data.drawCountLabel);
+        if (data.drawCountUnit !== undefined) this.drawCountUnit = String(data.drawCountUnit);
         if (data.onceout !== undefined || data.drawCount !== undefined) {
-            this.drawCount = parseInt(data.onceout !== undefined ? data.onceout : data.drawCount, 10) || 1;
-            this.drawCount = Math.max(1, Math.min(this.drawCount, this.maxDrawCount));
+            this.drawCount = parseInt(data.drawCount !== undefined ? data.drawCount : data.onceout, 10) || 1;
+            this.drawCount = Math.max(1, this.drawCount);
             this.refs.input.value = String(this.drawCount);
         }
         if (data.prize !== undefined) this.updatePrize(data.prize);
