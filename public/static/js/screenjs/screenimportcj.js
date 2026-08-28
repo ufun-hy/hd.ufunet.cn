@@ -36,6 +36,9 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 		stageFooterWindow: null,
 		recordsRequestId: 0,
 		recordsPrizeId: null,
+		drawRequestPending: false,
+		currentLuckerHtml: '',
+		currentLuckerList: [],
 		mountUnifiedPrize: function (config) {
 			var self = this;
 			if (!screenimportcjPrize) return;
@@ -65,12 +68,9 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 				speedEnabled: self.flytype == '6',
 				speedPreset: self.getDanmakuSpeedPreset(),
 				callbacks: {
-					/* legacy bridge: keep existing clickstart, lifecycle and keyboard behavior. */
-					onPrimaryAction: function () {
-						if (self.isstart == '1' || self.isstart == '2' || self.isstart == '3') $('.btn-start').trigger('click');
-					},
-					onRecords: function () { $('.btn-showalllucker').trigger('click'); },
-					onRecordsClose: function () { self.closeRecords(); },
+					onPrimaryAction: function () { return self.handlePrimaryAction(); },
+					onRecords: function () { return self.openRecords(); },
+					onRecordsClose: function () { return self.closeRecords(); },
 					onRecordsRetry: function () {
 						if (self.isstart == '4') {
 							self.openRecords(true);
@@ -1114,8 +1114,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 			var recordsActive = self.isstart == '4' || self.visualState == 'records' || (self.stageUi && self.stageUi.state == 'records') || (self.danmakuStage && self.danmakuStage.state == 'records');
 			if (!recordsActive) return false;
 			self.invalidateRecords();
-			$('.btn-close').trigger('click');
-			return true;
+			return self.closeResult();
 		},
 		startDrawingAnimation: function () {
 			var self = this;
@@ -1187,233 +1186,174 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 				}, 5e3);
 			});
 		},
+		startLottery: function () {
+			var self = this, $button = $(".btn-start"), onceout = self.drawCount || '0';
+			if (self.isstart != '1' || self.drawRequestPending) return false;
+			if (self.datas.length == 0) {
+				layerBox.showMsg('奖品来源数据不存在');
+				return false;
+			}
+			if (self.flytype == '6' || self.unifiedPrize) {
+				var drawValidation = self.validateDrawCount();
+				if (!drawValidation.ok) {
+					self.syncSharedControls();
+					layerBox.showMsg(drawValidation.message);
+					return false;
+				}
+				onceout = String(drawValidation.value);
+				self.syncLegacyDrawCount();
+			}
+			self.initrollitem(onceout > maxrollnum ? maxrollnum : onceout);
+			self.drawRequestPending = true;
+			if (self.flytype == '6' || self.unifiedPrize) self.setVisualState('requesting');
+			screencore.ajaxSubmit('/screen/importcj/savelucker', { isroundcj: isroundcj, prizeid: $(".active-prize").attr('data-prizeid'), onceout: onceout }).then(function (e) {
+				if (e.code == 0) {
+					self.currentLuckerHtml = '';
+					self.currentLuckerList = e.msg.list;
+					if (e.msg && e.msg.lucker) self.syncPrizeStats(e.msg.lucker.prizenum, e.msg.lucker.luckernum);
+					if (self.flytype == '6' && self.danmakuStage) self.danmakuStage.updatePrize(self.getPrize());
+					if (self.unifiedPrize || self.stageUi || self.danmakuStage) self.syncSharedControls();
+					if (isroundcj == '1') {
+						$.each(e.msg.list, function (i, l) {
+							$.each(l.luckers, function (j, v) {
+								v.datafield1 = self.fieldconfig[0] ? self.initonedata(v.datafield1, self.fieldconfig[0]) : '';
+								v.datafield2 = self.fieldconfig[1] ? self.initonedata(v.datafield2, self.fieldconfig[1]) : '';
+								v.datafield3 = self.fieldconfig[2] ? self.initonedata(v.datafield3, self.fieldconfig[2]) : '';
+								v.datafield4 = self.fieldconfig[3] ? self.initonedata(v.datafield4, self.fieldconfig[3]) : '';
+							});
+							self.currentLuckerHtml += template('roundlucker-item', l);
+						});
+					} else {
+						$.each(e.msg.list, function (i, v) {
+							v.xuhao = self.initNumXuhao(i);
+							v.isdrawed = '2';
+							v.datafield1 = self.fieldconfig[0] ? self.initonedata(v.datafield1, self.fieldconfig[0]) : '';
+							v.datafield2 = self.fieldconfig[1] ? self.initonedata(v.datafield2, self.fieldconfig[1]) : '';
+							v.datafield3 = self.fieldconfig[2] ? self.initonedata(v.datafield3, self.fieldconfig[2]) : '';
+							v.datafield4 = self.fieldconfig[3] ? self.initonedata(v.datafield4, self.fieldconfig[3]) : '';
+							self.currentLuckerHtml += template("lucker-tpl", v);
+						});
+					}
+					if (self.flytype != '6') screencore.hideFootAndQr();
+					setTimeout(function () {
+						var firevideo1 = $(".firevideo1");
+						if (firevideo1.length) {
+							firevideo1.show();
+							firevideo1[0].play();
+							firevideo1.unbind('ended').bind('ended', function () {
+								firevideo1.hide();
+								self.startDrawingAnimation();
+							});
+						} else {
+							self.startDrawingAnimation();
+						}
+					}, 50);
+					$(".importcj-mainbox").removeClass('isdrawed').addClass('isdrawing');
+					self.isstart = '2';
+					if (self.flytype == '6' || self.unifiedPrize || self.stageUi) self.setVisualState('starting');
+					setTimeout(function () {
+						$button.text('停止');
+						if (self.isstart == '2' && (self.flytype == '6' || self.unifiedPrize || self.stageUi)) self.setVisualState('drawing');
+						if (e.msg.lucker) {
+							$(".lucker-numbox .prize-num").text(e.msg.lucker.prizenum);
+							$(".lucker-numbox .lucker-num").text(e.msg.lucker.luckernum);
+						}
+					}, 3e3);
+					screencore.bgmusicpause();
+					if ($("#cjingmusic").length > 0) $("#cjingmusic")[0].play();
+				} else {
+					self.drawRequestPending = false;
+					if (self.flytype == '6' || self.unifiedPrize) self.setVisualState('ready');
+					layerBox.showMsg(e.msg);
+				}
+				setTimeout(function () { self.drawRequestPending = false; }, 1e3);
+			}, function () {
+				self.drawRequestPending = false;
+				if (self.flytype == '6' || self.unifiedPrize) self.setVisualState('ready');
+				layerBox.showMsg('出现异常，请稍后重试');
+			});
+			return true;
+		},
+		stopLottery: function () {
+			var self = this, luckerList = self.currentLuckerList, luckerHtml = self.currentLuckerHtml;
+			if (self.isstart != '2') return false;
+			if (self.flytype == '1' || self.flytype == '5' || self.flytype == '6') {
+				var prizeOne = self.prizeInfo[self.prizeIndex] || {}, stoptype = prizeOne.stoptype || '1';
+				if (stoptype == '1' || isroundcj == '1') {
+					self.stoprollitem();
+				} else {
+					var stopAll = self.stopOnerollitem(stoptype, luckerList);
+					if (!stopAll) return false;
+				}
+				if (self.flytype == '5' && self.haloStage) self.haloStage.stop();
+				if (self.flytype == '6' && self.danmakuStage) self.danmakuStage.setResult(luckerList, self.getPrize());
+			} else {
+				$(".importcj-wall").addClass('hidden');
+				self.stageStop = true;
+			}
+			if (self.stageUi) self.stageUi.setResult(luckerList, self.getPrize());
+			$(".importcj-luckerbox-lists").html(luckerHtml);
+			if (isroundcj == '1') {
+				var style = self.prizeInfo[self.prizeIndex].style || {};
+				var width = $(".importcj-luckerbox-lists").width() - 20, cols = style.rows || 8;
+				$(".prizelucklist ul li").css({ width: (width / cols) + 'px' });
+				$(".roundlucker-item .prizename").css({ color: style.awardcolor || '#FF9800', "font-size": (style.awardsize || 18) + 'px' });
+				$(".roundlucker-item .data-one").css({ "font-size": (style.namesize || 18) + 'px' });
+			}
+			$(".importcj-mainbox").removeClass('isdrawing').addClass('isdrawed');
+			$(".btn-start").text('关闭');
+			var firevideo2 = $(".firevideo2");
+			if (firevideo2.length) {
+				firevideo2.show();
+				firevideo2[0].play();
+				firevideo2.unbind('ended').bind('ended', function () { firevideo2.hide(); });
+			}
+			self.isstart = '3';
+			self.drawRequestPending = false;
+			if (self.stageUi || self.flytype == '6') self.setVisualState('result');
+			if ($("#cjingmusic").length) { $("#cjingmusic")[0].currentTime = 0; $("#cjingmusic")[0].pause(); }
+			if ($("#cjendmusic").length) $("#cjendmusic")[0].play();
+			if (isautoscroll == '1') setTimeout(function () { self.initautoScroll('.importcj-luckerbox-content'); }, 2e3);
+			return true;
+		},
+		closeResult: function () {
+			var self = this;
+			var recordsActive = self.isstart == '4' || self.visualState == 'records';
+			if (!recordsActive && self.isstart != '3' && self.visualState != 'result') return false;
+			if (isautoscroll == '1') {
+				self.removeautoScroll('.importcj-luckerbox-content');
+				setTimeout(function () { $(".importcj-mainbox").removeClass('isdrawed'); }, 20);
+			} else {
+				$(".importcj-mainbox").removeClass('isdrawed');
+			}
+			$(".btn-start").text('开始');
+			self.isstart = '1';
+			self.drawRequestPending = false;
+			if (self.stageUi || self.flytype == '6' || self.unifiedPrize) self.setVisualState('ready');
+			if (self.flytype == '6' && self.danmakuStage) self.danmakuStage.setReady(self.getDanmakuCandidates(), self.getPrize());
+			if ($("#cjendmusic").length) { $("#cjendmusic")[0].currentTime = 0; if (!$("#cjendmusic")[0].paused) $("#cjendmusic")[0].pause(); }
+			$(".importcj-luckerbox").hide();
+			setTimeout(function () { screencore.bgmusicplay(); }, 1e3);
+			return true;
+		},
+		handlePrimaryAction: function () {
+			if (this.isstart == '1') return this.startLottery();
+			if (this.isstart == '2') return this.stopLottery();
+			if (this.isstart == '3') return this.closeResult();
+			return false;
+		},
+		handleCloseAction: function () {
+			if (this.isstart == '4' || this.visualState == 'records') return this.closeRecords();
+			if (this.isstart == '3' || this.visualState == 'result') return this.closeResult();
+			return false;
+		},
 		bindevent: function () {
-			var self = this, clickstart = false, luckerHtml = '', luckerList = [];
+			var self = this;
 			keyboardJS.bind('space', function (e) {
-				$(".btn-start").trigger('click');
+				self.handlePrimaryAction();
 			});
 			$(".btn-start").click(function () {
-				var $this = $(this), onceout = $(".onceout").val() || '0';
-				if (self.isstart == '1') {
-					if (clickstart) {
-						return false;
-					}
-					if (self.datas.length == 0) {
-						layerBox.showMsg('奖品来源数据不存在');
-						return false;
-					}
-					if (self.flytype == '6' || self.unifiedPrize) {
-						var drawValidation = self.validateDrawCount();
-						if (!drawValidation.ok) {
-							self.syncSharedControls();
-							layerBox.showMsg(drawValidation.message);
-							return false;
-						}
-						onceout = String(drawValidation.value);
-						self.syncLegacyDrawCount();
-					}
-					self.initrollitem(onceout > maxrollnum ? maxrollnum : onceout);
-					clickstart = true;
-					if (self.flytype == '6' || self.unifiedPrize) self.setVisualState('requesting');
-					screencore.ajaxSubmit('/screen/importcj/savelucker', { isroundcj: isroundcj, prizeid: $(".active-prize").attr('data-prizeid'), onceout: onceout }).then(function (e) {
-						if (e.code == 0) {
-							luckerHtml = '';
-							luckerList = e.msg.list;
-							if (e.msg && e.msg.lucker) {
-								self.syncPrizeStats(e.msg.lucker.prizenum, e.msg.lucker.luckernum);
-							}
-							if (self.flytype == '6' && self.danmakuStage) {
-								self.danmakuStage.updatePrize(self.getPrize());
-							}
-							if (self.unifiedPrize || self.stageUi || self.danmakuStage) self.syncSharedControls();
-							if (isroundcj == '1') {
-								$.each(e.msg.list, function (i, l) {
-									$.each(l.luckers, function (j, v) {
-										var datafield1 = '';
-										if (self.fieldconfig[0]) {
-											datafield1 = self.initonedata(v.datafield1, self.fieldconfig[0]);
-										}
-										v.datafield1 = datafield1;
-										var datafield2 = '';
-										if (self.fieldconfig[1]) {
-											datafield2 = self.initonedata(v.datafield2, self.fieldconfig[1]);
-										}
-										v.datafield2 = datafield2;
-										var datafield3 = '';
-										if (self.fieldconfig[2]) {
-											datafield3 = self.initonedata(v.datafield3, self.fieldconfig[2]);
-										}
-										v.datafield3 = datafield3;
-										var datafield4 = '';
-										if (self.fieldconfig[3]) {
-											datafield4 = self.initonedata(v.datafield4, self.fieldconfig[3]);
-										}
-										v.datafield4 = datafield4;
-									});
-									luckerHtml += template('roundlucker-item', l);
-								});
-							} else {
-								$.each(e.msg.list, function (i, v) {
-									v.xuhao = self.initNumXuhao(i);
-									v.isdrawed = '2';
-									var datafield1 = '';
-									if (self.fieldconfig[0]) {
-										datafield1 = self.initonedata(v.datafield1, self.fieldconfig[0]);
-									}
-									v.datafield1 = datafield1;
-									var datafield2 = '';
-									if (self.fieldconfig[1]) {
-										datafield2 = self.initonedata(v.datafield2, self.fieldconfig[1]);
-									}
-									v.datafield2 = datafield2;
-									var datafield3 = '';
-									if (self.fieldconfig[2]) {
-										datafield3 = self.initonedata(v.datafield3, self.fieldconfig[2]);
-									}
-									v.datafield3 = datafield3;
-									var datafield4 = '';
-									if (self.fieldconfig[3]) {
-										datafield4 = self.initonedata(v.datafield4, self.fieldconfig[3]);
-									}
-									v.datafield4 = datafield4;
-									luckerHtml += template("lucker-tpl", v);
-								});
-							}
-							if (self.flytype != '6') screencore.hideFootAndQr();
-							setTimeout(function () {
-								var firevideo1 = $(".firevideo1");
-								if (firevideo1.length) {
-									firevideo1.show();
-									firevideo1[0].play();
-									firevideo1.unbind('ended').bind('ended', function () {
-										firevideo1.hide();
-									self.startDrawingAnimation();
-								});
-							} else {
-								self.startDrawingAnimation();
-							}
-							}, 50);
-							$(".importcj-mainbox").removeClass('isdrawed').addClass('isdrawing');
-								self.isstart = '2';
-								if (self.flytype == '6' || self.unifiedPrize || self.stageUi) self.setVisualState('starting');
-							setTimeout(function () {
-								$this.text('停止');
-								if (self.isstart == '2' && (self.flytype == '6' || self.unifiedPrize || self.stageUi)) self.setVisualState('drawing');
-								$(".lucker-numbox .prize-num").text(e.msg.lucker.prizenum);
-								$(".lucker-numbox .lucker-num").text(e.msg.lucker.luckernum);
-							}, 3e3);
-							screencore.bgmusicpause();
-							if ($("#cjingmusic").length > 0) {
-								$("#cjingmusic")[0].play();
-							}
-							} else {
-								if (self.flytype == '6' || self.unifiedPrize) self.setVisualState('ready');
-								layerBox.showMsg(e.msg);
-						}
-						setTimeout(function () {
-							clickstart = false;
-						}, 1e3);
-
-					}, function () {
-						clickstart = false;
-						if (self.flytype == '6' || self.unifiedPrize) self.setVisualState('ready');
-						layerBox.showMsg('出现异常，请稍后重试');
-					})
-				} else if (self.isstart == '2') {
-					if ($this.text() == '开始') {
-						return false;
-					}
-					if (self.flytype == '1' || self.flytype == '5' || self.flytype == '6') {
-						var prizeOne = self.prizeInfo[self.prizeIndex] || {}, stoptype = prizeOne.stoptype || '1';
-						//默认停止方式或者按轮次抽奖均不另外设置
-						if (stoptype == '1' || isroundcj == '1') {
-							self.stoprollitem();
-						} else {
-							//逐项停止
-							var stopAll = self.stopOnerollitem(stoptype, luckerList);
-							if (!stopAll) {
-								return false;
-							}
-						}
-						if (self.flytype == '5' && self.haloStage) {
-							self.haloStage.stop();
-						}
-						if (self.flytype == '6' && self.danmakuStage) {
-							self.danmakuStage.setResult(luckerList, self.getPrize());
-						}
-					} else {
-						$(".importcj-wall").addClass('hidden');
-						self.stageStop = true;
-					}
-					if (self.stageUi) {
-						self.stageUi.setResult(luckerList, self.getPrize());
-					}
-					$(".importcj-luckerbox-lists").html(luckerHtml);
-					if (isroundcj == '1') {
-						var style = self.prizeInfo[self.prizeIndex].style || {};
-						var width = $(".importcj-luckerbox-lists").width() - 20, cols = style.rows || 8;
-						$(".prizelucklist ul li").css({
-							width: (width / cols) + 'px',
-						});
-						$(".roundlucker-item .prizename").css({
-							color: style.awardcolor || '#FF9800',
-							"font-size": (style.awardsize || 18) + 'px'
-						});
-						$(".roundlucker-item .data-one").css({
-							//color: style.namecolor || '#FF9800',
-							"font-size": (style.namesize || 18) + 'px'
-						});
-					}
-					$(".importcj-mainbox").removeClass('isdrawing').addClass('isdrawed');
-					$this.text('关闭');
-					var firevideo2 = $(".firevideo2");
-					if (firevideo2.length) {
-						firevideo2.show();
-						firevideo2[0].play();
-						firevideo2.unbind('ended').bind('ended', function () {
-							firevideo2.hide();
-						});
-					}
-						self.isstart = '3';
-						if (self.stageUi || self.flytype == '6') self.setVisualState('result');
-					if ($("#cjingmusic").length) {
-						$("#cjingmusic")[0].currentTime = 0;
-						$("#cjingmusic")[0].pause();
-					}
-					if ($("#cjendmusic").length) {
-						$("#cjendmusic")[0].play();
-					}
-					if (isautoscroll == '1') {
-						setTimeout(function () {
-							self.initautoScroll('.importcj-luckerbox-content');
-						}, 2e3);
-					}
-				} else if (self.isstart == '3') {
-					if (isautoscroll == '1') {
-						self.removeautoScroll('.importcj-luckerbox-content');
-						setTimeout(function () {
-							$(".importcj-mainbox").removeClass('isdrawed');
-						}, 20)
-					} else {
-						$(".importcj-mainbox").removeClass('isdrawed');
-					}
-					$this.text('开始');
-					self.isstart = '1';
-					if (self.stageUi || self.flytype == '6') self.setVisualState('ready');
-					if (self.flytype == '6' && self.danmakuStage) {
-						self.danmakuStage.setReady(self.getDanmakuCandidates(), self.getPrize());
-					}
-					if ($("#cjendmusic").length) {
-						$("#cjendmusic")[0].currentTime = 0;
-						if (!$("#cjendmusic")[0].paused) {
-							$("#cjendmusic")[0].pause();
-						}
-					}
-					$(".importcj-luckerbox").hide();
-					setTimeout(function () {
-						screencore.bgmusicplay();
-					}, 1e3);
-				}
+				return self.handlePrimaryAction();
 			});
 			$(".importcj-luckerbox-lists").on('click', ".deldata i", function () {
 				var $this = $(this), recordid = $this.attr('data-id');
@@ -1448,150 +1388,11 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 					});
 				});
 			});
-				var allluckerclicked = false;
-				$(".btn-showalllucker").click(function () {
-					var $this = $(this);
-					if (self.stageUi || self.flytype == '6') {
-						if (self.isstart == '1' || self.isstart == '4') {
-							self.openRecords(self.isstart == '4');
-						}
-						return false;
-					}
-					if (self.isstart == '1') {
-					if (allluckerclicked) return false;
-					allluckerclicked = true;
-					self.isstart = '4';
-					if (self.unifiedPrize) self.setVisualState('records');
-					self.getprizelucker(self.prizeInfo[self.prizeIndex].id, function (lucker) {
-						var html = '';
-						if (isroundcj == '1') {
-							$.each(lucker, function (i, l) {
-								$.each(l.luckers, function (j, v) {
-									var datafield1 = '';
-									if (self.fieldconfig[0]) {
-										datafield1 = self.initonedata(v.datafield1, self.fieldconfig[0]);
-									}
-									v.datafield1 = datafield1;
-									var datafield2 = '';
-									if (self.fieldconfig[1]) {
-										datafield2 = self.initonedata(v.datafield2, self.fieldconfig[1]);
-									}
-									v.datafield2 = datafield2;
-									var datafield3 = '';
-									if (self.fieldconfig[2]) {
-										datafield3 = self.initonedata(v.datafield3, self.fieldconfig[2]);
-									}
-									v.datafield3 = datafield3;
-									var datafield4 = '';
-									if (self.fieldconfig[3]) {
-										datafield4 = self.initonedata(v.datafield4, self.fieldconfig[3]);
-									}
-									v.datafield4 = datafield4;
-								});
-								html += template('roundlucker-item', l);
-							});
-							$(".importcj-luckerbox-lists").html(html).removeClass('bigdata1 bigdata2 bigdata3 bigdata4');
-						} else {
-							$.each(lucker, function (i, v) {
-								v.xuhao = self.initNumXuhao(i);
-								v.isdrawed = '1';
-								var datafield1 = '';
-								if (self.fieldconfig[0]) {
-									datafield1 = self.initonedata(v.datafield1, self.fieldconfig[0]);
-								}
-								v.datafield1 = datafield1;
-								var datafield2 = '';
-								if (self.fieldconfig[1]) {
-									datafield2 = self.initonedata(v.datafield2, self.fieldconfig[1]);
-								}
-								v.datafield2 = datafield2;
-								var datafield3 = '';
-								if (self.fieldconfig[2]) {
-									datafield3 = self.initonedata(v.datafield3, self.fieldconfig[2]);
-								}
-								v.datafield3 = datafield3;
-								var datafield4 = '';
-								if (self.fieldconfig[3]) {
-									datafield4 = self.initonedata(v.datafield4, self.fieldconfig[3]);
-								}
-								v.datafield4 = datafield4;
-								html += template("lucker-tpl", v);
-							});
-							var num = lucker.length;
-							$(".importcj-luckerbox-lists").html(html).removeClass('bigdata1 bigdata2 bigdata3 bigdata4');
-							if (num > 0 && num <= 2) {
-								$(".importcj-luckerbox-lists").addClass('bigdata1');
-							} else if (num > 2 && num <= 4) {
-								$(".importcj-luckerbox-lists").addClass('bigdata2');
-							} else if (num > 4 && num <= 6) {
-								$(".importcj-luckerbox-lists").addClass('bigdata3');
-							} else if (num > 6 && num <= 8) {
-								$(".importcj-luckerbox-lists").addClass('bigdata4');
-							}
-						}
-						$(".btn-start").addClass('hidden');
-						$(".btn-close").removeClass('hidden');
-						$(".importcj-mainbox").removeClass('isdrawing').addClass('isdrawed');
-						if (isroundcj == '1') {
-							var style = self.prizeInfo[self.prizeIndex].style || {};
-							var width = $(".importcj-luckerbox-lists").width() - 20, cols = style.rows || 8;
-							$(".prizelucklist ul li").css({
-								width: (width / cols) + 'px',
-							});
-							$(".roundlucker-item .prizename").css({
-								color: style.awardcolor || '#FF9800',
-								"font-size": (style.awardsize || 18) + 'px'
-							});
-							$(".roundlucker-item .data-one").css({
-								//color: style.namecolor || '#FF9800',
-								"font-size": (style.namesize || 18) + 'px'
-							});
-						}
-							if (self.flytype == '6' && self.danmakuStage) {
-								self.danmakuStage.setResult(lucker, self.getPrize());
-							}
-							if (self.stageUi) {
-								self.stageUi.setResult(lucker, self.getPrize());
-							}
-							allluckerclicked = false;
-						if (isautoscroll == '1') {
-							setTimeout(function () {
-								self.initautoScroll('.importcj-luckerbox-content');
-							}, 2e3);
-						}
-					}, function (errmsg) {
-						self.isstart = '1';
-						if (self.unifiedPrize) self.setVisualState('ready');
-							if (self.flytype == '6' && self.danmakuStage) {
-								self.danmakuStage.setReady(self.getDanmakuCandidates(), self.getPrize());
-							}
-							if (self.stageUi) self.stageUi.setState('ready');
-						layerBox.showMsg(errmsg);
-					});
-				} else if (self.isstart == '4') {
-					$(".btn-close").trigger('click');
-				}
+			$(".btn-showalllucker").click(function () {
+				return self.openRecords();
 			});
 			$(".btn-close").click(function () {
-				self.isstart = '1';
-				if (self.unifiedPrize) self.setVisualState('ready');
-				if (self.flytype == '6') {
-					self.invalidateRecords();
-					if (!self.unifiedPrize) self.setVisualState('ready');
-				}
-				if (isautoscroll == '1') {
-					self.removeautoScroll('.importcj-luckerbox-content');
-					setTimeout(function () {
-						$(".importcj-mainbox").removeClass('isdrawed');
-					}, 20)
-				} else {
-					$(".importcj-mainbox").removeClass('isdrawed');
-				}
-				$(".btn-start").removeClass('hidden');
-				$(this).addClass('hidden');
-				if (self.flytype == '6' && self.danmakuStage) {
-					self.danmakuStage.setReady(self.getDanmakuCandidates(), self.getPrize());
-				}
+				return self.handleCloseAction();
 			});
 			keyboardJS.bind('/', function (e) {
 				if (self.isstart == '2') return false;
@@ -1658,7 +1459,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 				self.setDrawCount(Math.max(1, (parseInt(self.drawCount, 10) || 1) - 1));
 			});
 			keyboardJS.bind('shift', function (e) {
-				$(".btn-showalllucker").trigger('click');
+				self.openRecords();
 			});
 
 		},
