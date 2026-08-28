@@ -14,10 +14,14 @@
 ::-webkit-scrollbar-thumb {
     border-radius: 10px;
     outline-offset: -2px;
+    {if !isset($pcconfig['styleconfig']['flytype']) || $pcconfig['styleconfig']['flytype'] != '6'}
     background-color: {$pcconfig['styleconfig']['color']};
+    {/if}
 }
 ::-webkit-scrollbar-thumb:hover {
+    {if !isset($pcconfig['styleconfig']['flytype']) || $pcconfig['styleconfig']['flytype'] != '6'}
     background-color: {$pcconfig['styleconfig']['color']};
+    {/if}
 }
 .hidden{display: none}
 .header{pointer-events: none;}
@@ -52,7 +56,9 @@
     -webkit-align-items: center;
     -ms-flex-align: center;
     align-items: center;
+    {if !isset($pcconfig['styleconfig']['flytype']) || $pcconfig['styleconfig']['flytype'] != '6'}
     color:{$pcconfig['styleconfig']['color']};
+    {/if}
     transform-style: preserve-3d;
     will-change: transform;
 }
@@ -117,8 +123,8 @@
     top: 18px;
 }
 .importcj-lists .importcj-header .importcj-headerbg {width: 1034px;height: 76px;text-align: center;margin: 0 auto; background: url({:tomedia($pcconfig['styleconfig']['topbg'])}) no-repeat; background-size: cover;}
-.importcj-lists .importcj-header .awardname {font-weight: bold; font-size: {$pcconfig['styleconfig']['awardsize']??30}px;color: {$pcconfig['styleconfig']['color']};line-height:1}
-.importcj-lists .importcj-header .prizename {height:30px;text-align: center;font-size: {$pcconfig['styleconfig']['prizesize']??25}px;font-weight: bold;color:{$pcconfig['styleconfig']['color']};line-height: 1;}
+.importcj-lists .importcj-header .awardname {font-weight: bold; font-size: {$pcconfig['styleconfig']['awardsize']??30}px;{if !isset($pcconfig['styleconfig']['flytype']) || $pcconfig['styleconfig']['flytype'] != '6'}color: {$pcconfig['styleconfig']['color']};{/if}line-height:1}
+.importcj-lists .importcj-header .prizename {height:30px;text-align: center;font-size: {$pcconfig['styleconfig']['prizesize']??25}px;font-weight: bold;{if !isset($pcconfig['styleconfig']['flytype']) || $pcconfig['styleconfig']['flytype'] != '6'}color:{$pcconfig['styleconfig']['color']};{/if}line-height: 1;}
 .isroundcj .importcj-header .prizename{display: none;}
 .headerani { animation: headerani 0.6s ease-out 0s both; }
 @keyframes headerani { 
@@ -142,12 +148,12 @@
         opacity:1
     }
 }
-.importcj-lists .importcj-footer-box {width: 100%; height: 100%; background: url({:tomedia($pcconfig['styleconfig']['bottombg'])}) no-repeat center center; background-size: 100% 100%; box-sizing: border-box;color: {$pcconfig['styleconfig']['color']}; font-size: 18px;}
+.importcj-lists .importcj-footer-box {width: 100%; height: 100%; background: url({:tomedia($pcconfig['styleconfig']['bottombg'])}) no-repeat center center; background-size: 100% 100%; box-sizing: border-box;{if !isset($pcconfig['styleconfig']['flytype']) || $pcconfig['styleconfig']['flytype'] != '6'}color: {$pcconfig['styleconfig']['color']};{/if} font-size: 18px;}
 .importcj-lists .importcj-footer-box .select-prize{height: 45px; line-height: 45px; position: absolute; top:16px;left: 120px;}
 .importcj-lists .importcj-footer-box .select-prize .active-prize{padding:0 10px;width: 100px;text-align: center;}
 .importcj-lists .importcj-footer-box .select-prize span{font-size: 20px;font-weight: bold;cursor: pointer;}
 .importcj-lists .importcj-footer-box .select-box {position: absolute; top:-10px;left: 50%;transform: translate(-50%, 0%); width: 220px; height: 45px; line-height: 45px;display: flex; flex-wrap: nowrap; justify-content: center; font-size: 14px;}
-.importcj-lists .importcj-footer-box input{width:45px;line-height: 45px; font-size: 18px; height: 25px; margin: 10px 4px; border-radius: 6px; border: 0; text-align: center; color: {$pcconfig['styleconfig']['color']}; background-color: rgba(255,235,59,0.15);}
+.importcj-lists .importcj-footer-box input{width:45px;line-height: 45px; font-size: 18px; height: 25px; margin: 10px 4px; border-radius: 6px; border: 0; text-align: center;{if !isset($pcconfig['styleconfig']['flytype']) || $pcconfig['styleconfig']['flytype'] != '6'}color: {$pcconfig['styleconfig']['color']};{/if} background-color: rgba(255,235,59,0.15);}
 .importcj-lists .importcj-footer-box input:focus{outline: 0;border: 0;}
 .importcj-lists .importcj-footer-box .btn-start,.importcj-lists .importcj-footer-box .btn-close {width: 153px; height: 45px; line-height: 45px; position: absolute; top:50px;left: calc(50% - 153px/2);text-align: center; border-radius: 45px;cursor: pointer; color: #fff; font-size: 18px;font-weight:bold;letter-spacing: 3px;background-image: url({:tomedia($pcconfig['styleconfig']['btn'])});backgroud-repeat: no-repeat; background-size: cover;}
 .importcj-lists .importcj-footer-box .btn-showalllucker {width: 200px; height: 45px; line-height: 45px; position: absolute; top:16px;right: 140px; text-align: center; cursor: pointer;}
@@ -301,7 +307,9 @@
     -webkit-transform-style: preserve-3d;
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
+    {if !isset($pcconfig['styleconfig']['flytype']) || $pcconfig['styleconfig']['flytype'] != '6'}
     color:{$pcconfig['styleconfig']['color']};
+    {/if}
 }
 .importcj-luckerbox-lists li.importcj-luckerbox-item .lucker-one-item {
     padding: {$pcconfig['styleconfig']['padding']??7}px;
