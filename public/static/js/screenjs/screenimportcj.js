@@ -24,6 +24,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 		flyspheretype: '1',
 		haloStage: null,
 		danmakuStage: null,
+		danmakuStyleConfig: null,
 		unifiedPrize: null,
 		stageUi: null,
 		unifiedRoundItems: [],
@@ -130,12 +131,60 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 		getDanmakuSpeedStorageKey: function () {
 			return 'importcj:danmaku-speed:' + ((typeof XCV3Config != 'undefined' && XCV3Config.hdid) || 'default');
 		},
+		getLastPrizeStorageKey: function () {
+			var hdid = (typeof XCV3Config != 'undefined' && XCV3Config.hdid) || 'default';
+			return 'importcj:last-prize:' + hdid + ':' + (isroundcj == '1' ? 'round' : 'single');
+		},
+		getCurrentPrize: function () {
+			return this.prizeInfo[this.prizeIndex] || null;
+		},
+		getCurrentPrizeId: function () {
+			var prize = this.getCurrentPrize();
+			return prize && prize.id !== undefined && prize.id !== null && String(prize.id) !== '' ? prize.id : null;
+		},
+		rememberLastSuccessfulPrize: function (prizeId) {
+			if (!prizeId) return;
+			try { window.localStorage.setItem(this.getLastPrizeStorageKey(), String(prizeId)); } catch (e) {}
+		},
+		restoreLastPrize: function () {
+			var self = this, storedId = null, matched = -1;
+			try { storedId = window.localStorage.getItem(self.getLastPrizeStorageKey()); } catch (e) {}
+			if (storedId) {
+				$.each(self.prizeInfo, function (index, prize) {
+					if (matched < 0 && prize && String(prize.id) == String(storedId)) matched = index;
+				});
+			}
+			self.prizeIndex = matched >= 0 ? matched : 0;
+			return self.prizeIndex;
+		},
+		getDanmakuStyleConfig: function (config) {
+			var source = config || {}, fontSize = parseInt(source.danmakusize, 10), density = source.danmakudensity, speed = source.danmakuspeed, color = source.danmakucolor;
+			if (isNaN(fontSize)) fontSize = 18;
+			fontSize = Math.max(12, Math.min(40, fontSize));
+			if ($.inArray(density, ['sparse', 'normal', 'dense']) < 0) density = 'normal';
+			if ($.inArray(speed, ['slow', 'normal', 'fast']) < 0) speed = 'normal';
+			if (typeof color != 'string' || color.length > 64) color = '';
+			if (color && typeof document != 'undefined') {
+				var probe = document.createElement('span');
+				probe.style.color = '';
+				probe.style.color = color;
+				if (!probe.style.color) color = '';
+			}
+			if (!color) color = '#58e6ff';
+			return {
+				fontSize: fontSize,
+				density: density,
+				defaultSpeed: speed,
+				color: color,
+				showAvatar: source.danmakuavatar === undefined ? true : String(source.danmakuavatar) == '1',
+				showExtras: source.danmakuextra === undefined ? true : String(source.danmakuextra) == '1'
+			};
+		},
 		getDanmakuSpeedPreset: function () {
-			var value = 'normal';
-			try {
-				value = window.localStorage.getItem(this.getDanmakuSpeedStorageKey()) || 'normal';
-			} catch (e) {}
-			return $.inArray(value, ['slow', 'normal', 'fast']) > -1 ? value : 'normal';
+			var value = null, fallback = this.danmakuStyleConfig && this.danmakuStyleConfig.defaultSpeed;
+			if ($.inArray(fallback, ['slow', 'normal', 'fast']) < 0) fallback = 'normal';
+			try { value = window.localStorage.getItem(this.getDanmakuSpeedStorageKey()); } catch (e) {}
+			return $.inArray(value, ['slow', 'normal', 'fast']) > -1 ? value : fallback;
 		},
 		getAvailableCount: function () {
 			var self = this;
@@ -306,6 +355,8 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 		},
 		init: function (config) {
 			var self = this;
+			config = config || {};
+			self.danmakuStyleConfig = self.getDanmakuStyleConfig(config);
 			self.scrollSpeed = autoscrollspeed;
 			self.flytype = config.flytype || '1';
 			var mainRoot = document.querySelector('.importcj-mainbox');
@@ -346,6 +397,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 						prize: self.getPrize(),
 						onceout: self.drawCount || 1,
 						speedPreset: self.getDanmakuSpeedPreset(),
+						styleConfig: self.danmakuStyleConfig,
 						callbacks: {}
 					});
 					self.danmakuStage.mount(self.getDanmakuCandidates());
@@ -373,6 +425,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 					}
 					self.prizeInfo = json.msg.prizelist;
 					if (self.prizeInfo.length) {
+						self.restoreLastPrize();
 						if (isroundcj == '1') {
 							self.initroundinfo(true);
 						} else {
@@ -389,7 +442,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 		},
 		initprize: function (isfirst) {
 			isfirst = isfirst || false;
-			var self = this, prizeOne = self.prizeInfo[self.prizeIndex];
+			var self = this, prizeOne = self.getCurrentPrize();
 			if (!prizeOne) return;
 			self.invalidateRecords();
 			self.unifiedRoundItems = [];
@@ -417,7 +470,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 		},
 		initroundinfo: function (isfirst) {
 			isfirst = isfirst || false;
-			var self = this, roundOne = self.prizeInfo[self.prizeIndex];
+			var self = this, roundOne = self.getCurrentPrize();
 			if (!roundOne) return;
 			self.invalidateRecords();
 			self.unifiedRoundItems = [];
@@ -948,7 +1001,8 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 		},
 		initprizeandluckernum: function (prizeid) {
 			var self = this;
-			prizeid = prizeid || self.prizeInfo[self.prizeIndex].id;
+			prizeid = prizeid || self.getCurrentPrizeId();
+			if (!prizeid) return false;
 			var postdata = { isroundcj: isroundcj };
 			if (postdata.isroundcj == '1') {
 				postdata.roundid = prizeid;
@@ -971,7 +1025,8 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 		},
 		initOneround: function (roundid) {
 			var self = this;
-			roundid = roundid || self.prizeInfo[self.prizeIndex].id;
+			roundid = roundid || self.getCurrentPrizeId();
+			if (!roundid) return false;
 			screencore.ajaxSubmit('/screen/importcj/initoneround', { roundid: roundid }).then(function (json) {
 				if (json.code == 0) {
 					var html = '', round = json.msg.round || {}, prizes = round.roundawards || [], prizestyle = round.style || { cols: 5, width: 300, gap: 20, prizecolor: '#FF9800', prizesize: 18, namecolor: '#fff', namesize: 18 };
@@ -1085,7 +1140,8 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 			var self = this;
 			var recordsView = self.stageUi || (self.flytype == '6' ? self.danmakuStage : null);
 			if (!recordsView || (self.isstart != '1' && self.isstart != '3' && self.isstart != '4')) return false;
-			var id = self.prizeInfo[self.prizeIndex] && self.prizeInfo[self.prizeIndex].id;
+			var id = self.getCurrentPrizeId();
+			if (!id) return false;
 			var requestedPrizeIndex = self.prizeIndex;
 			var requestId = ++self.recordsRequestId;
 			self.recordsPrizeId = id;
@@ -1172,7 +1228,12 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 		},
 		getnewUser: function () {
 			var self = this;
-			screencore.ajaxSubmit('/screen/importcj/getmoreuser', { prizeid: $(".active-prize").attr('data-prizeid'), maxid: self.maxid }).then(function (json) {
+			var prizeId = self.getCurrentPrizeId();
+			if (!prizeId) {
+				setTimeout(function () { self.getnewUser(); }, 5e3);
+				return;
+			}
+			screencore.ajaxSubmit('/screen/importcj/getmoreuser', { prizeid: prizeId, maxid: self.maxid }).then(function (json) {
 				if (json.code == 0) {
 					var newdatas = json.msg || [];
 					if (newdatas.length) {
@@ -1200,8 +1261,12 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 			});
 		},
 		startLottery: function () {
-			var self = this, $button = $(".btn-start"), onceout = self.drawCount || '0';
+			var self = this, $button = $(".btn-start"), onceout = self.drawCount || '0', prizeId = self.getCurrentPrizeId();
 			if (self.isstart != '1' || self.drawRequestPending) return false;
+			if (!prizeId) {
+				layerBox.showMsg('请选择奖品');
+				return false;
+			}
 			if (self.datas.length == 0) {
 				layerBox.showMsg('奖品来源数据不存在');
 				return false;
@@ -1219,8 +1284,9 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 			self.initrollitem(onceout > maxrollnum ? maxrollnum : onceout);
 			self.drawRequestPending = true;
 			if (self.flytype == '6' || self.unifiedPrize) self.setVisualState('requesting');
-			screencore.ajaxSubmit('/screen/importcj/savelucker', { isroundcj: isroundcj, prizeid: $(".active-prize").attr('data-prizeid'), onceout: onceout }).then(function (e) {
+			screencore.ajaxSubmit('/screen/importcj/savelucker', { isroundcj: isroundcj, prizeid: prizeId, onceout: onceout }).then(function (e) {
 				if (e.code == 0) {
+					self.rememberLastSuccessfulPrize(prizeId);
 					self.currentLuckerHtml = '';
 					self.currentLuckerList = e.msg.list;
 					if (e.msg && e.msg.lucker) self.syncPrizeStats(e.msg.lucker.prizenum, e.msg.lucker.luckernum);
@@ -1373,9 +1439,9 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 				layerBox.showConfirm('警告', '删除将无法恢复，确定要删除此中奖用户么?', ['确定', '取消'], function () {
 					var postdata = { isroundcj: isroundcj, recordid: recordid };
 					if (isroundcj == '1') {
-						postdata.roundid = self.prizeInfo[self.prizeIndex].id;
+						postdata.roundid = self.getCurrentPrizeId();
 					} else {
-						postdata.prizeid = self.prizeInfo[self.prizeIndex].id;
+						postdata.prizeid = self.getCurrentPrizeId();
 					}
 					screencore.ajaxSubmit('/screen/importcj/dellucker', postdata, '').then(function (json) {
 						if (json.code == 0) {
@@ -1413,9 +1479,9 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 					var url = isroundcj == '1' ? '/screen/importcj/delroundalllucker' : '/screen/importcj/delalllucker';
 					var ajaxdata = {};
 					if (isroundcj == '1') {
-						ajaxdata.roundid = self.prizeInfo[self.prizeIndex].id;
+						ajaxdata.roundid = self.getCurrentPrizeId();
 					} else {
-						ajaxdata.prizeid = self.prizeInfo[self.prizeIndex].id;
+						ajaxdata.prizeid = self.getCurrentPrizeId();
 					}
 					screencore.ajaxSubmit(url, ajaxdata, '').then(function (e) {
 						if (e.code == 0) {
