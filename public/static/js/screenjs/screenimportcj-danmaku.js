@@ -38,21 +38,28 @@ define([], function () {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
+    function normalizeColor(value, fallback) {
+        var color = asText(value);
+        if (!color || color.length > 64 || /[;"'{}]/.test(color)) return fallback;
+        return color;
+    }
+
     function normalizeStyleConfig(value) {
         value = value || {};
         var fontSize = parseInt(value.fontSize, 10);
         if (isNaN(fontSize)) fontSize = 18;
         var density = DENSITY_PRESETS[value.density] ? value.density : 'normal';
         var accentColor = asText(value.accentColor);
-        var textColor = asText(value.textColor);
-        if (!accentColor || accentColor.length > 64 || /[;"'{}]/.test(accentColor)) accentColor = '#58e6ff';
-        if (!textColor || textColor.length > 64 || /[;"'{}]/.test(textColor)) textColor = '#f5fbff';
+        var fieldColors = value.fieldColors || {}, extraColors = fieldColors.extraColors || [];
         return {
             fontSize: Math.max(12, Math.min(40, fontSize)),
             density: density,
             colorMode: value.colorMode === 'random' ? 'random' : 'fixed',
-            accentColor: accentColor,
-            textColor: textColor,
+            accentColor: normalizeColor(accentColor, '#58e6ff'),
+            fieldColors: {
+                nameColor: normalizeColor(fieldColors.nameColor, '#f5fbff'),
+                extraColors: [0, 1, 2].map(function (index) { return normalizeColor(extraColors[index], null); })
+            },
             showAvatar: value.showAvatar !== false,
             showExtras: value.showExtras !== false,
             showBox: value.showBox !== false
@@ -90,7 +97,7 @@ define([], function () {
         stage.className = 'importcj-danmaku-stage';
         stage.style.setProperty('--danmaku-font-size', this.styleConfig.fontSize + 'px');
         stage.style.setProperty('--danmaku-accent', this.styleConfig.accentColor);
-        stage.style.setProperty('--danmaku-text-color', this.styleConfig.textColor);
+        stage.style.setProperty('--danmaku-name-color', this.styleConfig.fieldColors.nameColor);
         var field = doc.createElement('div');
         field.className = 'importcj-danmaku-field';
         field.setAttribute('aria-hidden', 'true');
@@ -248,12 +255,15 @@ define([], function () {
         name.className = 'importcj-danmaku-name';
         name.textContent = candidate.name;
         content.appendChild(name);
+        var extraIndex = 0;
         if (this.styleConfig.showExtras) candidate.extras.forEach(function (extra) {
                 var node = doc.createElement('small');
                 node.className = 'importcj-danmaku-extra';
                 node.textContent = extra;
+                if (this.styleConfig.fieldColors.extraColors[extraIndex]) node.style.setProperty('--danmaku-extra-color', this.styleConfig.fieldColors.extraColors[extraIndex]);
+                extraIndex++;
                 content.appendChild(node);
-            });
+            }, this);
         if (avatar) item.appendChild(avatar);
         item.appendChild(content);
         var width = this.field.clientWidth || (this.root ? this.root.clientWidth : 1920);

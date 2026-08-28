@@ -157,34 +157,35 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 			self.prizeIndex = matched >= 0 ? matched : 0;
 			return self.prizeIndex;
 		},
+		isSafeDanmakuColor: function (value) {
+			var color = typeof value == 'string' ? value.replace(/^\s+|\s+$/g, '') : '';
+			if (!color || color.length > 64 || /[;"'{}]/.test(color)) return null;
+			if (typeof document != 'undefined') {
+				var probe = document.createElement('span');
+				probe.style.color = '';
+				probe.style.color = color;
+				if (!probe.style.color) return null;
+			}
+			return color;
+		},
+		getDanmakuFieldColors: function () {
+			var fields = this.fieldconfig || [], nameColor = this.isSafeDanmakuColor(fields[0] && fields[0].fieldcolor) || '#f5fbff', extraColors = [];
+			for (var i = 1; i < 4; i++) extraColors.push(this.isSafeDanmakuColor(fields[i] && fields[i].fieldcolor));
+			return { nameColor: nameColor, extraColors: extraColors };
+		},
 		getDanmakuStyleConfig: function (config) {
-			var source = config || {}, fontSize = parseInt(source.danmakusize, 10), density = source.danmakudensity, colorMode = source.danmakucolormode, accentColor = source.danmakucolor, textColor = source.color;
+			var self = this, source = config || {}, fontSize = parseInt(source.danmakusize, 10), density = source.danmakudensity, colorMode = source.danmakucolormode, accentColor = source.danmakucolor;
 			if (isNaN(fontSize)) fontSize = 18;
 			fontSize = Math.max(12, Math.min(40, fontSize));
 			if ($.inArray(density, ['sparse', 'normal', 'dense']) < 0) density = 'normal';
 			if ($.inArray(colorMode, ['fixed', 'random']) < 0) colorMode = 'fixed';
-			if (typeof accentColor != 'string' || accentColor.length > 64) accentColor = '';
-			if (accentColor && typeof document != 'undefined') {
-				var probe = document.createElement('span');
-				probe.style.color = '';
-				probe.style.color = accentColor;
-				if (!probe.style.color) accentColor = '';
-			}
-			if (!accentColor) accentColor = '#58e6ff';
-			if (typeof textColor != 'string' || textColor.length > 64) textColor = '';
-			if (textColor && typeof document != 'undefined') {
-				var textProbe = document.createElement('span');
-				textProbe.style.color = '';
-				textProbe.style.color = textColor;
-				if (!textProbe.style.color) textColor = '';
-			}
-			if (!textColor) textColor = '#f5fbff';
+			accentColor = self.isSafeDanmakuColor(accentColor) || '#58e6ff';
 			return {
 				fontSize: fontSize,
 				density: density,
 				colorMode: colorMode,
 				accentColor: accentColor,
-				textColor: textColor,
+				fieldColors: self.getDanmakuFieldColors(),
 				showAvatar: source.danmakuavatar === undefined ? true : String(source.danmakuavatar) == '1',
 				showExtras: source.danmakuextra === undefined ? true : String(source.danmakuextra) == '1',
 				showBox: source.danmakubox === undefined ? true : String(source.danmakubox) == '1'
@@ -429,6 +430,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 				if (json.code == 0) {
 					self.datas = json.msg.datas;
 					self.fieldconfig = json.msg.fieldconfig;
+					if (self.danmakuStyleConfig) self.danmakuStyleConfig.fieldColors = self.getDanmakuFieldColors();
 					if (self.datas.length) {
 						self.maxid = self.datas[0].dataid;
 					}

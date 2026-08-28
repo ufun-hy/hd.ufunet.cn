@@ -52,9 +52,7 @@
 		$(".danmaku-color-picker").toggleClass('hidden', mode == 'random');
 	}
 	function syncImportcjMainColorCopy(flytype){
-		var danmaku = flytype == '6';
-		$(".importcj-main-color-label").text(danmaku ? '弹幕名单文字颜色' : '主色调');
-		$(".importcj-main-color-help").text(danmaku ? '仅控制弹幕名单姓名文字颜色。' : '奖品名，奖项名，中奖列表等文字均会生效');
+		$(".importcj-main-color-group").toggleClass('hidden', flytype == '6');
 	}
 	$(".zam-stylewrapper .zam-styleitem").click(function(){
 		var flytype = $(this).attr('data-val');
@@ -239,9 +237,10 @@
 				</div>
 			</div>
 			<div class="form-group danmaku-color-picker">
-				<label class="col-lg-2 control-label">弹幕主色</label>
+				<label class="col-lg-2 control-label">弹幕强调色</label>
 				<div class="col-lg-8">
 					{:tpl_color('styleconfig[danmakucolor]',$config['styleconfig']['danmakucolor']??'#58e6ff')}
+					<span class="help-block">用于头像、边框和轻微高光，不影响姓名文字颜色</span>
 				</div>
 			</div>
 			<div class="form-group">
@@ -264,11 +263,11 @@
 			</div>
 		</div>
 	</div>
-	<div class="form-group">
-		<label class="col-lg-2 control-label importcj-main-color-label">{if isset($config['styleconfig']['flytype']) && $config['styleconfig']['flytype'] == '6'}弹幕名单文字颜色{else /}主色调{/if}</label>
+	<div class="form-group importcj-main-color-group{if isset($config['styleconfig']['flytype']) && $config['styleconfig']['flytype'] == '6'} hidden{/if}">
+		<label class="col-lg-2 control-label">主色调</label>
 		<div class="col-lg-8">
 			{:tpl_color('styleconfig[color]',$config['styleconfig']['color']??'#feca00')}
-			<span class="help-block importcj-main-color-help">{if isset($config['styleconfig']['flytype']) && $config['styleconfig']['flytype'] == '6'}仅控制弹幕名单姓名文字颜色。{else /}奖品名，奖项名，中奖列表等文字均会生效{/if}</span>
+			<span class="help-block">奖品名，奖项名，中奖列表等文字均会生效</span>
 		</div>
 	</div>
 	<div class="form-group">
