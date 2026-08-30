@@ -12,6 +12,7 @@ define([], function () {
     };
 
     var SVG_ICONS = {
+        settings: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="7" x2="20" y2="7"></line><circle cx="9" cy="7" r="2"></circle><line x1="4" y1="17" x2="20" y2="17"></line><circle cx="15" cy="17" r="2"></circle></svg>',
         play: '<svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"></polygon></svg>',
         stop: '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2" ry="2"></rect></svg>',
         refresh: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>',
@@ -57,6 +58,10 @@ define([], function () {
         this.btnSpeed = null;
         this.btnSpeedText = null;
         this.btnRecords = null;
+        this.btnPrizeSettings = null;
+        this.btnPrizeSettingsText = null;
+        this.prizeSettingsVisible = false;
+        this.prizeSettingsEnabled = false;
         this.speedPopover = null;
         this.recordsDrawer = null;
         this.recordsTotalCount = null;
@@ -119,8 +124,14 @@ define([], function () {
         var image = doc.createElement('img');
         image.alt = '礼品图片';
         imageWrap.appendChild(image);
+        var copy = doc.createElement('div');
+        copy.className = 'importcj-stage-result-prize-copy';
+        var award = doc.createElement('span');
+        award.className = 'importcj-stage-result-prize-award';
         var title = doc.createElement('strong');
         title.className = 'importcj-stage-result-prize-title';
+        copy.appendChild(award);
+        copy.appendChild(title);
         var count = doc.createElement('span');
         count.className = 'importcj-stage-result-prize-count';
         count.textContent = '';
@@ -129,7 +140,7 @@ define([], function () {
         countValue.textContent = '-';
         count.appendChild(countValue);
         summary.appendChild(imageWrap);
-        summary.appendChild(title);
+        summary.appendChild(copy);
         summary.appendChild(count);
         var list = doc.createElement('div');
         list.className = 'importcj-stage-result-list';
@@ -138,6 +149,7 @@ define([], function () {
         panel.appendChild(list);
         panel._imageWrap = imageWrap;
         panel._image = image;
+        panel._award = award;
         panel._title = title;
         panel._count = countValue;
         return panel;
@@ -163,6 +175,19 @@ define([], function () {
         divider.setAttribute('aria-hidden', 'true');
         var group = doc.createElement('div');
         group.className = 'importcj-stage-dock-group';
+        var settings = doc.createElement('button');
+        settings.type = 'button';
+        settings.className = 'importcj-stage-dock-btn is-settings';
+        settings.setAttribute('aria-label', '展开奖品设置');
+        settings.setAttribute('aria-pressed', 'false');
+        settings.disabled = true;
+        settings.title = '奖品设置';
+        var settingsIcon = doc.createElement('span');
+        settingsIcon.innerHTML = SVG_ICONS.settings;
+        var settingsText = doc.createElement('span');
+        settingsText.textContent = '奖品设置';
+        settings.appendChild(settingsIcon);
+        settings.appendChild(settingsText);
         var speed = doc.createElement('button');
         speed.type = 'button';
         speed.className = 'importcj-stage-dock-btn is-speed';
@@ -188,6 +213,7 @@ define([], function () {
         recordsText.textContent = '中奖记录';
         records.appendChild(recordsIcon);
         records.appendChild(recordsText);
+        group.appendChild(settings);
         group.appendChild(speed);
         group.appendChild(records);
         dock.appendChild(primary);
@@ -199,6 +225,8 @@ define([], function () {
         this.btnSpeed = speed;
         this.btnSpeedText = speedText;
         this.btnRecords = records;
+        this.btnPrizeSettings = settings;
+        this.btnPrizeSettingsText = settingsText;
 
         var self = this;
         primary.addEventListener('click', function (event) {
@@ -210,6 +238,10 @@ define([], function () {
             event.preventDefault();
             event.stopPropagation();
             if (!primary.disabled) self.triggerCallback('onPrimaryAction');
+        });
+        settings.addEventListener('click', function (event) {
+            event.stopPropagation();
+            if (!settings.disabled) self.triggerCallback('onPrizeSettingsToggle');
         });
         speed.addEventListener('click', function (event) {
             event.stopPropagation();
@@ -405,7 +437,8 @@ define([], function () {
         if (!this.resultPanel) return;
         var award = asText(prize.awardname || prize.roundtitle || '');
         var name = asText(prize.prizename || '');
-        var title = award && name && award !== name ? award + ' · ' + name : (name || award || '等待奖项');
+        var title = name || award || '等待奖项';
+        this.resultPanel._award.textContent = award && award !== name ? award : '';
         this.resultPanel._title.textContent = title;
         this.resultPanel._count.textContent = '';
         this.bindImage(this.resultPanel._imageWrap, this.resultPanel._image, prize.prizeimg || prize.image);
@@ -502,8 +535,15 @@ define([], function () {
         var title = doc.createElement('strong');
         title.className = 'importcj-stage-result-group-title';
         title.textContent = group.prizename || group.awardname || '中奖奖品';
+        var award = doc.createElement('span');
+        award.className = 'importcj-stage-result-group-award';
+        award.textContent = group.awardname && group.awardname !== group.prizename ? group.awardname : '';
+        var copy = doc.createElement('div');
+        copy.className = 'importcj-stage-result-group-copy';
+        copy.appendChild(award);
+        copy.appendChild(title);
         prize.appendChild(imageWrap);
-        prize.appendChild(title);
+        prize.appendChild(copy);
         header.appendChild(prize);
         var winners = doc.createElement('div');
         winners.className = 'importcj-stage-result-group-winners';
@@ -712,6 +752,16 @@ define([], function () {
         else this.openSpeedPopover();
     };
 
+    StageUi.prototype.setPrizeSettingsVisible = function (visible) {
+        var show = !!visible && this.state === 'ready' && this.prizeSettingsEnabled;
+        this.prizeSettingsVisible = show;
+        if (!this.btnPrizeSettings) return show;
+        this.btnPrizeSettings.classList.toggle('is-active', show);
+        this.btnPrizeSettings.setAttribute('aria-pressed', show ? 'true' : 'false');
+        this.btnPrizeSettings.setAttribute('aria-label', show ? '收起奖品设置' : '展开奖品设置');
+        return show;
+    };
+
     StageUi.prototype.updateDockPrimaryUI = function (customText) {
         if (!this.btnPrimary) return;
         this.btnPrimary.className = 'importcj-stage-dock-btn is-primary state-' + this.state;
@@ -748,6 +798,10 @@ define([], function () {
         var busy = this.state === 'requesting' || this.state === 'starting';
         if (this.btnSpeed) this.btnSpeed.disabled = !ready || !this.speedEnabled;
         if (this.btnRecords) this.btnRecords.disabled = (!ready && !result) || records || busy;
+        if (this.btnPrizeSettings) {
+            this.btnPrizeSettings.disabled = !ready || !this.prizeSettingsEnabled;
+            if (!ready) this.setPrizeSettingsVisible(false);
+        }
         if (!ready) this.closeSpeedPopover();
     };
 
@@ -767,7 +821,9 @@ define([], function () {
         if (!this.stage) return this;
         if (data.prize !== undefined) this.updatePrize(data.prize);
         if (data.speedPreset !== undefined) this.setSpeedPreset(data.speedPreset);
+        if (data.prizeSettingsEnabled !== undefined) this.prizeSettingsEnabled = !!data.prizeSettingsEnabled;
         if (data.state !== undefined) this.setState(data.state);
+        if (data.prizeSettingsVisible !== undefined) this.setPrizeSettingsVisible(data.prizeSettingsVisible);
         if (data.primaryText !== undefined) this.updateDockPrimaryUI(data.primaryText);
         if (data.primaryEnabled !== undefined && this.state === 'ready') this.btnPrimary.disabled = !data.primaryEnabled;
         return this;
@@ -802,6 +858,16 @@ define([], function () {
         this.stage = null;
         this.resultPanel = null;
         this.resultList = null;
+        this.btnPrimary = null;
+        this.btnPrimaryIcon = null;
+        this.btnPrimaryText = null;
+        this.btnSpeed = null;
+        this.btnSpeedText = null;
+        this.btnRecords = null;
+        this.btnPrizeSettings = null;
+        this.btnPrizeSettingsText = null;
+        this.prizeSettingsVisible = false;
+        this.prizeSettingsEnabled = false;
         this.recordsDrawer = null;
         return this;
     };
