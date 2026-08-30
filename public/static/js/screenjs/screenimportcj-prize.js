@@ -249,13 +249,13 @@ define([], function () {
     UnifiedPrize.prototype.updatePrize = function (prize) {
         prize = prize || {};
         this.prize = prize;
-        var awardName = asText(prize.awardname || prize.roundtitle || '等待奖项');
+        var awardName = asText(prize.awardname || prize.roundtitle);
         var prizeName = asText(prize.prizename || awardName || '等待奖品');
         var remaining = prize.remaining === undefined || prize.remaining === null || asText(prize.remaining) === '' ? '—' : asText(prize.remaining);
         var roundItems = Object.prototype.toString.call(prize.items) === '[object Array]' ? prize.items : [];
 
-        this.refs.award.textContent = awardName;
-        this.refs.select.textContent = awardName;
+        this.refs.award.textContent = awardName && awardName !== prizeName ? awardName : '';
+        this.refs.select.textContent = awardName || prizeName;
         this.refs.count.textContent = remaining;
         this.panel.classList.toggle('is-round', roundItems.length > 0);
         if (roundItems.length) {

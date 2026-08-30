@@ -114,9 +114,6 @@ define([], function () {
         panel.setAttribute('aria-label', '中奖揭晓结果');
         panel.setAttribute('aria-live', 'polite');
 
-        var kicker = doc.createElement('span');
-        kicker.className = 'importcj-stage-result-kicker';
-        kicker.textContent = '中奖揭晓';
         var summary = doc.createElement('div');
         summary.className = 'importcj-stage-result-summary';
         var imageWrap = doc.createElement('div');
@@ -144,7 +141,6 @@ define([], function () {
         summary.appendChild(count);
         var list = doc.createElement('div');
         list.className = 'importcj-stage-result-list';
-        panel.appendChild(kicker);
         panel.appendChild(summary);
         panel.appendChild(list);
         panel._imageWrap = imageWrap;
