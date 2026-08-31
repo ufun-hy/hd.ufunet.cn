@@ -1047,7 +1047,8 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 				if (json.code == 0) {
 					var html = '', round = json.msg.round || {}, prizes = round.roundawards || [], prizestyle = round.style || { cols: 5, width: 300, gap: 20, prizecolor: '#FF9800', prizesize: 18, namecolor: '#fff', namesize: 18 };
 					self.unifiedRoundItems = $.map(prizes, function (item) {
-						return $.extend({}, item.prize || {}, { num: item.num });
+						var prize = item.prize || {}, prizeId = item.prizeid || item.id || prize.prizeid || prize.id;
+						return $.extend({}, prize, { id: prizeId, prizeid: prizeId, num: item.num });
 					});
 					self.roundDrawCount = parseInt(json.msg.prizenum, 10);
 					if (isNaN(self.roundDrawCount) || self.roundDrawCount < 1) self.roundDrawCount = null;

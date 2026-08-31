@@ -424,6 +424,24 @@ define([], function () {
             return isFinite(number) && number >= 0 && Math.floor(number) === number ? number : null;
         }
 
+        function stablePrizeId(value) {
+            value = value || {};
+            return value.prizeid || value.prizeId || value.id || null;
+        }
+
+        function prizeImageFor(prize, value, luckers) {
+            var image = prize.prizeimg || prize.image || value.prizeimg || value.image || '';
+            if (image) return image;
+            var id = stablePrizeId(prize) || stablePrizeId(value);
+            if (!id && luckers.length) id = stablePrizeId(luckers[0]);
+            if (!id || !fallback.items || !fallback.items.length) return '';
+            for (var i = 0; i < fallback.items.length; i++) {
+                var item = fallback.items[i] || {};
+                if (String(stablePrizeId(item)) == String(id)) return item.prizeimg || item.image || '';
+            }
+            return '';
+        }
+
         function addGroup(value, inheritedPrize) {
             value = value || {};
             if (value.roundawards && value.roundawards.length) {
@@ -448,7 +466,7 @@ define([], function () {
             groups.push({
                 awardname: awardname,
                 prizename: prizename,
-                prizeimg: prize.prizeimg || prize.image || value.prizeimg || value.image || '',
+                prizeimg: prizeImageFor(prize, value, luckers),
                 planned: planned,
                 winners: winnerList
             });
