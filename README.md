@@ -35,6 +35,23 @@
    php start.php start
    ```
 
+## 生产部署保护脚本
+
+`scripts/deploy-production.sh` 只允许在 `main` 分支、tracked working tree clean 时，从 `main` 历史中的完整 40 位 commit SHA 部署。文件必须逐个通过 `--file` 指定，不会同步整个项目；覆盖前会备份到生产根目录的 `runtime/deploy-backups/`，部署后逐文件比较 Git source 与生产文件的 SHA256。
+
+默认是 dry-run，不会复制文件或创建备份；它会检查目标目录中当前文件是否已与指定 commit 一致。实际复制必须显式使用 `--apply`：
+
+```bash
+scripts/deploy-production.sh \
+  --commit "$(git rev-parse HEAD)" \
+  --target-dir /path/to/production \
+  --file app/example.php \
+  --file public/example.html \
+  --dry-run
+```
+
+确认 dry-run 后，将最后一个参数改为 `--apply`。目标目录必须能在当前主机直接访问，并且已有 `runtime/deploy-backups/`；本版本不包含 SSH、CI/CD、自动回滚或历史备份清理。
+
 ## 不进入版本库的内容
 
 以下内容包含本地配置、运行数据或客户数据，部署时需单独备份和迁移：
