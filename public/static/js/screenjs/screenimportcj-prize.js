@@ -43,6 +43,7 @@ define([], function () {
         this.drawCountLabel = '单次抽取';
         this.drawCountUnit = '人';
         this.state = 'ready';
+        this.controlsVisible = false;
         this.refs = {};
         this.boundDocumentClick = this.handleDocumentClick.bind(this);
         this.boundKeyDown = this.handleKeyDown.bind(this);
@@ -59,14 +60,10 @@ define([], function () {
 
         var doc = this.root.ownerDocument || document;
         var panel = createElement(doc, 'section', 'importcj-unified-prize');
-        panel.setAttribute('aria-label', '当前奖品');
+        panel.setAttribute('aria-label', '奖品信息');
         panel.setAttribute('data-state', 'ready');
 
-        var heading = createElement(doc, 'div', 'importcj-unified-prize-heading');
-        var label = createElement(doc, 'span', 'importcj-unified-prize-label', '当前奖品');
         var award = createElement(doc, 'strong', 'importcj-unified-prize-award', '等待奖项');
-        heading.appendChild(label);
-        heading.appendChild(award);
 
         var media = createElement(doc, 'div', 'importcj-unified-prize-media');
         var single = createElement(doc, 'div', 'importcj-unified-prize-single is-missing');
@@ -85,6 +82,7 @@ define([], function () {
         count.appendChild(doc.createTextNode('剩余名额 '));
         var countValue = createElement(doc, 'strong', '', '—');
         count.appendChild(countValue);
+        info.appendChild(award);
         info.appendChild(name);
         info.appendChild(count);
 
@@ -135,7 +133,6 @@ define([], function () {
         controls.appendChild(switcher);
         controls.appendChild(stepper);
         controls.appendChild(menu);
-        panel.appendChild(heading);
         panel.appendChild(media);
         panel.appendChild(info);
         panel.appendChild(controls);
@@ -160,11 +157,13 @@ define([], function () {
             stepper: stepper,
             stepperLabel: stepperLabel,
             stepperUnit: stepperUnit,
-            menu: menu
+            menu: menu,
+            controls: controls
         };
         this.bindEvents();
         doc.addEventListener('click', this.boundDocumentClick);
         doc.addEventListener('keydown', this.boundKeyDown);
+        this.setControlsVisible(false);
         return this;
     };
 
@@ -255,8 +254,8 @@ define([], function () {
         var remaining = prize.remaining === undefined || prize.remaining === null || asText(prize.remaining) === '' ? '—' : asText(prize.remaining);
         var roundItems = Object.prototype.toString.call(prize.items) === '[object Array]' ? prize.items : [];
 
-        this.refs.award.textContent = awardName;
-        this.refs.select.textContent = awardName;
+        this.refs.award.textContent = awardName && awardName !== prizeName ? awardName : '';
+        this.refs.select.textContent = awardName || prizeName;
         this.refs.count.textContent = remaining;
         this.panel.classList.toggle('is-round', roundItems.length > 0);
         if (roundItems.length) {
@@ -352,6 +351,7 @@ define([], function () {
     };
 
     UnifiedPrize.prototype.setState = function (nextState) {
+        var previousState = this.state;
         this.state = /^(ready|requesting|starting|drawing|result|records)$/.test(nextState) ? nextState : 'ready';
         if (!this.panel) return;
         this.panel.setAttribute('data-state', this.state);
@@ -361,6 +361,7 @@ define([], function () {
         this.refs.prev.disabled = !ready || singlePrize;
         this.refs.next.disabled = !ready || singlePrize;
         this.refs.select.disabled = !ready || singlePrize;
+        this.panel.classList.toggle('is-single-prize', singlePrize);
         this.refs.decrease.disabled = !ready || readonly;
         this.refs.input.disabled = !ready;
         this.refs.input.readOnly = readonly;
@@ -373,7 +374,22 @@ define([], function () {
         this.refs.stepperLabel.textContent = this.drawCountLabel || (readonly ? '本轮抽取' : '单次抽取');
         this.refs.stepperUnit.textContent = this.drawCountUnit || (readonly ? '名' : '人');
         this.refs.stepper.setAttribute('aria-label', readonly ? '本轮抽取人数（只读）' : '单次抽取人数');
-        if (!ready) this.closeMenu();
+        if (!ready || previousState !== 'ready') this.setControlsVisible(false);
+    };
+
+    UnifiedPrize.prototype.setControlsVisible = function (visible) {
+        var show = !!visible && this.state === 'ready';
+        this.controlsVisible = show;
+        if (!this.panel || !this.refs.controls) return show;
+        this.panel.classList.toggle('is-controls-visible', show);
+        this.refs.controls.hidden = !show;
+        this.refs.controls.setAttribute('aria-hidden', show ? 'false' : 'true');
+        if (!show) this.closeMenu();
+        return show;
+    };
+
+    UnifiedPrize.prototype.isControlsVisible = function () {
+        return !!this.controlsVisible;
     };
 
     UnifiedPrize.prototype.update = function (data) {
@@ -383,6 +399,7 @@ define([], function () {
         if (data.prizeIndex !== undefined) this.prizeIndex = Math.max(0, parseInt(data.prizeIndex, 10) || 0);
         if (data.maxDrawCount !== undefined) this.maxDrawCount = Math.max(1, parseInt(data.maxDrawCount, 10) || 1);
         if (data.drawCountReadonly !== undefined) this.drawCountReadonly = !!data.drawCountReadonly;
+        if (data.prizeSettingsVisible !== undefined) this.setControlsVisible(data.prizeSettingsVisible);
         if (data.drawCountLabel !== undefined) this.drawCountLabel = String(data.drawCountLabel);
         if (data.drawCountUnit !== undefined) this.drawCountUnit = String(data.drawCountUnit);
         if (data.onceout !== undefined || data.drawCount !== undefined) {
@@ -413,6 +430,7 @@ define([], function () {
         if (this.panel && this.panel.parentNode) this.panel.parentNode.removeChild(this.panel);
         if (this.root) this.root.classList.remove('importcj-unified-prize-enabled');
         this.panel = null;
+        this.controlsVisible = false;
         this.refs = {};
         return this;
     };

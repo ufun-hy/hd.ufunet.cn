@@ -31,6 +31,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 		prizeStats: null,
 		drawCount: null,
 		roundDrawCount: null,
+		prizeSettingsVisible: false,
 		visualState: 'ready',
 		stageFooterObserver: null,
 		stageFooterMutationObserver: null,
@@ -72,6 +73,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 				speedPreset: self.getDanmakuSpeedPreset(),
 				callbacks: {
 					onPrimaryAction: function () { return self.handlePrimaryAction(); },
+					onPrizeSettingsToggle: function () { return self.togglePrizeSettings(); },
 					onRecords: function () { return self.openRecords(); },
 					onRecordsClose: function () { return self.closeRecords(); },
 					onRecordsRetry: function () {
@@ -246,7 +248,16 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 		},
 		setVisualState: function (state) {
 			this.visualState = state || 'ready';
+			if (this.visualState != 'ready') this.prizeSettingsVisible = false;
 			this.syncSharedControls();
+		},
+		togglePrizeSettings: function () {
+			var self = this;
+			if (self.getVisualState() != 'ready' || !self.unifiedPrize) return false;
+			self.prizeSettingsVisible = !self.prizeSettingsVisible;
+			self.unifiedPrize.setControlsVisible(self.prizeSettingsVisible);
+			self.syncSharedControls();
+			return self.prizeSettingsVisible;
 		},
 		getControlSnapshot: function () {
 			var self = this;
@@ -269,6 +280,8 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 				maxDrawCount: available === null ? 999 : Math.max(1, available),
 				canStart: canStart,
 				primaryEnabled: canStart || self.getVisualState() == 'drawing' || self.getVisualState() == 'result',
+				prizeSettingsEnabled: !!self.unifiedPrize && self.getVisualState() == 'ready',
+				prizeSettingsVisible: !!self.unifiedPrize && self.getVisualState() == 'ready' && !!self.prizeSettingsVisible,
 				primaryText: self.getVisualState() == 'drawing' ? '停止抽奖' : (self.getVisualState() == 'result' ? '关闭结果' : (self.getVisualState() == 'records' ? '记录查看中' : (self.getVisualState() == 'requesting' ? '正在准备...' : (self.getVisualState() == 'starting' ? '抽奖启动中...' : '开始抽奖')))),
 				speedPreset: self.getDanmakuSpeedPreset()
 			};
@@ -1047,7 +1060,8 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 				if (json.code == 0) {
 					var html = '', round = json.msg.round || {}, prizes = round.roundawards || [], prizestyle = round.style || { cols: 5, width: 300, gap: 20, prizecolor: '#FF9800', prizesize: 18, namecolor: '#fff', namesize: 18 };
 					self.unifiedRoundItems = $.map(prizes, function (item) {
-						return $.extend({}, item.prize || {}, { num: item.num });
+						var prize = item.prize || {}, prizeId = item.prizeid || item.id || prize.prizeid || prize.id;
+						return $.extend({}, prize, { id: prizeId, prizeid: prizeId, num: item.num });
 					});
 					self.roundDrawCount = parseInt(json.msg.prizenum, 10);
 					if (isNaN(self.roundDrawCount) || self.roundDrawCount < 1) self.roundDrawCount = null;
