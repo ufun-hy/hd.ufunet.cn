@@ -1,4 +1,5 @@
 {include file='$Wpath/common/header'}
+{php}$livemarkShowDecScore = \app\common\service\common\LivemarkDeductionScoreVisibilityService::get(request()->realhdid ?? 0);{/php}
 <form id="formBox" class="zam-formvalidation form-horizontal" method="post">
     <div class="config-titlebox">
         <span class="config-titlename">微信设置</span>
@@ -30,7 +31,7 @@
         <div class="form-group">
             <label class="col-lg-2 control-label">* 显示扣分与最终得分</label>
             <div class="col-lg-8">
-                {:tpl_switch('showdecscore',$config['showdecscore']??'1')}
+                {:tpl_switch('showdecscore',$livemarkShowDecScore)}
                 <span class="help-block">开启后大屏单个参评选手详情会显示人工加分/扣分以及调整后的最终得分；关闭后仅显示当前得分</span>
             </div>
         </div>

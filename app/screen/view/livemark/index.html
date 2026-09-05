@@ -1,4 +1,5 @@
 {include file='common/header' /}
+{php}$livemarkShowDecScore = \app\common\service\common\LivemarkDeductionScoreVisibilityService::get(request()->realhdid ?? 0);{/php}
 <style>
 .headerTitle{opacity:0;}
 .livemark-mainbox{
@@ -2850,7 +2851,7 @@
                                     <span>/</span>
                                     <span class="pwnums">总评委<span>0</span>人</span>
                                 </span>
-                                {if ($pcconfig['showdecscore']??'1') == '1'}
+                                {if $livemarkShowDecScore == '1'}
                                     <div class="decscorebox zam-app-flex zam-app-alignCenter hidden">
                                         <span class="decscorebox-icon">-</span>
                                         <div class="decscorebox-info zam-app-flex zam-app-directionColumn zam-app-alignCenter">
