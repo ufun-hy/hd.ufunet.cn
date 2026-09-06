@@ -22,6 +22,7 @@ return [
      ],
      'web' => [
           app\middleware\WebCheck::class,
+          app\middleware\LivemarkJudgeScoreVisibilityMiddleware::class,
           app\middleware\LivemarkDeductionScoreVisibilityMiddleware::class,
      ],
      'myhd' => [
@@ -32,6 +33,7 @@ return [
      ],
      'hdmanage' => [
           app\middleware\HdmanageCheck::class,
+          app\middleware\LivemarkJudgeScoreVisibilityMiddleware::class,
           app\middleware\LivemarkDeductionScoreVisibilityMiddleware::class,
      ],
      'screen' => [

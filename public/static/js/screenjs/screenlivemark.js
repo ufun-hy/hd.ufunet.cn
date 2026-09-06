@@ -423,9 +423,18 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 						}
 						$(".livemark-zanmain").addClass('display-none');
 					}
-							var showpws = json.msg.showpws || '2';
+							var configuredPws = $.isArray(json.msg.pws) ? json.msg.pws : [];
+							// 详情页默认先展示本轮配置的全部专家评委，尚未提交的评委也保留在列表中。
+							var visiblePws = configuredPws;
+							if (visiblePws.length <= 0) {
+								// 兼容旧接口：pfusers 只包含已提交记录，补齐状态后仍走统一展示模板。
+								visiblePws = $.map(json.msg.pfusers || [], function (pw) {
+									return $.extend({}, pw, { hadpf: '1' });
+								});
+							}
+							var showpws = visiblePws.length > 0 ? '1' : '2';
 							self.currentPwMap = {};
-							self.currentPwList = (showpws == '1' ? json.msg.pws : json.msg.pfusers) || [];
+							self.currentPwList = visiblePws;
 							self.currentPfItems = $.isArray(json.msg.pfitem) ? json.msg.pfitem : [];
 							self.currentPfMax = json.msg.pfmax || self.currentPfMax || 10;
 							$.each(self.currentPwList, function (i, v) {
@@ -475,11 +484,8 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 						$('.livemark-user-score').removeClass('hidden');
 						$('.openpubpw').addClass('hidden');
 						$(".livemark-user-score .scoretype").text('得分：');
-						var scorenumtxt = finalScoreText;
-						if (showpws == '1' && json.msg.hadpwnum < json.msg.totalpwnum) {
-							scorenumtxt = '评分中';
-						}
-						$(".livemark-user-score .scorenum").text(scorenumtxt);
+						// 右上角展示接口实时汇总分；评委是否提交只影响下方评委卡片状态。
+						$(".livemark-user-score .scorenum").text(finalScoreText);
 						$(".livemark-user-score .pwbox .hadpwnum span").text(json.msg.hadpwnum || 0);
 						$(".livemark-user-score .pwbox .pwnums span").text(json.msg.totalpwnum || 0);
 					}
@@ -533,7 +539,7 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 						}
 						if (showpws == '1') {
 						var pwhtml = '';
-						$.each(json.msg.pws, function (i, v) {
+						$.each(visiblePws, function (i, v) {
 							v.showpws = '1';
 							pwhtml += template("pwpfItem", v);
 						});
@@ -760,6 +766,7 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 						self.setDetailViewMode(self.detailViewMode == 'judge' ? 'avg' : 'judge');
 					});
 					$(".livemark-user-pingwei").on('click', '.pingweione', function () {
+						if ($(".livemark-mainbox").hasClass('livemark-hide-pw-score')) return false;
 						self.setDetailViewMode('judgeDetail', $(this).attr('data-prid'));
 					});
 					$(".livemark-user-single").on('click', '.livemark-judge-detail-back', function () {
@@ -998,19 +1005,26 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 						+ '<div class="livemark-judge-comment-text">' + this.escapeHtml(comment) + '</div>'
 						+ '</div>';
 				},
-				renderJudgeDetail: function (prid) {
-					var self = this;
-					var pw = self.currentPwMap[String(prid)] || {};
-					var name = self.getPwName(pw);
-					var score = self.pickFirst(pw, ['totalscore', 'score', 'dfscore', 'tw']);
-					var itemhtml = '';
-					$.each(self.getPwDetailItems(pw), function (i, item) {
-						itemhtml += self.renderJudgeScoreItem(item);
-					});
-					if (itemhtml === '') {
-						itemhtml = '<div class="livemark-judge-score-empty">暂无评分细项</div>';
-					}
-					var html = '<div class="livemark-judge-detail">'
+					renderJudgeDetail: function (prid) {
+						var self = this;
+						var pw = self.currentPwMap[String(prid)] || {};
+						var name = self.getPwName(pw);
+						var score = self.pickFirst(pw, ['totalscore', 'score', 'dfscore', 'tw']);
+						var isTotalScoreMode = String(self.detailPftype) == '1';
+						var itemhtml = '';
+						if (!isTotalScoreMode) {
+							$.each(self.getPwDetailItems(pw), function (i, item) {
+								itemhtml += self.renderJudgeScoreItem(item);
+							});
+							if (itemhtml === '') {
+								itemhtml = '<div class="livemark-judge-score-empty">暂无评分细项</div>';
+							}
+						}
+						var scoreItemsHtml = isTotalScoreMode ? '' : '<div class="livemark-judge-detail-left">'
+							+ '<div class="livemark-judge-detail-title">评分细项</div>'
+							+ itemhtml
+							+ '</div>';
+						var html = '<div class="livemark-judge-detail">'
 						+ '<div class="livemark-judge-detail-head">'
 						+ '<div><span class="livemark-judge-detail-label">当前评委</span><span class="livemark-judge-detail-name">' + self.escapeHtml(name) + '</span></div>'
 						+ '<div class="livemark-judge-detail-actions">'
@@ -1018,11 +1032,8 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 						+ '<button type="button" class="livemark-judge-detail-back">返回评分列表</button>'
 						+ '</div>'
 						+ '</div>'
-						+ '<div class="livemark-judge-detail-body">'
-						+ '<div class="livemark-judge-detail-left">'
-						+ '<div class="livemark-judge-detail-title">评分细项</div>'
-						+ itemhtml
-						+ '</div>'
+							+ '<div class="livemark-judge-detail-body' + (isTotalScoreMode ? ' is-total-score' : '') + '">'
+							+ scoreItemsHtml
 						+ '<div class="livemark-judge-detail-right">'
 						+ '<div class="livemark-judge-detail-title">当前评委评分意见</div>'
 						+ '<div class="livemark-judge-comment-list">' + self.renderJudgeComment(pw) + '</div>'

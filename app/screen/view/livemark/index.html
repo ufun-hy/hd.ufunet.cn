@@ -1,4 +1,5 @@
 {include file='common/header' /}
+{php}$livemarkShowPwScore = \app\common\service\common\LivemarkJudgeScoreVisibilityService::get(request()->realhdid ?? 0);{/php}
 {php}$livemarkShowDecScore = \app\common\service\common\LivemarkDeductionScoreVisibilityService::get(request()->realhdid ?? 0);{/php}
 <style>
 .headerTitle{opacity:0;}
@@ -2370,6 +2371,9 @@
     background:none;
     cursor:pointer;
 }
+.livemark-mainbox.livemark-hide-pw-score .livemark-user-pingwei .pingweione{
+    cursor:default;
+}
 .pingweione .pingwei-info{
     display:flex!important;
     flex-direction:column;
@@ -2540,6 +2544,9 @@
     grid-template-columns:minmax(0, 1.05fr) minmax(280px, .95fr);
     gap:16px;
     min-height:0;
+}
+.livemark-judge-detail-body.is-total-score{
+    grid-template-columns:minmax(0, 1fr);
 }
 .livemark-judge-detail-left,
 .livemark-judge-detail-right{
@@ -2781,7 +2788,7 @@
     background:linear-gradient(180deg, #4DB8FF 0%, #2F8CFF 100%);
 }
 </style>
-	<section class="livemark-mainbox normal-box zam-app-flex-ajCenter2">
+	<section class="livemark-mainbox normal-box zam-app-flex-ajCenter2{if $livemarkShowPwScore == '2'} livemark-hide-pw-score{/if}">
     <div class="livemark-title limitbox"></div>
     <div class="emptybox zam-app-flex-ajCenter display-none">
         <img src="/{:SIMGURL}common/empty.png">
@@ -3453,7 +3460,11 @@
         <div class="pingwei-name limitbox">{{ pwname }}</div>
         {{ if showpws == '1'}}
             <div class="pingwei-score zam-app-flex-ajCenter{{ if hadpf == '1'}} pingwei-hadpf{{ /if }}">
+                {if $livemarkShowPwScore == '1'}
                 <span class="pingwei-score-value">{{ if hadpf == '1'}}{{ if showscore == '1'}}{{ totalscore }}{{ else }}已评分{{ /if }}{{ else }}评分中{{ /if }}</span>
+                {else /}
+                <span class="pingwei-score-value">{{ if hadpf == '1'}}已提交{{ else }}打分中{{ /if }}</span>
+                {/if}
             </div>
         {{ else }}
             <div class="pingwei-score zam-app-flex-ajCenter">
