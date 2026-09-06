@@ -154,9 +154,10 @@ table tr td{text-align:center!important}
 				  <tr>
 					<td colspan="5">
 					  <div class="m-b-10">
-					  	<a  class="btn btn-primary btn-sm addprizeitem" href="javascript:;"> <i class="mdi mdi-plus"></i>&nbsp;<span>新增奖品</span></a>
-					  	<a  class="btn btn-warning btn-sm importprizeitem" href="javascript:;"> <i class="mdi mdi-plus"></i>&nbsp;<span>导入奖品</span></a>
-					  	<div>随机模式单次导入奖品数量不可超过50个</div>
+						<a  class="btn btn-primary btn-sm addprizeitem" href="javascript:;"> <i class="mdi mdi-plus"></i>&nbsp;<span>新增奖品</span></a>
+						<a  class="btn btn-warning btn-sm importprizeitem" href="javascript:;"> <i class="mdi mdi-plus"></i>&nbsp;<span>导入奖品</span></a>
+						<div><strong>主推礼品：</strong>拖动排序后保存，第一款奖品会显示在大屏左侧顶部的大卡片中。</div>
+						<div>奖品数量会展开为独立红包实例；单行最多 500 个。</div>
 					  </div>
 					</td>
 				  </tr>
@@ -756,7 +757,7 @@ require(['webcore','jconfirmBox','zamnotice','layerBox',"ueditor","bootstrap-tou
 		});
 	});
 	$(".importprizeitem").on('click',function(){
-		webcore.importxls({title:'导入奖品',url:"{:gohdmanage('confighbwall/importprize',['hdid'=>$hdid])}&rotateid="+rotateid+"&openmode="+$(".openmodebox input:radio:checked").val(),moban:"/{:SYSIMGURL}excel/hbwallprize.xls",uptxt:"点击上传奖品xls文件",xlstxt:"注:请务必严格按照模板内容制作xls文件"},function(data){
+		webcore.importxls({title:'导入奖品',url:"{:gohdmanage('confighbwall/importprize',['hdid'=>$hdid])}&rotateid="+rotateid+"&openmode="+$(".openmodebox input:radio:checked").val(),moban:"/{:SYSIMGURL}excel/hbwallprize.xls",uptxt:"点击上传奖品xls文件",xlstxt:"奖品数量 N 会生成 N 个独立红包（单行最多 500 个）。请务必严格按照模板内容制作 xls 文件。"},function(data){
 			var html = '';
 			if(data.length > 0){
 				$.each(data,function(i,v){
