@@ -33,6 +33,7 @@ return [
      ],
      'hdmanage' => [
           app\middleware\HdmanageCheck::class,
+          app\middleware\HbwallPrizeImportQuantityMiddleware::class,
           app\middleware\LivemarkJudgeScoreVisibilityMiddleware::class,
           app\middleware\LivemarkDeductionScoreVisibilityMiddleware::class,
      ],
