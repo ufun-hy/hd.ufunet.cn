@@ -212,10 +212,10 @@ $votenamecolor = $appconfig['apppageconfig']['votenamecolor']??'';
 	<div class="list-theme1 vote-item zam-app-flex zam-app-flex-wrap">
 	{if empty($groups)}
 		{foreach $rotate['items'] as $ikey=>$ival}
-		<div class="list-item item-{$ival['id']}">
-			<div class="list-img{if empty($ival['voteimg'])} hidden{/if}" {if isset($ival['votebigimg']) && !empty($ival['votebigimg'])}data-bigimg="{$ival['votebigimg']}"{/if}>
-				<img src="{$ival['voteimg']}">
-			</div>
+			<div class="list-item item-{$ival['id']}">
+				<div class="list-img{if empty($ival['voteimg'])} hidden{/if}" {if isset($ival['votebigimg']) && !empty($ival['votebigimg'])}data-bigimg="{:tomedia($ival['votebigimg'])}"{/if}>
+					<div class="vote-media" data-vote-media="{:tomedia($ival['voteimg'])}" {if isset($ival['votebigimg']) && !empty($ival['votebigimg'])}data-vote-poster="{:tomedia($ival['votebigimg'])}"{/if} data-vote-media-mode="cover"></div>
+				</div>
 			<div class="list-mes">
 					<h3 class="list-title">{:$ival['votename']}</h3>
 					{if $rotate['votetype'] != '2'}
@@ -553,7 +553,14 @@ $votenamecolor = $appconfig['apppageconfig']['votenamecolor']??'';
 	max-width: 100%;
 	max-height: 100%;
 	border-radius: .2rem;
-	
+	display: block;
+}
+.votebigpopbox .votebigpopbody .bigimgbox video{
+	max-width: 100%;
+	max-height: 100%;
+	border-radius: .2rem;
+	display: block;
+	background: #000;
 }
 @keyframes imgscale {
     from {
@@ -598,13 +605,48 @@ $votenamecolor = $appconfig['apppageconfig']['votenamecolor']??'';
 	        <div class="loadadv-txt">图片加载中...</div>
 	    </div>
 	    <div class="bigimgbox zam-app-flex-ajCenter2 hidden">
-			<span class="close zam-app-flex-ajCenter2" onclick="javascript:$('.votebigpopbox,.votebigpopbox .loadadv-iconbox,.votebigpopbox .bigimgbox').addClass('hidden');"><i class="mxc-close"></i></span>
-			<img src="" />
+			<span class="close zam-app-flex-ajCenter2" onclick="javascript:closeVoteMediaPopup();"><i class="mxc-close"></i></span>
+			<img class="bigimg" src="" />
+			<video class="bigvideo hidden" controls playsinline webkit-playsinline></video>
 		</div>
 	</div>
 </section>
 <script>
 var clicked = false,maxselect = parseInt("{$rotate['maxselect']}"),minselect = parseInt("{$rotate['minselect']}"),rotateid = "{$rotate['id']}",votetype = "{$rotate['votetype']}",autocancel = "{$rotate['autocancel']??2}",canceltype = "{$rotate['canceltype']??1}",selvoteids = [];
+function closeVoteMediaPopup(){
+	var video = $('.votebigpopbox .bigvideo').get(0);
+	if(video){
+		video.pause();
+		video.removeAttribute('src');
+		video.load();
+	}
+	$('.votebigpopbox .bigvideo').addClass('hidden');
+	$('.votebigpopbox,.votebigpopbox .loadadv-iconbox,.votebigpopbox .bigimgbox').addClass('hidden');
+}
+function openVoteVideoPopup(src){
+	var $popup = $('.votebigpopbox'), $video = $popup.find('.bigvideo'), video = $video.get(0);
+	if(!video){
+		return;
+	}
+	$popup.removeClass('hidden');
+	$popup.find('.loadadv-txt').text('视频加载中...');
+	$popup.find('.loadadv-iconbox').removeClass('hidden');
+	$popup.find('.bigimgbox').addClass('hidden');
+	$popup.find('.bigimg').addClass('hidden').attr('src','');
+	$video.addClass('hidden').off('.voteVideoPopup').attr('src',src).prop('autoplay',true).prop('controls',true);
+	$video.one('loadeddata.voteVideoPopup error.voteVideoPopup',function(){
+		$popup.find('.loadadv-iconbox').addClass('hidden');
+		$popup.find('.bigimgbox').removeClass('hidden').addClass('imgani').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend',function(){
+			$(this).removeClass('imgani');
+		});
+		$video.removeClass('hidden');
+	});
+	video.load();
+	var playPromise = video.play();
+	if(playPromise && playPromise.catch){
+		playPromise.catch(function(){});
+	}
+}
 require(['wechatcore'],function (wechatcore) {
 $(".vote-searchBox .btn").click(function(){
 	var $this = $(this),inputval = $this.prev().val(),listitems = $(".list-theme1 .list-item");
@@ -622,13 +664,19 @@ $(".vote-searchBox .btn").click(function(){
 	//listitems.addClass('hidden').filter(":contains('"+inputval+"')").removeClass('hidden');
 });
 $(".vote-itemlists").on('click','.list-img',function(){
-	var $this = $(this),bigimg = $this.attr('data-bigimg') || '';
+	var $this = $(this),bigimg = $this.attr('data-bigimg') || '',videoSrc = $this.find('[data-vote-media]').attr('data-vote-media') || $this.find('video').attr('src') || '';
+	if(window.voteMedia && window.voteMedia.isVideo(videoSrc)){
+		openVoteVideoPopup(videoSrc);
+		return;
+	}
 	if(bigimg!=''){
+		closeVoteMediaPopup();
 		$(".votebigpopbox,.votebigpopbox .loadadv-iconbox").removeClass('hidden');
 		var img = new Image();
         img.onload = img.onerror = function(){
         	setTimeout(function(){
-        		$(".votebigpopbox img").attr('src',bigimg);
+				$(".votebigpopbox .bigimg").attr('src',bigimg).removeClass('hidden');
+				$(".votebigpopbox .bigvideo").addClass('hidden');
         		$(".votebigpopbox .loadadv-iconbox").addClass('hidden');
         		$(".votebigpopbox .bigimgbox").removeClass('hidden').addClass('imgani').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function () {
         			$(this).removeClass('imgani');
@@ -806,8 +854,11 @@ $(".votegroups li").click(function(){
 		}
 		groupclicked = true;
 		wechatcore.ajaxSubmit('{:gowechat("vote/dzajaxgroupvote")}',{groupid:groupid,votetxt:votetxt},'正在加载中..').then(function(data){
-			if(data.code==0){
-				$(".vote-item").html(data.msg);
+				if(data.code==0){
+					$(".vote-item").html(data.msg);
+					if(window.voteMedia){
+						window.voteMedia.renderAll($('.vote-item'),{mode:'cover'});
+					}
 				if(votetype == '2'){
 					$(".vote-itemlists input:checkbox").each(function(){
 						var vid = $(this).val()||'', ischecked = $(this).prop("checked"), isdisabled = $(this).prop("disabled");

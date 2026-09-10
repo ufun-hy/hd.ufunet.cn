@@ -111,7 +111,10 @@ define('screenvote', ['screensocket', 'screencore', 'template', 'layerBox', 'ful
 						}
 					}
 				}
-				$(".vote-list").html(html);
+					$(".vote-list").html(html);
+					if (window.voteMedia) {
+						window.voteMedia.renderAll($('.vote-list'),{mode:'cover'});
+					}
 				var swiperConfig = {
 					observer: true,
 					watchOverflow: true,
@@ -163,7 +166,10 @@ define('screenvote', ['screensocket', 'screencore', 'template', 'layerBox', 'ful
 						}
 					}
 				}
-				$(".vote-list").html(html);
+					$(".vote-list").html(html);
+					if (window.voteMedia) {
+						window.voteMedia.renderAll($('.vote-list'),{mode:'cover'});
+					}
 				var swiperConfig = {
 					observer: true,
 					watchOverflow: true,

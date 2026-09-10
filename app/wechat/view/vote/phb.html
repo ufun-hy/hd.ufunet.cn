@@ -62,7 +62,7 @@ function timerun(remainSec){
 			{$ikey+1}
 		{/if}
 	 </section>
-	 <section class="avatar zam-app-flex-ajCenter"><img src="{$ival['voteimg']}" {if empty($ival['voteimg'])}class="hidden"{/if} /></section>
+	 <section class="avatar zam-app-flex-ajCenter{if empty($ival['voteimg'])} hidden{/if}"><div class="vote-media" data-vote-media="{:tomedia($ival['voteimg'])}" {if isset($ival['votebigimg']) && !empty($ival['votebigimg'])}data-vote-poster="{:tomedia($ival['votebigimg'])}"{/if} data-vote-media-mode="cover"></div></section>
 	 <section class="nickname">{:str_replace('<br>',' - ',$ival['votename'])}</section>
 	 <section class="score zam-app-flex-ajCenter">{$ival['votenums']}{$appconfig['voteunit']??'票'}</section>
 	</li>
