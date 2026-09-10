@@ -3536,7 +3536,9 @@ require(['screencore', 'screenlivemark'],function (screencore, screenlivemark) {
         if (!json || json.code != 0 || !json.msg || typeof json.msg.scoretxtcolor == 'undefined') return;
         var textColor = normalizeLivemarkTextColor(json.msg.scoretxtcolor);
         $('.livemark-mainbox')
-            .css('--livemark-text-color', textColor)
+            .each(function () {
+                this.style.setProperty('--livemark-text-color', textColor);
+            })
             .toggleClass('livemark-theme-tech_blue', isTechBlueScoreColor(textColor));
     }
     if (!screencore._livemarkScoreColorThemePatched) {
