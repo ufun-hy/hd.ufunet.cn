@@ -731,35 +731,113 @@ define('screenlottery', ['screencore', 'template', 'layerBox', 'fulldm', 'keyboa
 		changeuser: function (num) {
 			var self = this, popone = template('popuser-item');
 			$(".lottery-userBox-item").remove();
-			var pophtml = '';
-			if (num >= 12) {
-				num = 12;
+			var pophtml = '', displayNum = parseInt(num, 10) || 1;
+			var isHaloTheme = $(".main-box").hasClass("lottery-halo-theme");
+			// 星环主题的运行态固定为 1 个中央头像 + 60 个环绕头像，与演示页保持一致。
+			// displayNum 仅控制抽奖动画占位；真实中奖人数仍使用原始 num 提交给 savelucker。
+			if (isHaloTheme) {
+				displayNum = 61;
+			} else if (displayNum >= 12) {
+				displayNum = 12;
 			}
-			for (var m = 0; m < num; m++) {
+			for (var m = 0; m < displayNum; m++) {
 				pophtml += popone();
 			}
 			$(".lottery-userBox-wrapper").append(pophtml);
 			var userBox = $(".lottery-userBox-item");
+			if (isHaloTheme) {
+				var calcHaloScale = function () {
+					var box = $(".lottery-userBox");
+					var w = box.width();
+					var h = box.height();
+					var scale = 800 / 1080;
+					if (w > 0 && h > 0) {
+						scale = Math.min(w / 1920, h / 1080);
+					}
+					$(".lottery-userBox-wrapper").css('--halo-stage-scale', scale);
+				};
+				calcHaloScale();
+				// 因为 changeuser 调用时容器仍可能 hidden，需在容器显示后的下一帧或短延迟重新计算
+				setTimeout(calcHaloScale, 50);
+
+				if (!self.haloResizeBound) {
+					$(window).on('resize', calcHaloScale);
+					self.haloResizeBound = true;
+				}
+
+				var haloColors = ['18,181,255', '169,60,255', '255,41,112', '255,170,0', '0,255,136', '0,170,255'];
+				userBox.each(function (index) {
+					if (index === 0) return;
+					var haloColor = haloColors[Math.floor(Math.random() * haloColors.length)];
+					this.style.setProperty('--size', (Math.floor(Math.random() * 51) + 40) + 'px');
+					this.style.setProperty('--radius', (Math.floor(Math.random() * 751) + 200) + 'px');
+					this.style.setProperty('--scale', (Math.random() * 1.5 + 0.3).toFixed(2));
+					this.style.setProperty('--dur', (Math.floor(Math.random() * 31) + 20) + 's');
+					this.style.setProperty('--delay', '-' + Math.floor(Math.random() * 51) + 's');
+					this.style.setProperty('--opacity', (Math.random() * 0.5 + 0.15).toFixed(2));
+					this.style.setProperty('--color', 'rgba(' + haloColor + ', 0.6)');
+				});
+			}
+			var refreshUser = function (item) {
+				var userInfo = self.alluser[Math.floor((Math.random() * self.alluser.length))] || {};
+				var nickname = '';
+				if (userInfo.userid) {
+					if (userInfo.showitems.length > 0) {
+						var bdval = '';
+						$.each(userInfo.showitems, function (index, val) {
+							bdval += '<div>' + val + '</div>';
+						});
+						nickname += bdval;
+					} else {
+						nickname += '<div>' + userInfo.nickname + '</div>';
+					}
+					$(item).find("img").attr('src', userInfo.avatar);
+					$(item).find("p").html(nickname);
+				}
+			};
+			if (isHaloTheme) {
+				userBox.each(function () {
+					refreshUser(this);
+				});
+			}
+			var haloOuterUsers = isHaloTheme ? userBox.slice(1) : $();
+			var haloLastOuterRefresh = Date.now();
 			clearInterval(self.changeTimer);
 			self.changeTimer = setInterval(function () {
-				userBox.each(function () {
-					var userInfo = self.alluser[Math.floor((Math.random() * self.alluser.length))] || {};
-					var nickname = '';
-					if (userInfo.userid) {
-						if (userInfo.showitems.length > 0) {
-							var bdval = '';
-							$.each(userInfo.showitems, function (index, val) {
-								bdval += '<div>' + val + '</div>';
-							});
-							nickname += bdval;
-						} else {
-							nickname += '<div>' + userInfo.nickname + '</div>';
+				if (isHaloTheme) {
+					refreshUser(userBox.get(0));
+					// 每约 900ms 分批替换 3 个外围头像，让候选池持续流动，同时保持轨道节点稳定。
+					var haloNow = Date.now();
+					if (haloNow - haloLastOuterRefresh >= 900 && haloOuterUsers.length > 0) {
+						haloLastOuterRefresh = haloNow;
+						var haloRefreshCount = Math.min(3, haloOuterUsers.length);
+						var haloUsedIndexes = {};
+						for (var h = 0; h < haloRefreshCount; h++) {
+							var haloIndex;
+							do {
+								haloIndex = Math.floor(Math.random() * haloOuterUsers.length);
+							} while (haloUsedIndexes[haloIndex]);
+							haloUsedIndexes[haloIndex] = true;
+							(function (haloItem, stagger) {
+								setTimeout(function () {
+									var target = $(haloItem);
+									target.addClass('halo-avatar-changing');
+									setTimeout(function () {
+										refreshUser(haloItem);
+									}, 140);
+									setTimeout(function () {
+										target.removeClass('halo-avatar-changing');
+									}, 320);
+								}, stagger);
+							})(haloOuterUsers.get(haloIndex), h * 80);
 						}
-						$(this).find("img").attr('src', userInfo.avatar);
-						$(this).find("p").html(nickname);
 					}
-				});
-			}, 100);
+				} else {
+					userBox.each(function () {
+						refreshUser(this);
+					});
+				}
+			}, isHaloTheme ? 60 : 100);
 		},
 		changeawardinfo: function () {
 			var self = this, prize = self.prizeInfo[self.prizeIndex], awardobj = $('.dzawardinfo');
