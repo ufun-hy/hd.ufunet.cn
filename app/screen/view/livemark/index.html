@@ -1206,6 +1206,8 @@
 }
 .livemark-mainbox{
     font-family:"PingFang SC","Microsoft YaHei",sans-serif;
+    color:var(--livemark-text-color, #fff);
+    --livemark-text-color:#fff;
 }
 .livemark-mainbox:before{
     content:"";
@@ -3340,6 +3342,37 @@
         font-size:38px;
     }
 }
+
+/* 普通文字使用后台配置；评分、排名和状态色由各自语义样式继续控制。 */
+.livemark-mainbox .livemark-title,
+.livemark-mainbox .livemark-list .livemark-user-info,
+.livemark-mainbox .livemark-list .livemark-user-name,
+.livemark-mainbox .livemark-list .livemark-user-score,
+.livemark-mainbox .livemark-list .livemark-dz-name,
+.livemark-mainbox .livemark-list .livemark-phb-head,
+.livemark-mainbox .livemark-list .livemark-phb-name,
+.livemark-mainbox .livemark-list .livemark-phb-other-name,
+.livemark-mainbox .livemark-userone-info div,
+.livemark-mainbox .livemark-userone-des,
+.livemark-mainbox .livemark-user-score .scoretype,
+.livemark-mainbox .livemark-user-score-meta,
+.livemark-mainbox .livemark-user-pingwei .pingwei-name,
+.livemark-mainbox .livemark-judge-detail,
+.livemark-mainbox .livemark-judge-detail-label,
+.livemark-mainbox .livemark-judge-detail-name,
+.livemark-mainbox .livemark-judge-detail-title,
+.livemark-mainbox .livemark-judge-comment-text,
+.livemark-mainbox .livemark-user-single .singleone,
+.livemark-mainbox .livemark-user-single .singleone-bar-score,
+.livemark-mainbox .livemark-user-detailpanel .livemark-user-nodata,
+.livemark-mainbox .openpubpw .showpub1,
+.livemark-mainbox .openpubpw .showpub2,
+.livemark-mainbox .openpubpw .showpub3,
+.livemark-mainbox .openpubpw .pw_num,
+.livemark-mainbox .openpubpw .pwweightbox,
+.livemark-mainbox .openpubpw .pubweightbox{
+    color:var(--livemark-text-color, #fff);
+}
 </style>
 <script id="normaluserItem" type="html/javascript">
 <div class="livemark-user-item{{ if userstatus=='2' && screenshow=='2' }} hidden{{ /if }}" data-pfuserid="{{ id }}">
@@ -3494,9 +3527,17 @@ require(['screencore', 'screenlivemark'],function (screencore, screenlivemark) {
         color = (color || '').replace(/\s+/g, '').toLowerCase();
         return color == '#4db8ff' || color == 'rgb(77,184,255)' || color == 'rgba(77,184,255,1)';
     }
+    function normalizeLivemarkTextColor(color) {
+        var probe = document.createElement('span');
+        probe.style.color = (color || '').trim();
+        return probe.style.color || '#fff';
+    }
     function applyLivemarkThemeByScoreColor(json) {
         if (!json || json.code != 0 || !json.msg || typeof json.msg.scoretxtcolor == 'undefined') return;
-        $('.livemark-mainbox').toggleClass('livemark-theme-tech_blue', isTechBlueScoreColor(json.msg.scoretxtcolor));
+        var textColor = normalizeLivemarkTextColor(json.msg.scoretxtcolor);
+        $('.livemark-mainbox')
+            .css('--livemark-text-color', textColor)
+            .toggleClass('livemark-theme-tech_blue', isTechBlueScoreColor(textColor));
     }
     if (!screencore._livemarkScoreColorThemePatched) {
         var livemarkAjaxSubmit = screencore.ajaxSubmit;
