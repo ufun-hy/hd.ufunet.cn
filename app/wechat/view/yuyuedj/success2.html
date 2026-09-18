@@ -5,7 +5,15 @@ input::-webkit-input-placeholder,textarea::-webkit-input-placeholder{ color:#666
 .zam-input-select{width: 100%;height: 0.75rem;line-height:0.75rem;font-size:0.3rem;color:#555;text-align:left}
 /**wechat-sign style**/
 body{overflow-y:auto}
-.zam-app-sign{height:100%;}
+.zam-app-sign{
+	min-height:100vh;
+	background-repeat:no-repeat;
+	background-position:center;
+	background-size:cover;
+	{if isset($appconfig['appbgimg']) && !empty($appconfig['appbgimg'])}
+	background-image:url("{:tomedia($appconfig['appbgimg'])}");
+	{/if}
+}
 .zam-app-signbox{
 	width:6.5rem;
 	padding:0.4rem;
