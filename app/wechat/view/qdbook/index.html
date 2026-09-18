@@ -4,7 +4,11 @@ input,textarea{font:inherit;font-family: 微软雅黑,"Microsoft YaHei";backgrou
 .zam-app-sign{
 	height:100%;
 	background-repeat: no-repeat;
+	background-position: center;
     background-size: cover;
+	{if !empty($mysigndata) && isset($appconfig['appbgimg']) && !empty($appconfig['appbgimg'])}
+	background-image: url("{:tomedia($appconfig['appbgimg'])}");
+	{/if}
 }
 .zam-app-signbox{
 	width:6.5rem;
