@@ -100,6 +100,12 @@ define('screenliuyancj', ['screensocket', 'screencore', 'template', 'layerBox', 
 			if (isNaN(total) || total < 0) return null;
 			return Math.max(0, total - this.currentWinnerCount);
 		},
+		countWinners: function (list) {
+			if (!list) return 0;
+			if ($.isArray(list)) return list.length;
+			if (typeof list == 'object') return Object.keys(list).length;
+			return 0;
+		},
 		normalizeDrawCount: function (value) {
 			var count = parseInt(value, 10);
 			if (isNaN(count) || count < 1) count = 1;
@@ -227,7 +233,7 @@ define('screenliuyancj', ['screensocket', 'screencore', 'template', 'layerBox', 
 			screencore.ajaxSubmit('/screen/liuyancj/ajaxlucker', { prizeid: prizeid, gametype: XCV3Config.gametype }, '').then(function (e) {
 				if (requestId != self.winnerRequestId || String(prizeid) != String((self.getCurrentPrize() || {}).id)) return;
 				if (e.code == 0) {
-					self.currentWinnerCount = (e.msg.list || []).length;
+					self.currentWinnerCount = self.countWinners(e.msg.list);
 					self.winnerCountReady = true;
 					self.drawCount = self.normalizeDrawCount(self.drawCount);
 					self.syncSharedUi();
@@ -267,7 +273,7 @@ define('screenliuyancj', ['screensocket', 'screencore', 'template', 'layerBox', 
 				}
 				self.luckerids = e.msg.luckerids || [];
 				self.lastDrawWinners = self.toStageWinners(e.msg.list || []);
-				self.currentWinnerCount += (e.msg.list || []).length;
+				self.currentWinnerCount += self.countWinners(e.msg.list);
 				self.winnerCountReady = true;
 				self.drawCount = self.normalizeDrawCount(self.drawCount);
 				screencore.hideFootAndQr();
@@ -327,7 +333,7 @@ define('screenliuyancj', ['screensocket', 'screencore', 'template', 'layerBox', 
 				if (requestId != self.recordsRequestId || self.getVisualState() != 'records') return;
 				if (e.code == 0) {
 					var list = e.msg.list || [];
-					self.currentWinnerCount = list.length;
+					self.currentWinnerCount = self.countWinners(list);
 					self.winnerCountReady = true;
 					self.drawCount = self.normalizeDrawCount(self.drawCount);
 					self.stageUi.setRecords(self.toStageWinners(list), 'ready');
