@@ -6,10 +6,15 @@
 
 分支：main
 
-本次实现提交：
+本次核心实现提交：
 
 f96a7f303b20038dd42c8943dcb14f60acfccd89  
 refactor: share lottery stage UI with message draw
+
+本次 Review 前补充修复：
+
+bc7201859e2c2d6b67abe8e5ff978ff8618bf071  
+fix: harden message lottery winner counts
 
 前置提交：
 
@@ -19,7 +24,7 @@ refactor: extract shared screen prize component
 b899c15d9b5b510ce69bb29eeae4f849763ce187  
 refactor: use shared prize component in message lottery
 
-本轮尚未在服务器完成真实页面和开奖验收，当前完成的是代码修改与静态检查。
+本轮尚未在服务器完成真实页面和开奖验收，当前完成的是代码修改、结构收敛与静态检查。Review 请以当前 main HEAD（bc7201859e2c2d6b67abe8e5ff978ff8618bf071）为准。
 
 ## 2. 任务背景
 
@@ -315,7 +320,7 @@ ImportCJ 当前没有传入 onRecordDelete，因此不会因为这个能力自�
 
 ## 13. 静态检查结果
 
-针对实现提交 f96a7f303b20038dd42c8943dcb14f60acfccd89 已检查：
+针对核心实现 f96a7f303b20038dd42c8943dcb14f60acfccd89 及补充修复 bc7201859e2c2d6b67abe8e5ff978ff8618bf071 已检查：
 
 - screen-stage-ui.js：JS parse PASS
 - screenimportcj-stage-ui.js：JS parse PASS
@@ -420,3 +425,73 @@ ImportCJ 当前没有传入 onRecordDelete，因此不会因为这个能力自�
 - 留言抽奖核心 3D 动画
 
 留言抽奖服务器验收和 Review 通过后，再将相同的 screen-prize + screen-stage-ui 逐个接入其余扫码抽奖样式。
+
+## 17. Review 前补充修复：中奖人数计数健壮性
+
+在准备 Review 时继续检查留言抽奖 Controller，发现历史接口 `/screen/liuyancj/ajaxlucker` 的 `e.msg.list` 旧代码长期通过 `$.each` 遍历，因此它既可能是数组，也可能是对象形态。
+
+公共 UI 接入后的首版代码有三处直接使用：
+
+    list.length
+
+如果服务端返回对象而不是数组，会导致：
+
+- currentWinnerCount 变成 undefined
+- remaining 计算出现 NaN
+- 开始按钮错误禁用或剩余名额显示异常
+- 删除 / 新增中奖后的数量状态可能失真
+
+因此在 `screenliuyancj.js` 增加统一：
+
+    countWinners(list)
+
+规则：
+
+- Array：使用 length
+- Object：使用 Object.keys(list).length
+- 空值 / 其他类型：返回 0
+
+并统一替换以下三处：
+
+1. 切换奖品加载历史中奖记录后的 currentWinnerCount
+2. 本轮开奖成功后新增中奖人数
+3. 打开中奖记录抽屉后重新同步 currentWinnerCount
+
+补充提交：
+
+    bc7201859e2c2d6b67abe8e5ff978ff8618bf071
+    fix: harden message lottery winner counts
+
+这一修复不改变接口、不改变 UI，仅保证 Controller 的“中奖人数 / 剩余名额”状态源稳定。
+
+## 18. 当前 Review 基线
+
+请其他智能体 Review 时不要只看单一 commit diff，建议以：
+
+    main @ bc7201859e2c2d6b67abe8e5ff978ff8618bf071
+
+作为完整基线。
+
+重点文件：
+
+- public/static/js/screenjs/screen-prize.js
+- public/static/css/screencss/screen-prize.css
+- public/static/js/screenjs/screen-stage-ui.js
+- public/static/css/screencss/screen-stage-ui.css
+- public/static/js/screenjs/screenimportcj-stage-ui.js
+- public/static/css/screencss/screenimportcj-stage-ui.css
+- public/static/js/screenjs/screenimportcj.js
+- public/static/js/screenjs/screenliuyancj.js
+- public/static/css/screencss/screenliuyancj-prize.css
+- app/screen/view/importcj/index.html
+- app/screen/view/liuyancj/index.html
+
+Review 目标不是重新设计视觉，而是确认：
+
+- 公共组件和业务 Controller 的职责边界是否清楚
+- ImportCJ 是否保持兼容
+- 留言抽奖准备态是否只输出公共 Prize + Stage UI
+- drawing / result / records 状态是否互斥且可恢复
+- 异步请求是否存在旧响应覆盖新状态
+- remaining / drawCount / currentWinnerCount 是否始终由 Controller 单一状态源维护
+- 公共 Stage UI 是否仍残留某个具体抽奖模块的接口或 DOM 依赖
