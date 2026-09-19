@@ -1,4 +1,4 @@
-define('screenliuyancj', ['screensocket', 'screencore', 'template', 'layerBox', 'fulldm', 'keyboard', 'anime', 'snabbt'], function (screensocket, screencore, template, layerBox, fulldm, keyboardJS, anime) {
+define('screenliuyancj', ['screensocket', 'screencore', 'template', 'layerBox', 'fulldm', 'keyboard', 'anime', 'screenjs/screen-prize', 'snabbt'], function (screensocket, screencore, template, layerBox, fulldm, keyboardJS, anime, screenPrize) {
 	var screenliuyancj = {
 		txt: '虚位以待',
 		fromtype: '1',
@@ -6,6 +6,11 @@ define('screenliuyancj', ['screensocket', 'screencore', 'template', 'layerBox', 
 		oldmsg: [],
 		onepage: 4,
 		prizeInfo: [],
+		prizeIndex: 0,
+		drawCount: 1,
+		currentWinnerCount: 0,
+		unifiedPrize: null,
+		winnerRequestId: 0,
 		luckerids: [],
 		init: function () {
 			var self = this;
@@ -74,19 +79,116 @@ define('screenliuyancj', ['screensocket', 'screencore', 'template', 'layerBox', 
 				}
 			});
 		},
-		initprize: function () {
-			var self = this, selprizeobj = $(".liuyan-selprize"), selnumobj = $(".liuyan-selnum input"), showprize = self.prizeInfo[0], html = '';
-			selprizeobj.find('.selaward').attr({
-				"data-prizeid": showprize.id,
-				"data-num": showprize.prizenum,
-				"data-onceout": showprize.onceout
-			}).text(showprize.prizename);
-			selnumobj.val(showprize.onceout);
-			$.each(self.prizeInfo, function (i, v) {
-				html += '<li class="limitbox' + (i == 0 ? ' active' : '') + '" data-prizeid="' + v.id + '" data-nums="' + v.prizenum + '" data-onceout="' + v.onceout + '">' + v.prizename + '</li>';
+		getCurrentPrize: function () {
+			return this.prizeInfo[this.prizeIndex] || null;
+		},
+		getRemainingCount: function () {
+			var prize = this.getCurrentPrize();
+			if (!prize) return 0;
+			var total = parseInt(prize.prizenum, 10);
+			if (isNaN(total) || total < 0) return 0;
+			return Math.max(0, total - this.currentWinnerCount);
+		},
+		normalizeDrawCount: function (value) {
+			var count = parseInt(value, 10);
+			if (isNaN(count) || count < 1) count = 1;
+			var remaining = this.getRemainingCount();
+			if (remaining > 0) count = Math.min(count, remaining);
+			return count;
+		},
+		getPrizeOptions: function () {
+			var self = this;
+			return self.prizeInfo.map(function (prize, index) {
+				var copy = $.extend({}, prize);
+				if (index == self.prizeIndex) copy.remaining = self.getRemainingCount();
+				return copy;
 			});
-			selprizeobj.find('.liuyan-awardlist').html(html);
+		},
+		mountPrizeComponent: function () {
+			var self = this, root = document.querySelector('.liuyan-prize-host');
+			if (!screenPrize || !root) return;
+			if (self.unifiedPrize) self.unifiedPrize.destroy();
+			self.unifiedPrize = screenPrize.create({
+				root: root,
+				callbacks: {
+					onPrizePrev: function () { if (self.prizeIndex > 0) self.selectPrize(self.prizeIndex - 1); },
+					onPrizeNext: function () { if (self.prizeIndex < self.prizeInfo.length - 1) self.selectPrize(self.prizeIndex + 1); },
+					onPrizeSelect: function (prize, index) { self.selectPrize(index); },
+					onDrawCountChange: function (value) { self.setDrawCount(value); }
+				}
+			});
+			self.unifiedPrize.mount();
+			self.syncPrizeComponent();
+		},
+		syncPrizeComponent: function () {
+			var self = this, prize = self.getCurrentPrize();
+			if (!self.unifiedPrize || !prize) return;
+			var remaining = self.getRemainingCount();
+			self.unifiedPrize.update({
+				state: 'ready',
+				prize: $.extend({}, prize, { remaining: remaining }),
+				prizes: self.getPrizeOptions(),
+				prizeIndex: self.prizeIndex,
+				drawCount: self.drawCount,
+				maxDrawCount: Math.max(1, remaining),
+				prizeSettingsVisible: true
+			});
+		},
+		setDrawCount: function (value) {
+			this.drawCount = this.normalizeDrawCount(value);
+			this.syncPrizeComponent();
+			return this.drawCount;
+		},
+		selectPrize: function (index) {
+			var self = this;
+			index = parseInt(index, 10);
+			if (isNaN(index) || index < 0 || index >= self.prizeInfo.length) return false;
+			self.prizeIndex = index;
+			self.currentWinnerCount = 0;
+			self.drawCount = self.normalizeDrawCount(self.prizeInfo[index].onceout);
+			self.syncPrizeComponent();
+			self.loadPrizeLuckers(self.prizeInfo[index].id);
+			return true;
+		},
+		renderPrizeLuckers: function (lucker) {
+			var rightlucktpl = template('rightlucker-tpl'), html = '';
+			$.each(lucker || [], function (i, v) {
+				var nickname = '';
+				if (v.showitems.length > 0) {
+					var bdval = '';
+					$.each(v.showitems, function (index, val) { bdval += '<span>' + val + '</span>'; });
+					nickname += bdval;
+				} else {
+					nickname += '<span>' + v.nickname + '</span>';
+				}
+				v.nickname = nickname;
+				v.content = screencore.emoToimg(v.msgcontent);
+				html += rightlucktpl(v);
+			});
+			$(".liuyancj-right ul").html(html);
+		},
+		loadPrizeLuckers: function (prizeid) {
+			var self = this, requestId = ++self.winnerRequestId;
+			screencore.ajaxSubmit('/screen/liuyancj/ajaxlucker', { prizeid: prizeid, gametype: XCV3Config.gametype }, '').then(function (e) {
+				if (requestId != self.winnerRequestId || String(prizeid) != String((self.getCurrentPrize() || {}).id)) return;
+				if (e.code == 0) {
+					var lucker = e.msg.list || [];
+					self.currentWinnerCount = lucker.length;
+					self.drawCount = self.normalizeDrawCount(self.drawCount);
+					self.renderPrizeLuckers(lucker);
+					self.syncPrizeComponent();
+				}
+			});
+		},
+		initprize: function () {
+			var self = this, showprize = self.prizeInfo[0];
+			if (!showprize) return;
+			self.prizeIndex = 0;
+			self.currentWinnerCount = 0;
+			self.drawCount = self.normalizeDrawCount(showprize.onceout);
+			self.mountPrizeComponent();
 			$(".liuyan-welcomeBox").removeClass('display-none');
+			self.loadPrizeLuckers(showprize.id);
 		},
 		bindEvent: function () {
 			var self = this;
@@ -96,48 +198,18 @@ define('screenliuyancj', ['screensocket', 'screencore', 'template', 'layerBox', 
 			setInterval(function () {
 				self.loadjoinnum();
 			}, 4e3);
-			$(".liuyan-selprize span").on('click', function () {
-				$(".liuyan-awardlist").toggleClass('display-none');
-			});
-			$(".liuyan-awardlist li").on('click', function () {
-				var prizeid = $(this).attr("data-prizeid");
-				$(".liuyan-selprize .selaward").text($(this).text());
-				$(".liuyan-selprize .selaward").attr({ "data-prizeid": prizeid, "data-nums": $(this).attr("data-nums") });
-				$(".liuyan-selnum input").val($(this).attr("data-onceout"));
-				$(".liuyan-awardlist").addClass('display-none');
-				$(this).addClass("active").siblings().removeClass("active");
-				screencore.ajaxSubmit('/screen/liuyancj/ajaxlucker', { prizeid: prizeid, gametype: XCV3Config.gametype }, '').then(function (e) {
-					if (e.code == 0) {
-						var lucker = e.msg.list, rightlucktpl = template('rightlucker-tpl'), html = '';
-						$.each(lucker, function (i, v) {
-							var nickname = '';
-							if (v.showitems.length > 0) {
-								var bdval = '';
-								$.each(v.showitems, function (index, val) {
-									bdval += '<span>' + val + '</span>';
-								});
-								nickname += bdval;
-							} else {
-								nickname += '<span>' + v.nickname + '</span>';
-							}
-							v.nickname = nickname;
-							v.content = screencore.emoToimg(v.msgcontent);
-							html += rightlucktpl(v);
-						});
-						$(".liuyancj-right ul").html(html);
-					}
-				});
-			});
 			var hadclicked = false, canshowlay = false;
 			$(".liuyan-startbtn").click(function () {
-				var $this = $(this), prizeid = $(".liuyan-selprize .selaward").attr('data-prizeid'), onceout = $(".liuyan-selnum input").val();
+				var $this = $(this), prize = self.getCurrentPrize(), prizeid = prize && prize.id, onceout = self.drawCount, remaining = self.getRemainingCount();
 				if (prizeid == '' || prizeid == null) return layerBox.showMsg('请选择奖品');
-				if (onceout == '' || parseInt(onceout) <= 0) return layerBox.showMsg('请设置正确的奖品抽取人数');
-				if ($(".liuyancj-right li").length >= $(".liuyan-selprize .selaward").attr('data-nums')) return layerBox.showMsg($(".liuyan-selprize .selaward").text() + '人数已抽满');
+				if (!onceout || parseInt(onceout, 10) <= 0) return layerBox.showMsg('请设置正确的奖品抽取人数');
+				if (remaining <= 0) return layerBox.showMsg((prize.prizename || prize.awardname || '当前奖品') + '人数已抽满');
+				onceout = self.normalizeDrawCount(onceout);
+				self.drawCount = onceout;
+				self.syncPrizeComponent();
 				if (hadclicked) return;
 				hadclicked = true;
 				screencore.hideFootAndQr();
-				$(".liuyan-awardlist").addClass('display-none');
 				$(".liuyan-welcomeBox").addClass('display-none');
 				$(".liuyan-output").addClass('display-none');
 				$(".liuyan-rolldmmain").removeClass('display-none');
@@ -167,6 +239,9 @@ define('screenliuyancj', ['screensocket', 'screencore', 'template', 'layerBox', 
 						});
 						$(".liuyan-output-main ul").html(html);
 						$(".liuyancj-right ul").prepend(luckhtml);
+						self.currentWinnerCount += (e.msg.list || []).length;
+						self.drawCount = self.normalizeDrawCount(self.drawCount);
+						self.syncPrizeComponent();
 						screencore.bgmusicpause();
 						if ($("#cjingmusic").length) {
 							$("#cjingmusic")[0].play();
@@ -217,11 +292,14 @@ define('screenliuyancj', ['screensocket', 'screencore', 'template', 'layerBox', 
 				});
 			});
 			$(".liuyan-luckerlist").on('click', ".right-luckerdel", function () {
-				var $this = $(this), prizeid = $(".liuyan-selprize .selaward").attr('data-prizeid'), recordid = $this.attr('data-id');
+				var $this = $(this), prize = self.getCurrentPrize(), prizeid = prize && prize.id, recordid = $this.attr('data-id');
 				layerBox.showConfirm('警告', '删除将无法恢复，确定要删除此中奖用户么?', ['确定', '取消'], function () {
 					screencore.ajaxSubmit('/screen/liuyancj/dellucker', { recordid: recordid, prizeid: prizeid }, '').then(function (e) {
 						if (e.code == 0) {
 							$this.parent().remove();
+							self.currentWinnerCount = Math.max(0, self.currentWinnerCount - 1);
+							self.drawCount = self.normalizeDrawCount(self.drawCount);
+							self.syncPrizeComponent();
 							layerBox.showMsg('删除成功');
 						} else {
 							layerBox.showMsg(e.msg);
@@ -241,12 +319,15 @@ define('screenliuyancj', ['screensocket', 'screencore', 'template', 'layerBox', 
 				}
 			});
 			keyboardJS.bind('/', function (e) {
-				var selprize = $(".liuyan-selprize .selaward"), prizeid = selprize.attr("data-prizeid");
+				var prize = self.getCurrentPrize(), prizeid = prize && prize.id;
 				if (prizeid == '' || prizeid == null) return;
-				layerBox.showConfirm('警告', '清空将删除' + selprize.text() + '所有中奖用户，并且无法恢复，您确定要清空？', ['确定', '取消'], function () {
+				layerBox.showConfirm('警告', '清空将删除' + (prize.prizename || prize.awardname || '当前奖品') + '所有中奖用户，并且无法恢复，您确定要清空？', ['确定', '取消'], function () {
 					screencore.ajaxSubmit('/screen/liuyancj/delalllucker', { prizeid: prizeid, gametype: XCV3Config.gametype }, '').then(function (e) {
 						if (e.code == 0) {
 							$(".liuyancj-right ul").empty();
+							self.currentWinnerCount = 0;
+							self.drawCount = self.normalizeDrawCount(self.drawCount);
+							self.syncPrizeComponent();
 							layerBox.showMsg('清空成功');
 						} else {
 							layerBox.showMsg(e.msg);
@@ -254,35 +335,14 @@ define('screenliuyancj', ['screensocket', 'screencore', 'template', 'layerBox', 
 					});
 				});
 			});
-			keyboardJS.bind('left', function (e) {
-				var activeli = $(".liuyan-awardlist li.active"), prevli = activeli.prev();
-				if (activeli.length <= 0 || prevli.length <= 0) return;
-				prevli.trigger('click');
+			keyboardJS.bind('left', function () {
+				if (self.prizeIndex > 0) self.selectPrize(self.prizeIndex - 1);
 			});
-			keyboardJS.bind('right', function (e) {
-				var activeli = $(".liuyan-awardlist li.active"), nextli = activeli.next();
-				if (activeli.length <= 0 || nextli.length <= 0) return;
-				nextli.trigger('click');
+			keyboardJS.bind('right', function () {
+				if (self.prizeIndex < self.prizeInfo.length - 1) self.selectPrize(self.prizeIndex + 1);
 			});
-			keyboardJS.bind('up', function (e) {
-				var activeli = $(".liuyan-awardlist li.active");
-				if (activeli.length <= 0) return;
-				var selnum = $(".liuyan-selnum input").val();
-				if (selnum == '' || selnum == null) {
-					selnum = 1;
-				}
-				selnum++;
-				if (selnum > activeli.attr("data-nums")) selnum = activeli.attr("data-nums");
-				$(".liuyan-selnum input").val(selnum);
-			});
-			keyboardJS.bind('down', function (e) {
-				var selnum = $(".liuyan-selnum input").val();
-				if (selnum && parseInt(selnum) > 1) {
-					selnum--;
-					$(".liuyan-selnum input").val(selnum);
-				}
-			});
-			$(".liuyan-awardlist li.active").trigger('click');//加载第一个奖品的中奖用户
+			keyboardJS.bind('up', function () { self.setDrawCount(self.drawCount + 1); });
+			keyboardJS.bind('down', function () { self.setDrawCount(self.drawCount - 1); });
 		},
 		initSocket: function () {
 			var self = this, params = {};
