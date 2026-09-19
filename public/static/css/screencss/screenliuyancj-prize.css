@@ -1,82 +1,41 @@
-/* 留言抽奖接入公共奖品组件的宿主布局。 */
-.liuyan-welcomeBox {
-    justify-content: center !important;
-    gap: 28px;
-    box-sizing: border-box;
-    padding: 0 24px;
-}
-
-.liuyancj-center,
-.liuyancj-right,
-.liuyan-prize-host {
-    min-width: 0;
+/* 留言抽奖宿主层：准备态与 ImportCJ 共用同一套 Prize + Stage UI。 */
+.liuyancj-mainbox {
+    --screen-stage-action-bottom: 24px;
 }
 
 .liuyan-prize-host {
-    display: flex;
-    width: 360px;
-    flex: 0 1 360px;
-    align-items: center;
-    justify-content: center;
+    position: absolute;
+    left: 50%;
+    top: 48%;
+    z-index: 13;
+    width: min(580px, 50vw);
+    transform: translate3d(-50%, -50%, 0);
 }
 
 .liuyan-prize-host .screen-prize {
-    --screen-prize-accent: #d63645;
     width: 100%;
-    padding: 18px 20px 20px;
-    row-gap: 12px;
 }
 
-.liuyan-prize-host .screen-prize-media {
-    min-height: 120px;
+/* 旧左右面板继续作为留言数据/兼容节点，但不再参与准备态视觉输出。 */
+.liuyan-legacy-panels {
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
 }
 
-.liuyan-prize-host .screen-prize-single {
-    height: 150px;
+/* 旧中奖弹窗退出视觉链路，结果统一交给 screen-stage-ui。 */
+.liuyan-legacy-result {
+    display: none !important;
 }
 
-.liuyan-prize-host .screen-prize-single img {
-    max-height: 140px;
-}
-
-.liuyan-prize-host .screen-prize-name {
-    font-size: clamp(22px, 1.8vw, 30px);
-}
-
-.liuyan-prize-host .screen-prize-count {
-    margin-top: 12px;
-}
-
-.liuyan-prize-host .screen-prize-controls {
-    grid-template-columns: 1fr;
-    gap: 8px;
-    padding-top: 12px;
-}
-
-.liuyan-setting {
-    justify-content: center !important;
-}
-
-@media (max-width: 1600px) {
-    .liuyan-welcomeBox {
-        gap: 18px;
-        padding: 0 16px;
-    }
-
+@media (max-width: 1366px) {
     .liuyan-prize-host {
-        width: 320px;
-        flex-basis: 320px;
+        width: min(540px, 56vw);
     }
+}
 
-    .liuyan-prize-host .screen-prize {
-        padding: 16px;
-    }
-
-    .liuyan-prize-host .screen-prize-single {
-        height: 130px;
-    }
-
-    .liuyan-prize-host .screen-prize-single img {
-        max-height: 120px;
+@media (max-width: 900px) {
+    .liuyan-prize-host {
+        width: 90vw;
     }
 }
