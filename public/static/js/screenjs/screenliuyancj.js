@@ -134,6 +134,7 @@ define('screenliuyancj', ['screensocket', 'screencore', 'template', 'layerBox', 
 			if (this.winnerMutationPending || !this.getPrizeDataKey(prizeId)) return false;
 			this.winnerMutationPending = true;
 			this.winnerMutationPrizeId = this.getPrizeDataKey(prizeId);
+			this.prizeSettingsVisible = false;
 			this.advanceWinnerDataVersion(prizeId);
 			this.winnerRequestId++;
 			this.recordsRequestId++;
@@ -239,7 +240,7 @@ define('screenliuyancj', ['screensocket', 'screencore', 'template', 'layerBox', 
 				drawCountLabel: '单次抽取',
 				drawCountUnit: '人',
 				prizeSettingsEnabled: !!self.unifiedPrize && state == 'ready' && !self.winnerMutationPending,
-				prizeSettingsVisible: !!self.unifiedPrize && state == 'ready' && !!self.prizeSettingsVisible,
+				prizeSettingsVisible: !!self.unifiedPrize && state == 'ready' && !self.winnerMutationPending && !!self.prizeSettingsVisible,
 				primaryEnabled: canStart,
 				primaryText: state == 'drawing' ? '停止抽奖' : (state == 'result' ? '关闭结果' : (state == 'records' ? '记录查看中' : (state == 'requesting' ? '正在准备...' : '开始抽奖')))
 			};
@@ -255,7 +256,7 @@ define('screenliuyancj', ['screensocket', 'screencore', 'template', 'layerBox', 
 			this.syncSharedUi();
 		},
 		togglePrizeSettings: function () {
-			if (this.getVisualState() != 'ready' || !this.unifiedPrize) return false;
+			if (this.getVisualState() != 'ready' || !this.unifiedPrize || this.winnerMutationPending) return false;
 			this.prizeSettingsVisible = !this.prizeSettingsVisible;
 			this.syncSharedUi();
 			return this.prizeSettingsVisible;
