@@ -495,3 +495,164 @@ Review 目标不是重新设计视觉，而是确认：
 - 异步请求是否存在旧响应覆盖新状态
 - remaining / drawCount / currentWinnerCount 是否始终由 Controller 单一状态源维护
 - 公共 Stage UI 是否仍残留某个具体抽奖模块的接口或 DOM 依赖
+
+## 19. 2026-09-20 复审反馈修复
+
+复审发现两个异步一致性问题：
+
+1. 删除 / 清空旧奖品请求延迟返回时，可能改写当前另一个奖品的 `currentWinnerCount`。
+2. `loadPrizeLuckers()` 与 Records 查询使用独立请求 ID，后发查询虽然返回了更新数据，但更早的历史查询仍可能随后覆盖计数。
+
+本轮继续当前 task / main 修复，没有新建分支或 worktree。
+
+功能修复提交：
+
+    295e8d4343eead17b110c69612e0f1f48fb94ce8
+    fix: serialize message lottery winner state
+
+控制门禁补充提交：
+
+    7637431510dead61722bfc549ef24ff00ea6a2ed
+    fix: gate prize controls during winner mutation
+
+### 19.1 每个奖品共享数据版本
+
+`screenliuyancj.js` 新增：
+
+- `winnerDataVersions`
+- `getWinnerDataVersion(prizeId)`
+- `advanceWinnerDataVersion(prizeId)`
+- `isWinnerDataVersionCurrent(prizeId, version)`
+
+`loadPrizeLuckers()` 与 `openRecords()` 现在都会在发起查询时推进并捕获同一个奖品的数据版本。
+
+响应只有同时满足以下条件才允许写回 Controller：
+
+- 请求 ID 仍为最新
+- 当前奖品仍是该请求的奖品
+- 请求捕获的数据版本仍是该奖品最新版本
+- Records 读取还要求当前仍处于 records 状态
+
+因此同奖品的后发 Records 查询会使更早的历史查询失效；新增 / 删除 / 清空也会推进版本，使变更前的所有旧读取失效。
+
+### 19.2 删除 / 清空绑定奖品并加 mutation lock
+
+新增：
+
+- `winnerMutationPending`
+- `winnerMutationPrizeId`
+- `beginWinnerMutation(prizeId)`
+- `endWinnerMutation(prizeId)`
+
+删除和清空确认框打开时仍允许用户改变想法并切换奖品，但真正确认执行时会再次检查：
+
+- 当前奖品仍然等于确认框打开时捕获的 prizeId
+- 页面状态仍允许执行
+
+如果确认前已经切换奖品，本次操作直接取消，不发送删除 / 清空请求。
+
+一旦变更请求真正发出：
+
+- 锁定奖品切换
+- 禁止开始抽奖
+- 禁止奖品设置
+- 隐藏已展开的奖品设置
+- winnerCountReady 变为 false
+- 旧 winner / records 查询立即失效
+
+请求成功后不再直接用 `-1` 或 `0` 改写全局计数，而是重新调用权威查询读取当前奖品中奖人数。
+
+请求失败或网络异常时同样重新读取权威计数。
+
+### 19.3 开奖也推进中奖数据版本
+
+`startLottery()` 发起 `savelucker` 前推进当前奖品数据版本并使旧的中奖人数查询失效。
+
+这样可以避免：
+
+    旧历史查询 H
+      ↓
+    Records 新查询 R
+      ↓
+    成功开奖 +1
+      ↓
+    H 最后返回
+
+把开奖后的 3 人错误覆盖回旧的 2 人。
+
+### 19.4 Records 提前关闭恢复
+
+如果 Records 查询还没拿到权威计数就被关闭，并且当前 `winnerCountReady=false`，关闭后会自动重新发起当前奖品的中奖人数读取。
+
+防止 Records 查询被取消后准备态长期停留在“计数未知”。
+
+### 19.5 隔离状态回归
+
+针对复审给出的核心乱序场景已做 Controller 级隔离回归：
+
+#### P2-A
+
+    H 历史查询 → R Records 查询 → R 返回 2
+    → 成功抽 1 人 → H 最后返回旧 2 人
+
+结果：
+
+- Records 后计数：2
+- 开奖后计数：3
+- 旧 H 返回后仍为：3
+- remaining：7
+
+#### P1 删除
+
+    奖品 A 删除请求 pending
+    → 关闭 Records
+    → 尝试切换 B
+    → A 删除响应
+    → 权威刷新
+
+结果：
+
+- pending 期间切换奖品返回 false
+- 当前奖品保持 A
+- 删除完成后重新读取
+- 权威计数 9
+- remaining 1
+
+#### 确认框期间切换
+
+    打开清空 A 确认框
+    → 尚未确认时切换到 B
+    → 再点击确认
+
+结果：
+
+- 不发送 A 的清空请求
+- 当前奖品保持 B
+- mutation lock 不会错误开启
+
+#### P2-B
+
+    H 历史查询旧快照 2 人
+    → 清空成功
+    → H 返回
+    → 权威刷新返回 0
+
+结果：
+
+- H 返回时不会恢复旧的 2 人 ready 状态
+- 权威刷新后 count=0
+- remaining=10
+
+以上为前端隔离环境状态验证，不替代服务器真实接口验收。
+
+### 19.6 复审重点
+
+请下一轮 Review 重点验证：
+
+- 复审 P1、P2 原始复现步骤是否均已不可复现
+- mutation pending 时鼠标和键盘是否都不能切奖品
+- 删除 / 清空失败时是否能恢复权威计数
+- Records 快速打开 / 关闭后是否不会留下永久 `winnerCountReady=false`
+- ImportCJ 不受本轮留言 Controller 修复影响
+
+服务器真实验收仍需在代码 Review 通过后执行。
