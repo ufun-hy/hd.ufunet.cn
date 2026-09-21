@@ -1,0 +1,41 @@
+/* 留言抽奖宿主层：准备态与 ImportCJ 共用同一套 Prize + Stage UI。 */
+.liuyancj-mainbox {
+    --screen-stage-action-bottom: 24px;
+}
+
+.liuyan-prize-host {
+    position: absolute;
+    left: 50%;
+    top: 48%;
+    z-index: 13;
+    width: min(580px, 50vw);
+    transform: translate3d(-50%, -50%, 0);
+}
+
+.liuyan-prize-host .screen-prize {
+    width: 100%;
+}
+
+/* 旧左右面板继续作为留言数据/兼容节点，但不再参与准备态视觉输出。 */
+.liuyan-legacy-panels {
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+/* 旧中奖弹窗退出视觉链路，结果统一交给 screen-stage-ui。 */
+.liuyan-legacy-result {
+    display: none !important;
+}
+
+@media (max-width: 1366px) {
+    .liuyan-prize-host {
+        width: min(540px, 56vw);
+    }
+}
+
+@media (max-width: 900px) {
+    .liuyan-prize-host {
+        width: 90vw;
+    }
+}

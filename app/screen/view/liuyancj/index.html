@@ -405,6 +405,9 @@
     cursor: pointer;
 }
 </style>
+<link rel="stylesheet" href="/static/css/screencss/screen-prize.css">
+<link rel="stylesheet" href="/static/css/screencss/screen-stage-ui.css">
+<link rel="stylesheet" href="/static/css/screencss/screenliuyancj-prize.css">
 {if !empty($pcconfig['cjingmusic'])}
 <audio id="cjingmusic" src="{:tomedia($pcconfig['cjingmusic'])}" loop preload="preload" style="display:none"></audio>
 {/if}
@@ -416,27 +419,15 @@
 	<img src="/{:SIMGURL}common/empty.png">
 	<p style="padding:20px;">请到后台添加奖品</p>
   </div>
-  <section class="liuyan-welcomeBox zam-app-flex zam-app-alignCenter zam-app-justifyspacearound display-none">
-	<section class="liuyancj-center">
-	    <div class="liuyan-joinnum{if $pcconfig['showjoin']=='2'} display-none{/if}">奖池总人数:<span>0</span></div>
-		<div class="liuyan-messageBox"><ul class="liuyan-messagelist"></ul></div>
-		<div class="liuyan-setting zam-app-flex zam-app-alignCenter zam-app-justifyspacearound">
-			<div class="liuyan-selprize">
-				<span class="selaward limitbox" data-prizeid="0" data-nums="0" data-onceout="0">xxx</span>
-				<span class="selarrow mxc-roundrightfill"></span>
-				<ul class="liuyan-awardlist display-none"></ul>
-			</div>
-			<div class="liuyan-startbtn">
-				开始抽奖
-			</div>
-			<div class="liuyan-selnum">
-				<input value="0" type="text" onkeyup="value=value.replace(/[^\d]/g,'')">
-			</div>
-		</div>
-	</section>
-	<section class="liuyancj-right">
-		<ul class="liuyan-luckerlist"></ul>
-	</section>
+  <section class="liuyan-prize-host" aria-label="奖品设置"></section>
+  <section class="liuyan-welcomeBox liuyan-legacy-panels zam-app-flex zam-app-alignCenter zam-app-justifyspacearound">
+    <section class="liuyancj-center">
+        <div class="liuyan-joinnum{if $pcconfig['showjoin']=='2'} display-none{/if}">奖池总人数:<span>0</span></div>
+        <div class="liuyan-messageBox"><ul class="liuyan-messagelist"></ul></div>
+    </section>
+    <section class="liuyancj-right">
+        <ul class="liuyan-luckerlist"></ul>
+    </section>
   </section>
 </section>
 <!--滚动区域-->
@@ -447,7 +438,7 @@
 	</div>
 </section>
 <!--中奖弹窗-->
-<section class="liuyan-output zam-app-flex-ajCenter2 display-none">
+<section class="liuyan-output liuyan-legacy-result zam-app-flex-ajCenter2 display-none" aria-hidden="true">
 	<section class="liuyan-output-main">
 		<ul class="zam-app-flex zam-app-flex-wrap"></ul>
 		<span class="liuyan-output-close mxc-unie631"></span>

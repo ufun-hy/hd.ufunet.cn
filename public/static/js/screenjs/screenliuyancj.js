@@ -1,4 +1,4 @@
-define('screenliuyancj', ['screensocket', 'screencore', 'template', 'layerBox', 'fulldm', 'keyboard', 'anime', 'snabbt'], function (screensocket, screencore, template, layerBox, fulldm, keyboardJS, anime) {
+define('screenliuyancj', ['screensocket', 'screencore', 'template', 'layerBox', 'fulldm', 'keyboard', 'anime', 'screenjs/screen-prize', 'screenjs/screen-stage-ui', 'snabbt'], function (screensocket, screencore, template, layerBox, fulldm, keyboardJS, anime, screenPrize, screenStageUi) {
 	var screenliuyancj = {
 		txt: '虚位以待',
 		fromtype: '1',
@@ -6,6 +6,22 @@ define('screenliuyancj', ['screensocket', 'screencore', 'template', 'layerBox', 
 		oldmsg: [],
 		onepage: 4,
 		prizeInfo: [],
+		prizeIndex: 0,
+		drawCount: 1,
+		currentWinnerCount: 0,
+		winnerCountReady: false,
+		unifiedPrize: null,
+		stageUi: null,
+		winnerRequestId: 0,
+		recordsRequestId: 0,
+		winnerDataVersions: {},
+		winnerMutationPending: false,
+		winnerMutationPrizeId: null,
+		recordsReturnState: null,
+		prizeSettingsVisible: false,
+		visualState: 'ready',
+		drawRequestPending: false,
+		lastDrawWinners: [],
 		luckerids: [],
 		init: function () {
 			var self = this;
@@ -74,215 +90,406 @@ define('screenliuyancj', ['screensocket', 'screencore', 'template', 'layerBox', 
 				}
 			});
 		},
-		initprize: function () {
-			var self = this, selprizeobj = $(".liuyan-selprize"), selnumobj = $(".liuyan-selnum input"), showprize = self.prizeInfo[0], html = '';
-			selprizeobj.find('.selaward').attr({
-				"data-prizeid": showprize.id,
-				"data-num": showprize.prizenum,
-				"data-onceout": showprize.onceout
-			}).text(showprize.prizename);
-			selnumobj.val(showprize.onceout);
-			$.each(self.prizeInfo, function (i, v) {
-				html += '<li class="limitbox' + (i == 0 ? ' active' : '') + '" data-prizeid="' + v.id + '" data-nums="' + v.prizenum + '" data-onceout="' + v.onceout + '">' + v.prizename + '</li>';
+		getCurrentPrize: function () {
+			return this.prizeInfo[this.prizeIndex] || null;
+		},
+		getVisualState: function () {
+			return this.visualState || 'ready';
+		},
+		getRemainingCount: function () {
+			var prize = this.getCurrentPrize();
+			if (!prize || !this.winnerCountReady) return null;
+			var total = parseInt(prize.prizenum, 10);
+			if (isNaN(total) || total < 0) return null;
+			return Math.max(0, total - this.currentWinnerCount);
+		},
+		countWinners: function (list) {
+			if (!list) return 0;
+			if ($.isArray(list)) return list.length;
+			if (typeof list == 'object') return Object.keys(list).length;
+			return 0;
+		},
+		getPrizeDataKey: function (prizeId) {
+			return prizeId === undefined || prizeId === null ? '' : String(prizeId);
+		},
+		getWinnerDataVersion: function (prizeId) {
+			var key = this.getPrizeDataKey(prizeId);
+			return key && this.winnerDataVersions[key] ? this.winnerDataVersions[key] : 0;
+		},
+		advanceWinnerDataVersion: function (prizeId) {
+			var key = this.getPrizeDataKey(prizeId);
+			if (!key) return 0;
+			var next = this.getWinnerDataVersion(prizeId) + 1;
+			this.winnerDataVersions[key] = next;
+			return next;
+		},
+		isWinnerDataVersionCurrent: function (prizeId, version) {
+			return version === this.getWinnerDataVersion(prizeId);
+		},
+		isCurrentPrizeId: function (prizeId) {
+			var prize = this.getCurrentPrize();
+			return !!prize && this.getPrizeDataKey(prize.id) === this.getPrizeDataKey(prizeId);
+		},
+		beginWinnerMutation: function (prizeId) {
+			if (this.winnerMutationPending || !this.getPrizeDataKey(prizeId)) return false;
+			this.winnerMutationPending = true;
+			this.winnerMutationPrizeId = this.getPrizeDataKey(prizeId);
+			this.prizeSettingsVisible = false;
+			this.advanceWinnerDataVersion(prizeId);
+			this.winnerRequestId++;
+			this.recordsRequestId++;
+			if (this.isCurrentPrizeId(prizeId)) {
+				this.winnerCountReady = false;
+				this.syncSharedUi();
+			}
+			return true;
+		},
+		endWinnerMutation: function (prizeId) {
+			if (!this.winnerMutationPending) return false;
+			if (this.winnerMutationPrizeId !== this.getPrizeDataKey(prizeId)) return false;
+			this.winnerMutationPending = false;
+			this.winnerMutationPrizeId = null;
+			this.syncSharedUi();
+			return true;
+		},
+		refreshCurrentPrizeWinnerState: function (prizeId) {
+			if (!this.isCurrentPrizeId(prizeId)) return false;
+			if (this.getVisualState() == 'records') return this.openRecords();
+			this.loadPrizeLuckers(prizeId);
+			return true;
+		},
+		normalizeDrawCount: function (value) {
+			var count = parseInt(value, 10);
+			if (isNaN(count) || count < 1) count = 1;
+			var remaining = this.getRemainingCount();
+			if (remaining !== null && remaining > 0) count = Math.min(count, remaining);
+			return count;
+		},
+		getPrizeOptions: function () {
+			var self = this;
+			return self.prizeInfo.map(function (prize, index) {
+				var copy = $.extend({}, prize);
+				if (index == self.prizeIndex) copy.remaining = self.getRemainingCount();
+				return copy;
 			});
-			selprizeobj.find('.liuyan-awardlist').html(html);
-			$(".liuyan-welcomeBox").removeClass('display-none');
+		},
+		toStageWinners: function (list) {
+			return $.map(list || [], function (winner) {
+				winner = winner || {};
+				var showitems = $.isArray(winner.showitems) ? winner.showitems : [];
+				return {
+					name: (showitems.length ? showitems[0] : winner.nickname) || '中奖用户',
+					extras: showitems.length > 1 ? showitems.slice(1, 3) : [],
+					recordId: winner.recordid || winner.luckerid || null
+				};
+			});
+		},
+		mountPrizeComponent: function () {
+			var self = this, root = document.querySelector('.liuyan-prize-host');
+			if (!screenPrize || !root) return;
+			if (self.unifiedPrize) self.unifiedPrize.destroy();
+			self.unifiedPrize = screenPrize.create({
+				root: root,
+				callbacks: {
+					onPrizePrev: function () { if (self.getVisualState() == 'ready' && self.prizeIndex > 0) self.selectPrize(self.prizeIndex - 1); },
+					onPrizeNext: function () { if (self.getVisualState() == 'ready' && self.prizeIndex < self.prizeInfo.length - 1) self.selectPrize(self.prizeIndex + 1); },
+					onPrizeSelect: function (prize, index) { if (self.getVisualState() == 'ready') self.selectPrize(index); },
+					onDrawCountChange: function (value) { self.setDrawCount(value); }
+				}
+			});
+			self.unifiedPrize.mount();
+			self.syncSharedUi();
+		},
+		mountStageUi: function () {
+			var self = this, root = document.querySelector('.liuyancj-mainbox');
+			if (!screenStageUi || !root) return;
+			if (self.stageUi) self.stageUi.destroy();
+			self.stageUi = screenStageUi.create({
+				root: root,
+				speedEnabled: false,
+				callbacks: {
+					onPrimaryAction: function () { return self.handlePrimaryAction(); },
+					onPrizeSettingsToggle: function () { return self.togglePrizeSettings(); },
+					onRecords: function () { return self.openRecords(); },
+					onRecordsClose: function () { return self.closeRecords(); },
+					onRecordsRetry: function () { return self.openRecords(true); },
+					onRecordDelete: function (recordId) { return self.deleteRecord(recordId); }
+				}
+			});
+			self.stageUi.mount();
+			self.syncSharedUi();
+		},
+		destroySharedUi: function () {
+			if (this.unifiedPrize) this.unifiedPrize.destroy();
+			if (this.stageUi) this.stageUi.destroy();
+			this.unifiedPrize = null;
+			this.stageUi = null;
+		},
+		getControlSnapshot: function () {
+			var self = this, remaining = self.getRemainingCount(), state = self.getVisualState();
+			var canStart = state == 'ready' && remaining !== null && remaining > 0 && self.drawCount > 0 && self.drawCount <= remaining && !self.drawRequestPending && !self.winnerMutationPending;
+			return {
+				state: state,
+				prize: $.extend({}, self.getCurrentPrize() || {}, { remaining: remaining }),
+				prizes: self.getPrizeOptions(),
+				prizeIndex: self.prizeIndex,
+				drawCount: self.drawCount,
+				onceout: self.drawCount,
+				maxDrawCount: remaining === null ? 999 : Math.max(1, remaining),
+				drawCountReadonly: false,
+				drawCountLabel: '单次抽取',
+				drawCountUnit: '人',
+				prizeSettingsEnabled: !!self.unifiedPrize && state == 'ready' && !self.winnerMutationPending,
+				prizeSettingsVisible: !!self.unifiedPrize && state == 'ready' && !self.winnerMutationPending && !!self.prizeSettingsVisible,
+				primaryEnabled: canStart,
+				primaryText: state == 'drawing' ? '停止抽奖' : (state == 'result' ? '关闭结果' : (state == 'records' ? '记录查看中' : (state == 'requesting' ? '正在准备...' : '开始抽奖')))
+			};
+		},
+		syncSharedUi: function () {
+			var snapshot = this.getControlSnapshot();
+			if (this.unifiedPrize) this.unifiedPrize.update(snapshot);
+			if (this.stageUi) this.stageUi.update(snapshot);
+		},
+		setVisualState: function (state) {
+			this.visualState = /^(ready|requesting|drawing|result|records)$/.test(state) ? state : 'ready';
+			if (this.visualState != 'ready') this.prizeSettingsVisible = false;
+			this.syncSharedUi();
+		},
+		togglePrizeSettings: function () {
+			if (this.getVisualState() != 'ready' || !this.unifiedPrize || this.winnerMutationPending) return false;
+			this.prizeSettingsVisible = !this.prizeSettingsVisible;
+			this.syncSharedUi();
+			return this.prizeSettingsVisible;
+		},
+		setDrawCount: function (value) {
+			if (this.getVisualState() != 'ready' || this.winnerMutationPending) return false;
+			this.drawCount = this.normalizeDrawCount(value);
+			this.syncSharedUi();
+			return this.drawCount;
+		},
+		selectPrize: function (index) {
+			var self = this;
+			if (self.getVisualState() != 'ready' || self.winnerMutationPending) return false;
+			index = parseInt(index, 10);
+			if (isNaN(index) || index < 0 || index >= self.prizeInfo.length) return false;
+			self.prizeIndex = index;
+			self.currentWinnerCount = 0;
+			self.winnerCountReady = false;
+			self.drawCount = self.normalizeDrawCount(self.prizeInfo[index].onceout);
+			self.syncSharedUi();
+			self.loadPrizeLuckers(self.prizeInfo[index].id);
+			return true;
+		},
+		loadPrizeLuckers: function (prizeid) {
+			var self = this, requestId = ++self.winnerRequestId, dataVersion = self.advanceWinnerDataVersion(prizeid);
+			if (self.isCurrentPrizeId(prizeid)) {
+				self.winnerCountReady = false;
+				self.syncSharedUi();
+			}
+			screencore.ajaxSubmit('/screen/liuyancj/ajaxlucker', { prizeid: prizeid, gametype: XCV3Config.gametype }, '').then(function (e) {
+				if (requestId != self.winnerRequestId || !self.isCurrentPrizeId(prizeid) || !self.isWinnerDataVersionCurrent(prizeid, dataVersion)) return;
+				if (e.code == 0) {
+					self.currentWinnerCount = self.countWinners(e.msg.list);
+					self.winnerCountReady = true;
+					self.drawCount = self.normalizeDrawCount(self.drawCount);
+					self.syncSharedUi();
+				}
+			}, function () {
+				if (requestId != self.winnerRequestId || !self.isCurrentPrizeId(prizeid) || !self.isWinnerDataVersionCurrent(prizeid, dataVersion)) return;
+				self.winnerCountReady = false;
+				self.syncSharedUi();
+			});
+		},
+		initprize: function () {
+			var self = this, showprize = self.prizeInfo[0];
+			if (!showprize) return;
+			self.prizeIndex = 0;
+			self.currentWinnerCount = 0;
+			self.winnerCountReady = false;
+			self.drawCount = self.normalizeDrawCount(showprize.onceout);
+			self.mountPrizeComponent();
+			self.loadPrizeLuckers(showprize.id);
+		},
+		startLottery: function () {
+			var self = this, prize = self.getCurrentPrize(), remaining = self.getRemainingCount();
+			if (self.getVisualState() != 'ready' || self.drawRequestPending || self.winnerMutationPending) return false;
+			if (!prize || prize.id === undefined || prize.id === null || prize.id === '') return layerBox.showMsg('请选择奖品');
+			if (remaining === null) return layerBox.showMsg('正在读取当前奖品名额，请稍候');
+			if (remaining <= 0) return layerBox.showMsg((prize.prizename || prize.awardname || '当前奖品') + '人数已抽满');
+			var onceout = self.normalizeDrawCount(self.drawCount);
+			if (!onceout || onceout <= 0 || onceout > remaining) return layerBox.showMsg('请设置正确的奖品抽取人数');
+			self.drawCount = onceout;
+			self.advanceWinnerDataVersion(prize.id);
+			self.winnerRequestId++;
+			self.recordsRequestId++;
+			self.drawRequestPending = true;
+			self.setVisualState('requesting');
+			screencore.ajaxSubmit('/screen/liuyancj/savelucker', { prizeid: prize.id, selnum: onceout, gametype: XCV3Config.gametype }).then(function (e) {
+				self.drawRequestPending = false;
+				if (e.code != 0) {
+					self.setVisualState('ready');
+					return layerBox.showMsg(e.msg);
+				}
+				self.luckerids = e.msg.luckerids || [];
+				self.lastDrawWinners = self.toStageWinners(e.msg.list || []);
+				self.currentWinnerCount += self.countWinners(e.msg.list);
+				self.winnerCountReady = true;
+				self.drawCount = self.normalizeDrawCount(self.drawCount);
+				screencore.hideFootAndQr();
+				$(".liuyan-rolldmmain").removeClass('display-none');
+				self.setVisualState('drawing');
+				screencore.bgmusicpause();
+				if ($("#cjingmusic").length) $("#cjingmusic")[0].play();
+			}, function () {
+				self.drawRequestPending = false;
+				self.setVisualState('ready');
+				layerBox.showMsg('网络异常');
+			});
+			return true;
+		},
+		stopLottery: function () {
+			var self = this;
+			if (self.getVisualState() != 'drawing') return false;
+			$(".liuyan-rolldmmain").addClass('display-none');
+			if ($("#cjingmusic").length) {
+				$("#cjingmusic")[0].currentTime = 0;
+				$("#cjingmusic")[0].pause();
+			}
+			if ($("#cjendmusic").length) $("#cjendmusic")[0].play();
+			self.visualState = 'result';
+			if (self.stageUi) self.stageUi.setResult(self.lastDrawWinners, $.extend({}, self.getCurrentPrize() || {}, { remaining: self.getRemainingCount() }));
+			self.syncSharedUi();
+			screencore.sendLuckerTpl({ luckerids: self.luckerids }, function () { self.luckerids = []; });
+			return true;
+		},
+		closeResult: function () {
+			if (this.getVisualState() != 'result') return false;
+			if ($("#cjendmusic").length) {
+				$("#cjendmusic")[0].currentTime = 0;
+				if (!$("#cjendmusic")[0].paused) $("#cjendmusic")[0].pause();
+			}
+			this.lastDrawWinners = [];
+			this.setVisualState('ready');
+			setTimeout(function () { screencore.bgmusicplay(); }, 1e3);
+			return true;
+		},
+		handlePrimaryAction: function () {
+			var state = this.getVisualState();
+			if (state == 'ready') return this.startLottery();
+			if (state == 'drawing') return this.stopLottery();
+			if (state == 'result') return this.closeResult();
+			return false;
+		},
+		openRecords: function () {
+			var self = this, prize = self.getCurrentPrize();
+			if (!self.stageUi || !prize || self.winnerMutationPending || (self.getVisualState() != 'ready' && self.getVisualState() != 'result' && self.getVisualState() != 'records')) return false;
+			if (self.getVisualState() != 'records') self.recordsReturnState = self.getVisualState() == 'result' ? 'result' : 'ready';
+			var prizeId = prize.id, requestId = ++self.recordsRequestId, dataVersion = self.advanceWinnerDataVersion(prizeId);
+			self.visualState = 'records';
+			self.syncSharedUi();
+			self.stageUi.setRecords(null, 'loading');
+			screencore.ajaxSubmit('/screen/liuyancj/ajaxlucker', { prizeid: prizeId, gametype: XCV3Config.gametype }, '').then(function (e) {
+				if (requestId != self.recordsRequestId || self.getVisualState() != 'records' || !self.isCurrentPrizeId(prizeId) || !self.isWinnerDataVersionCurrent(prizeId, dataVersion)) return;
+				if (e.code == 0) {
+					var list = e.msg.list || [];
+					self.currentWinnerCount = self.countWinners(list);
+					self.winnerCountReady = true;
+					self.drawCount = self.normalizeDrawCount(self.drawCount);
+					self.stageUi.setRecords(self.toStageWinners(list), 'ready');
+					self.syncSharedUi();
+				} else {
+					self.stageUi.setRecords(e.msg || '中奖记录加载失败', 'error');
+				}
+			}, function () {
+				if (requestId != self.recordsRequestId || self.getVisualState() != 'records' || !self.isCurrentPrizeId(prizeId) || !self.isWinnerDataVersionCurrent(prizeId, dataVersion)) return;
+				self.stageUi.setRecords('网络异常，请重试', 'error');
+			});
+			return true;
+		},
+		closeRecords: function () {
+			if (this.getVisualState() != 'records') return false;
+			this.recordsRequestId++;
+			if (this.stageUi) this.stageUi.closeRecords();
+			this.visualState = this.recordsReturnState || 'ready';
+			this.recordsReturnState = null;
+			this.syncSharedUi();
+			var prize = this.getCurrentPrize();
+			if (!this.winnerCountReady && prize && !this.winnerMutationPending) this.loadPrizeLuckers(prize.id);
+			return true;
+		},
+		deleteRecord: function (recordId) {
+			var self = this, prize = self.getCurrentPrize();
+			if (!recordId || !prize || self.winnerMutationPending || self.getVisualState() != 'records') return false;
+			var prizeId = prize.id;
+			layerBox.showConfirm('警告', '删除将无法恢复，确定要删除此中奖用户么?', ['确定', '取消'], function () {
+				if (!self.isCurrentPrizeId(prizeId) || self.getVisualState() != 'records') {
+					layerBox.showMsg('当前奖品或页面状态已变化，请重新操作');
+					return;
+				}
+				if (!self.beginWinnerMutation(prizeId)) return;
+				screencore.ajaxSubmit('/screen/liuyancj/dellucker', { recordid: recordId, prizeid: prizeId }, '').then(function (e) {
+					if (e.code == 0) {
+						self.advanceWinnerDataVersion(prizeId);
+						self.endWinnerMutation(prizeId);
+						layerBox.showMsg('删除成功');
+						self.refreshCurrentPrizeWinnerState(prizeId);
+					} else {
+						self.endWinnerMutation(prizeId);
+						layerBox.showMsg(e.msg);
+						self.refreshCurrentPrizeWinnerState(prizeId);
+					}
+				}, function () {
+					self.endWinnerMutation(prizeId);
+					layerBox.showMsg('网络异常');
+					self.refreshCurrentPrizeWinnerState(prizeId);
+				});
+			});
+			return true;
+		},
+		clearCurrentPrizeWinners: function () {
+			var self = this, prize = self.getCurrentPrize();
+			if (!prize || self.getVisualState() != 'ready' || self.winnerMutationPending) return false;
+			var prizeId = prize.id;
+			layerBox.showConfirm('警告', '清空将删除' + (prize.prizename || prize.awardname || '当前奖品') + '所有中奖用户，并且无法恢复，您确定要清空？', ['确定', '取消'], function () {
+				if (!self.isCurrentPrizeId(prizeId) || self.getVisualState() != 'ready') {
+					layerBox.showMsg('当前奖品或页面状态已变化，请重新操作');
+					return;
+				}
+				if (!self.beginWinnerMutation(prizeId)) return;
+				screencore.ajaxSubmit('/screen/liuyancj/delalllucker', { prizeid: prizeId, gametype: XCV3Config.gametype }, '').then(function (e) {
+					if (e.code == 0) {
+						self.advanceWinnerDataVersion(prizeId);
+						self.endWinnerMutation(prizeId);
+						layerBox.showMsg('清空成功');
+						self.refreshCurrentPrizeWinnerState(prizeId);
+					} else {
+						self.endWinnerMutation(prizeId);
+						layerBox.showMsg(e.msg);
+						self.refreshCurrentPrizeWinnerState(prizeId);
+					}
+				}, function () {
+					self.endWinnerMutation(prizeId);
+					layerBox.showMsg('网络异常');
+					self.refreshCurrentPrizeWinnerState(prizeId);
+				});
+			});
+			return true;
 		},
 		bindEvent: function () {
 			var self = this;
 			self.initprize();
+			self.mountStageUi();
 			self.initSocket();
 			self.initRolldm();
-			setInterval(function () {
-				self.loadjoinnum();
-			}, 4e3);
-			$(".liuyan-selprize span").on('click', function () {
-				$(".liuyan-awardlist").toggleClass('display-none');
-			});
-			$(".liuyan-awardlist li").on('click', function () {
-				var prizeid = $(this).attr("data-prizeid");
-				$(".liuyan-selprize .selaward").text($(this).text());
-				$(".liuyan-selprize .selaward").attr({ "data-prizeid": prizeid, "data-nums": $(this).attr("data-nums") });
-				$(".liuyan-selnum input").val($(this).attr("data-onceout"));
-				$(".liuyan-awardlist").addClass('display-none');
-				$(this).addClass("active").siblings().removeClass("active");
-				screencore.ajaxSubmit('/screen/liuyancj/ajaxlucker', { prizeid: prizeid, gametype: XCV3Config.gametype }, '').then(function (e) {
-					if (e.code == 0) {
-						var lucker = e.msg.list, rightlucktpl = template('rightlucker-tpl'), html = '';
-						$.each(lucker, function (i, v) {
-							var nickname = '';
-							if (v.showitems.length > 0) {
-								var bdval = '';
-								$.each(v.showitems, function (index, val) {
-									bdval += '<span>' + val + '</span>';
-								});
-								nickname += bdval;
-							} else {
-								nickname += '<span>' + v.nickname + '</span>';
-							}
-							v.nickname = nickname;
-							v.content = screencore.emoToimg(v.msgcontent);
-							html += rightlucktpl(v);
-						});
-						$(".liuyancj-right ul").html(html);
-					}
-				});
-			});
-			var hadclicked = false, canshowlay = false;
-			$(".liuyan-startbtn").click(function () {
-				var $this = $(this), prizeid = $(".liuyan-selprize .selaward").attr('data-prizeid'), onceout = $(".liuyan-selnum input").val();
-				if (prizeid == '' || prizeid == null) return layerBox.showMsg('请选择奖品');
-				if (onceout == '' || parseInt(onceout) <= 0) return layerBox.showMsg('请设置正确的奖品抽取人数');
-				if ($(".liuyancj-right li").length >= $(".liuyan-selprize .selaward").attr('data-nums')) return layerBox.showMsg($(".liuyan-selprize .selaward").text() + '人数已抽满');
-				if (hadclicked) return;
-				hadclicked = true;
-				screencore.hideFootAndQr();
-				$(".liuyan-awardlist").addClass('display-none');
-				$(".liuyan-welcomeBox").addClass('display-none');
-				$(".liuyan-output").addClass('display-none');
-				$(".liuyan-rolldmmain").removeClass('display-none');
-				screencore.ajaxSubmit('/screen/liuyancj/savelucker', { prizeid: prizeid, selnum: onceout, gametype: XCV3Config.gametype }).then(function (e) {
-					if (e.code == 0) {
-						canshowlay = true;
-						self.luckerids = e.msg.luckerids;
-						var layusertpl = template('layuser-tpl');
-						var rightlucktpl = template('rightlucker-tpl');
-						var html = '';
-						var luckhtml = '';
-						$.each(e.msg.list, function (i, v) {
-							var nickname = '';
-							if (v.showitems.length > 0) {
-								var bdval = '';
-								$.each(v.showitems, function (index, val) {
-									bdval += '<span>' + val + '</span>';
-								});
-								nickname += bdval;
-							} else {
-								nickname += '<span>' + v.nickname + '</span>';
-							}
-							v.nickname = nickname;
-							v.content = screencore.emoToimg(v.content);
-							html += layusertpl(v);
-							luckhtml += rightlucktpl(v);
-						});
-						$(".liuyan-output-main ul").html(html);
-						$(".liuyancj-right ul").prepend(luckhtml);
-						screencore.bgmusicpause();
-						if ($("#cjingmusic").length) {
-							$("#cjingmusic")[0].play();
-						}
-					} else {
-						hadclicked = false;
-						$(".liuyan-welcomeBox").removeClass('display-none');
-						$(".liuyan-rolldmmain").addClass('display-none');
-						layerBox.showMsg(e.msg);
-					}
-
-				}, function () {
-					layerBox.showMsg('网络异常');
-					hadclicked = false;
-				});
-			});
-			$(".liuyan-stopbtn").click(function () {
-				if (!canshowlay) return;
-				hadclicked = false;
-				canshowlay = false;
-				$(".liuyan-rolldmmain").addClass('display-none');
-				$(".liuyan-output").removeClass('display-none');
-				$(".liuyan-output-main").animateControl("bounceInDown");
-				$(".liuyan-welcomeBox").removeClass('display-none');
-				if ($("#cjingmusic").length) {
-					$("#cjingmusic")[0].currentTime = 0;
-					$("#cjingmusic")[0].pause();
-				}
-				if ($("#cjendmusic").length) {
-					$("#cjendmusic")[0].play();
-				}
-				screencore.sendLuckerTpl({ luckerids: self.luckerids }, function () {
-					self.luckerids = [];
-				});
-			});
-			$(".liuyan-output-close").on('click', function () {
-				if ($("#cjendmusic").length) {
-					$("#cjendmusic")[0].currentTime = 0;
-					if (!$("#cjendmusic")[0].paused) {
-						$("#cjendmusic")[0].pause();
-					}
-				}
-				$(".liuyan-output-main").animateControl("bounceOutDown", function () {
-					$(".liuyan-output").addClass('display-none');
-					setTimeout(function () {
-						screencore.bgmusicplay();
-					}, 1e3);
-				});
-			});
-			$(".liuyan-luckerlist").on('click', ".right-luckerdel", function () {
-				var $this = $(this), prizeid = $(".liuyan-selprize .selaward").attr('data-prizeid'), recordid = $this.attr('data-id');
-				layerBox.showConfirm('警告', '删除将无法恢复，确定要删除此中奖用户么?', ['确定', '取消'], function () {
-					screencore.ajaxSubmit('/screen/liuyancj/dellucker', { recordid: recordid, prizeid: prizeid }, '').then(function (e) {
-						if (e.code == 0) {
-							$this.parent().remove();
-							layerBox.showMsg('删除成功');
-						} else {
-							layerBox.showMsg(e.msg);
-						}
-					});
-				});
-			});
-			keyboardJS.bind('space', function (e) {
-				if (hadclicked) {
-					$(".liuyan-stopbtn").trigger('click');
-				} else {
-					if ($(".liuyan-output").is(':hidden')) {
-						$(".liuyan-startbtn").trigger('click');
-					} else {
-						$(".liuyan-output-close").trigger('click');
-					}
-				}
-			});
-			keyboardJS.bind('/', function (e) {
-				var selprize = $(".liuyan-selprize .selaward"), prizeid = selprize.attr("data-prizeid");
-				if (prizeid == '' || prizeid == null) return;
-				layerBox.showConfirm('警告', '清空将删除' + selprize.text() + '所有中奖用户，并且无法恢复，您确定要清空？', ['确定', '取消'], function () {
-					screencore.ajaxSubmit('/screen/liuyancj/delalllucker', { prizeid: prizeid, gametype: XCV3Config.gametype }, '').then(function (e) {
-						if (e.code == 0) {
-							$(".liuyancj-right ul").empty();
-							layerBox.showMsg('清空成功');
-						} else {
-							layerBox.showMsg(e.msg);
-						}
-					});
-				});
-			});
-			keyboardJS.bind('left', function (e) {
-				var activeli = $(".liuyan-awardlist li.active"), prevli = activeli.prev();
-				if (activeli.length <= 0 || prevli.length <= 0) return;
-				prevli.trigger('click');
-			});
-			keyboardJS.bind('right', function (e) {
-				var activeli = $(".liuyan-awardlist li.active"), nextli = activeli.next();
-				if (activeli.length <= 0 || nextli.length <= 0) return;
-				nextli.trigger('click');
-			});
-			keyboardJS.bind('up', function (e) {
-				var activeli = $(".liuyan-awardlist li.active");
-				if (activeli.length <= 0) return;
-				var selnum = $(".liuyan-selnum input").val();
-				if (selnum == '' || selnum == null) {
-					selnum = 1;
-				}
-				selnum++;
-				if (selnum > activeli.attr("data-nums")) selnum = activeli.attr("data-nums");
-				$(".liuyan-selnum input").val(selnum);
-			});
-			keyboardJS.bind('down', function (e) {
-				var selnum = $(".liuyan-selnum input").val();
-				if (selnum && parseInt(selnum) > 1) {
-					selnum--;
-					$(".liuyan-selnum input").val(selnum);
-				}
-			});
-			$(".liuyan-awardlist li.active").trigger('click');//加载第一个奖品的中奖用户
+			setInterval(function () { self.loadjoinnum(); }, 4e3);
+			keyboardJS.bind('space', function () { self.handlePrimaryAction(); });
+			keyboardJS.bind('/', function () { self.clearCurrentPrizeWinners(); });
+			keyboardJS.bind('left', function () { if (self.getVisualState() == 'ready' && self.prizeIndex > 0) self.selectPrize(self.prizeIndex - 1); });
+			keyboardJS.bind('right', function () { if (self.getVisualState() == 'ready' && self.prizeIndex < self.prizeInfo.length - 1) self.selectPrize(self.prizeIndex + 1); });
+			keyboardJS.bind('up', function () { if (self.getVisualState() == 'ready') self.setDrawCount(self.drawCount + 1); });
+			keyboardJS.bind('down', function () { if (self.getVisualState() == 'ready') self.setDrawCount(Math.max(1, self.drawCount - 1)); });
+			keyboardJS.bind('shift', function () { self.openRecords(); });
+			if (typeof window != 'undefined' && window.addEventListener) window.addEventListener('pagehide', function () { self.destroySharedUi(); });
 		},
 		initSocket: function () {
 			var self = this, params = {};

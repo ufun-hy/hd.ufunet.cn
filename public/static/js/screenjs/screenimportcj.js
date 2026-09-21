@@ -339,7 +339,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 						}
 					}
 				}
-				root.style.setProperty('--importcj-stage-action-bottom', safeBottom + 'px');
+				root.style.setProperty('--screen-stage-action-bottom', safeBottom + 'px');
 				root.style.setProperty('--danmaku-action-bottom', safeBottom + 'px');
 				root.style.setProperty('--danmaku-field-bottom', Math.max(126, safeBottom + 74) + 'px');
 			};
