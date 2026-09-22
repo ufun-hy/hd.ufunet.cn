@@ -406,44 +406,49 @@
 }
 </style>
 <link rel="stylesheet" href="/static/css/screencss/screen-prize.css">
-<link rel="stylesheet" href="/static/css/screencss/screen-stage-ui.css">
-<link rel="stylesheet" href="/static/css/screencss/screenliuyancj-prize.css">
+<link rel="stylesheet" href="/static/css/screencss/screen-stage-ui.css?v=20260922-shared-ui">
+<link rel="stylesheet" href="/static/css/screencss/screenliuyancj-prize.css?v=20260922-shared-ui">
 {if !empty($pcconfig['cjingmusic'])}
 <audio id="cjingmusic" src="{:tomedia($pcconfig['cjingmusic'])}" loop preload="preload" style="display:none"></audio>
 {/if}
 {if !empty($pcconfig['cjendmusic'])}
 <audio id="cjendmusic" src="{:tomedia($pcconfig['cjendmusic'])}" preload="preload" style="display:none"></audio>
 {/if}
+<div class="liuyancj-page">
 <section class="normal-box liuyancj-mainbox">
   <div class="emptybox zam-app-flex-ajCenter display-none">
 	<img src="/{:SIMGURL}common/empty.png">
 	<p style="padding:20px;">请到后台添加奖品</p>
   </div>
   <section class="liuyan-prize-host" aria-label="奖品设置"></section>
-  <section class="liuyan-welcomeBox liuyan-legacy-panels zam-app-flex zam-app-alignCenter zam-app-justifyspacearound">
+  <section class="liuyan-welcomeBox liuyan-legacy-panel zam-app-flex zam-app-alignCenter zam-app-justifyspacearound" aria-hidden="true">
     <section class="liuyancj-center">
         <div class="liuyan-joinnum{if $pcconfig['showjoin']=='2'} display-none{/if}">奖池总人数:<span>0</span></div>
-        <div class="liuyan-messageBox"><ul class="liuyan-messagelist"></ul></div>
     </section>
     <section class="liuyancj-right">
         <ul class="liuyan-luckerlist"></ul>
     </section>
   </section>
+  <!-- 保留可测量的留言缓冲节点，Socket 和滚动逻辑继续使用原容器。 -->
+  <div class="liuyan-message-buffer" aria-hidden="true">
+    <div class="liuyan-messageBox"><ul class="liuyan-messagelist"></ul></div>
+  </div>
 </section>
 <!--滚动区域-->
 <section class="liuyan-rolldmmain display-none">
 	<section class="rolldmBox"><ul></ul></section>
-	<div class="liuyan-stopbtn">
+	<div class="liuyan-stopbtn liuyan-legacy-panel" aria-hidden="true">
 		停止抽奖
 	</div>
 </section>
 <!--中奖弹窗-->
-<section class="liuyan-output liuyan-legacy-result zam-app-flex-ajCenter2 display-none" aria-hidden="true">
+<section class="liuyan-output liuyan-legacy-panel zam-app-flex-ajCenter2 display-none" aria-hidden="true">
 	<section class="liuyan-output-main">
 		<ul class="zam-app-flex zam-app-flex-wrap"></ul>
 		<span class="liuyan-output-close mxc-unie631"></span>
 	</section>
 </section>
+</div>
 <script id="msg-tpl" type="html/javascript">
 <li class="zam-app-flex">
 	<div class="liuyan-message-avatar zam-app-flex-ajCenter2">
@@ -488,6 +493,8 @@
 var defaultimg = "{:tomedia($pcconfig['defaultimg'])}";
 var lotteryshow = {};
 var luckerids = [],rotatesecond = parseInt("{if empty($pcconfig['defaultstyle']['rotatesecond'])}20{else}{$pcconfig['defaultstyle']['rotatesecond']}{/if}");
+// 仅更新留言控制器的缓存地址，不改变其他大屏模块的资源版本。
+require.config({ paths: { screenliuyancj: 'screenjs/screenliuyancj.js?v=20260922-shared-ui' } });
 require(['screenliuyancj'],function (screenliuyancj) {
 	screenliuyancj.init();
 });

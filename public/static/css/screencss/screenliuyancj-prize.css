@@ -1,9 +1,18 @@
 /* 留言抽奖宿主层：准备态与 ImportCJ 共用同一套 Prize + Stage UI。 */
-.liuyancj-mainbox {
+.liuyancj-page .liuyancj-mainbox {
     --screen-stage-action-bottom: 24px;
+    position: absolute;
+    top: 90px;
+    right: 0;
+    bottom: 40px;
+    left: 0;
+    width: 100%;
+    height: auto;
+    margin: 0;
+    padding: 0;
 }
 
-.liuyan-prize-host {
+.liuyancj-page .liuyan-prize-host {
     position: absolute;
     left: 50%;
     top: 48%;
@@ -12,30 +21,40 @@
     transform: translate3d(-50%, -50%, 0);
 }
 
-.liuyan-prize-host .screen-prize {
+.liuyancj-page .liuyan-prize-host .screen-prize {
     width: 100%;
 }
 
-/* 旧左右面板继续作为留言数据/兼容节点，但不再参与准备态视觉输出。 */
-.liuyan-legacy-panels {
-    visibility: hidden !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
-}
-
-/* 旧中奖弹窗退出视觉链路，结果统一交给 screen-stage-ui。 */
-.liuyan-legacy-result {
+/* 保留旧左右面板、停止按钮与结果节点，但退出布局和交互。 */
+.liuyancj-page .liuyan-legacy-panel {
     display: none !important;
 }
 
+/* 不放进 display:none 面板，保留原滚动逻辑所需的真实高度。 */
+.liuyancj-page .liuyan-message-buffer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 490px;
+    height: 407px;
+    overflow: hidden;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.liuyancj-page .liuyan-message-buffer .liuyan-messageBox {
+    top: 0;
+    left: 0;
+}
+
 @media (max-width: 1366px) {
-    .liuyan-prize-host {
+    .liuyancj-page .liuyan-prize-host {
         width: min(540px, 56vw);
     }
 }
 
 @media (max-width: 900px) {
-    .liuyan-prize-host {
+    .liuyancj-page .liuyan-prize-host {
         width: 90vw;
     }
 }
