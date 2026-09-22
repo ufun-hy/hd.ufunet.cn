@@ -406,8 +406,8 @@
 }
 </style>
 <link rel="stylesheet" href="/static/css/screencss/screen-prize.css">
-<link rel="stylesheet" href="/static/css/screencss/screen-stage-ui.css?v=20260922-shared-ui">
-<link rel="stylesheet" href="/static/css/screencss/screenliuyancj-prize.css?v=20260922-shared-ui">
+<link rel="stylesheet" href="/static/css/screencss/screen-stage-ui.css?v=20260922-shared-ui-r2">
+<link rel="stylesheet" href="/static/css/screencss/screenliuyancj-prize.css?v=20260922-shared-ui-r2">
 {if !empty($pcconfig['cjingmusic'])}
 <audio id="cjingmusic" src="{:tomedia($pcconfig['cjingmusic'])}" loop preload="preload" style="display:none"></audio>
 {/if}
@@ -493,8 +493,9 @@
 var defaultimg = "{:tomedia($pcconfig['defaultimg'])}";
 var lotteryshow = {};
 var luckerids = [],rotatesecond = parseInt("{if empty($pcconfig['defaultstyle']['rotatesecond'])}20{else}{$pcconfig['defaultstyle']['rotatesecond']}{/if}");
+$('.liuyancj-page').closest('.main-box').addClass('liuyancj-page-shell');
 // 仅更新留言控制器的缓存地址，不改变其他大屏模块的资源版本。
-require.config({ paths: { screenliuyancj: 'screenjs/screenliuyancj.js?v=20260922-shared-ui' } });
+require.config({ paths: { screenliuyancj: 'screenjs/screenliuyancj.js?v=20260922-shared-ui-r2' } });
 require(['screenliuyancj'],function (screenliuyancj) {
 	screenliuyancj.init();
 });
