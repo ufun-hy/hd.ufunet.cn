@@ -87,3 +87,13 @@ python3 tests/liuyancj-danmaku/serve.py
 打开 `http://127.0.0.1:8766`。在已有 Ego task space 中，将测试脚本的 `globalThis.LIUYAN_TEST_SPACE` 替换为该空间数字 ID，再通过 `ego-browser nodejs` 执行。此预览只使用虚构活动数据。
 
 本次仅恢复 GitHub Desktop stash 内与本任务有关的文件，原 stash 保留，主分支已有评分页修复保持不变。
+
+## 2026-09-24 反馈修复
+
+服务器 SSH 预检连接被关闭，84797be 未写入生产，用户截图仍为旧螺旋动画。
+
+- 补齐与导入抽奖一致的 3 秒启动保护：动画开始后公共按钮显示“正在启动…”并禁用；Controller 同时拒绝停止，避免快速二次点击跳过动画。
+- 留言页在捕获阶段处理空格的 keydown/keyup，取消原生按钮激活，拦截长按 repeat；输入框和可编辑内容保留原行为。退出时清理监听器及启动计时器。
+- 不修改公共 Stage/Prize 和 ImportCJ。更新留言 Controller 资源版本参数。
+- 扩展回归检查启动禁用、长按跨过启动阶段、空格停止、记录按钮焦点下空格不打开侧栏。
+- 修复后完整隔离浏览器回归 **23 项通过**；JavaScript 语法与 diff 检查通过。再次只读 SSH 探测仍返回连接关闭，未进行生产写入。

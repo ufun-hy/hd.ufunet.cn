@@ -20,6 +20,8 @@ define('screenliuyancj', ['screensocket', 'screencore', 'layerBox', 'fulldm', 'k
 		lastDrawWinners: [],
 		danmaku: null,
 		animationLockPending: false,
+		startupPending: false,
+		startupTimer: null,
 		lastDrawMessages: [],
 		bgTimer: null,
 		destroyed: false,
@@ -29,6 +31,7 @@ define('screenliuyancj', ['screensocket', 'screencore', 'layerBox', 'fulldm', 'k
             self.destroyed = false;
             self.onPageHide = function () { self.destroySharedUi(); };
             window.addEventListener('pagehide', self.onPageHide);
+            self.bindSpaceControl();
             screencore.ajaxSubmit('/screen/liuyancj/initdata', { gametype: XCV3Config.gametype }).then(function (json) {
                 if (self.destroyed) return;
                 if (json.code != 0) return layerBox.showMsg(json.msg || '加载出错');
@@ -179,6 +182,11 @@ define('screenliuyancj', ['screensocket', 'screencore', 'layerBox', 'fulldm', 'k
             this.recordsRequestId++;
             window.removeEventListener('pagehide', this.onPageHide);
             this.animationLockPending = false;
+            this.startupPending = false;
+            clearTimeout(this.startupTimer);
+            document.removeEventListener('keydown', this.onSpaceDown, true);
+            document.removeEventListener('keyup', this.onSpaceUp, true);
+            window.removeEventListener('blur', this.onSpaceBlur);
             clearTimeout(this.bgTimer);
             if (this.danmaku) this.danmaku.destroy();
             fulldm.setExternalDisplay(null);
@@ -192,7 +200,7 @@ define('screenliuyancj', ['screensocket', 'screencore', 'layerBox', 'fulldm', 'k
 			var self = this, remaining = self.getRemainingCount(), state = self.getVisualState();
 			var canStart = state == 'ready' && remaining !== null && remaining > 0 && self.drawCount > 0 && self.drawCount <= remaining && !self.drawRequestPending && !self.winnerMutationPending;
 			return {
-				state: self.animationLockPending ? 'requesting' : state,
+				state: self.animationLockPending ? 'requesting' : self.startupPending ? 'starting' : state,
 				prize: $.extend({}, self.getCurrentPrize() || {}, { remaining: remaining }),
 				prizes: self.getPrizeOptions(),
 				prizeIndex: self.prizeIndex,
@@ -205,7 +213,7 @@ define('screenliuyancj', ['screensocket', 'screencore', 'layerBox', 'fulldm', 'k
 				prizeSettingsEnabled: !!self.unifiedPrize && state == 'ready' && !self.winnerMutationPending,
 				prizeSettingsVisible: !!self.unifiedPrize && state == 'ready' && !self.winnerMutationPending && !!self.prizeSettingsVisible,
 				primaryEnabled: canStart,
-				primaryText: self.animationLockPending ? '正在锁定留言...' : state == 'drawing' ? '停止抽奖' : (state == 'result' ? '关闭结果' : (state == 'records' ? '记录查看中' : (state == 'requesting' ? '正在准备...' : '开始抽奖')))
+				primaryText: self.animationLockPending ? '正在锁定留言...' : self.startupPending ? '正在启动...' : state == 'drawing' ? '停止抽奖' : (state == 'result' ? '关闭结果' : (state == 'records' ? '记录查看中' : (state == 'requesting' ? '正在准备...' : '开始抽奖')))
 			};
 		},
 		syncSharedUi: function () {
@@ -310,7 +318,14 @@ define('screenliuyancj', ['screensocket', 'screencore', 'layerBox', 'fulldm', 'k
 				self.winnerCountReady = true;
 				self.drawCount = self.normalizeDrawCount(self.drawCount);
 				screencore.hideFootAndQr();
-				self.setVisualState('drawing');
+				self.startupPending = true;
+                self.setVisualState('drawing');
+                // 与导入抽奖一致，动画启动后 3 秒内不接受停止，防止连点开始立即开奖。
+                self.startupTimer = setTimeout(function () {
+                    if (self.destroyed) return;
+                    self.startupPending = false;
+                    self.syncSharedUi();
+                }, 3000);
 				screencore.bgmusicpause();
 				if ($("#cjingmusic").length) $("#cjingmusic")[0].play();
 			}, function () {
@@ -323,7 +338,7 @@ define('screenliuyancj', ['screensocket', 'screencore', 'layerBox', 'fulldm', 'k
 		},
 		stopLottery: function () {
             var self = this;
-            if (self.getVisualState() != 'drawing' || self.animationLockPending || self.destroyed) return false;
+            if (self.getVisualState() != 'drawing' || self.animationLockPending || self.startupPending || self.destroyed) return false;
             self.animationLockPending = true;
             self.syncSharedUi();
             function reveal() {
@@ -456,12 +471,40 @@ define('screenliuyancj', ['screensocket', 'screencore', 'layerBox', 'fulldm', 'k
 			});
 			return true;
 		},
+        bindSpaceControl: function () {
+            var self = this;
+            self.spaceHeld = false;
+            function isSpace(event) { return event.code === 'Space' || event.key === ' ' || event.keyCode === 32; }
+            function isEditing(target) {
+                return target && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName));
+            }
+            self.onSpaceDown = function (event) {
+                if (!isSpace(event) || isEditing(event.target) || self.destroyed) return;
+                // 捕获阶段消费空格，避免聚焦的“中奖记录”按钮在 keyup 产生原生 click。
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                if (event.repeat || self.spaceHeld) return;
+                self.spaceHeld = true;
+                self.handlePrimaryAction();
+            };
+            self.onSpaceUp = function (event) {
+                if (!isSpace(event)) return;
+                if (self.spaceHeld || !isEditing(event.target)) {
+                    event.preventDefault();
+                    event.stopImmediatePropagation();
+                }
+                self.spaceHeld = false;
+            };
+            self.onSpaceBlur = function () { self.spaceHeld = false; };
+            document.addEventListener('keydown', self.onSpaceDown, true);
+            document.addEventListener('keyup', self.onSpaceUp, true);
+            window.addEventListener('blur', self.onSpaceBlur);
+        },
 		bindEvent: function () {
 			var self = this;
 			self.initprize();
 			self.mountStageUi();
 			self.initSocket();
-			keyboardJS.bind('space', function () { self.handlePrimaryAction(); });
 			keyboardJS.bind('/', function () { self.clearCurrentPrizeWinners(); });
 			keyboardJS.bind('left', function () { if (self.getVisualState() == 'ready' && self.prizeIndex > 0) self.selectPrize(self.prizeIndex - 1); });
 			keyboardJS.bind('right', function () { if (self.getVisualState() == 'ready' && self.prizeIndex < self.prizeInfo.length - 1) self.selectPrize(self.prizeIndex + 1); });

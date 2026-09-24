@@ -32,8 +32,9 @@ await page.click('button[aria-label="开始抽奖"]');
 await page.waitForFunction(() => require('screenliuyancj').danmaku.factor === 4);
 check('Only original draw endpoint, duplicate start refused, acceleration active', await page.evaluate(() => {
     const c=require('screenliuyancj');
-    return c.getVisualState()==='drawing' && c.startLottery()===false && c.danmaku.factor===4 && calls.filter(x=>/savelucker$/.test(x.url)).length===1;
+    return c.getVisualState()==='drawing' && c.startLottery()===false && c.danmaku.factor===4 && c.startupPending && c.stopLottery()===false && document.querySelector('.screen-stage-dock .is-primary').disabled && calls.filter(x=>/savelucker$/.test(x.url)).length===1;
 }));
+await page.waitForFunction(() => !require('screenliuyancj').startupPending);
 await page.click('button[aria-label="停止抽奖"]');
 check('Locking gates duplicate stop, prize changes and Records', await page.evaluate(() => {
     const c=require('screenliuyancj');
@@ -75,6 +76,7 @@ await page.waitForFunction(() => require('screenliuyancj').getVisualState()==='r
 check('Request failure resumes live stream without entering lock', await page.evaluate(() => require('screenliuyancj').danmaku.state==='ready' && !require('screenliuyancj').animationLockPending));
 await page.click('button[aria-label="开始抽奖"]');
 await page.waitForFunction(() => require('screenliuyancj').getVisualState()==='drawing');
+await page.waitForFunction(() => !require('screenliuyancj').startupPending);
 check('Disposal during lock cancels reveal and releases engine timers', await page.evaluate(async () => {
     const c=require('screenliuyancj'),d=c.danmaku,before=effects.filter(x=>x==='sendLuckerTpl').length;
     c.stopLottery();c.destroySharedUi();
@@ -102,6 +104,7 @@ check('Empty stream accepts its first message and late config keeps the common s
 }));
 await page.click('button[aria-label="开始抽奖"]');
 await page.waitForFunction(() => require('screenliuyancj').getVisualState()==='drawing');
+await page.waitForFunction(() => !require('screenliuyancj').startupPending);
 await page.click('button[aria-label="停止抽奖"]');
 await page.waitForFunction(() => document.querySelector('.message-danmaku').getAttribute('data-state')==='locked');
 check('Multi-winner lock stays within stage and keeps Prize hidden', await page.evaluate(() => {
@@ -112,5 +115,22 @@ check('Multi-winner lock stays within stage and keeps Prize hidden', await page.
 }));
 await page.waitForFunction(() => require('screenliuyancj').getVisualState()==='result');
 check('Full result includes every winner', await page.evaluate(() => require('screenliuyancj').lastDrawMessages.length===4 && document.querySelector('.screen-stage-result').textContent.includes('后端中奖用户 4')));
+await page.click('button[aria-label="关闭结果"]');
+await page.focus('button[aria-label="查看中奖记录"]');
+await page.keyboard.down('Space');
+await page.waitForFunction(() => require('screenliuyancj').getVisualState()==='drawing' && !require('screenliuyancj').startupPending);
+check('Holding Space across startup does not stop or reopen Records', await page.evaluate(() => {
+    document.activeElement.dispatchEvent(new KeyboardEvent('keydown',{key:' ',code:'Space',repeat:true,bubbles:true,cancelable:true}));
+    const c=require('screenliuyancj');return c.getVisualState()==='drawing' && !c.animationLockPending;
+}));
+await page.keyboard.up('Space');
+await page.keyboard.press('Space');
+await page.waitForFunction(() => require('screenliuyancj').getVisualState()==='result');
+check('Space stop shows result without opening drawer', await page.evaluate(() => !document.querySelector('.screen-stage-records.is-open') && require('screenliuyancj').getVisualState()==='result'));
+await page.focus('button[aria-label="查看中奖记录"]');
+check('Space consumes the focused Records button default click', await page.evaluate(() => document.activeElement.getAttribute('aria-label')==='查看中奖记录'));
+await page.keyboard.press('Space');
+await page.waitForFunction(() => require('screenliuyancj').getVisualState()==='ready');
+check('Space on focused Records closes result once and does not open drawer', await page.evaluate(() => !document.querySelector('.screen-stage-records.is-open')));
 check('No JavaScript errors', await page.evaluate(() => errors.length===0));
 console.log(JSON.stringify({passed:results.length, results},null,2));
