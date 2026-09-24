@@ -30,27 +30,9 @@
     width: 100%;
 }
 
-/* 保留旧左右面板、停止按钮与结果节点，但退出布局和交互。 */
-.liuyancj-page .liuyan-legacy-panel {
-    display: none !important;
-}
-
-/* 不放进 display:none 面板，保留原滚动逻辑所需的真实高度。 */
-.liuyancj-page .liuyan-message-buffer {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 490px;
-    height: 407px;
-    overflow: hidden;
-    visibility: hidden;
-    pointer-events: none;
-}
-
-.liuyancj-page .liuyan-message-buffer .liuyan-messageBox {
-    top: 0;
-    left: 0;
-}
+/* 动画在礼品之后、公共控制台之前；不会截获点击。 */
+.liuyancj-page .liuyan-danmaku-host { z-index: 12; }
+.liuyancj-page .emptybox { position: absolute; inset: 0; z-index: 13; color: #fff; pointer-events: none; }
 
 @media (max-width: 1366px) {
     .liuyancj-page .liuyan-prize-host {

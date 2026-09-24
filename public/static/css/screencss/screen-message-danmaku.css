@@ -1,0 +1,33 @@
+/* 扫码留言与留言抽奖可共用的消息显示层。 */
+.message-danmaku { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.message-danmaku-field { position: absolute; inset: 40px 0 86px; opacity: .7; transition: opacity .35s; }
+.message-danmaku-card {
+    display: flex !important; align-items: center; gap: 12px; box-sizing: border-box;
+    width: 350px; height: 76px; padding: 12px 18px 12px 12px; border-radius: 40px;
+    color: #fff; background: rgba(16, 28, 48, .84); border: 1px solid rgba(155, 213, 255, .28);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, .18); pointer-events: none !important;
+}
+.message-danmaku-avatar { display: grid; place-items: center; flex: 0 0 44px; height: 44px; border-radius: 50%; overflow: hidden; background: #345474; font-size: 22px; }
+.message-danmaku-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.message-danmaku-body { min-width: 0; flex: 1; }
+.message-danmaku-body strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; line-height: 20px; color: #9cdbff; }
+.message-danmaku-content { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 21px; line-height: 28px; }
+.message-danmaku-emoji { height: 1.2em; width: auto; vertical-align: middle; }
+.message-danmaku-status { position: absolute; top: 2px; left: 0; right: 0; color: rgba(255, 255, 255, .8); text-align: center; font-size: 16px; letter-spacing: 2px; }
+.message-danmaku[data-state="drawing"] .message-danmaku-field { opacity: 1; }
+.message-danmaku[data-state="drawing"] .message-danmaku-card { border-color: rgba(92, 230, 182, .65); box-shadow: 0 0 22px rgba(88, 230, 255, .16); }
+.message-danmaku[data-state="locking"] .message-danmaku-field { opacity: .45; }
+.message-danmaku[data-state="locked"] .message-danmaku-field { opacity: .12; }
+.message-danmaku[data-state="result"], .message-danmaku[data-state="records"] { display: none; }
+.message-danmaku-spotlight { position: absolute; inset: 65px 10% 100px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; }
+.message-danmaku-spotlight .message-danmaku-card { flex-shrink: 0; width: min(640px, 100%); height: auto; min-height: 64px; border-color: #f6c860; border-radius: 18px; background: rgba(38, 31, 18, .95); box-shadow: 0 0 40px rgba(246, 200, 96, .3); animation: message-danmaku-lock .35s ease-out both; }
+.message-danmaku-spotlight .message-danmaku-body strong { color: #f6c860; }
+.message-danmaku-spotlight .message-danmaku-content { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.message-danmaku-spotlight p { color: #f6c860; font-size: 18px; }
+.message-danmaku[data-muted="true"][data-state="ready"] .message-danmaku-field,
+.message-danmaku[data-muted="true"][data-state="ready"] .message-danmaku-status { visibility: hidden; }
+@keyframes message-danmaku-lock { from { opacity: 0; transform: scale(.94); } to { opacity: 1; transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) {
+    .message-danmaku-field { transition: none; }
+    .message-danmaku-spotlight .message-danmaku-card { animation: none; }
+}

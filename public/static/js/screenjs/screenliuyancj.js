@@ -1,10 +1,6 @@
-define('screenliuyancj', ['screensocket', 'screencore', 'template', 'layerBox', 'fulldm', 'keyboard', 'anime', 'screenjs/screen-prize', 'screenjs/screen-stage-ui', 'snabbt'], function (screensocket, screencore, template, layerBox, fulldm, keyboardJS, anime, screenPrize, screenStageUi) {
+define('screenliuyancj', ['screensocket', 'screencore', 'layerBox', 'fulldm', 'keyboard', 'screenjs/screen-prize', 'screenjs/screen-stage-ui', 'screenjs/screen-message-danmaku'], function (screensocket, screencore, layerBox, fulldm, keyboardJS, screenPrize, screenStageUi, messageDanmaku) {
 	var screenliuyancj = {
-		txt: '虚位以待',
 		fromtype: '1',
-		msgtpl: null,
-		oldmsg: [],
-		onepage: 4,
 		prizeInfo: [],
 		prizeIndex: 0,
 		drawCount: 1,
@@ -22,74 +18,32 @@ define('screenliuyancj', ['screensocket', 'screencore', 'template', 'layerBox', 
 		visualState: 'ready',
 		drawRequestPending: false,
 		lastDrawWinners: [],
+		danmaku: null,
+		animationLockPending: false,
+		lastDrawMessages: [],
+		bgTimer: null,
+		destroyed: false,
 		luckerids: [],
 		init: function () {
-			var self = this;
-			self.shapeTime = rotatesecond * 1e3;
-			self.loadMsg();
-		},
-		loadMsg: function () {
-			var self = this;
-			self.msgtpl = template('msg-tpl');
-			screencore.ajaxSubmit("/screen/liuyancj/initdata", { gametype: XCV3Config.gametype }).then(function (json) {
-				if (json.code == 0) {
-					self.prizeInfo = json.msg.prizelist;
-					self.fromtype = json.msg.fromtype;
-					if (self.prizeInfo.length > 0) {
-						var ajaxmsgs = json.msg.list.reverse(), msglen = ajaxmsgs.length;
-						for (var i = 0; i < msglen; i++) {
-							var one = ajaxmsgs[i % msglen];
-							one.content = screencore.emoToimg(one.content);
-							$(".liuyan-messagelist").append(self.msgtpl(one));
-						}
-						self.oldmsg = ajaxmsgs;
-						$(".liuyan-joinnum span").text(json.msg.total);
-						self.bindEvent();
-					} else {
-						$(".emptybox").removeClass('display-none');
-					}
-				}
-				setTimeout(function () {
-					self.loopRun();
-				}, 1e3);
-			}, function () {
-				layerBox.showMsg('加载出错');
-			});
-		},
-		loopRun: function () {
-			var self = this;
-			var contentsbox = $('.liuyan-messageBox');
-			var contentbox = $('.liuyan-messagelist');
-			if (contentbox.outerHeight() >= contentsbox.outerHeight()) {
-				var firstdom = contentbox.find('li').first(), scrollH = firstdom.outerHeight(true);
-				anime({
-					targets: contentbox.get(0),
-					translateY: [0, -scrollH],
-					easing: 'linear',
-					duration: 2e3,
-					//delay: self.loopDelay,
-					complete: function () {
-						var one = self.oldmsg.shift();
-						self.oldmsg.push(one);
-						one.content = screencore.emoToimg(one.content);
-						contentbox.append(self.msgtpl(one));
-						firstdom.remove();
-						self.loopRun();
-					},
-				});
-			} else {
-				setTimeout(function () {
-					self.loopRun();
-				}, 2e3);
-			}
-		},
-		loadjoinnum: function () {
-			screencore.ajaxSubmit('/screen/liuyancj/dmusercount', {}).then(function (e) {
-				if (e.code == 0) {
-					$(".liuyan-joinnum span").text(e.msg);
-				}
-			});
-		},
+            var self = this;
+            self.destroyed = false;
+            self.onPageHide = function () { self.destroySharedUi(); };
+            window.addEventListener('pagehide', self.onPageHide);
+            screencore.ajaxSubmit('/screen/liuyancj/initdata', { gametype: XCV3Config.gametype }).then(function (json) {
+                if (self.destroyed) return;
+                if (json.code != 0) return layerBox.showMsg(json.msg || '加载出错');
+                self.prizeInfo = json.msg.prizelist || [];
+                self.fromtype = json.msg.fromtype;
+                self.danmaku = messageDanmaku.create({
+                    root: document.querySelector('.liuyan-danmaku-host'),
+                    formatContent: function (content) { return screencore.emoToimg(content); }
+                }).mount((json.msg.list || []).slice().reverse());
+                // 本页由奖池消息驱动展示；普通弹幕的开关继续控制同一显示层。
+                fulldm.setExternalDisplay(self.danmaku);
+                if (!self.prizeInfo.length) $('.emptybox').removeClass('display-none');
+                self.bindEvent();
+            }, function () { if (!self.destroyed) layerBox.showMsg('加载出错'); });
+        },
 		getCurrentPrize: function () {
 			return this.prizeInfo[this.prizeIndex] || null;
 		},
@@ -220,6 +174,15 @@ define('screenliuyancj', ['screensocket', 'screencore', 'template', 'layerBox', 
 			self.syncSharedUi();
 		},
 		destroySharedUi: function () {
+            this.destroyed = true;
+            this.winnerRequestId++;
+            this.recordsRequestId++;
+            window.removeEventListener('pagehide', this.onPageHide);
+            this.animationLockPending = false;
+            clearTimeout(this.bgTimer);
+            if (this.danmaku) this.danmaku.destroy();
+            fulldm.setExternalDisplay(null);
+            this.danmaku = null;
 			if (this.unifiedPrize) this.unifiedPrize.destroy();
 			if (this.stageUi) this.stageUi.destroy();
 			this.unifiedPrize = null;
@@ -229,7 +192,7 @@ define('screenliuyancj', ['screensocket', 'screencore', 'template', 'layerBox', 
 			var self = this, remaining = self.getRemainingCount(), state = self.getVisualState();
 			var canStart = state == 'ready' && remaining !== null && remaining > 0 && self.drawCount > 0 && self.drawCount <= remaining && !self.drawRequestPending && !self.winnerMutationPending;
 			return {
-				state: state,
+				state: self.animationLockPending ? 'requesting' : state,
 				prize: $.extend({}, self.getCurrentPrize() || {}, { remaining: remaining }),
 				prizes: self.getPrizeOptions(),
 				prizeIndex: self.prizeIndex,
@@ -242,13 +205,15 @@ define('screenliuyancj', ['screensocket', 'screencore', 'template', 'layerBox', 
 				prizeSettingsEnabled: !!self.unifiedPrize && state == 'ready' && !self.winnerMutationPending,
 				prizeSettingsVisible: !!self.unifiedPrize && state == 'ready' && !self.winnerMutationPending && !!self.prizeSettingsVisible,
 				primaryEnabled: canStart,
-				primaryText: state == 'drawing' ? '停止抽奖' : (state == 'result' ? '关闭结果' : (state == 'records' ? '记录查看中' : (state == 'requesting' ? '正在准备...' : '开始抽奖')))
+				primaryText: self.animationLockPending ? '正在锁定留言...' : state == 'drawing' ? '停止抽奖' : (state == 'result' ? '关闭结果' : (state == 'records' ? '记录查看中' : (state == 'requesting' ? '正在准备...' : '开始抽奖')))
 			};
 		},
 		syncSharedUi: function () {
 			var snapshot = this.getControlSnapshot();
-			if (this.unifiedPrize) this.unifiedPrize.update(snapshot);
+			// 锁定期间控制台禁用操作，但礼品保持 drawing 隐藏态，避免遮住中奖留言。
+			if (this.unifiedPrize) this.unifiedPrize.update($.extend({}, snapshot, {state: this.getVisualState()}));
 			if (this.stageUi) this.stageUi.update(snapshot);
+            if (this.danmaku && !this.animationLockPending) this.danmaku.setState(this.getVisualState());
 		},
 		setVisualState: function (state) {
 			this.visualState = /^(ready|requesting|drawing|result|records)$/.test(state) ? state : 'ready';
@@ -312,12 +277,13 @@ define('screenliuyancj', ['screensocket', 'screencore', 'template', 'layerBox', 
 		},
 		startLottery: function () {
 			var self = this, prize = self.getCurrentPrize(), remaining = self.getRemainingCount();
-			if (self.getVisualState() != 'ready' || self.drawRequestPending || self.winnerMutationPending) return false;
+			if (self.destroyed || self.getVisualState() != 'ready' || self.drawRequestPending || self.winnerMutationPending) return false;
 			if (!prize || prize.id === undefined || prize.id === null || prize.id === '') return layerBox.showMsg('请选择奖品');
 			if (remaining === null) return layerBox.showMsg('正在读取当前奖品名额，请稍候');
 			if (remaining <= 0) return layerBox.showMsg((prize.prizename || prize.awardname || '当前奖品') + '人数已抽满');
 			var onceout = self.normalizeDrawCount(self.drawCount);
 			if (!onceout || onceout <= 0 || onceout > remaining) return layerBox.showMsg('请设置正确的奖品抽取人数');
+			clearTimeout(self.bgTimer);
 			self.drawCount = onceout;
 			self.advanceWinnerDataVersion(prize.id);
 			self.winnerRequestId++;
@@ -325,6 +291,7 @@ define('screenliuyancj', ['screensocket', 'screencore', 'template', 'layerBox', 
 			self.drawRequestPending = true;
 			self.setVisualState('requesting');
 			screencore.ajaxSubmit('/screen/liuyancj/savelucker', { prizeid: prize.id, selnum: onceout, gametype: XCV3Config.gametype }).then(function (e) {
+				if (self.destroyed) return;
 				self.drawRequestPending = false;
 				if (e.code != 0) {
 					self.setVisualState('ready');
@@ -332,15 +299,22 @@ define('screenliuyancj', ['screensocket', 'screencore', 'template', 'layerBox', 
 				}
 				self.luckerids = e.msg.luckerids || [];
 				self.lastDrawWinners = self.toStageWinners(e.msg.list || []);
+                self.lastDrawMessages = $.map(e.msg.list || [], function (winner) {
+                    return {
+                        nickname: winner.nickname || (winner.showitems || [])[0] || '中奖用户',
+                        avatar: winner.avatar,
+                        content: winner.content || winner.msgcontent || ''
+                    };
+                });
 				self.currentWinnerCount += self.countWinners(e.msg.list);
 				self.winnerCountReady = true;
 				self.drawCount = self.normalizeDrawCount(self.drawCount);
 				screencore.hideFootAndQr();
-				$(".liuyan-rolldmmain").removeClass('display-none');
 				self.setVisualState('drawing');
 				screencore.bgmusicpause();
 				if ($("#cjingmusic").length) $("#cjingmusic")[0].play();
 			}, function () {
+				if (self.destroyed) return;
 				self.drawRequestPending = false;
 				self.setVisualState('ready');
 				layerBox.showMsg('网络异常');
@@ -348,20 +322,26 @@ define('screenliuyancj', ['screensocket', 'screencore', 'template', 'layerBox', 
 			return true;
 		},
 		stopLottery: function () {
-			var self = this;
-			if (self.getVisualState() != 'drawing') return false;
-			$(".liuyan-rolldmmain").addClass('display-none');
-			if ($("#cjingmusic").length) {
-				$("#cjingmusic")[0].currentTime = 0;
-				$("#cjingmusic")[0].pause();
-			}
-			if ($("#cjendmusic").length) $("#cjendmusic")[0].play();
-			self.visualState = 'result';
-			if (self.stageUi) self.stageUi.setResult(self.lastDrawWinners, $.extend({}, self.getCurrentPrize() || {}, { remaining: self.getRemainingCount() }));
-			self.syncSharedUi();
-			screencore.sendLuckerTpl({ luckerids: self.luckerids }, function () { self.luckerids = []; });
-			return true;
-		},
+            var self = this;
+            if (self.getVisualState() != 'drawing' || self.animationLockPending || self.destroyed) return false;
+            self.animationLockPending = true;
+            self.syncSharedUi();
+            function reveal() {
+                if (self.destroyed || !self.animationLockPending) return;
+                self.animationLockPending = false;
+                if ($('#cjingmusic').length) {
+                    $('#cjingmusic')[0].currentTime = 0;
+                    $('#cjingmusic')[0].pause();
+                }
+                if ($('#cjendmusic').length) $('#cjendmusic')[0].play();
+                self.visualState = 'result';
+                if (self.stageUi) self.stageUi.setResult(self.lastDrawWinners, $.extend({}, self.getCurrentPrize() || {}, { remaining: self.getRemainingCount() }));
+                self.syncSharedUi();
+                screencore.sendLuckerTpl({ luckerids: self.luckerids }, function () { self.luckerids = []; });
+            }
+            if (!self.danmaku || !self.danmaku.lock(self.lastDrawMessages, reveal)) reveal();
+            return true;
+        },
 		closeResult: function () {
 			if (this.getVisualState() != 'result') return false;
 			if ($("#cjendmusic").length) {
@@ -369,8 +349,9 @@ define('screenliuyancj', ['screensocket', 'screencore', 'template', 'layerBox', 
 				if (!$("#cjendmusic")[0].paused) $("#cjendmusic")[0].pause();
 			}
 			this.lastDrawWinners = [];
+            this.lastDrawMessages = [];
 			this.setVisualState('ready');
-			setTimeout(function () { screencore.bgmusicplay(); }, 1e3);
+			this.bgTimer = setTimeout(function () { screencore.bgmusicplay(); }, 1e3);
 			return true;
 		},
 		handlePrimaryAction: function () {
@@ -480,8 +461,6 @@ define('screenliuyancj', ['screensocket', 'screencore', 'template', 'layerBox', 
 			self.initprize();
 			self.mountStageUi();
 			self.initSocket();
-			self.initRolldm();
-			setInterval(function () { self.loadjoinnum(); }, 4e3);
 			keyboardJS.bind('space', function () { self.handlePrimaryAction(); });
 			keyboardJS.bind('/', function () { self.clearCurrentPrizeWinners(); });
 			keyboardJS.bind('left', function () { if (self.getVisualState() == 'ready' && self.prizeIndex > 0) self.selectPrize(self.prizeIndex - 1); });
@@ -489,11 +468,11 @@ define('screenliuyancj', ['screensocket', 'screencore', 'template', 'layerBox', 
 			keyboardJS.bind('up', function () { if (self.getVisualState() == 'ready') self.setDrawCount(self.drawCount + 1); });
 			keyboardJS.bind('down', function () { if (self.getVisualState() == 'ready') self.setDrawCount(Math.max(1, self.drawCount - 1)); });
 			keyboardJS.bind('shift', function () { self.openRecords(); });
-			if (typeof window != 'undefined' && window.addEventListener) window.addEventListener('pagehide', function () { self.destroySharedUi(); });
 		},
 		initSocket: function () {
 			var self = this, params = {};
 			params.onmessage = function (data) {
+                if (self.destroyed) return;
 				if (data.type == 'connected') {
 					screensocket.isclose = false;
 					screencore.connectsocket({ clientid: data.clientid });
@@ -530,6 +509,7 @@ define('screenliuyancj', ['screensocket', 'screencore', 'template', 'layerBox', 
 						fulldm.addBullet(data);
 					}
 				} else if (data.type == 'screendeldm') {
+                    if (self.danmaku) self.danmaku.remove(data.msgid);
 					if (!$.isArray(data.msgid)) {
 						fulldm.delBullet(data.msgid);
 					} else {
@@ -538,222 +518,18 @@ define('screenliuyancj', ['screensocket', 'screencore', 'template', 'layerBox', 
 						});
 					}
 				} else if (data.type == 'screenresetdm') {
+                    if (self.danmaku) self.danmaku.reset();
 					fulldm.resetBullet();
 				}
 			};
 			screensocket.init(params);
 		},
-		addnewMsg: function (msg) {
-			var self = this;
-			if (msg.type == 'screendm') {
-				msg.type = msg.msgtype || '1';
-			}
-			if (msg.type == '2') {
-				return false;
-			}
-			self.oldmsg.push(msg);
-			var contentsbox = $('.liuyan-messageBox');
-			var contentbox = $('.liuyan-messagelist');
-			if (contentbox.outerHeight() < contentsbox.outerHeight()) {
-				msg.content = screencore.emoToimg(msg.content);
-				contentbox.append(self.msgtpl(msg));
-			}
-			var replaceAll = $(".liuyan-rolldmmain .card-needreplace");
-			if (replaceAll.length <= 0) {
-				var replaceone = $(".liuyan-rolldmmain li").eq(Math.floor((Math.random() * $(".liuyan-rolldmmain li").length)));
-			} else {
-				var replaceone = replaceAll.eq(0);
-			}
-			replaceone.find(".card-avatar img").attr("src", msg.avatar);
-			replaceone.find(".card-content").html(screencore.emoToimg(msg.content));
-			replaceone.removeClass('card-needreplace');
-		},
-		initRolldm: function () {
-			var self = this;
-			self.rolltpl = template('roll-tpl');
-			self.Stage = self.makeStage();
-			self.Utils = self.makeUtils();
-			self.Card = self.makeCard();
-			self.screw = self.makeScrew();
-			self.changeShape(self.shape);
-		},
-		stageObj: $(".rolldmBox ul"),
-		shape: 'screw',
-		shapeTime: 20e3,
-		Utils: {},
-		Stage: {},
-		Card: {},
-		screw: {},
-		deg: function (o) {
-			return Math.PI / 180 * o
-		},
-		rolltpl: null,
-		makeUtils: function () {
-			var o = window.innerWidth,
-				i = window.innerHeight;
-			return {
-				width: o,
-				height: i,
-			}
-		},
-		makeStage: function () {
-			var self = this;
-			var o = {
-				fromRotation: [0, 0, 0],
-				rotation: [0, 2 * Math.PI, 0],
-				duration: 35e3,
-				complete: function () {
-					i()
-				}
-			},
-				i = function () {
-					self.Stage.stop(), self.Stage.snabbt(o)
-				};
-			return {//          stage 
-				default: function (n) {
-					n.transformOrigin || (n.transformOrigin = [0, 0, 0]);
-					n.duration || (n.duration = 35e3);
-					Object.keys(n).forEach(function (i) {
-						o[i] = n[i]
-					});
-					self.Stage.snabbt({
-						position: [0, 0, 0],
-						duration: 100,
-						complete: i
-					})
-				},
-				snabbt: self.stageObj.snabbt.bind(self.stageObj),
-				stop: function () {
-					self.stageObj.snabbt("stop")
-				},
-				reset: function (o) {
-					self.stageObj.css("transform", "")
-				}
-			}
-		},
-		makeCard: function () {
-			var self = this;
-			var o = -1,
-				i = [],
-				n = function (key) {
-					var onedm = { avatar: defaultimg, content: self.txt, needreplace: false };
-					if (self.oldmsg[key]) {
-						onedm.avatar = self.oldmsg[key].avatar;
-						onedm.content = screencore.emoToimg(self.oldmsg[key].content);
-					} else {
-						var msg = self.oldmsg[Math.floor((Math.random() * self.oldmsg.length))];
-						if (msg) {
-							onedm.avatar = msg.avatar;
-							onedm.content = screencore.emoToimg(msg.content);
-						}
-						onedm.needreplace = true;
-					}
-					var o = $(self.rolltpl(onedm));
-					i.push(o);
-					self.stageObj.append(o);
-				};
-			return {
-				count: function () {
-					return i.length;
-				},
-				init: function (o) {
-					var t = o - i.length;//160 - 0
-					if (t > 0) {
-						for (var e = i.length; e < o; e++) {
-							n(e);
-						}
-					}
-				},
-				reset: function () {
-					o = -1;
-				},
-				next: function () {
-					if (++o, i[o]) return i[o]
-				}
-			}
-		},
-		makeScrew: function () {
-			var self = this;
-			var o = [], e = 500, s = 4, a = 40, l = self.Utils.width / s / a, r = 360 / a;
-			var p = s / 2, d = a / 2;
-			for (var c = 0; c < s; c++) {//4 * 40 160个card
-				for (var u = 0; u < a; u++) {
-					var f = self.deg(r * u),
-						h = (c - p) * a * l + (u - d) * l,
-						g = e * Math.sin(f),
-						v = e * Math.cos(f),
-						m = f,
-						b = 0,
-						w = 0;
-					o.push({
-						position: [h, g, v],
-						rotation: [m, b, w],
-						skew: [0, self.deg(6)]
-					})
-				}
-			}
-			return {
-				card: {
-					count: o.length,
-					allCard: o,
-					perspective: 3500
-				},
-				stage: function () {
-					var n = function () {
-						self.Stage.snabbt({
-							fromRotation: [0, 0, 0],
-							rotation: [2 * Math.PI, 0, 0],
-							duration: self.shapeTime,
-							complete: function () {
-								n()
-							}
-						})
-					};
-					return n;
-				}
-			}
-		},
-		Build: function () {
-			var self = this;
-			var o = self[self.shape];
-			if (o) {
-				var i = o.stage,
-					n = o.card,
-					e = function () { };
-				if (i && "function" == typeof i) {
-					//self rotate
-					e = i();
-				} else {
-					//stage rotate
-					self.Stage.default(i);
-				}
-				self.Card.reset();
-				for (var s = 0, a = 0; a < n.count; a++) {
-					var l = self.Card.next();
-					if (l) {
-						var r = n.allCard[a];
-						var c = {
-							rotation: r.rotation,
-							position: r.position,
-							scale: r.scale || [1, 1],
-							complete: function () {
-								++s, s == n.count && e();
-							}
-						};
-						c.duration = 0;
-						c.delay = 0;
-						r.skew || (r.skew = [0, 0]), c.skew = r.skew, l.snabbt(c)
-					}
-				}
-			}
-		},
-		changeShape: function (shape) {
-			var self = this;
-			self.shape = shape;
-			var i = self[shape];
-			self.Card.init(i.card.count);
-			self.Build();
-		},
-	};
-	return screenliuyancj;
-})
+        addnewMsg: function (msg) {
+            if (!this.danmaku || this.destroyed) return false;
+            var message = $.extend({}, msg);
+            if (message.type == 'screendm') message.type = message.msgtype || '1';
+            this.danmaku.add(message);
+        }
+    };
+    return screenliuyancj;
+});

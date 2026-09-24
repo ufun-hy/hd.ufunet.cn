@@ -1,5 +1,19 @@
 define('fulldm', ['template', 'screencore', 'danmuku', 'jquerytrans'], function (template, screencore, Danmuku) {
 	var fulldm = {
+        // 可选的页面显示层；页面自行提供消息，公共开关继续复用。
+        externalDisplay: null,
+        setExternalDisplay: function (display) {
+            clearInterval(this.timer);
+            this.timer = null;
+            if (this.dmmanager) this.dmmanager.clear();
+            this.externalDisplay = display;
+            if (display) {
+                this.bindevent();
+                var saved = window.localStorage.getItem('openfulldm' + XCV3Config.hdid);
+                if (saved === '2' || (!saved && this.config.opendm === '2')) this.stop();
+                else this.start();
+            }
+        },
 		container: null,
 		timer: null,
 		oldBullet: [],
@@ -20,6 +34,7 @@ define('fulldm', ['template', 'screencore', 'danmuku', 'jquerytrans'], function 
 			self.container = container;
 			if (!config || $.isEmptyObject(config)) return;
 			self.config = config;
+            if (self.externalDisplay) { self.setExternalDisplay(self.externalDisplay); return; }
 			self.dmtpl = template('fulldm-tpl');
 			if (config.isloop == '1') {
 				self.isLoop = true;
@@ -162,8 +177,10 @@ define('fulldm', ['template', 'screencore', 'danmuku', 'jquerytrans'], function 
 		},
 		bindevent: function () {
 			var self = this;
+            if (self.eventsBound) return;
+            self.eventsBound = true;
 			$(".control-normal-list .opendm").on('click', function (e, params) {
-				if (!self.dmmanager.runing) {
+				if (self.externalDisplay ? !self.externalDisplay.isVisible() : !self.dmmanager.runing) {
 					//开启弹幕
 					self.start();
 					!params && window.localStorage.setItem("openfulldm" + XCV3Config.hdid, '1');
@@ -174,7 +191,8 @@ define('fulldm', ['template', 'screencore', 'danmuku', 'jquerytrans'], function 
 				}
 			});
 			$(window).resize(function () {
-				self.dmmanager != null && self.dmmanager.resize();
+				if (self.externalDisplay) self.externalDisplay.resize();
+                else if (self.dmmanager) self.dmmanager.resize();
 			});
 			setInterval(function () {
 				self.capacityhistroy();
@@ -182,12 +200,14 @@ define('fulldm', ['template', 'screencore', 'danmuku', 'jquerytrans'], function 
 		},
 		addoldBullet: function (data, flag) {
 			var self = this, flag = flag || '1';
+            if (self.externalDisplay) return;
 			if (self.isdelExists(data.id) == -1 && self.isoldExists(data.id) == -1) {
 				flag == '1' ? self.oldBullet.push(data) : self.oldBullet.unshift(data);
 			}
 		},
 		addBullet: function (data, flag) {
 			var self = this, flag = flag || '1';
+            if (self.externalDisplay) return;
 			if (data.type == 'screendm') {
 				data.type = data.msgtype || '1';
 			}
@@ -204,6 +224,7 @@ define('fulldm', ['template', 'screencore', 'danmuku', 'jquerytrans'], function 
 		},
 		delBullet: function (key) {
 			var self = this;
+			if (self.externalDisplay) return;
 			self.haddelBullet.push(key);
 			self.dmmanager.each(barrage => {
 				if (barrage.data.id == key) {
@@ -221,6 +242,7 @@ define('fulldm', ['template', 'screencore', 'danmuku', 'jquerytrans'], function 
 		},
 		resetBullet: function () {
 			var self = this, needrestart = false;
+			if (self.externalDisplay) return;
 			if (self.dmmanager.runing) {
 				needrestart = true;
 			}
@@ -233,7 +255,7 @@ define('fulldm', ['template', 'screencore', 'danmuku', 'jquerytrans'], function 
 		ajaxhistory: function (num, type) {
 			var self = this, fromtype = type || '1', msgtype = self.config.dmrolltype < 3 ? '1' : '2';
 			screencore.ajaxSubmit('/common/fulldm/ajaxdm', { fromtype: fromtype, dmnum: num, rhdid: XCV3Config.rhdid, msgtype: msgtype }).then(function (data) {
-				if (data.code == 0) self.oldBullet = data.msg;
+				if (data.code == 0 && !self.externalDisplay) self.oldBullet = data.msg;
 			});
 		},
 		randColor: function () {
@@ -244,21 +266,24 @@ define('fulldm', ['template', 'screencore', 'danmuku', 'jquerytrans'], function 
 		},
 		stop: function () {
 			var self = this;
-			if (!self.config || $.isEmptyObject(self.config)) return;
+			if (!self.externalDisplay && (!self.config || $.isEmptyObject(self.config))) return;
 			self.timer != null && clearInterval(self.timer);
 			self.timer = null;
-			self.dmmanager.hidden();
-			self.dmmanager.clear();
+			if (self.externalDisplay) self.externalDisplay.setVisible(false);
+            else { self.dmmanager.hidden(); self.dmmanager.clear(); }
 			$(".control-normal-list .fulldm-icon-box .isstop").show();
 			$(".inputfulldm").val('2');
 			screencore.sendMsg2frame({ 'type': 'fulldmclose' });
 		},
 		start: function () {
 			var self = this;
-			if (!self.config || $.isEmptyObject(self.config)) return;
-			self.dmmanager.show();
-			self.dmmanager.start();
-			self.timer == null && self.barrageTimer();
+			if (!self.externalDisplay && (!self.config || $.isEmptyObject(self.config))) return;
+			if (self.externalDisplay) self.externalDisplay.setVisible(true);
+            else {
+                self.dmmanager.show();
+                self.dmmanager.start();
+                self.timer == null && self.barrageTimer();
+            }
 			$(".control-normal-list .fulldm-icon-box .isstop").hide();
 			$(".inputfulldm").val('1');
 			screencore.sendMsg2frame({ 'type': 'fulldmopen' });
@@ -304,6 +329,7 @@ define('fulldm', ['template', 'screencore', 'danmuku', 'jquerytrans'], function 
 		},
 		capacityhistroy: function () {
 			var self = this, deldms = [];
+			if (self.externalDisplay || !self.dmmanager) return;
 			if (self.oldBullet.length >= self.dmmanager.opts.capacity) {
 				self.oldBullet = self.oldBullet.sort(screencore.sortBy('id'));
 				deldms = self.oldBullet.splice(0, 50);
