@@ -4,6 +4,7 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 			stimeout: null,//成绩排名定时器
 			ztimeout: null,//赞排名定时器
 			otimeout: null,//单个用户定时器
+			scoreScrollPending: false,
 			pfuserid: 0,
 			openpubpw: 2,
 					pubweight: 0,
@@ -155,7 +156,12 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 							if (pfuser.length != len) {
 								self.removeautoScroll('.livemark-phbs');
 								$('.livemark-phbs').scrollTop(0);
-						}
+								self.scoreScrollPending = true;
+							}
+							if (self.scoreScrollPending && !$('.livemark-phbs').hasClass('display-none')) {
+								self.scoreScrollPending = false;
+								self.initautoScroll('.livemark-phbs');
+							}
 						json.msg.openzan == '2' ? $(".livemark-btns").addClass('display-none') : $(".livemark-btns").removeClass('display-none');
 					}
 				} else {
@@ -209,6 +215,7 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 				$(".livemark-scrollbox>div").addClass('display-none');
 				$(".livemark-users").empty();
 				self.removeautoScroll('.livemark-users');
+				self.scoreScrollPending = true;
 				self.clearAll();
 				self.loadScoredata();
 				self.stimeout = setInterval(function () {
@@ -640,6 +647,8 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 				$(".livemark-scrollbox>div").addClass('display-none');
 				if ($this.hasClass('btn-mark')) {
 					if ($(".livemark-topbtn").attr('data-view') == 'list') {
+						self.removeautoScroll('.livemark-phbs');
+						self.scoreScrollPending = false;
 						self.clearAll();
 						self.loadNormaldata();
 						self.ntimeout = setInterval(function () {
@@ -647,6 +656,8 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 						}, 3e3);
 						$(".livemark-scrollbox .livemark-users").removeClass('display-none');
 					} else {
+						self.removeautoScroll('.livemark-users');
+						self.scoreScrollPending = true;
 						self.clearAll();
 						self.loadScoredata();
 						self.stimeout = setInterval(function () {
@@ -656,6 +667,8 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 					}
 					$(".livemark-topbtn").removeClass('display-none');
 				} else {//点击了人气
+					self.removeautoScroll('.livemark-phbs');
+					self.scoreScrollPending = false;
 					self.clearAll();
 					self.loadZandata();
 					self.ztimeout = setInterval(function () {
@@ -674,6 +687,7 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 					$(".livemark-scrollbox>div").addClass('display-none');
 					$(".livemark-phb-top .rank2,.livemark-phb-top .rank1,.livemark-phb-top .rank3,.livemark-phb-others").empty();
 					self.removeautoScroll('.livemark-phbs');
+					self.scoreScrollPending = false;
 					self.clearAll();
 					self.loadNormaldata();
 					self.ntimeout = setInterval(function () {
