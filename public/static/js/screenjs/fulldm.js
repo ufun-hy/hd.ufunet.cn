@@ -5,9 +5,10 @@ define('fulldm', ['template', 'screencore', 'danmuku', 'jquerytrans'], function 
         setExternalDisplay: function (display) {
             clearInterval(this.timer);
             this.timer = null;
-            if (this.dmmanager) this.dmmanager.clear();
+            if (this.dmmanager) { this.dmmanager.clear(); this.dmmanager = null; }
             this.externalDisplay = display;
             if (display) {
+                if (display.configure) display.configure(this);
                 this.bindevent();
                 var saved = window.localStorage.getItem('openfulldm' + XCV3Config.hdid);
                 if (saved === '2' || (!saved && this.config.opendm === '2')) this.stop();
@@ -34,8 +35,8 @@ define('fulldm', ['template', 'screencore', 'danmuku', 'jquerytrans'], function 
 			self.container = container;
 			if (!config || $.isEmptyObject(config)) return;
 			self.config = config;
-            if (self.externalDisplay) { self.setExternalDisplay(self.externalDisplay); return; }
 			self.dmtpl = template('fulldm-tpl');
+            if (self.externalDisplay) { self.setExternalDisplay(self.externalDisplay); return; }
 			if (config.isloop == '1') {
 				self.isLoop = true;
 			}
@@ -126,7 +127,8 @@ define('fulldm', ['template', 'screencore', 'danmuku', 'jquerytrans'], function 
 			var speed = this.config.dmspeed;
 			return speed == '1' ? [20, 26] : (speed == '2' ? [15, 21] : [4, 10]);
 		},
-		createManager: function () {
+		// Both ordinary danmaku and the lottery adapter use these backend settings.
+		getManagerOptions: function () {
 			var self = this, direction = self.config.dmrolltype == '1' ? 'right' : (self.config.dmrolltype == '2' ? 'left' : (self.config.dmrolltype == '3' ? 'bottom' : 'top')), dmkuConfig = {
 				container: self.container[0],
 				height: self.config.height || self.height,
@@ -135,7 +137,7 @@ define('fulldm', ['template', 'screencore', 'danmuku', 'jquerytrans'], function 
 				direction: direction,
 				times: self.rollspeed(),
 				limit: 100,
-				interval: self.addinterval,
+				interval: self.config.ismiji == '2' ? 1 : 2,
 				capacity: 800,
 				hooks: {
 					barrageCreate(barrage, node) {
@@ -165,7 +167,11 @@ define('fulldm', ['template', 'screencore', 'danmuku', 'jquerytrans'], function 
 					}
 				}
 			};
-			self.dmmanager = Danmuku.create(dmkuConfig);
+			return dmkuConfig;
+		},
+		createManager: function () {
+			var self = this;
+			self.dmmanager = Danmuku.create(self.getManagerOptions());
 			var openfulldm = window.localStorage.getItem("openfulldm" + XCV3Config.hdid);
 			if ((!openfulldm && self.config.opendm == '1') || openfulldm == '1') {
 				self.barrageTimer();

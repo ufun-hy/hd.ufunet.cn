@@ -1,4 +1,4 @@
-/* 留言动画适配层：复用扫码弹幕 Danmuku 的轨道和位移，不负责选人或调用业务接口。 */
+/* 留言抽奖显示适配层：复用后台弹幕模板、样式及轨道配置，不负责开奖。 */
 define(['danmuku'], function (Danmuku) {
     'use strict';
 
@@ -16,8 +16,10 @@ define(['danmuku'], function (Danmuku) {
         this.state = 'ready';
         this.factor = 1;
         this.timers = [];
+        this.rafId = null;
         this.disposed = false;
         this.visible = true;
+        this.nextFeedAt = 0;
         this.reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         this.onResize = this.resize.bind(this);
         this.onVisibility = this.visibility.bind(this);
@@ -33,7 +35,7 @@ define(['danmuku'], function (Danmuku) {
                     var src = imageUrl(child.getAttribute('src'));
                     if (src) {
                         var img = doc.createElement('img');
-                        img.className = 'message-danmaku-emoji'; img.src = src; img.alt = child.alt || '';
+                        img.className = 'faceImg'; img.src = src; img.alt = child.alt || '';
                         parent.appendChild(img);
                     }
                 } else if (child.nodeType === 1 && !/^(SCRIPT|STYLE|IFRAME|OBJECT|SVG)$/.test(child.tagName)) append(parent, child);
@@ -41,35 +43,42 @@ define(['danmuku'], function (Danmuku) {
         }
         append(node, template.content);
     };
-    MessageStream.prototype.card = function (node, message) {
-        var doc = this.root.ownerDocument;
-        node.className = 'message-danmaku-card';
-        var avatar = doc.createElement('span'); avatar.className = 'message-danmaku-avatar';
-        var src = imageUrl(message.avatar);
-        if (src) {
-            var img = doc.createElement('img'); img.src = src; img.alt = ''; avatar.appendChild(img);
-        } else avatar.textContent = text(message.nickname || '留').slice(0, 1);
-        var body = doc.createElement('div'); body.className = 'message-danmaku-body';
-        var name = doc.createElement('strong'); name.textContent = message.nickname || '现场用户';
-        var content = doc.createElement('div'); content.className = 'message-danmaku-content';
-        this.content(content, message.content);
-        body.appendChild(name); body.appendChild(content); node.appendChild(avatar); node.appendChild(body);
+    MessageStream.prototype.renderBarrage = function (barrage, node) {
+        // 保留原渲染模板与随机颜色；仅净化留言内容，避免 raw HTML 执行。
+        var content = this.root.ownerDocument.createElement('div');
+        this.content(content, barrage.data.content);
+        var data = Object.assign({}, barrage.data, {content: content.innerHTML});
+        this.fulldm.rebindBarragedom({data: data}, node);
+    };
+    MessageStream.prototype.configure = function (fulldm) {
+        if (this.disposed || !fulldm.dmtpl || !fulldm.container || !fulldm.container[0]) return;
+        if (this.manager && this.config === fulldm.config && this.field === fulldm.container[0]) return;
+        if (this.manager) this.manager.clear();
+        this.fulldm = fulldm;
+        this.config = fulldm.config;
+        // 使用页脚原容器，保留后台半屏、上下区域与原始坐标系。
+        this.field = fulldm.container[0];
+        this.field.classList.add('message-danmaku-field');
+        this.field.setAttribute('aria-hidden', 'true');
+        var self = this, options = fulldm.getManagerOptions();
+        this.baseTimes = options.times.slice();
+        this.drawFactor = Math.min(1.8, this.baseTimes[0] / 3.5);
+        this.feedInterval = this.config.ismiji == '2' ? 800 : 2000;
+        options.hooks = {barrageCreate: function (barrage, node) { self.renderBarrage(barrage, node); },
+            // 引擎可能在下一帧才挂载已入队节点；暂停状态下也不能漏出运动。
+            barrageMove: function (barrage) { if (!self.canMove()) barrage.pause(); }};
+        this.manager = Danmuku.create(options);
+        this.speed(this.state === 'drawing' && !this.reducedMotion ? this.drawFactor : this.factor);
+        this.syncField(); this.visibility(); this.feed();
     };
     MessageStream.prototype.mount = function (messages) {
         var self = this, doc = this.root.ownerDocument;
         this.root.classList.add('message-danmaku');
-        this.field = doc.createElement('div'); this.field.className = 'message-danmaku-field';
-        this.field.setAttribute('aria-hidden', 'true');
         this.status = doc.createElement('div'); this.status.className = 'message-danmaku-status';
-        this.status.setAttribute('role', 'status');
-        this.spotlight = doc.createElement('div'); this.spotlight.className = 'message-danmaku-spotlight';
-        this.root.appendChild(this.field); this.root.appendChild(this.status); this.root.appendChild(this.spotlight);
-        this.manager = Danmuku.create({container: this.field, direction: 'right', height: 88, rowGap: 64,
-            times: [14, 18], limit: 36, capacity: 60, interval: 0.25,
-            hooks: { barrageCreate: function (barrage, node) { self.card(node, barrage.data); } }});
+        this.status.setAttribute('role', 'status'); this.root.appendChild(this.status);
         (messages || []).forEach(function (message) { self.add(message, true); });
         this.setState('ready');
-        this.feedTimer = window.setInterval(function () { self.feed(); }, 350);
+        this.feedTimer = window.setInterval(function () { self.feed(); }, 200);
         window.addEventListener('resize', this.onResize);
         doc.addEventListener('visibilitychange', this.onVisibility);
         return this;
@@ -79,7 +88,7 @@ define(['danmuku'], function (Danmuku) {
         if (message.type === '2' || message.type === 2) return;
         var id = message.id == null ? '' : String(message.id);
         if (id && this.messages.some(function (m) { return m.id === id; })) return;
-        var copy = {id: id, nickname: text(message.nickname), avatar: imageUrl(message.avatar), content: text(message.content)};
+        var copy = {id: id, nickname: text(message.nickname), avatar: imageUrl(message.avatar), content: text(message.content), type: '1'};
         this.messages.push(copy);
         if (this.messages.length > 300) this.messages.shift();
         if (!history) {
@@ -94,18 +103,18 @@ define(['danmuku'], function (Danmuku) {
         this.messages = this.messages.filter(function (m) { return ids.indexOf(m.id) === -1; });
         // clear 同时清理已排队消息，避免审核删除后再次进入画面。
         this.pendingMessages = this.pendingMessages.filter(function (m) { return ids.indexOf(m.id) === -1; });
-        this.manager.clear();
+        if (this.manager) this.manager.clear();
         this.visibility();
         this.feed();
     };
     MessageStream.prototype.reset = function () {
-        this.messages = []; this.pendingMessages = []; this.cursor = 0; this.manager.clear();
+        this.messages = []; this.pendingMessages = []; this.cursor = 0; if (this.manager) this.manager.clear();
         if (this.state === 'ready') this.status.textContent = '等待第一条现场留言';
     };
     MessageStream.prototype.feed = function () {
-        if (this.disposed || this.root.ownerDocument.hidden || (!this.visible && this.state === 'ready') || !/^(ready|drawing)$/.test(this.state) || !this.messages.length) return;
+        if (this.disposed || !this.manager || !this.canMove() || !/^(ready|drawing)$/.test(this.state) || !this.messages.length || Date.now() < this.nextFeedAt) return;
+        this.nextFeedAt = Date.now() + this.feedInterval;
         if (!this.manager.runing) this.manager.start();
-        // 优先给新留言一次前插机会；历史循环不会把实时消息压在队尾。
         if (this.pendingMessages.length && this.manager.stashLength < 12) {
             this.manager.send(this.pendingMessages.shift(), true);
             return;
@@ -118,78 +127,105 @@ define(['danmuku'], function (Danmuku) {
     };
     MessageStream.prototype.clearTimers = function () {
         this.timers.forEach(window.clearTimeout); this.timers = [];
+        window.cancelAnimationFrame(this.rafId); this.rafId = null;
     };
     MessageStream.prototype.later = function (fn, delay) {
         var self = this;
         this.timers.push(window.setTimeout(function () { if (!self.disposed) fn(); }, delay));
     };
+    MessageStream.prototype.canMove = function () {
+        return !this.disposed && !this.root.ownerDocument.hidden &&
+            /^(ready|drawing|locking)$/.test(this.state) && (this.visible || this.state !== 'ready');
+    };
     MessageStream.prototype.speed = function (factor) {
-        if (!this.manager) return;
         var previous = this.factor; this.factor = factor;
-        this.manager.setOptions({times: [14 / factor, 18 / factor]});
-        // Danmuku 的 resume2 只改 CSS 时长，不更新位移时钟；这里保持两者一致。
+        if (!this.manager) return;
+        this.manager.setOptions({times: this.baseTimes.map(function (time) { return time / factor; })});
+        var moving = [], now = Date.now();
         this.manager.each(function (barrage) {
             barrage.pause();
-            var percent = Math.max(0, Math.min(0.999, barrage.getMovePercent())), now = Date.now();
+            var percent = Math.max(0, Math.min(0.999999, barrage.getMovePercent()));
+            // 保持每条消息的实际时长比例（含引擎避碰修正），不重置位置。
             barrage.duration = barrage.duration * previous / factor;
             barrage.timeInfo.startTime = now - percent * barrage.duration * 1000;
             barrage.timeInfo.pauseTime = 0;
             barrage.timeInfo.prevPauseTime = now;
-            if (!barrage.node.ownerDocument.hidden) barrage.resume();
+            moving.push(barrage);
         });
+        if (moving.length && this.canMove()) {
+            // 一次批量布局刷新提交暂停位置，再恢复 CSS 位移，避免逐帧跳回/卡住。
+            void this.field.offsetWidth;
+            moving.forEach(function (barrage) { barrage.resume(); });
+        }
+    };
+    MessageStream.prototype.animateFactor = function (target, duration, complete) {
+        var self = this, from = this.factor, started = performance.now();
+        window.cancelAnimationFrame(this.rafId);
+        function frame(now) {
+            if (self.disposed) return;
+            var progress = Math.min(1, (now - started) / duration);
+            // smoothstep 在起止两端速度变化率为零，按帧连续变速。
+            var eased = progress * progress * (3 - 2 * progress);
+            self.speed(from + (target - from) * eased);
+            if (progress < 1) self.rafId = window.requestAnimationFrame(frame);
+            else { self.rafId = null; if (complete) complete(); }
+        }
+        if (this.reducedMotion || !duration) { this.speed(target); if (complete) complete(); }
+        else this.rafId = window.requestAnimationFrame(frame);
+    };
+    MessageStream.prototype.syncField = function () {
+        this.root.setAttribute('data-state', this.state);
+        this.root.setAttribute('data-muted', String(!this.visible));
+        if (this.field) {
+            this.field.setAttribute('data-state', this.state);
+            this.field.setAttribute('data-muted', String(!this.visible));
+        }
     };
     MessageStream.prototype.setState = function (state) {
         if (this.disposed || this.state === state && this.root.getAttribute('data-state') === state) return;
-        this.clearTimers(); this.state = state; this.root.setAttribute('data-state', state);
+        var previousState = this.state;
+        this.clearTimers(); this.state = state; this.syncField();
         if (state === 'ready' || state === 'drawing') {
-            this.spotlight.textContent = '';
             this.status.textContent = state === 'drawing' ? '幸运留言流动中' : (this.messages.length ? '扫码留言，让你的声音上大屏' : '等待第一条现场留言');
-            this.speed(state === 'drawing' && !this.reducedMotion ? 2 : 1);
-            if (state === 'drawing' && !this.reducedMotion) {
-                var self = this; this.later(function () { self.speed(4); }, 400);
-            }
-            this.visibility(); this.feed();
-        } else {
-            this.manager.stop(); this.manager.each(function (b) { b.pause(); });
-        }
+            this.visibility(); this.resize();
+            var target = state === 'drawing' && !this.reducedMotion ? (this.drawFactor || 1) : 1;
+            this.animateFactor(target, state === 'drawing' ? 400 : previousState === 'ready' ? 0 : 250);
+            this.nextFeedAt = 0; this.feed();
+        } else this.visibility();
     };
     MessageStream.prototype.lock = function (winners, complete) {
         var self = this;
         if (this.disposed || this.state !== 'drawing') return false;
-        this.clearTimers(); this.state = 'locking'; this.root.setAttribute('data-state', 'locking');
-        this.status.textContent = '正在锁定幸运留言'; this.manager.stop();
-        this.speed(this.reducedMotion ? 1 : 1.4);
-        this.later(function () { self.speed(0.4); }, this.reducedMotion ? 0 : 240);
-        this.later(function () {
-            self.manager.each(function (b) { b.pause(); });
-            self.root.setAttribute('data-state', 'locked');
-            self.status.textContent = '本轮锁定 ' + winners.length + ' 位幸运用户';
-            winners.slice(0, 3).forEach(function (winner) {
-                var node = self.root.ownerDocument.createElement('div');
-                self.card(node, winner); self.spotlight.appendChild(node);
-            });
-            if (winners.length > 3) {
-                var more = self.root.ownerDocument.createElement('p');
-                more.textContent = '另有 ' + (winners.length - 3) + ' 位，完整名单即将揭晓'; self.spotlight.appendChild(more);
-            }
-        }, this.reducedMotion ? 0 : 650);
-        this.later(function () { complete(); }, this.reducedMotion ? 150 : 1500);
+        this.clearTimers(); this.state = 'locking'; this.syncField();
+        this.status.textContent = '正在揭晓幸运留言';
+        if (this.manager) this.manager.stop();
+        var finished = false;
+        function finish() {
+            if (finished || self.disposed || self.state !== 'locking') return;
+            finished = true; self.clearTimers();
+            self.speed(0.3); self.state = 'locked'; self.syncField(); self.visibility();
+            // 不制造中奖节点；单人、多人、不可见中奖留言都只揭晓一次公共结果。
+            complete();
+        }
+        this.animateFactor(this.reducedMotion ? 1 : 0.3, this.reducedMotion ? 0 : 600, finish);
+        // 后台标签页的 rAF 会暂停，开奖收尾不能因此永久锁住。
+        if (!finished) this.later(finish, 650);
         return true;
     };
     MessageStream.prototype.isVisible = function () { return this.visible; };
     MessageStream.prototype.setVisible = function (visible) {
-        this.visible = !!visible; this.root.setAttribute('data-muted', String(!this.visible));
-        this.visibility();
+        this.visible = !!visible; this.syncField(); this.visibility();
     };
     MessageStream.prototype.resize = function () {
         if (!this.disposed && this.manager) this.manager.resize();
     };
     MessageStream.prototype.visibility = function () {
-        if (this.disposed) return;
-        if (this.root.ownerDocument.hidden || (!this.visible && this.state === 'ready') || !/^(ready|drawing)$/.test(this.state)) {
+        if (this.disposed || !this.manager) return;
+        if (!this.canMove()) {
             this.manager.stop(); this.manager.each(function (b) { b.pause(); });
         } else {
-            this.manager.each(function (b) { b.resume(); }); this.manager.start();
+            this.manager.each(function (b) { b.resume(); });
+            if (this.state !== 'locking') this.manager.start();
         }
     };
     MessageStream.prototype.destroy = function () {
@@ -197,6 +233,11 @@ define(['danmuku'], function (Danmuku) {
         window.removeEventListener('resize', this.onResize);
         this.root.ownerDocument.removeEventListener('visibilitychange', this.onVisibility);
         if (this.manager) this.manager.clear();
+        if (this.field) {
+            this.field.classList.remove('message-danmaku-field');
+            this.field.removeAttribute('data-state'); this.field.removeAttribute('data-muted');
+            this.field.removeAttribute('aria-hidden');
+        }
         this.root.textContent = ''; this.manager = null; this.messages = []; this.pendingMessages = [];
     };
     return {create: function (options) { return new MessageStream(options); }};

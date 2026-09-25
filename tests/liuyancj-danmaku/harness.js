@@ -22,7 +22,7 @@ define('screencore', [], function () {
             return new Promise(function (resolve) {
                 var msg = {}, code = 0;
                 if (/initdata$/.test(url)) msg = {prizelist: testPrizes, fromtype: '1', total: 24,
-                    list: Array.from({length: 24}, function (_, i) { return {id: String(i + 1), type: '1', nickname: ['小陈', '可可', '星辰', '晨光'][i % 4], content: demoMessages[i % 8]}; })};
+                    list: Array.from({length: 24}, function (_, i) { return {id: String(i + 1), type: '1', avatar: '/static/images/sys/prizeimg.png', nickname: ['小陈', '可可', '星辰', '晨光'][i % 4], content: demoMessages[i % 8]}; })};
                 else if (/ajaxlucker$/.test(url)) {
                     msg = {list: testWinners[data.prizeid].map(function (x) { return Object.assign({}, x); })};
                     if (holdReads) { pendingReads.push(function () { resolve({code: 0, msg: msg}); }); return; }

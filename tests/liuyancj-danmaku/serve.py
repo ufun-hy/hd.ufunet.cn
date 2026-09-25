@@ -2,8 +2,41 @@
 from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
 from pathlib import Path
 import re
+import json
+from urllib.parse import urlparse, parse_qs
 
 ROOT = Path(__file__).resolve().parents[2]
+def render_danmaku(config):
+    """Evaluate only this checked-in template's server tags; keep art-template tags intact."""
+    source = (ROOT / 'app/screen/view/common/footer_fulldm.html').read_text()
+    def expression(expr):
+        expr = expr.strip().removesuffix('/').strip()
+        expr = expr.replace('!empty($dmconfig)', 'True')
+        expr = re.sub(r"\$dmconfig\['([^']+)'\](?:\?\?('.*?'|\d+))?",
+                      lambda m: repr(config.get(m[1], (m[2] or '').strip("'"))), expr)
+        expr = re.sub(r"'(\d+)'", r"\1", expr)
+        return eval(expr.replace('&&', ' and ').replace('||', ' or '), {'__builtins__': {}}, {})
+    active, stack, output, pos = True, [], [], 0
+    pattern = r"(?<!\{)\{(if [^{}]+|elseif [^{}]+|else(?: /)?|/if|\$dmconfig[^{}]+)\}(?!\})"
+    for m in re.finditer(pattern, source):
+        if active: output.append(source[pos:m.start()])
+        tag = m[1]
+        if tag.startswith('if '):
+            condition = bool(expression(tag[3:]))
+            stack.append([active, condition]); active = active and condition
+        elif tag.startswith('elseif '):
+            parent, taken = stack[-1]
+            condition = not taken and bool(expression(tag[7:]))
+            active = parent and condition; stack[-1][1] = taken or condition
+        elif tag.startswith('else'):
+            parent, taken = stack[-1]; active = parent and not taken; stack[-1][1] = True
+        elif tag == '/if': active = stack.pop()[0]
+        elif active: output.append(str(expression(tag)))
+        pos = m.end()
+    output.append(source[pos:])
+    assert not stack
+    return ''.join(output)
+
 class Handler(SimpleHTTPRequestHandler):
     def do_GET(self):
         if self.path.split('?')[0] == '/':
@@ -15,9 +48,18 @@ class Handler(SimpleHTTPRequestHandler):
 <div class="pc-box"><div class="full-main"><div class="main-box"><header class="header">现场留言 · 幸运时刻</header>'''
             html = html.replace("{include file='common/header' /}", header)
             html = re.sub(r'\{if !empty.*?\{/if\}', '', html, flags=re.S)
-            html = html.replace("{include file='common/footer' /}", '''</div><div class="fulldmBox"></div></div></div>
-<script id="fulldm-tpl" type="text/html">{{data.nickname}}：{{data.content}}</script>
-<script>function fitStage(){const zoom=innerHeight/800;$('.full-main').css({zoom:zoom,width:innerWidth/zoom});}addEventListener('DOMContentLoaded',fitStage);addEventListener('resize',fitStage);</script>''')
+            params = parse_qs(urlparse(self.path).query)
+            config = dict(dmtype='1', dmrolltype='1', dmpos='1', dmspeed='2', ismiji='1',
+                          needavatar='1', neednickname='1', needbg='2', bgcolortype='1',
+                          bgcolor='#9b2537', fontcolortype='1', fontcolor='#ffdf87', fontsize='32',
+                          vwidth='270', clickdel='2', hoverstop='2', opendm='1', isloop='1', loadhistory='2')
+            for key in config:
+                if key in params: config[key] = params[key][0]
+            footer = '</div>' + render_danmaku(config) + '</div></div>'
+            footer += '<script>window.fixtureConfig=' + json.dumps(config) + ';'
+            footer += "require(['fulldm'],function(f){setTimeout(function(){f.init($('.fulldmBox'),fixtureConfig);}," + str(int(params.get('configDelay', ['0'])[0])) + ");});</script>"
+            footer += "<script>function fitStage(){const zoom=innerHeight/800;$('.full-main').css({zoom:zoom,width:innerWidth/zoom});}addEventListener('DOMContentLoaded',fitStage);addEventListener('resize',fitStage);</script>"
+            html = html.replace("{include file='common/footer' /}", footer)
             data = html.encode()
             self.send_response(200); self.send_header('Content-Type','text/html; charset=utf-8'); self.end_headers(); self.wfile.write(data)
         else:

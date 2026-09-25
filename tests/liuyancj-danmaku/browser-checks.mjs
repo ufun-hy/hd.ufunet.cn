@@ -6,7 +6,7 @@ const results = [];
 const check = (name, value) => { assert.ok(value, name); results.push(name); };
 await page.goto('http://127.0.0.1:8766');
 await page.waitForFunction(() => window.require && require.defined('screenliuyancj') && require('screenliuyancj').winnerCountReady);
-await page.waitForFunction(() => document.querySelectorAll('.message-danmaku-field .message-danmaku-card').length >= 4);
+await page.waitForFunction(() => document.querySelectorAll('.message-danmaku-field .fulldmBox-item').length >= 4);
 check('Ready: real Danmuku rows and one shared Stage/Prize', await page.evaluate(() => {
     const c = require('screenliuyancj');
     return c.danmaku.manager.showLength >= 4 && c.danmaku.messages.length === 24 && c.getRemainingCount() === 7 &&
@@ -16,7 +16,7 @@ check('Socket message deduplication, bounded buffer, HTML safety and moderation 
     const c = require('screenliuyancj'), m = {id:'live',type:'1',nickname:'<script>bad</script>',content:'hello<img src=x onerror="window.__xss=1"><script>window.__xss=1</script>'};
     socketCallback({type:'liuyancjmsg',messages:[m,m]});
     const duplicateOK = c.danmaku.messages.filter(x=>x.id==='live').length === 1;
-    const n=document.createElement('div'); c.danmaku.card(n,m);
+    const n=document.createElement('div'); c.danmaku.renderBarrage({data:m},n);
     const safe = !n.querySelector('script,[onerror]') && !window.__xss;
     socketCallback({type:'screendeldm',msgid:'live'});
     const removed = !c.danmaku.messages.some(x=>x.id==='live');
@@ -29,10 +29,10 @@ check('Common danmaku switch delegates without starting a second manager', await
     f.start(); return off && d.isVisible() && d.manager.runing && !f.dmmanager;
 }));
 await page.click('button[aria-label="开始抽奖"]');
-await page.waitForFunction(() => require('screenliuyancj').danmaku.factor === 4);
+await page.waitForFunction(() => require('screenliuyancj').danmaku.factor === 1.8);
 check('Only original draw endpoint, duplicate start refused, acceleration active', await page.evaluate(() => {
     const c=require('screenliuyancj');
-    return c.getVisualState()==='drawing' && c.startLottery()===false && c.danmaku.factor===4 && c.startupPending && c.stopLottery()===false && document.querySelector('.screen-stage-dock .is-primary').disabled && calls.filter(x=>/savelucker$/.test(x.url)).length===1;
+    return c.getVisualState()==='drawing' && c.startLottery()===false && c.danmaku.factor===1.8 && c.startupPending && c.stopLottery()===false && document.querySelector('.screen-stage-dock .is-primary').disabled && calls.filter(x=>/savelucker$/.test(x.url)).length===1;
 }));
 await page.waitForFunction(() => !require('screenliuyancj').startupPending);
 await page.click('button[aria-label="停止抽奖"]');
@@ -40,13 +40,11 @@ check('Locking gates duplicate stop, prize changes and Records', await page.eval
     const c=require('screenliuyancj');
     return c.animationLockPending && c.stopLottery()===false && c.selectPrize(1)===false && c.openRecords()===false && document.querySelector('.screen-stage-dock .is-primary').disabled;
 }));
-await page.waitForFunction(() => document.querySelector('.message-danmaku').getAttribute('data-state')==='locked');
-check('Spotlight uses backend winner message, never selects a candidate locally', await page.evaluate(() => {
-    const spot=document.querySelector('.message-danmaku-spotlight');
-    return spot.textContent.includes('后端中奖用户 1') && spot.textContent.includes('这条中奖留言由接口返回') && getComputedStyle(document.querySelector('.screen-prize')).visibility === 'hidden';
-}));
+check('No intermediate winner cards during deceleration', await page.evaluate(() =>
+    !document.querySelector('.message-danmaku-spotlight,.message-danmaku-card') &&
+    getComputedStyle(document.querySelector('.screen-prize')).visibility === 'hidden'));
 await page.waitForFunction(() => require('screenliuyancj').getVisualState()==='result');
-check('Shared result and one result notification', await page.evaluate(() => document.querySelector('.screen-stage-result').textContent.includes('后端中奖用户 1') && effects.filter(x=>x==='sendLuckerTpl').length===1 && document.querySelector('.message-danmaku').getBoundingClientRect().height===0));
+check('Shared result and one result notification', await page.evaluate(() => document.querySelector('.screen-stage-result').textContent.includes('后端中奖用户 1') && effects.filter(x=>x==='sendLuckerTpl').length===1 && getComputedStyle(document.querySelector('.message-danmaku-field')).visibility==='hidden'));
 await page.click('button[aria-label="关闭结果"]');
 check('Close returns to live Ready stream', await page.evaluate(() => require('screenliuyancj').danmaku.state==='ready' && require('screenliuyancj').getRemainingCount()===6));
 await page.click('button[aria-label="查看中奖记录"]');
@@ -97,7 +95,7 @@ await page.waitForFunction(() => window.require && require.defined('screenliuyan
 check('Empty stream accepts its first message and late config keeps the common switch', await page.evaluate(() => {
     const c=require('screenliuyancj'),f=require('fulldm'),d=c.danmaku;
     d.reset(); const empty=d.messages.length===0 && d.status.textContent.includes('第一条');
-    f.init($('.fulldmBox'),{opendm:'2'}); const muted=!d.isVisible();
+    f.init($('.fulldmBox'),Object.assign({},fixtureConfig,{opendm:'2'})); const muted=!d.isVisible();
     socketCallback({type:'liuyancjmsg',messages:[{id:'first',type:'1',nickname:'新用户',content:'第一条留言'}]});
     const first=d.messages.length===1 && !d.manager.runing;
     f.start();c.setDrawCount(4);return empty && muted && first && d.manager.runing;
@@ -106,13 +104,9 @@ await page.click('button[aria-label="开始抽奖"]');
 await page.waitForFunction(() => require('screenliuyancj').getVisualState()==='drawing');
 await page.waitForFunction(() => !require('screenliuyancj').startupPending);
 await page.click('button[aria-label="停止抽奖"]');
-await page.waitForFunction(() => document.querySelector('.message-danmaku').getAttribute('data-state')==='locked');
-check('Multi-winner lock stays within stage and keeps Prize hidden', await page.evaluate(() => {
-    const cards=[...document.querySelectorAll('.message-danmaku-spotlight .message-danmaku-card')],host=document.querySelector('.liuyancj-mainbox').getBoundingClientRect();
-    return cards.length===3 && document.querySelector('.message-danmaku-spotlight').textContent.includes('另有 1 位') &&
-        cards.every(n=>{const r=n.getBoundingClientRect();return r.top>=host.top && r.bottom<=host.bottom;}) &&
-        getComputedStyle(document.querySelector('.screen-prize')).visibility==='hidden';
-}));
+check('Multiple winners use the same transition with no fabricated visible messages', await page.evaluate(() =>
+    !document.querySelector('.message-danmaku-spotlight,.message-danmaku-card') &&
+    getComputedStyle(document.querySelector('.screen-prize')).visibility==='hidden'));
 await page.waitForFunction(() => require('screenliuyancj').getVisualState()==='result');
 check('Full result includes every winner', await page.evaluate(() => require('screenliuyancj').lastDrawMessages.length===4 && document.querySelector('.screen-stage-result').textContent.includes('后端中奖用户 4')));
 await page.click('button[aria-label="关闭结果"]');
