@@ -20,8 +20,6 @@ define(['danmuku'], function (Danmuku) {
         this.timers = [];
         this.rafId = null;
         this.animationTimer = null;
-        this.waveTimer = null;
-        this.waveHigh = false;
         this.disposed = false;
         this.visible = true;
         this.nextFeedAt = 0;
@@ -127,7 +125,7 @@ define(['danmuku'], function (Danmuku) {
             this.manager.send(this.pendingMessages.shift(), true);
             return;
         }
-        var count = this.state === 'drawing' ? (this.waveHigh ? 3 : 2) : 1;
+        var count = this.state === 'drawing' ? 2 : 1;
         for (var i = 0; i < count && this.manager.stashLength < 10; i++) {
             this.cursor %= this.messages.length;
             this.manager.send(this.messages[this.cursor++]);
@@ -137,7 +135,6 @@ define(['danmuku'], function (Danmuku) {
         this.timers.forEach(window.clearTimeout); this.timers = [];
         if (this.rafId) { window.cancelAnimationFrame(this.rafId); this.rafId = null; }
         if (this.animationTimer) { window.clearTimeout(this.animationTimer); this.animationTimer = null; }
-        if (this.waveTimer) { window.clearTimeout(this.waveTimer); this.waveTimer = null; }
     };
     MessageStream.prototype.later = function (fn, delay) {
         var self = this;
@@ -217,19 +214,6 @@ define(['danmuku'], function (Danmuku) {
         if (this.reducedMotion || !duration) { this.speed(target); if (complete) complete(); }
         else this.animationTimer = window.setTimeout(frame, Math.min(30, duration));
     };
-    MessageStream.prototype.startWave = function () {
-        var self = this;
-        if (this.disposed || this.state !== 'drawing' || this.reducedMotion) return;
-        if (this.waveTimer) window.clearTimeout(this.waveTimer);
-        var target = this.waveHigh ? 2.35 : 2.75;
-        this.waveHigh = !this.waveHigh;
-        this.animateFactor(target, 700, function () {
-            if (self.disposed || self.state !== 'drawing') return;
-            self.waveTimer = window.setTimeout(function () {
-                self.startWave();
-            }, 1200);
-        });
-    };
     MessageStream.prototype.syncField = function () {
         this.root.setAttribute('data-state', this.state);
         this.root.setAttribute('data-phase', this.lockPhase || '');
@@ -256,12 +240,8 @@ define(['danmuku'], function (Danmuku) {
             var target = state === 'drawing' && !this.reducedMotion ? (this.drawFactor || 2.6) : 1;
             if (state === 'drawing') {
                 this.feedInterval = 420;
-                this.waveHigh = false;
-                var self = this;
                 var easeInOutCubic = function (p) { return p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2; };
-                this.animateFactor(target, 750, function () {
-                    if (self.state === 'drawing') self.startWave();
-                }, easeInOutCubic);
+                this.animateFactor(target, 750, null, easeInOutCubic);
             } else {
                 this.feedInterval = this.readyFeedInterval || 2000;
                 this.animateFactor(1, previousState === 'ready' ? 0 : 300);

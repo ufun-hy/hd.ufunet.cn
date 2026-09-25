@@ -47,6 +47,13 @@ for (const config of cases) {
         Math.abs(acceleration.values.at(-1)-2.6)<0.001 && acceleration.target===2.6 &&
         acceleration.times.every((time,i)=>Math.abs(time-acceleration.base[i]/2.6)<0.001) &&
         await page.evaluate(()=>require('screenliuyancj').danmaku.feedInterval===420));
+    const cruise = await page.evaluate(async () => {
+        const d=require('screenliuyancj').danmaku, values=[];
+        await new Promise(resolve=>{const started=performance.now();function sample(){values.push(d.factor);if(performance.now()-started>=1500)resolve();else setTimeout(sample,25);}sample();});
+        return {values,feedInterval:d.feedInterval};
+    });
+    check('Drawing holds a steady speed and feed interval for direction '+config.dmrolltype,
+        cruise.values.length>40 && cruise.values.every(v=>Math.abs(v-2.6)<0.001) && cruise.feedInterval===420);
     await page.waitForFunction(() => !require('screenliuyancj').startupPending);
     const deceleration=await page.evaluate(async()=>{
         const c=require('screenliuyancj'),d=c.danmaku;
