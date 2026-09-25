@@ -14,10 +14,14 @@ define(['danmuku'], function (Danmuku) {
         this.pendingMessages = [];
         this.cursor = 0;
         this.state = 'ready';
+        this.lockPhase = '';
         this.factor = 1;
+        this.drawFactor = 2.6;
         this.timers = [];
         this.rafId = null;
         this.animationTimer = null;
+        this.waveTimer = null;
+        this.waveHigh = false;
         this.disposed = false;
         this.visible = true;
         this.nextFeedAt = 0;
@@ -63,12 +67,14 @@ define(['danmuku'], function (Danmuku) {
         this.field.setAttribute('aria-hidden', 'true');
         var self = this, options = fulldm.getManagerOptions();
         this.baseTimes = options.times.slice();
-        this.drawFactor = 2.2;
+        this.drawFactor = 2.6;
         this.readyFeedInterval = this.config.ismiji == '2' ? 800 : 2000;
         this.feedInterval = this.readyFeedInterval;
-        options.hooks = {barrageCreate: function (barrage, node) { self.renderBarrage(barrage, node); },
+        options.hooks = {
+            barrageCreate: function (barrage, node) { self.renderBarrage(barrage, node); },
             // 引擎可能在下一帧才挂载已入队节点；暂停状态下也不能漏出运动。
-            barrageMove: function (barrage) { if (!self.canMove()) barrage.pause(); }};
+            barrageMove: function (barrage) { if (!self.canMove()) barrage.pause(); }
+        };
         this.manager = Danmuku.create(options);
         this.speed(this.state === 'drawing' && !this.reducedMotion ? this.drawFactor : this.factor);
         this.syncField(); this.visibility(); this.feed();
@@ -117,20 +123,21 @@ define(['danmuku'], function (Danmuku) {
         if (this.disposed || !this.manager || !this.canMove() || !/^(ready|drawing)$/.test(this.state) || !this.messages.length || Date.now() < this.nextFeedAt) return;
         this.nextFeedAt = Date.now() + this.feedInterval;
         if (!this.manager.runing) this.manager.start();
-        if (this.pendingMessages.length && this.manager.stashLength < 12) {
+        if (this.pendingMessages.length && this.manager.stashLength < 14) {
             this.manager.send(this.pendingMessages.shift(), true);
             return;
         }
-        var count = this.state === 'drawing' ? 3 : 1;
-        for (var i = 0; i < count && this.manager.stashLength < 8; i++) {
+        var count = this.state === 'drawing' ? (this.waveHigh ? 3 : 2) : 1;
+        for (var i = 0; i < count && this.manager.stashLength < 10; i++) {
             this.cursor %= this.messages.length;
             this.manager.send(this.messages[this.cursor++]);
         }
     };
     MessageStream.prototype.clearTimers = function () {
         this.timers.forEach(window.clearTimeout); this.timers = [];
-        window.cancelAnimationFrame(this.rafId); this.rafId = null;
-        window.clearTimeout(this.animationTimer); this.animationTimer = null;
+        if (this.rafId) { window.cancelAnimationFrame(this.rafId); this.rafId = null; }
+        if (this.animationTimer) { window.clearTimeout(this.animationTimer); this.animationTimer = null; }
+        if (this.waveTimer) { window.clearTimeout(this.waveTimer); this.waveTimer = null; }
     };
     MessageStream.prototype.later = function (fn, delay) {
         var self = this;
@@ -146,8 +153,37 @@ define(['danmuku'], function (Danmuku) {
         this.manager.setOptions({times: this.baseTimes.map(function (time) { return time / factor; })});
         var moving = [], now = Date.now();
         this.manager.each(function (barrage) {
+            if (!barrage.moveing) return;
+            var totalSpan = (barrage.direction === 'left' || barrage.direction === 'right')
+                ? (barrage.RuntimeManager.containerWidth + barrage.getWidth())
+                : (barrage.RuntimeManager.containerHeight + barrage.getHeight());
+            var percent = null, currentPos = null;
+            if (barrage.node) {
+                var style = window.getComputedStyle(barrage.node);
+                var transform = style.transform || style.webkitTransform;
+                if (transform && transform !== 'none') {
+                    try {
+                        var matrix = window.DOMMatrixReadOnly ? new DOMMatrixReadOnly(transform) : (window.WebKitCSSMatrix ? new WebKitCSSMatrix(transform) : null);
+                        if (matrix) {
+                            currentPos = (barrage.direction === 'left' || barrage.direction === 'right') ? matrix.m41 : matrix.m42;
+                            if (totalSpan > 0) percent = Math.abs(currentPos) / totalSpan;
+                        }
+                    } catch (e) {}
+                }
+            }
             barrage.pause();
-            var percent = Math.max(0, Math.min(0.999999, barrage.getMovePercent()));
+            if (percent == null || isNaN(percent)) {
+                percent = barrage.getMovePercent();
+            }
+            percent = Math.max(0, Math.min(0.999999, percent));
+            if (currentPos != null && barrage.node) {
+                if (barrage.direction === 'left' || barrage.direction === 'right') {
+                    barrage.node.style.transform = 'translateX(' + currentPos + 'px)';
+                } else {
+                    barrage.node.style.transform = 'translateY(' + currentPos + 'px)';
+                }
+                barrage.node.style.transitionDuration = '0s';
+            }
             // 保持每条消息的实际时长比例（含引擎避碰修正），不重置位置。
             barrage.duration = barrage.duration * previous / factor;
             barrage.timeInfo.startTime = now - percent * barrage.duration * 1000;
@@ -161,25 +197,38 @@ define(['danmuku'], function (Danmuku) {
             moving.forEach(function (barrage) { barrage.resume(); });
         }
     };
-    MessageStream.prototype.animateFactor = function (target, duration, complete) {
+    MessageStream.prototype.animateFactor = function (target, duration, complete, easing) {
         var self = this, from = this.factor, started = performance.now();
-        window.cancelAnimationFrame(this.rafId); this.rafId = null;
-        window.clearTimeout(this.animationTimer); this.animationTimer = null;
+        if (this.rafId) { window.cancelAnimationFrame(this.rafId); this.rafId = null; }
+        if (this.animationTimer) { window.clearTimeout(this.animationTimer); this.animationTimer = null; }
+        easing = easing || function (p) { return p * p * (3 - 2 * p); };
         function frame() {
             if (self.disposed) return;
             var elapsed = performance.now() - started;
             var progress = Math.min(1, elapsed / duration);
-            // smoothstep；以50ms间隔调整原生位移时长，避免逐帧强制重排。
-            var eased = progress * progress * (3 - 2 * progress);
+            var eased = easing(progress);
             self.speed(from + (target - from) * eased);
-            if (progress < 1) self.animationTimer = window.setTimeout(frame, Math.min(50, duration - elapsed));
+            if (progress < 1) self.animationTimer = window.setTimeout(frame, Math.min(30, duration - elapsed));
             else {
                 self.animationTimer = null;
                 if (complete) complete();
             }
         }
         if (this.reducedMotion || !duration) { this.speed(target); if (complete) complete(); }
-        else this.animationTimer = window.setTimeout(frame, Math.min(50, duration));
+        else this.animationTimer = window.setTimeout(frame, Math.min(30, duration));
+    };
+    MessageStream.prototype.startWave = function () {
+        var self = this;
+        if (this.disposed || this.state !== 'drawing' || this.reducedMotion) return;
+        if (this.waveTimer) window.clearTimeout(this.waveTimer);
+        var target = this.waveHigh ? 2.35 : 2.75;
+        this.waveHigh = !this.waveHigh;
+        this.animateFactor(target, 700, function () {
+            if (self.disposed || self.state !== 'drawing') return;
+            self.waveTimer = window.setTimeout(function () {
+                self.startWave();
+            }, 1200);
+        });
     };
     MessageStream.prototype.syncField = function () {
         this.root.setAttribute('data-state', this.state);
@@ -192,52 +241,90 @@ define(['danmuku'], function (Danmuku) {
         }
     };
     MessageStream.prototype.setState = function (state) {
-        if (this.disposed || this.state === state && this.root.getAttribute('data-state') === state) return;
+        if (this.disposed || (this.state === state && this.root.getAttribute('data-state') === state)) return;
         var previousState = this.state;
-        this.clearTimers(); this.state = state; this.syncField();
+        this.clearTimers();
+        this.state = state;
+        this.lockPhase = '';
+        this.syncField();
         if (state === 'ready' || state === 'drawing') {
-            this.status.textContent = state === 'drawing' ? '幸运留言流动中' : (this.messages.length ? '扫码留言，让你的声音上大屏' : '等待第一条现场留言');
-            this.visibility(); this.resize();
-            var target = state === 'drawing' && !this.reducedMotion ? (this.drawFactor || 1) : 1;
-            if (state === 'drawing') this.feedInterval = 600;
-            else this.feedInterval = this.readyFeedInterval || 2000;
-            this.animateFactor(target, state === 'drawing' ? 500 : previousState === 'ready' ? 0 : 250);
-            this.nextFeedAt = 0; this.feed();
-        } else this.visibility();
+            this.status.textContent = state === 'drawing'
+                ? '幸运留言飞速抽取中'
+                : (this.messages.length ? '扫码留言，让你的声音上大屏' : '等待第一条现场留言');
+            this.visibility();
+            this.resize();
+            var target = state === 'drawing' && !this.reducedMotion ? (this.drawFactor || 2.6) : 1;
+            if (state === 'drawing') {
+                this.feedInterval = 420;
+                this.waveHigh = false;
+                var self = this;
+                var easeInOutCubic = function (p) { return p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2; };
+                this.animateFactor(target, 750, function () {
+                    if (self.state === 'drawing') self.startWave();
+                }, easeInOutCubic);
+            } else {
+                this.feedInterval = this.readyFeedInterval || 2000;
+                this.animateFactor(1, previousState === 'ready' ? 0 : 300);
+            }
+            this.nextFeedAt = 0;
+            this.feed();
+        } else {
+            this.visibility();
+        }
     };
     MessageStream.prototype.lock = function (winners, complete) {
         var self = this;
         if (this.disposed || this.state !== 'drawing') return false;
-        this.clearTimers(); this.state = 'locking'; this.lockPhase = 'decelerating'; this.syncField();
-        this.status.textContent = '正在揭晓幸运留言';
+        this.clearTimers();
+        this.state = 'locking';
+        this.lockPhase = 'decelerating';
+        this.syncField();
+        this.status.textContent = '正在减速锁定幸运留言';
         if (this.manager) this.manager.stop();
         var finished = false;
         function finish() {
             if (finished || self.disposed || self.state !== 'locking') return;
-            finished = true; self.clearTimers();
-            self.speed(0.3); self.lockPhase = 'complete'; self.state = 'locked'; self.syncField(); self.visibility();
+            finished = true;
+            self.clearTimers();
+            self.speed(0.2);
+            self.lockPhase = 'complete';
+            self.state = 'locked';
+            self.syncField();
+            self.visibility();
             // 不制造中奖节点；单人、多人、不可见中奖留言都只揭晓一次公共结果。
             complete();
         }
         function fadeOut() {
             if (self.disposed || self.state !== 'locking') return;
-            self.lockPhase = 'fading'; self.syncField();
+            self.lockPhase = 'fading';
+            self.status.textContent = '正在揭晓中奖结果';
+            self.syncField();
             if (self.reducedMotion) { finish(); return; }
-            self.later(finish, 400);
+            self.later(finish, 380);
+        }
+        function coast() {
+            if (self.disposed || self.state !== 'locking') return;
+            self.speed(0.2);
+            self.lockPhase = 'coasting';
+            self.status.textContent = '幸运留言已锁定，即将揭晓';
+            self.syncField();
+            self.later(fadeOut, 650);
         }
         if (this.reducedMotion) {
-            this.speed(1); fadeOut();
-        } else this.animateFactor(0.3, 350, function () {
-            // 留出可见的低速滑行窗口，再开始淡出，避免减速被透明度变化掩盖。
-            self.speed(0.3); self.lockPhase = 'coasting'; self.syncField();
-            self.later(fadeOut, 350);
-        });
+            this.speed(1);
+            fadeOut();
+        } else {
+            var easeOutCubic = function (p) { return 1 - Math.pow(1 - p, 3); };
+            this.animateFactor(0.2, 900, function () {
+                coast();
+            }, easeOutCubic);
+        }
         // 后台标签页的 rAF 会暂停，计时兜底避免控制台永久锁定。
         this.later(function () {
             if (self.state !== 'locking') return;
             self.lockPhase = 'complete';
             finish();
-        }, 1400);
+        }, 2600);
         return true;
     };
     MessageStream.prototype.isVisible = function () { return this.visible; };

@@ -29,10 +29,10 @@ check('Common danmaku switch delegates without starting a second manager', await
     f.start(); return off && d.isVisible() && d.manager.runing && !f.dmmanager;
 }));
 await page.click('button[aria-label="开始抽奖"]');
-await page.waitForFunction(() => require('screenliuyancj').danmaku.factor === 2.2);
+await page.waitForFunction(() => require('screenliuyancj').danmaku.factor >= 2.6);
 check('Only original draw endpoint, duplicate start refused, acceleration active', await page.evaluate(() => {
     const c=require('screenliuyancj');
-    return c.getVisualState()==='drawing' && c.startLottery()===false && c.danmaku.factor===2.2 && c.startupPending && c.stopLottery()===false && document.querySelector('.screen-stage-dock .is-primary').disabled && calls.filter(x=>/savelucker$/.test(x.url)).length===1;
+    return c.getVisualState()==='drawing' && c.startLottery()===false && c.danmaku.factor>=2.6 && c.danmaku.factor<=2.75 && c.startupPending && c.stopLottery()===false && document.querySelector('.screen-stage-dock .is-primary').disabled && calls.filter(x=>/savelucker$/.test(x.url)).length===1;
 }));
 await page.waitForFunction(() => !require('screenliuyancj').startupPending);
 await page.click('button[aria-label="停止抽奖"]');
@@ -44,7 +44,7 @@ check('No intermediate winner cards during deceleration', await page.evaluate(()
     !document.querySelector('.message-danmaku-spotlight,.message-danmaku-card') &&
     getComputedStyle(document.querySelector('.screen-prize')).visibility === 'hidden'));
 await page.waitForFunction(() => require('screenliuyancj').getVisualState()==='result');
-check('Shared result and one result notification', await page.evaluate(() => document.querySelector('.screen-stage-result').textContent.includes('后端中奖用户 1') && effects.filter(x=>x==='sendLuckerTpl').length===1 && getComputedStyle(document.querySelector('.message-danmaku-field')).visibility==='hidden'));
+check('Shared result includes winning message and one result notification', await page.evaluate(() => document.querySelector('.screen-stage-result').textContent.includes('后端中奖用户 1') && document.querySelector('.screen-stage-result').textContent.includes('这条中奖留言由接口返回') && effects.filter(x=>x==='sendLuckerTpl').length===1 && getComputedStyle(document.querySelector('.message-danmaku-field')).visibility==='hidden'));
 await page.click('button[aria-label="关闭结果"]');
 check('Close returns to live Ready stream', await page.evaluate(() => require('screenliuyancj').danmaku.state==='ready' && require('screenliuyancj').getRemainingCount()===6));
 await page.click('button[aria-label="查看中奖记录"]');

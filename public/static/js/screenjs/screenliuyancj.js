@@ -131,13 +131,62 @@ define('screenliuyancj', ['screensocket', 'screencore', 'layerBox', 'fulldm', 'k
 			});
 		},
 		toStageWinners: function (list) {
+			function cleanText(val, maxLen) {
+				if (val === null || val === undefined) return '';
+				var str = String(val).replace(/<[^>]+>/g, '').replace(/[\r\n\t]+/g, ' ').replace(/\s+/g, ' ').trim();
+				if (!str) return '';
+				if (maxLen && str.length > maxLen) {
+					return str.slice(0, maxLen);
+				}
+				return str;
+			}
 			return $.map(list || [], function (winner) {
+				if (typeof winner === 'string') {
+					var rawStr = cleanText(winner);
+					return {
+						name: rawStr || '中奖用户',
+						extras: [],
+						recordId: null
+					};
+				}
 				winner = winner || {};
-				var showitems = $.isArray(winner.showitems) ? winner.showitems : [];
+				var showitems = $.isArray(winner.showitems) ? winner.showitems : (winner.showitems ? [winner.showitems] : []);
+				var rawName = showitems.length ? showitems[0] : (winner.nickname || winner.name || winner.datafield1);
+				var name = cleanText(rawName) || '中奖用户';
+
+				var content = cleanText(winner.content || winner.msgcontent, 60);
+
+				var candidates = [];
+				if (content) {
+					candidates.push(content);
+				}
+				if (showitems.length > 1) {
+					for (var i = 1; i < showitems.length; i++) {
+						candidates.push(cleanText(showitems[i], 60));
+					}
+				}
+				if ($.isArray(winner.extras)) {
+					for (var j = 0; j < winner.extras.length; j++) {
+						candidates.push(cleanText(winner.extras[j], 60));
+					}
+				}
+				if (winner.datafield2 !== undefined) candidates.push(cleanText(winner.datafield2, 60));
+				if (winner.datafield3 !== undefined) candidates.push(cleanText(winner.datafield3, 60));
+				if (winner.datafield4 !== undefined) candidates.push(cleanText(winner.datafield4, 60));
+
+				var extras = [];
+				for (var k = 0; k < candidates.length; k++) {
+					var item = candidates[k];
+					if (item && item !== name && extras.indexOf(item) === -1) {
+						extras.push(item);
+						if (extras.length >= 2) break;
+					}
+				}
+
 				return {
-					name: (showitems.length ? showitems[0] : winner.nickname) || '中奖用户',
-					extras: showitems.length > 1 ? showitems.slice(1, 3) : [],
-					recordId: winner.recordid || winner.luckerid || null
+					name: name,
+					extras: extras,
+					recordId: winner.recordid || winner.recordId || winner.luckerid || null
 				};
 			});
 		},

@@ -1,21 +1,101 @@
-/* 外观与区域完全沿用 footer_fulldm；抽奖阶段只控制整层过渡。 */
-.message-danmaku { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
-.fulldmBox.message-danmaku-field { opacity: 1; transition: opacity 250ms ease-out; }
-.fulldmBox.message-danmaku-field .fulldmBox-item { pointer-events: none !important; }
+/* 外观与区域完全沿用 footer_fulldm；抽奖阶段只控制整层过渡与专属视觉。 */
+.message-danmaku {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+/* 左右边缘出入场平滑羽化与图层基础过渡 */
+.fulldmBox.message-danmaku-field {
+    opacity: 1;
+    transform: translateZ(0);
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
+    transition: opacity 250ms ease-out, transform 250ms ease-out;
+}
+
+.fulldmBox.message-danmaku-field .fulldmBox-item {
+    pointer-events: none !important;
+}
+
+/* 锁定阶段：减速与滑行期（保持高透明度、轻度微缩与光晕聚焦） */
 .fulldmBox.message-danmaku-field[data-state="locking"][data-phase="decelerating"],
 .fulldmBox.message-danmaku-field[data-state="locking"][data-phase="coasting"] {
-    opacity: .95; transition: opacity 350ms ease-out;
+    opacity: .95;
+    transform: scale(.985);
+    filter: drop-shadow(0 0 14px rgba(88, 230, 255, .2));
+    transition: opacity 500ms ease-out, transform 500ms cubic-bezier(.22, 1, .36, 1);
 }
+
+/* 锁定阶段：淡出期（与中奖结果卡片升起形成交错过渡） */
 .fulldmBox.message-danmaku-field[data-state="locking"][data-phase="fading"] {
-    opacity: 0; transition: opacity 400ms ease-in;
+    opacity: 0;
+    transform: scale(.96);
+    transition: opacity 280ms ease-in, transform 280ms ease-in;
 }
+
 .fulldmBox.message-danmaku-field[data-state="locked"],
 .fulldmBox.message-danmaku-field[data-state="result"],
-.fulldmBox.message-danmaku-field[data-state="records"] { opacity: 0; visibility: hidden; }
-.message-danmaku-status { position: absolute; top: 2px; left: 0; right: 0; color: rgba(255,255,255,.8); text-align: center; font-size: 16px; letter-spacing: 2px; }
-.message-danmaku[data-state="result"], .message-danmaku[data-state="records"] { visibility: hidden; }
+.fulldmBox.message-danmaku-field[data-state="records"] {
+    opacity: 0;
+    visibility: hidden;
+}
+
+/* 顶部状态标识胶囊化与进行态金色光效 */
+.message-danmaku-status {
+    position: absolute;
+    top: 14px;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 22px;
+    border-radius: 999px;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    white-space: nowrap;
+    color: var(--screen-stage-ink, #effaff);
+    background: rgba(14, 38, 64, .65);
+    border: 1px solid rgba(125, 220, 255, .22);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, .25);
+    transition: color 300ms ease, border-color 300ms ease, box-shadow 300ms ease;
+}
+
+.message-danmaku[data-state="drawing"] .message-danmaku-status {
+    color: var(--screen-stage-gold, #f6c860);
+    border-color: rgba(246, 200, 96, .45);
+    box-shadow: 0 0 20px rgba(246, 200, 96, .25);
+}
+
+.message-danmaku[data-state="locking"] .message-danmaku-status {
+    color: var(--screen-stage-cyan, #58e6ff);
+    border-color: rgba(88, 230, 255, .45);
+    box-shadow: 0 0 20px rgba(88, 230, 255, .25);
+}
+
+.message-danmaku[data-state="result"],
+.message-danmaku[data-state="records"] {
+    visibility: hidden;
+}
+
 .fulldmBox.message-danmaku-field[data-muted="true"][data-state="ready"],
-.message-danmaku[data-muted="true"][data-state="ready"] { visibility: hidden; }
+.message-danmaku[data-muted="true"][data-state="ready"] {
+    visibility: hidden;
+}
+
 @media (prefers-reduced-motion: reduce) {
-    .fulldmBox.message-danmaku-field { transition: none; }
+    .fulldmBox.message-danmaku-field {
+        transition: none !important;
+        transform: none !important;
+        filter: none !important;
+    }
+    .message-danmaku-status {
+        transition: none !important;
+    }
 }

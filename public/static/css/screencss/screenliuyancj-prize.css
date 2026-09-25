@@ -34,14 +34,329 @@
 .liuyancj-page .liuyan-danmaku-host { z-index: 12; }
 .liuyancj-page .emptybox { position: absolute; inset: 0; z-index: 13; color: #fff; pointer-events: none; }
 
+/* 移除控制坞在红色大屏上形成的黑色投影，仅作用于留言抽奖页。 */
+.liuyancj-page .screen-stage-dock {
+    box-shadow: 0 0 36px rgba(88, 230, 255, .15), inset 0 1px rgba(255, 255, 255, .2);
+}
+
+/* ==========================================================================
+   留言抽奖揭晓结果阶段：纯净排版与无嵌套卡片中奖呈现
+   ========================================================================== */
+
+/* 揭晓结果面板：保留公共 StageUi 单一外层结果面板，提供统一沉浸暗色半透背景 */
+.liuyancj-page .screen-stage-ui[data-state="result"] .screen-stage-result {
+    border-color: rgba(255, 255, 255, .12);
+    background: rgba(14, 23, 38, .88);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, .45);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    padding: 24px 32px 28px;
+    gap: 16px;
+}
+
+/* 奖品概览区域：紧凑布局，去除厚重阴影，作为顶部清晰的信息导引 */
+.liuyancj-page .screen-stage-result-summary {
+    gap: 14px;
+    margin-bottom: 2px;
+}
+
+.liuyancj-page .screen-stage-result-prize-image {
+    width: 88px;
+    height: 88px;
+    flex: 0 0 88px;
+    padding: 4px;
+}
+
+.liuyancj-page .screen-stage-result-prize-copy {
+    gap: 2px;
+}
+
+.liuyancj-page .screen-stage-result-prize-award {
+    color: var(--screen-stage-gold);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: .04em;
+    text-shadow: none;
+}
+
+.liuyancj-page .screen-stage-result-prize-title {
+    color: var(--screen-stage-ink);
+    font-size: clamp(20px, 2vw, 24px);
+    font-weight: 700;
+    text-shadow: none;
+}
+
+/* 结果文字列表容器：简洁开阔，保持呼吸感 */
+.liuyancj-page .screen-stage-result-list {
+    gap: 14px 20px;
+    padding: 6px 10px;
+    max-height: min(380px, 44vh);
+}
+
+/* 中奖条目：彻底去除卡片套卡片（无背景框、无外边框、无圆角块、无阴影），纯净文字排版 */
+.liuyancj-page .screen-stage-ui[data-state="result"] .screen-stage-result-card,
+.liuyancj-page .screen-stage-result-card {
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    padding: 8px 12px;
+    animation: liuyancj-item-fadein .3s cubic-bezier(.22, 1, .36, 1) both;
+    transition: opacity .2s ease, transform .2s ease;
+}
+
+.liuyancj-page .screen-stage-ui[data-state="result"] .screen-stage-result-card:hover {
+    border: none;
+    background: transparent;
+    box-shadow: none;
+    transform: translateY(-1px);
+}
+
+@keyframes liuyancj-item-fadein {
+    0% {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 多人中奖列表：中奖者姓名作为视觉焦点 */
+.liuyancj-page .screen-stage-result-card strong {
+    color: var(--screen-stage-ink);
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: .02em;
+    text-shadow: none;
+}
+
+/* 多人中奖留言：易读的引用文本直接排在姓名下方，无任何块状背景与边框，靠字号、行距、留白与少量单色点缀区分 */
+.liuyancj-page .screen-stage-result-card small {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    width: 100%;
+    max-height: 44px;
+    box-sizing: border-box;
+    margin-top: 5px;
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    color: var(--screen-stage-muted);
+    background: transparent;
+    box-shadow: none;
+    font-size: 13px;
+    line-height: 1.45;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    overflow: hidden;
+}
+
+/* 多人中奖留言单色引用点缀 */
+.liuyancj-page .screen-stage-result-card small::before {
+    content: "“";
+    color: var(--screen-stage-cyan);
+    margin-right: 2px;
+    opacity: .65;
+    font-family: Georgia, serif;
+}
+
+.liuyancj-page .screen-stage-result-card small::after {
+    content: "”";
+    color: var(--screen-stage-cyan);
+    margin-left: 2px;
+    opacity: .65;
+    font-family: Georgia, serif;
+}
+
+/* 单人揭晓：居中大气呈现，彻底避免卡片和多层背景，姓名与留言自然舒展 */
+.liuyancj-page .screen-stage-result-list .screen-stage-result-card:only-child {
+    max-width: 640px;
+    min-width: 280px;
+    padding: 12px 20px 16px;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    animation: liuyancj-single-fadein .32s cubic-bezier(.16, 1, .3, 1) both;
+}
+
+@keyframes liuyancj-single-fadein {
+    0% {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 单人中奖者姓名：强化核心视觉焦点 */
+.liuyancj-page .screen-stage-result-list .screen-stage-result-card:only-child strong {
+    font-size: clamp(28px, 3.4vw, 36px);
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1.25;
+    letter-spacing: .03em;
+    text-shadow: none;
+    margin-bottom: 8px;
+}
+
+/* 单人中奖留言：大号引用文本，排在姓名正下方，无背景色块/边框/半透明底，长文本自然换行与适度滚动 */
+.liuyancj-page .screen-stage-result-list .screen-stage-result-card:only-child small {
+    display: block;
+    width: 100%;
+    max-width: 580px;
+    max-height: 160px;
+    margin-top: 6px;
+    padding: 0 12px;
+    border: none;
+    border-radius: 0;
+    color: rgba(220, 240, 255, .88);
+    background: transparent;
+    box-shadow: none;
+    font-size: clamp(15px, 1.4vw, 17px);
+    font-weight: 400;
+    line-height: 1.65;
+    text-align: center;
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+.liuyancj-page .screen-stage-result-list .screen-stage-result-card:only-child small::before {
+    content: "“";
+    color: var(--screen-stage-cyan);
+    margin-right: 4px;
+    opacity: .75;
+    font-family: Georgia, serif;
+    font-size: 1.15em;
+}
+
+.liuyancj-page .screen-stage-result-list .screen-stage-result-card:only-child small::after {
+    content: "”";
+    color: var(--screen-stage-cyan);
+    margin-left: 4px;
+    opacity: .75;
+    font-family: Georgia, serif;
+    font-size: 1.15em;
+}
+
+.liuyancj-page .screen-stage-result-list .screen-stage-result-card:only-child small::-webkit-scrollbar {
+    width: 4px;
+}
+
+.liuyancj-page .screen-stage-result-list .screen-stage-result-card:only-child small::-webkit-scrollbar-track {
+    border-radius: 4px;
+    background: transparent;
+}
+
+.liuyancj-page .screen-stage-result-list .screen-stage-result-card:only-child small::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background: rgba(255, 255, 255, .18);
+}
+
+/* 分组模式：去除厚重卡片框与嵌套底色，仅用极细线和留白区分 */
+.liuyancj-page .screen-stage-result-group {
+    border: none;
+    border-bottom: 1px solid rgba(255, 255, 255, .06);
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    padding: 12px 6px;
+}
+
+.liuyancj-page .screen-stage-result-group:last-child {
+    border-bottom: none;
+}
+
+.liuyancj-page .screen-stage-result-group-header {
+    border-bottom: 1px solid rgba(255, 255, 255, .05);
+    padding-bottom: 8px;
+}
+
 @media (max-width: 1366px) {
     .liuyancj-page .liuyan-prize-host {
         width: min(540px, 56vw);
+    }
+
+    .liuyancj-page .screen-stage-result-prize-image {
+        width: 76px;
+        height: 76px;
+        flex-basis: 76px;
+    }
+
+    .liuyancj-page .screen-stage-result-prize-title {
+        font-size: 20px;
+    }
+
+    .liuyancj-page .screen-stage-result-list .screen-stage-result-card:only-child {
+        max-width: 520px;
+        padding: 10px 14px 14px;
+    }
+
+    .liuyancj-page .screen-stage-result-list .screen-stage-result-card:only-child strong {
+        font-size: 28px;
+    }
+
+    .liuyancj-page .screen-stage-result-list .screen-stage-result-card:only-child small {
+        font-size: 15px;
+        max-height: 130px;
+    }
+
+    .liuyancj-page .screen-stage-result-card small {
+        font-size: 12px;
+        max-height: 40px;
     }
 }
 
 @media (max-width: 900px) {
     .liuyancj-page .liuyan-prize-host {
         width: 90vw;
+    }
+
+    .liuyancj-page .screen-stage-ui[data-state="result"] .screen-stage-result {
+        padding: 20px 22px 24px;
+    }
+}
+
+@media (max-width: 768px) {
+    .liuyancj-page .screen-stage-result-list .screen-stage-result-card:only-child {
+        min-width: 0;
+        width: 100%;
+        padding: 8px 10px 12px;
+    }
+
+    .liuyancj-page .screen-stage-result-list .screen-stage-result-card:only-child strong {
+        font-size: 24px;
+    }
+
+    .liuyancj-page .screen-stage-result-list .screen-stage-result-card:only-child small {
+        font-size: 14px;
+        max-height: 110px;
+    }
+
+    .liuyancj-page .screen-stage-result-card small {
+        font-size: 11px;
+        -webkit-line-clamp: 2;
+        max-height: 36px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .liuyancj-page .screen-stage-ui[data-state="result"] .screen-stage-result,
+    .liuyancj-page .screen-stage-ui[data-state="result"] .screen-stage-result-card,
+    .liuyancj-page .screen-stage-result-list .screen-stage-result-card:only-child {
+        animation: none !important;
+        transition: opacity .12s linear, transform .12s linear, visibility .12s linear !important;
     }
 }
