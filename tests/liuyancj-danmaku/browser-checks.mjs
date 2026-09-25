@@ -29,10 +29,10 @@ check('Common danmaku switch delegates without starting a second manager', await
     f.start(); return off && d.isVisible() && d.manager.runing && !f.dmmanager;
 }));
 await page.click('button[aria-label="开始抽奖"]');
-await page.waitForFunction(() => require('screenliuyancj').danmaku.factor === 1.8);
+await page.waitForFunction(() => require('screenliuyancj').danmaku.factor === 2.2);
 check('Only original draw endpoint, duplicate start refused, acceleration active', await page.evaluate(() => {
     const c=require('screenliuyancj');
-    return c.getVisualState()==='drawing' && c.startLottery()===false && c.danmaku.factor===1.8 && c.startupPending && c.stopLottery()===false && document.querySelector('.screen-stage-dock .is-primary').disabled && calls.filter(x=>/savelucker$/.test(x.url)).length===1;
+    return c.getVisualState()==='drawing' && c.startLottery()===false && c.danmaku.factor===2.2 && c.startupPending && c.stopLottery()===false && document.querySelector('.screen-stage-dock .is-primary').disabled && calls.filter(x=>/savelucker$/.test(x.url)).length===1;
 }));
 await page.waitForFunction(() => !require('screenliuyancj').startupPending);
 await page.click('button[aria-label="停止抽奖"]');

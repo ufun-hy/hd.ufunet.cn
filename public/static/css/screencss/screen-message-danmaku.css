@@ -1,8 +1,14 @@
-/* 外观与区域完全沿用 footer_fulldm；这里仅控制抽奖过程的整层淡入淡出。 */
+/* 外观与区域完全沿用 footer_fulldm；抽奖阶段只控制整层过渡。 */
 .message-danmaku { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
 .fulldmBox.message-danmaku-field { opacity: 1; transition: opacity 250ms ease-out; }
 .fulldmBox.message-danmaku-field .fulldmBox-item { pointer-events: none !important; }
-.fulldmBox.message-danmaku-field[data-state="locking"] { opacity: 0; transition: opacity 600ms ease-in-out; }
+.fulldmBox.message-danmaku-field[data-state="locking"][data-phase="decelerating"],
+.fulldmBox.message-danmaku-field[data-state="locking"][data-phase="coasting"] {
+    opacity: .95; transition: opacity 350ms ease-out;
+}
+.fulldmBox.message-danmaku-field[data-state="locking"][data-phase="fading"] {
+    opacity: 0; transition: opacity 400ms ease-in;
+}
 .fulldmBox.message-danmaku-field[data-state="locked"],
 .fulldmBox.message-danmaku-field[data-state="result"],
 .fulldmBox.message-danmaku-field[data-state="records"] { opacity: 0; visibility: hidden; }

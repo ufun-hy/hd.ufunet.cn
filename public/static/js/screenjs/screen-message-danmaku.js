@@ -17,6 +17,7 @@ define(['danmuku'], function (Danmuku) {
         this.factor = 1;
         this.timers = [];
         this.rafId = null;
+        this.animationTimer = null;
         this.disposed = false;
         this.visible = true;
         this.nextFeedAt = 0;
@@ -62,8 +63,9 @@ define(['danmuku'], function (Danmuku) {
         this.field.setAttribute('aria-hidden', 'true');
         var self = this, options = fulldm.getManagerOptions();
         this.baseTimes = options.times.slice();
-        this.drawFactor = Math.min(1.8, this.baseTimes[0] / 3.5);
-        this.feedInterval = this.config.ismiji == '2' ? 800 : 2000;
+        this.drawFactor = 2.2;
+        this.readyFeedInterval = this.config.ismiji == '2' ? 800 : 2000;
+        this.feedInterval = this.readyFeedInterval;
         options.hooks = {barrageCreate: function (barrage, node) { self.renderBarrage(barrage, node); },
             // 引擎可能在下一帧才挂载已入队节点；暂停状态下也不能漏出运动。
             barrageMove: function (barrage) { if (!self.canMove()) barrage.pause(); }};
@@ -128,6 +130,7 @@ define(['danmuku'], function (Danmuku) {
     MessageStream.prototype.clearTimers = function () {
         this.timers.forEach(window.clearTimeout); this.timers = [];
         window.cancelAnimationFrame(this.rafId); this.rafId = null;
+        window.clearTimeout(this.animationTimer); this.animationTimer = null;
     };
     MessageStream.prototype.later = function (fn, delay) {
         var self = this;
@@ -160,24 +163,31 @@ define(['danmuku'], function (Danmuku) {
     };
     MessageStream.prototype.animateFactor = function (target, duration, complete) {
         var self = this, from = this.factor, started = performance.now();
-        window.cancelAnimationFrame(this.rafId);
-        function frame(now) {
+        window.cancelAnimationFrame(this.rafId); this.rafId = null;
+        window.clearTimeout(this.animationTimer); this.animationTimer = null;
+        function frame() {
             if (self.disposed) return;
-            var progress = Math.min(1, (now - started) / duration);
-            // smoothstep 在起止两端速度变化率为零，按帧连续变速。
+            var elapsed = performance.now() - started;
+            var progress = Math.min(1, elapsed / duration);
+            // smoothstep；以50ms间隔调整原生位移时长，避免逐帧强制重排。
             var eased = progress * progress * (3 - 2 * progress);
             self.speed(from + (target - from) * eased);
-            if (progress < 1) self.rafId = window.requestAnimationFrame(frame);
-            else { self.rafId = null; if (complete) complete(); }
+            if (progress < 1) self.animationTimer = window.setTimeout(frame, Math.min(50, duration - elapsed));
+            else {
+                self.animationTimer = null;
+                if (complete) complete();
+            }
         }
         if (this.reducedMotion || !duration) { this.speed(target); if (complete) complete(); }
-        else this.rafId = window.requestAnimationFrame(frame);
+        else this.animationTimer = window.setTimeout(frame, Math.min(50, duration));
     };
     MessageStream.prototype.syncField = function () {
         this.root.setAttribute('data-state', this.state);
+        this.root.setAttribute('data-phase', this.lockPhase || '');
         this.root.setAttribute('data-muted', String(!this.visible));
         if (this.field) {
             this.field.setAttribute('data-state', this.state);
+            this.field.setAttribute('data-phase', this.lockPhase || '');
             this.field.setAttribute('data-muted', String(!this.visible));
         }
     };
@@ -189,27 +199,45 @@ define(['danmuku'], function (Danmuku) {
             this.status.textContent = state === 'drawing' ? '幸运留言流动中' : (this.messages.length ? '扫码留言，让你的声音上大屏' : '等待第一条现场留言');
             this.visibility(); this.resize();
             var target = state === 'drawing' && !this.reducedMotion ? (this.drawFactor || 1) : 1;
-            this.animateFactor(target, state === 'drawing' ? 400 : previousState === 'ready' ? 0 : 250);
+            if (state === 'drawing') this.feedInterval = 600;
+            else this.feedInterval = this.readyFeedInterval || 2000;
+            this.animateFactor(target, state === 'drawing' ? 500 : previousState === 'ready' ? 0 : 250);
             this.nextFeedAt = 0; this.feed();
         } else this.visibility();
     };
     MessageStream.prototype.lock = function (winners, complete) {
         var self = this;
         if (this.disposed || this.state !== 'drawing') return false;
-        this.clearTimers(); this.state = 'locking'; this.syncField();
+        this.clearTimers(); this.state = 'locking'; this.lockPhase = 'decelerating'; this.syncField();
         this.status.textContent = '正在揭晓幸运留言';
         if (this.manager) this.manager.stop();
         var finished = false;
         function finish() {
             if (finished || self.disposed || self.state !== 'locking') return;
             finished = true; self.clearTimers();
-            self.speed(0.3); self.state = 'locked'; self.syncField(); self.visibility();
+            self.speed(0.3); self.lockPhase = 'complete'; self.state = 'locked'; self.syncField(); self.visibility();
             // 不制造中奖节点；单人、多人、不可见中奖留言都只揭晓一次公共结果。
             complete();
         }
-        this.animateFactor(this.reducedMotion ? 1 : 0.3, this.reducedMotion ? 0 : 600, finish);
-        // 后台标签页的 rAF 会暂停，开奖收尾不能因此永久锁住。
-        if (!finished) this.later(finish, 650);
+        function fadeOut() {
+            if (self.disposed || self.state !== 'locking') return;
+            self.lockPhase = 'fading'; self.syncField();
+            if (self.reducedMotion) { finish(); return; }
+            self.later(finish, 400);
+        }
+        if (this.reducedMotion) {
+            this.speed(1); fadeOut();
+        } else this.animateFactor(0.3, 350, function () {
+            // 留出可见的低速滑行窗口，再开始淡出，避免减速被透明度变化掩盖。
+            self.speed(0.3); self.lockPhase = 'coasting'; self.syncField();
+            self.later(fadeOut, 350);
+        });
+        // 后台标签页的 rAF 会暂停，计时兜底避免控制台永久锁定。
+        this.later(function () {
+            if (self.state !== 'locking') return;
+            self.lockPhase = 'complete';
+            finish();
+        }, 1400);
         return true;
     };
     MessageStream.prototype.isVisible = function () { return this.visible; };
@@ -235,7 +263,7 @@ define(['danmuku'], function (Danmuku) {
         if (this.manager) this.manager.clear();
         if (this.field) {
             this.field.classList.remove('message-danmaku-field');
-            this.field.removeAttribute('data-state'); this.field.removeAttribute('data-muted');
+            this.field.removeAttribute('data-state'); this.field.removeAttribute('data-phase'); this.field.removeAttribute('data-muted');
             this.field.removeAttribute('aria-hidden');
         }
         this.root.textContent = ''; this.manager = null; this.messages = []; this.pendingMessages = [];

@@ -39,29 +39,32 @@ for (const config of cases) {
     await page.waitForFunction(() => require('screenliuyancj').getVisualState()==='drawing');
     const acceleration = await page.evaluate(async () => {
         const d=require('screenliuyancj').danmaku, values=[];
-        await new Promise(resolve=>{const started=performance.now();function frame(){values.push(d.factor);if(performance.now()-started<450)requestAnimationFrame(frame);else resolve();}frame();});
-        return {distinct:new Set(values.map(x=>x.toFixed(3))).size,values,target:d.drawFactor,times:d.manager.opts.times};
+        await new Promise(resolve=>{const started=performance.now();function sample(){values.push(d.factor);if(d.factor>=2.2||performance.now()-started>=1800)resolve();else setTimeout(sample,25);}sample();});
+        return {distinct:new Set(values.map(x=>x.toFixed(3))).size,values,target:d.drawFactor,times:d.manager.opts.times,base:d.baseTimes};
     });
     check('Continuous acceleration and speed ceiling for direction '+config.dmrolltype,
         acceleration.distinct>8 && acceleration.values.every((v,i,a)=>!i||v>=a[i-1]) &&
-        Math.abs(acceleration.values.at(-1)-acceleration.target)<0.001 && acceleration.times[0]>=3.5);
+        Math.abs(acceleration.values.at(-1)-2.2)<0.001 && acceleration.target===2.2 &&
+        acceleration.times.every((time,i)=>Math.abs(time-acceleration.base[i]/2.2)<0.001) &&
+        await page.evaluate(()=>require('screenliuyancj').danmaku.feedInterval===600));
     await page.waitForFunction(() => !require('screenliuyancj').startupPending);
     const deceleration=await page.evaluate(async()=>{
         const c=require('screenliuyancj'),d=c.danmaku;
         let b;d.manager.each(x=>{if(!b && x.getMovePercent()<0.6)b=x;});
         const samples=[],started=performance.now();c.stopLottery();
-        await new Promise(resolve=>{function frame(){
-            if(c.getVisualState()==='result'){resolve();return;}
+        await new Promise(resolve=>{function sample(){
             const matrix=b?.node?new DOMMatrixReadOnly(getComputedStyle(b.node).transform):null;
             samples.push({t:performance.now()-started,factor:d.factor,opacity:Number(getComputedStyle(d.field).opacity),
-                position:matrix?(d.manager.opts.direction==='left'||d.manager.opts.direction==='right'?matrix.m41:matrix.m42):null});
-            if(performance.now()-started<850)requestAnimationFrame(frame);else resolve();
-        }frame();});
+                phase:d.field.getAttribute('data-phase'),position:matrix?(d.manager.opts.direction==='left'||d.manager.opts.direction==='right'?matrix.m41:matrix.m42):null});
+            if(c.getVisualState()==='result'||performance.now()-started>=1600)resolve();else setTimeout(sample,25);
+        }sample();});
         return {samples,direction:d.manager.opts.direction,state:c.getVisualState(),cards:!!document.querySelector('.message-danmaku-card,.message-danmaku-spotlight'),errors};
     });
     const samples=deceleration.samples,sign=['right','bottom'].includes(deceleration.direction)?-1:1;
     check('Smooth deceleration, continuous position and single reveal for direction '+config.dmrolltype,
-        samples.length>8 && samples.every((v,i,a)=>!i || (v.factor<=a[i-1].factor && v.opacity<=a[i-1].opacity+0.01)) &&
+        samples.length>12 && samples.every((v,i,a)=>!i || (v.factor<=a[i-1].factor && v.opacity<=a[i-1].opacity+0.001)) &&
+        samples.some(v=>v.phase==='coasting' && v.opacity>=0.9 && v.factor<=0.31) &&
+        samples.some(v=>v.phase==='fading' && v.opacity<0.9) &&
         samples.every((v,i,a)=>!i || v.position===null || a[i-1].position===null ||
             ((v.position-a[i-1].position)*sign>=-2 && Math.abs(v.position-a[i-1].position)<80)) &&
         samples.some(v=>v.position!==null) && deceleration.state==='result' && !deceleration.cards && !deceleration.errors.length);
@@ -89,8 +92,8 @@ check('Hidden-page fallback reveals once when animation frames stop',await page.
     const c=require('screenliuyancj'),d=c.danmaku,before=effects.filter(x=>x==='sendLuckerTpl').length;
     c.stopLottery();
     Object.defineProperty(document,'hidden',{configurable:true,value:true});document.dispatchEvent(new Event('visibilitychange'));
-    cancelAnimationFrame(d.rafId);d.rafId=null;
-    await new Promise(resolve=>setTimeout(resolve,750));
+    clearTimeout(d.animationTimer);d.animationTimer=null;
+    await new Promise(resolve=>setTimeout(resolve,1500));
     const ok=c.visualState==='result'&&!c.animationLockPending&&effects.filter(x=>x==='sendLuckerTpl').length===before+1;
     delete document.hidden;document.dispatchEvent(new Event('visibilitychange'));
     return ok;
