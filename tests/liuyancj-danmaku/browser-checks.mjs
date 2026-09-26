@@ -65,14 +65,18 @@ await page.click('button[aria-label="关闭结果"]');
 check('Close returns to live Ready stream', await page.evaluate(() => require('screenliuyancj').danmaku.state==='ready' && require('screenliuyancj').getRemainingCount()===6));
 await page.click('button[aria-label="查看中奖记录"]');
 await page.waitForFunction(() => document.querySelectorAll('.screen-stage-records-card').length===4);
+await page.waitForFunction(() => Math.abs(document.querySelector('.screen-stage-records-drawer').getBoundingClientRect().right-innerWidth)<2);
 check('Records show winner avatar and readable full comment', await page.evaluate(() => {
     const cards=[...document.querySelectorAll('.screen-stage-records-card')],messages=cards.map(x=>x.querySelector('.screen-stage-records-card-message'));
     const overlay=document.querySelector('.screen-stage-records'),backdrop=document.querySelector('.screen-stage-records-backdrop'),rect=backdrop.getBoundingClientRect();
+    const panel=document.querySelector('.screen-stage-records-drawer').getBoundingClientRect();
     return cards.every(x=>!!x.querySelector('.screen-stage-records-card-avatar img')) &&
         messages.some(x=>x.textContent.includes('留言文本继续 '.repeat(12).trim()) && x.textContent.length>60 && !!x.querySelector('img.faceImg')) &&
         getComputedStyle(document.querySelector('.screen-stage-records-content')).overflowY==='auto' &&
-        overlay.classList.contains('is-open') && getComputedStyle(backdrop).position==='fixed' &&
-        Math.abs(rect.left)<1 && Math.abs(rect.top)<1 && Math.abs(rect.width-innerWidth)<2 && Math.abs(rect.height-innerHeight)<2;
+        overlay.classList.contains('is-open') &&
+        Math.abs(rect.left)<1 && Math.abs(rect.top)<1 && Math.abs(rect.width-innerWidth)<2 && Math.abs(rect.height-innerHeight)<2 &&
+        Math.abs(panel.top)<1 && Math.abs(panel.bottom-innerHeight)<2 && Math.abs(panel.right-innerWidth)<2 &&
+        (innerWidth<=900 || panel.width<innerWidth*.8);
 }));
 await page.click('.screen-stage-records-card-delete >> nth=0');
 await page.waitForFunction(() => require('screenliuyancj').currentWinnerCount===3 && !require('screenliuyancj').winnerMutationPending);

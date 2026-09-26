@@ -495,12 +495,13 @@
    ========================================================================== */
 
 .liuyancj-page .screen-stage-records {
-    position: absolute;
+    /* 以视口定位整个记录层，让遮罩和侧栏共用完整高度。 */
+    position: fixed;
     inset: 0;
     z-index: 50;
     display: none;
-    width: 100%;
-    height: 100%;
+    width: auto;
+    height: auto;
     box-sizing: border-box;
     pointer-events: none;
 }
@@ -534,7 +535,7 @@
     flex-direction: column;
     width: min(540px, 90vw);
     height: 100%;
-    max-height: 100vh;
+    max-height: 100%;
     box-sizing: border-box;
     border-left: 1px solid rgba(88, 230, 255, .24);
     background: linear-gradient(180deg, rgba(12, 22, 38, .97) 0%, rgba(7, 14, 26, .99) 100%);
@@ -1034,10 +1035,4 @@
     margin: 0 .08em;
     object-fit: contain;
     vertical-align: -.28em;
-}
-
-/* 记录仍使用原有右侧面板，只把背景遮罩扩展到整个视口。 */
-.liuyancj-page .screen-stage-records-backdrop {
-    position: fixed;
-    inset: 0;
 }
