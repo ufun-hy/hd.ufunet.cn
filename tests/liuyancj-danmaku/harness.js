@@ -5,7 +5,7 @@ addEventListener('unhandledrejection', function (e) { errors.push(String(e.reaso
 window.XCV3Config = {gametype: 'liuyancj', hdid: 'isolated-danmaku', rhdid: 'mock'};
 window.calls = []; window.effects = []; window.pendingReads = []; window.holdReads = false;
 window.nextDrawFails = false;
-window.testWinners = {A: [1, 2, 3].map(function (id) { return {recordid: id, nickname: '记录用户 ' + id}; }), B: []};
+window.testWinners = {A: [1, 2, 3].map(function (id) { return {recordid: id, nickname: '记录用户 ' + id, avatar: '/static/images/sys/prizeimg.png', content: '已有留言表情 ✨ ' + id}; }), B: []};
 window.demoMessages = ['今天一定要中奖！', '和同事一起留下难忘的夜晚', '现场气氛太棒了 🎉', '好运正在向我走来', '为每一份努力喝彩', '谢谢有你，一路同行', '这份礼物我想带回家', '下一位幸运儿就是我'];
 window.testPrizes = [
     {id: 'A', prizenum: 10, onceout: 1, prizename: '幸运礼盒', awardname: '三等奖', prizeimg: '/static/images/sys/prizeimg.png'},
@@ -29,7 +29,7 @@ define('screencore', [], function () {
                 } else if (/savelucker$/.test(url)) {
                     if (nextDrawFails) { nextDrawFails = false; code = 1; msg = '模拟接口失败'; }
                     else {
-                        var list = Array.from({length: data.selnum}, function (_, i) { return {recordid: 100 + testWinners[data.prizeid].length + i, nickname: '后端中奖用户 ' + (i + 1), content: '这条中奖留言由接口返回 ✨'}; });
+                        var list = Array.from({length: data.selnum}, function (_, i) { return {recordid: 100 + testWinners[data.prizeid].length + i, nickname: '后端中奖用户 ' + (i + 1), avatar: '/static/images/sys/prizeimg.png', content: '这条中奖留言由接口返回 ✨ [龇牙]，完整文字不应被截断：' + '留言文本继续 '.repeat(12)}; });
                         testWinners[data.prizeid].push.apply(testWinners[data.prizeid], list);
                         msg = {list: list, luckerids: list.map(function (x) { return x.recordid; })};
                     }
@@ -38,7 +38,7 @@ define('screencore', [], function () {
                 setTimeout(function () { resolve({code: code, msg: msg}); }, 25);
             });
         },
-        emoToimg: function (value) { return value; }, hideFootAndQr: function () {},
+        emoToimg: function (value) { return String(value || '').replace(/\[龇牙\]/g, '<img src="/static/images/wechat/emoji/14.png" class="faceImg" />'); }, hideFootAndQr: function () {},
         bgmusicpause: function () { effects.push('bgmusicpause'); }, bgmusicplay: function () { effects.push('bgmusicplay'); },
         sendLuckerTpl: function (data, cb) { effects.push('sendLuckerTpl'); cb(); }, connectsocket: function () {},
         sendMsg2frame: function () {}, sortBy: function () { return function () { return 0; }; }

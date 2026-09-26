@@ -12,6 +12,15 @@ check('Ready: real Danmuku rows and one shared Stage/Prize', await page.evaluate
     return c.danmaku.manager.showLength >= 4 && c.danmaku.messages.length === 24 && c.getRemainingCount() === 7 &&
         document.querySelectorAll('.screen-stage-ui').length === 1 && document.querySelectorAll('.screen-prize').length === 1 && !document.querySelector('.rolldmBox');
 }));
+check('Shared Stage keeps ImportCJ legacy extras by default', await page.evaluate(() => {
+    const root=document.createElement('div');document.body.appendChild(root);
+    const ui=require('screenjs/screen-stage-ui').create({root});ui.mount();
+    ui.setResult([{name:'导入名单用户',extras:['部门甲']}],{prizename:'兼容检查奖品'});
+    const result=root.querySelector('.screen-stage-result-card'),resultOK=result?.querySelector('small')?.textContent==='部门甲'&&!result?.querySelector('.screen-stage-result-avatar');
+    ui.setRecords([{name:'导入名单用户',extras:['部门甲'],recordId:9}],'ready');
+    const record=root.querySelector('.screen-stage-records-card'),recordsOK=record?.querySelector('.screen-stage-records-card-chip')?.textContent==='部门甲'&&!record?.querySelector('.screen-stage-records-card-avatar');
+    ui.destroy();root.remove();return resultOK&&recordsOK;
+}));
 check('Socket message deduplication, bounded buffer, HTML safety and moderation deletion', await page.evaluate(() => {
     const c = require('screenliuyancj'), m = {id:'live',type:'1',nickname:'<script>bad</script>',content:'hello<img src=x onerror="window.__xss=1"><script>window.__xss=1</script>'};
     socketCallback({type:'liuyancjmsg',messages:[m,m]});
@@ -44,11 +53,24 @@ check('No intermediate winner cards during deceleration', await page.evaluate(()
     !document.querySelector('.message-danmaku-spotlight,.message-danmaku-card') &&
     getComputedStyle(document.querySelector('.screen-prize')).visibility === 'hidden'));
 await page.waitForFunction(() => require('screenliuyancj').getVisualState()==='result');
-check('Shared result includes winning message and one result notification', await page.evaluate(() => document.querySelector('.screen-stage-result').textContent.includes('后端中奖用户 1') && document.querySelector('.screen-stage-result').textContent.includes('这条中奖留言由接口返回') && effects.filter(x=>x==='sendLuckerTpl').length===1 && getComputedStyle(document.querySelector('.message-danmaku-field')).visibility==='hidden'));
+check('Shared result includes avatar, full emoji message and one result notification', await page.evaluate(() => {
+    const result=document.querySelector('.screen-stage-result'),message=result.querySelector('.screen-stage-result-message');
+    return result.textContent.includes('后端中奖用户 1') && message.textContent.includes('这条中奖留言由接口返回 ✨') &&
+        message.textContent.includes('留言文本继续 '.repeat(12).trim()) && message.textContent.length>60 &&
+        !!message.querySelector('img.faceImg') && result.querySelector('.screen-stage-result-avatar img')?.getAttribute('src')==='/static/images/sys/prizeimg.png' &&
+        getComputedStyle(message,'::before').content==='none' && effects.filter(x=>x==='sendLuckerTpl').length===1 &&
+        getComputedStyle(document.querySelector('.message-danmaku-field')).visibility==='hidden';
+}));
 await page.click('button[aria-label="关闭结果"]');
 check('Close returns to live Ready stream', await page.evaluate(() => require('screenliuyancj').danmaku.state==='ready' && require('screenliuyancj').getRemainingCount()===6));
 await page.click('button[aria-label="查看中奖记录"]');
 await page.waitForFunction(() => document.querySelectorAll('.screen-stage-records-card').length===4);
+check('Records show winner avatar and readable full comment', await page.evaluate(() => {
+    const cards=[...document.querySelectorAll('.screen-stage-records-card')],messages=cards.map(x=>x.querySelector('.screen-stage-records-card-message'));
+    return cards.every(x=>!!x.querySelector('.screen-stage-records-card-avatar img')) &&
+        messages.some(x=>x.textContent.includes('留言文本继续 '.repeat(12).trim()) && x.textContent.length>60 && !!x.querySelector('img.faceImg')) &&
+        getComputedStyle(document.querySelector('.screen-stage-records-content')).overflowY==='auto';
+}));
 await page.click('.screen-stage-records-card-delete >> nth=0');
 await page.waitForFunction(() => require('screenliuyancj').currentWinnerCount===3 && !require('screenliuyancj').winnerMutationPending);
 await page.click('.screen-stage-records-close');

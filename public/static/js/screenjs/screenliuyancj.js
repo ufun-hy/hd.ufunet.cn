@@ -140,11 +140,43 @@ define('screenliuyancj', ['screensocket', 'screencore', 'layerBox', 'fulldm', 'k
 				}
 				return str;
 			}
+
+			function cleanMessage(val) {
+				if (val === null || val === undefined) return '';
+				var str = String(val);
+				if (!str) return '';
+				str = str.replace(/<img\b[^>]*>/gi, function (imgTag) {
+					var altMatch = imgTag.match(/(?:alt|title|data-title|data-emo)\s*=\s*["']?(\[[\u4e00-\u9fa5]+\])["']?/i);
+					if (altMatch && altMatch[1]) {
+						return altMatch[1];
+					}
+					var srcMatch = imgTag.match(/(?:emoji\/|\/wechat\/|\b)(\d+)\.png/i);
+					if (srcMatch && srcMatch[1]) {
+						var idx = srcMatch[1];
+						if (screencore && screencore.emotions && screencore.emotions[idx] && screencore.emotions[idx][0]) {
+							return screencore.emotions[idx][0];
+						}
+					}
+					return '';
+				});
+				str = str.replace(/<br\s*\/?>/gi, ' ');
+				str = str.replace(/<[^>]+>/g, '');
+				str = str.replace(/&nbsp;/gi, ' ')
+					.replace(/&amp;/gi, '&')
+					.replace(/&lt;/gi, '<')
+					.replace(/&gt;/gi, '>')
+					.replace(/&quot;/gi, '"')
+					.replace(/&#39;/gi, "'");
+				return str.replace(/[\r\n\t]+/g, ' ').replace(/\s+/g, ' ').trim();
+			}
+
 			return $.map(list || [], function (winner) {
 				if (typeof winner === 'string') {
 					var rawStr = cleanText(winner);
 					return {
 						name: rawStr || '中奖用户',
+						avatar: '',
+						message: '',
 						extras: [],
 						recordId: null
 					};
@@ -154,12 +186,13 @@ define('screenliuyancj', ['screensocket', 'screencore', 'layerBox', 'fulldm', 'k
 				var rawName = showitems.length ? showitems[0] : (winner.nickname || winner.name || winner.datafield1);
 				var name = cleanText(rawName) || '中奖用户';
 
-				var content = cleanText(winner.content || winner.msgcontent, 60);
+				var avatar = winner.avatar || winner.headimgurl || winner.headimg || winner.avatarUrl || winner.userimg || winner.pic || '';
+				var rawMessage = winner.content !== undefined && winner.content !== null && winner.content !== ''
+					? winner.content
+					: (winner.msgcontent !== undefined && winner.msgcontent !== null ? winner.msgcontent : (winner.message || ''));
+				var message = cleanMessage(rawMessage);
 
 				var candidates = [];
-				if (content) {
-					candidates.push(content);
-				}
 				if (showitems.length > 1) {
 					for (var i = 1; i < showitems.length; i++) {
 						candidates.push(cleanText(showitems[i], 60));
@@ -185,8 +218,11 @@ define('screenliuyancj', ['screensocket', 'screencore', 'layerBox', 'fulldm', 'k
 
 				return {
 					name: name,
+					avatar: avatar,
+					message: message,
+					messageHtml: screencore && typeof screencore.emoToimg === 'function' ? screencore.emoToimg(message) : '',
 					extras: extras,
-					recordId: winner.recordid || winner.recordId || winner.luckerid || null
+					recordId: winner.recordid || winner.recordId || winner.luckerid || winner.id || null
 				};
 			});
 		},
@@ -213,6 +249,7 @@ define('screenliuyancj', ['screensocket', 'screencore', 'layerBox', 'fulldm', 'k
 			self.stageUi = screenStageUi.create({
 				root: root,
 				speedEnabled: false,
+				messageWinnerDetails: true,
 				callbacks: {
 					onPrimaryAction: function () { return self.handlePrimaryAction(); },
 					onPrizeSettingsToggle: function () { return self.togglePrizeSettings(); },

@@ -27,13 +27,50 @@ define([], function () {
     }
 
     function normalizeCandidate(value) {
-        if (typeof value === 'string') return { name: asText(value), extras: [] };
+        if (typeof value === 'string') {
+            return {
+                name: asText(value),
+                avatar: '',
+                message: '',
+                content: '',
+                extras: [],
+                recordId: null
+            };
+        }
         value = value || {};
-        var extras = value.extras || [value.datafield2, value.datafield3, value.datafield4];
+        var showitems = Object.prototype.toString.call(value.showitems) === '[object Array]' ? value.showitems : (value.showitems ? [value.showitems] : []);
+        var name = asText(value.name || value.nickname || (showitems.length ? showitems[0] : '') || value.datafield1 || '');
+        var avatar = safeImageUrl(value.avatar || value.headimgurl || value.headimg || value.avatarUrl || value.userimg || value.pic || '');
+
+        var rawMsg = '';
+        if (value.message !== undefined && value.message !== null) {
+            rawMsg = value.message;
+        } else if (value.content !== undefined && value.content !== null) {
+            rawMsg = value.content;
+        } else if (value.msgcontent !== undefined && value.msgcontent !== null) {
+            rawMsg = value.msgcontent;
+        } else if (value.text !== undefined && value.text !== null) {
+            rawMsg = value.text;
+        } else if (Object.prototype.toString.call(value.extras) === '[object Array]' && value.extras.length > 0) {
+            rawMsg = value.extras[0];
+        } else if (value.datafield2 !== undefined && value.datafield2 !== null) {
+            rawMsg = value.datafield2;
+        }
+        var message = asText(rawMsg);
+
+        var rawExtras = Object.prototype.toString.call(value.extras) === '[object Array]' ? value.extras : [value.datafield2, value.datafield3, value.datafield4];
+        var extras = rawExtras.map(asText).filter(function (item) { return item !== ''; });
+
+        var recordId = value.recordId || value.recordid || value.luckerid || value.id || null;
+
         return {
-            name: asText(value.name || value.nickname || value.datafield1 || ''),
-            extras: extras.map(asText).filter(function (item) { return item !== ''; }).slice(0, 2),
-            recordId: value.recordId || value.recordid || value.luckerid || null
+            name: name,
+            avatar: avatar,
+            message: message,
+            content: message,
+            messageHtml: value.messageHtml || '',
+            extras: extras,
+            recordId: recordId
         };
     }
 
@@ -43,10 +80,45 @@ define([], function () {
         return /^(https?:\/\/|\/|\.\/|\.\.\/)/i.test(value) ? value : '';
     }
 
+    function appendWinnerMessage(doc, target, winner) {
+        var markup = winner && winner.messageHtml;
+        if (!markup) {
+            target.textContent = winner ? (winner.message || winner.content || '') : '';
+            return;
+        }
+        var holder = doc.createElement('div');
+        holder.innerHTML = String(markup);
+        function copySafeNode(node, parent) {
+            if (node.nodeType === 3) {
+                parent.appendChild(doc.createTextNode(node.nodeValue || ''));
+                return;
+            }
+            if (node.nodeType !== 1) return;
+            var tag = node.tagName.toLowerCase();
+            if (tag === 'script' || tag === 'style' || tag === 'iframe' || tag === 'object') return;
+            if (tag === 'img' && /(?:^|\s)faceImg(?:\s|$)/.test(node.className || '')) {
+                var src = safeImageUrl(node.getAttribute('src'));
+                var path = src.replace(/^(?:https?:)?\/\/[^/]+/i, '');
+                if (src && /\/images\/wechat\/emoji\/\d+\.png(?:[?#].*)?$/i.test(path)) {
+                    var image = doc.createElement('img');
+                    image.className = 'faceImg';
+                    image.alt = node.getAttribute('alt') || '';
+                    image.src = src;
+                    image.loading = 'lazy';
+                    parent.appendChild(image);
+                }
+                return;
+            }
+            Array.prototype.forEach.call(node.childNodes, function (child) { copySafeNode(child, parent); });
+        }
+        Array.prototype.forEach.call(holder.childNodes, function (node) { copySafeNode(node, target); });
+    }
+
     function StageUi(options) {
         options = options || {};
         this.root = options.root || null;
         this.callbacks = options.callbacks || {};
+        this.messageWinnerDetails = options.messageWinnerDetails === true;
         this.speedEnabled = options.speedEnabled !== false;
         this.speedPreset = SPEED_PRESETS[options.speedPreset] ? options.speedPreset : 'normal';
         this.state = 'ready';
@@ -522,16 +594,46 @@ define([], function () {
     };
 
     StageUi.prototype.createResultWinnerCard = function (doc, winner) {
+        winner = normalizeCandidate(winner);
         var card = doc.createElement('div');
         card.className = 'screen-stage-result-card';
+        if (!this.messageWinnerDetails) {
+            var legacyName = doc.createElement('strong');
+            legacyName.textContent = winner.name;
+            card.appendChild(legacyName);
+            winner.extras.forEach(function (extra) {
+                var extraNode = doc.createElement('small');
+                extraNode.textContent = extra;
+                card.appendChild(extraNode);
+            });
+            return card;
+        }
+        if (winner.recordId) {
+            card.setAttribute('data-record-id', String(winner.recordId));
+        }
+
+        var avatarWrap = doc.createElement('div');
+        avatarWrap.className = 'screen-stage-result-avatar is-missing';
+        var avatarImg = doc.createElement('img');
+        avatarImg.alt = winner.name || '中奖用户头像';
+        avatarWrap.appendChild(avatarImg);
+        this.bindImage(avatarWrap, avatarImg, winner.avatar);
+        card.appendChild(avatarWrap);
+
+        var body = doc.createElement('div');
+        body.className = 'screen-stage-result-body';
+
         var name = doc.createElement('strong');
-        name.textContent = winner.name;
-        card.appendChild(name);
-        winner.extras.forEach(function (extra) {
-            var node = doc.createElement('small');
-            node.textContent = extra;
-            card.appendChild(node);
-        });
+        name.className = 'screen-stage-result-name';
+        name.textContent = winner.name || '中奖用户';
+        body.appendChild(name);
+
+        var message = doc.createElement('div');
+        message.className = 'screen-stage-result-message';
+        appendWinnerMessage(doc, message, winner);
+        body.appendChild(message);
+
+        card.appendChild(body);
         return card;
     };
 
@@ -619,30 +721,80 @@ define([], function () {
     };
 
     StageUi.prototype.createWinnerCard = function (doc, winner, serial) {
+        winner = normalizeCandidate(winner);
         var card = doc.createElement('div');
         card.className = 'screen-stage-records-card';
+        if (!this.messageWinnerDetails) {
+            var legacyNumber = doc.createElement('span');
+            legacyNumber.className = 'screen-stage-records-card-num';
+            legacyNumber.textContent = String(serial);
+            var legacyInfo = doc.createElement('div');
+            legacyInfo.className = 'screen-stage-records-card-info';
+            var legacyName = doc.createElement('strong');
+            legacyName.className = 'screen-stage-records-card-name';
+            legacyName.textContent = winner.name;
+            legacyInfo.appendChild(legacyName);
+            if (winner.extras.length) {
+                var legacyExtras = doc.createElement('div');
+                legacyExtras.className = 'screen-stage-records-card-extras';
+                winner.extras.forEach(function (value) {
+                    var chip = doc.createElement('span');
+                    chip.className = 'screen-stage-records-card-chip';
+                    chip.textContent = value;
+                    legacyExtras.appendChild(chip);
+                });
+                legacyInfo.appendChild(legacyExtras);
+            }
+            card.appendChild(legacyNumber);
+            card.appendChild(legacyInfo);
+            if (this.callbacks && typeof this.callbacks.onRecordDelete === 'function' && winner.recordId !== null && winner.recordId !== undefined && winner.recordId !== '') {
+                var legacyAction = doc.createElement('button');
+                legacyAction.type = 'button';
+                legacyAction.className = 'screen-stage-records-card-delete';
+                legacyAction.setAttribute('aria-label', '删除中奖记录');
+                legacyAction.textContent = '删除';
+                var legacySelf = this;
+                legacyAction.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    legacySelf.triggerCallback('onRecordDelete', winner.recordId, winner);
+                });
+                card.appendChild(legacyAction);
+            }
+            return card;
+        }
+        if (winner.recordId) {
+            card.setAttribute('data-record-id', String(winner.recordId));
+        }
+
         var number = doc.createElement('span');
         number.className = 'screen-stage-records-card-num';
         number.textContent = String(serial);
+        card.appendChild(number);
+
+        var avatarWrap = doc.createElement('div');
+        avatarWrap.className = 'screen-stage-records-card-avatar is-missing';
+        var avatarImg = doc.createElement('img');
+        avatarImg.alt = winner.name || '中奖用户头像';
+        avatarWrap.appendChild(avatarImg);
+        this.bindImage(avatarWrap, avatarImg, winner.avatar);
+        card.appendChild(avatarWrap);
+
         var info = doc.createElement('div');
         info.className = 'screen-stage-records-card-info';
+
         var name = doc.createElement('strong');
         name.className = 'screen-stage-records-card-name';
-        name.textContent = winner.name;
+        name.textContent = winner.name || '中奖用户';
         info.appendChild(name);
-        if (winner.extras.length) {
-            var extras = doc.createElement('div');
-            extras.className = 'screen-stage-records-card-extras';
-            winner.extras.forEach(function (value) {
-                var chip = doc.createElement('span');
-                chip.className = 'screen-stage-records-card-chip';
-                chip.textContent = value;
-                extras.appendChild(chip);
-            });
-            info.appendChild(extras);
-        }
-        card.appendChild(number);
+
+        var message = doc.createElement('div');
+        message.className = 'screen-stage-records-card-message';
+        appendWinnerMessage(doc, message, winner);
+        info.appendChild(message);
+
         card.appendChild(info);
+
         if (this.callbacks && typeof this.callbacks.onRecordDelete === 'function' && winner.recordId !== null && winner.recordId !== undefined && winner.recordId !== '') {
             var action = doc.createElement('button');
             action.type = 'button';
@@ -801,8 +953,8 @@ define([], function () {
             text = customText || '停止';
         } else if (this.state === 'result') {
             this.btnPrimary.disabled = false;
-            this.btnPrimaryIcon.innerHTML = SVG_ICONS.refresh;
-            text = customText || '再抽一次';
+            this.btnPrimaryIcon.innerHTML = SVG_ICONS.close;
+            text = customText || '关闭结果';
         } else if (this.state === 'records') {
             this.btnPrimary.disabled = true;
             this.btnPrimaryIcon.innerHTML = SVG_ICONS.play;

@@ -1,5 +1,9 @@
-/* 留言抽奖宿主层：准备态与 ImportCJ 共用同一套 Prize + Stage UI。 */
-/* 解除父层的 z-index:5 限制，让公共控件高于 z-index:11 的弹幕层。 */
+/* ==========================================================================
+   留言抽奖大屏视觉系统：宿主层、中奖揭晓面板与中奖记录抽屉
+   所有规则均严格限定在 .liuyancj-page 作用域内，基于真实组件 DOM 构建。
+   ========================================================================== */
+
+/* 宿主层与图层管理：解除父层 z-index 限制，保持控制坞高于弹幕层 */
 .main-box.liuyancj-page-shell {
     z-index: auto;
 }
@@ -30,164 +34,194 @@
     width: 100%;
 }
 
-/* 动画在礼品之后、公共控制台之前；不会截获点击。 */
-.liuyancj-page .liuyan-danmaku-host { z-index: 12; }
-.liuyancj-page .emptybox { position: absolute; inset: 0; z-index: 13; color: #fff; pointer-events: none; }
+.liuyancj-page .liuyan-danmaku-host {
+    z-index: 12;
+}
 
-/* 移除控制坞在红色大屏上形成的黑色投影，仅作用于留言抽奖页。 */
+.liuyancj-page .emptybox {
+    position: absolute;
+    inset: 0;
+    z-index: 13;
+    color: #ffffff;
+    pointer-events: none;
+}
+
+/* 控制坞：保留既有造型，移除红色大屏上的沉重暗影 */
 .liuyancj-page .screen-stage-dock {
     box-shadow: 0 0 36px rgba(88, 230, 255, .15), inset 0 1px rgba(255, 255, 255, .2);
 }
 
 /* ==========================================================================
-   留言抽奖揭晓结果阶段：纯净排版与无嵌套卡片中奖呈现
+   1. 中奖揭晓结果面板 (Result Reveal Stage)
    ========================================================================== */
 
-/* 揭晓结果面板：保留公共 StageUi 单一外层结果面板，提供统一沉浸暗色半透背景 */
-.liuyancj-page .screen-stage-ui[data-state="result"] .screen-stage-result {
-    border-color: rgba(255, 255, 255, .12);
-    background: rgba(14, 23, 38, .88);
-    box-shadow: 0 24px 60px rgba(0, 0, 0, .45);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    padding: 24px 32px 28px;
+/* 揭晓大面板：深邃暗夜流光质感，自适应视口高度，杜绝矮屏截断 */
+.liuyancj-page .screen-stage-result {
+    position: absolute;
+    left: 50%;
+    top: 46%;
+    z-index: 7;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
     gap: 16px;
+    width: min(960px, 86vw);
+    max-height: min(660px, calc(100vh - 140px));
+    box-sizing: border-box;
+    padding: 24px 32px 28px;
+    border: 1px solid rgba(88, 230, 255, .22);
+    border-radius: 24px;
+    background: linear-gradient(170deg, rgba(12, 24, 44, .95) 0%, rgba(6, 14, 28, .98) 100%);
+    box-shadow: 0 24px 64px rgba(0, 0, 0, .6), 0 0 40px rgba(88, 230, 255, .12), inset 0 1px rgba(255, 255, 255, .15);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    opacity: 0;
+    visibility: hidden;
+    transform: translate(-50%, -50%) scale(.92);
+    pointer-events: none;
+    transition: opacity .25s cubic-bezier(.22, 1, .36, 1), transform .25s cubic-bezier(.22, 1, .36, 1), visibility .25s cubic-bezier(.22, 1, .36, 1);
 }
 
-/* 奖品概览区域：紧凑布局，去除厚重阴影，作为顶部清晰的信息导引 */
+.liuyancj-page .screen-stage-ui[data-state="result"] .screen-stage-result {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: translate(-50%, -50%) scale(1) !important;
+    pointer-events: auto;
+    transition: opacity .36s cubic-bezier(.16, 1, .3, 1), transform .36s cubic-bezier(.16, 1, .3, 1), visibility .36s cubic-bezier(.16, 1, .3, 1);
+}
+
+/* 奖品概览区域：横向轻量导引，奖品图与奖项名称清晰联动 */
 .liuyancj-page .screen-stage-result-summary {
-    gap: 14px;
-    margin-bottom: 2px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    max-width: 100%;
+    flex-shrink: 0;
+    box-sizing: border-box;
+    padding: 0 8px 12px;
+    border: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, .08);
+    background: transparent;
+    box-shadow: none;
+}
+
+.liuyancj-page .screen-stage-result.is-grouped .screen-stage-result-summary {
+    display: none;
 }
 
 .liuyancj-page .screen-stage-result-prize-image {
-    width: 88px;
-    height: 88px;
-    flex: 0 0 88px;
+    display: grid;
+    place-items: center;
+    width: 68px;
+    height: 68px;
+    flex: 0 0 68px;
+    box-sizing: border-box;
     padding: 4px;
+    overflow: hidden;
+    border: 1px solid rgba(88, 230, 255, .25);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, .04);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .25);
+}
+
+.liuyancj-page .screen-stage-result-prize-image img {
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, .4));
+}
+
+.liuyancj-page .screen-stage-result-prize-image.is-missing {
+    display: none;
 }
 
 .liuyancj-page .screen-stage-result-prize-copy {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
     gap: 2px;
+    min-width: 0;
 }
 
 .liuyancj-page .screen-stage-result-prize-award {
-    color: var(--screen-stage-gold);
+    color: var(--screen-stage-gold, #f6c860);
     font-size: 13px;
-    font-weight: 600;
-    letter-spacing: .04em;
-    text-shadow: none;
+    font-weight: 700;
+    letter-spacing: .08em;
+    line-height: 1.2;
+    text-transform: uppercase;
 }
 
 .liuyancj-page .screen-stage-result-prize-title {
-    color: var(--screen-stage-ink);
-    font-size: clamp(20px, 2vw, 24px);
-    font-weight: 700;
-    text-shadow: none;
+    color: #ffffff;
+    font-size: clamp(20px, 2.2vw, 26px);
+    font-weight: 800;
+    line-height: 1.25;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, .4);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: min(520px, 55vw);
 }
 
-/* 结果文字列表容器：简洁开阔，保持呼吸感 */
+/* 结果列表滚动容器：弹性自适应，长列表平滑滚动 */
 .liuyancj-page .screen-stage-result-list {
-    gap: 14px 20px;
-    padding: 6px 10px;
-    max-height: min(380px, 44vh);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    align-content: start;
+    justify-items: stretch;
+    gap: 14px 16px;
+    width: 100%;
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: min(440px, calc(78vh - 160px));
+    box-sizing: border-box;
+    padding: 4px 6px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
 }
 
-/* 中奖条目：彻底去除卡片套卡片（无背景框、无外边框、无圆角块、无阴影），纯净文字排版 */
-.liuyancj-page .screen-stage-ui[data-state="result"] .screen-stage-result-card,
+.liuyancj-page .screen-stage-result-list.is-grouped {
+    grid-template-columns: 1fr;
+}
+
+.liuyancj-page .screen-stage-result-list.is-grouped.is-dense {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* 中奖条目基础结构：去除卡片套卡片与沉重嵌套块，统一通透纯净质感 */
 .liuyancj-page .screen-stage-result-card {
-    border: none;
-    border-radius: 0;
-    background: transparent;
-    box-shadow: none;
-    padding: 8px 12px;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 12px;
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    box-sizing: border-box;
+    padding: 12px 16px;
+    border: 1px solid rgba(255, 255, 255, .08);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, .04);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, .25);
+    text-align: left;
     animation: liuyancj-item-fadein .3s cubic-bezier(.22, 1, .36, 1) both;
-    transition: opacity .2s ease, transform .2s ease;
+    transition: background-color .2s ease, border-color .2s ease, transform .2s ease;
 }
 
-.liuyancj-page .screen-stage-ui[data-state="result"] .screen-stage-result-card:hover {
-    border: none;
-    background: transparent;
-    box-shadow: none;
+.liuyancj-page .screen-stage-result-card:hover {
+    background: rgba(255, 255, 255, .07);
+    border-color: rgba(88, 230, 255, .35);
     transform: translateY(-1px);
 }
 
 @keyframes liuyancj-item-fadein {
-    0% {
-        opacity: 0;
-        transform: translateY(6px);
-    }
-    100% {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* 多人中奖列表：中奖者姓名作为视觉焦点 */
-.liuyancj-page .screen-stage-result-card strong {
-    color: var(--screen-stage-ink);
-    font-size: 17px;
-    font-weight: 700;
-    line-height: 1.3;
-    letter-spacing: .02em;
-    text-shadow: none;
-}
-
-/* 多人中奖留言：易读的引用文本直接排在姓名下方，无任何块状背景与边框，靠字号、行距、留白与少量单色点缀区分 */
-.liuyancj-page .screen-stage-result-card small {
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-    width: 100%;
-    max-height: 44px;
-    box-sizing: border-box;
-    margin-top: 5px;
-    padding: 0;
-    border: none;
-    border-radius: 0;
-    color: var(--screen-stage-muted);
-    background: transparent;
-    box-shadow: none;
-    font-size: 13px;
-    line-height: 1.45;
-    text-align: center;
-    text-overflow: ellipsis;
-    white-space: normal;
-    word-break: break-word;
-    overflow-wrap: anywhere;
-    overflow: hidden;
-}
-
-/* 多人中奖留言单色引用点缀 */
-.liuyancj-page .screen-stage-result-card small::before {
-    content: "“";
-    color: var(--screen-stage-cyan);
-    margin-right: 2px;
-    opacity: .65;
-    font-family: Georgia, serif;
-}
-
-.liuyancj-page .screen-stage-result-card small::after {
-    content: "”";
-    color: var(--screen-stage-cyan);
-    margin-left: 2px;
-    opacity: .65;
-    font-family: Georgia, serif;
-}
-
-/* 单人揭晓：居中大气呈现，彻底避免卡片和多层背景，姓名与留言自然舒展 */
-.liuyancj-page .screen-stage-result-list .screen-stage-result-card:only-child {
-    max-width: 640px;
-    min-width: 280px;
-    padding: 12px 20px 16px;
-    border: none;
-    border-radius: 0;
-    background: transparent;
-    box-shadow: none;
-    animation: liuyancj-single-fadein .32s cubic-bezier(.16, 1, .3, 1) both;
-}
-
-@keyframes liuyancj-single-fadein {
     0% {
         opacity: 0;
         transform: translateY(8px);
@@ -198,90 +232,724 @@
     }
 }
 
-/* 单人中奖者姓名：强化核心视觉焦点 */
+/* 多人中奖卡片头像 */
+.liuyancj-page .screen-stage-result-avatar {
+    width: 48px;
+    height: 48px;
+    flex: 0 0 48px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid rgba(88, 230, 255, .35);
+    background: rgba(255, 255, 255, .06);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .3);
+}
+
+.liuyancj-page .screen-stage-result-avatar img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.liuyancj-page .screen-stage-result-avatar.is-missing {
+    display: none;
+}
+
+/* 多人中奖卡片主体 */
+.liuyancj-page .screen-stage-result-body {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+/* 中奖者姓名 */
+.liuyancj-page .screen-stage-result-name,
+.liuyancj-page .screen-stage-result-card strong {
+    display: block;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: .02em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* 多人中奖完整留言正文：无引用符号，独立易读微底块，支持多行与滚动 */
+.liuyancj-page .screen-stage-result-message,
+.liuyancj-page .screen-stage-result-card small {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    margin: 2px 0 0;
+    padding: 6px 10px;
+    border: 1px solid rgba(88, 230, 255, .08);
+    border-radius: 8px;
+    color: rgba(225, 243, 255, .9);
+    background: rgba(0, 0, 0, .22);
+    box-shadow: none;
+    font-size: 13px;
+    line-height: 1.5;
+    text-align: left;
+    white-space: normal !important;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    overflow: visible;
+    overscroll-behavior: contain;
+}
+
+/* 彻底移除所有引用符号伪元素 */
+.liuyancj-page .screen-stage-result-card small::before,
+.liuyancj-page .screen-stage-result-card small::after,
+.liuyancj-page .screen-stage-result-message::before,
+.liuyancj-page .screen-stage-result-message::after {
+    content: none !important;
+    display: none !important;
+}
+
+/* ==========================================================================
+   单人中奖大视觉呈现 (Single Winner Hero Presentation)
+   ========================================================================== */
+.liuyancj-page .screen-stage-result-list .screen-stage-result-card:only-child {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 12px;
+    width: 100%;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 12px 20px 16px;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    animation: liuyancj-single-fadein .35s cubic-bezier(.16, 1, .3, 1) both;
+}
+
+@keyframes liuyancj-single-fadein {
+    0% {
+        opacity: 0;
+        transform: translateY(12px) scale(.98);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* 单人头像：大号圆弧光环 */
+.liuyancj-page .screen-stage-result-list .screen-stage-result-card:only-child .screen-stage-result-avatar {
+    width: 80px;
+    height: 80px;
+    flex: 0 0 80px;
+    border-radius: 50%;
+    border: 3px solid rgba(88, 230, 255, .5);
+    box-shadow: 0 0 24px rgba(88, 230, 255, .35), 0 4px 16px rgba(0, 0, 0, .4);
+    background: rgba(255, 255, 255, .08);
+}
+
+.liuyancj-page .screen-stage-result-list .screen-stage-result-card:only-child .screen-stage-result-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+}
+
+/* 单人中奖者姓名：醒目大号白金焦点字 */
+.liuyancj-page .screen-stage-result-list .screen-stage-result-card:only-child .screen-stage-result-name,
 .liuyancj-page .screen-stage-result-list .screen-stage-result-card:only-child strong {
-    font-size: clamp(28px, 3.4vw, 36px);
+    font-size: clamp(28px, 3.2vw, 36px);
     font-weight: 800;
     color: #ffffff;
     line-height: 1.25;
     letter-spacing: .03em;
-    text-shadow: none;
-    margin-bottom: 8px;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, .6);
 }
 
-/* 单人中奖留言：大号引用文本，排在姓名正下方，无背景色块/边框/半透明底，长文本自然换行与适度滚动 */
+/* 单人中奖留言正文：高清晰阅读气泡区，移除引号，支持长留言完整平滑滚动 */
+.liuyancj-page .screen-stage-result-list .screen-stage-result-card:only-child .screen-stage-result-message,
 .liuyancj-page .screen-stage-result-list .screen-stage-result-card:only-child small {
     display: block;
+    box-sizing: border-box;
     width: 100%;
-    max-width: 580px;
-    max-height: 160px;
-    margin-top: 6px;
-    padding: 0 12px;
-    border: none;
-    border-radius: 0;
-    color: rgba(220, 240, 255, .88);
-    background: transparent;
-    box-shadow: none;
-    font-size: clamp(15px, 1.4vw, 17px);
+    max-width: 640px;
+    margin: 4px 0 0;
+    padding: 12px 20px;
+    border: 1px solid rgba(88, 230, 255, .18);
+    border-radius: 14px;
+    color: rgba(230, 245, 255, .95);
+    background: rgba(255, 255, 255, .05);
+    box-shadow: inset 0 1px rgba(255, 255, 255, .1), 0 4px 16px rgba(0, 0, 0, .25);
+    font-size: clamp(16px, 1.5vw, 19px);
     font-weight: 400;
-    line-height: 1.65;
+    line-height: 1.6;
     text-align: center;
-    white-space: normal;
+    white-space: normal !important;
     word-break: break-word;
     overflow-wrap: anywhere;
-    overflow-y: auto;
+    overflow: visible;
     overscroll-behavior: contain;
 }
 
-.liuyancj-page .screen-stage-result-list .screen-stage-result-card:only-child small::before {
-    content: "“";
-    color: var(--screen-stage-cyan);
-    margin-right: 4px;
-    opacity: .75;
-    font-family: Georgia, serif;
-    font-size: 1.15em;
-}
-
-.liuyancj-page .screen-stage-result-list .screen-stage-result-card:only-child small::after {
-    content: "”";
-    color: var(--screen-stage-cyan);
-    margin-left: 4px;
-    opacity: .75;
-    font-family: Georgia, serif;
-    font-size: 1.15em;
-}
-
-.liuyancj-page .screen-stage-result-list .screen-stage-result-card:only-child small::-webkit-scrollbar {
-    width: 4px;
-}
-
-.liuyancj-page .screen-stage-result-list .screen-stage-result-card:only-child small::-webkit-scrollbar-track {
-    border-radius: 4px;
-    background: transparent;
-}
-
-.liuyancj-page .screen-stage-result-list .screen-stage-result-card:only-child small::-webkit-scrollbar-thumb {
-    border-radius: 4px;
-    background: rgba(255, 255, 255, .18);
-}
-
-/* 分组模式：去除厚重卡片框与嵌套底色，仅用极细线和留白区分 */
+/* ==========================================================================
+   分组揭晓模式 (Grouped Reveal Mode)
+   ========================================================================== */
 .liuyancj-page .screen-stage-result-group {
-    border: none;
-    border-bottom: 1px solid rgba(255, 255, 255, .06);
-    border-radius: 0;
-    background: transparent;
-    box-shadow: none;
-    padding: 12px 6px;
-}
-
-.liuyancj-page .screen-stage-result-group:last-child {
-    border-bottom: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 0;
+    box-sizing: border-box;
+    padding: 14px 16px;
+    border: 1px solid rgba(255, 255, 255, .08);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, .03);
 }
 
 .liuyancj-page .screen-stage-result-group-header {
-    border-bottom: 1px solid rgba(255, 255, 255, .05);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
     padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, .06);
+}
+
+.liuyancj-page .screen-stage-result-group-prize {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.liuyancj-page .screen-stage-result-group-image {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, .04);
+    border: 1px solid rgba(255, 255, 255, .08);
+}
+
+.liuyancj-page .screen-stage-result-group-image img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.liuyancj-page .screen-stage-result-group-image.is-missing {
+    display: none;
+}
+
+.liuyancj-page .screen-stage-result-group-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.liuyancj-page .screen-stage-result-group-award {
+    color: var(--screen-stage-gold, #f6c860);
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.liuyancj-page .screen-stage-result-group-title {
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 800;
+    line-height: 1.25;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.liuyancj-page .screen-stage-result-group-winners {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 10px;
+}
+
+.liuyancj-page .screen-stage-result-empty {
+    grid-column: 1 / -1;
+    padding: 32px 16px;
+    color: var(--screen-stage-muted, rgba(214, 238, 255, .72));
+    font-size: 15px;
+    text-align: center;
+}
+
+/* ==========================================================================
+   2. 中奖记录抽屉 (Winners Record Drawer)
+   ========================================================================== */
+
+.liuyancj-page .screen-stage-records {
+    position: absolute;
+    inset: 0;
+    z-index: 50;
+    display: none;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    pointer-events: none;
+}
+
+.liuyancj-page .screen-stage-records.is-open {
+    display: flex;
+    pointer-events: auto;
+}
+
+.liuyancj-page .screen-stage-records-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(3, 10, 22, .72);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    opacity: 0;
+    transition: opacity .32s cubic-bezier(.22, 1, .36, 1);
+}
+
+.liuyancj-page .screen-stage-records.is-open .screen-stage-records-backdrop {
+    opacity: 1;
+}
+
+.liuyancj-page .screen-stage-records-drawer {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    width: min(540px, 90vw);
+    height: 100%;
+    max-height: 100vh;
+    box-sizing: border-box;
+    border-left: 1px solid rgba(88, 230, 255, .24);
+    background: linear-gradient(180deg, rgba(12, 22, 38, .97) 0%, rgba(7, 14, 26, .99) 100%);
+    box-shadow: -24px 0 64px rgba(0, 0, 0, .65), 0 0 32px rgba(88, 230, 255, .08), inset 1px 0 rgba(255, 255, 255, .1);
+    transform: translate3d(100%, 0, 0);
+    transition: transform .36s cubic-bezier(.22, 1, .36, 1);
+    will-change: transform;
+    overflow: hidden;
+}
+
+.liuyancj-page .screen-stage-records.is-open .screen-stage-records-drawer {
+    transform: translate3d(0, 0, 0);
+}
+
+/* 抽屉头部 */
+.liuyancj-page .screen-stage-records-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    padding: 20px 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, .08);
+    background: rgba(255, 255, 255, .02);
+}
+
+.liuyancj-page .screen-stage-records-kicker {
+    display: block;
+    margin-bottom: 2px;
+    color: var(--screen-stage-gold, #f6c860);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+}
+
+.liuyancj-page .screen-stage-records-title {
+    margin: 0;
+    color: #ffffff;
+    font-size: 22px;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.liuyancj-page .screen-stage-records-meta {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.liuyancj-page .screen-stage-records-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 12px;
+    border: 1px solid rgba(92, 230, 182, .35);
+    border-radius: 999px;
+    color: var(--screen-stage-teal, #5ce6b6);
+    background: rgba(92, 230, 182, .12);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.liuyancj-page .screen-stage-records-badge strong {
+    margin: 0 2px;
+    color: #ffffff;
+    font-size: 15px;
+}
+
+.liuyancj-page .screen-stage-records-close {
+    display: inline-flex;
+    width: 40px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid rgba(125, 220, 255, .2);
+    border-radius: 50%;
+    color: #ffffff;
+    background: rgba(255, 255, 255, .06);
+    cursor: pointer;
+    outline: none;
+    transition: all .2s ease;
+}
+
+.liuyancj-page .screen-stage-records-close:hover {
+    color: #ffffff;
+    background: rgba(255, 78, 107, .25);
+    border-color: rgba(255, 78, 107, .5);
+    transform: rotate(90deg) scale(1.05);
+}
+
+.liuyancj-page .screen-stage-records-close:active {
+    transform: scale(.92);
+}
+
+/* 抽屉可滚动正文区：确保在任何视口高度下均有完整滚动能力 */
+.liuyancj-page .screen-stage-records-content {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    gap: 16px;
+    min-height: 0;
+    height: 100%;
+    padding: 20px 24px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    box-sizing: border-box;
+}
+
+/* 加载、空态与错误状态 */
+.liuyancj-page .screen-stage-records-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 60px 20px;
+    color: var(--screen-stage-muted, rgba(214, 238, 255, .72));
+    font-size: 14px;
+    text-align: center;
+}
+
+.liuyancj-page .screen-stage-records-spinner {
+    width: 36px;
+    height: 36px;
+    border: 3px solid rgba(88, 230, 255, .15);
+    border-top-color: var(--screen-stage-cyan, #58e6ff);
+    border-radius: 50%;
+    animation: screen-stage-spin .8s linear infinite;
+}
+
+.liuyancj-page .screen-stage-records-error-icon {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 1px solid rgba(255, 80, 80, .45);
+    border-radius: 50%;
+    color: #ff6b6b;
+    background: rgba(255, 80, 80, .2);
+    font-size: 22px;
+    font-weight: 900;
+}
+
+.liuyancj-page .screen-stage-records-retry-btn {
+    margin-top: 4px;
+    padding: 6px 18px;
+    border: 1px solid rgba(88, 230, 255, .35);
+    border-radius: 999px;
+    color: #ffffff;
+    background: rgba(88, 230, 255, .16);
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 700;
+    outline: none;
+    transition: all .2s ease;
+}
+
+.liuyancj-page .screen-stage-records-retry-btn:hover {
+    border-color: rgba(88, 230, 255, .6);
+    background: rgba(88, 230, 255, .28);
+}
+
+.liuyancj-page .screen-stage-records-empty-icon {
+    font-size: 42px;
+    line-height: 1;
+    filter: drop-shadow(0 4px 12px rgba(246, 200, 96, .3));
+}
+
+/* 分组小节 */
+.liuyancj-page .screen-stage-records-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.liuyancj-page .screen-stage-records-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    border-left: 3px solid var(--screen-stage-gold, #f6c860);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, .04);
+}
+
+.liuyancj-page .screen-stage-records-section-header strong {
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.liuyancj-page .screen-stage-records-section-header span {
+    color: var(--screen-stage-gold, #f6c860);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+/* 记录列表网格：单列纵向排列，给予留言充分的横向阅读宽度 */
+.liuyancj-page .screen-stage-records-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+}
+
+/* 中奖记录条目卡片：以留言扫读为核心，头像/姓名/编号/删除功能层级明晰 */
+.liuyancj-page .screen-stage-records-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    box-sizing: border-box;
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid rgba(255, 255, 255, .08);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, .035);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, .2);
+    transition: background-color .18s ease, border-color .18s ease, transform .18s ease;
+}
+
+.liuyancj-page .screen-stage-records-card:hover {
+    background: rgba(255, 255, 255, .06);
+    border-color: rgba(88, 230, 255, .32);
+    transform: translateY(-1px);
+}
+
+/* 编号徽标 */
+.liuyancj-page .screen-stage-records-card-num {
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    flex: 0 0 26px;
+    margin-top: 2px;
+    border: 1px solid rgba(246, 200, 96, .35);
+    border-radius: 50%;
+    color: var(--screen-stage-gold, #f6c860);
+    background: rgba(246, 200, 96, .14);
+    font-size: 12px;
+    font-weight: 800;
+}
+
+/* 头像 */
+.liuyancj-page .screen-stage-records-card-avatar {
+    width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid rgba(88, 230, 255, .25);
+    background: rgba(255, 255, 255, .05);
+}
+
+.liuyancj-page .screen-stage-records-card-avatar img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.liuyancj-page .screen-stage-records-card-avatar.is-missing {
+    display: none;
+}
+
+/* 信息核心区 */
+.liuyancj-page .screen-stage-records-card-info {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+/* 姓名 */
+.liuyancj-page .screen-stage-records-card-name {
+    display: block;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* 留言正文：抽屉扫读主力信息，高对比度气泡框，文本完整呈现 */
+.liuyancj-page .screen-stage-records-card-message {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid rgba(88, 230, 255, .1);
+    border-radius: 8px;
+    color: rgba(230, 245, 255, .95);
+    background: rgba(0, 0, 0, .28);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.55;
+    white-space: normal !important;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
+/* 删除操作按钮：右上紧凑放置，交互反馈明确 */
+.liuyancj-page .screen-stage-records-card-delete {
+    flex: 0 0 auto;
+    min-width: 44px;
+    height: 28px;
+    margin-top: 2px;
+    padding: 0 10px;
+    border: 1px solid rgba(255, 78, 107, .28);
+    border-radius: 6px;
+    color: rgba(255, 120, 140, .9);
+    background: rgba(255, 78, 107, .08);
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    outline: none;
+    transition: background-color .16s ease, color .16s ease, border-color .16s ease, box-shadow .16s ease;
+}
+
+.liuyancj-page .screen-stage-records-card-delete:hover {
+    color: #ffffff;
+    border-color: rgba(255, 78, 107, .8);
+    background: rgba(255, 78, 107, .8);
+    box-shadow: 0 2px 8px rgba(255, 78, 107, .4);
+}
+
+.liuyancj-page .screen-stage-records-card-delete:active {
+    transform: scale(.95);
+}
+
+/* ==========================================================================
+   3. 统一滚动条美化 (Scrollbars Styling)
+   ========================================================================== */
+.liuyancj-page .screen-stage-result-list::-webkit-scrollbar,
+.liuyancj-page .screen-stage-records-content::-webkit-scrollbar,
+.liuyancj-page .screen-stage-result-card small::-webkit-scrollbar,
+.liuyancj-page .screen-stage-result-message::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.liuyancj-page .screen-stage-result-list::-webkit-scrollbar-track,
+.liuyancj-page .screen-stage-records-content::-webkit-scrollbar-track,
+.liuyancj-page .screen-stage-result-card small::-webkit-scrollbar-track,
+.liuyancj-page .screen-stage-result-message::-webkit-scrollbar-track {
+    border-radius: 6px;
+    background: rgba(255, 255, 255, .04);
+}
+
+.liuyancj-page .screen-stage-result-list::-webkit-scrollbar-thumb,
+.liuyancj-page .screen-stage-records-content::-webkit-scrollbar-thumb,
+.liuyancj-page .screen-stage-result-card small::-webkit-scrollbar-thumb,
+.liuyancj-page .screen-stage-result-message::-webkit-scrollbar-thumb {
+    border-radius: 6px;
+    background: rgba(88, 230, 255, .32);
+}
+
+.liuyancj-page .screen-stage-result-list::-webkit-scrollbar-thumb:hover,
+.liuyancj-page .screen-stage-records-content::-webkit-scrollbar-thumb:hover,
+.liuyancj-page .screen-stage-result-card small::-webkit-scrollbar-thumb:hover,
+.liuyancj-page .screen-stage-result-message::-webkit-scrollbar-thumb:hover {
+    background: rgba(88, 230, 255, .55);
+}
+
+/* ==========================================================================
+   4. 响应式与矮屏自适应 (Responsive & Viewport Adaptations)
+   ========================================================================== */
+
+/* 矮屏适配：防止面板被大屏视口或控制坞截断 */
+@media (max-height: 800px) {
+    .liuyancj-page .screen-stage-result {
+        max-height: calc(100vh - 110px);
+        padding: 18px 24px 22px;
+        gap: 12px;
+    }
+
+    .liuyancj-page .screen-stage-result-summary {
+        gap: 12px;
+        padding-bottom: 8px;
+    }
+
+    .liuyancj-page .screen-stage-result-prize-image {
+        width: 54px;
+        height: 54px;
+        flex-basis: 54px;
+    }
+
+    .liuyancj-page .screen-stage-result-prize-title {
+        font-size: 20px;
+    }
+
+    .liuyancj-page .screen-stage-result-list {
+        max-height: calc(100vh - 240px);
+        gap: 10px;
+    }
+
+    .liuyancj-page .screen-stage-result-list .screen-stage-result-card:only-child .screen-stage-result-avatar {
+        width: 64px;
+        height: 64px;
+        flex-basis: 64px;
+    }
+
+    .liuyancj-page .screen-stage-result-list .screen-stage-result-card:only-child strong {
+        font-size: 26px;
+    }
+
+    .liuyancj-page .screen-stage-result-list .screen-stage-result-card:only-child small,
+    .liuyancj-page .screen-stage-result-list .screen-stage-result-card:only-child .screen-stage-result-message {
+        font-size: 15px;
+        padding: 10px 16px;
+    }
 }
 
 @media (max-width: 1366px) {
@@ -289,33 +957,12 @@
         width: min(540px, 56vw);
     }
 
-    .liuyancj-page .screen-stage-result-prize-image {
-        width: 76px;
-        height: 76px;
-        flex-basis: 76px;
+    .liuyancj-page .screen-stage-result {
+        width: min(880px, 88vw);
     }
 
-    .liuyancj-page .screen-stage-result-prize-title {
-        font-size: 20px;
-    }
-
-    .liuyancj-page .screen-stage-result-list .screen-stage-result-card:only-child {
-        max-width: 520px;
-        padding: 10px 14px 14px;
-    }
-
-    .liuyancj-page .screen-stage-result-list .screen-stage-result-card:only-child strong {
-        font-size: 28px;
-    }
-
-    .liuyancj-page .screen-stage-result-list .screen-stage-result-card:only-child small {
-        font-size: 15px;
-        max-height: 130px;
-    }
-
-    .liuyancj-page .screen-stage-result-card small {
-        font-size: 12px;
-        max-height: 40px;
+    .liuyancj-page .screen-stage-records-drawer {
+        width: min(500px, 92vw);
     }
 }
 
@@ -324,39 +971,67 @@
         width: 90vw;
     }
 
-    .liuyancj-page .screen-stage-ui[data-state="result"] .screen-stage-result {
-        padding: 20px 22px 24px;
+    .liuyancj-page .screen-stage-result {
+        width: 92vw;
+        padding: 18px 20px 22px;
+    }
+
+    .liuyancj-page .screen-stage-result-list {
+        grid-template-columns: 1fr;
+    }
+
+    .liuyancj-page .screen-stage-records-drawer {
+        width: 100vw;
     }
 }
 
 @media (max-width: 768px) {
     .liuyancj-page .screen-stage-result-list .screen-stage-result-card:only-child {
-        min-width: 0;
-        width: 100%;
-        padding: 8px 10px 12px;
+        padding: 8px 12px 14px;
     }
 
     .liuyancj-page .screen-stage-result-list .screen-stage-result-card:only-child strong {
         font-size: 24px;
     }
 
-    .liuyancj-page .screen-stage-result-list .screen-stage-result-card:only-child small {
+    .liuyancj-page .screen-stage-result-list .screen-stage-result-card:only-child small,
+    .liuyancj-page .screen-stage-result-list .screen-stage-result-card:only-child .screen-stage-result-message {
         font-size: 14px;
-        max-height: 110px;
     }
 
-    .liuyancj-page .screen-stage-result-card small {
-        font-size: 11px;
-        -webkit-line-clamp: 2;
-        max-height: 36px;
+    .liuyancj-page .screen-stage-result-card small,
+    .liuyancj-page .screen-stage-result-message {
+        font-size: 12px;
+    }
+
+    .liuyancj-page .screen-stage-records-header {
+        padding: 16px 18px;
+    }
+
+    .liuyancj-page .screen-stage-records-content {
+        padding: 16px 18px;
     }
 }
 
+/* 减弱动态偏好 */
 @media (prefers-reduced-motion: reduce) {
-    .liuyancj-page .screen-stage-ui[data-state="result"] .screen-stage-result,
-    .liuyancj-page .screen-stage-ui[data-state="result"] .screen-stage-result-card,
-    .liuyancj-page .screen-stage-result-list .screen-stage-result-card:only-child {
+    .liuyancj-page .screen-stage-result,
+    .liuyancj-page .screen-stage-result-card,
+    .liuyancj-page .screen-stage-result-list .screen-stage-result-card:only-child,
+    .liuyancj-page .screen-stage-records-drawer,
+    .liuyancj-page .screen-stage-records-backdrop {
         animation: none !important;
         transition: opacity .12s linear, transform .12s linear, visibility .12s linear !important;
     }
+}
+
+/* 微信表情资源经安全白名单节点渲染，保持与正文行高协调。 */
+.liuyancj-page .screen-stage-result-message img.faceImg,
+.liuyancj-page .screen-stage-records-card-message img.faceImg {
+    display: inline-block;
+    width: 1.35em;
+    height: 1.35em;
+    margin: 0 .08em;
+    object-fit: contain;
+    vertical-align: -.28em;
 }
