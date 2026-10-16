@@ -191,32 +191,29 @@ define([], function () {
         });
     };
     ResultView.prototype.chooseLayout = function (count, metrics, width, height) {
-        var maxCols = this.width < this.height ? 2 : 5;
-        var gap = this.gap, minFont = this.height * .045, best = null;
-        var preferred = count <= 3 ? count : (count <= 4 ? 2 : (count <= 6 ? 3 : (count <= 8 ? 4 : (count <= 10 ? 5 : 4))));
-        for (var cols = 1; cols <= Math.min(count, maxCols); cols++) {
-            var rows = Math.ceil(count / cols);
-            var cardWidth = (width - gap * (cols - 1)) / cols;
-            if (count === 1) cardWidth = Math.min(cardWidth, this.width * (this.width < this.height ? .86 : .46));
-            var cardHeight = Math.min((height - gap * (rows - 1)) / rows, this.height * .44);
-            var pad = Math.min(cardWidth, cardHeight) * .10;
-            var innerWidth = cardWidth - pad * 2 - 6, innerHeight = cardHeight - pad * 2 - 6;
-            var mainSize = this.height * .215, extraSize = this.height * .047;
-            var extraMin = this.height * .022;
-            metrics.forEach(function (metric) {
-                metric.extras.forEach(function (size) { extraSize = Math.min(extraSize, innerWidth / Math.max(size, 1)); });
-            });
-            extraSize = Math.max(extraMin, extraSize);
-            metrics.forEach(function (metric) {
-                var lines = metric.extras.reduce(function (n, size) { return n + Math.max(1, Math.ceil(size * extraSize / innerWidth)); }, 0);
-                var extraHeight = lines ? lines * extraSize * 1.3 + gap * 1.4 : 0;
-                mainSize = Math.min(mainSize, innerWidth / Math.max(metric.main, 1), (innerHeight - extraHeight) / 1.12);
-            });
-            if (mainSize < minFont || cardHeight <= 0) continue;
-            var score = mainSize * (cols === preferred ? 1.25 : 1);
-            if (!best || score > best.score) best = { cols: cols, rows: rows, width: cardWidth, height: cardHeight, main: mainSize, extra: Math.min(extraSize, mainSize * .38), pad: pad, score: score };
-        }
-        return best;
+        // Stable count-based columns: resizing changes card width, not an optimization score.
+        var cols = count <= 3 ? count : (count <= 4 ? 2 : (count <= 6 ? 3 : (count <= 8 ? 4 : (count <= 10 ? 5 : 4))));
+        if (this.width < this.height) cols = count <= 3 ? 1 : 2;
+        var rows = Math.ceil(count / cols), gap = this.gap;
+        var cardWidth = (width - gap * (cols - 1)) / cols;
+        if (count === 1) cardWidth = Math.min(cardWidth, this.width * (this.width < this.height ? .80 : .46));
+        var cardHeight = Math.min((height - gap * (rows - 1)) / rows, this.height * .44);
+        var pad = Math.min(cardWidth, cardHeight) * .10;
+        var innerWidth = cardWidth - pad * 2 - 6, innerHeight = cardHeight - pad * 2 - 6;
+        if (innerWidth <= 0 || innerHeight <= 0) return null;
+        var mainSize = this.height * .215, extraSize = this.height * .047;
+        var extraMin = this.height * .022;
+        metrics.forEach(function (metric) {
+            metric.extras.forEach(function (size) { extraSize = Math.min(extraSize, innerWidth / Math.max(size, 1)); });
+        });
+        extraSize = Math.max(extraMin, extraSize);
+        metrics.forEach(function (metric) {
+            var lines = metric.extras.reduce(function (n, size) { return n + Math.max(1, Math.ceil(size * extraSize / innerWidth)); }, 0);
+            var extraHeight = lines ? lines * extraSize * 1.3 + gap * 1.4 : 0;
+            mainSize = Math.min(mainSize, innerWidth / Math.max(metric.main, 1), (innerHeight - extraHeight) / 1.12);
+        });
+        if (mainSize < this.height * .045) return null;
+        return { cols: cols, rows: rows, width: cardWidth, height: cardHeight, main: mainSize, extra: Math.min(extraSize, mainSize * .38), pad: pad };
     };
     ResultView.prototype.sizeKey = function () {
         var dock = this.host.querySelector('.screen-stage-dock');
@@ -231,7 +228,7 @@ define([], function () {
         this.gap = Math.max(8, 24 * scale);
         this.el.style.setProperty('--ir-scale', scale);
         this.el.style.setProperty('--ir-gap', this.gap + 'px');
-        this.content.style.width = Math.min(this.width * (this.width < this.height ? .88 : .80), this.height * 1.6) + 'px';
+        this.content.style.width = Math.min(this.width * .80, this.height * 1.6) + 'px';
         this.content.style.top = Math.max(12, this.height * .065) + 'px';
         var dock = this.host.querySelector('.screen-stage-dock');
         var dockStyle = dock && this.win.getComputedStyle(dock);
@@ -245,20 +242,28 @@ define([], function () {
         this.groups.forEach(function (group) { self.setHeading(group); headerHeight = Math.max(headerHeight, self.header.offsetHeight); });
         this.header.style.minHeight = headerHeight + 'px';
         this.pager.hidden = false;
+        // Reserve the longest possible page label before measuring available height.
+        this.pager.style.minHeight = '';
+        this.pageLabel.textContent = this.total + ' / ' + this.total + ' 页 · 共 ' + this.total + ' 名';
+        this.pager.style.minHeight = this.pager.offsetHeight + 'px';
         var width = this.board.clientWidth, height = this.board.clientHeight;
+        // Size the whole round once, including every prize's text and largest page.
+        // Switching prizes or reaching a partial page must only change content.
+        var metrics = [], capacity = 0, layout;
+        this.groups.forEach(function (group) {
+            metrics = metrics.concat(self.metrics(group.winners));
+            capacity = Math.max(capacity, Math.min(12, group.winners.length));
+        });
+        while (capacity > 0) {
+            layout = this.chooseLayout(capacity, metrics, width, height);
+            if (layout || capacity === 1) break;
+            capacity--;
+        }
+        if (!layout) layout = { cols: 1, rows: 1, width: width, height: height, main: this.height * .045, extra: this.height * .025, pad: this.gap, wrapped: true };
         this.groups.forEach(function (group, groupIndex) {
-            var metrics = self.metrics(group.winners);
-            var capacity = Math.min(12, group.winners.length), layout;
-            while (capacity > 0) {
-                layout = self.chooseLayout(capacity, metrics, width, height);
-                if (layout || capacity === 1) break;
-                capacity--;
-            }
-            if (!layout) layout = { cols: 1, rows: 1, width: width, height: height, main: self.height * .045, extra: self.height * .025, pad: self.gap, wrapped: true };
             for (var start = 0; start < group.winners.length; start += capacity) {
                 var winners = group.winners.slice(start, start + capacity);
-                var pageLayout = winners.length === capacity ? layout : self.chooseLayout(winners.length, metrics.slice(start, start + capacity), width, height) || layout;
-                pages.push({ group: group, groupIndex: groupIndex, start: start, winners: winners, layout: pageLayout });
+                pages.push({ group: group, groupIndex: groupIndex, start: start, winners: winners, layout: layout });
             }
         });
         this.pages = pages;
@@ -267,11 +272,11 @@ define([], function () {
             this.pageIndex = Math.max(0, anchor);
         }
         this.pageIndex = Math.min(this.pageIndex, Math.max(0, pages.length - 1));
-        this.render(this.firstReveal);
+        this.render(this.firstReveal, false);
         this.firstReveal = false;
         this.layoutSize = this.sizeKey();
     };
-    ResultView.prototype.render = function (reveal) {
+    ResultView.prototype.render = function (reveal, transition) {
         this.clearTimer();
         var page = this.pages[this.pageIndex], self = this;
         this.board.textContent = '';
@@ -289,7 +294,7 @@ define([], function () {
         var reduced = this.win.matchMedia && this.win.matchMedia('(prefers-reduced-motion: reduce)').matches;
         var lastDelay = 0;
         page.winners.forEach(function (winner, index) {
-            var card = self.element('div', 'import-result-card' + (layout.wrapped ? ' is-wrapped' : '') + (!reduced ? (reveal ? ' is-revealing' : ' is-entering') : ''));
+            var card = self.element('div', 'import-result-card' + (layout.wrapped ? ' is-wrapped' : '') + (!reduced ? (reveal ? ' is-revealing' : (transition !== false ? ' is-entering' : '')) : ''));
             card.setAttribute('role', 'listitem');
             card.style.width = layout.width + 'px';
             card.style.height = layout.height + 'px';
