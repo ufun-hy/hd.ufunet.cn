@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>导入抽奖结果 · 本地隔离预览</title>
+<link rel="stylesheet" href="/public/static/css/screencss/screen-stage-ui.css">
+<link rel="stylesheet" href="/public/static/css/screencss/screenimportcj-stage-ui.css">
+<style>
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#28172a}
+.importcj-mainbox{position:relative;width:100%;height:100%}
+.fixture-ready{position:absolute;inset:0;display:grid;place-items:center;color:#fff;font:32px Arial}
+</style>
+<div class="importcj-mainbox"><div class="fixture-ready">准备界面 · 原有背景</div></div>
+<script src="/public/static/js/require.js"></script>
+<script>
+require.config({baseUrl:'/public/static/js'});
+require(['screenjs/screenimportcj-stage-ui','screenjs/screen-stage-ui'],function(importStage,sharedStage){
+    window.showResult=function(count,kind,config){
+        if(window.ui) window.ui.destroy();
+        var source=kind==='message'?sharedStage:importStage;
+        window.ui=source.create({root:document.querySelector('.importcj-mainbox'),resultConfig:config||{},speedEnabled:false,messageWinnerDetails:kind==='message',callbacks:{
+            onPrimaryAction:function(){ui.setState('ready');},
+            onRecords:function(){ui.setRecords([], 'result');ui.setState('records');},
+            onRecordsClose:function(){ui.setState('result');}
+        }}).mount();
+        var winners=Array.from({length:count},function(_,i){return {datafield1:['A09','B14','B01'][i%3],datafield2:String(20902+i).padStart(6,'0'),datafield3:'',datafield4:'',id:i+1};});
+        if(kind==='long') winners.forEach(function(w,i){w.datafield1='研发中心嘉宾'+(i+1)+'号';w.datafield2='华东区域产品研发部';w.datafield3='020902';w.datafield4='VIP-00001234';});
+        if(kind==='empty') winners=[{datafield1:'',datafield2:'',datafield3:''}];
+        if(kind==='zero') winners=[{datafield1:0,datafield2:'000012'}];
+        if(kind==='extreme') winners=[{datafield1:'长字段'.repeat(60),datafield2:'其他内容'.repeat(100)}];
+        if(kind==='xss') winners=[{datafield1:'<img src=x onerror=alert(1)>',datafield2:'<script>bad<'+ '/script>'}];
+        if(kind==='message') winners=[{name:'留言用户',avatar:'/public/static/images/sys/prizeimg.png',message:'留言内容保持原样',extras:['留言内容保持原样']}];
+        var prize={id:1,awardname:'三等奖',prizename:'宋朝香薰礼盒 / 小米养生壶',prizeimg:'/public/static/images/sys/prizeimg.png'};
+        if(kind==='groups') winners=[{awardname:'一等奖',prizename:'一等奖礼品',luckers:winners.slice(0,2)},{awardname:'二等奖',prizename:'二等奖礼品',luckers:winners.slice(2)}];
+        window.fixtureInput=winners;
+        window.fixtureOriginal=JSON.stringify(winners);
+        ui.setResult(winners,prize);
+        return true;
+    };
+    var p=new URLSearchParams(location.search);
+    showResult(Number(p.get('count')||3),p.get('kind')||'',{});
+    if(p.get('zoom')) {var z=Number(p.get('zoom'));document.querySelector('.importcj-mainbox').style.cssText='zoom:'+z+';width:'+(100/z)+'vw;height:'+(100/z)+'vh';}
+});
+</script>
+</html>

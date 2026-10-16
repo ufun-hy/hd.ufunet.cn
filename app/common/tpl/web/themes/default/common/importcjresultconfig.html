@@ -1,0 +1,58 @@
+<div class="config-titlebox"><span class="config-titlename">中奖结果展示</span></div>
+<div class="form-group">
+    <label class="col-lg-2 control-label" for="import-result-main-field">主字段</label>
+    <div class="col-lg-8">
+        <select id="import-result-main-field" class="form-control" name="styleconfig[resultmainfield]">
+            {foreach $config['fieldconfig'] as $fieldIndex=>$field}
+            <option value="{$fieldIndex+1}" {if ($config['styleconfig']['resultmainfield']??'1') == ($fieldIndex+1)}selected{/if}>{$field['fieldname']}</option>
+            {/foreach}
+        </select>
+        <span class="help-block">仅影响最终中奖结果。主字段放大显示，卡片不显示字段名称；保留已有隐私遮罩。主字段为空时使用已选其他字段中的第一个非空值。</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label" for="import-result-extra-1">其他字段 1</label>
+    <div class="col-lg-8">
+        <select id="import-result-extra-1" class="form-control" name="styleconfig[resultextra1]">
+            <option value="auto" {if ($config['styleconfig']['resultextra1']??'auto') == 'auto'}selected{/if}>自动：主字段以外的第 1 个字段</option>
+            <option value="0" {if ($config['styleconfig']['resultextra1']??'auto') == '0'}selected{/if}>不显示</option>
+            {foreach $config['fieldconfig'] as $fieldIndex=>$field}
+            <option value="{$fieldIndex+1}" {if ($config['styleconfig']['resultextra1']??'auto') == ($fieldIndex+1)}selected{/if}>{$field['fieldname']}</option>
+            {/foreach}
+        </select>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label" for="import-result-extra-2">其他字段 2</label>
+    <div class="col-lg-8">
+        <select id="import-result-extra-2" class="form-control" name="styleconfig[resultextra2]">
+            <option value="auto" {if ($config['styleconfig']['resultextra2']??'auto') == 'auto'}selected{/if}>自动：主字段以外的第 2 个字段</option>
+            <option value="0" {if ($config['styleconfig']['resultextra2']??'auto') == '0'}selected{/if}>不显示</option>
+            {foreach $config['fieldconfig'] as $fieldIndex=>$field}
+            <option value="{$fieldIndex+1}" {if ($config['styleconfig']['resultextra2']??'auto') == ($fieldIndex+1)}selected{/if}>{$field['fieldname']}</option>
+            {/foreach}
+        </select>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label" for="import-result-extra-3">其他字段 3</label>
+    <div class="col-lg-8">
+        <select id="import-result-extra-3" class="form-control" name="styleconfig[resultextra3]">
+            <option value="auto" {if ($config['styleconfig']['resultextra3']??'auto') == 'auto'}selected{/if}>自动：主字段以外的第 3 个字段</option>
+            <option value="0" {if ($config['styleconfig']['resultextra3']??'auto') == '0'}selected{/if}>不显示</option>
+            {foreach $config['fieldconfig'] as $fieldIndex=>$field}
+            <option value="{$fieldIndex+1}" {if ($config['styleconfig']['resultextra3']??'auto') == ($fieldIndex+1)}selected{/if}>{$field['fieldname']}</option>
+            {/foreach}
+        </select>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label" for="import-result-interval">分页停留时间</label>
+    <div class="col-lg-8">
+        <div class="input-group">
+            <input id="import-result-interval" class="form-control" type="number" min="4" max="60" step="1" name="styleconfig[resultinterval]" value="{$config['styleconfig']['resultinterval']??8}">
+            <span class="input-group-addon">秒</span>
+        </div>
+        <span class="help-block">默认 8 秒。人数较多或字段较长时自动分页，每页最多 12 人；大屏可暂停或手动翻页。其他字段按 1、2、3 顺序展示，重复选择只显示一次，空值不占位。已选字段不会因空间不足自动隐藏。调整数据结构后先保存，再选择展示字段。</span>
+    </div>
+</div>

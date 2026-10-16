@@ -27,6 +27,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 		danmakuStyleConfig: null,
 		unifiedPrize: null,
 		stageUi: null,
+		resultConfig: null,
 		unifiedRoundItems: [],
 		prizeStats: null,
 		drawCount: null,
@@ -69,6 +70,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 			if (!screenimportcjStageUi) return;
 			self.stageUi = screenimportcjStageUi.create({
 				root: document.querySelector('.importcj-mainbox'),
+				resultConfig: self.resultConfig,
 				speedEnabled: self.flytype == '6',
 				speedPreset: self.getDanmakuSpeedPreset(),
 				callbacks: {
@@ -379,6 +381,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 		init: function (config) {
 			var self = this;
 			config = config || {};
+			self.resultConfig = config;
 			self.danmakuStyleConfig = self.getDanmakuStyleConfig(config);
 			self.scrollSpeed = autoscrollspeed;
 			self.flytype = config.flytype || '1';
