@@ -54,7 +54,7 @@
 	function syncImportcjMainColorCopy(flytype){
 		$(".importcj-main-color-group").toggleClass('hidden', flytype == '6');
 	}
-	$(".zam-stylewrapper .zam-styleitem").click(function(){
+	$("#styleconfigbox .zam-stylewrapper .zam-styleitem").click(function(){
 		var flytype = $(this).attr('data-val');
 		$(this).addClass('hadchecked').siblings().removeClass('hadchecked');
 		$(this).parent().next().val(flytype);
@@ -77,7 +77,7 @@
 		syncImportcjMainColorCopy(flytype);
 	});
 	{if !request()->realhdid}
-	$(".zam-stylewrapper .zam-styleitem img").click(function(e){
+	$("#styleconfigbox .zam-stylewrapper .zam-styleitem img").click(function(e){
 		//e.stopPropagation();
 		tpl_image_one(this,function($imgsrc,srcpath,obj){
 			$(obj).attr('src',$imgsrc);
@@ -87,7 +87,7 @@
 	{/if}
 	$(function(){
 		syncDanmakuColorMode();
-		syncImportcjMainColorCopy($(".zam-stylewrapper .zam-styleitem.hadchecked").attr('data-val') || '1');
+		syncImportcjMainColorCopy($("#styleconfigbox .zam-stylewrapper .zam-styleitem.hadchecked").attr('data-val') || '1');
 		$(".danmaku input[name='styleconfig[danmakucolormode]']").on('change', syncDanmakuColorMode);
 	});
 	</script>

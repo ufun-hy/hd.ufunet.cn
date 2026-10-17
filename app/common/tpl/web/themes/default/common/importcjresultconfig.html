@@ -1,25 +1,64 @@
 <div class="config-titlebox"><span class="config-titlename">中奖结果展示</span></div>
 <div class="form-group">
-    <label class="col-lg-2 control-label" for="import-result-card-mode">卡片样式</label>
+    <label class="col-lg-2 control-label" id="import-result-card-label">卡片样式</label>
     <div class="col-lg-8">
-        <select id="import-result-card-mode" class="form-control" name="styleconfig[resultcardmode]">
-            <option value="gold" {if !in_array(($config['styleconfig']['resultcardmode']??'gold'),['transparent','softgold','ivory','custom'])}selected{/if}>原版金卡</option>
-            <option value="transparent" {if ($config['styleconfig']['resultcardmode']??'gold') == 'transparent'}selected{/if}>通透卡片</option>
-            <option value="softgold" {if ($config['styleconfig']['resultcardmode']??'gold') == 'softgold'}selected{/if}>收敛金卡（推荐）</option>
-            <option value="ivory" {if ($config['styleconfig']['resultcardmode']??'gold') == 'ivory'}selected{/if}>象牙白卡</option>
-            <option value="custom" {if ($config['styleconfig']['resultcardmode']??'gold') == 'custom'}selected{/if}>自定义颜色</option>
-        </select>
+        <div id="import-result-card-mode" class="zam-stylewrapper zam-flex zam-alignItems" role="radiogroup" aria-labelledby="import-result-card-label">
+            <label class="zam-styleitem{if !in_array(($config['styleconfig']['resultcardmode']??'gold'),['transparent','softgold','ivory','custom'])} hadchecked{/if}">
+                <input class="import-result-style-radio" type="radio" name="styleconfig[resultcardmode]" value="gold" aria-label="原版金卡" {if !in_array(($config['styleconfig']['resultcardmode']??'gold'),['transparent','softgold','ivory','custom'])}checked{/if}>
+                <div class="zam-styleimg"><img src="/static/images/sys/style/importcj/result-gold.png" alt="原版金卡预览" width="200" height="112"></div>
+                <div class="zam-stylename">原版金卡</div>
+                <div class="zam-selected" aria-hidden="true"><i class="mdi mdi-check"></i></div>
+            </label>
+            <label class="zam-styleitem{if ($config['styleconfig']['resultcardmode']??'gold') == 'transparent'} hadchecked{/if}">
+                <input class="import-result-style-radio" type="radio" name="styleconfig[resultcardmode]" value="transparent" aria-label="通透卡片" {if ($config['styleconfig']['resultcardmode']??'gold') == 'transparent'}checked{/if}>
+                <div class="zam-styleimg"><img src="/static/images/sys/style/importcj/result-transparent.png" alt="通透卡片预览" width="200" height="112"></div>
+                <div class="zam-stylename">通透卡片</div>
+                <div class="zam-selected" aria-hidden="true"><i class="mdi mdi-check"></i></div>
+            </label>
+            <label class="zam-styleitem{if ($config['styleconfig']['resultcardmode']??'gold') == 'softgold'} hadchecked{/if}">
+                <input class="import-result-style-radio" type="radio" name="styleconfig[resultcardmode]" value="softgold" aria-label="收敛金卡（推荐）" {if ($config['styleconfig']['resultcardmode']??'gold') == 'softgold'}checked{/if}>
+                <div class="zam-styleimg"><img src="/static/images/sys/style/importcj/result-softgold.png" alt="收敛金卡（推荐）预览" width="200" height="112"></div>
+                <div class="zam-stylename">收敛金卡（推荐）</div>
+                <div class="zam-selected" aria-hidden="true"><i class="mdi mdi-check"></i></div>
+            </label>
+            <label class="zam-styleitem{if ($config['styleconfig']['resultcardmode']??'gold') == 'ivory'} hadchecked{/if}">
+                <input class="import-result-style-radio" type="radio" name="styleconfig[resultcardmode]" value="ivory" aria-label="象牙白卡" {if ($config['styleconfig']['resultcardmode']??'gold') == 'ivory'}checked{/if}>
+                <div class="zam-styleimg"><img src="/static/images/sys/style/importcj/result-ivory.png" alt="象牙白卡预览" width="200" height="112"></div>
+                <div class="zam-stylename">象牙白卡</div>
+                <div class="zam-selected" aria-hidden="true"><i class="mdi mdi-check"></i></div>
+            </label>
+            <label class="zam-styleitem{if ($config['styleconfig']['resultcardmode']??'gold') == 'custom'} hadchecked{/if}">
+                <input class="import-result-style-radio" type="radio" name="styleconfig[resultcardmode]" value="custom" aria-label="自定义颜色" {if ($config['styleconfig']['resultcardmode']??'gold') == 'custom'}checked{/if}>
+                <div class="zam-styleimg"><img src="/static/images/sys/style/importcj/result-custom.png" alt="自定义颜色预览" width="200" height="112"></div>
+                <div class="zam-stylename">自定义颜色</div>
+                <div class="zam-selected" aria-hidden="true"><i class="mdi mdi-check"></i></div>
+            </label>
+        </div>
         <div id="import-result-card-color" style="margin-top:10px" {if ($config['styleconfig']['resultcardmode']??'gold') != 'custom'}hidden{/if}>
             {:tpl_color('styleconfig[resultcardcolor]',$config['styleconfig']['resultcardcolor']??'#e8b04a')}
         </div>
-        <span class="help-block">中奖结果和中奖记录共用卡片样式，记录面板使用通透背景。字段文字始终使用上方“数据结构”中的颜色；通透卡片建议搭配浅色文字。自定义颜色沿用原版金卡的边框和阴影。</span>
+        <span class="help-block">中奖结果和中奖记录共用卡片样式，记录面板使用通透背景。字段文字始终使用上方“数据结构”中的颜色；通透卡片建议搭配浅色文字。自定义颜色沿用原版金卡的边框和阴影，缩略图仅为示例。</span>
     </div>
 </div>
+<style>
+#import-result-card-mode .zam-styleitem { font-weight:normal; }
+#import-result-card-mode .import-result-style-radio { position:absolute; width:1px; height:1px; opacity:0; }
+#import-result-card-mode .zam-styleitem:focus-within { outline:2px solid #48b0f7; outline-offset:2px; }
+</style>
 <script>
 (function () {
     var mode = document.getElementById('import-result-card-mode');
     var color = document.getElementById('import-result-card-color');
-    if (mode && color) mode.addEventListener('change', function () { color.hidden = mode.value !== 'custom'; });
+    if (!mode || !color) return;
+    function syncSelection() {
+        var selected = mode.querySelector('input:checked');
+        mode.querySelectorAll('.zam-styleitem').forEach(function (item) {
+            item.classList.toggle('hadchecked', item.querySelector('input').checked);
+        });
+        color.hidden = !selected || selected.value !== 'custom';
+    }
+    mode.addEventListener('change', syncSelection);
+    syncSelection();
 })();
 </script>
 <div class="form-group">
