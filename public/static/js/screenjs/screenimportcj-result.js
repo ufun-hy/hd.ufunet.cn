@@ -14,7 +14,9 @@ define([], function () {
         return probe.style.color;
     }
     function applyCardBackground(host, config) {
-        var color = config.resultcardmode === 'custom' ? safeColor(config.resultcardcolor, host.ownerDocument) : '';
+        var mode = ['gold', 'transparent', 'softgold', 'ivory', 'custom'].indexOf(config.resultcardmode) >= 0 ? config.resultcardmode : 'gold';
+        host.setAttribute('data-card-style', mode);
+        var color = mode === 'custom' ? safeColor(config.resultcardcolor, host.ownerDocument) : '';
         if (color) host.style.setProperty('--import-card-background', color);
         else host.style.removeProperty('--import-card-background');
     }
@@ -233,6 +235,7 @@ define([], function () {
         if (H > maxH) { H = maxH; W = H * ratio; }
         this.width = W; this.height = H;
         var u = this.unit = Math.min(H, W * 9 / 16);
+        this.el.style.setProperty('--u', (u / 100) + 'px');
         this.content.style.width = W + 'px';
         this.content.style.height = H + 'px';
         this.header.style.top = .05 * u + 'px';
@@ -293,7 +296,7 @@ define([], function () {
         var cardW = Math.min(lay.cw, lay.fs * Math.max(3.6, WF[this.fieldCount - 1])), cardH = Math.min(lay.ch, lay.fs * HF[this.fieldCount - 1]);
         inner.style.cssText = 'width:' + (lay.c * cardW + (lay.c - 1) * lay.g) + 'px;gap:' + lay.g + 'px';
         inner.querySelectorAll('.import-result-card').forEach(function (card) {
-            card.style.cssText = '--fs:' + lay.fs + 'px;width:' + cardW + 'px;height:' + cardH + 'px;border-width:' + Math.max(2, H * .003) + 'px;border-radius:' + Math.min(28, cardH * .1) + 'px';
+            card.style.cssText = '--fs:' + lay.fs + 'px;width:' + cardW + 'px;height:' + cardH + 'px;--import-card-border-size:' + Math.max(2, H * .003) + 'px;border-radius:' + Math.min(28, cardH * .1) + 'px';
             card.querySelector('.import-result-main').style.fontSize = lay.fs + 'px';
         });
     };
@@ -302,6 +305,7 @@ define([], function () {
         this.content.querySelectorAll('.import-result-particle').forEach(function (p) { p.remove(); });
         var page = this.pages[this.pageIndex], self = this;
         this.renderedPage = page;
+        this.el.classList.toggle('has-many-cards', !!page && page.winners.length > 6);
         this.setHeading(page && page.group);
         this.pager.textContent = this.pages.length > 1 ? '第 ' + (this.pageIndex + 1) + ' / ' + this.pages.length + ' 页' : '';
         if (!page) { this.board.appendChild(this.element('div', 'import-result-empty', '暂无中奖结果')); return; }

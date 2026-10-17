@@ -40,7 +40,9 @@ define(['screenjs/screen-stage-ui', 'screenjs/screenimportcj-result'], function 
                 content.scrollTop = 0;
                 var data = status === 'loading' || status === 'error' ? values :
                     resultView.selectFields(values || [], options.resultConfig || {}, options.fieldConfig || []);
-                return setRecords.call(this, data, status);
+                setRecords.call(this, data, status);
+                this.recordsDrawer.classList.toggle('has-many-cards', this.recordsListWrap.querySelectorAll('.import-record-card').length > 6);
+                return this;
             };
             ui.mount = function () {
                 mount.call(this);
