@@ -6,6 +6,19 @@ define([], function () {
         return /^[1-4]$/.test(String(value)) ? Number(value) - 1 : fallback;
     }
 
+    function safeColor(value, doc) {
+        var color = text(value);
+        if (!color || color.length > 64 || /[;"'{}]/.test(color) || /var\s*\(|url\s*\(|^(inherit|initial|unset|revert|revert-layer|currentcolor)$/i.test(color)) return '';
+        var probe = doc.createElement('span');
+        probe.style.color = color;
+        return probe.style.color;
+    }
+    function applyCardBackground(host, config) {
+        var color = config.resultcardmode === 'custom' ? safeColor(config.resultcardcolor, host.ownerDocument) : '';
+        if (color) host.style.setProperty('--import-card-background', color);
+        else host.style.removeProperty('--import-card-background');
+    }
+
     // Never modify the controller's result objects or undo its privacy masking.
     function selectFields(value, config, fieldConfig) {
         if (Array.isArray(value)) return value.map(function (item) { return selectFields(item, config, fieldConfig); });
@@ -45,7 +58,7 @@ define([], function () {
         }
         copy.name = fields[primary] || '信息缺失';
         copy.displayFields = [primary].concat(extras.filter(function (i) { return i !== primary; })).map(function (i, slot) {
-            return { index: i, label: text(fieldConfig && fieldConfig[i] && fieldConfig[i].fieldname) || '字段' + (i + 1), value: fields[i] || (slot ? '—' : '信息缺失') };
+            return { index: i, color: fieldConfig && fieldConfig[i] && fieldConfig[i].fieldcolor, label: text(fieldConfig && fieldConfig[i] && fieldConfig[i].fieldname) || '字段' + (i + 1), value: fields[i] || (slot ? '—' : '信息缺失') };
         });
         copy.extras = copy.displayFields.slice(1).map(function (field) { return field.value; });
         return copy;
@@ -57,6 +70,7 @@ define([], function () {
             var field = winner.displayFields[Number(node.getAttribute('data-field-value'))];
             node.textContent = field.value;
             node.title = field.value;
+            node.style.color = safeColor(field.color, card.ownerDocument);
         });
     }
     function appendFields(card, winner, prefix, pending) {
@@ -127,6 +141,7 @@ define([], function () {
     ResultView.prototype.mount = function () {
         var self = this;
         this.el = this.element('section', 'import-result');
+        applyCardBackground(this.el, this.config);
         this.el.setAttribute('aria-label', '中奖结果');
         this.el.hidden = true;
         this.content = this.element('div', 'import-result-content');
@@ -366,5 +381,5 @@ define([], function () {
         this.el.remove();
         this.active = false;
     };
-    return { create: function (options) { return new ResultView(options); }, selectFields: selectFields, appendFields: appendFields };
+    return { create: function (options) { return new ResultView(options); }, selectFields: selectFields, appendFields: appendFields, applyCardBackground: applyCardBackground };
 });

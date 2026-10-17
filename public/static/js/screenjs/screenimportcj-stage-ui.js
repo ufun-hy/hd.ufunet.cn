@@ -56,6 +56,7 @@ define(['screenjs/screen-stage-ui', 'screenjs/screenimportcj-result'], function 
                 var self = this, drawer = this.recordsDrawer;
                 if (drawer) {
                     drawer.classList.add('import-records');
+                    resultView.applyCardBackground(drawer, options.resultConfig || {});
                     var panel = drawer.querySelector('.screen-stage-records-drawer');
                     var content = drawer.querySelector('.screen-stage-records-content');
                     var top = this.importRecordTop = drawer.ownerDocument.createElement('button');

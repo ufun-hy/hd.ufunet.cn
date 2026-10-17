@@ -50,3 +50,11 @@
 - `resize-checks.mjs` 检查 912 组连续宽度、跨页尺寸、CSS zoom、控制台避让、透明背景及控制台与共享组件样式一致。
 
 字段配置继续沿用既有 `styleconfig[resultmainfield]` 与 `styleconfig[resultextra1/2/3]`。本地没有 PHP 运行环境且现有控制器加密，字段配置的服务端保存/回读仍需测试环境验证。
+
+## 卡片与字段颜色
+
+后台“中奖结果展示”新增卡片背景模式：默认金色渐变（旧配置未设置时沿用）或自定义纯色；`styleconfig[resultcardmode]` / `styleconfig[resultcardcolor]` 同时作用于结果及记录卡片。
+字段内容复用 `fieldconfig[].fieldcolor`，按原字段索引携带颜色，主字段回退及重新排序后仍正确对应；标签颜色保留默认深棕。颜色无效时使用原样式。舞台背景和控制台不受影响。
+预览支持 `?fields=4&cardcolor=%23e6f0ff&fieldcolors=%23112233,%23445566,%23778899,%23123456`，添加 `&records=1` 查看记录。
+`color-checks.mjs` 验证两页自定义背景、默认渐变、字段重排/空值回退的颜色、无效输入、分页、缩放、返回、即时揭晓和共享组件隔离。
+后台新增字段的保存回读仍需在可登录环境验证；本地没有 PHP 运行环境，未修改或调用后台保存接口。

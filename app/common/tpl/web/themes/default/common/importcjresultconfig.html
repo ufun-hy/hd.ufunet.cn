@@ -1,5 +1,25 @@
 <div class="config-titlebox"><span class="config-titlename">中奖结果展示</span></div>
 <div class="form-group">
+    <label class="col-lg-2 control-label" for="import-result-card-mode">卡片背景</label>
+    <div class="col-lg-8">
+        <select id="import-result-card-mode" class="form-control" name="styleconfig[resultcardmode]">
+            <option value="gold" {if ($config['styleconfig']['resultcardmode']??'gold') != 'custom'}selected{/if}>默认金色渐变</option>
+            <option value="custom" {if ($config['styleconfig']['resultcardmode']??'gold') == 'custom'}selected{/if}>自定义颜色</option>
+        </select>
+        <div id="import-result-card-color" style="margin-top:10px" {if ($config['styleconfig']['resultcardmode']??'gold') != 'custom'}hidden{/if}>
+            {:tpl_color('styleconfig[resultcardcolor]',$config['styleconfig']['resultcardcolor']??'#e8b04a')}
+        </div>
+        <span class="help-block">同时应用于中奖结果和中奖记录的卡片背景。字段内容使用上方“数据结构”中对应字段的颜色，请搭配清晰可读的文字颜色。</span>
+    </div>
+</div>
+<script>
+(function () {
+    var mode = document.getElementById('import-result-card-mode');
+    var color = document.getElementById('import-result-card-color');
+    if (mode && color) mode.addEventListener('change', function () { color.hidden = mode.value !== 'custom'; });
+})();
+</script>
+<div class="form-group">
     <label class="col-lg-2 control-label" for="import-result-main-field">主字段</label>
     <div class="col-lg-8">
         <select id="import-result-main-field" class="form-control" name="styleconfig[resultmainfield]">

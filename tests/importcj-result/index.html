@@ -4,7 +4,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>导入抽奖结果 · 本地隔离预览</title>
 <link rel="stylesheet" href="/public/static/css/screencss/screen-stage-ui.css">
-<link rel="stylesheet" href="/public/static/css/screencss/screenimportcj-stage-ui.css?v=20261017-multifield">
+<link rel="stylesheet" href="/public/static/css/screencss/screenimportcj-stage-ui.css?v=20261017-card-color">
 <style>
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#28172a}
 .importcj-mainbox{position:relative;width:100%;height:100%}
@@ -14,12 +14,12 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#28172a}
 <div class="importcj-mainbox"><div class="fixture-ready">准备界面 · 原有背景</div></div>
 <script src="/public/static/js/require.js"></script>
 <script>
-require.config({baseUrl:'/public/static/js',urlArgs:'v=20261017-multifield'});
+require.config({baseUrl:'/public/static/js',urlArgs:'v=20261017-card-color'});
 require(['screenjs/screenimportcj-stage-ui','screenjs/screen-stage-ui'],function(importStage,sharedStage){
-    window.showResult=function(count,kind,config,fieldCount){
+    window.showResult=function(count,kind,config,fieldCount,fieldColors){
         if(window.ui) window.ui.destroy();
         var source=kind==='message'?sharedStage:importStage;
-        window.ui=source.create({root:document.querySelector('.importcj-mainbox'),resultConfig:config||{},fieldConfig:fieldCount? ["座位号","姓名","部门","编号"].slice(0,fieldCount).map(function(fieldname){return {fieldname:fieldname};}):[],speedEnabled:false,messageWinnerDetails:kind==='message',callbacks:{
+        window.ui=source.create({root:document.querySelector('.importcj-mainbox'),resultConfig:config||{},fieldConfig:fieldCount? ["座位号","姓名","部门","编号"].slice(0,fieldCount).map(function(fieldname,i){return {fieldname:fieldname,fieldcolor:(fieldColors||[])[i]};}):[],speedEnabled:false,messageWinnerDetails:kind==='message',callbacks:{
             onPrimaryAction:function(){ui.setState('ready');},
             onRecords:function(){ui.setRecords(window.fixtureInput, 'result');ui.setState('records');},
             onRecordsClose:function(){ui.setState('result');}
@@ -40,7 +40,7 @@ require(['screenjs/screenimportcj-stage-ui','screenjs/screen-stage-ui'],function
         return true;
     };
     var p=new URLSearchParams(location.search);
-    showResult(Number(p.get('count')||3),p.get('kind')||'',{},Number(p.get('fields')||0));
+    showResult(Number(p.get('count')||3),p.get('kind')||'',p.has('cardcolor')?{resultcardmode:'custom',resultcardcolor:p.get('cardcolor')}:{},Number(p.get('fields')||0),(p.get('fieldcolors')||'').split(','));
     if(p.get('records')) {ui.setRecords(fixtureInput);ui.setState('records');}
     if(p.get('zoom')) {var z=Number(p.get('zoom'));document.querySelector('.importcj-mainbox').style.cssText='zoom:'+z+';width:'+(100/z)+'vw;height:'+(100/z)+'vh';}
 });
