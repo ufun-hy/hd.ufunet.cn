@@ -26,10 +26,10 @@ const checks=await page.evaluate(async()=>{
         const first=controller.stopLottery(),second=controller.stopLottery();callbacks.forEach(fn=>fn());
         const card=ui.importResult.board.querySelector('.import-result-card');
         results.push({flytype,first,second,resultsShown,stops,videoPlays,videoPauses,legacyWrites,scrolls,
-            concealed:getComputedStyle(card).visibility==='hidden'&&card.textContent==='',state:controller.isstart});
+            immediate:getComputedStyle(card).visibility==='visible'&&card.textContent==='A09020902'&&card.classList.contains('done'),state:controller.isstart});
     }
     showResult(3);return results;
 });
 console.log(checks);
-for(const c of checks){assert.equal(c.first,true);assert.equal(c.second,false);assert.equal(c.resultsShown,1);assert.equal(c.videoPlays,0);assert.equal(c.videoPauses,1);assert.equal(c.legacyWrites,0);assert.equal(c.scrolls,0);assert.equal(c.concealed,true);assert.equal(c.state,'3');}
+for(const c of checks){assert.equal(c.first,true);assert.equal(c.second,false);assert.equal(c.resultsShown,1);assert.equal(c.videoPlays,0);assert.equal(c.videoPauses,1);assert.equal(c.legacyWrites,0);assert.equal(c.scrolls,0);assert.equal(c.immediate,true);assert.equal(c.state,'3');}
 console.log('PASS: real stopLottery path, one result renderer, no legacy video or hidden result animation, repeat stop ignored');

@@ -225,9 +225,9 @@ define([], function () {
         this.stopAll();
         this.render(reveal, false);
         this.firstReveal = false;
-        // Same first-rotation timing as the demo, including the 4s interval after startup.
+        // Keep the reading time after reveal, without the demo's removed number-roll delay.
         var count = pages[this.pageIndex] ? pages[this.pageIndex].winners.length : 0;
-        var delay = count && reveal && !this.reducedMotion() ? 1200 + count * Math.min(380, 2200 / count) + 2500 : 0;
+        var delay = count && reveal && !this.reducedMotion() ? count * Math.min(380, 2200 / count) + 2500 : 0;
         this.startRotation(delay);
         this.layoutSize = this.sizeKey();
     };
@@ -256,7 +256,7 @@ define([], function () {
         if (!page) { this.board.appendChild(this.element('div', 'import-result-empty', '暂无中奖结果')); return; }
         var inner = this.element('div', 'import-result-inner');
         this.board.appendChild(inner);
-        var reduced = this.reducedMotion(), count = page.winners.length;
+        var reduced = this.reducedMotion(), count = page.winners.length, reveals = [];
         this.revealInProgress = reveal && !reduced;
         page.winners.forEach(function (winner, i) {
             var pending = reveal && !reduced && !self.revealedWinners.has(winner);
@@ -271,7 +271,7 @@ define([], function () {
                 card.appendChild(extra);
             });
             inner.appendChild(card);
-            if (pending) self.later(function () {
+            if (pending) reveals.push({ delay: i * Math.min(380, 2200 / count), run: function () {
                 main.textContent = winner.name;
                 card.querySelectorAll('.import-result-extra').forEach(function (extra, index) { extra.textContent = winner.extras[index]; });
                 card.removeAttribute('aria-hidden');
@@ -280,9 +280,14 @@ define([], function () {
                 self.revealedWinners.add(winner);
                 if (!self.board.querySelector('.is-pending')) self.revealInProgress = false;
                 if (i < 12) self.burst(card, count > 6 ? 8 : 14);
-            }, 1200 + i * Math.min(380, 2200 / count));
+            } });
         });
         this.sizeCards();
+        reveals.forEach(function (effect) {
+            // The first card enters in this render, not after a timer or a blank frame.
+            if (!effect.delay) effect.run();
+            else self.later(effect.run, effect.delay);
+        });
         if (!this.board.querySelector('.is-pending')) this.revealInProgress = false;
     };
     ResultView.prototype.burst = function (card, count) {
