@@ -1390,6 +1390,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 		stopLottery: function () {
 			var self = this, luckerList = self.currentLuckerList, luckerHtml = self.currentLuckerHtml;
 			if (self.isstart != '2' || self.getVisualState() != 'drawing') return false;
+			var dedicatedResult = !!(self.stageUi && self.stageUi.importResult);
 			if (self.flytype == '1' || self.flytype == '5' || self.flytype == '6') {
 				var prizeOne = self.prizeInfo[self.prizeIndex] || {}, stoptype = prizeOne.stoptype || '1';
 				if (stoptype == '1' || isroundcj == '1') {
@@ -1405,8 +1406,8 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 				self.stageStop = true;
 			}
 			if (self.stageUi) self.stageUi.setResult(luckerList, self.getPrize());
-			$(".importcj-luckerbox-lists").html(luckerHtml);
-			if (isroundcj == '1') {
+			if (!dedicatedResult) $(".importcj-luckerbox-lists").html(luckerHtml);
+			if (!dedicatedResult && isroundcj == '1') {
 				var style = self.prizeInfo[self.prizeIndex].style || {};
 				var width = $(".importcj-luckerbox-lists").width() - 20, cols = style.rows || 8;
 				$(".prizelucklist ul li").css({ width: (width / cols) + 'px' });
@@ -1416,7 +1417,10 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 			$(".importcj-mainbox").removeClass('isdrawing').addClass('isdrawed');
 			$(".btn-start").text('关闭');
 			var firevideo2 = $(".firevideo2");
-			if (firevideo2.length) {
+			if (dedicatedResult && firevideo2.length) {
+				firevideo2.unbind('ended').hide();
+				firevideo2[0].pause();
+			} else if (firevideo2.length) {
 				firevideo2.show();
 				firevideo2[0].play();
 				firevideo2.unbind('ended').bind('ended', function () { firevideo2.hide(); });
@@ -1426,7 +1430,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 			if (self.stageUi || self.flytype == '6') self.setVisualState('result');
 			if ($("#cjingmusic").length) { $("#cjingmusic")[0].currentTime = 0; $("#cjingmusic")[0].pause(); }
 			if ($("#cjendmusic").length) $("#cjendmusic")[0].play();
-			if (isautoscroll == '1') setTimeout(function () { self.initautoScroll('.importcj-luckerbox-content'); }, 2e3);
+			if (!dedicatedResult && isautoscroll == '1') setTimeout(function () { self.initautoScroll('.importcj-luckerbox-content'); }, 2e3);
 			return true;
 		},
 		closeResult: function () {

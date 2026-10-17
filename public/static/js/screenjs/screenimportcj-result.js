@@ -69,6 +69,8 @@ define([], function () {
         this.total = 0;
         this.active = false;
         this.firstReveal = false;
+        this.revealInProgress = false;
+        this.revealedWinners = new Set();
         this.timers = [];
         this.rotation = null;
         this.resizeTimer = null;
@@ -120,7 +122,9 @@ define([], function () {
         this.onVisibility = function () {
             if (!self.active) return;
             self.stopAll();
-            if (!self.doc.hidden) { self.render(false); self.startRotation(); }
+            self.revealInProgress = false;
+            self.renderedPage = null;
+            if (!self.doc.hidden) { self.render(false, false); self.startRotation(); }
         };
         this.win.addEventListener('resize', this.onResize);
         this.doc.addEventListener('visibilitychange', this.onVisibility);
@@ -141,6 +145,9 @@ define([], function () {
         this.total = this.groups.reduce(function (count, group) { return count + group.winners.length; }, 0);
         this.pageIndex = 0;
         this.pages = [];
+        this.renderedPage = null;
+        this.revealInProgress = false;
+        this.revealedWinners.clear();
         this.firstReveal = true;
         if (this.active) this.layout();
     };
@@ -149,7 +156,7 @@ define([], function () {
         this.active = active;
         this.el.hidden = !active;
         if (active) this.layout();
-        else this.stopAll();
+        else { this.stopAll(); this.revealInProgress = false; this.renderedPage = null; }
     };
     ResultView.prototype.sizeKey = function () {
         var dock = this.host.querySelector('.screen-stage-dock');
@@ -166,7 +173,6 @@ define([], function () {
     };
     ResultView.prototype.layout = function () {
         if (!this.active || !this.host.clientWidth || !this.host.clientHeight) return;
-        this.stopAll();
         // The existing control dock occupies the demo's external toolbar area.
         var dock = this.host.querySelector('.screen-stage-dock');
         var ratio = this.host.clientWidth / this.host.clientHeight;
@@ -204,51 +210,80 @@ define([], function () {
         this.pageIndex = old ? Math.max(0, pages.findIndex(function (page) {
             return page.groupIndex === old.groupIndex && page.start <= old.start && page.start + page.winners.length > old.start;
         })) : 0;
-        var reveal = this.firstReveal && !this.doc.hidden;
-        this.render(reveal);
+        var reveal = (this.firstReveal || this.revealInProgress) && !this.doc.hidden;
+        var page = pages[this.pageIndex], previous = this.renderedPage;
+        var samePage = previous && page && previous.group === page.group && previous.start === page.start && previous.winners.length === page.winners.length;
+        if (samePage) {
+            // A resize or dock adjustment must not replace nodes or restart their effects.
+            this.setHeading(page.group);
+            this.pager.textContent = this.pages.length > 1 ? '第 ' + (this.pageIndex + 1) + ' / ' + this.pages.length + ' 页' : '';
+            this.sizeCards();
+            this.renderedPage = page;
+            this.layoutSize = this.sizeKey();
+            return;
+        }
+        this.stopAll();
+        this.render(reveal, false);
         this.firstReveal = false;
         // Same first-rotation timing as the demo, including the 4s interval after startup.
         var count = pages[this.pageIndex] ? pages[this.pageIndex].winners.length : 0;
-        var delay = reveal && !this.reducedMotion() ? 1200 + count * Math.min(380, 2200 / count) + 2500 : 0;
+        var delay = count && reveal && !this.reducedMotion() ? 1200 + count * Math.min(380, 2200 / count) + 2500 : 0;
         this.startRotation(delay);
         this.layoutSize = this.sizeKey();
     };
     ResultView.prototype.reducedMotion = function () {
         return this.win.matchMedia && this.win.matchMedia('(prefers-reduced-motion: reduce)').matches;
     };
-    ResultView.prototype.render = function (reveal) {
+    ResultView.prototype.sizeCards = function () {
+        var lay = this.cardLayout, H = this.height;
+        var inner = this.board.querySelector('.import-result-inner');
+        if (!lay || !inner) return;
+        var cardW = Math.min(lay.cw, lay.fs * 3.6), cardH = Math.min(lay.ch, lay.fs * 2);
+        inner.style.cssText = 'width:' + (lay.c * cardW + (lay.c - 1) * lay.g) + 'px;gap:' + lay.g + 'px';
+        inner.querySelectorAll('.import-result-card').forEach(function (card) {
+            card.style.cssText = 'width:' + cardW + 'px;height:' + cardH + 'px;border-width:' + Math.max(2, H * .003) + 'px;border-radius:' + Math.min(28, cardH * .12) + 'px';
+            card.querySelector('.import-result-main').style.fontSize = lay.fs + 'px';
+            card.querySelectorAll('.import-result-extra').forEach(function (extra) { extra.style.fontSize = Math.max(12, lay.fs * .3) + 'px'; });
+        });
+    };
+    ResultView.prototype.render = function (reveal, pageTransition) {
         this.board.textContent = '';
         this.content.querySelectorAll('.import-result-particle').forEach(function (p) { p.remove(); });
         var page = this.pages[this.pageIndex], self = this;
+        this.renderedPage = page;
         this.setHeading(page && page.group);
         this.pager.textContent = this.pages.length > 1 ? '第 ' + (this.pageIndex + 1) + ' / ' + this.pages.length + ' 页' : '';
         if (!page) { this.board.appendChild(this.element('div', 'import-result-empty', '暂无中奖结果')); return; }
-        var lay = this.cardLayout, H = this.height;
-        var cardW = Math.min(lay.cw, lay.fs * 3.6), cardH = Math.min(lay.ch, lay.fs * 2);
         var inner = this.element('div', 'import-result-inner');
-        inner.style.cssText = 'width:' + (lay.c * cardW + (lay.c - 1) * lay.g) + 'px;gap:' + lay.g + 'px';
         this.board.appendChild(inner);
         var reduced = this.reducedMotion(), count = page.winners.length;
+        this.revealInProgress = reveal && !reduced;
         page.winners.forEach(function (winner, i) {
-            var card = self.element('div', 'import-result-card' + (reveal && !reduced ? ' rolling' : (!reduced ? ' done' : '')));
+            var pending = reveal && !reduced && !self.revealedWinners.has(winner);
+            var card = self.element('div', 'import-result-card' + (pending ? ' is-pending' : (pageTransition && !reduced ? ' done' : '')));
             card.setAttribute('role', 'listitem');
-            card.style.cssText = 'width:' + cardW + 'px;height:' + cardH + 'px;border-width:' + Math.max(2, H * .003) + 'px;border-radius:' + Math.min(28, cardH * .12) + 'px';
-            // Final server values only: no random-number interval from the demo.
-            var main = self.element('div', 'import-result-main', winner.name);
-            main.style.fontSize = lay.fs + 'px';
+            if (pending) card.setAttribute('aria-hidden', 'true');
+            // Keep the complete card concealed and its fields empty until its reveal.
+            var main = self.element('div', 'import-result-main', pending ? '' : winner.name);
             card.appendChild(main);
             winner.extras.forEach(function (value) {
-                var extra = self.element('div', 'import-result-extra', value);
-                extra.style.fontSize = Math.max(12, lay.fs * .3) + 'px';
+                var extra = self.element('div', 'import-result-extra', pending ? '' : value);
                 card.appendChild(extra);
             });
             inner.appendChild(card);
-            if (reveal && !reduced) self.later(function () {
-                card.classList.remove('rolling');
+            if (pending) self.later(function () {
+                main.textContent = winner.name;
+                card.querySelectorAll('.import-result-extra').forEach(function (extra, index) { extra.textContent = winner.extras[index]; });
+                card.removeAttribute('aria-hidden');
+                card.classList.remove('is-pending');
                 card.classList.add('done', 'sw');
+                self.revealedWinners.add(winner);
+                if (!self.board.querySelector('.is-pending')) self.revealInProgress = false;
                 if (i < 12) self.burst(card, count > 6 ? 8 : 14);
             }, 1200 + i * Math.min(380, 2200 / count));
         });
+        this.sizeCards();
+        if (!this.board.querySelector('.is-pending')) this.revealInProgress = false;
     };
     ResultView.prototype.burst = function (card, count) {
         var r = card.getBoundingClientRect(), f = this.content.getBoundingClientRect();
@@ -272,7 +307,7 @@ define([], function () {
         function start() {
             self.rotation = self.win.setInterval(function () {
                 self.pageIndex = (self.pageIndex + 1) % self.pages.length;
-                self.render(false);
+                self.render(false, true);
             }, 4000);
         }
         if (delay) this.later(start, delay); else start();

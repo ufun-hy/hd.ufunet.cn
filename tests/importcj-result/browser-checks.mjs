@@ -1,6 +1,7 @@
 // Compare the integrated component with the user's actual reference HTML, not a second layout implementation.
 const {strict:assert}=await import('node:assert');
 const task=await taskSpace(globalThis.RESULT_TEST_SPACE),page=task.page('p1');
+await page.cdp('Network.enable');await page.cdp('Network.setCacheDisabled',{cacheDisabled:true});
 await page.goto('http://127.0.0.1:8767/tests/importcj-result/');
 await page.waitForFunction(()=>window.showResult&&ui.importResult);
 const result=await page.evaluate(async()=>{
@@ -46,16 +47,16 @@ console.log(result);assert.deepEqual(result.errors,[]);
 const edge=await page.evaluate(()=>{
     const out={};
     showResult(3);out.header=!ui.importResult.header.querySelector('.import-result-award,.import-result-count')&&ui.importResult.title.textContent.includes('小米');
-    showResult(1,'zero');out.zero=ui.importResult.pages[0].winners[0].name==='0'&&ui.importResult.el.textContent.includes('000012');
-    showResult(1,'empty');out.empty=ui.importResult.el.textContent.includes('信息缺失');
-    showResult(1,'xss');out.xss=!ui.importResult.board.querySelector('img,script');
+    showResult(1,'zero');ui.importResult.render(false);out.zero=ui.importResult.pages[0].winners[0].name==='0'&&ui.importResult.el.textContent.includes('000012');
+    showResult(1,'empty');ui.importResult.render(false);out.empty=ui.importResult.el.textContent.includes('信息缺失');
+    showResult(1,'xss');ui.importResult.render(false);out.xss=!ui.importResult.board.querySelector('img,script');
     showResult(3,'',{resultmainfield:'2',resultextra1:'1',resultextra2:'1',resultextra3:'0'});
     out.mapping=ui.importResult.pages[0].winners[0].name==='020902'&&JSON.stringify(ui.importResult.pages[0].winners[0].extras)==='["A09"]';
     showResult(31,'groups');let r=ui.importResult;r.stopAll();
     const widths=[];for(let p=0;p<r.pages.length;p++){r.pageIndex=p;r.render(false);widths.push(r.board.querySelector('.import-result-card').style.width);}
     out.groups=new Set(widths).size===1&&r.total===31&&r.pages[0].group.awardname==='一等奖'&&r.pages[1].group.awardname==='二等奖';
     const index=r.pageIndex;ui.setState('records');out.records=r.rotation===null&&r.timers.length===0&&r.el.hidden;
-    ui.setState('result');out.return=r.pageIndex===index&&!r.el.querySelector('.rolling,.sw');
+    ui.setState('result');out.return=r.pageIndex===index&&!r.el.querySelector('.is-pending,.done,.sw');
     ui.setState('ready');out.ready=r.el.hidden&&r.rotation===null&&r.timers.length===0;
     showResult(3,'message');out.message=!ui.importResult&&!!ui.resultPanel.querySelector('.screen-stage-result-avatar')&&ui.resultPanel.textContent.includes('留言内容保持原样');
     showResult(31);r=ui.importResult;ui.destroy();out.destroy=r.rotation===null&&r.timers.length===0&&!document.querySelector('.import-result');

@@ -1,5 +1,6 @@
 const {strict:assert}=await import('node:assert');
 const task=await taskSpace(globalThis.RESULT_TEST_SPACE),page=task.page('p1');
+await page.cdp('Network.enable');await page.cdp('Network.setCacheDisabled',{cacheDisabled:true});
 await page.goto('http://127.0.0.1:8767/tests/importcj-result/');
 await page.waitForFunction(()=>window.showResult&&ui.importResult);
 const result=await page.evaluate(()=>{
