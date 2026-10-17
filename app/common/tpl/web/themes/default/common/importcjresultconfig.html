@@ -7,7 +7,7 @@
             <option value="{$fieldIndex+1}" {if ($config['styleconfig']['resultmainfield']??'1') == ($fieldIndex+1)}selected{/if}>{$field['fieldname']}</option>
             {/foreach}
         </select>
-        <span class="help-block">仅影响最终中奖结果。主字段放大显示，卡片不显示字段名称；保留已有隐私遮罩。主字段为空时使用已选其他字段中的第一个非空值。</span>
+        <span class="help-block">中奖结果和中奖记录共用此配置。第 1 个字段最大，第 2 个字段次之，第 3、4 个字段在底部显示字段名称；保留已有隐私遮罩。主字段为空时使用已选其他字段中的第一个非空值。</span>
     </div>
 </div>
 <div class="form-group">
@@ -46,4 +46,4 @@
         </select>
     </div>
 </div>
-<p class="help-block">结果按屏幕尺寸和人数自动布局，分页时每 4 秒翻页。其他字段按 1、2、3 顺序展示，重复选择只显示一次，空值不占位。</p>
+<p class="help-block">结果按屏幕尺寸和人数自动布局，分页时每 4 秒翻页。其他字段按 1、2、3 顺序展示，重复选择只显示一次，按实际启用的字段数使用 1、2、3、4 字段布局，未启用的字段不占位。</p>

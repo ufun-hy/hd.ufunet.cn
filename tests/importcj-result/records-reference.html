@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>中奖记录（金色·多字段）</title>
+<style>
+:root{color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--gold:#f0c96b;--gold2:#ffe29a;--brown:#3a1c06;--brown2:#6b3d10;--line:rgba(240,201,107,.32)}
+*{box-sizing:border-box}
+html,body{margin:0;background:#120803;font-family:'PingFang SC','Microsoft YaHei',sans-serif;color:#fff}
+#stage{position:relative;overflow:hidden;margin:0 auto;background:radial-gradient(ellipse 80% 90% at 30% 50%,#9a5a16,#5a2e0a 60%,#1f0e03)}
+#bokeh{position:absolute;inset:0;filter:blur(calc(var(--u)*.6));opacity:.8;
+ background:radial-gradient(circle calc(var(--u)*5) at 10% 80%,rgba(255,214,128,.5),transparent),radial-gradient(circle calc(var(--u)*3.5) at 22% 92%,rgba(255,214,128,.35),transparent),radial-gradient(circle calc(var(--u)*5) at 60% 10%,rgba(255,196,84,.3),transparent)}
+#dim{position:absolute;inset:0;background:rgba(20,8,2,.45);transition:opacity .3s}
+#reopen{position:absolute;left:calc(var(--u)*4);top:calc(var(--u)*4);font:inherit;font-weight:800;font-size:calc(var(--u)*2.4);padding:calc(var(--u)*1.2) calc(var(--u)*2.8);border-radius:calc(var(--u)*3);border:1px solid var(--gold);background:linear-gradient(160deg,var(--gold2),#d9a03a);color:var(--brown);cursor:pointer;display:none}
+#panel{position:absolute;top:0;right:0;bottom:0;width:min(50%,calc(var(--u)*92));display:flex;flex-direction:column;background:linear-gradient(180deg,#2b1608,#190a03);border-left:1px solid var(--line);box-shadow:-30px 0 70px rgba(0,0,0,.55);transition:transform .45s cubic-bezier(.2,.9,.3,1)}
+#panel.closed{transform:translateX(105%)}
+.portrait #panel{width:94%}
+header{display:flex;align-items:center;gap:calc(var(--u)*1.6);padding:calc(var(--u)*3) calc(var(--u)*3.2) calc(var(--u)*2.4);border-bottom:1px solid var(--line)}
+.eyebrow{font-size:calc(var(--u)*1.5);letter-spacing:.22em;color:var(--gold);font-weight:700}
+h1{margin:calc(var(--u)*.4) 0 0;font-size:calc(var(--u)*4.2);font-weight:900;letter-spacing:.04em;color:#fff3d6}
+.sp{flex:1}
+.count{font-size:calc(var(--u)*2.3);font-weight:900;color:var(--brown);padding:calc(var(--u)*.7) calc(var(--u)*2);border-radius:calc(var(--u)*3);background:linear-gradient(160deg,var(--gold2),#d9a03a)}
+#close{width:calc(var(--u)*4.6);height:calc(var(--u)*4.6);border-radius:50%;border:1px solid var(--gold);background:transparent;color:var(--gold2);font-size:calc(var(--u)*2.2);cursor:pointer;line-height:1}
+#list{flex:1;overflow-y:auto;padding:calc(var(--u)*2.6) calc(var(--u)*3.2) calc(var(--u)*5);scrollbar-width:thin;scrollbar-color:rgba(240,201,107,.5) transparent}
+.gh{display:flex;align-items:center;gap:calc(var(--u)*1.4);margin:calc(var(--u)*2.4) 0 calc(var(--u)*1.4)}
+.gh:first-child{margin-top:0}
+.gh b{font-size:calc(var(--u)*2.3);font-weight:900;padding:calc(var(--u)*.4) calc(var(--u)*1.6);border-radius:calc(var(--u)*2);background:rgba(240,201,107,.16);color:var(--gold2);border:1px solid var(--line)}
+.gh span{font-size:calc(var(--u)*1.8);color:#d9c08a;font-weight:700}
+.gh i{flex:1;height:1px;background:var(--line)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:calc(var(--u)*1.6);align-items:start}
+.portrait .grid{grid-template-columns:1fr}
+.t{padding:calc(var(--u)*1.9) calc(var(--u)*2.2);border-radius:calc(var(--u)*1.4);border:2px solid #fff3c4;background:linear-gradient(160deg,#ffe29a,#e8b04a 55%,#c98a25);color:var(--brown);box-shadow:0 0 calc(var(--u)*2.4) rgba(255,190,70,.3),0 calc(var(--u)*.8) calc(var(--u)*1.6) rgba(0,0,0,.3);font-variant-numeric:tabular-nums;opacity:0;animation:in .45s ease-out forwards;min-width:0}
+.t .p{font-size:calc(var(--u)*4.2);font-weight:900;line-height:1.05;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.t.f1{text-align:center}
+.t.f1 .p{font-size:calc(var(--u)*5.4)}
+.t .s2{margin-top:calc(var(--u)*.6);font-size:calc(var(--u)*2.7);font-weight:800;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.t .ex{margin-top:calc(var(--u)*1.1);padding-top:calc(var(--u)*1);border-top:2px solid rgba(58,28,6,.25);display:grid;grid-template-columns:repeat(var(--k),minmax(0,1fr));gap:calc(var(--u)*1.4)}
+.t .ex div{min-width:0}
+.t .ex em{display:block;font-style:normal;font-size:calc(var(--u)*1.45);color:var(--brown2);font-weight:700;letter-spacing:.06em}
+.t .ex b{display:block;margin-top:calc(var(--u)*.2);font-size:calc(var(--u)*2.1);font-weight:800;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@keyframes in{from{opacity:0;transform:translateY(calc(var(--u)*1.6))}to{opacity:1;transform:none}}
+#top{position:absolute;right:calc(var(--u)*3);bottom:calc(var(--u)*3);width:calc(var(--u)*5.2);height:calc(var(--u)*5.2);border-radius:50%;border:0;background:linear-gradient(160deg,var(--gold2),#d9a03a);color:var(--brown);font-size:calc(var(--u)*2.6);font-weight:900;cursor:pointer;display:none;box-shadow:0 6px 16px rgba(0,0,0,.4)}
+#bar{display:flex;gap:10px 18px;align-items:center;justify-content:center;flex-wrap:wrap;padding:10px 12px;font-size:14px}
+#bar .g{display:flex;gap:6px;align-items:center}
+#bar button.q{font:inherit;font-weight:700;padding:6px 12px;border-radius:6px;border:1px solid var(--gold);background:transparent;color:var(--gold);cursor:pointer}
+#bar button.q.on{background:var(--gold);color:var(--brown)}
+#bar label{display:flex;gap:6px;align-items:center;cursor:pointer}
+#note{width:100%;text-align:center;font-size:13px;color:#d9c08a}
+</style>
+</head>
+<body>
+<div id="stage">
+ <div id="bokeh"></div><div id="dim"></div>
+ <button id="reopen">打开中奖记录</button>
+ <aside id="panel">
+  <header>
+   <div><div class="eyebrow">WINNERS RECORD</div><h1>中奖记录</h1></div>
+   <div class="sp"></div>
+   <div class="count" id="count"></div>
+   <button id="close" aria-label="关闭">✕</button>
+  </header>
+  <div id="list"></div>
+  <button id="top" aria-label="回到顶部">↑</button>
+ </aside>
+</div>
+<div id="bar">
+ <div class="g"><span>字段数</span><span id="qf"></span></div>
+ <div class="g"><span>人数</span><span id="qn"></span></div>
+ <div class="g"><span>屏幕比例</span><span id="qr"></span></div>
+ <label><input type="checkbox" id="grp">按奖项分组（示例分组）</label>
+ <div id="note">第 1 个字段为主（最大），第 2 个为次（中等），第 3、4 个为带标签的小字，与中奖结果页的字段层级一致。</div>
+</div>
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const stage=$('stage'),panel=$('panel'),list=$('list');
+const pad=(x,l=2)=>String(x).padStart(l,'0');
+const NAMES=['张伟','王芳','李娜','刘洋','陈静','杨磊','赵敏','黄强','周杰','吴婷','徐涛','孙丽','马超','朱琳','胡军','郭敏'];
+const DEPTS=['市场部','研发部','财务部','人力资源部','销售部','运营部'];
+const LABELS=['座位号','姓名','部门','编号'];
+const BASE=["V29","V22","A06","A10","A23","V12","A40","A16","V11","V06","A15","A39"];
+const BASESUB=["012907","012205","020605","021007","022303","011207","024008","021603","011104","010604","021502","023902"];
+const RATIOS=[['16:9',16/9],['4:3',4/3],['9:16 竖屏',9/16]];
+let n=12,f=4,ratio=16/9,grp=false;
+function row(i){
+ let seat,sub;
+ if(i<BASE.length){seat=BASE[i];sub=BASESUB[i]}
+ else{const L=i%3?'A':'V',num=1+(i*7+3)%40;seat=L+pad(num);sub=(L==='A'?'02':'01')+pad(num)+pad(1+i%9)}
+ return [seat,NAMES[i%NAMES.length],DEPTS[(i*5+2)%DEPTS.length],sub];
+}
+function card(i){
+ const d=row(i);
+ let h='<div class="t f'+f+'" style="animation-delay:'+Math.min(i*40,600)+'ms"><div class="p">'+d[0]+'</div>';
+ if(f>=2)h+='<div class="s2">'+d[1]+'</div>';
+ if(f>=3){
+  h+='<div class="ex" style="--k:'+(f-2)+'">';
+  for(let j=2;j<f;j++)h+='<div><em>'+LABELS[j]+'</em><b>'+d[j]+'</b></div>';
+  h+='</div>';
+ }
+ return h+'</div>';
+}
+function build(){
+ let h='';
+ if(!grp){
+  h='<div class="grid">';for(let i=0;i<n;i++)h+=card(i);h+='</div>';
+ }else{
+  const a=Math.max(1,Math.round(n*.17)),b=Math.max(1,Math.round(n*.25));
+  [['一等奖',0,a],['二等奖',a,a+b],['三等奖',a+b,n]].forEach(g=>{
+   if(g[2]<=g[1])return;
+   h+='<div class="gh"><b>'+g[0]+'</b><span>'+(g[2]-g[1])+' 人</span><i></i></div><div class="grid">';
+   for(let i=g[1];i<g[2];i++)h+=card(i);
+   h+='</div>';
+  });
+ }
+ list.innerHTML=h;list.scrollTop=0;
+ $('count').textContent='共 '+n+' 人';
+}
+function fit(){
+ const barH=$('bar').offsetHeight;
+ let w=innerWidth,hh=w/ratio,max=innerHeight-barH-6;
+ if(hh>max){hh=max;w=hh*ratio}
+ stage.style.width=w+'px';stage.style.height=hh+'px';
+ stage.style.setProperty('--u',(ratio<1?w*0.0109:Math.min(hh,w*9/16)/100)+'px');
+ stage.classList.toggle('portrait',ratio<1);
+}
+function setOpen(o){
+ panel.classList.toggle('closed',!o);
+ $('reopen').style.display=o?'none':'block';
+ $('dim').style.opacity=o?1:0.2;
+}
+$('close').onclick=()=>setOpen(false);
+$('reopen').onclick=()=>{setOpen(true);build()};
+$('top').onclick=()=>list.scrollTo({top:0,behavior:'smooth'});
+list.addEventListener('scroll',()=>{$('top').style.display=list.scrollTop>200?'block':'none'});
+$('grp').onchange=e=>{grp=e.target.checked;build()};
+[1,2,3,4].forEach(v=>{const b=document.createElement('button');b.className='q';b.textContent=v;b.onclick=()=>{f=v;sync();build()};$('qf').appendChild(b)});
+[12,30,60].forEach(v=>{const b=document.createElement('button');b.className='q';b.textContent=v;b.onclick=()=>{n=v;sync();build()};$('qn').appendChild(b)});
+RATIOS.forEach(([t,v])=>{const b=document.createElement('button');b.className='q';b.textContent=t;b.dataset.r=v;b.onclick=()=>{ratio=v;sync();fit();build()};$('qr').appendChild(b)});
+function sync(){
+ [...$('qf').children].forEach(b=>b.classList.toggle('on',+b.textContent===f));
+ [...$('qn').children].forEach(b=>b.classList.toggle('on',+b.textContent===n));
+ [...$('qr').children].forEach(b=>b.classList.toggle('on',Math.abs(+b.dataset.r-ratio)<1e-6));
+}
+addEventListener('resize',fit);
+sync();fit();build();
+})();
+</script>
+</body>
+</html>

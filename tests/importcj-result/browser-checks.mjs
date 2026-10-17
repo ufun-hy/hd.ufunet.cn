@@ -8,14 +8,14 @@ const result=await page.evaluate(async()=>{
     const source=await (await fetch('./reference.html')).text(),errors=[];
     const sizes=[[1920,1080],[1920,1200],[1024,768],[2560,1080],[1080,1920],[375,812]];
     let scenarios=0;
-    for(const [w,h] of sizes)for(const count of [1,2,3,4,6,10,12,15,20,31,40,60]){
-        ui.root.style.cssText='width:'+w+'px;height:'+h+'px';showResult(count);
+    for(const f of [1,2,3,4])for(const [w,h] of sizes)for(const count of [1,2,3,4,6,10,12,15,20,31,40,60]){
+        ui.root.style.cssText='width:'+w+'px;height:'+h+'px';showResult(count,'',{},f);
         const r=ui.importResult;r.stopAll();
         const occupied=h-ui.stage.querySelector('.screen-stage-dock').offsetTop;
         const ref=document.createElement('iframe');ref.style.cssText='position:absolute;left:-10000px;top:0;border:0;width:'+w+'px;height:'+h+'px';
-        const html=source.replace('let n=3,ratio=16/9,','let n='+count+',ratio='+w+'/'+h+',')
+        const html=source.replace('let n=3,f=4,ratio=16/9,','let n='+count+',f='+f+',ratio='+w+'/'+h+',')
             .replace("const barH=$('bar').offsetHeight;",'const barH='+occupied+';')
-            .replace('const cardW=Math.min(lay.cw,lay.fs*3.6),cardH=Math.min(lay.ch,lay.fs*2.0);','const cardW=Math.min(lay.cw,lay.fs*3.6),cardH=Math.min(lay.ch,lay.fs*2.0);window.expected={W,H,u,m,lay,pages,cardW,cardH};');
+            .replace('grid.style.cssText=', 'window.expected={W,H,u,m,lay,pages,cardW,cardH};grid.style.cssText=');
         await new Promise(resolve=>{ref.onload=resolve;ref.srcdoc=html;document.body.appendChild(ref);});
         const e=ref.contentWindow.expected;
         if(!e)throw Error('Reference did not execute');
@@ -31,7 +31,9 @@ const result=await page.evaluate(async()=>{
                 const rect=c.getBoundingClientRect(),board=r.board.getBoundingClientRect();
                 same(rect.width,e.cardW,'card width');same(rect.height,e.cardH,'card height');
                 same(parseFloat(getComputedStyle(c.querySelector('.import-result-main')).fontSize),e.lay.fs,'main font');
-                same(parseFloat(getComputedStyle(c.querySelector('.import-result-extra')).fontSize),Math.max(12,e.lay.fs*.3),'extra font');
+                if(f>=2)same(parseFloat(getComputedStyle(c.querySelector('.import-result-secondary')).fontSize),e.lay.fs*.5,'secondary font');
+                if(f>=3)same(parseFloat(getComputedStyle(c.querySelector('.import-result-extra')).fontSize),Math.max(13,e.lay.fs*.3),'extra font');
+                if(c.querySelectorAll('[data-field-value]').length!==f)errors.push({f,w,h,count,problem:'wrong field count'});
                 if(rect.left<board.left-1||rect.right>board.right+1||rect.top<board.top-1||rect.bottom>board.bottom+1)errors.push({w,h,count,p,problem:'card outside board'});
             }
             seen.push(...r.pages[p].winners.map(x=>x.recordId));

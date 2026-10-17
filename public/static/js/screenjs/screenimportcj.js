@@ -71,6 +71,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 			self.stageUi = screenimportcjStageUi.create({
 				root: document.querySelector('.importcj-mainbox'),
 				resultConfig: self.resultConfig,
+				fieldConfig: self.fieldconfig,
 				speedEnabled: self.flytype == '6',
 				speedPreset: self.getDanmakuSpeedPreset(),
 				callbacks: {

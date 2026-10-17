@@ -7,14 +7,14 @@ define([], function () {
     }
 
     // Never modify the controller's result objects or undo its privacy masking.
-    function selectFields(value, config) {
-        if (Array.isArray(value)) return value.map(function (item) { return selectFields(item, config); });
+    function selectFields(value, config, fieldConfig) {
+        if (Array.isArray(value)) return value.map(function (item) { return selectFields(item, config, fieldConfig); });
         if (!value || typeof value !== 'object') value = { name: text(value) };
         var copy = {};
         Object.keys(value).forEach(function (key) { copy[key] = value[key]; });
         var grouped = false;
         ['roundawards', 'luckers', 'winners'].forEach(function (key) {
-            if (Array.isArray(value[key])) { copy[key] = selectFields(value[key], config); grouped = true; }
+            if (Array.isArray(value[key])) { copy[key] = selectFields(value[key], config, fieldConfig); grouped = true; }
         });
         if (grouped) {
             // Some round APIs put prize metadata beside luckers rather than inside prize.
@@ -28,31 +28,64 @@ define([], function () {
         }
         var imported = [1, 2, 3, 4].some(function (i) { return Object.prototype.hasOwnProperty.call(value, 'datafield' + i); });
         var fields = imported ? [1, 2, 3, 4].map(function (i) { return text(value['datafield' + i]); }) :
-            [text(value.name || value.nickname || (value.showitems || [])[0])].concat((value.extras || []).map(text));
+            (Array.isArray(value.showitems) && value.showitems.length ? value.showitems.map(text) :
+            [text(value.name == null ? value.nickname : value.name)].concat((value.extras || []).map(text)));
+        var available = [0, 1, 2, 3].filter(function (i) { return fieldConfig && fieldConfig.length ? !!fieldConfig[i] : !!fields[i]; });
         var primary = fieldIndex(config.resultmainfield, 0);
-        var remaining = [0, 1, 2, 3].filter(function (i) { return i !== primary; });
+        var remaining = available.filter(function (i) { return i !== primary; });
         var extras = [];
         for (var slot = 1; slot <= 3; slot++) {
             var selected = config['resultextra' + slot];
             var index = selected === undefined || selected === 'auto' ? remaining[slot - 1] : fieldIndex(selected, -1);
-            if (index >= 0 && index !== primary && extras.indexOf(index) < 0) extras.push(index);
+            if (available.indexOf(index) >= 0 && index !== primary && extras.indexOf(index) < 0) extras.push(index);
         }
         if (!fields[primary]) {
             var fallback = extras.filter(function (i) { return !!fields[i]; });
             if (fallback.length) primary = fallback[0];
         }
         copy.name = fields[primary] || '信息缺失';
-        copy.extras = extras.filter(function (i) { return i !== primary && !!fields[i]; }).map(function (i) { return fields[i]; });
+        copy.displayFields = [primary].concat(extras.filter(function (i) { return i !== primary; })).map(function (i, slot) {
+            return { index: i, label: text(fieldConfig && fieldConfig[i] && fieldConfig[i].fieldname) || '字段' + (i + 1), value: fields[i] || (slot ? '—' : '信息缺失') };
+        });
+        copy.extras = copy.displayFields.slice(1).map(function (field) { return field.value; });
         return copy;
     }
 
-    // Layout, pagination and effects ported from 中奖界面布局演示（动效版） (1).html.
-    function best(m, aw, ah, H) {
+    // Shared DOM hierarchy for ImportCJ result and records; no HTML from imported values.
+    function fillFields(card, winner) {
+        card.querySelectorAll('[data-field-value]').forEach(function (node) {
+            var field = winner.displayFields[Number(node.getAttribute('data-field-value'))];
+            node.textContent = field.value;
+            node.title = field.value;
+        });
+    }
+    function appendFields(card, winner, prefix, pending) {
+        var doc = card.ownerDocument, fields = winner.displayFields;
+        function el(tag, cls, parent) {
+            var node = doc.createElement(tag); node.className = prefix + '-' + cls; parent.appendChild(node); return node;
+        }
+        el('div', 'main', card).setAttribute('data-field-value', '0');
+        if (fields.length >= 2) el('div', 'secondary', card).setAttribute('data-field-value', '1');
+        if (fields.length >= 3) {
+            var bottom = el('div', 'fields', card);
+            bottom.style.gridTemplateColumns = 'repeat(' + (fields.length - 2) + ', minmax(0, 1fr))';
+            fields.slice(2).forEach(function (field, i) {
+                var cell = el('div', 'field', bottom);
+                el('em', 'label', cell).textContent = field.label;
+                el('b', 'extra', cell).setAttribute('data-field-value', String(i + 2));
+            });
+        }
+        if (!pending) fillFields(card, winner);
+    }
+
+    // Field-dependent geometry from 中奖界面布局演示（动效版） (2).html.
+    var HF = [1.9, 2.4, 3.2, 3.2], WF = [2.6, 2.8, 3.8, 3.8];
+    function best(m, aw, ah, H, f) {
         var b = null;
         for (var c = 1; c <= m; c++) {
             var r = Math.ceil(m / c), g = Math.min(aw, ah) * .03;
             var cw = (aw - (c - 1) * g) / c, ch = (ah - (r - 1) * g) / r;
-            var fs = Math.min(ch * .5, cw / 2.6, H * .24);
+            var fs = Math.min(ch / HF[f - 1], cw / WF[f - 1], H * .24);
             if (!b || fs > b.fs + .5) b = { c: c, r: r, g: g, cw: cw, ch: ch, fs: fs };
         }
         return b;
@@ -62,6 +95,7 @@ define([], function () {
         this.doc = this.host.ownerDocument;
         this.win = this.doc.defaultView;
         this.config = options.config || {};
+        this.fieldConfig = options.fieldConfig || [];
         this.normalizeGroups = options.normalizeGroups;
         this.groups = [];
         this.pages = [];
@@ -141,7 +175,10 @@ define([], function () {
     };
     ResultView.prototype.setData = function (values, prize) {
         this.stopAll();
-        this.groups = this.normalizeGroups(selectFields(values, this.config), prize).groups;
+        this.groups = this.normalizeGroups(selectFields(values, this.config, this.fieldConfig), prize).groups;
+        this.fieldCount = Math.max(1, this.groups.reduce(function (max, group) {
+            return group.winners.reduce(function (n, winner) { return Math.max(n, winner.displayFields.length); }, max);
+        }, 1));
         this.total = this.groups.reduce(function (count, group) { return count + group.winners.length; }, 0);
         this.pageIndex = 0;
         this.pages = [];
@@ -191,11 +228,11 @@ define([], function () {
         this.title.style.marginTop = .012 * u + 'px';
         var n = this.total, aw = .9 * W, top = .27 * u;
         var m = n, ah = H * .93 - top;
-        if (n && best(n, aw, ah, H).fs < .07 * H) {
+        if (n && best(n, aw, ah, H, this.fieldCount).fs < .07 * H) {
             ah = H * .88 - top;
-            for (m = Math.min(15, n); m > 1; m--) if (best(m, aw, ah, H).fs >= .07 * H) break;
+            for (m = Math.min(15, n); m > 1; m--) if (best(m, aw, ah, H, this.fieldCount).fs >= .07 * H) break;
         }
-        this.cardLayout = n ? best(m, aw, ah, H) : null;
+        this.cardLayout = n ? best(m, aw, ah, H, this.fieldCount) : null;
         this.capacity = m;
         this.board.style.cssText = 'left:' + (W - aw) / 2 + 'px;top:' + top + 'px;width:' + aw + 'px;height:' + ah + 'px';
         this.pager.style.top = H * .9 + 'px';
@@ -238,12 +275,11 @@ define([], function () {
         var lay = this.cardLayout, H = this.height;
         var inner = this.board.querySelector('.import-result-inner');
         if (!lay || !inner) return;
-        var cardW = Math.min(lay.cw, lay.fs * 3.6), cardH = Math.min(lay.ch, lay.fs * 2);
+        var cardW = Math.min(lay.cw, lay.fs * Math.max(3.6, WF[this.fieldCount - 1])), cardH = Math.min(lay.ch, lay.fs * HF[this.fieldCount - 1]);
         inner.style.cssText = 'width:' + (lay.c * cardW + (lay.c - 1) * lay.g) + 'px;gap:' + lay.g + 'px';
         inner.querySelectorAll('.import-result-card').forEach(function (card) {
-            card.style.cssText = 'width:' + cardW + 'px;height:' + cardH + 'px;border-width:' + Math.max(2, H * .003) + 'px;border-radius:' + Math.min(28, cardH * .12) + 'px';
+            card.style.cssText = '--fs:' + lay.fs + 'px;width:' + cardW + 'px;height:' + cardH + 'px;border-width:' + Math.max(2, H * .003) + 'px;border-radius:' + Math.min(28, cardH * .1) + 'px';
             card.querySelector('.import-result-main').style.fontSize = lay.fs + 'px';
-            card.querySelectorAll('.import-result-extra').forEach(function (extra) { extra.style.fontSize = Math.max(12, lay.fs * .3) + 'px'; });
         });
     };
     ResultView.prototype.render = function (reveal, pageTransition) {
@@ -264,16 +300,10 @@ define([], function () {
             card.setAttribute('role', 'listitem');
             if (pending) card.setAttribute('aria-hidden', 'true');
             // Keep the complete card concealed and its fields empty until its reveal.
-            var main = self.element('div', 'import-result-main', pending ? '' : winner.name);
-            card.appendChild(main);
-            winner.extras.forEach(function (value) {
-                var extra = self.element('div', 'import-result-extra', pending ? '' : value);
-                card.appendChild(extra);
-            });
+            appendFields(card, winner, 'import-result', pending);
             inner.appendChild(card);
             if (pending) reveals.push({ delay: i * Math.min(380, 2200 / count), run: function () {
-                main.textContent = winner.name;
-                card.querySelectorAll('.import-result-extra').forEach(function (extra, index) { extra.textContent = winner.extras[index]; });
+                fillFields(card, winner);
                 card.removeAttribute('aria-hidden');
                 card.classList.remove('is-pending');
                 card.classList.add('done', 'sw');
@@ -336,5 +366,5 @@ define([], function () {
         this.el.remove();
         this.active = false;
     };
-    return { create: function (options) { return new ResultView(options); }, selectFields: selectFields };
+    return { create: function (options) { return new ResultView(options); }, selectFields: selectFields, appendFields: appendFields };
 });

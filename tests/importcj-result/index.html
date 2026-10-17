@@ -4,7 +4,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>导入抽奖结果 · 本地隔离预览</title>
 <link rel="stylesheet" href="/public/static/css/screencss/screen-stage-ui.css">
-<link rel="stylesheet" href="/public/static/css/screencss/screenimportcj-stage-ui.css?v=20261017-reveal-immediate">
+<link rel="stylesheet" href="/public/static/css/screencss/screenimportcj-stage-ui.css?v=20261017-multifield">
 <style>
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#28172a}
 .importcj-mainbox{position:relative;width:100%;height:100%}
@@ -14,17 +14,18 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#28172a}
 <div class="importcj-mainbox"><div class="fixture-ready">准备界面 · 原有背景</div></div>
 <script src="/public/static/js/require.js"></script>
 <script>
-require.config({baseUrl:'/public/static/js',urlArgs:'v=20261017-reveal-immediate'});
+require.config({baseUrl:'/public/static/js',urlArgs:'v=20261017-multifield'});
 require(['screenjs/screenimportcj-stage-ui','screenjs/screen-stage-ui'],function(importStage,sharedStage){
-    window.showResult=function(count,kind,config){
+    window.showResult=function(count,kind,config,fieldCount){
         if(window.ui) window.ui.destroy();
         var source=kind==='message'?sharedStage:importStage;
-        window.ui=source.create({root:document.querySelector('.importcj-mainbox'),resultConfig:config||{},speedEnabled:false,messageWinnerDetails:kind==='message',callbacks:{
+        window.ui=source.create({root:document.querySelector('.importcj-mainbox'),resultConfig:config||{},fieldConfig:fieldCount? ["座位号","姓名","部门","编号"].slice(0,fieldCount).map(function(fieldname){return {fieldname:fieldname};}):[],speedEnabled:false,messageWinnerDetails:kind==='message',callbacks:{
             onPrimaryAction:function(){ui.setState('ready');},
-            onRecords:function(){ui.setRecords([], 'result');ui.setState('records');},
+            onRecords:function(){ui.setRecords(window.fixtureInput, 'result');ui.setState('records');},
             onRecordsClose:function(){ui.setState('result');}
         }}).mount();
         var winners=Array.from({length:count},function(_,i){return {datafield1:['A09','B14','B01'][i%3],datafield2:String(20902+i).padStart(6,'0'),datafield3:'',datafield4:'',id:i+1};});
+        if(fieldCount) winners.forEach(function(w,i){w.datafield2=['张伟','王芳','李娜'][i%3];w.datafield3='市场部';w.datafield4=String(20902+i).padStart(6,'0');});
         if(kind==='long') winners.forEach(function(w,i){w.datafield1='研发中心嘉宾'+(i+1)+'号';w.datafield2='华东区域产品研发部';w.datafield3='020902';w.datafield4='VIP-00001234';});
         if(kind==='empty') winners=[{datafield1:'',datafield2:'',datafield3:''}];
         if(kind==='zero') winners=[{datafield1:0,datafield2:'000012'}];
@@ -39,7 +40,8 @@ require(['screenjs/screenimportcj-stage-ui','screenjs/screen-stage-ui'],function
         return true;
     };
     var p=new URLSearchParams(location.search);
-    showResult(Number(p.get('count')||3),p.get('kind')||'',{});
+    showResult(Number(p.get('count')||3),p.get('kind')||'',{},Number(p.get('fields')||0));
+    if(p.get('records')) {ui.setRecords(fixtureInput);ui.setState('records');}
     if(p.get('zoom')) {var z=Number(p.get('zoom'));document.querySelector('.importcj-mainbox').style.cssText='zoom:'+z+';width:'+(100/z)+'vw;height:'+(100/z)+'vh';}
 });
 </script>

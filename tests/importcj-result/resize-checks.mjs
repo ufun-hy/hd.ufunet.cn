@@ -5,8 +5,8 @@ await page.goto('http://127.0.0.1:8767/tests/importcj-result/');
 await page.waitForFunction(()=>window.showResult&&ui.importResult);
 const result=await page.evaluate(()=>{
     const errors=[];let scenarios=0;
-    for(const count of [3,6,10,40]){
-        ui.root.style.cssText='width:1280px;height:900px';showResult(count);
+    for(const f of [1,2,3,4])for(const count of [3,6,10,40]){
+        ui.root.style.cssText='width:1280px;height:900px';showResult(count,'',{},f);
         for(let width=1280;width<=2400;width+=20){
             ui.root.style.width=width+'px';const r=ui.importResult;r.layout();r.stopAll();
             let expected=null,seen=[];
@@ -28,7 +28,8 @@ const result=await page.evaluate(()=>{
     }
     const r=ui.importResult;
     if(getComputedStyle(r.el).backgroundImage!=='none'||getComputedStyle(r.el).backgroundColor!=='rgba(0, 0, 0, 0)')errors.push({problem:'background changed'});
-    const style=el=>{let s=getComputedStyle(el);return [s.background,s.borderColor,s.color,s.boxShadow].join('|');};
+    // Compare settled colors, not two different frames of the shared button transition.
+    const style=el=>{el.style.transition='none';let s=getComputedStyle(el);return [s.background,s.borderColor,s.color,s.boxShadow].join('|');};
     const dock=style(ui.stage.querySelector('.screen-stage-dock')),button=style(ui.btnPrimary);
     showResult(3,'message');
     if(dock!==style(ui.stage.querySelector('.screen-stage-dock'))||button!==style(ui.btnPrimary))errors.push({problem:'console style changed'});

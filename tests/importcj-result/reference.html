@@ -22,8 +22,12 @@ html,body{margin:0;background:#120803;font-family:'PingFang SC','Microsoft YaHei
 .card{position:relative;overflow:hidden;border:solid #fff3c4;background:linear-gradient(160deg,#ffe29a,#e8b04a 55%,#c98a25);color:var(--brown);
  display:flex;flex-direction:column;align-items:center;justify-content:center;font-variant-numeric:tabular-nums;
  box-shadow:0 0 40px rgba(255,190,70,.55),0 14px 26px rgba(0,0,0,.35)}
-.card .code{font-weight:900;line-height:1;white-space:nowrap}
-.card .sub{margin-top:.2em;font-weight:700;color:#6b3d10;white-space:nowrap}
+.card .code{font-size:var(--fs);font-weight:900;line-height:1;white-space:nowrap}
+.card .s2{margin-top:calc(var(--fs)*.1);font-size:calc(var(--fs)*.5);font-weight:800;line-height:1.2;white-space:nowrap;max-width:92%;overflow:hidden;text-overflow:ellipsis}
+.card .ex{width:92%;margin-top:calc(var(--fs)*.15);padding-top:calc(var(--fs)*.12);border-top:2px solid rgba(58,28,6,.25);display:grid;gap:calc(var(--fs)*.2)}
+.card .ex>div{min-width:0}
+.card .ex em{display:block;font-style:normal;font-size:max(11px,calc(var(--fs)*.2));font-weight:700;color:#6b3d10}
+.card .ex b{display:block;font-size:max(13px,calc(var(--fs)*.3));font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .card.rolling{filter:brightness(.82)}
 .card.done{animation:pop .55s cubic-bezier(.2,1.4,.4,1)}
 .card.sw::after{content:"";position:absolute;top:0;bottom:0;width:30%;left:-40%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.65),transparent);animation:sweep 1s .15s ease-out forwards}
@@ -48,8 +52,8 @@ html,body{margin:0;background:#120803;font-family:'PingFang SC','Microsoft YaHei
  <div id="pager"></div>
 </div></div>
 <div id="bar">
- <div class="g"><span>中奖人数</span><input type="number" id="num" min="1" max="60" value="3">
-  <span id="qn"></span></div>
+ <div class="g"><span>字段数</span><span id="qf"></span></div>
+ <div class="g"><span>中奖人数</span><input type="number" id="num" min="1" max="60" value="3"><span id="qn"></span></div>
  <div class="g"><span>屏幕比例</span><span id="qr"></span></div>
  <label><input type="checkbox" id="imgTog" checked>奖品图（4 人以上自动隐藏）</label>
  <button id="replay">重新揭晓</button>
@@ -61,27 +65,44 @@ const stage=$('stage'),grid=$('grid'),pager=$('pager'),head=$('head'),thumb=$('t
 const pad=(x,l=2)=>String(x).padStart(l,'0');
 const RATIOS=[['16:9',16/9],['16:10',16/10],['4:3',4/3],['21:9',21/9],['9:16 竖屏',9/16]];
 const NS=[1,2,3,6,10,20,40];
-let n=3,ratio=16/9,W=0,H=0,u=0,timers=[],iv=null,rot=null;
-function code(i){
- if(i<3)return [["A09","020902"],["B14","031403"],["B01","030102"]][i];
+const NAMES=['张伟','王芳','李娜','刘洋','陈静','杨磊','赵敏','黄强','周杰','吴婷','徐涛','孙丽','马超','朱琳','胡军','郭敏'];
+const DEPTS=['市场部','研发部','财务部','人力资源部','销售部','运营部'];
+const LABELS=['座位号','姓名','部门','编号'];
+const HF=[1.9,2.4,3.2,3.2],WF=[2.6,2.8,3.8,3.8];
+let n=3,f=4,ratio=16/9,W=0,H=0,u=0,timers=[],iv=null,rot=null;
+function row(i){
+ if(i<3)return [["A09","张伟","市场部","020902"],["B14","王芳","研发部","031403"],["B01","李娜","财务部","030102"]][i];
  const li=(i*5+1)%6,num=1+(i*7+3)%40;
- return ['ABCDEF'[li]+pad(num),pad(li+1)+pad(num)+pad(1+i%4)];
+ return ['ABCDEF'[li]+pad(num),NAMES[i%NAMES.length],DEPTS[(i*5+2)%DEPTS.length],pad(li+1)+pad(num)+pad(1+i%4)];
 }
 function rnd(len){let s='';for(let i=0;i<len;i++)s+=Math.floor(Math.random()*10);return s}
-function scr(){return 'ABCDEF'[Math.floor(Math.random()*6)]+rnd(2)}
+function pick(a){return a[Math.floor(Math.random()*a.length)]}
+function scr(){return ['ABCDEF'[Math.floor(Math.random()*6)]+rnd(2),pick(NAMES),pick(DEPTS),rnd(6)]}
 function best(m,aw,ah){
  let b=null;
  for(let c=1;c<=m;c++){
   const r=Math.ceil(m/c),g=Math.min(aw,ah)*0.03;
   const cw=(aw-(c-1)*g)/c,ch=(ah-(r-1)*g)/r;
-  let fs=Math.min(ch*0.5,cw/2.6,H*0.24);
+  const fs=Math.min(ch/HF[f-1],cw/WF[f-1],H*0.24);
   if(!b||fs>b.fs+0.5)b={c,r,g,cw,ch,fs};
  }
  return b;
 }
+function mk(){
+ const c=document.createElement('div');c.className='card';
+ let h='<div class="code"></div>';
+ if(f>=2)h+='<div class="s2"></div>';
+ if(f>=3){h+='<div class="ex" style="grid-template-columns:repeat('+(f-2)+',minmax(0,1fr))">';for(let j=2;j<f;j++)h+='<div><em>'+LABELS[j]+'</em><b></b></div>';h+='</div>'}
+ c.innerHTML=h;return c;
+}
+function fill(c,d){
+ c.querySelector('.code').textContent=d[0];
+ const s=c.querySelector('.s2');if(s)s.textContent=d[1];
+ c.querySelectorAll('.ex b').forEach((b,j)=>b.textContent=d[j+2]);
+}
 function burst(card,count){
- const r=card.getBoundingClientRect(),f=stage.getBoundingClientRect();
- const cx=r.left-f.left+r.width/2,cy=r.top-f.top+r.height/2,cols=['#ffe29a','#f0c96b','#fff','#e8803a'];
+ const r=card.getBoundingClientRect(),s=stage.getBoundingClientRect();
+ const cx=r.left-s.left+r.width/2,cy=r.top-s.top+r.height/2,cols=['#ffe29a','#f0c96b','#fff','#e8803a'];
  for(let i=0;i<count;i++){
   const p=document.createElement('div');p.className='p';
   p.style.left=cx+'px';p.style.top=cy+'px';p.style.background=cols[i%4];
@@ -114,10 +135,9 @@ function play(){
   for(m=Math.min(15,n);m>1;m--)if(best(m,aw,ah).fs>=0.07*H)break;
  }
  const lay=best(m,aw,ah),pages=Math.ceil(n/m);
- const cardW=Math.min(lay.cw,lay.fs*3.6),cardH=Math.min(lay.ch,lay.fs*2.0);
+ const cardW=Math.min(lay.cw,lay.fs*Math.max(3.6,WF[f-1])),cardH=Math.min(lay.ch,lay.fs*HF[f-1]);
  grid.style.cssText='left:'+(W-aw)/2+'px;top:'+top+'px;width:'+aw+'px;height:'+ah+'px';
- pager.style.top=H*0.9+'px';pager.style.fontSize=0.026*u+'px';
- pager.textContent='';
+ pager.style.top=H*0.9+'px';pager.style.fontSize=0.026*u+'px';pager.textContent='';
  function render(p,roll){
   const start=p*m,cnt=Math.min(m,n-start);
   grid.innerHTML='';
@@ -126,23 +146,19 @@ function play(){
   grid.appendChild(inner);
   const cards=[];
   for(let i=0;i<cnt;i++){
-   const c=document.createElement('div');c.className='card'+(roll?' rolling':'');
-   c.style.cssText='width:'+cardW+'px;height:'+cardH+'px;border-width:'+Math.max(2,H*0.003)+'px;border-radius:'+Math.min(28,cardH*0.12)+'px';
-   const a=document.createElement('div'),b=document.createElement('div');
-   a.className='code';b.className='sub';
-   a.style.fontSize=lay.fs+'px';b.style.fontSize=Math.max(12,lay.fs*0.3)+'px';
-   if(!roll){const d=code(start+i);a.textContent=d[0];b.textContent=d[1];c.classList.add('done')}
-   c.appendChild(a);c.appendChild(b);inner.appendChild(c);cards.push(c);
+   const c=mk();c.classList.add(roll?'rolling':'done');
+   c.style.cssText='--fs:'+lay.fs+'px;width:'+cardW+'px;height:'+cardH+'px;border-width:'+Math.max(2,H*0.003)+'px;border-radius:'+Math.min(28,cardH*0.1)+'px';
+   if(!roll)fill(c,row(start+i));
+   inner.appendChild(c);cards.push(c);
   }
   if(pages>1)pager.textContent='第 '+(p+1)+' / '+pages+' 页';
   return cards;
  }
  const cards=render(0,true);
- iv=setInterval(()=>{cards.forEach(c=>{if(c.classList.contains('rolling')){c.children[0].textContent=scr();c.children[1].textContent=rnd(6)}})},60);
+ iv=setInterval(()=>{cards.forEach(c=>{if(c.classList.contains('rolling'))fill(c,scr())})},60);
  const step=Math.min(380,2200/cards.length);
  cards.forEach((c,i)=>timers.push(setTimeout(()=>{
-  const d=code(i);c.children[0].textContent=d[0];c.children[1].textContent=d[1];
-  c.classList.remove('rolling');c.classList.add('done','sw');
+  fill(c,row(i));c.classList.remove('rolling');c.classList.add('done','sw');
   if(i<12)burst(c,cards.length>6?8:14);
   if(i===cards.length-1)clearInterval(iv);
  },1200+i*step)));
@@ -151,9 +167,11 @@ function play(){
   timers.push(setTimeout(()=>{rot=setInterval(()=>{p=(p+1)%pages;render(p,false)},4000)},1200+cards.length*step+2500));
  }
 }
+[1,2,3,4].forEach(v=>{const b=document.createElement('button');b.textContent=v;b.onclick=()=>{f=v;sync();play()};$('qf').appendChild(b)});
 NS.forEach(v=>{const b=document.createElement('button');b.textContent=v;b.onclick=()=>{$('num').value=v;n=v;sync();play()};$('qn').appendChild(b)});
 RATIOS.forEach(([t,v])=>{const b=document.createElement('button');b.textContent=t;b.dataset.r=v;b.onclick=()=>{ratio=v;sync();play()};$('qr').appendChild(b)});
 function sync(){
+ [...$('qf').children].forEach(b=>b.classList.toggle('on',+b.textContent===f));
  [...$('qn').children].forEach(b=>b.classList.toggle('on',+b.textContent===n));
  [...$('qr').children].forEach(b=>b.classList.toggle('on',Math.abs(+b.dataset.r-ratio)<1e-6));
 }

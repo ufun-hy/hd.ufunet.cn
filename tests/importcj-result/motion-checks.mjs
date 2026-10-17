@@ -4,7 +4,10 @@ await page.cdp('Network.enable');await page.cdp('Network.setCacheDisabled',{cach
 await page.goto('http://127.0.0.1:8767/tests/importcj-result/');
 await page.waitForFunction(()=>window.showResult&&ui.importResult);
 // A local virtual clock verifies exact demo timings without a slow, flaky wall-clock test.
-const result=await page.evaluate(()=>{
+for(const fieldCount of [1,2,3,4]) {
+const result=await page.evaluate((fieldCount)=>{
+    const showResult=n=>window.showResult(n,'',{},fieldCount);
+    const valuesText=card=>[...card.querySelectorAll('[data-field-value]')].map(node=>node.textContent).join('');
     const realTimeout=window.setTimeout,realInterval=window.setInterval,realClearTimeout=window.clearTimeout,realClearInterval=window.clearInterval;
     const jobs=new Map();let now=0,id=100000;
     window.setTimeout=(fn,ms=0)=>{jobs.set(++id,{fn,time:now+ms,repeat:0});return id;};
@@ -21,17 +24,17 @@ const result=await page.evaluate(()=>{
         const r=ui.importResult,cards=[...r.board.querySelectorAll('.import-result-card')],values=r.pages[0].winners.map(w=>w.name+w.extras.join('')),count=cards.length,step=Math.min(380,2200/count);
         checks.pages=r.pages.length>1;
         checks.noRandomInterval=[...jobs.values()].every(j=>j.repeat!==60);
-        checks.firstImmediate=cards[0].classList.contains('done')&&cards[0].textContent===values[0]&&getComputedStyle(cards[0]).visibility==='visible';
-        checks.noEarlyRemainingResults=cards.slice(1).every(c=>getComputedStyle(c).visibility==='hidden'&&c.textContent===''&&c.getAttribute('aria-hidden')==='true');
+        checks.firstImmediate=cards[0].classList.contains('done')&&valuesText(cards[0])===values[0]&&getComputedStyle(cards[0]).visibility==='visible';
+        checks.noEarlyRemainingResults=cards.slice(1).every(c=>getComputedStyle(c).visibility==='hidden'&&valuesText(c)===''&&c.getAttribute('aria-hidden')==='true');
         const beforeTimers=[...r.timers];r.layout();
         checks.resizePreservesPending=r.board.querySelector('.import-result-card')===cards[0]&&cards.slice(1).every(c=>getComputedStyle(c).visibility==='hidden')&&JSON.stringify(beforeTimers)===JSON.stringify(r.timers);
-        checks.first=cards[0].classList.contains('done')&&cards[0].classList.contains('sw')&&cards.slice(1).every(c=>c.classList.contains('is-pending')&&c.textContent==='');
-        checks.revealedValue=cards[0].textContent===values[0]&&getComputedStyle(cards[0]).visibility==='visible';
+        checks.first=cards[0].classList.contains('done')&&cards[0].classList.contains('sw')&&cards.slice(1).every(c=>c.classList.contains('is-pending')&&valuesText(c)==='');
+        checks.revealedValue=valuesText(cards[0])===values[0]&&getComputedStyle(cards[0]).visibility==='visible';
         checks.particles=r.content.querySelectorAll('.import-result-particle').length===(count>6?8:14);
         const style=getComputedStyle(cards[0]),shine=getComputedStyle(cards[0],'::after');
         checks.pop=style.animationDuration==='0.55s'&&style.animationTimingFunction==='cubic-bezier(0.2, 1.4, 0.4, 1)';
         checks.shine=shine.animationDuration==='1s'&&shine.animationDelay==='0.15s';
-        tick((count-1)*step);checks.sequential=cards.every(c=>c.classList.contains('done'))&&cards.every((c,i)=>c.textContent===values[i]);
+        tick((count-1)*step);checks.sequential=cards.every(c=>c.classList.contains('done'))&&cards.every((c,i)=>valuesText(c)===values[i]);
         r.layout();checks.resizeKeepsNodes=r.board.querySelector('.import-result-card')===cards[0];
         const firstTurn=count*step+2500+4000;
         tick(firstTurn-1);checks.firstPageHold=r.pageIndex===0;
@@ -46,15 +49,16 @@ const result=await page.evaluate(()=>{
         ui.root.style.cssText='width:1920px;height:1080px';resized.layout();
         const resizedCards=[...resized.board.querySelectorAll('.import-result-card')];
         checks.repaginationKeepsRevealed=resizedCards[0].textContent.startsWith(revealedValue)&&!resizedCards[0].classList.contains('done');
-        checks.repaginationConcealsPending=resizedCards.slice(1).every(c=>c.textContent===''&&getComputedStyle(c).visibility==='hidden');
+        checks.repaginationConcealsPending=resizedCards.slice(1).every(c=>valuesText(c)===''&&getComputedStyle(c).visibility==='hidden');
         ui.destroy();
     }finally{
         window.setTimeout=realTimeout;window.setInterval=realInterval;window.clearTimeout=realClearTimeout;window.clearInterval=realClearInterval;
         showResult(3);
     }
     return checks;
-});
-console.log(result);for(const [k,v]of Object.entries(result))assert.ok(v,k);
+},fieldCount);
+console.log({fieldCount,...result});for(const [k,v]of Object.entries(result))assert.ok(v,k);
+}
 await page.cdp('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]});
 assert.ok(await page.evaluate(()=>{showResult(6);return !ui.importResult.board.querySelector('.is-pending,.done,.sw');}));
 await page.cdp('Emulation.setEmulatedMedia',{features:[]});
