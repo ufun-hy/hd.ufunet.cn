@@ -1,9 +1,7 @@
 /* Presentation only: consumes confirmed, privacy-formatted ImportCJ winners. */
 define([], function () {
     'use strict';
-    var FONT = 'Arial, "PingFang SC", "Microsoft YaHei", sans-serif';
     function text(value) { return value == null ? '' : String(value).trim(); }
-    function clamp(value, low, high) { return Math.max(low, Math.min(high, value)); }
     function fieldIndex(value, fallback) {
         return /^[1-4]$/.test(String(value)) ? Number(value) - 1 : fallback;
     }
@@ -48,23 +46,32 @@ define([], function () {
         return copy;
     }
 
+    // Layout, pagination and effects ported from 中奖界面布局演示（动效版） (1).html.
+    function best(m, aw, ah, H) {
+        var b = null;
+        for (var c = 1; c <= m; c++) {
+            var r = Math.ceil(m / c), g = Math.min(aw, ah) * .03;
+            var cw = (aw - (c - 1) * g) / c, ch = (ah - (r - 1) * g) / r;
+            var fs = Math.min(ch * .5, cw / 2.6, H * .24);
+            if (!b || fs > b.fs + .5) b = { c: c, r: r, g: g, cw: cw, ch: ch, fs: fs };
+        }
+        return b;
+    }
     function ResultView(options) {
         this.host = options.host;
         this.doc = this.host.ownerDocument;
         this.win = this.doc.defaultView;
         this.config = options.config || {};
         this.normalizeGroups = options.normalizeGroups;
-        this.interval = clamp(Number(this.config.resultinterval) || 8, 4, 60) * 1000;
         this.groups = [];
         this.pages = [];
         this.pageIndex = 0;
         this.total = 0;
         this.active = false;
-        this.paused = false;
         this.firstReveal = false;
-        this.timer = null;
-        this.frame = null;
-        this.canvas = this.doc.createElement('canvas').getContext('2d');
+        this.timers = [];
+        this.rotation = null;
+        this.resizeTimer = null;
         this.mount();
     }
     ResultView.prototype.element = function (tag, className, value) {
@@ -73,6 +80,14 @@ define([], function () {
         if (value !== undefined) el.textContent = value;
         return el;
     };
+    ResultView.prototype.later = function (fn, delay) {
+        var self = this;
+        var id = this.win.setTimeout(function () {
+            self.timers = self.timers.filter(function (timer) { return timer !== id; });
+            fn();
+        }, delay);
+        this.timers.push(id);
+    };
     ResultView.prototype.mount = function () {
         var self = this;
         this.el = this.element('section', 'import-result');
@@ -80,80 +95,52 @@ define([], function () {
         this.el.hidden = true;
         this.content = this.element('div', 'import-result-content');
         this.header = this.element('header', 'import-result-header');
-        this.award = this.element('div', 'import-result-award');
-        this.titleRow = this.element('div', 'import-result-title-row');
-        this.title = this.element('h2', 'import-result-title');
         this.image = this.element('img', 'import-result-image');
         this.image.alt = '奖品图片';
         this.image.onerror = function () { self.image.hidden = true; };
-        this.titleRow.appendChild(this.title);
-        this.titleRow.appendChild(this.image);
-        this.count = this.element('div', 'import-result-count');
-        this.header.appendChild(this.award);
-        this.header.appendChild(this.titleRow);
-        this.header.appendChild(this.count);
+        this.title = this.element('h2', 'import-result-title');
+        this.header.appendChild(this.image);
+        this.header.appendChild(this.title);
         this.board = this.element('div', 'import-result-board');
         this.board.setAttribute('role', 'list');
-        this.pager = this.element('nav', 'import-result-pager');
-        this.pager.setAttribute('aria-label', '中奖结果分页');
-        function button(label, action) {
-            var el = self.element('button', 'import-result-page-button', label);
-            el.type = 'button';
-            el.addEventListener('click', action);
-            self.pager.appendChild(el);
-            return el;
-        }
-        this.prev = button('上一页', function () { self.changePage(-1, true); });
-        this.pageLabel = this.element('span', 'import-result-page-label');
-        this.pageLabel.setAttribute('aria-live', 'polite');
-        this.pager.appendChild(this.pageLabel);
-        this.next = button('下一页', function () { self.changePage(1, true); });
-        this.pause = button('暂停轮播', function () {
-            self.paused = !self.paused;
-            self.updatePager();
-            self.schedule(0);
-        });
+        this.pager = this.element('div', 'import-result-pager');
+        this.pager.setAttribute('aria-live', 'polite');
         this.content.appendChild(this.header);
         this.content.appendChild(this.board);
         this.content.appendChild(this.pager);
         this.el.appendChild(this.content);
         this.host.insertBefore(this.el, this.host.firstChild);
         this.onResize = function () {
-            if (!self.active || self.frame !== null) return;
-            self.frame = self.win.requestAnimationFrame(function () {
-                self.frame = null;
-                if (self.layoutSize !== self.sizeKey()) self.layout();
-            });
+            self.win.clearTimeout(self.resizeTimer);
+            self.resizeTimer = self.win.setTimeout(function () {
+                self.resizeTimer = null;
+                if (self.active && self.layoutSize !== self.sizeKey()) self.layout();
+            }, 150);
         };
-        this.onVisibility = function () { self.schedule(0); };
+        this.onVisibility = function () {
+            if (!self.active) return;
+            self.stopAll();
+            if (!self.doc.hidden) { self.render(false); self.startRotation(); }
+        };
         this.win.addEventListener('resize', this.onResize);
         this.doc.addEventListener('visibilitychange', this.onVisibility);
         if (this.win.ResizeObserver) {
             this.observer = new this.win.ResizeObserver(this.onResize);
             this.observer.observe(this.host);
-            this.observer.observe(this.board);
+            var dock = this.host.querySelector('.screen-stage-dock');
+            if (dock) this.observer.observe(dock);
         }
         if (this.win.MutationObserver) {
             this.styleObserver = new this.win.MutationObserver(this.onResize);
             this.styleObserver.observe(this.host.parentElement, { attributes: true, attributeFilter: ['style'] });
         }
-        this.onKey = function (event) {
-            if (!self.active || self.pages.length < 2 || /INPUT|TEXTAREA|SELECT/.test(event.target.tagName) || event.target.isContentEditable) return;
-            if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
-                event.preventDefault();
-                event.stopImmediatePropagation();
-                self.changePage(event.key === 'ArrowLeft' ? -1 : 1, true);
-            }
-        };
-        this.doc.addEventListener('keydown', this.onKey, true);
     };
     ResultView.prototype.setData = function (values, prize) {
-        this.clearTimer();
+        this.stopAll();
         this.groups = this.normalizeGroups(selectFields(values, this.config), prize).groups;
         this.total = this.groups.reduce(function (count, group) { return count + group.winners.length; }, 0);
         this.pageIndex = 0;
         this.pages = [];
-        this.paused = false;
         this.firstReveal = true;
         if (this.active) this.layout();
     };
@@ -162,190 +149,149 @@ define([], function () {
         this.active = active;
         this.el.hidden = !active;
         if (active) this.layout();
-        else {
-            this.clearTimer();
-            // Returning from records must not replay the reveal.
-            this.board.querySelectorAll('.is-revealing,.is-entering').forEach(function (el) { el.classList.remove('is-revealing', 'is-entering'); });
-        }
-    };
-    ResultView.prototype.measure = function (value, weight) {
-        this.canvas.font = weight + ' 100px ' + FONT;
-        return this.canvas.measureText(value).width / 100;
-    };
-    ResultView.prototype.setHeading = function (group) {
-        group = group || {};
-        this.award.textContent = group.awardname || '';
-        this.award.hidden = !group.awardname;
-        this.title.textContent = group.prizename || (group.awardname ? '' : '中奖结果');
-        this.title.hidden = !this.title.textContent;
-        this.count.textContent = this.groups.length > 1 ? '本奖项 ' + (group.winners || []).length + ' 名 · 本轮共 ' + this.total + ' 名' : '共 ' + this.total + ' 名';
-        var src = text(group.prizeimg);
-        var show = this.total <= 3 && this.width >= this.height && /^(https?:\/\/|\/|\.\/|\.\.\/)/i.test(src);
-        this.image.hidden = !show;
-        if (show && this.image.getAttribute('src') !== src) this.image.src = src;
-    };
-    ResultView.prototype.metrics = function (winners) {
-        var self = this;
-        return winners.map(function (winner) {
-            return { main: self.measure(winner.name, 800), extras: winner.extras.map(function (extra) { return self.measure(extra, 600); }) };
-        });
-    };
-    ResultView.prototype.chooseLayout = function (count, metrics, width, height) {
-        // Stable count-based columns: resizing changes card width, not an optimization score.
-        var cols = count <= 3 ? count : (count <= 4 ? 2 : (count <= 6 ? 3 : (count <= 8 ? 4 : (count <= 10 ? 5 : 4))));
-        if (this.width < this.height) cols = count <= 3 ? 1 : 2;
-        var rows = Math.ceil(count / cols), gap = this.gap;
-        var cardWidth = (width - gap * (cols - 1)) / cols;
-        if (count === 1) cardWidth = Math.min(cardWidth, this.width * (this.width < this.height ? .80 : .46));
-        var cardHeight = Math.min((height - gap * (rows - 1)) / rows, this.height * .44);
-        var pad = Math.min(cardWidth, cardHeight) * .10;
-        var innerWidth = cardWidth - pad * 2 - 6, innerHeight = cardHeight - pad * 2 - 6;
-        if (innerWidth <= 0 || innerHeight <= 0) return null;
-        var mainSize = this.height * .215, extraSize = this.height * .047;
-        var extraMin = this.height * .022;
-        metrics.forEach(function (metric) {
-            metric.extras.forEach(function (size) { extraSize = Math.min(extraSize, innerWidth / Math.max(size, 1)); });
-        });
-        extraSize = Math.max(extraMin, extraSize);
-        metrics.forEach(function (metric) {
-            var lines = metric.extras.reduce(function (n, size) { return n + Math.max(1, Math.ceil(size * extraSize / innerWidth)); }, 0);
-            var extraHeight = lines ? lines * extraSize * 1.3 + gap * 1.4 : 0;
-            mainSize = Math.min(mainSize, innerWidth / Math.max(metric.main, 1), (innerHeight - extraHeight) / 1.12);
-        });
-        if (mainSize < this.height * .045) return null;
-        return { cols: cols, rows: rows, width: cardWidth, height: cardHeight, main: mainSize, extra: Math.min(extraSize, mainSize * .38), pad: pad };
+        else this.stopAll();
     };
     ResultView.prototype.sizeKey = function () {
         var dock = this.host.querySelector('.screen-stage-dock');
-        return [this.host.clientWidth, this.host.clientHeight, this.board.clientWidth, this.board.clientHeight, dock && this.win.getComputedStyle(dock).bottom].join(':');
+        return [this.host.clientWidth, this.host.clientHeight, dock && dock.offsetTop, dock && dock.offsetHeight].join(':');
+    };
+    ResultView.prototype.setHeading = function (group) {
+        group = group || {};
+        this.title.textContent = group.prizename || '中奖结果';
+        var src = text(group.prizeimg);
+        var show = this.total <= 3 && this.width > this.height && /^(https?:\/\/|\/|\.\/|\.\.\/)/i.test(src);
+        this.image.hidden = !show;
+        if (show && this.image.getAttribute('src') !== src) this.image.src = src;
+        this.title.style.maxWidth = (show ? .9 * this.width - .265 * this.unit : .9 * this.width) + 'px';
     };
     ResultView.prototype.layout = function () {
-        if (!this.active) return;
-        this.width = this.host.clientWidth;
-        this.height = this.host.clientHeight;
-        if (!this.width || !this.height) return;
-        var scale = Math.min(this.width / 1920, this.height / 1080);
-        this.gap = Math.max(8, 24 * scale);
-        this.el.style.setProperty('--ir-scale', scale);
-        this.el.style.setProperty('--ir-gap', this.gap + 'px');
-        this.content.style.width = Math.min(this.width * .80, this.height * 1.6) + 'px';
-        this.content.style.top = Math.max(12, this.height * .065) + 'px';
+        if (!this.active || !this.host.clientWidth || !this.host.clientHeight) return;
+        this.stopAll();
+        // The existing control dock occupies the demo's external toolbar area.
         var dock = this.host.querySelector('.screen-stage-dock');
-        var dockStyle = dock && this.win.getComputedStyle(dock);
-        var bottom = dock ? (parseFloat(dockStyle.bottom) || 24) + dock.offsetHeight + this.gap : this.height * .08;
-        this.content.style.bottom = bottom + 'px';
-        var old = this.pages[this.pageIndex];
-        var self = this, pages = [];
-        // Reserve the tallest heading so differently named prizes never resize the grid mid-cycle.
-        this.header.style.minHeight = '';
-        var headerHeight = 0;
-        this.groups.forEach(function (group) { self.setHeading(group); headerHeight = Math.max(headerHeight, self.header.offsetHeight); });
-        this.header.style.minHeight = headerHeight + 'px';
-        this.pager.hidden = false;
-        // Reserve the longest possible page label before measuring available height.
-        this.pager.style.minHeight = '';
-        this.pageLabel.textContent = this.total + ' / ' + this.total + ' 页 · 共 ' + this.total + ' 名';
-        this.pager.style.minHeight = this.pager.offsetHeight + 'px';
-        var width = this.board.clientWidth, height = this.board.clientHeight;
-        // Size the whole round once, including every prize's text and largest page.
-        // Switching prizes or reaching a partial page must only change content.
-        var metrics = [], capacity = 0, layout;
-        this.groups.forEach(function (group) {
-            metrics = metrics.concat(self.metrics(group.winners));
-            capacity = Math.max(capacity, Math.min(12, group.winners.length));
-        });
-        while (capacity > 0) {
-            layout = this.chooseLayout(capacity, metrics, width, height);
-            if (layout || capacity === 1) break;
-            capacity--;
+        var ratio = this.host.clientWidth / this.host.clientHeight;
+        var maxH = Math.max(1, (dock ? dock.offsetTop : this.host.clientHeight) - 6);
+        var W = this.host.clientWidth, H = W / ratio;
+        if (H > maxH) { H = maxH; W = H * ratio; }
+        this.width = W; this.height = H;
+        var u = this.unit = Math.min(H, W * 9 / 16);
+        this.content.style.width = W + 'px';
+        this.content.style.height = H + 'px';
+        this.header.style.top = .05 * u + 'px';
+        this.image.style.width = .225 * u + 'px';
+        this.image.style.height = .15 * u + 'px';
+        this.image.style.marginRight = .04 * u + 'px';
+        this.title.style.fontSize = .063 * u + 'px';
+        this.title.style.marginTop = .012 * u + 'px';
+        var n = this.total, aw = .9 * W, top = .27 * u;
+        var m = n, ah = H * .93 - top;
+        if (n && best(n, aw, ah, H).fs < .07 * H) {
+            ah = H * .88 - top;
+            for (m = Math.min(15, n); m > 1; m--) if (best(m, aw, ah, H).fs >= .07 * H) break;
         }
-        if (!layout) layout = { cols: 1, rows: 1, width: width, height: height, main: this.height * .045, extra: this.height * .025, pad: this.gap, wrapped: true };
+        this.cardLayout = n ? best(m, aw, ah, H) : null;
+        this.capacity = m;
+        this.board.style.cssText = 'left:' + (W - aw) / 2 + 'px;top:' + top + 'px;width:' + aw + 'px;height:' + ah + 'px';
+        this.pager.style.top = H * .9 + 'px';
+        this.pager.style.fontSize = .026 * u + 'px';
+        var old = this.pages[this.pageIndex], pages = [];
         this.groups.forEach(function (group, groupIndex) {
-            for (var start = 0; start < group.winners.length; start += capacity) {
-                var winners = group.winners.slice(start, start + capacity);
-                pages.push({ group: group, groupIndex: groupIndex, start: start, winners: winners, layout: layout });
+            for (var start = 0; start < group.winners.length; start += m) {
+                pages.push({ group: group, groupIndex: groupIndex, start: start, winners: group.winners.slice(start, start + m) });
             }
         });
         this.pages = pages;
-        if (old) {
-            var anchor = pages.findIndex(function (page) { return page.groupIndex === old.groupIndex && page.start <= old.start && page.start + page.winners.length > old.start; });
-            this.pageIndex = Math.max(0, anchor);
-        }
-        this.pageIndex = Math.min(this.pageIndex, Math.max(0, pages.length - 1));
-        this.render(this.firstReveal, false);
+        this.pageIndex = old ? Math.max(0, pages.findIndex(function (page) {
+            return page.groupIndex === old.groupIndex && page.start <= old.start && page.start + page.winners.length > old.start;
+        })) : 0;
+        var reveal = this.firstReveal && !this.doc.hidden;
+        this.render(reveal);
         this.firstReveal = false;
+        // Same first-rotation timing as the demo, including the 4s interval after startup.
+        var count = pages[this.pageIndex] ? pages[this.pageIndex].winners.length : 0;
+        var delay = reveal && !this.reducedMotion() ? 1200 + count * Math.min(380, 2200 / count) + 2500 : 0;
+        this.startRotation(delay);
         this.layoutSize = this.sizeKey();
     };
-    ResultView.prototype.render = function (reveal, transition) {
-        this.clearTimer();
-        var page = this.pages[this.pageIndex], self = this;
+    ResultView.prototype.reducedMotion = function () {
+        return this.win.matchMedia && this.win.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    };
+    ResultView.prototype.render = function (reveal) {
         this.board.textContent = '';
-        if (!page) {
-            this.setHeading(null);
-            this.board.appendChild(this.element('div', 'import-result-empty', '暂无中奖结果'));
-            this.pager.hidden = true;
-            return;
-        }
-        this.setHeading(page.group);
-        var layout = page.layout;
-        this.board.style.setProperty('--ir-main-size', layout.main + 'px');
-        this.board.style.setProperty('--ir-extra-size', layout.extra + 'px');
-        this.board.style.setProperty('--ir-card-pad', layout.pad + 'px');
-        var reduced = this.win.matchMedia && this.win.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        var lastDelay = 0;
-        page.winners.forEach(function (winner, index) {
-            var card = self.element('div', 'import-result-card' + (layout.wrapped ? ' is-wrapped' : '') + (!reduced ? (reveal ? ' is-revealing' : (transition !== false ? ' is-entering' : '')) : ''));
+        this.content.querySelectorAll('.import-result-particle').forEach(function (p) { p.remove(); });
+        var page = this.pages[this.pageIndex], self = this;
+        this.setHeading(page && page.group);
+        this.pager.textContent = this.pages.length > 1 ? '第 ' + (this.pageIndex + 1) + ' / ' + this.pages.length + ' 页' : '';
+        if (!page) { this.board.appendChild(this.element('div', 'import-result-empty', '暂无中奖结果')); return; }
+        var lay = this.cardLayout, H = this.height;
+        var cardW = Math.min(lay.cw, lay.fs * 3.6), cardH = Math.min(lay.ch, lay.fs * 2);
+        var inner = this.element('div', 'import-result-inner');
+        inner.style.cssText = 'width:' + (lay.c * cardW + (lay.c - 1) * lay.g) + 'px;gap:' + lay.g + 'px';
+        this.board.appendChild(inner);
+        var reduced = this.reducedMotion(), count = page.winners.length;
+        page.winners.forEach(function (winner, i) {
+            var card = self.element('div', 'import-result-card' + (reveal && !reduced ? ' rolling' : (!reduced ? ' done' : '')));
             card.setAttribute('role', 'listitem');
-            card.style.width = layout.width + 'px';
-            card.style.height = layout.height + 'px';
-            var delay = reveal ? (page.winners.length <= 6 ? index * .16 : Math.floor(index / layout.cols) * .22) : 0;
-            lastDelay = Math.max(lastDelay, delay);
-            card.style.setProperty('--ir-delay', delay + 's');
-            var body = self.element('div', 'import-result-card-body');
-            body.appendChild(self.element('strong', 'import-result-main', winner.name));
-            if (winner.extras.length) {
-                var extras = self.element('div', 'import-result-extras');
-                winner.extras.forEach(function (extra) { extras.appendChild(self.element('div', 'import-result-extra', extra)); });
-                body.appendChild(extras);
-            }
-            card.appendChild(body);
-            // Extreme multi-line content remains fully accessible instead of being truncated.
-            if (layout.wrapped) { card.tabIndex = 0; card.setAttribute('aria-label', winner.name + ' ' + winner.extras.join(' ')); }
-            self.board.appendChild(card);
+            card.style.cssText = 'width:' + cardW + 'px;height:' + cardH + 'px;border-width:' + Math.max(2, H * .003) + 'px;border-radius:' + Math.min(28, cardH * .12) + 'px';
+            // Final server values only: no random-number interval from the demo.
+            var main = self.element('div', 'import-result-main', winner.name);
+            main.style.fontSize = lay.fs + 'px';
+            card.appendChild(main);
+            winner.extras.forEach(function (value) {
+                var extra = self.element('div', 'import-result-extra', value);
+                extra.style.fontSize = Math.max(12, lay.fs * .3) + 'px';
+                card.appendChild(extra);
+            });
+            inner.appendChild(card);
+            if (reveal && !reduced) self.later(function () {
+                card.classList.remove('rolling');
+                card.classList.add('done', 'sw');
+                if (i < 12) self.burst(card, count > 6 ? 8 : 14);
+            }, 1200 + i * Math.min(380, 2200 / count));
         });
-        this.updatePager();
-        this.schedule(reveal && !reduced ? Math.min(2000, (lastDelay + .9) * 1000) : 0);
     };
-    ResultView.prototype.updatePager = function () {
-        this.pager.hidden = this.pages.length <= 1;
-        this.pageLabel.textContent = (this.pageIndex + 1) + ' / ' + this.pages.length + ' 页 · 共 ' + this.total + ' 名';
-        this.pause.textContent = this.paused ? '继续轮播' : '暂停轮播';
-        this.pause.setAttribute('aria-pressed', this.paused ? 'true' : 'false');
+    ResultView.prototype.burst = function (card, count) {
+        var r = card.getBoundingClientRect(), f = this.content.getBoundingClientRect();
+        // Convert viewport pixels to local pixels so CSS zoom does not move the burst.
+        var k = f.width / this.width;
+        var cx = (r.left - f.left + r.width / 2) / k, cy = (r.top - f.top + r.height / 2) / k;
+        var colors = ['#ffe29a', '#f0c96b', '#fff', '#e8803a'], self = this;
+        for (var i = 0; i < count; i++) {
+            var particle = this.element('div', 'import-result-particle');
+            particle.style.left = cx + 'px'; particle.style.top = cy + 'px'; particle.style.background = colors[i % 4];
+            var angle = Math.random() * Math.PI * 2, distance = (.08 + Math.random() * .12) * this.unit;
+            particle.style.setProperty('--dx', Math.cos(angle) * distance + 'px');
+            particle.style.setProperty('--dy', Math.sin(angle) * distance - this.unit * .03 + 'px');
+            this.content.appendChild(particle);
+            (function (p) { self.later(function () { p.remove(); }, 1400); })(particle);
+        }
     };
-    ResultView.prototype.changePage = function (step, manual) {
-        if (!this.active || this.pages.length < 2) return;
-        if (manual) this.paused = true;
-        this.pageIndex = (this.pageIndex + step + this.pages.length) % this.pages.length;
-        this.render(false);
-    };
-    ResultView.prototype.clearTimer = function () {
-        if (this.timer !== null) this.win.clearTimeout(this.timer);
-        this.timer = null;
-    };
-    ResultView.prototype.schedule = function (revealTime) {
-        this.clearTimer();
-        if (!this.active || this.paused || this.doc.hidden || this.pages.length < 2) return;
+    ResultView.prototype.startRotation = function (delay) {
+        if (!this.active || this.doc.hidden || this.pages.length < 2) return;
         var self = this;
-        this.timer = this.win.setTimeout(function () { self.timer = null; self.changePage(1, false); }, this.interval + revealTime);
+        function start() {
+            self.rotation = self.win.setInterval(function () {
+                self.pageIndex = (self.pageIndex + 1) % self.pages.length;
+                self.render(false);
+            }, 4000);
+        }
+        if (delay) this.later(start, delay); else start();
+    };
+    ResultView.prototype.stopAll = function () {
+        var self = this;
+        this.timers.forEach(function (timer) { self.win.clearTimeout(timer); });
+        this.timers = [];
+        this.win.clearInterval(this.rotation);
+        this.rotation = null;
+        if (this.content) this.content.querySelectorAll('.import-result-particle').forEach(function (p) { p.remove(); });
     };
     ResultView.prototype.destroy = function () {
-        this.clearTimer();
-        if (this.frame !== null) this.win.cancelAnimationFrame(this.frame);
+        this.stopAll();
+        this.win.clearTimeout(this.resizeTimer);
         if (this.observer) this.observer.disconnect();
         if (this.styleObserver) this.styleObserver.disconnect();
         this.win.removeEventListener('resize', this.onResize);
         this.doc.removeEventListener('visibilitychange', this.onVisibility);
-        this.doc.removeEventListener('keydown', this.onKey, true);
         this.image.onerror = null;
         this.el.remove();
         this.active = false;
