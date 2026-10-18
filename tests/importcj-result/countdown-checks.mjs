@@ -10,7 +10,7 @@ const checks=await page.evaluate(()=>{
  try{
   ui.root.style.cssText='width:1440px;height:900px';showResult(40,'',{},2);const r=ui.importResult;
   const card=r.board.querySelector('.import-result-card'),width=parseFloat(card.style.width),font=parseFloat(card.querySelector('.import-result-main').style.fontSize);
-  checks.cardProportions=Math.abs(width/font-3.8)<.01&&Math.abs(parseFloat(card.style.height)/font-2.4)<.01;
+  checks.cardProportions=Math.abs(width/(font/.8)-3.8)<.01&&Math.abs(parseFloat(card.style.height)/(font/.8)-2.4)<.01;
   checks.noOperationText=r.prev.textContent==='‹'&&r.next.textContent==='›'&&r.pause.textContent==='';
   checks.thinLine=getComputedStyle(r.progress).height==='1px'&&!r.progress.querySelector('svg,circle');
   checks.waitForReveal=!r.progressAnimation&&r.rotationDeadline===null;

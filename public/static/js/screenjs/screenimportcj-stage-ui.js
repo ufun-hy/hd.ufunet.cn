@@ -1,5 +1,5 @@
 /* ImportCJ-only result presentation; shared message/avatar UI stays unchanged. */
-define(['screenjs/screen-stage-ui', 'screenjs/screenimportcj-result'], function (shared, resultView) {
+define(['screenjs/screen-stage-ui', 'screenjs/screenimportcj-result', 'screenjs/screenimportcj-typography'], function (shared, resultView, typography) {
     'use strict';
     return {
         normalizeCandidate: shared.normalizeCandidate,
@@ -30,6 +30,53 @@ define(['screenjs/screen-stage-ui', 'screenjs/screenimportcj-result'], function 
                 resultView.appendFields(card, winner, 'import-record', false);
                 return card;
             };
+            ui.fitRecordText = function () {
+                var drawer = this.recordsDrawer;
+                if (!drawer || !drawer.clientWidth) return;
+                // Each section is one round/prize; use all its records, including offscreen rows.
+                var sections = drawer.querySelectorAll('.screen-stage-records-section');
+                (sections.length ? Array.prototype.slice.call(sections) : [this.recordsListWrap]).forEach(function (section) {
+                    var buckets = {}, cards = Array.prototype.slice.call(section.querySelectorAll('.import-record-card'));
+                    cards.forEach(function (card) {
+                        card.style.height = '';
+                        card.querySelectorAll('[data-field-value]').forEach(function (node) { node.style.fontSize = ''; });
+                    });
+                    // Batch reads/writes so large record lists do not reflow once per card.
+                    var heights = cards.map(function (card) { return card.offsetHeight; });
+                    cards.forEach(function (card, i) { card.style.height = heights[i] + 'px'; });
+                    cards.forEach(function (card) {
+                        card.querySelectorAll('[data-field-value]').forEach(function (node) {
+                            var slot = Number(node.getAttribute('data-field-value'));
+                            var id = slot + ':' + node.getAttribute('data-field-index') + ':' + card.classList.contains('f1');
+                            var base = parseFloat(node.ownerDocument.defaultView.getComputedStyle(node).fontSize);
+                            var target = base * (slot === 0 ? .8 : 1) * Number(node.getAttribute('data-field-scale'));
+                            if (!buckets[id]) buckets[id] = { nodes: [], values: [], target: target, width: node.clientWidth };
+                            buckets[id].nodes.push(node); buckets[id].values.push(node.textContent);
+                            buckets[id].width = Math.min(buckets[id].width, node.clientWidth);
+                        });
+                    });
+                    Object.keys(buckets).forEach(function (id) {
+                        var b = buckets[id], size = typography.fit(b.nodes[0], b.values, b.target, b.width);
+                        b.nodes.forEach(function (node) { node.style.fontSize = size + 'px'; });
+                    });
+                    // A uniform height cap for the round avoids clipping at enlarged settings.
+                    var ratio = 1;
+                    section.querySelectorAll('.import-record-card').forEach(function (card) {
+                        var style = card.ownerDocument.defaultView.getComputedStyle(card), used = 0;
+                        Array.prototype.forEach.call(card.children, function (node) {
+                            var s = node.ownerDocument.defaultView.getComputedStyle(node);
+                            used += node.offsetHeight + (parseFloat(s.marginTop) || 0) + (parseFloat(s.marginBottom) || 0);
+                        });
+                        var available = card.clientHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom), textHeight = 0;
+                        card.querySelectorAll('[data-field-value]').forEach(function (node) { textHeight += node.offsetHeight; });
+                        // The two bottom cells share a row, so count only the tallest value there.
+                        var extras = card.querySelectorAll('.import-record-extra');
+                        if (extras.length === 2) textHeight -= Math.min(extras[0].offsetHeight, extras[1].offsetHeight);
+                        if (textHeight) ratio = Math.min(ratio, Math.max(.1, (available - (used - textHeight)) / textHeight));
+                    });
+                    if (ratio < 1) section.querySelectorAll('[data-field-value]').forEach(function (node) { node.style.fontSize = parseFloat(node.style.fontSize) * ratio + 'px'; });
+                });
+            };
             ui.setRecords = function (values, status) {
                 if (!this.recordsDrawer) return this;
                 this.importRecordIndex = 0;
@@ -42,6 +89,7 @@ define(['screenjs/screen-stage-ui', 'screenjs/screenimportcj-result'], function 
                     resultView.selectFields(values || [], options.resultConfig || {}, options.fieldConfig || []);
                 setRecords.call(this, data, status);
                 this.recordsDrawer.classList.toggle('has-many-cards', this.recordsListWrap.querySelectorAll('.import-record-card').length > 6);
+                this.fitRecordText();
                 return this;
             };
             ui.mount = function () {
@@ -71,6 +119,7 @@ define(['screenjs/screen-stage-ui', 'screenjs/screenimportcj-result'], function 
                         var W = self.root.clientWidth, H = self.root.clientHeight;
                         drawer.style.setProperty('--u', (W < H ? W * .0109 : Math.min(H, W * 9 / 16) / 100) + 'px');
                         drawer.classList.toggle('is-portrait', W < H);
+                        self.fitRecordText();
                     };
                     this.fitImportRecords();
                     if (window.ResizeObserver) {
@@ -78,6 +127,8 @@ define(['screenjs/screen-stage-ui', 'screenjs/screenimportcj-result'], function 
                         this.importRecordObserver.observe(this.root);
                     }
                     window.addEventListener('resize', this.fitImportRecords);
+                    this.recordFontsReady = function () { if (self.recordsDrawer) self.fitRecordText(); };
+                    if (drawer.ownerDocument.fonts) drawer.ownerDocument.fonts.addEventListener('loadingdone', this.recordFontsReady);
                 }
                 return this;
             };
@@ -89,6 +140,7 @@ define(['screenjs/screen-stage-ui', 'screenjs/screenimportcj-result'], function 
             ui.setState = function (state) {
                 setState.call(this, state);
                 if (this.importResult) this.importResult.setActive(this.state === 'result');
+                if (this.state === 'records') this.fitRecordText();
                 return this;
             };
             ui.closeRecords = function () {
@@ -102,6 +154,7 @@ define(['screenjs/screen-stage-ui', 'screenjs/screenimportcj-result'], function 
                 window.clearTimeout(this.importRecordCloseTimer);
                 if (this.importRecordObserver) this.importRecordObserver.disconnect();
                 if (this.fitImportRecords) window.removeEventListener('resize', this.fitImportRecords);
+                if (this.recordFontsReady && this.root.ownerDocument.fonts) this.root.ownerDocument.fonts.removeEventListener('loadingdone', this.recordFontsReady);
                 if (this.importResult) this.importResult.destroy();
                 this.importResult = null;
                 return destroy.call(this);

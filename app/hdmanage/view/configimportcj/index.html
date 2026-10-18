@@ -16,12 +16,13 @@
                          <tr>
                              <th style="width:15%;text-align:center;">数据名称</th>
                              <th style="width:15%;text-align:center;">数据颜色</th>
-                             <th style="width:60%;text-align:center;">数据隐私</th>
+                             <th style="width:18%;text-align:center;">文字大小</th>
+                             <th style="width:42%;text-align:center;">数据隐私</th>
                              <th style="width:10%;text-align:center;">操作</th>
                          </tr>
                      </thead>
                      <tbody class="fieldlists">
-                        {foreach $config['fieldconfig'] as $field}
+                        {foreach $config['fieldconfig'] as $fieldIndex=>$field}
                          <tr>
                              <td>
                                  <input class="form-control" type="text" name="fieldname[]" value="{$field['fieldname']}">
@@ -30,6 +31,9 @@
                                 <div class="zam-flex-center">
                                     {:tpl_color('fieldcolor[]',$field['fieldcolor'])}
                                 </div>
+                             </td>
+                             <td>
+                                 <div class="input-group"><input type="number" class="form-control import-field-scale" min="50" max="150" step="1" aria-label="字段文字大小比例" name="styleconfig[resultfieldscale{$fieldIndex+1}]" value="{:max(50,min(150,intval($config['styleconfig']['resultfieldscale'.($fieldIndex+1)]??100)))}"><span class="input-group-addon">%</span></div>
                              </td>
                              <td>
                                 <div class="zam-flex-center">
@@ -78,6 +82,7 @@
                          </tr>
                      </tfoot>
                  </table>
+                 <span class="help-block">文字大小用于中奖结果和中奖记录。100% 为默认自适应字号，主字段默认已缩小；长文字会自动缩小，仍放不下时显示省略号。字段颜色保持上方配置。</span>
                  
             </div>
         </div>
@@ -129,6 +134,14 @@ require(['webcore','jconfirmBox','zamnotice','layerBox','zvalidator'],function(w
     }).on('success.form.fv', function(e) {
         e.preventDefault();
         var $form = $(e.target);
+        // Preserve row order when fields are added or deleted; store with existing style settings.
+        var scaleValid = true;
+        $form.find('.import-field-scale').each(function (i) {
+            var value = Number(this.value);
+            if (!Number.isFinite(value) || value < 50 || value > 150 || Math.floor(value) !== value) scaleValid = false;
+            this.name = 'styleconfig[resultfieldscale' + (i + 1) + ']';
+        });
+        if (!scaleValid) { $form.formValidation('disableSubmitButtons', false); return zamnotice.showTips('error','文字大小请输入 50～150 的整数'); }
         var postData = webcore.serializeObject($form);
         var bload = $form.find(".zam-fixedbottom button").lyearloading({opacity: 0.2,spinnerSize: 'nm'});
         $form.formValidation('disableSubmitButtons', true);
@@ -182,6 +195,10 @@ function openfieldsecret(obj,status,url){
      <td>
         <div class="zam-flex-center">
             <input type="hidden" class="js-colorpicker" name="fieldcolor[]" value="#000" style="display: none;">
+        </div>
+     </td>
+     <td>
+        <div class="input-group"><input type="number" class="form-control import-field-scale" min="50" max="150" step="1" value="100" aria-label="字段文字大小比例"><span class="input-group-addon">%</span></div>
      </td>
      <td>
         <div class="zam-flex-center">

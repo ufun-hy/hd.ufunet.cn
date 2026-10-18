@@ -34,7 +34,7 @@ const result=await page.evaluate(async()=>{
                 const rect=c.getBoundingClientRect(),board=r.board.getBoundingClientRect();
                 same(rect.width,e.cardW,'card width');same(rect.height,e.cardH,'card height');
                 const expectedFont=e.lay.fs;
-                same(parseFloat(getComputedStyle(c.querySelector('.import-result-main')).fontSize),expectedFont,'main font');
+                same(parseFloat(getComputedStyle(c.querySelector('.import-result-main')).fontSize),expectedFont*.8,'main font (80% default)');
                 same(rect.width/expectedFont,3.8,'card width/font proportion');
                 same(rect.height/expectedFont,[1.9,2.4,3.2,3.2][f-1],'card height/font proportion');
                 if(f>=2)same(parseFloat(getComputedStyle(c.querySelector('.import-result-secondary')).fontSize),expectedFont*.5,'secondary font');

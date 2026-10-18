@@ -17,7 +17,7 @@ const result=await page.evaluate(async()=>{
   same(card.offsetHeight,expected.offsetHeight,'card height');
   same(parseFloat(getComputedStyle(card).width),parseFloat(win.getComputedStyle(expected).width),'card width');
   same(ui.recordsDrawer.querySelector('.screen-stage-records-drawer').offsetWidth,d.querySelector('#panel').offsetWidth,'panel width');
-  for(const [a,b]of pairs){const x=card.querySelector(a),y=expected.querySelector(b);if(!!x!==!!y)errors.push({f,kind:'field structure'});if(x&&y)same(parseFloat(getComputedStyle(x).fontSize),parseFloat(win.getComputedStyle(y).fontSize),a+' font');}
+  for(const [a,b]of pairs){const x=card.querySelector(a),y=expected.querySelector(b);if(!!x!==!!y)errors.push({f,kind:'field structure'});if(x&&y)same(parseFloat(getComputedStyle(x).fontSize),parseFloat(win.getComputedStyle(y).fontSize)*(a==='.import-record-main'?.8:1),a+' font');}
   if(ui.recordsListWrap.querySelectorAll('.import-record-card').length!==n)errors.push({f,n,kind:'lost cards'});
   if(card.querySelectorAll('[data-field-value]').length!==f)errors.push({f,kind:'wrong fields'});
   ref.remove();scenarios++;

@@ -4,17 +4,18 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>导入抽奖结果 · 本地隔离预览</title>
 <link rel="stylesheet" href="/public/static/css/screencss/screen-stage-ui.css">
-<link rel="stylesheet" href="/public/static/css/screencss/screenimportcj-stage-ui.css?v=20261017-card-themes">
+<link rel="stylesheet" href="/public/static/css/screencss/screenimportcj-stage-ui.css?v=20261019-field-type">
 <style>
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#28172a}
 .importcj-mainbox{position:relative;width:100%;height:100%}
 .fixture-ready{position:absolute;inset:0;display:grid;place-items:center;color:#fff;font:32px Arial}
-.importcj-mainbox:has(.screen-stage-ui[data-state="result"]) .fixture-ready{visibility:hidden}
+.importcj-mainbox:has(.screen-stage-ui[data-state="result"]) .fixture-ready,
+.importcj-mainbox:has(.screen-stage-ui[data-state="records"]) .fixture-ready{visibility:hidden}
 </style>
 <div class="importcj-mainbox"><div class="fixture-ready">准备界面 · 原有背景</div></div>
 <script src="/public/static/js/require.js"></script>
 <script>
-require.config({baseUrl:'/public/static/js',urlArgs:'v=20261017-card-themes'});
+require.config({baseUrl:'/public/static/js',urlArgs:'v=20261019-field-type'});
 require(['screenjs/screenimportcj-stage-ui','screenjs/screen-stage-ui'],function(importStage,sharedStage){
     window.showResult=function(count,kind,config,fieldCount,fieldColors){
         if(window.ui) window.ui.destroy();
@@ -26,6 +27,7 @@ require(['screenjs/screenimportcj-stage-ui','screenjs/screen-stage-ui'],function
         }}).mount();
         var winners=Array.from({length:count},function(_,i){return {datafield1:['A09','B14','B01'][i%3],datafield2:String(20902+i).padStart(6,'0'),datafield3:'',datafield4:'',id:i+1};});
         if(fieldCount) winners.forEach(function(w,i){w.datafield2=['张伟','王芳','李娜'][i%3];w.datafield3='市场部';w.datafield4=String(20902+i).padStart(6,'0');});
+        if(kind==='department') winners.forEach(function(w,i){w.datafield1=['运营支持部','财务管理部','品牌市场部'][i%3];w.datafield2=['张伟','王芳','李娜'][i%3];});
         if(kind==='long') winners.forEach(function(w,i){w.datafield1='研发中心嘉宾'+(i+1)+'号';w.datafield2='华东区域产品研发部';w.datafield3='020902';w.datafield4='VIP-00001234';});
         if(kind==='empty') winners=[{datafield1:'',datafield2:'',datafield3:''}];
         if(kind==='zero') winners=[{datafield1:0,datafield2:'000012'}];
@@ -40,7 +42,9 @@ require(['screenjs/screenimportcj-stage-ui','screenjs/screen-stage-ui'],function
         return true;
     };
     var p=new URLSearchParams(location.search);
-    showResult(Number(p.get('count')||3),p.get('kind')||'',{resultcardmode:p.get('cardstyle')||(p.has('cardcolor')?'custom':'gold'),resultcardcolor:p.get('cardcolor')},Number(p.get('fields')||0),(p.get('fieldcolors')||'').split(','));
+    var resultConfig={resultcardmode:p.get('cardstyle')||(p.has('cardcolor')?'custom':'gold'),resultcardcolor:p.get('cardcolor')};
+    (p.get('fieldscales')||'').split(',').forEach(function(value,i){if(value)resultConfig['resultfieldscale'+(i+1)]=value;});
+    showResult(Number(p.get('count')||3),p.get('kind')||'',resultConfig,Number(p.get('fields')||0),(p.get('fieldcolors')||'').split(','));
     if(p.get('records')) {ui.setRecords(fixtureInput);ui.setState('records');}
     if(p.get('zoom')) {var z=Number(p.get('zoom'));document.querySelector('.importcj-mainbox').style.cssText='zoom:'+z+';width:'+(100/z)+'vw;height:'+(100/z)+'vh';}
 });

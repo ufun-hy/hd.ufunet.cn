@@ -1,5 +1,5 @@
 /* Presentation only: consumes confirmed, privacy-formatted ImportCJ winners. */
-define([], function () {
+define(['screenjs/screenimportcj-typography'], function (typography) {
     'use strict';
     function text(value) { return value == null ? '' : String(value).trim(); }
     function fieldIndex(value, fallback) {
@@ -60,7 +60,7 @@ define([], function () {
         }
         copy.name = fields[primary] || '信息缺失';
         copy.displayFields = [primary].concat(extras.filter(function (i) { return i !== primary; })).map(function (i, slot) {
-            return { index: i, color: fieldConfig && fieldConfig[i] && fieldConfig[i].fieldcolor, label: text(fieldConfig && fieldConfig[i] && fieldConfig[i].fieldname) || '字段' + (i + 1), value: fields[i] || (slot ? '—' : '信息缺失') };
+            return { index: i, scale: typography.scale(config['resultfieldscale' + (i + 1)]), color: fieldConfig && fieldConfig[i] && fieldConfig[i].fieldcolor, label: text(fieldConfig && fieldConfig[i] && fieldConfig[i].fieldname) || '字段' + (i + 1), value: fields[i] || (slot ? '—' : '信息缺失') };
         });
         copy.extras = copy.displayFields.slice(1).map(function (field) { return field.value; });
         return copy;
@@ -92,6 +92,11 @@ define([], function () {
             });
         }
         if (!pending) fillFields(card, winner);
+        card.querySelectorAll('[data-field-value]').forEach(function (node) {
+            var field = fields[Number(node.getAttribute('data-field-value'))];
+            node.setAttribute('data-field-index', field.index);
+            node.setAttribute('data-field-scale', field.scale || 1);
+        });
     }
 
     // Use the style reference's 3.8 x 3.2 frame to choose grid and font size.
@@ -214,6 +219,11 @@ define([], function () {
         };
         this.win.addEventListener('resize', this.onResize);
         this.doc.addEventListener('visibilitychange', this.onVisibility);
+        this.onFonts = function () { self.typeSizes = null; if (self.active) self.sizeCards(); };
+        if (this.doc.fonts) {
+            this.doc.fonts.ready.then(this.onFonts);
+            this.doc.fonts.addEventListener('loadingdone', this.onFonts);
+        }
         if (this.win.ResizeObserver) {
             this.observer = new this.win.ResizeObserver(this.onResize);
             this.observer.observe(this.host);
@@ -237,6 +247,7 @@ define([], function () {
         this.pages = [];
         this.renderedPage = null;
         this.revealInProgress = false;
+        this.typeSizes = null;
         this.revealedWinners.clear();
         this.firstReveal = true;
         if (this.active) this.layout();
@@ -328,10 +339,54 @@ define([], function () {
         if (!lay || !inner) return;
         var cardW = lay.fs * CARD_WIDTH_RATIO, cardH = lay.fs * HF[this.fieldCount - 1];
         inner.style.cssText = 'width:' + (lay.c * cardW + (lay.c - 1) * lay.g) + 'px;gap:' + lay.g + 'px';
-        var fontSize = lay.fs;
+        var self = this, fontSize = lay.fs, samples = {};
         inner.querySelectorAll('.import-result-card').forEach(function (card) {
             card.style.cssText = '--fs:' + fontSize + 'px;width:' + cardW + 'px;height:' + cardH + 'px;--import-card-border-size:' + Math.max(2, H * .003) + 'px;border-radius:' + Math.min(28, cardH * .1) + 'px';
-            card.querySelector('.import-result-main').style.fontSize = fontSize + 'px';
+            card.querySelectorAll('[data-field-value]').forEach(function (node) {
+                samples[node.getAttribute('data-field-value')] = node;
+            });
+        });
+        var key = [cardW, cardH, fontSize].join(':');
+        if (!this.typeSizes || this.typeSizeKey !== key) {
+            var buckets = {}, sizes = {}, bases = [fontSize * .8, fontSize * .5, Math.max(13, fontSize * .3), Math.max(13, fontSize * .3)];
+            this.groups.forEach(function (group) { group.winners.forEach(function (winner) {
+                winner.displayFields.forEach(function (field, slot) {
+                    var id = slot + ':' + field.index;
+                    if (!buckets[id]) buckets[id] = { slot: slot, scale: field.scale || 1, cells: 1, values: [] };
+                    if (slot > 1) buckets[id].cells = Math.max(buckets[id].cells, winner.displayFields.length - 2);
+                    buckets[id].values.push(field.value);
+                });
+            }); });
+            Object.keys(buckets).forEach(function (id) {
+                var bucket = buckets[id], node = samples[bucket.slot] || samples[2] || samples[0], target = bases[bucket.slot] * bucket.scale;
+                var available = inner.firstElementChild.clientWidth * .92;
+                if (bucket.slot > 1) available = (available - (bucket.cells - 1) * fontSize * .2) / bucket.cells;
+                sizes[id] = typography.fit(node, bucket.values, target, available);
+            });
+            this.groups.forEach(function (group) { group.winners.forEach(function (winner) {
+                var fields = winner.displayFields;
+                if (fields.length > 1) {
+                    var secondary = '1:' + fields[1].index;
+                    sizes[secondary] = Math.min(sizes[secondary], sizes['0:' + fields[0].index] * .8);
+                }
+            }); });
+            // Leave room for fixed gaps/labels even when all four fields are set to 150%.
+            var maxHeight = 0;
+            this.groups.forEach(function (group) { group.winners.forEach(function (winner) {
+                var fields = winner.displayFields;
+                function size(slot) { return sizes[slot + ':' + fields[slot].index]; }
+                var height = size(0);
+                if (fields.length > 1) height += fontSize * .1 + size(1) * 1.2;
+                if (fields.length > 2) height += fontSize * .27 + 2 + Math.max(11, fontSize * .2) * 1.4 + Math.max(size(2), fields.length > 3 ? size(3) : 0) * 1.4;
+                maxHeight = Math.max(maxHeight, height);
+            }); });
+            var verticalScale = Math.min(1, (cardH - Math.max(4, H * .006)) * .94 / maxHeight);
+            Object.keys(sizes).forEach(function (id) { sizes[id] *= verticalScale; });
+            this.typeSizes = sizes; this.typeSizeKey = key;
+        }
+        inner.querySelectorAll('[data-field-value]').forEach(function (node) {
+            var id = node.getAttribute('data-field-value') + ':' + node.getAttribute('data-field-index');
+            node.style.fontSize = self.typeSizes[id] + 'px';
         });
     };
     ResultView.prototype.render = function (reveal) {
@@ -457,6 +512,7 @@ define([], function () {
         if (this.styleObserver) this.styleObserver.disconnect();
         this.win.removeEventListener('resize', this.onResize);
         this.doc.removeEventListener('visibilitychange', this.onVisibility);
+        if (this.doc.fonts) this.doc.fonts.removeEventListener('loadingdone', this.onFonts);
         this.image.onerror = null;
         this.el.remove();
         this.active = false;
