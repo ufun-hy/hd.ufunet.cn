@@ -38,8 +38,14 @@ const result=await page.evaluate((fieldCount)=>{
         r.layout();checks.resizeKeepsNodes=r.board.querySelector('.import-result-card')===cards[0];
         const firstTurn=count*step+2500+4000;
         tick(firstTurn-1);checks.firstPageHold=r.pageIndex===0;
-        tick(firstTurn);checks.firstTurn=r.pageIndex===1&&!r.board.querySelector('.is-pending,.sw')&&!!r.board.querySelector('.done');
-        tick(firstTurn+4000);checks.fourSeconds=r.pageIndex===2%r.pages.length;
+        tick(firstTurn);
+        const second=[...r.board.querySelectorAll('.import-result-card')],secondCount=second.length,secondStep=Math.min(380,2200/secondCount);
+        checks.firstTurn=r.pageIndex===1&&second[0].classList.contains('sw')&&second.slice(1).every(c=>c.classList.contains('is-pending')&&valuesText(c)==='');
+        tick(firstTurn+(secondCount-1)*secondStep);
+        checks.secondReveal=second.every(c=>c.classList.contains('done')&&c.classList.contains('sw'));
+        const secondTurn=firstTurn+secondCount*secondStep+2500+4000;
+        tick(secondTurn-1);checks.secondPageHold=r.pageIndex===1;
+        tick(secondTurn);checks.nextPage=r.pageIndex===2%r.pages.length;
         ui.setState('records');checks.cleanup=r.rotation===null&&r.timers.length===0&&!r.content.querySelector('.import-result-particle');
         tick(firstTurn+20000);checks.noHiddenRotation=r.pageIndex===2%r.pages.length;
         ui.setState('result');checks.returnIsStatic=!r.board.querySelector('.done,.sw,.is-pending')&&r.content.querySelectorAll('.import-result-particle').length===0;

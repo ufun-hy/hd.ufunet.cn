@@ -123,6 +123,7 @@ define([], function () {
         this.revealedWinners = new Set();
         this.timers = [];
         this.rotation = null;
+        this.paused = false;
         this.resizeTimer = null;
         this.mount();
     }
@@ -156,8 +157,24 @@ define([], function () {
         this.header.appendChild(this.title);
         this.board = this.element('div', 'import-result-board');
         this.board.setAttribute('role', 'list');
-        this.pager = this.element('div', 'import-result-pager');
-        this.pager.setAttribute('aria-live', 'polite');
+        this.pager = this.element('nav', 'import-result-pager');
+        this.pager.setAttribute('aria-label', '中奖结果分页');
+        function button(label, action) {
+            var node = self.element('button', 'import-result-page-button', label);
+            node.type = 'button'; node.onclick = action; self.pager.appendChild(node); return node;
+        }
+        this.prev = button('上一页', function () { self.changePage(-1); });
+        this.pageLabel = this.element('span', 'import-result-page-label');
+        this.pageLabel.setAttribute('aria-live', 'polite');
+        this.pager.appendChild(this.pageLabel);
+        this.next = button('下一页', function () { self.changePage(1); });
+        this.pause = button('暂停轮播', function () {
+            self.paused = !self.paused;
+            self.stopRotation();
+            self.updatePager();
+            if (!self.paused) self.startRotation();
+        });
+        this.updatePager();
         this.content.appendChild(this.header);
         this.content.appendChild(this.board);
         this.content.appendChild(this.pager);
@@ -175,7 +192,7 @@ define([], function () {
             self.stopAll();
             self.revealInProgress = false;
             self.renderedPage = null;
-            if (!self.doc.hidden) { self.render(false, false); self.startRotation(); }
+            if (!self.doc.hidden) { self.render(false); self.startRotation(); }
         };
         this.win.addEventListener('resize', this.onResize);
         this.doc.addEventListener('visibilitychange', this.onVisibility);
@@ -198,6 +215,7 @@ define([], function () {
         }, 1));
         this.total = this.groups.reduce(function (count, group) { return count + group.winners.length; }, 0);
         this.pageIndex = 0;
+        this.paused = false;
         this.pages = [];
         this.renderedPage = null;
         this.revealInProgress = false;
@@ -271,14 +289,14 @@ define([], function () {
         if (samePage) {
             // A resize or dock adjustment must not replace nodes or restart their effects.
             this.setHeading(page.group);
-            this.pager.textContent = this.pages.length > 1 ? '第 ' + (this.pageIndex + 1) + ' / ' + this.pages.length + ' 页' : '';
+            this.updatePager();
             this.sizeCards();
             this.renderedPage = page;
             this.layoutSize = this.sizeKey();
             return;
         }
         this.stopAll();
-        this.render(reveal, false);
+        this.render(reveal);
         this.firstReveal = false;
         // Keep the reading time after reveal, without the demo's removed number-roll delay.
         var count = pages[this.pageIndex] ? pages[this.pageIndex].winners.length : 0;
@@ -300,14 +318,14 @@ define([], function () {
             card.querySelector('.import-result-main').style.fontSize = lay.fs + 'px';
         });
     };
-    ResultView.prototype.render = function (reveal, pageTransition) {
+    ResultView.prototype.render = function (reveal) {
         this.board.textContent = '';
         this.content.querySelectorAll('.import-result-particle').forEach(function (p) { p.remove(); });
         var page = this.pages[this.pageIndex], self = this;
         this.renderedPage = page;
         this.el.classList.toggle('has-many-cards', !!page && page.winners.length > 6);
         this.setHeading(page && page.group);
-        this.pager.textContent = this.pages.length > 1 ? '第 ' + (this.pageIndex + 1) + ' / ' + this.pages.length + ' 页' : '';
+        this.updatePager();
         if (!page) { this.board.appendChild(this.element('div', 'import-result-empty', '暂无中奖结果')); return; }
         var inner = this.element('div', 'import-result-inner');
         this.board.appendChild(inner);
@@ -315,11 +333,12 @@ define([], function () {
         this.revealInProgress = reveal && !reduced;
         page.winners.forEach(function (winner, i) {
             var pending = reveal && !reduced && !self.revealedWinners.has(winner);
-            var card = self.element('div', 'import-result-card' + (pending ? ' is-pending' : (pageTransition && !reduced ? ' done' : '')));
+            var card = self.element('div', 'import-result-card' + (pending ? ' is-pending' : ''));
             card.setAttribute('role', 'listitem');
             if (pending) card.setAttribute('aria-hidden', 'true');
             // Keep the complete card concealed and its fields empty until its reveal.
             appendFields(card, winner, 'import-result', pending);
+            if (!pending) self.revealedWinners.add(winner);
             inner.appendChild(card);
             if (pending) reveals.push({ delay: i * Math.min(380, 2200 / count), run: function () {
                 fillFields(card, winner);
@@ -355,23 +374,48 @@ define([], function () {
             (function (p) { self.later(function () { p.remove(); }, 1400); })(particle);
         }
     };
+    ResultView.prototype.updatePager = function () {
+        this.pager.hidden = this.pages.length <= 1;
+        this.pageLabel.textContent = this.pages.length ? '第 ' + (this.pageIndex + 1) + ' / ' + this.pages.length + ' 页' : '';
+        this.prev.disabled = this.pages.length <= 1;
+        this.next.disabled = this.pages.length <= 1;
+        this.pause.textContent = this.paused ? '继续轮播' : '暂停轮播';
+        this.pause.setAttribute('aria-pressed', String(this.paused));
+    };
+    ResultView.prototype.changePage = function (direction) {
+        if (!this.active || this.pages.length < 2) return;
+        // Finish the outgoing page logically so revisiting it never replays celebration.
+        var self = this, page = this.pages[this.pageIndex];
+        if (page) page.winners.forEach(function (winner) { self.revealedWinners.add(winner); });
+        this.stopAll();
+        this.pageIndex = (this.pageIndex + direction + this.pages.length) % this.pages.length;
+        this.render(true);
+        this.startRotation();
+    };
+    ResultView.prototype.stopRotation = function () {
+        this.win.clearTimeout(this.rotation);
+        this.rotation = null;
+    };
     ResultView.prototype.startRotation = function (delay) {
-        if (!this.active || this.doc.hidden || this.pages.length < 2) return;
+        this.stopRotation();
+        if (!this.active || this.doc.hidden || this.paused || this.pages.length < 2) return;
         var self = this;
-        function start() {
-            self.rotation = self.win.setInterval(function () {
-                self.pageIndex = (self.pageIndex + 1) % self.pages.length;
-                self.render(false, true);
-            }, 4000);
+        if (delay === undefined) {
+            var pending = this.board.querySelectorAll('.is-pending').length;
+            var count = this.pages[this.pageIndex].winners.length;
+            delay = pending ? count * Math.min(380, 2200 / count) + 2500 : 0;
         }
-        if (delay) this.later(start, delay); else start();
+        // Give each new page the same reveal and reading time as the first page.
+        this.rotation = this.win.setTimeout(function () {
+            self.rotation = null;
+            self.changePage(1);
+        }, (delay || 0) + 4000);
     };
     ResultView.prototype.stopAll = function () {
         var self = this;
         this.timers.forEach(function (timer) { self.win.clearTimeout(timer); });
         this.timers = [];
-        this.win.clearInterval(this.rotation);
-        this.rotation = null;
+        this.stopRotation();
         if (this.content) this.content.querySelectorAll('.import-result-particle').forEach(function (p) { p.remove(); });
     };
     ResultView.prototype.destroy = function () {
