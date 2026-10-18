@@ -9,7 +9,7 @@ const result=await page.evaluate((fieldCount)=>{
     const showResult=n=>window.showResult(n,'',{},fieldCount);
     const valuesText=card=>[...card.querySelectorAll('[data-field-value]')].map(node=>node.textContent).join('');
     const realTimeout=window.setTimeout,realInterval=window.setInterval,realClearTimeout=window.clearTimeout,realClearInterval=window.clearInterval;
-    const jobs=new Map();let now=0,id=100000;
+    const realNow=Date.now;const jobs=new Map();let now=0,id=100000;Date.now=()=>now;
     window.setTimeout=(fn,ms=0)=>{jobs.set(++id,{fn,time:now+ms,repeat:0});return id;};
     window.setInterval=(fn,ms)=>{jobs.set(++id,{fn,time:now+ms,repeat:ms});return id;};
     window.clearTimeout=window.clearInterval=id=>jobs.delete(id);
@@ -36,14 +36,14 @@ const result=await page.evaluate((fieldCount)=>{
         checks.shine=shine.animationDuration==='1s'&&shine.animationDelay==='0.15s';
         tick((count-1)*step);checks.sequential=cards.every(c=>c.classList.contains('done'))&&cards.every((c,i)=>valuesText(c)===values[i]);
         r.layout();checks.resizeKeepsNodes=r.board.querySelector('.import-result-card')===cards[0];
-        const firstTurn=count*step+2500+4000;
+        const firstTurn=(count-1)*step+1150+4000;
         tick(firstTurn-1);checks.firstPageHold=r.pageIndex===0;
         tick(firstTurn);
         const second=[...r.board.querySelectorAll('.import-result-card')],secondCount=second.length,secondStep=Math.min(380,2200/secondCount);
         checks.firstTurn=r.pageIndex===1&&second[0].classList.contains('sw')&&second.slice(1).every(c=>c.classList.contains('is-pending')&&valuesText(c)==='');
         tick(firstTurn+(secondCount-1)*secondStep);
         checks.secondReveal=second.every(c=>c.classList.contains('done')&&c.classList.contains('sw'));
-        const secondTurn=firstTurn+secondCount*secondStep+2500+4000;
+        const secondTurn=firstTurn+(secondCount-1)*secondStep+1150+4000;
         tick(secondTurn-1);checks.secondPageHold=r.pageIndex===1;
         tick(secondTurn);checks.nextPage=r.pageIndex===2%r.pages.length;
         ui.setState('records');checks.cleanup=r.rotation===null&&r.timers.length===0&&!r.content.querySelector('.import-result-particle');
@@ -58,7 +58,7 @@ const result=await page.evaluate((fieldCount)=>{
         checks.repaginationConcealsPending=resizedCards.slice(1).every(c=>valuesText(c)===''&&getComputedStyle(c).visibility==='hidden');
         ui.destroy();
     }finally{
-        window.setTimeout=realTimeout;window.setInterval=realInterval;window.clearTimeout=realClearTimeout;window.clearInterval=realClearInterval;
+        Date.now=realNow;window.setTimeout=realTimeout;window.setInterval=realInterval;window.clearTimeout=realClearTimeout;window.clearInterval=realClearInterval;
         showResult(3);
     }
     return checks;

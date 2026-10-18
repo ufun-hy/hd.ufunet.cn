@@ -124,6 +124,9 @@ define([], function () {
         this.timers = [];
         this.rotation = null;
         this.paused = false;
+        this.rotationRemaining = 4000;
+        this.rotationDeadline = null;
+        this.revealReadyAt = 0;
         this.resizeTimer = null;
         this.mount();
     }
@@ -161,19 +164,32 @@ define([], function () {
         this.pager.setAttribute('aria-label', '中奖结果分页');
         function button(label, action) {
             var node = self.element('button', 'import-result-page-button', label);
-            node.type = 'button'; node.onclick = action; self.pager.appendChild(node); return node;
+            node.type = 'button'; node.setAttribute('aria-label', label); node.title = label;
+            node.onclick = action; self.pager.appendChild(node); return node;
         }
         this.prev = button('上一页', function () { self.changePage(-1); });
+        this.prev.textContent = '‹';
         this.pageLabel = this.element('span', 'import-result-page-label');
         this.pageLabel.setAttribute('aria-live', 'polite');
         this.pager.appendChild(this.pageLabel);
         this.next = button('下一页', function () { self.changePage(1); });
+        this.next.textContent = '›';
         this.pause = button('暂停轮播', function () {
             self.paused = !self.paused;
-            self.stopRotation();
+            self.stopRotation(true);
             self.updatePager();
             if (!self.paused) self.startRotation();
         });
+        this.pause.classList.add('import-result-playback');
+        this.pause.textContent = '';
+        this.pauseIcon = this.element('span', 'import-result-playback-icon');
+        this.pauseIcon.setAttribute('aria-hidden', 'true');
+        this.pause.appendChild(this.pauseIcon);
+        this.progress = this.element('span', 'import-result-page-progress');
+        this.progress.setAttribute('aria-hidden', 'true');
+        this.progressFill = this.element('span', 'import-result-page-progress-fill');
+        this.progress.appendChild(this.progressFill);
+        this.pager.appendChild(this.progress);
         this.updatePager();
         this.content.appendChild(this.header);
         this.content.appendChild(this.board);
@@ -298,10 +314,7 @@ define([], function () {
         this.stopAll();
         this.render(reveal);
         this.firstReveal = false;
-        // Keep the reading time after reveal, without the demo's removed number-roll delay.
-        var count = pages[this.pageIndex] ? pages[this.pageIndex].winners.length : 0;
-        var delay = count && reveal && !this.reducedMotion() ? count * Math.min(380, 2200 / count) + 2500 : 0;
-        this.startRotation(delay);
+        this.startRotation();
         this.layoutSize = this.sizeKey();
     };
     ResultView.prototype.reducedMotion = function () {
@@ -313,9 +326,10 @@ define([], function () {
         if (!lay || !inner) return;
         var cardW = Math.min(lay.cw, lay.fs * Math.max(3.6, WF[this.fieldCount - 1])), cardH = Math.min(lay.ch, lay.fs * HF[this.fieldCount - 1]);
         inner.style.cssText = 'width:' + (lay.c * cardW + (lay.c - 1) * lay.g) + 'px;gap:' + lay.g + 'px';
+        var fontSize = this.fieldCount <= 2 ? Math.min(lay.fs, cardW / 3.8) : lay.fs;
         inner.querySelectorAll('.import-result-card').forEach(function (card) {
-            card.style.cssText = '--fs:' + lay.fs + 'px;width:' + cardW + 'px;height:' + cardH + 'px;--import-card-border-size:' + Math.max(2, H * .003) + 'px;border-radius:' + Math.min(28, cardH * .1) + 'px';
-            card.querySelector('.import-result-main').style.fontSize = lay.fs + 'px';
+            card.style.cssText = '--fs:' + fontSize + 'px;width:' + cardW + 'px;height:' + cardH + 'px;--import-card-border-size:' + Math.max(2, H * .003) + 'px;border-radius:' + Math.min(28, cardH * .1) + 'px';
+            card.querySelector('.import-result-main').style.fontSize = fontSize + 'px';
         });
     };
     ResultView.prototype.render = function (reveal) {
@@ -331,6 +345,7 @@ define([], function () {
         this.board.appendChild(inner);
         var reduced = this.reducedMotion(), count = page.winners.length, reveals = [];
         this.revealInProgress = reveal && !reduced;
+        this.revealReadyAt = 0;
         page.winners.forEach(function (winner, i) {
             var pending = reveal && !reduced && !self.revealedWinners.has(winner);
             var card = self.element('div', 'import-result-card' + (pending ? ' is-pending' : ''));
@@ -351,6 +366,7 @@ define([], function () {
             } });
         });
         this.sizeCards();
+        if (reveals.length) this.revealReadyAt = this.win.Date.now() + reveals[reveals.length - 1].delay + 1150;
         reveals.forEach(function (effect) {
             // The first card enters in this render, not after a timer or a blank frame.
             if (!effect.delay) effect.run();
@@ -376,10 +392,13 @@ define([], function () {
     };
     ResultView.prototype.updatePager = function () {
         this.pager.hidden = this.pages.length <= 1;
-        this.pageLabel.textContent = this.pages.length ? '第 ' + (this.pageIndex + 1) + ' / ' + this.pages.length + ' 页' : '';
+        this.pageLabel.textContent = this.pages.length ? (this.pageIndex + 1) + ' / ' + this.pages.length : '';
         this.prev.disabled = this.pages.length <= 1;
         this.next.disabled = this.pages.length <= 1;
-        this.pause.textContent = this.paused ? '继续轮播' : '暂停轮播';
+        var label = this.paused ? '继续轮播' : '暂停轮播';
+        this.pause.setAttribute('aria-label', label);
+        this.pause.title = label;
+        this.pause.classList.toggle('is-paused', this.paused);
         this.pause.setAttribute('aria-pressed', String(this.paused));
     };
     ResultView.prototype.changePage = function (direction) {
@@ -392,24 +411,35 @@ define([], function () {
         this.render(true);
         this.startRotation();
     };
-    ResultView.prototype.stopRotation = function () {
+    ResultView.prototype.stopRotation = function (preserve) {
+        if (preserve && this.rotationDeadline !== null) this.rotationRemaining = Math.max(0, this.rotationDeadline - this.win.Date.now());
         this.win.clearTimeout(this.rotation);
         this.rotation = null;
+        this.rotationDeadline = null;
+        if (this.progressAnimation) this.progressAnimation.cancel();
+        this.progressAnimation = null;
+        if (!preserve) this.rotationRemaining = 4000;
+        if (this.progressFill) this.progressFill.style.transform = 'scaleX(' + (1 - this.rotationRemaining / 4000) + ')';
     };
-    ResultView.prototype.startRotation = function (delay) {
-        this.stopRotation();
+    ResultView.prototype.startRotation = function () {
+        this.stopRotation(true);
         if (!this.active || this.doc.hidden || this.paused || this.pages.length < 2) return;
         var self = this;
-        if (delay === undefined) {
-            var pending = this.board.querySelectorAll('.is-pending').length;
-            var count = this.pages[this.pageIndex].winners.length;
-            delay = pending ? count * Math.min(380, 2200 / count) + 2500 : 0;
+        function beginCountdown() {
+            var remaining = self.rotationRemaining;
+            self.rotationDeadline = self.win.Date.now() + remaining;
+            // The quiet progress line and page timer always use the same remaining time.
+            if (self.progressFill.animate) self.progressAnimation = self.progressFill.animate([
+                { transform: 'scaleX(' + (1 - remaining / 4000) + ')' }, { transform: 'scaleX(1)' }
+            ], { duration: remaining, easing: 'linear', fill: 'forwards' });
+            self.rotation = self.win.setTimeout(function () {
+                self.rotation = null;
+                self.changePage(1);
+            }, remaining);
         }
-        // Give each new page the same reveal and reading time as the first page.
-        this.rotation = this.win.setTimeout(function () {
-            self.rotation = null;
-            self.changePage(1);
-        }, (delay || 0) + 4000);
+        var wait = Math.max(0, this.revealReadyAt - this.win.Date.now());
+        if (wait) this.rotation = this.win.setTimeout(beginCountdown, wait);
+        else beginCountdown();
     };
     ResultView.prototype.stopAll = function () {
         var self = this;

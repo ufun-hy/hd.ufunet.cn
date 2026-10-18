@@ -6,7 +6,7 @@ await page.waitForFunction(()=>window.ui&&ui.importResult);
 const result=await page.evaluate(()=>{
  const checks={};
  for(const fields of [1,2,3,4]){
-  const real={setTimeout,clearTimeout,setInterval,clearInterval};let now=0,id=100000;const jobs=new Map();
+  const real={setTimeout,clearTimeout,setInterval,clearInterval},realNow=Date.now;let now=0,id=100000;Date.now=()=>now;const jobs=new Map();
   window.setTimeout=(fn,delay=0)=>{jobs.set(++id,{fn,time:now+delay});return id;};
   window.clearTimeout=key=>jobs.delete(key);
   function tick(to){while(true){const next=[...jobs].filter(([,j])=>j.time<=to).sort((a,b)=>a[1].time-b[1].time)[0];if(!next)break;const[key,j]=next;now=j.time;jobs.delete(key);j.fn();}now=to;}
@@ -15,7 +15,7 @@ const result=await page.evaluate(()=>{
    const r=ui.importResult,buttons=[r.prev,r.next,r.pause];
    checks['buttons'+fields]=!r.pager.hidden&&buttons.every(b=>b.tagName==='BUTTON');
    r.pause.click();tick(20000);
-   checks['pause'+fields]=r.pageIndex===0&&r.rotation===null&&r.pause.textContent==='继续轮播'&&!r.board.querySelector('.is-pending');
+   checks['pause'+fields]=r.pageIndex===0&&r.rotation===null&&r.pause.getAttribute('aria-label')==='继续轮播'&&!r.board.querySelector('.is-pending');
    r.next.click();
    checks['manualWhilePaused'+fields]=r.pageIndex===1&&r.paused&&r.rotation===null&&!!r.board.querySelector('.is-pending')&&!!r.board.querySelector('.sw');
    r.prev.click();
@@ -32,7 +32,7 @@ const result=await page.evaluate(()=>{
    const rect=r.pager.getBoundingClientRect(),content=r.content.getBoundingClientRect();
    checks['fitsPortrait'+fields]=rect.bottom<=content.bottom+1&&r.pager.scrollWidth<=r.content.clientWidth;
    r.destroy();checks['cleanup'+fields]=r.rotation===null&&r.timers.length===0;
-  }finally{Object.assign(window,real);showResult(3);}
+  }finally{Date.now=realNow;Object.assign(window,real);showResult(3);}
  }
  checks.singlePageHidden=ui.importResult.pager.hidden;
  return checks;

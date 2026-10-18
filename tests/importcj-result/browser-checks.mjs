@@ -30,8 +30,9 @@ const result=await page.evaluate(async()=>{
                 c.classList.remove('done');
                 const rect=c.getBoundingClientRect(),board=r.board.getBoundingClientRect();
                 same(rect.width,e.cardW,'card width');same(rect.height,e.cardH,'card height');
-                same(parseFloat(getComputedStyle(c.querySelector('.import-result-main')).fontSize),e.lay.fs,'main font');
-                if(f>=2)same(parseFloat(getComputedStyle(c.querySelector('.import-result-secondary')).fontSize),e.lay.fs*.5,'secondary font');
+                const expectedFont=f<=2?Math.min(e.lay.fs,e.cardW/3.8):e.lay.fs;
+                same(parseFloat(getComputedStyle(c.querySelector('.import-result-main')).fontSize),expectedFont,'main font');
+                if(f>=2)same(parseFloat(getComputedStyle(c.querySelector('.import-result-secondary')).fontSize),expectedFont*.5,'secondary font');
                 if(f>=3)same(parseFloat(getComputedStyle(c.querySelector('.import-result-extra')).fontSize),Math.max(13,e.lay.fs*.3),'extra font');
                 if(c.querySelectorAll('[data-field-value]').length!==f)errors.push({f,w,h,count,problem:'wrong field count'});
                 if(rect.left<board.left-1||rect.right>board.right+1||rect.top<board.top-1||rect.bottom>board.bottom+1)errors.push({w,h,count,p,problem:'card outside board'});
