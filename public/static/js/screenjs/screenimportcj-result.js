@@ -94,14 +94,16 @@ define([], function () {
         if (!pending) fillFields(card, winner);
     }
 
-    // Field-dependent geometry from 中奖界面布局演示（动效版） (2).html.
-    var HF = [1.9, 2.4, 3.2, 3.2], WF = [2.6, 2.8, 3.8, 3.8];
-    function best(m, aw, ah, H, f) {
+    // Use the style reference's 3.8 x 3.2 frame to choose grid and font size.
+    // Fewer fields shorten the card using the motion reference's height ratios;
+    // they must not enlarge the text or switch a three-card row into two rows.
+    var HF = [1.9, 2.4, 3.2, 3.2], CARD_WIDTH_RATIO = 3.8;
+    function best(m, aw, ah, H) {
         var b = null;
         for (var c = 1; c <= m; c++) {
             var r = Math.ceil(m / c), g = Math.min(aw, ah) * .03;
             var cw = (aw - (c - 1) * g) / c, ch = (ah - (r - 1) * g) / r;
-            var fs = Math.min(ch / HF[f - 1], cw / WF[f - 1], H * .24);
+            var fs = Math.min(ch / 3.2, cw / CARD_WIDTH_RATIO, H * .24);
             if (!b || fs > b.fs + .5) b = { c: c, r: r, g: g, cw: cw, ch: ch, fs: fs };
         }
         return b;
@@ -280,11 +282,11 @@ define([], function () {
         this.title.style.marginTop = .012 * u + 'px';
         var n = this.total, aw = .9 * W, top = .27 * u;
         var m = n, ah = H * .93 - top;
-        if (n && best(n, aw, ah, H, this.fieldCount).fs < .07 * H) {
+        if (n && best(n, aw, ah, H).fs < .07 * H) {
             ah = H * .88 - top;
-            for (m = Math.min(15, n); m > 1; m--) if (best(m, aw, ah, H, this.fieldCount).fs >= .07 * H) break;
+            for (m = Math.min(15, n); m > 1; m--) if (best(m, aw, ah, H).fs >= .07 * H) break;
         }
-        this.cardLayout = n ? best(m, aw, ah, H, this.fieldCount) : null;
+        this.cardLayout = n ? best(m, aw, ah, H) : null;
         this.capacity = m;
         this.board.style.cssText = 'left:' + (W - aw) / 2 + 'px;top:' + top + 'px;width:' + aw + 'px;height:' + ah + 'px';
         this.pager.style.top = H * .9 + 'px';
@@ -324,9 +326,9 @@ define([], function () {
         var lay = this.cardLayout, H = this.height;
         var inner = this.board.querySelector('.import-result-inner');
         if (!lay || !inner) return;
-        var cardW = Math.min(lay.cw, lay.fs * Math.max(3.6, WF[this.fieldCount - 1])), cardH = Math.min(lay.ch, lay.fs * HF[this.fieldCount - 1]);
+        var cardW = lay.fs * CARD_WIDTH_RATIO, cardH = lay.fs * HF[this.fieldCount - 1];
         inner.style.cssText = 'width:' + (lay.c * cardW + (lay.c - 1) * lay.g) + 'px;gap:' + lay.g + 'px';
-        var fontSize = this.fieldCount <= 2 ? Math.min(lay.fs, cardW / 3.8) : lay.fs;
+        var fontSize = lay.fs;
         inner.querySelectorAll('.import-result-card').forEach(function (card) {
             card.style.cssText = '--fs:' + fontSize + 'px;width:' + cardW + 'px;height:' + cardH + 'px;--import-card-border-size:' + Math.max(2, H * .003) + 'px;border-radius:' + Math.min(28, cardH * .1) + 'px';
             card.querySelector('.import-result-main').style.fontSize = fontSize + 'px';

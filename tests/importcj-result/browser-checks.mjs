@@ -1,4 +1,5 @@
-// Compare the integrated component with the user's actual reference HTML, not a second layout implementation.
+// Compare against the motion reference, adopting the later style reference's
+// common 3.8 x 3.2 grid frame, then shortening one/two-field card heights.
 const {strict:assert}=await import('node:assert');
 const task=await taskSpace(globalThis.RESULT_TEST_SPACE),page=task.page('p1');
 await page.cdp('Network.enable');await page.cdp('Network.setCacheDisabled',{cacheDisabled:true});
@@ -14,6 +15,8 @@ const result=await page.evaluate(async()=>{
         const occupied=h-ui.stage.querySelector('.screen-stage-dock').offsetTop;
         const ref=document.createElement('iframe');ref.style.cssText='position:absolute;left:-10000px;top:0;border:0;width:'+w+'px;height:'+h+'px';
         const html=source.replace('let n=3,f=4,ratio=16/9,','let n='+count+',f='+f+',ratio='+w+'/'+h+',')
+            .replace('WF=[2.6,2.8,3.8,3.8]', 'WF=[3.8,3.8,3.8,3.8]')
+            .replace('ch/HF[f-1]', 'ch/3.2')
             .replace("const barH=$('bar').offsetHeight;",'const barH='+occupied+';')
             .replace('grid.style.cssText=', 'window.expected={W,H,u,m,lay,pages,cardW,cardH};grid.style.cssText=');
         await new Promise(resolve=>{ref.onload=resolve;ref.srcdoc=html;document.body.appendChild(ref);});
@@ -30,8 +33,10 @@ const result=await page.evaluate(async()=>{
                 c.classList.remove('done');
                 const rect=c.getBoundingClientRect(),board=r.board.getBoundingClientRect();
                 same(rect.width,e.cardW,'card width');same(rect.height,e.cardH,'card height');
-                const expectedFont=f<=2?Math.min(e.lay.fs,e.cardW/3.8):e.lay.fs;
+                const expectedFont=e.lay.fs;
                 same(parseFloat(getComputedStyle(c.querySelector('.import-result-main')).fontSize),expectedFont,'main font');
+                same(rect.width/expectedFont,3.8,'card width/font proportion');
+                same(rect.height/expectedFont,[1.9,2.4,3.2,3.2][f-1],'card height/font proportion');
                 if(f>=2)same(parseFloat(getComputedStyle(c.querySelector('.import-result-secondary')).fontSize),expectedFont*.5,'secondary font');
                 if(f>=3)same(parseFloat(getComputedStyle(c.querySelector('.import-result-extra')).fontSize),Math.max(13,e.lay.fs*.3),'extra font');
                 if(c.querySelectorAll('[data-field-value]').length!==f)errors.push({f,w,h,count,problem:'wrong field count'});
