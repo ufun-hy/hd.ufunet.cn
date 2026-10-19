@@ -2,21 +2,20 @@
 <style type="text/css">.fieldlists tr td{text-align:center!important;}.lyear-checkbox span::before{border-color:gray;}</style>
 <form id="formBox" class="zam-formvalidation form-horizontal" method="post">
     <div class="config-titlebox">
-        <span class="config-titlename">大屏设置</span>
+        <span class="config-titlename">基础与数据</span>
         <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#screenconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
     </div>
     <div id="screenconfigbox" class="collapse in">
         {include file="$Wpath/common/configscreencommon" /}
-        {include file="$Wpath/common/configscreenmusic" /}
         <div class="form-group">
-            <label class="col-lg-2 control-label">* 数据结构</label>
+            <label class="col-lg-2 control-label">* 数据字段</label>
             <div class="col-lg-10">
                  <table class="table table-bordered">
                      <thead>
                          <tr>
                              <th style="width:15%;text-align:center;">数据名称</th>
-                             <th style="width:15%;text-align:center;">数据颜色</th>
-                             <th style="width:18%;text-align:center;">文字大小</th>
+                             <th style="width:15%;text-align:center;">字段文字颜色</th>
+                             <th style="width:18%;text-align:center;">结果/记录字号</th>
                              <th style="width:42%;text-align:center;">数据隐私</th>
                              <th style="width:10%;text-align:center;">操作</th>
                          </tr>
@@ -74,7 +73,7 @@
                      </tbody>
                      <tfoot>
                          <tr>
-                             <td colspan="4">
+                             <td colspan="5">
                                 <a href="javascript:;" class="btn btn-primary btn-xs btn-addone"><i class="mdi mdi-plus"></i>新增</a>
                                 <div class="help-block">此处设置决定了后台导入数据以及大屏幕展示的数据种类，您需要几种数据就增加几种，最多可支持4种</div>
                                 <div class="help-block">新增或者修改后需点击底部保存按钮</div>
@@ -86,30 +85,11 @@
                  
             </div>
         </div>
-        <div class="form-group">
-            <label class="col-lg-2 control-label">* 中奖数据列表是否自动滚动</label>
-            <div class="col-lg-8">
-                {:tpl_switch('autoscroll',$config['autoscroll']??'2')}
-                 <span class="help-block">注：仅中奖名单总高度超过外框总高度才可以自动滚动，如果您想停止自动滚动，将鼠标移动到某个中奖名单上将自动停止滚动，移开后将会自动重新开始滚动</span>
-            </div>
-        </div>
-        <div class="form-group">
-			<label class="col-lg-2 control-label">抽奖进行中背景音效</label>
-			<div class="col-lg-8">
-				{:tpl_audio('iscjingmusic',$config['iscjingmusic'])}
-				<span class="help-block">尽量控制在200KB内</span>
-			</div>
-		</div>
-		<div class="form-group">
-			<label class="col-lg-2 control-label">中奖弹窗时背景音效</label>
-			<div class="col-lg-8">
-				{:tpl_audio('iscjendmusic',$config['iscjendmusic'])}
-				<span class="help-block">尽量控制在200KB内</span>
-			</div>
-		</div>
     </div>
-    {include file='$Wpath/common/importcjresultconfig'}
     {include file='$Wpath/common/importcjstyle'}
+    {include file='$Wpath/common/importcjresultconfig'}
+    {include file='$Wpath/common/importcjmediaconfig'}
+    {include file='$Wpath/common/importcjlegacyconfig'}
     {include file='$Wpath/common/configsavepanel'}
 </form>
 {if dzroundcj() && isset($config['id']) && !empty($config['id'])}

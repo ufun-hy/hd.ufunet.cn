@@ -1,0 +1,99 @@
+<details id="importcj-legacy-settings">
+    <summary class="config-titlebox"><span class="config-titlename">旧版兼容设置</span></summary>
+    <p class="help-block">以下设置仅供旧版页面使用，当前大屏的结果卡片和控制台不使用这些设置。已有值会保留；通常无需修改。</p>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">旧版中奖列表自动滚动</label>
+        <div class="col-lg-8">
+            {:tpl_switch('autoscroll',$config['autoscroll']??'2')}
+            <span class="help-block">仅用于旧版长列表，当前结果页使用分页展示。</span>
+        </div>
+    </div>
+<div class="form-group">
+		<label class="col-lg-2 control-label">* 旧版奖项及奖品名称大小</label>
+		<div class="col-lg-10">
+			<div class="input-group">
+                <div class="input-group-btn not-allow"><a class="btn btn-default">奖项名称大小</a></div>
+                <div class="touchspin">
+					<input type="text" class="form-control numberincdec" name="styleconfig[awardsize]"
+					data-bts-min="0" data-bts-replacement-val="30"
+					data-bts-max="200"
+					data-bts-step="1"
+					data-bts-postfix="px"
+					data-bts-postfix-extra-class="touchspin-postfix"
+					value="{$config['styleconfig']['awardsize']??30}">
+                </div>
+                <div class="input-group-btn not-allow"><a class="btn btn-default">奖品名称大小</a></div>
+				<div class="touchspin">
+					<input type="text" class="form-control numberincdec" name="styleconfig[prizesize]"
+					data-bts-min="0" data-bts-replacement-val="25"
+					data-bts-max="200"
+					data-bts-step="1"
+					data-bts-postfix="px"
+					data-bts-postfix-extra-class="touchspin-postfix"
+					value="{$config['styleconfig']['prizesize']??25}">
+                </div>
+            </div>
+		</div>
+	</div>
+<div class="form-group">
+		<label class="col-lg-2 control-label">* 旧版中奖列表滚动速度</label>
+		<div class="col-lg-6">
+			<input type="text" class="form-control numberincdec" name="styleconfig[autoscrollspeed]"
+				data-bts-min="1" data-bts-replacement-val="1"
+				data-bts-max="200"
+				data-bts-step="1"
+				data-bts-postfix="px"
+				data-bts-postfix-extra-class="touchspin-postfix"
+				value="{$config['styleconfig']['autoscrollspeed']??50}">
+			<span class="zam-help-block">注:此设置仅限开启了自动滚动有效，设置的越大滚动越快，最大可以设置200</span>
+		</div>
+	</div>
+<div class="form-group">
+		<label class="col-lg-2 control-label">顶部奖品背景图</label>
+		<div class="col-lg-8">
+			{:tpl_image_one('styleconfig[topbg]',$config['styleconfig']['topbg'])}
+			<span class="help-block">规格:1034px * 76px</span>
+		</div>
+	</div>
+<div class="form-group">
+		<label class="col-lg-2 control-label">奖品动态背景图</label>
+		<div class="col-lg-8">
+			{:tpl_image_one('styleconfig[prizebg]',$config['styleconfig']['prizebg'])}
+			<span class="help-block">规格:600px * 600px</span>
+		</div>
+	</div>
+<div class="form-group">
+		<label class="col-lg-2 control-label">底部背景图</label>
+		<div class="col-lg-8">
+			{:tpl_image_one('styleconfig[bottombg]',$config['styleconfig']['bottombg'])}
+			<span class="help-block">规格:1056px * 116px</span>
+		</div>
+	</div>
+<div class="form-group">
+		<label class="col-lg-2 control-label">抽奖按钮背景图</label>
+		<div class="col-lg-8">
+			{:tpl_image_one('styleconfig[btn]',$config['styleconfig']['btn']??'')}
+			<span class="help-block">规格:153px * 45px</span>
+		</div>
+	</div>
+<div class="form-group">
+		<label class="col-lg-2 control-label">* 抽奖进行中显示停止按钮</label>
+		<div class="col-lg-8">
+			{:tpl_switch('styleconfig[showstopbtn]',$config['styleconfig']['showstopbtn']??'2')}
+			 <span class="help-block">仅控制旧版停止按钮；当前控制台始终提供停止入口。</span>
+		</div>
+	</div>
+<div class="form-group">
+		<label class="col-lg-2 control-label">结束抽奖背景视频（爆炸效果）</label>
+		<div class="col-lg-8">
+			{:tpl_video('styleconfig[baozhavideo]',$config['styleconfig']['baozhavideo'])}
+			<span class="help-block">规格:1920px * 1080px</span>
+		</div>
+	</div>
+<div class="form-group">
+		<label class="col-lg-2 control-label">* 右侧中奖列表别名</label>
+		<div class="col-lg-8">
+		  <input type="text" class="form-control"  name="styleconfig[listname]"  value="{$config['styleconfig']['listname']??'中奖列表'}" maxlength="15" placeholder="15个字符以内">
+		</div>
+	</div>
+</details>
