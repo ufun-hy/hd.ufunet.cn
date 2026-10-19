@@ -6,7 +6,7 @@ define(['screenjs/screen-stage-ui', 'screenjs/screenimportcj-result', 'screenjs/
         create: function (options) {
             options = options || {};
             var ui = shared.create(options);
-            var mount = ui.mount, destroy = ui.destroy, setState = ui.setState, setRecords = ui.setRecords;
+            var mount = ui.mount, destroy = ui.destroy, setState = ui.setState, setRecords = ui.setRecords, update = ui.update;
             // Keep ImportCJ field descriptors through group normalization without changing shared UI.
             ui.flattenWinners = function (values) {
                 var winners = [];
@@ -137,9 +137,47 @@ define(['screenjs/screen-stage-ui', 'screenjs/screenimportcj-result', 'screenjs/
                 if (this.importResult) this.importResult.setData(values, prize || {});
                 return this.setState('result');
             };
+            ui.prepareDrawing = function (data) {
+                if (String(options.flytype) !== '7' || !this.importResult) return false;
+                this.importResult.prepareJump(data);
+                return true;
+            };
+            ui.beginDrawing = function () {
+                return !!this.importResult && this.importResult.startJump();
+            };
+            ui.revealDrawing = function (callbacks) {
+                if (!this.importResult) return false;
+                callbacks = callbacks || {};
+                var self = this;
+                var accepted = this.importResult.revealJump({
+                    onFirstReveal: callbacks.onFirstReveal,
+                    onComplete: function () { if (callbacks.onComplete) callbacks.onComplete(); self.applyJumpGate(); }
+                });
+                this.applyJumpGate();
+                return accepted;
+            };
+            ui.applyJumpGate = function () {
+                if (!this.importResult || !this.importResult.jump || this.importResult.jump.phase !== 'revealing') return;
+                this.btnPrimary.disabled = true;
+                this.btnPrimaryText.textContent = '揭晓中…';
+                this.btnPrimary.setAttribute('aria-label', '揭晓中…');
+                this.btnRecords.disabled = true;
+                this.btnPrizeSettings.disabled = true;
+            };
+            ui.update = function (data) {
+                update.call(this, data);
+                this.applyJumpGate();
+                return this;
+            };
             ui.setState = function (state) {
                 setState.call(this, state);
-                if (this.importResult) this.importResult.setActive(this.state === 'result');
+                if (this.importResult) {
+                    if (this.state === 'ready') this.importResult.cancelJump();
+                    var jump = this.importResult.jump;
+                    var running = jump && jump.phase !== 'prepared' && /^(starting|drawing)$/.test(this.state);
+                    this.importResult.setActive(this.state === 'result' || !!running);
+                }
+                this.applyJumpGate();
                 if (this.state === 'records') this.fitRecordText();
                 return this;
             };

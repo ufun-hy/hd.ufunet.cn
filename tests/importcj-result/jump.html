@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>数据跳动 · 本地隔离预览</title>
+<link rel="stylesheet" href="/public/static/css/screencss/screen-stage-ui.css">
+<link rel="stylesheet" href="/public/static/css/screencss/screenimportcj-stage-ui.css">
+<link rel="stylesheet" href="/public/static/css/screencss/screenimportcj-jump.css">
+<style>html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#28172a}.importcj-mainbox{position:relative;width:100%;height:100%}</style>
+<div class="importcj-mainbox"></div>
+<script src="/public/static/js/jquery.2.1.4.js"></script>
+<script src="/public/static/js/require.js"></script>
+<script>
+require.config({baseUrl:'/public/static/js',urlArgs:'v=20261019-jump'});
+require(['screenjs/screenimportcj-stage-ui'],function(stage){
+    window.jumpStageModule=stage;
+    window.showJump=function(options){
+        options=options||{};
+        if(window.ui) ui.destroy();
+        window.jumpEvents=[];
+        var colors=(options.config||{}).resultcardmode==='transparent'?['#fff3d6','#f4dfa6','#fff3d6','#f4dfa6']:['#692f13','#83502f','#944422','#664422'];
+        window.ui=stage.create({root:document.querySelector('.importcj-mainbox'),flytype:'7',resultConfig:options.config||{},fieldConfig:['座位号','姓名','部门','编号'].slice(0,options.fields||4).map(function(name,i){return {fieldname:name,fieldcolor:colors[i]};}),callbacks:{
+            onPrimaryAction:function(){if(ui.state==='drawing') stopJump();else if(ui.state==='result') ui.setState('ready');else showJump(options);},
+            onRecords:function(){ui.setRecords(window.jumpWinners);ui.setState('records');},
+            onRecordsClose:function(){ui.setState('result');}
+        }}).mount();
+        var count=options.count||6;
+        var winners=options.winners||Array.from({length:count},function(_,i){return {id:i+1,datafield1:'W'+String(i+1).padStart(3,'0'),datafield2:'中奖嘉宾'+(i+1),datafield3:'产品部',datafield4:'138****'+String(i+1).padStart(4,'0')};});
+        if(options.groups) winners=[{prizename:'一等奖礼品',luckers:winners.slice(0,2)},{prizename:'二等奖礼品',luckers:winners.slice(2)}];
+        window.jumpWinners=winners;
+        window.jumpCandidates=options.candidates||Array.from({length:30},function(_,i){return {datafield1:'C'+String(i+1).padStart(3,'0'),datafield2:['张伟','李娜','王芳'][i%3],datafield3:['运营部','市场部'][i%2],datafield4:'139****'+String(i).padStart(4,'0')};});
+        window.stopJump=function(){return ui.revealDrawing({onFirstReveal:function(){jumpEvents.push('first');},onComplete:function(){jumpEvents.push('complete');ui.setState('result');}});};
+        ui.prepareDrawing({candidates:jumpCandidates,confirmedValues:winners,prize:{prizename:'数据跳动 · 测试礼品'},runId:1});
+        ui.setState('starting');ui.beginDrawing();ui.setState('drawing');
+        return true;
+    };
+    var q=new URLSearchParams(location.search);
+    showJump({count:Number(q.get('count')||6),fields:Number(q.get('fields')||4),groups:q.has('groups'),config:{resultcardmode:q.get('theme')||'gold'}});
+});
+</script>
+</html>

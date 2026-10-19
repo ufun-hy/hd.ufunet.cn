@@ -1,0 +1,18 @@
+/* Same result card, blue only while it is still sampling candidates. */
+.import-result.is-jump-session .import-result-card.is-jumping {
+    background: linear-gradient(145deg, rgba(27,71,151,.96), rgba(8,27,79,.96));
+    border: var(--import-card-border-size, 2px) solid #70bcff;
+    box-shadow: 0 0 24px rgba(48,139,255,.3), 0 12px 24px rgba(0,0,0,.24);
+    animation: import-jump-pulse 1.3s ease-in-out infinite alternate;
+    --import-card-divider: 1px solid rgba(167,211,255,.3);
+    --import-card-label: #b2d7ff;
+}
+.import-result .import-result-card.is-jumping [data-field-value] { color: #edf6ff !important; }
+.import-result .import-result-card.is-jumping .import-result-label { color: #b2d7ff; }
+.import-result .import-result-card.is-jumping .import-result-fields { border-color: rgba(167,211,255,.3); }
+.import-result .import-result-card.is-jump-lock.done { animation-name: import-jump-lock; }
+@keyframes import-jump-pulse { to { box-shadow: 0 0 38px rgba(72,157,255,.5), 0 12px 24px rgba(0,0,0,.24); } }
+@keyframes import-jump-lock { 0% { transform: scale(.96); } 60% { transform: scale(1.06); } 100% { transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) {
+    .import-result .import-result-card.is-jumping, .import-result .import-result-card.is-jump-lock.done { animation: none; }
+}

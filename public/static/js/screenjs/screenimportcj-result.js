@@ -1,5 +1,5 @@
 /* Presentation only: consumes confirmed, privacy-formatted ImportCJ winners. */
-define(['screenjs/screenimportcj-typography'], function (typography) {
+define(['screenjs/screenimportcj-typography', 'screenjs/screenimportcj-jump'], function (typography, jumpScheduler) {
     'use strict';
     function text(value) { return value == null ? '' : String(value).trim(); }
     function fieldIndex(value, fallback) {
@@ -212,6 +212,7 @@ define(['screenjs/screenimportcj-typography'], function (typography) {
         };
         this.onVisibility = function () {
             if (!self.active) return;
+            if (self.jump && self.jump.phase !== 'complete') { self.jump.clock.visibility(); return; }
             self.stopAll();
             self.revealInProgress = false;
             self.renderedPage = null;
@@ -236,6 +237,7 @@ define(['screenjs/screenimportcj-typography'], function (typography) {
         }
     };
     ResultView.prototype.setData = function (values, prize) {
+        this.cancelJump();
         this.stopAll();
         this.groups = this.normalizeGroups(selectFields(values, this.config, this.fieldConfig), prize).groups;
         this.fieldCount = Math.max(1, this.groups.reduce(function (max, group) {
@@ -251,6 +253,132 @@ define(['screenjs/screenimportcj-typography'], function (typography) {
         this.revealedWinners.clear();
         this.firstReveal = true;
         if (this.active) this.layout();
+    };
+    ResultView.prototype.prepareJump = function (options) {
+        // Normalization happens once so the same winner identity survives every resize.
+        this.setActive(false);
+        this.setData(options.confirmedValues, options.prize || {});
+        var self = this, candidates = selectFields(options.candidates || [], this.config, this.fieldConfig);
+        if (!candidates.length) candidates = [selectFields({ name: '等待揭晓' }, this.config, this.fieldConfig)];
+        this.fieldCount = candidates.reduce(function (n, item) { return Math.max(n, item.displayFields.length); }, this.fieldCount);
+        var session = this.jump = { phase: 'prepared', candidates: candidates, samples: candidates.slice(), cards: new Map(), callbacks: {}, runId: options.runId };
+        session.clock = jumpScheduler.create({
+            window: this.win,
+            hidden: function () { return self.doc.hidden; },
+            reduced: function () { return self.reducedMotion(); },
+            pending: function () { return self.jump === session ? self.jumpPending() : []; },
+            count: function () { return (self.pages[0] || { winners: [] }).winners.length; },
+            tick: function () { if (self.jump === session) self.tickJump(); },
+            lock: function (winner) { if (self.jump === session) self.lockJump(winner); },
+            first: function () { if (session.callbacks.onFirstReveal) session.callbacks.onFirstReveal(); },
+            complete: function () {
+                if (self.jump !== session) return;
+                session.phase = 'complete';
+                self.finishJump();
+                var callback = session.callbacks.onComplete;
+                session.callbacks = {};
+                if (callback) callback();
+            }
+        });
+        this.firstReveal = false;
+        this.el.classList.add('is-jump-session');
+        this.el.setAttribute('aria-label', '数据跳动抽奖');
+    };
+    ResultView.prototype.startJump = function () {
+        if (!this.jump || this.jump.phase !== 'prepared') return false;
+        this.jump.phase = 'drawing';
+        this.setActive(true);
+        return this.jump.clock.start();
+    };
+    ResultView.prototype.jumpPending = function () {
+        var self = this, page = this.pages[0];
+        return page ? page.winners.filter(function (winner) { return !self.revealedWinners.has(winner); }) : [];
+    };
+    ResultView.prototype.updateJumpCard = function (card, value) {
+        var signature = JSON.stringify(value.displayFields.map(function (field) { return [field.index, field.label]; }));
+        if (card._fieldSignature !== signature) {
+            card.textContent = '';
+            appendFields(card, value, 'import-result', false);
+            card._fieldSignature = signature;
+        } else fillFields(card, value);
+        // Sizes were measured against the whole round once, never against a random tick.
+        var sizes = this.typeSizes || {};
+        card.querySelectorAll('[data-field-value]').forEach(function (node) {
+            var size = sizes[node.getAttribute('data-field-value') + ':' + node.getAttribute('data-field-index')];
+            if (size) node.style.fontSize = size + 'px';
+        });
+    };
+    ResultView.prototype.tickJump = function () {
+        var self = this, session = this.jump;
+        this.jumpPending().forEach(function (winner) {
+            var card = session.cards.get(winner);
+            if (card) self.updateJumpCard(card, session.candidates[Math.floor(Math.random() * session.candidates.length)]);
+        });
+    };
+    ResultView.prototype.renderJump = function () {
+        var self = this, session = this.jump, page = this.pages[0];
+        this.pageIndex = 0;
+        this.renderedPage = page;
+        this.setHeading(page && page.group);
+        this.updatePager();
+        this.el.classList.toggle('has-many-cards', !!page && page.winners.length > 6);
+        var inner = this.board.querySelector('.import-result-inner');
+        if (!inner) { this.board.textContent = ''; inner = this.element('div', 'import-result-inner'); this.board.appendChild(inner); }
+        var visible = new Set(page ? page.winners : []);
+        session.cards.forEach(function (card, winner) { if (!visible.has(winner)) card.remove(); });
+        if (page) page.winners.forEach(function (winner) {
+            var card = session.cards.get(winner);
+            if (!card) {
+                card = self.element('div', 'import-result-card is-jumping');
+                card.setAttribute('role', 'listitem');
+                session.cards.set(winner, card);
+                self.updateJumpCard(card, session.candidates[Math.floor(Math.random() * session.candidates.length)]);
+            }
+            inner.appendChild(card);
+        });
+        this.sizeCards();
+    };
+    ResultView.prototype.lockJump = function (winner) {
+        var session = this.jump, card = session.cards.get(winner);
+        this.revealedWinners.add(winner);
+        if (!card) return;
+        this.updateJumpCard(card, winner);
+        card.classList.remove('is-jumping');
+        if (!this.reducedMotion() && !this.doc.hidden) {
+            card.classList.add('done', 'sw', 'is-jump-lock');
+            this.burst(card, this.jumpPending().length > 6 ? 8 : 14);
+        }
+    };
+    ResultView.prototype.revealJump = function (callbacks) {
+        if (!this.jump || this.jump.phase !== 'drawing') return false;
+        this.jump.phase = 'revealing';
+        this.jump.callbacks = callbacks || {};
+        return this.jump.clock.reveal();
+    };
+    ResultView.prototype.finishJump = function () {
+        if (!this.jump || this.jump.phase !== 'complete') return false;
+        this.el.setAttribute('aria-label', '中奖结果');
+        this.revealInProgress = false;
+        this.revealReadyAt = this.win.Date.now() + 2500;
+        this.updatePager();
+        this.startRotation();
+        return true;
+    };
+    ResultView.prototype.updateJumpCandidates = function (values) {
+        if (!this.jump || this.jump.phase === 'complete') return;
+        var session = this.jump;
+        var signatures = new Set(session.samples.map(function (item) { return item.displayFields.map(function (field) { return field.index; }).join(':'); }));
+        var candidates = selectFields(values || [], this.config, this.fieldConfig).filter(function (item) {
+            return signatures.has(item.displayFields.map(function (field) { return field.index; }).join(':'));
+        });
+        // A newly introduced field structure waits until the next round.
+        if (candidates.length) session.candidates = candidates;
+    };
+    ResultView.prototype.cancelJump = function () {
+        if (this.jump) this.jump.clock.cancel();
+        this.jump = null;
+        this.el.classList.remove('is-jump-session');
+        this.el.setAttribute('aria-label', '中奖结果');
     };
     ResultView.prototype.setActive = function (active) {
         if (this.active === active) return;
@@ -325,7 +453,8 @@ define(['screenjs/screenimportcj-typography'], function (typography) {
             return;
         }
         this.stopAll();
-        this.render(reveal);
+        if (this.jump && this.jump.phase !== 'complete') this.renderJump();
+        else this.render(reveal);
         this.firstReveal = false;
         this.startRotation();
         this.layoutSize = this.sizeKey();
@@ -340,6 +469,7 @@ define(['screenjs/screenimportcj-typography'], function (typography) {
         var cardW = lay.fs * CARD_WIDTH_RATIO, cardH = lay.fs * HF[this.fieldCount - 1];
         inner.style.cssText = 'width:' + (lay.c * cardW + (lay.c - 1) * lay.g) + 'px;gap:' + lay.g + 'px';
         var self = this, fontSize = lay.fs, samples = {};
+        var typeGroups = this.groups.concat(this.jump ? [{ winners: this.jump.samples }] : []);
         inner.querySelectorAll('.import-result-card').forEach(function (card) {
             card.style.cssText = '--fs:' + fontSize + 'px;width:' + cardW + 'px;height:' + cardH + 'px;--import-card-border-size:' + Math.max(2, H * .003) + 'px;border-radius:' + Math.min(28, cardH * .1) + 'px';
             card.querySelectorAll('[data-field-value]').forEach(function (node) {
@@ -349,7 +479,7 @@ define(['screenjs/screenimportcj-typography'], function (typography) {
         var key = [cardW, cardH, fontSize].join(':');
         if (!this.typeSizes || this.typeSizeKey !== key) {
             var buckets = {}, sizes = {}, bases = [fontSize * .8, fontSize * .5, Math.max(13, fontSize * .3), Math.max(13, fontSize * .3)];
-            this.groups.forEach(function (group) { group.winners.forEach(function (winner) {
+            typeGroups.forEach(function (group) { group.winners.forEach(function (winner) {
                 winner.displayFields.forEach(function (field, slot) {
                     var id = slot + ':' + field.index;
                     if (!buckets[id]) buckets[id] = { slot: slot, scale: field.scale || 1, cells: 1, values: [] };
@@ -363,7 +493,7 @@ define(['screenjs/screenimportcj-typography'], function (typography) {
                 if (bucket.slot > 1) available = (available - (bucket.cells - 1) * fontSize * .2) / bucket.cells;
                 sizes[id] = typography.fit(node, bucket.values, target, available);
             });
-            this.groups.forEach(function (group) { group.winners.forEach(function (winner) {
+            typeGroups.forEach(function (group) { group.winners.forEach(function (winner) {
                 var fields = winner.displayFields;
                 if (fields.length > 1) {
                     var secondary = '1:' + fields[1].index;
@@ -372,7 +502,7 @@ define(['screenjs/screenimportcj-typography'], function (typography) {
             }); });
             // Leave room for fixed gaps/labels even when all four fields are set to 150%.
             var maxHeight = 0;
-            this.groups.forEach(function (group) { group.winners.forEach(function (winner) {
+            typeGroups.forEach(function (group) { group.winners.forEach(function (winner) {
                 var fields = winner.displayFields;
                 function size(slot) { return sizes[slot + ':' + fields[slot].index]; }
                 var height = size(0);
@@ -448,7 +578,7 @@ define(['screenjs/screenimportcj-typography'], function (typography) {
         }
     };
     ResultView.prototype.updatePager = function () {
-        this.pager.hidden = this.pages.length <= 1;
+        this.pager.hidden = this.pages.length <= 1 || !!(this.jump && this.jump.phase !== 'complete');
         this.pageLabel.textContent = this.pages.length ? (this.pageIndex + 1) + ' / ' + this.pages.length : '';
         this.prev.disabled = this.pages.length <= 1;
         this.next.disabled = this.pages.length <= 1;
@@ -459,7 +589,7 @@ define(['screenjs/screenimportcj-typography'], function (typography) {
         this.pause.setAttribute('aria-pressed', String(this.paused));
     };
     ResultView.prototype.changePage = function (direction) {
-        if (!this.active || this.pages.length < 2) return;
+        if (!this.active || this.pages.length < 2 || (this.jump && this.jump.phase !== 'complete')) return;
         // Finish the outgoing page logically so revisiting it never replays celebration.
         var self = this, page = this.pages[this.pageIndex];
         if (page) page.winners.forEach(function (winner) { self.revealedWinners.add(winner); });
@@ -480,7 +610,7 @@ define(['screenjs/screenimportcj-typography'], function (typography) {
     };
     ResultView.prototype.startRotation = function () {
         this.stopRotation(true);
-        if (!this.active || this.doc.hidden || this.paused || this.pages.length < 2) return;
+        if (!this.active || this.doc.hidden || this.paused || this.pages.length < 2 || (this.jump && this.jump.phase !== 'complete')) return;
         var self = this;
         function beginCountdown() {
             var remaining = self.rotationRemaining;
@@ -506,6 +636,7 @@ define(['screenjs/screenimportcj-typography'], function (typography) {
         if (this.content) this.content.querySelectorAll('.import-result-particle').forEach(function (p) { p.remove(); });
     };
     ResultView.prototype.destroy = function () {
+        this.cancelJump();
         this.stopAll();
         this.win.clearTimeout(this.resizeTimer);
         if (this.observer) this.observer.disconnect();

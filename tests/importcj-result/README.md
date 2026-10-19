@@ -1,5 +1,13 @@
 # 导入抽奖结果组件验证
 
+## 数据跳动风格 7
+
+隔离预览：`http://127.0.0.1:8767/tests/importcj-result/jump.html`。支持 `count=1/3/6/10/20/40`、`fields=1/2/3/4`、`theme=gold/transparent/softgold/ivory/custom`、`groups=1`。点击停止可查看逐张原位定格；关闭后再次开始只使用同一组本地样例。
+
+在现有 Ego TaskSpace 中设置 `globalThis.RESULT_TEST_SPACE`，用 `await import('file:///绝对仓库路径/tests/importcj-result/jump-checks.mjs')` 与 `jump-controller-checks.mjs` 运行。每次 CLI 调用是新 Node 进程，可以重新 import 验证更新后的源码。
+
+`jump-checks.mjs` 使用虚拟时钟检查 120 组人数/字段/主题组合，以及分页、缩放、控制门禁、结构回退、候选更新、隐藏、取消和 reduced-motion。`jump-controller-checks.mjs` 执行真实控制器开始/停止方法，用内存 Promise 替代唯一开奖请求，覆盖视频时序、遗留停止方式、隐私格式化和旧回调隔离。均不访问真实业务接口。详见 [实现验收记录](../../docs/reviews/importcj-data-jump-implementation.md)。
+
 动效和字段结构参考用户提供的 `中奖界面布局演示（动效版） (2).html`（保存为 `reference.html`），记录参考保存为 `records-reference.html`。参考文件仅用于对照，不部署。当前布局、分页交互及字号已按后续讨论调整，不能把本实现描述为参考文件的原样复制。
 
 ## 预览

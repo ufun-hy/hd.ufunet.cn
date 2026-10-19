@@ -44,6 +44,10 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 		drawRequestPending: false,
 		currentLuckerHtml: '',
 		currentLuckerList: [],
+		jumpRunId: 0,
+		jumpPhase: null,
+		jumpStarted: false,
+		jumpStartGate: false,
 		mountUnifiedPrize: function (config) {
 			var self = this;
 			if (!screenimportcjPrize) return;
@@ -70,6 +74,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 			if (!screenimportcjStageUi) return;
 			self.stageUi = screenimportcjStageUi.create({
 				root: document.querySelector('.importcj-mainbox'),
+				flytype: self.flytype,
 				resultConfig: self.resultConfig,
 				fieldConfig: self.fieldconfig,
 				speedEnabled: self.flytype == '6',
@@ -402,6 +407,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 				self.bindevent();
 				if (typeof window !== 'undefined' && window.addEventListener) {
 					window.addEventListener('pagehide', function () {
+						if (self.flytype == '7') self.cancelJumpRun();
 						self.destroyUnifiedPrize();
 						self.destroyStageUi();
 						self.unbindStageFooterOffset();
@@ -429,6 +435,8 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 					});
 					self.danmakuStage.mount(self.getDanmakuCandidates());
 					self.danmakuStage.updateControls(self.getControlSnapshot());
+				} else if (self.flytype == '7') {
+					// The dedicated result view owns the jumping cards too.
 				} else if (self.flytype > 1) {
 					$("body").append('<ul class="importcj-wall hidden"></ul>');
 					if (self.flytype == '2') {
@@ -1004,7 +1012,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 		updateCardsData: function () {
 			var self = this, allLen = self.cards.length;
 			//数据更新
-			if (self.flytype > 1) {
+			if (self.flytype > 1 && self.flytype != '7') {
 				for (var j = 0; j < allLen; j++) {
 					var h = self.cards[j], s = $(h.element);
 					var userInfo = self.datas[Math.floor((Math.random() * self.datas.length))] || false;
@@ -1127,6 +1135,44 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 			}
 			return str;
 		},
+		getJumpCandidates: function () {
+			var self = this;
+			return self.datas.map(function (user) {
+				var copy = {};
+				for (var i = 0; i < 4; i++) copy['datafield' + (i + 1)] = self.fieldconfig[i] ? self.initonedata(user['datafield' + (i + 1)], self.fieldconfig[i]) : '';
+				return copy;
+			});
+		},
+		cancelJumpRun: function () {
+			this.jumpRunId++;
+			this.jumpPhase = null;
+			this.jumpStarted = false;
+			this.jumpStartGate = false;
+			if (this.stageUi && this.stageUi.importResult) this.stageUi.importResult.cancelJump();
+			var video = $('.firevideo1');
+			if (video.length) { video.off('.importJump').hide(); video[0].pause(); }
+		},
+		stopJumpLottery: function () {
+			var self = this, runId = self.jumpRunId;
+			if (self.jumpPhase !== 'drawing' || !self.jumpStarted || !self.jumpStartGate) return false;
+			self.jumpPhase = 'revealing';
+			if ($('#cjingmusic').length) { $('#cjingmusic')[0].pause(); $('#cjingmusic')[0].currentTime = 0; }
+			var video = $('.firevideo2');
+			if (video.length) { video.unbind('ended').hide(); video[0].pause(); }
+			return self.stageUi.revealDrawing({
+				onFirstReveal: function () {
+					if (runId === self.jumpRunId && $('#cjendmusic').length) $('#cjendmusic')[0].play();
+				},
+				onComplete: function () {
+					if (runId !== self.jumpRunId || self.jumpPhase !== 'revealing') return;
+					self.jumpPhase = 'complete';
+					self.isstart = '3'; self.drawRequestPending = false;
+					$('.importcj-mainbox').removeClass('isdrawing').addClass('isdrawed');
+					$('.btn-start').text('关闭');
+					self.setVisualState('result');
+				}
+			});
+		},
 		getHaloCandidates: function () {
 			var self = this, fieldIndex = -1;
 			for (var i = 0; i < 4; i++) {
@@ -1219,9 +1265,16 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 			self.setVisualState(returnState);
 			return true;
 		},
-		startDrawingAnimation: function () {
+		startDrawingAnimation: function (runId) {
 			var self = this;
 			if (self.isstart != '2') return;
+			if (self.flytype == '7') {
+				if (runId !== self.jumpRunId || self.jumpPhase !== 'prepared' || !self.stageUi) return;
+				if (!self.stageUi.beginDrawing()) return;
+				self.jumpStarted = true; self.jumpPhase = 'drawing';
+				if (self.jumpStartGate) self.setVisualState('drawing');
+				return;
+			}
 			if (self.flytype == '1') {
 				self.changerollitem();
 			} else if (self.flytype == '5') {
@@ -1251,6 +1304,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 					self.datas = json.msg;
 					if (self.datas.length) self.maxid = self.datas[0].dataid;
 					self.updateCardsData();
+					if (self.flytype == '7' && self.stageUi) self.stageUi.importResult.updateJumpCandidates(self.getJumpCandidates());
 					self.normalizeCurrentDrawCount();
 					if (self.flytype == '6' && self.danmakuStage) {
 						self.danmakuStage.updateCandidates(self.getDanmakuCandidates());
@@ -1276,6 +1330,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 							self.datas.push(v);
 						});
 						self.maxid = newdatas[0].dataid;
+						if (self.flytype == '7' && self.stageUi) self.stageUi.importResult.updateJumpCandidates(self.getJumpCandidates());
 						if (self.datas.length > 800) {
 							self.datas.splice(0, (self.datas.length - 300));
 						}
@@ -1316,10 +1371,15 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 				onceout = String(drawValidation.value);
 				self.syncLegacyDrawCount();
 			}
-			self.initrollitem(onceout > maxrollnum ? maxrollnum : onceout);
+			if (self.flytype == '7') {
+				if (!self.stageUi || !self.stageUi.importResult) return false;
+				self.cancelJumpRun();
+			} else self.initrollitem(onceout > maxrollnum ? maxrollnum : onceout);
+			var runId = self.jumpRunId;
 			self.drawRequestPending = true;
 			if (self.flytype == '6' || self.unifiedPrize) self.setVisualState('requesting');
 			screencore.ajaxSubmit('/screen/importcj/savelucker', { isroundcj: isroundcj, prizeid: prizeId, onceout: onceout }).then(function (e) {
+				if (self.flytype == '7' && runId !== self.jumpRunId) return;
 				if (e.code == 0) {
 					self.rememberLastSuccessfulPrize(prizeId);
 					self.currentLuckerHtml = '';
@@ -1335,7 +1395,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 								v.datafield3 = self.fieldconfig[2] ? self.initonedata(v.datafield3, self.fieldconfig[2]) : '';
 								v.datafield4 = self.fieldconfig[3] ? self.initonedata(v.datafield4, self.fieldconfig[3]) : '';
 							});
-							self.currentLuckerHtml += template('roundlucker-item', l);
+							if (self.flytype != '7') self.currentLuckerHtml += template('roundlucker-item', l);
 						});
 					} else {
 						$.each(e.msg.list, function (i, v) {
@@ -1345,29 +1405,46 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 							v.datafield2 = self.fieldconfig[1] ? self.initonedata(v.datafield2, self.fieldconfig[1]) : '';
 							v.datafield3 = self.fieldconfig[2] ? self.initonedata(v.datafield3, self.fieldconfig[2]) : '';
 							v.datafield4 = self.fieldconfig[3] ? self.initonedata(v.datafield4, self.fieldconfig[3]) : '';
-							self.currentLuckerHtml += template("lucker-tpl", v);
+							if (self.flytype != '7') self.currentLuckerHtml += template("lucker-tpl", v);
 						});
+					}
+					if (self.flytype == '7') {
+						self.stageUi.prepareDrawing({ candidates: self.getJumpCandidates(), confirmedValues: self.currentLuckerList, prize: self.getPrize(), runId: runId });
+						self.jumpPhase = 'prepared';
 					}
 					if (self.flytype != '6') screencore.hideFootAndQr();
 					setTimeout(function () {
+						if (self.flytype == '7' && runId !== self.jumpRunId) return;
 						var firevideo1 = $(".firevideo1");
-						if (firevideo1.length) {
+						if (self.flytype == '7' && firevideo1.length) {
+							var beginJump = function () {
+								if (runId !== self.jumpRunId) return;
+								firevideo1.off('.importJump').hide();
+								self.startDrawingAnimation(runId);
+							};
+							firevideo1.off('.importJump').on('ended.importJump error.importJump', beginJump).show();
+							firevideo1[0].currentTime = 0;
+							var playing = firevideo1[0].play();
+							if (playing && playing.catch) playing.catch(beginJump);
+						} else if (firevideo1.length) {
 							firevideo1.show();
 							firevideo1[0].play();
 							firevideo1.unbind('ended').bind('ended', function () {
 								firevideo1.hide();
-								self.startDrawingAnimation();
+								self.startDrawingAnimation(runId);
 							});
 						} else {
-							self.startDrawingAnimation();
+							self.startDrawingAnimation(runId);
 						}
 					}, 50);
 					$(".importcj-mainbox").removeClass('isdrawed').addClass('isdrawing');
 					self.isstart = '2';
 					if (self.flytype == '6' || self.unifiedPrize || self.stageUi) self.setVisualState('starting');
 					setTimeout(function () {
+						if (self.flytype == '7' && runId !== self.jumpRunId) return;
+						self.jumpStartGate = true;
 						$button.text('停止');
-						if (self.isstart == '2' && (self.flytype == '6' || self.unifiedPrize || self.stageUi)) self.setVisualState('drawing');
+						if (self.isstart == '2' && (self.flytype != '7' || self.jumpStarted) && (self.flytype == '6' || self.unifiedPrize || self.stageUi)) self.setVisualState('drawing');
 						if (e.msg.lucker) {
 							$(".lucker-numbox .prize-num").text(e.msg.lucker.prizenum);
 							$(".lucker-numbox .lucker-num").text(e.msg.lucker.luckernum);
@@ -1380,8 +1457,9 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 					if (self.flytype == '6' || self.unifiedPrize) self.setVisualState('ready');
 					layerBox.showMsg(e.msg);
 				}
-				setTimeout(function () { self.drawRequestPending = false; }, 1e3);
+				setTimeout(function () { if (self.flytype != '7' || runId === self.jumpRunId) self.drawRequestPending = false; }, 1e3);
 			}, function () {
+				if (self.flytype == '7' && runId !== self.jumpRunId) return;
 				self.drawRequestPending = false;
 				if (self.flytype == '6' || self.unifiedPrize) self.setVisualState('ready');
 				layerBox.showMsg('出现异常，请稍后重试');
@@ -1391,6 +1469,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 		stopLottery: function () {
 			var self = this, luckerList = self.currentLuckerList, luckerHtml = self.currentLuckerHtml;
 			if (self.isstart != '2' || self.getVisualState() != 'drawing') return false;
+			if (self.flytype == '7') return self.stopJumpLottery();
 			var dedicatedResult = !!(self.stageUi && self.stageUi.importResult);
 			if (self.flytype == '1' || self.flytype == '5' || self.flytype == '6') {
 				var prizeOne = self.prizeInfo[self.prizeIndex] || {}, stoptype = prizeOne.stoptype || '1';
@@ -1437,6 +1516,8 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 		closeResult: function () {
 			var self = this;
 			if (self.isstart != '3' && self.visualState != 'result') return false;
+			if (self.flytype == '7') self.cancelJumpRun();
+			var runId = self.jumpRunId;
 			if (isautoscroll == '1') {
 				self.removeautoScroll('.importcj-luckerbox-content');
 				setTimeout(function () { $(".importcj-mainbox").removeClass('isdrawed'); }, 20);
@@ -1450,7 +1531,9 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 			if (self.flytype == '6' && self.danmakuStage) self.danmakuStage.setReady(self.getDanmakuCandidates(), self.getPrize());
 			if ($("#cjendmusic").length) { $("#cjendmusic")[0].currentTime = 0; if (!$("#cjendmusic")[0].paused) $("#cjendmusic")[0].pause(); }
 			$(".importcj-luckerbox").hide();
-			setTimeout(function () { screencore.bgmusicplay(); }, 1e3);
+			setTimeout(function () {
+				if (self.flytype != '7' || (runId === self.jumpRunId && self.getVisualState() == 'ready')) screencore.bgmusicplay();
+			}, 1e3);
 			return true;
 		},
 		handlePrimaryAction: function () {

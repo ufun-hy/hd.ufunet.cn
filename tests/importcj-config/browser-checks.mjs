@@ -2,7 +2,7 @@
 const { strict: assert } = await import('node:assert');
 const task = await taskSpace(globalThis.CONFIG_TEST_SPACE), page = task.page('p1');
 const cases = [];
-for (const mode of ['activity', 'web']) for (const initial of ['1', '2', '3', '4', '5', '6']) {
+for (const mode of ['activity', 'web']) for (const initial of ['1', '2', '3', '4', '5', '6', '7']) {
     await page.goto(`http://127.0.0.1:8767/tests/importcj-config/?mode=${mode}&flytype=${initial}`);
     await page.waitForFunction(() => window.fixtureReady || window.fixtureError);
     const result = await page.evaluate(() => {
@@ -19,7 +19,7 @@ for (const mode of ['activity', 'web']) for (const initial of ['1', '2', '3', '4
             });
             check(document.querySelectorAll('.importcj-style-picker .hadchecked').length === 1, 'one selected style');
             check(document.querySelector('.importcj-style-picker .hadchecked').dataset.val === type, 'selected style');
-            const fields = {rolltxt1:['1'],over8linenum:['1'],flyonesize:['2'],flygridsize:['3'],flysphereballw:['4'],danmakusize:['6'],maxrollnum:['1','5','6'],color:['1','2','3','4','5']};
+            const fields = {rolltxt1:['1'],over8linenum:['1'],flyonesize:['2'],flygridsize:['3'],flysphereballw:['4'],danmakusize:['6'],maxrollnum:['1','5','6'],color:['1','2','3','4','5','7']};
             for (const [key, styles] of Object.entries(fields)) check(isVisible(form.querySelector('[name="styleconfig['+key+']"]')) === styles.includes(type), 'applicable field ' + key + ' at ' + type);
         };
         verifyStyle(window.fixtureReady.flytype);
@@ -30,7 +30,7 @@ for (const mode of ['activity', 'web']) for (const initial of ['1', '2', '3', '4
         check(JSON.stringify(order) === JSON.stringify(['基础与数据','抽奖风格与过程','结果与记录','音效与启动过渡','旧版兼容设置']), 'section order');
         form.querySelector('[name="styleconfig[flysphereballw]"]').value = '1777';
         const before = serialize();
-        for (const type of ['6','4','1','5','3','2','6','4']) { select(type); verifyStyle(type); }
+        for (const type of ['7','6','4','1','5','3','2','7','6','4']) { select(type); verifyStyle(type); }
         // Compare every submitted setting except the deliberately selected style.
         const after = serialize();
         check(Object.keys(before).length === Object.keys(after).length, 'same serialized field count');
@@ -60,4 +60,4 @@ for (const mode of ['activity', 'web']) for (const initial of ['1', '2', '3', '4
     cases.push(result);
     assert.deepEqual(result.errors, [], JSON.stringify(result));
 }
-console.log({ cases, result: 'PASS: both entry templates, six initial styles, switching, preserved serialized settings, legacy disclosure and keyboard selection' });
+console.log({ cases, result: 'PASS: both entry templates, seven initial styles, switching, preserved serialized settings, legacy disclosure and keyboard selection' });

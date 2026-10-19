@@ -39,6 +39,14 @@
 					<input type="hidden" name="styleimg6" value="/static/images/sys/style/importcj/6.svg">
 					{/if}
 				</div>
+                <div data-val="7" class="zam-styleitem{if isset($config['styleconfig']['flytype']) && $config['styleconfig']['flytype'] == '7'} hadchecked{/if}">
+                    <div class="zam-styleimg"><img src="/static/images/sys/style/importcj/7.svg" alt="蓝色跳动卡片逐张揭晓为中奖卡片"></div>
+                    <div class="zam-stylename">数据跳动</div>
+                    <div class="zam-selected"><i class="mdi mdi-check"></i></div>
+                    {if !request()->realhdid}
+                    <input type="hidden" name="styleimg7" value="/static/images/sys/style/importcj/7.svg">
+                    {/if}
+                </div>
 				</div>
 			<input type="hidden" name="styleconfig[flytype]" value="{$config['styleconfig']['flytype']??1}">
 			{if !request()->realhdid}
@@ -47,6 +55,9 @@
 		</div>
 	</div>
 <p class="help-block col-lg-offset-2">仅显示当前风格适用的设置；切换风格后，其他风格已填写的值仍会保留。</p>
+<div class="importcj-style-options{if !in_array(($config['styleconfig']['flytype']??'1'),['7'])} hidden{/if}" data-importcj-styles="7">
+    <div class="form-group"><label class="col-lg-2 control-label">数据跳动</label><div class="col-lg-8"><p class="form-control-static">候选数据在卡片内跳动，点击一次停止后逐张揭晓。卡片数量随本轮人数与屏幕空间自动适配，多页结果在首屏揭晓后轮播。</p><span class="help-block">字段、字号与结果卡片主题沿用“数据字段”和“结果与记录”的设置；跳动阶段统一使用蓝色卡片。</span></div></div>
+</div>
 <div class="importcj-style-options roll{if !in_array(($config['styleconfig']['flytype']??'1'),['1'])} hidden{/if}" data-importcj-styles="1">
 <div class="form-group">
 		<label class="col-lg-2 control-label">* 抽奖中滚动文字大小</label>
@@ -345,7 +356,7 @@
 		</div>
 	</div>
 </div>
-<div class="importcj-style-options {if !in_array(($config['styleconfig']['flytype']??'1'),['1','2','3','4','5'])} hidden{/if}" data-importcj-styles="1 2 3 4 5">
+<div class="importcj-style-options {if !in_array(($config['styleconfig']['flytype']??'1'),['1','2','3','4','5','7'])} hidden{/if}" data-importcj-styles="1 2 3 4 5 7">
 <div class="form-group">
 		<label class="col-lg-2 control-label">准备页强调色</label>
 		<div class="col-lg-8">
