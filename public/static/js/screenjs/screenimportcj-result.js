@@ -13,6 +13,14 @@ define(['screenjs/screenimportcj-typography', 'screenjs/screenimportcj-jump'], f
         probe.style.color = color;
         return probe.style.color;
     }
+    // Accept the same stored values the legacy prize box used as src: absolute,
+    // root-relative and plain relative attachment paths. Reject other URL schemes.
+    function prizeImageUrl(value) {
+        var url = text(value);
+        if (!url || /[\s"'<>]/.test(url)) return '';
+        var scheme = /^([a-z][a-z0-9+.-]*):/i.exec(url);
+        return scheme && !/^https?$/i.test(scheme[1]) ? '' : url;
+    }
     function applyCardBackground(host, config) {
         var mode = ['gold', 'transparent', 'softgold', 'ivory', 'custom'].indexOf(config.resultcardmode) >= 0 ? config.resultcardmode : 'gold';
         host.setAttribute('data-card-style', mode);
@@ -102,16 +110,31 @@ define(['screenjs/screenimportcj-typography', 'screenjs/screenimportcj-jump'], f
     // Use the style reference's 3.8 x 3.2 frame to choose grid and font size.
     // Fewer fields shorten the card using the motion reference's height ratios;
     // they must not enlarge the text or switch a three-card row into two rows.
-    var HF = [1.9, 2.4, 3.2, 3.2], CARD_WIDTH_RATIO = 3.8;
-    function best(m, aw, ah, H) {
+    var HF = [1.9, 2.4, 3.2, 3.2], FRAME_HF = 3.2, CARD_WIDTH_RATIO = 3.8, MAX_PAGE_CARDS = 24;
+    function best(m, aw, ah, H, hf) {
         var b = null;
         for (var c = 1; c <= m; c++) {
             var r = Math.ceil(m / c), g = Math.min(aw, ah) * .03;
             var cw = (aw - (c - 1) * g) / c, ch = (ah - (r - 1) * g) / r;
-            var fs = Math.min(ch / 3.2, cw / CARD_WIDTH_RATIO, H * .24);
+            var fs = Math.min(ch / (hf || FRAME_HF), cw / CARD_WIDTH_RATIO, H * .24);
             if (!b || fs > b.fs + .5) b = { c: c, r: r, g: g, cw: cw, ch: ch, fs: fs };
         }
         return b;
+    }
+    // Plan one prize group. A group that is readable in the reference frame keeps
+    // that exact look. Denser groups use the real card height for their field count,
+    // so short cards are not paged as if they had four fields. Pages are balanced.
+    function planGroup(n, aw, H, top, floor, hf, reservePager) {
+        var ah = H * (reservePager ? .88 : .93) - top, frame = best(n, aw, ah, H, FRAME_HF);
+        if (frame.fs >= floor) return { m: n, lay: frame, paged: reservePager };
+        var fit = n <= MAX_PAGE_CARDS && best(n, aw, ah, H, hf);
+        if (fit && fit.fs >= floor) return { m: n, lay: fit, paged: reservePager };
+        ah = H * .88 - top;
+        var m = Math.min(MAX_PAGE_CARDS, n);
+        while (m > 1 && best(m, aw, ah, H, hf).fs < floor) m--;
+        var count = Math.ceil(n / m);
+        m = Math.ceil(n / count);
+        return { m: m, count: count, lay: best(m, aw, ah, H, hf), paged: true };
     }
     function ResultView(options) {
         this.host = options.host;
@@ -161,7 +184,13 @@ define(['screenjs/screenimportcj-typography', 'screenjs/screenimportcj-jump'], f
         this.header = this.element('header', 'import-result-header');
         this.image = this.element('img', 'import-result-image');
         this.image.alt = '奖品图片';
-        this.image.onerror = function () { self.image.hidden = true; };
+        // Remember a failed URL so later headings keep it hidden instead of showing a broken image.
+        this.image.onerror = function () {
+            self.failedImage = self.image.getAttribute('src');
+            self.image.hidden = true;
+            if (self.width) self.title.style.maxWidth = .9 * self.width + 'px';
+        };
+        this.image.onload = function () { self.failedImage = null; };
         this.title = this.element('h2', 'import-result-title');
         this.header.appendChild(this.image);
         this.header.appendChild(this.title);
@@ -239,6 +268,8 @@ define(['screenjs/screenimportcj-typography', 'screenjs/screenimportcj-jump'], f
     ResultView.prototype.setData = function (values, prize) {
         this.cancelJump();
         this.stopAll();
+        // A new round may retry a prize image whose earlier request failed.
+        if (this.failedImage) { this.failedImage = null; this.image.removeAttribute('src'); }
         this.groups = this.normalizeGroups(selectFields(values, this.config, this.fieldConfig), prize).groups;
         this.fieldCount = Math.max(1, this.groups.reduce(function (max, group) {
             return group.winners.reduce(function (n, winner) { return Math.max(n, winner.displayFields.length); }, max);
@@ -394,10 +425,12 @@ define(['screenjs/screenimportcj-typography', 'screenjs/screenimportcj-jump'], f
     ResultView.prototype.setHeading = function (group) {
         group = group || {};
         this.title.textContent = group.prizename || '中奖结果';
-        var src = text(group.prizeimg);
-        var show = this.total <= 3 && this.width > this.height && /^(https?:\/\/|\/|\.\/|\.\.\/)/i.test(src);
+        var src = prizeImageUrl(group.prizeimg);
+        // Always show a configured prize image, whatever the winner count or screen orientation.
+        var show = !!src && src !== this.failedImage;
         this.image.hidden = !show;
         if (show && this.image.getAttribute('src') !== src) this.image.src = src;
+        else if (!src) this.image.removeAttribute('src');
         this.title.style.maxWidth = (show ? .9 * this.width - .265 * this.unit : .9 * this.width) + 'px';
     };
     ResultView.prototype.layout = function () {
@@ -419,23 +452,25 @@ define(['screenjs/screenimportcj-typography', 'screenjs/screenimportcj-jump'], f
         this.image.style.marginRight = .04 * u + 'px';
         this.title.style.fontSize = .063 * u + 'px';
         this.title.style.marginTop = .012 * u + 'px';
-        var n = this.total, aw = .9 * W, top = .27 * u;
-        var m = n, ah = H * .93 - top;
-        if (n && best(n, aw, ah, H).fs < .07 * H) {
-            ah = H * .88 - top;
-            for (m = Math.min(15, n); m > 1; m--) if (best(m, aw, ah, H).fs >= .07 * H) break;
-        }
-        this.cardLayout = n ? best(m, aw, ah, H) : null;
-        this.capacity = m;
-        this.board.style.cssText = 'left:' + (W - aw) / 2 + 'px;top:' + top + 'px;width:' + aw + 'px;height:' + ah + 'px';
+        // Each prize group gets its own card size. The readability floor is 7% of the
+        // short side: unchanged for landscape, and portrait is not forced into one column.
+        // 32px keeps the 13px extra fields and 11px labels inside small four-field cards.
+        var aw = .9 * W, top = .27 * u, floor = Math.max(32, .07 * Math.min(W, H)), hf = HF[this.fieldCount - 1], self = this;
+        this.board.style.cssText = 'left:' + (W - aw) / 2 + 'px;top:' + top + 'px;width:' + aw + 'px;height:' + (H * .93 - top) + 'px';
         this.pager.style.top = H * .9 + 'px';
         this.pager.style.fontSize = .026 * u + 'px';
         var old = this.pages[this.pageIndex], pages = [];
         this.groups.forEach(function (group, groupIndex) {
-            for (var start = 0; start < group.winners.length; start += m) {
-                pages.push({ group: group, groupIndex: groupIndex, start: start, winners: group.winners.slice(start, start + m) });
+            var n = group.winners.length, plan = planGroup(n, aw, H, top, floor, hf, self.groups.length > 1);
+            // Page sizes differ by at most one (40 -> 14+13+13); all pages share one card size.
+            var count = plan.count || 1, size = Math.floor(n / count), larger = n % count;
+            for (var p = 0, start = 0; p < count; p++) {
+                var length = size + (p < larger ? 1 : 0);
+                pages.push({ group: group, groupIndex: groupIndex, start: start, winners: group.winners.slice(start, start + length), capacity: plan.m, layout: plan.lay, paged: !!plan.paged });
+                start += length;
             }
         });
+        this.boardTop = top;
         this.pages = pages;
         this.pageIndex = old ? Math.max(0, pages.findIndex(function (page) {
             return page.groupIndex === old.groupIndex && page.start <= old.start && page.start + page.winners.length > old.start;
@@ -463,7 +498,9 @@ define(['screenjs/screenimportcj-typography', 'screenjs/screenimportcj-jump'], f
         return this.win.matchMedia && this.win.matchMedia('(prefers-reduced-motion: reduce)').matches;
     };
     ResultView.prototype.sizeCards = function () {
-        var lay = this.cardLayout, H = this.height;
+        var page = this.pages[this.pageIndex], lay = page && page.layout, H = this.height;
+        // Paged groups reserve the pager strip; single-page groups use the full board.
+        if (page) this.board.style.height = H * (page.paged ? .88 : .93) - this.boardTop + 'px';
         var inner = this.board.querySelector('.import-result-inner');
         if (!lay || !inner) return;
         var cardW = lay.fs * CARD_WIDTH_RATIO, cardH = lay.fs * HF[this.fieldCount - 1];
@@ -645,6 +682,7 @@ define(['screenjs/screenimportcj-typography', 'screenjs/screenimportcj-jump'], f
         this.doc.removeEventListener('visibilitychange', this.onVisibility);
         if (this.doc.fonts) this.doc.fonts.removeEventListener('loadingdone', this.onFonts);
         this.image.onerror = null;
+        this.image.onload = null;
         this.el.remove();
         this.active = false;
     };

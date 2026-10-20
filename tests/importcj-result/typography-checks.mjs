@@ -15,8 +15,8 @@ const result=await page.evaluate(()=>{
    const config={};for(let i=1;i<=4;i++)config['resultfieldscale'+i]=scale;
    showResult(40,'',config,f);const r=ui.importResult;r.stopAll();r.render(false);
    const size=card().style.width+'|'+card().style.height;
-   if(dimensions)check(size===dimensions&&capacity===r.capacity,'geometry changes with scale',context);
-   dimensions=size;capacity=r.capacity;
+   if(dimensions)check(size===dimensions&&capacity===r.pages.map(p=>p.capacity).join(),'geometry changes with scale',context);
+   dimensions=size;capacity=r.pages.map(p=>p.capacity).join();
    const before=fonts(card());
    for(let p=0;p<r.pages.length;p++){
     r.pageIndex=p;r.render(false);check(JSON.stringify(fonts(card()))===JSON.stringify(before),'page typography changed',context);
@@ -40,17 +40,17 @@ const result=await page.evaluate(()=>{
  }
  ui.root.style.cssText='width:1920px;height:1080px';
  showResult(40,'',{},2);let r=ui.importResult;r.stopAll();r.render(false);
- checks.defaultMain=Math.abs(fonts(card())[0]-r.cardLayout.fs*.8)<.02;
+ checks.defaultMain=Math.abs(fonts(card())[0]-r.pages[r.pageIndex].layout.fs*.8)<.02;
  const data=Array.from({length:40},(_,i)=>({id:i+1,datafield1:i===39?'运营支持部门组':'A09',datafield2:'张伟'}));
  ui.setResult(data,{});r.stopAll();r.render(false);const fit=fonts(card())[0];
- checks.longLastPageAffectsFirst=fit<r.cardLayout.fs*.8;
+ checks.longLastPageAffectsFirst=fit<r.pages[r.pageIndex].layout.fs*.8;
  const seen=[];for(let p=0;p<r.pages.length;p++){r.pageIndex=p;r.render(false);seen.push(fonts(card())[0]);}
  checks.allPagesSame=seen.every(x=>x===fit);
  checks.longChineseFits=[...r.board.querySelectorAll('.import-result-main')].every(n=>n.scrollWidth<=n.clientWidth+1);
  const previous=fit;r.layout();checks.resizeStable=fonts(card())[0]===previous;
  showResult(1,'extreme',{},2);r=ui.importResult;r.stopAll();r.render(false);
  const main=card().querySelector('.import-result-main');
- checks.extremeEllipsis=main.scrollWidth>main.clientWidth&&getComputedStyle(main).textOverflow==='ellipsis'&&parseFloat(main.style.fontSize)>=Math.min(r.cardLayout.fs*.8,Math.max(12,r.cardLayout.fs*.4))-.02&&main.title===fixtureInput[0].datafield1;
+ checks.extremeEllipsis=main.scrollWidth>main.clientWidth&&getComputedStyle(main).textOverflow==='ellipsis'&&parseFloat(main.style.fontSize)>=Math.min(r.pages[r.pageIndex].layout.fs*.8,Math.max(12,r.pages[r.pageIndex].layout.fs*.4))-.02&&main.title===fixtureInput[0].datafield1;
  showResult(3,'',{resultmainfield:'2',resultextra1:'1',resultextra2:'3',resultextra3:'4',resultfieldscale1:60,resultfieldscale2:120,resultfieldscale3:80,resultfieldscale4:110},4);
  r=ui.importResult;r.stopAll();r.render(false);ui.setRecords(fixtureInput);ui.setState('records');
  checks.mapping=[card(),ui.recordsListWrap.querySelector('.import-record-card')].every(c=>[...c.querySelectorAll('[data-field-value]')].map(n=>n.dataset.fieldScale).join(',')==='1.2,0.6,0.8,1.1');
@@ -65,7 +65,7 @@ const result=await page.evaluate(()=>{
  }
  // Newly formatted/privacy-masked values replace old measurements.
  ui.setResult([{id:1,datafield1:'张**'}],{});r=ui.importResult;r.stopAll();r.render(false);
- checks.maskPreserved=card().textContent==='张**'&&Math.abs(fonts(card())[0]-r.cardLayout.fs*.8)<.02;
+ checks.maskPreserved=card().textContent==='张**'&&Math.abs(fonts(card())[0]-r.pages[r.pageIndex].layout.fs*.8)<.02;
  ui.root.style.cssText='width:100%;height:100%';showResult(10,'department',{resultcardmode:'transparent'},2);
  return {errors,checks,scenarios};
 });

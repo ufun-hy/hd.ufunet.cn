@@ -50,11 +50,12 @@ const result=await page.evaluate((fieldCount)=>{
         tick(firstTurn+20000);checks.noHiddenRotation=r.pageIndex===2%r.pages.length;
         ui.setState('result');checks.returnIsStatic=!r.board.querySelector('.done,.sw,.is-pending')&&r.content.querySelectorAll('.import-result-particle').length===0;
         r.onVisibility();checks.visibilityIsStatic=!r.board.querySelector('.done,.sw,.is-pending');
-        showResult(40);const resized=ui.importResult;
-        const revealedValue=resized.board.querySelector('.import-result-main').textContent;
+        showResult(40);const resized=ui.importResult,firstCard=resized.board.querySelector('.import-result-card');
+        const revealedValue=resized.board.querySelector('.import-result-main').textContent,beforePages=resized.pages.map(p=>p.winners.length).join('+');
         ui.root.style.cssText='width:1920px;height:1080px';resized.layout();
         const resizedCards=[...resized.board.querySelectorAll('.import-result-card')];
-        checks.repaginationKeepsRevealed=resizedCards[0].textContent.startsWith(revealedValue)&&!resizedCards[0].classList.contains('done');
+        // Same page split keeps the animated nodes; a real repagination shows revealed winners statically.
+        checks.repaginationKeepsRevealed=resizedCards[0].textContent.startsWith(revealedValue)&&(resized.pages.map(p=>p.winners.length).join('+')===beforePages?resizedCards[0]===firstCard:!resizedCards[0].classList.contains('done'));
         checks.repaginationConcealsPending=resizedCards.slice(1).every(c=>valuesText(c)===''&&getComputedStyle(c).visibility==='hidden');
         ui.destroy();
     }finally{

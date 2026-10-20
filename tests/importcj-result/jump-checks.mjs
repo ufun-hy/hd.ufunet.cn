@@ -50,9 +50,10 @@ const results=await page.evaluate(()=>{
         tick(3000);ui.setState('records');ui.setState('result');check(!r.board.querySelector('.is-jumping,.is-pending,.done'),'return from records static');
         // A real capacity change must not re-randomize a winner already revealed.
         ui.root.style.cssText='width:375px;height:812px';showJump({count:40});r=ui.importResult;stopJump();tick(500);
-        const first=cards()[0],locked=values(first),beforeCapacity=r.capacity;
-        ui.root.style.cssText='width:1920px;height:1080px';r.layout();
-        check(r.capacity!==beforeCapacity,'resize changes capacity');check(cards()[0]===first&&values(first)===locked,'lock survives repagination');
+        const first=cards()[0],locked=values(first),beforeCapacity=r.pages[0].capacity;
+        // Pick a target that really changes the page capacity under the current plan.
+        for(const [w,h] of [[1920,1080],[1080,1920],[2560,1080],[1024,768]]){ui.root.style.cssText='width:'+w+'px;height:'+h+'px';r.layout();if(r.pages[0].capacity!==beforeCapacity)break;}
+        check(r.pages[0].capacity!==beforeCapacity,'resize changes capacity');check(cards()[0]===first&&values(first)===locked,'lock survives repagination');
         r.updateJumpCandidates([{datafield1:'NEW',datafield2:'新增候选',datafield3:'研发',datafield4:'133****1234'}]);tick(90);
         check(values(first)===locked&&cards().slice(1).some(c=>values(c).startsWith('NEW')),'candidate updates affect only unlocked cards');
         tick(4000);check(ui.state==='result'&&jumpEvents.length===2,'resized completion');

@@ -1,5 +1,8 @@
 // Compare against the motion reference, adopting the later style reference's
 // common 3.8 x 3.2 grid frame, then shortening one/two-field card heights.
+// When the reference fits a round on one readable page, the result must match it
+// exactly. Denser rounds use the per-page plan: real card height for the field
+// count, a floor of 7% of the short side, at most 24 cards and balanced pages.
 const {strict:assert}=await import('node:assert');
 const task=await taskSpace(globalThis.RESULT_TEST_SPACE),page=task.page('p1');
 await page.cdp('Network.enable');await page.cdp('Network.setCacheDisabled',{cacheDisabled:true});
@@ -23,22 +26,32 @@ const result=await page.evaluate(async()=>{
         const e=ref.contentWindow.expected;
         if(!e)throw Error('Reference did not execute');
         const same=(actual,expected,label)=>{if(Math.abs(actual-expected)>.05)errors.push({w,h,count,label,actual,expected});};
-        same(r.width,e.W,'stage width');same(r.height,e.H,'stage height');same(r.capacity,e.m,'capacity');same(r.pages.length,e.pages,'page count');
-        for(const k of ['c','r','g','cw','ch','fs'])same(r.cardLayout[k],e.lay[k],'layout '+k);
+        same(r.width,e.W,'stage width');same(r.height,e.H,'stage height');
+        const floor=Math.max(32,.07*Math.min(r.width,r.height)),referenceFits=e.pages===1&&e.lay.fs>=floor;
+        if(referenceFits){
+            same(r.pages.length,1,'page count');same(r.pages[0].capacity,e.m,'capacity');
+            for(const k of ['c','r','g','cw','ch','fs'])same(r.pages[0].layout[k],e.lay[k],'layout '+k);
+        }else{
+            if(r.pages.length>e.pages)errors.push({f,w,h,count,problem:'more pages than reference',actual:r.pages.length,expected:e.pages});
+            const sizes=r.pages.map(p=>p.winners.length);
+            if(Math.max(...sizes)-Math.min(...sizes)>1)errors.push({f,w,h,count,problem:'unbalanced pages',sizes:sizes.join('+')});
+            if(Math.max(...sizes)>24)errors.push({f,w,h,count,problem:'page over 24 cards',sizes:sizes.join('+')});
+            for(const p of r.pages)if(p.capacity>1&&p.layout.fs<floor-.05)errors.push({f,w,h,count,problem:'font below floor',fs:p.layout.fs,floor});
+        }
         const seen=[];
         for(let p=0;p<r.pages.length;p++){
             r.pageIndex=p;r.render(false);
-            const cards=[...r.board.querySelectorAll('.import-result-card')];
+            const lay=r.pages[p].layout,cards=[...r.board.querySelectorAll('.import-result-card')];
             for(const c of cards){
                 c.classList.remove('done');
                 const rect=c.getBoundingClientRect(),board=r.board.getBoundingClientRect();
-                same(rect.width,e.cardW,'card width');same(rect.height,e.cardH,'card height');
-                const expectedFont=e.lay.fs;
+                if(referenceFits){same(rect.width,e.cardW,'card width');same(rect.height,e.cardH,'card height');}
+                const expectedFont=lay.fs;
                 same(parseFloat(getComputedStyle(c.querySelector('.import-result-main')).fontSize),expectedFont*.8,'main font (80% default)');
                 same(rect.width/expectedFont,3.8,'card width/font proportion');
                 same(rect.height/expectedFont,[1.9,2.4,3.2,3.2][f-1],'card height/font proportion');
                 if(f>=2)same(parseFloat(getComputedStyle(c.querySelector('.import-result-secondary')).fontSize),expectedFont*.5,'secondary font');
-                if(f>=3)same(parseFloat(getComputedStyle(c.querySelector('.import-result-extra')).fontSize),Math.max(13,e.lay.fs*.3),'extra font');
+                if(f>=3)same(parseFloat(getComputedStyle(c.querySelector('.import-result-extra')).fontSize),Math.max(13,lay.fs*.3),'extra font');
                 if(c.querySelectorAll('[data-field-value]').length!==f)errors.push({f,w,h,count,problem:'wrong field count'});
                 if(rect.left<board.left-1||rect.right>board.right+1||rect.top<board.top-1||rect.bottom>board.bottom+1)errors.push({w,h,count,p,problem:'card outside board'});
             }
@@ -61,8 +74,9 @@ const edge=await page.evaluate(()=>{
     showResult(3,'',{resultmainfield:'2',resultextra1:'1',resultextra2:'1',resultextra3:'0'});
     out.mapping=ui.importResult.pages[0].winners[0].name==='020902'&&JSON.stringify(ui.importResult.pages[0].winners[0].extras)==='["A09"]';
     showResult(31,'groups');let r=ui.importResult;r.stopAll();
-    const widths=[];for(let p=0;p<r.pages.length;p++){r.pageIndex=p;r.render(false);widths.push(r.board.querySelector('.import-result-card').style.width);}
-    out.groups=new Set(widths).size===1&&r.total===31&&r.pages[0].group.awardname==='一等奖'&&r.pages[1].group.awardname==='二等奖';
+    // Each prize group has its own card size; pages within one group share it.
+    const widths={};for(let p=0;p<r.pages.length;p++){r.pageIndex=p;r.render(false);(widths[r.pages[p].groupIndex]=widths[r.pages[p].groupIndex]||new Set()).add(r.board.querySelector('.import-result-card').style.width);}
+    out.groups=Object.values(widths).every(set=>set.size===1)&&r.total===31&&r.pages[0].group.awardname==='一等奖'&&r.pages[1].group.awardname==='二等奖';
     const index=r.pageIndex;ui.setState('records');out.records=r.rotation===null&&r.timers.length===0&&r.el.hidden;
     ui.setState('result');out.return=r.pageIndex===index&&!r.el.querySelector('.is-pending,.done,.sw');
     ui.setState('ready');out.ready=r.el.hidden&&r.rotation===null&&r.timers.length===0;
@@ -72,3 +86,23 @@ const edge=await page.evaluate(()=>{
     showResult(3);return out;
 });
 console.log(edge);for(const [key,value] of Object.entries(edge))assert.ok(value,key);
+
+// Prize images show for any winner count/orientation; a failed URL stays hidden
+// in that round and is requested again by the next round.
+const image=await page.evaluate(async()=>{
+    const out={},wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+    const next=(img,type)=>Promise.race([new Promise(resolve=>img.addEventListener(type,()=>resolve(true),{once:true})),wait(3000).then(()=>false)]);
+    ui.root.style.cssText='width:1080px;height:1920px';showResult(20);let r=ui.importResult;
+    out.manyPortrait=!r.image.hidden&&r.image.getAttribute('src')==='/public/static/images/sys/prizeimg.png';
+    ui.root.style.cssText='width:100%;height:100%';
+    const bad='/public/static/images/sys/__missing_prize__.png',winners=[{id:1,datafield1:'A01'}];
+    ui.setResult(winners,{prizename:'失败重试',prizeimg:bad});r=ui.importResult;
+    out.firstFailure=await next(r.image,'error');
+    r.layout();r.changePage&&r.render(false);out.failedStaysHidden=r.image.hidden;
+    const retry=next(r.image,'error');ui.setResult(winners,{prizename:'失败重试',prizeimg:bad});
+    out.nextRoundRetries=await retry;out.retryVisibleUntilFailure=r.image.getAttribute('src')===bad;
+    const load=next(r.image,'load');ui.setResult(winners,{prizename:'恢复',prizeimg:'/public/static/images/sys/prizeimg.png'});
+    out.recovered=await load&&!r.image.hidden;
+    showResult(3);return out;
+});
+console.log(image);for(const [key,value] of Object.entries(image))assert.ok(value,key);

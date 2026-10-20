@@ -23,7 +23,7 @@ const result=await page.evaluate(()=>{
    r.next.click();
    checks['interruptedReturnStatic'+fields]=r.pageIndex===1&&!r.board.querySelector('.done,.sw,.is-pending');
    r.pause.click();tick(23999);checks['resumeHold'+fields]=r.pageIndex===1;
-   tick(24000);checks['resume'+fields]=r.pageIndex===2&&!!r.board.querySelector('.sw');
+   tick(24000);checks['resume'+fields]=r.pageIndex===2%r.pages.length&&!!r.board.querySelector('.sw');
    r.prev.click();r.next.click();r.prev.click();tick(24001);
    checks['rapidSwitch'+fields]=r.pageIndex===1&&!r.board.querySelector('.is-pending,.sw,.done')&&r.timers.length===0;
    r.pause.click();ui.setState('records');ui.setState('result');
