@@ -6,7 +6,7 @@
 
 在现有 Ego TaskSpace 中设置 `globalThis.RESULT_TEST_SPACE`，用 `await import('file:///绝对仓库路径/tests/importcj-result/jump-checks.mjs')` 与 `jump-controller-checks.mjs` 运行。每次 CLI 调用是新 Node 进程，可以重新 import 验证更新后的源码。
 
-`jump-checks.mjs` 使用虚拟时钟检查 120 组人数/字段/主题组合，以及分页、缩放、控制门禁、结构回退、候选更新、隐藏、取消和 reduced-motion。`jump-controller-checks.mjs` 执行真实控制器开始/停止方法，用内存 Promise 替代唯一开奖请求，覆盖视频时序、遗留停止方式、隐私格式化和旧回调隔离。均不访问真实业务接口。详见 [实现验收记录](../../docs/reviews/importcj-data-jump-implementation.md)。
+`jump-checks.mjs` 使用虚拟时钟检查 120 组人数/字段/主题组合，以及分页、缩放、控制门禁、结构回退、候选更新、隐藏、取消和 reduced-motion；另有 20 次复用同一组件、同一奖品的连续开奖，覆盖人数变化、翻页和查看记录后重开，确保旧卡片清除且本轮缩放保留节点。`jump-controller-checks.mjs` 执行真实控制器开始/停止方法，用内存 Promise 替代唯一开奖请求，覆盖视频时序、遗留停止方式、隐私格式化和旧回调隔离。均不访问真实业务接口。详见 [实现验收记录](../../docs/reviews/importcj-data-jump-implementation.md)。
 
 动效和字段结构参考用户提供的 `中奖界面布局演示（动效版） (2).html`（保存为 `reference.html`），记录参考保存为 `records-reference.html`。参考文件仅用于对照，不部署。当前布局、分页交互及字号已按后续讨论调整，不能把本实现描述为参考文件的原样复制。
 

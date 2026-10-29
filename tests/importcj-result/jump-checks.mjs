@@ -42,6 +42,32 @@ const results=await page.evaluate(()=>{
             check(JSON.stringify(jumpWinners).includes('W001'),'input not overwritten');
             report.push({fields,count,theme});
         }
+        // Production reuses the same component across rounds; showJump() remounts it.
+        // Keep one instance and prize while changing winner counts and return paths.
+        let repeatedRounds=0;
+        for(const fields of [1,2,3,4]){
+            showJump({fields,count:6});stopJump();tick(4000);
+            const view=ui.importResult,prize={id:77,prizename:'同一奖品'};
+            for(const [round,count] of [6,3,40,2,10].entries()){
+                if(round===3){view.changePage(1);tick(3000);}
+                if(round===4){ui.setRecords(jumpWinners);ui.setState('records');}
+                const oldCards=cards();
+                ui.setState('ready');
+                const winners=Array.from({length:count},(_,i)=>({id:1000+round*100+i,datafield1:'R'+round+'-'+i,datafield2:'本轮嘉宾'+i,datafield3:'产品部',datafield4:'138****0001'}));
+                ui.prepareDrawing({candidates:jumpCandidates,confirmedValues:winners,prize,runId:round+2});
+                ui.setState('starting');ui.beginDrawing();ui.setState('drawing');
+                check(ui.importResult===view,'consecutive rounds reuse the component');
+                check(oldCards.every(card=>!card.isConnected),'previous round cards removed');
+                check(cards().length===view.pages[0].winners.length&&cards().every(card=>card.classList.contains('is-jumping')),'only current round candidate cards');
+                const current=cards();view.layout();
+                check(cards().every((card,i)=>card===current[i]),'current round resize preserves nodes');
+                stopJump();tick(4000);
+                check(cards().length===view.pages[0].winners.length&&cards().every((card,i)=>values(card)===view.pages[0].winners[i].displayFields.map(f=>f.value).join('|')),'only current round confirmed winners');
+                const board=view.board.getBoundingClientRect();
+                check(cards().every(card=>{card.classList.remove('done');const rect=card.getBoundingClientRect();return rect.top>=board.top-1&&rect.bottom<=board.bottom+1;}),'previous results cannot push new cards outside board');
+                repeatedRounds++;
+            }
+        }
         showJump({count:31,groups:true});let r=ui.importResult;
         check(r.pages[0].winners.length===2&&cards().length===2,'small first prize group');
         stopJump();tick(920);check(ui.state==='result','group reveal completion');
@@ -91,12 +117,12 @@ const results=await page.evaluate(()=>{
         // Empty primaries, selected field order, long values, zeroes and markup remain safe text.
         showJump({count:1,config:{resultmainfield:'2',resultextra1:'1',resultextra2:'4',resultextra3:'3'},candidates:[{datafield1:'C09',datafield2:'',datafield3:'市场部',datafield4:'长'.repeat(120)}],winners:[{datafield1:0,datafield2:'',datafield3:'<img src=x onerror=alert(1)>',datafield4:'138****0123'}]});
         r=ui.importResult;stopJump();tick(500);check(cards()[0].querySelector('[data-field-value]').textContent==='0','empty main fallback keeps zero');check(!r.board.querySelector('img'),'no markup injection');
-        return {matrixCases:report.length,edgeCases:'timing, groups, resize, polling, privacy, hidden, cancel, safe fields'};
+        return {matrixCases:report.length,repeatedRounds,edgeCases:'timing, groups, resize, polling, privacy, hidden, cancel, safe fields'};
     }finally{
         if(window.ui)ui.destroy();Object.assign(window,{setTimeout:originals.setTimeout,clearTimeout:originals.clearTimeout,setInterval:originals.setInterval,clearInterval:originals.clearInterval});Date.now=originals.now;Math.random=originals.random;showJump({count:6});
     }
 });
-console.log(results);assert.equal(results.matrixCases,120);
+console.log(results);assert.equal(results.matrixCases,120);assert.equal(results.repeatedRounds,20);
 await page.cdp('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]});
 assert.ok(await page.evaluate(()=>{showJump({count:6});stopJump();return ui.state==='result'&&jumpEvents.join(',')==='first,complete'&&!ui.importResult.board.querySelector('.is-jumping');}));
 await page.cdp('Emulation.setEmulatedMedia',{features:[]});

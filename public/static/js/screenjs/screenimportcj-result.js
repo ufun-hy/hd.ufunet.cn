@@ -289,6 +289,9 @@ define(['screenjs/screenimportcj-typography', 'screenjs/screenimportcj-jump'], f
         // Normalization happens once so the same winner identity survives every resize.
         this.setActive(false);
         this.setData(options.confirmedValues, options.prize || {});
+        // A new session has a new card map; retire the previous round's DOM too.
+        // renderJump preserves nodes only for resizes within the current session.
+        this.board.textContent = '';
         var self = this, candidates = selectFields(options.candidates || [], this.config, this.fieldConfig);
         if (!candidates.length) candidates = [selectFields({ name: '等待揭晓' }, this.config, this.fieldConfig)];
         this.fieldCount = candidates.reduce(function (n, item) { return Math.max(n, item.displayFields.length); }, this.fieldCount);
