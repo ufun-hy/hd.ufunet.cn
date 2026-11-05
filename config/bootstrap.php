@@ -16,4 +16,5 @@ return [
     support\bootstrap\Session::class,
     support\bootstrap\LaravelDb::class,
     Webman\ThinkOrm\ThinkOrm::class,
+    app\bootstrap\CompatErrorRouter::class,   // 必须放最后，确保 handler 覆盖生效
 ];

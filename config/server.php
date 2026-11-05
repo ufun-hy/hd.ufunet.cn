@@ -18,5 +18,5 @@ return [
     'stdout_file' => '/var/log/miboout.log',
     'log_file' => '/var/log/mibo.log',
     'max_package_size' => 100 * 1024 * 1024,
-    'is_slb' => true,
+    'is_slb' => false,
 ];

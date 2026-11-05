@@ -643,6 +643,9 @@ function trimSpace(obj,type){
     return true;
 }
 </script>
+{if dznormalrequest('hidesys')}
+<style>.softxieyi,.serverinfobox{display:none}</style>
+{/if}
 {:globalcss()}
 {php}$hdinfo = request()->hdinfo;{/php}
 {if !empty($hdinfo) && isset($hdinfo['diycss']) && !empty($hdinfo['diycss'])}

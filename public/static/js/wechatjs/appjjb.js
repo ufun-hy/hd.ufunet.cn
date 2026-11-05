@@ -20,6 +20,7 @@ define('appjjb', ['appsocket', 'wechatcore', 'phaser'], function (appsocket, wec
 				self.initGame();
 				self.closerule = window.localStorage.getItem("closejjbrule-" + XCV3Config.hdid);
 				self.bindEvent();
+				wechatcore.bgAudioPlay();
 			});
 		},
 		initsocket: function () {
@@ -63,10 +64,6 @@ define('appjjb', ['appsocket', 'wechatcore', 'phaser'], function (appsocket, wec
 					}
 					self.showteambox(data.teaminfo, data.jointype);
 				} else if (data.type == 'gameiscountdown') {
-					if ($("#bgm").length > 0 && game.musicPause) {
-						if (!$("#bgm")[0].paused) $("#bgm")[0].pause();
-						game.musicPause = false;
-					}
 					self.gamestatus = 1;
 					self.myscore = 0;
 					self.hidemyteambox();
@@ -74,7 +71,7 @@ define('appjjb', ['appsocket', 'wechatcore', 'phaser'], function (appsocket, wec
 					s.text(data.djs > 0 ? data.djs : 'GO');
 					b.removeClass('hidden');
 					self.gametip = self.statustip[1];
-					wechatcore.playAudio(self.djsaudio);
+					wechatcore.audioPlay(self.djsaudio);
 					if (data.djs == 0) {
 						self.gametip = self.statustip[2];
 						setTimeout(function () {
@@ -148,7 +145,7 @@ define('appjjb', ['appsocket', 'wechatcore', 'phaser'], function (appsocket, wec
 		},
 		initAudio: function () {
 			var self = this;
-			self.djsaudio = $("#djsaudio")[0];
+			self.djsaudio = { audio: wechatcore.autoAudio({ audio: $("#djsaudio")[0] }) };
 		},
 		bindEvent: function () {
 			var self = this;
@@ -284,14 +281,16 @@ define('appjjb', ['appsocket', 'wechatcore', 'phaser'], function (appsocket, wec
 		initGame: function () {
 			var self = this;
 			game = new Phaser.Game(Gameconfig.gameW, Gameconfig.gameH, Phaser.CANVAS, 'zam-app-mainbox', null, true);
-			game.playAudio = function (audio) {
-				wechatcore.playAudio(audio, '2');
-			};
-
+			game.playMusic = function (sound) {
+				var key = sound?.key || '';
+				var soundok = key && game.cache.checkSoundKey(key) && game.cache.isSoundDecoded(key);
+				if (soundok) {
+					wechatcore.audioPlay({ audio: sound });
+				}
+			}
 			game.States = {
 				bootState: {
 					init: function () {
-						game.musicPause = false;
 						game.scale.pagesAlignHorizontally = true;
 						game.scale.pageAlignVertically = true;
 						game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
@@ -329,16 +328,19 @@ define('appjjb', ['appsocket', 'wechatcore', 'phaser'], function (appsocket, wec
 						game.load.audio('coinv', Gameconfig.gameImgs.coinv, true);
 						game.load.audio('boomv', Gameconfig.gameImgs.boomv, true);
 						game.load.audio('overv', Gameconfig.gameImgs.overv, true);
-						if (Gameconfig.gameImgs.bgv) {
-							game.load.audio('bgv', Gameconfig.gameImgs.bgv, true);
-						}
 						game.load.onFileComplete.add(function (progress) {
 							self.progresstxt.text = progress + '%';
 						});
 						game.load.onLoadComplete.add(function () {
-							var voices = ['coinv', 'boomv', 'overv'];
-							if (Gameconfig.gameImgs.bgv) {
-								voices.push('bgv');
+							var voices = [];
+							if (Gameconfig.gameImgs.coinv) {
+								voices.push('coinv');
+							}
+							if (Gameconfig.gameImgs.boomv) {
+								voices.push('boomv');
+							}
+							if (Gameconfig.gameImgs.overv) {
+								voices.push('overv');
 							}
 							game.sound.setDecodedCallback(voices, function () {
 								self.loadtext.destroy();
@@ -357,13 +359,10 @@ define('appjjb', ['appsocket', 'wechatcore', 'phaser'], function (appsocket, wec
 						titleImg.anchor.set(0.5, 0.5);
 						this.gametxt = game.add.text(game.world.centerX, 650, '111', { fill: '#fff', fontSize: '32px' });
 						this.gametxt.anchor.set(0.5);
-						this.player = game.add.sprite(game.world.centerX, game.height - 128, 'player');
-						this.player.anchor.set(0.5, 1);
-						this.player.scale.set(0.9);
-						if (!game.musicPause && $("#bgm").length > 0) {
-							wechatcore.playAudio($("#bgm")[0]);
-							game.musicPause = true;
-						}
+						this.player = game.add.sprite(game.world.centerX, game.height - 300, 'player');
+						this.player.anchor.set(0.5, 0.5);
+						// this.player.scale.set(0.9);
+
 					},
 					update: function () {
 						this.gametxt.text = self.gametip;
@@ -372,12 +371,12 @@ define('appjjb', ['appsocket', 'wechatcore', 'phaser'], function (appsocket, wec
 				gameState: {
 					create: function () {
 						game.physics.startSystem(Phaser.Physics.ARCADE);
-						this.player = game.add.sprite(game.world.centerX, game.height - 178, 'player');
-						this.player.anchor.set(0.5, 1);
-						this.player.scale.set(0.9);
+						this.player = game.add.sprite(game.world.centerX, game.height - 300, 'player');
+						this.player.anchor.set(0.5, 0.5);
+						//this.player.scale.set(0.9);
 						game.physics.arcade.enable(this.player);
 						this.player.body.collideWorldBounds = true;
-						this.player.body.bounce.set(0);
+						// this.player.body.bounce.set(0);
 						this.onStart();
 						this.showScore = game.add.sprite();
 						this.scoreBox = game.add.sprite(25, 8, 'scorebox');
@@ -400,9 +399,9 @@ define('appjjb', ['appsocket', 'wechatcore', 'phaser'], function (appsocket, wec
 						this.gamesecond.scale.set(0.8);
 						this.showTime.addChild(this.gamesecond);
 						this.showTime.bringToTop();
-						this.coinbgm = game.add.audio('coinv', 0.2, false);
-						this.boombgm = game.add.audio('boomv', 0.2, false);
-						this.overbgm = game.add.audio('overv', 0.2, false);
+						this.coinbgm = game.add.audio('coinv');
+						this.boombgm = game.add.audio('boomv');
+						this.overbgm = game.add.audio('overv');
 						this.overPopup = game.add.group();
 						this.overBox = game.add.image(game.world.centerX, game.world.centerY, 'overbox');
 						this.overBox.scale.set(0.7);
@@ -443,6 +442,13 @@ define('appjjb', ['appsocket', 'wechatcore', 'phaser'], function (appsocket, wec
 						this.player.inputEnabled = true;
 						this.player.input.enableDrag(false);
 						this.player.input.allowVerticalDrag = false;
+						this.player.events.onDragStart.add(function () {
+							this.player.body.moves = false;
+						}, this);
+						this.player.events.onDragStop.add(function () {
+							this.player.body.moves = true;
+							this.player.x = Math.max(0, Math.min(game.width, this.player.x));
+						}, this);
 						alldrops.forEach(function (item) {
 							var key = item.dkey;
 							_this[key] = new Drop(item);
@@ -450,10 +456,9 @@ define('appjjb', ['appsocket', 'wechatcore', 'phaser'], function (appsocket, wec
 						})
 					},
 					showOverPopup: function () {
-						var _this = this;
-						setTimeout(function () {
-							_this.overPopup.visible = true;
-							game.playAudio(_this.overbgm);
+						setTimeout(() => {
+							this.overPopup.visible = true;
+							game.playMusic(this.overbgm);
 						}, 400);
 					},
 					stopGame: function () {
@@ -545,18 +550,11 @@ define('appjjb', ['appsocket', 'wechatcore', 'phaser'], function (appsocket, wec
 									return item.dkey == drop.key
 								}), scoretype = one.type || '1', onescore = one.score || '0';
 								if (onescore > 0) {
-									/*
-									if (drop.key === "boom") {
-										game.playAudio(this.boombgm);
-									}else {
-										game.playAudio(this.coinbgm);
-									}
-									*/
 									if (scoretype == '1') {
-										game.playAudio(this.coinbgm);
+										game.playMusic(this.coinbgm);
 										self.myscore += parseInt(onescore);
 									} else {
-										game.playAudio(this.boombgm);
+										game.playMusic(this.boombgm);
 										self.myscore -= parseInt(onescore);
 									}
 									if (self.myscore < 0) {

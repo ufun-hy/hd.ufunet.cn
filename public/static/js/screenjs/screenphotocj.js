@@ -14,7 +14,7 @@ define('screenphotocj', ['screencore', 'layerBox', 'template', 'keyboard', 'anim
 		rollduration: 60e3,
 		fastrollduration: 10e3,
 		imgmoveduration: 1e2,
-		imgscalcduration: 4e2,
+		imgscaleduration: 4e2,
 		maxid: 0,
 		prizeIndex: 0,
 		prizeInfo: [],
@@ -211,9 +211,9 @@ define('screenphotocj', ['screencore', 'layerBox', 'template', 'keyboard', 'anim
 			});
 			setTimeout(function () {
 				toobj.find('img').attr('src', moveobj.find('img').attr('src'));
-				toobj.find('div').snabbt({ fromScale: [0.2, 0.2], fromOpacity: 0.2, scale: [1, 1], opacity: 1, duration: self.imgscalcduration });
+				toobj.find('div').snabbt({ fromScale: [0.2, 0.2], fromOpacity: 0.2, scale: [1, 1], opacity: 1, duration: self.imgscaleduration });
 				moveobj.find('img').attr('src', toimg);
-				moveobj.find('div').snabbt({ fromScale: [0.8, 0.8], fromOpacity: 0.8, scale: [1, 1], opacity: 1, duration: self.imgscalcduration, });
+				moveobj.find('div').snabbt({ fromScale: [0.8, 0.8], fromOpacity: 0.8, scale: [1, 1], opacity: 1, duration: self.imgscaleduration, });
 				if (line % 2 != 0) {
 					i--;
 					if (i < 0) {

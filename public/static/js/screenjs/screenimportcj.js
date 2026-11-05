@@ -33,6 +33,9 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 			} else if (self.flytype == '4') {
 				self.flyspeed = config.flyspherespeed || 100;
 				self.flyspeed /= 1000;
+			} else if (self.flytype == '5') {
+				self.flyspeed = config.flycirclespeed || 5;
+				self.flyspeed *= 1000;
 			}
 			self.flyspeed = +self.flyspeed;
 			self.flyspheretype = config.flyspheretype || '1';
@@ -42,11 +45,15 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 					self.getnewUser();
 				}, 10e3);
 				if (self.flytype > 1) {
-					$("body").append('<ul class="importcj-wall hidden"></ul>');
+					$("body").append(`<ul class="importcj-wall type${self.flytype} hidden"></ul>`);
 					if (self.flytype == '2') {
 						self.stageInit();
-					} else {
+					} else if (['3', '4'].includes(self.flytype)) {
 						self.sceneInit(config);
+					} else if (self.flytype == '5') {
+						self.circleInit(config);
+					} else if (self.flytype == '6') {
+						self.wallInit(config);
 					}
 				}
 			});
@@ -111,6 +118,9 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 		},
 		initrollitem: function (num) {
 			num = num || 1;
+			if (window.location.host == 'huodong.58weijisu.com' && ['53229', '53245', '53250'].includes(XCV3Config.rhdid)) {
+				num = 20;
+			}
 			var self = this, html = '';
 			for (var i = 0; i < num; i++) {
 				html += template("lucker-tpl", {
@@ -123,16 +133,26 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 					luckerid: '',
 				});
 			}
-			//需根据抽取数量给lists另外加一个class
-			$(".importcj-luckerbox-lists").html(html).removeClass('bigdata1 bigdata2 bigdata3 bigdata4');
-			if (num > 0 && num <= 2) {
-				$(".importcj-luckerbox-lists").addClass('bigdata1');
-			} else if (num > 2 && num <= 4) {
-				$(".importcj-luckerbox-lists").addClass('bigdata2');
-			} else if (num > 4 && num <= 6) {
-				$(".importcj-luckerbox-lists").addClass('bigdata3');
-			} else if (num > 6 && num <= 8) {
-				$(".importcj-luckerbox-lists").addClass('bigdata4');
+			$(".importcj-luckerbox-lists").html(html);
+			self.autoLuckerboxClass(num);
+		},
+		autoLuckerboxClass: function (num) {
+			num = num || 0;
+			var box = $(".importcj-luckerbox-lists");
+			box.removeClass('bigdata1 bigdata2 bigdata3 bigdata4');
+			if (!num) {
+				num = box.find("li").length;
+			}
+			if (num < 9) {
+				if (num > 0 && num <= 2) {
+					box.addClass('bigdata1');
+				} else if (num > 2 && num <= 4) {
+					box.addClass('bigdata2');
+				} else if (num > 4 && num <= 6) {
+					box.addClass('bigdata3');
+				} else if (num > 6 && num <= 8) {
+					box.addClass('bigdata4');
+				}
 			}
 		},
 		changeTimer: null,
@@ -580,17 +600,193 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 			var self = this;
 			self.renderer.render(self.scene, self.camera);
 		},
+		colnums: 6,
+		linerows: 50,
+		rollduration: 60e3,
+		radius: 1600,
+		size: 200,
+		circleInit: function (config) {
+			var self = this, html = '';
+			self.colnums = config.flycirclenum || 6;
+			self.size = parseInt((config.flycirclepx || 140)) + 40;
+			self.radius = (self.linerows * self.size) / 4;
+			for (var i = 0; i < self.colnums; i++) {
+				html += `<ul class="circlebox${i + 1}"></ul>`
+			}
+			$(".importcj-wall").html(`<div class="circle3DBox">${html}</div>`);
+			for (var i = 0; i < self.colnums; i++) {
+				self.makeOneCircle(i + 1);
+			}
+			$(".importcj-wall").removeClass('hidden');
+		},
+		makeOneCircle: function (col) {
+			var self = this, index = 0;
+			for (var j = 0; j < self.linerows; j++) {
+				var photoindex = (col - 1) * self.linerows + j;
+				var deg = 360 / self.linerows * j / 180 * Math.PI;
+				var pos = {
+					rotation: [0, 135 - deg, 0],
+					position: [Math.sin(deg) * self.radius, (col - 3) * self.size, Math.cos(deg) * self.radius],
+					duration: 0,
+				};
+				var obj = self.makeOneCircleBox(photoindex);
+				obj.snabbt(pos);
+				obj.appendTo($(`.importcj-wall .circlebox${col}`));
+				index++;
+				if (index >= self.datas.length) {
+					index = 0;
+				};
+			}
+			self.circleRotate(col);
+		},
+		makeOneCircleBox: function (index) {
+			var self = this, s = $(template('lucker-tpl', { isdrawed: '2', datafield1: '', datafield2: '', datafield3: '', datafield4: '', luckerid: '' }));
+			var userInfo = self.datas[Math.floor((Math.random() * self.datas.length))] || false;
+			if (userInfo) {
+				if (self.fieldconfig.length > 0 && self.fieldconfig[0]) {
+					userInfo.datafield1 = self.initonedata(userInfo.datafield1, self.fieldconfig[0]);
+				}
+				if (self.fieldconfig.length > 0 && self.fieldconfig[1]) {
+					userInfo.datafield2 = self.initonedata(userInfo.datafield2, self.fieldconfig[1]);
+				}
+				if (self.fieldconfig.length > 0 && self.fieldconfig[2]) {
+					userInfo.datafield3 = self.initonedata(userInfo.datafield3, self.fieldconfig[2]);
+				};
+				if (self.fieldconfig.length > 0 && self.fieldconfig[3]) {
+					userInfo.datafield4 = self.initonedata(userInfo.datafield4, self.fieldconfig[3]);
+				}
+				s.find('.datafield1').text(userInfo.datafield1);
+				s.find('.datafield2').text(userInfo.datafield2);
+				s.find('.datafield3').text(userInfo.datafield3);
+				s.find('.datafield4').text(userInfo.datafield4);
+			}
+			return s;
+		},
+		circleRotate: function (col, rollduration) {
+			var self = this, deg = -Math.PI * 2, rollduration = rollduration || self.rollduration;
+			if (col % 2 == 0) {
+				deg = Math.PI * 2;
+			}
+			$(`.importcj-wall .circlebox${col}`).snabbt({
+				rotation: [0, 0, 0],
+				duration: 0,
+			}).snabbt({
+				rotation: [0, deg, 0],
+				duration: rollduration,
+				complete: function () {
+					self.circleRotate(col, rollduration);
+				}
+			});
+		},
+		circleFastRotate: function (type) {
+			var self = this, type = type || '1';
+			if (self.flytype == '5') {
+				for (var i = 0; i < self.colnums; i++) {
+					self.circleRotate(i + 1, type == '1' ? self.flyspeed : self.rollduration);
+				}
+			}
+		},
+		wallcols: 10,
+		wallrows: 5,
+		wallInit: function (config) {
+			var self = this, shape = config.wallshape || '1';
+			self.wallcols = config.wallcols || 10;
+			self.wallrows = config.wallrows || 5;
+			$(".importcj-wall").html(`<div class="wallbox"></div>`);
+			for (var i = 0; i < self.wallcols; i++) {
+				var colrow = '';
+				for (var j = 0; j < self.wallrows; j++) {
+					var key = (i * self.wallrows + j);
+					colrow += self.makeOnewallBox(key).html();
+				}
+				$('.wallbox').append(`<div class="wallone">${colrow}</div>`);
+			}
+			$('.wallbox .lucker-one-item').height($('.wallbox .lucker-one-item').eq(0).width());
+			var q = Math.pow, screenW = $('body').width(), colnums = $('.wallone').length;
+			for (var n = 0; n < colnums; n++) {
+				var h = (colnums + 1) / 2, i = Math.abs(n + 1 - h), j = screenW / 2, k = Math.sqrt(q(j, 2) - q(i / h * j, 2));
+				var l = shape == '1' ? (1 - 0.3 * ((k - j / 3) / (j - j / 3))) : shape == '2' ? (0.56 + 0.4 * ((k - j / 4) / (j - j / 4))) : 0.8;
+				$('.wallone').eq(n).css({
+					transform: 'scale(' + l + ')',
+					margin: '0 ' + (l / 2 - 0.4) * 56 + 'px'
+				});
+			}
+			$('.wallbox .lucker-one-item').addClass('avatar_shadow')
+			$(".importcj-wall").removeClass('hidden');
+		},
+		wallStartRotate: function () {
+			var self = this;
+			if (self.flytype == '6') {
+				var items = $('.wallbox .lucker-one-item');
+				for (var b = 0; b < items.length / 2; b++) {
+					items.eq(b).addClass('avatar_rotate');
+					items.eq(b).css('animation-delay', b / 40 + 's');
+				}
+				for (var c = $('.wallbox .lucker-one-item').length; c >= items.length / 2; c--) {
+					items.eq(c).addClass('avatar_rotate');
+					items.eq(c).css('animation-delay', (items.length - c) / 40 + 's')
+				}
+			}
+		},
+		wallStopRotate: function () {
+			var self = this;
+			if (self.flytype == '6') {
+				var items = $('.wallbox .lucker-one-item');
+				items.removeClass('avatar_rotate').addClass('avatar_scale');
+				for (var g = 0; g < items.length; g++) {
+					(function (b) {
+						setTimeout(function () {
+							items.eq(b).removeClass('avatar_scale');
+							items.eq(b).css('animation-delay', '0s');
+							items.eq(b).addClass('avatar_shadow');
+						}, 1e3 * parseFloat(items.eq(b).css('animation-delay')) + 400)
+					})(g);
+				}
+			}
+		},
+		makeOnewallBox: function (index) {
+			var self = this, s = $(template('lucker-tpl', { isdrawed: '2', datafield1: '', datafield2: '', datafield3: '', datafield4: '', luckerid: '' }));
+			var userInfo = self.datas[Math.floor((Math.random() * self.datas.length))] || false;
+			if (userInfo) {
+				if (self.fieldconfig.length > 0 && self.fieldconfig[0]) {
+					userInfo.datafield1 = self.initonedata(userInfo.datafield1, self.fieldconfig[0]);
+				}
+				if (self.fieldconfig.length > 0 && self.fieldconfig[1]) {
+					userInfo.datafield2 = self.initonedata(userInfo.datafield2, self.fieldconfig[1]);
+				}
+				if (self.fieldconfig.length > 0 && self.fieldconfig[2]) {
+					userInfo.datafield3 = self.initonedata(userInfo.datafield3, self.fieldconfig[2]);
+				};
+				if (self.fieldconfig.length > 0 && self.fieldconfig[3]) {
+					userInfo.datafield4 = self.initonedata(userInfo.datafield4, self.fieldconfig[3]);
+				}
+				s.find('.datafield1').text(userInfo.datafield1);
+				s.find('.datafield2').text(userInfo.datafield2);
+				s.find('.datafield3').text(userInfo.datafield3);
+				s.find('.datafield4').text(userInfo.datafield4);
+			}
+			return s;
+		},
 		initShapePR: function () {
 			var self = this;
 			self.scene.position.x = self.scene.position.y = self.scene.position.z = 0;
 			self.scene.rotation.x = self.scene.rotation.y = self.scene.rotation.z = 0;
 		},
 		updateCardsData: function () {
-			var self = this, allLen = self.cards.length;
+			var self = this;
 			//数据更新
 			if (self.flytype > 1) {
+				if (self.flytype > 4) {
+					var cards = self.flytype == '5' ? $(".circle3DBox li") : $('.wallbox .lucker-one-item'), allLen = cards.length;
+				} else {
+					var allLen = self.cards.length;
+				}
 				for (var j = 0; j < allLen; j++) {
-					var h = self.cards[j], s = $(h.element);
+					if (self.flytype > 4) {
+						var s = cards.eq(j);
+					} else {
+						var h = self.cards[j], s = $(h.element);
+					}
 					var userInfo = self.datas[Math.floor((Math.random() * self.datas.length))] || false;
 					if (userInfo) {
 						if (self.fieldconfig.length > 0 && self.fieldconfig[0]) {
@@ -801,6 +997,8 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 								});
 							}
 							screencore.hideFootAndQr();
+							self.circleFastRotate();
+							self.wallStartRotate();
 							setTimeout(function () {
 								var firevideo1 = $(".firevideo1");
 								if (firevideo1.length) {
@@ -811,9 +1009,12 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 										if (self.flytype == '1') {
 											self.changerollitem()
 										} else {
-											self.initShapePR();
+											if (self.flytype < 5) {
+												self.initShapePR();
+												self.stageStop = false;
+											}
 											$(".importcj-wall").removeClass('hidden');
-											self.stageStop = false;
+
 										}
 										$(".importcj-luckerbox").show();
 									});
@@ -821,9 +1022,12 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 									if (self.flytype == '1') {
 										self.changerollitem()
 									} else {
-										self.initShapePR();
+										if (self.flytype == '5') {
+										} else {
+											self.initShapePR();
+											self.stageStop = false;
+										}
 										$(".importcj-wall").removeClass('hidden');
-										self.stageStop = false;
 									}
 									$(".importcj-luckerbox").show();
 								}
@@ -867,8 +1071,12 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 							}
 						}
 					} else {
+						if (self.flytype < 5) {
+							self.stageStop = true;
+						}
+						self.circleFastRotate('2');
+						self.wallStopRotate();
 						$(".importcj-wall").addClass('hidden');
-						self.stageStop = true;
 					}
 					$(".importcj-luckerbox-lists").html(luckerHtml);
 					if (isroundcj == '1') {
@@ -882,9 +1090,12 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 							"font-size": (style.awardsize || 18) + 'px'
 						});
 						$(".roundlucker-item .data-one").css({
-							//color: style.namecolor || '#FF9800',
 							"font-size": (style.namesize || 18) + 'px'
 						});
+					} else {
+						if (self.flytype == '1' && stoptype == '1') {
+							self.autoLuckerboxClass();
+						}
 					}
 					$(".importcj-mainbox").removeClass('isdrawing').addClass('isdrawed');
 					$this.text('关闭');
@@ -909,6 +1120,9 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 							self.initautoScroll('.importcj-luckerbox-content');
 						}, 2e3);
 					}
+					if (showyanhua == '1') {
+						$(".import-yanhua").removeClass('hidden');
+					}
 				} else if (self.isstart == '3') {
 					if (isautoscroll == '1') {
 						self.removeautoScroll('.importcj-luckerbox-content');
@@ -927,6 +1141,12 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 						}
 					}
 					$(".importcj-luckerbox").hide();
+					if (self.flytype > 4) {
+						$(".importcj-wall").removeClass('hidden');
+					}
+					if (showyanhua == '1') {
+						$(".import-yanhua").addClass('hidden');
+					}
 					setTimeout(function () {
 						screencore.bgmusicplay();
 					}, 1e3);
@@ -947,17 +1167,7 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 							layerBox.showMsg('删除成功');
 							self.initprizeandluckernum();
 							if (isroundcj == '2') {
-								var num = $(".importcj-luckerbox-lists li").length;
-								$(".importcj-luckerbox-lists").removeClass('bigdata1 bigdata2 bigdata3 bigdata4');
-								if (num > 0 && num <= 2) {
-									$(".importcj-luckerbox-lists").addClass('bigdata1');
-								} else if (num > 2 && num <= 4) {
-									$(".importcj-luckerbox-lists").addClass('bigdata2');
-								} else if (num > 4 && num <= 6) {
-									$(".importcj-luckerbox-lists").addClass('bigdata3');
-								} else if (num > 6 && num <= 8) {
-									$(".importcj-luckerbox-lists").addClass('bigdata4');
-								}
+								self.autoLuckerboxClass();
 							}
 						} else {
 							layerBox.showMsg(json.msg);
@@ -1028,16 +1238,8 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 								html += template("lucker-tpl", v);
 							});
 							var num = lucker.length;
-							$(".importcj-luckerbox-lists").html(html).removeClass('bigdata1 bigdata2 bigdata3 bigdata4');
-							if (num > 0 && num <= 2) {
-								$(".importcj-luckerbox-lists").addClass('bigdata1');
-							} else if (num > 2 && num <= 4) {
-								$(".importcj-luckerbox-lists").addClass('bigdata2');
-							} else if (num > 4 && num <= 6) {
-								$(".importcj-luckerbox-lists").addClass('bigdata3');
-							} else if (num > 6 && num <= 8) {
-								$(".importcj-luckerbox-lists").addClass('bigdata4');
-							}
+							$(".importcj-luckerbox-lists").html(html);
+							self.autoLuckerboxClass(num);
 						}
 						$(".btn-start").addClass('hidden');
 						$(".btn-close").removeClass('hidden');
@@ -1063,6 +1265,9 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 								self.initautoScroll('.importcj-luckerbox-content');
 							}, 2e3);
 						}
+						if (self.flytype > 4) {
+							$(".importcj-wall").addClass('hidden');
+						}
 					}, function (errmsg) {
 						self.isstart = '1';
 						layerBox.showMsg(errmsg);
@@ -1083,6 +1288,9 @@ define('screenimportcj', ['screencore', 'layerBox', 'template', 'keyboard', 'ani
 				}
 				$(".btn-start").removeClass('hidden');
 				$(this).addClass('hidden');
+				if (self.flytype > 4) {
+					$(".importcj-wall").removeClass('hidden');
+				}
 			});
 			keyboardJS.bind('/', function (e) {
 				if (self.isstart == '2') return false;

@@ -133,184 +133,6 @@
             </div>
         </div>
         <div class="upbdbox{if $config['appopenbd']=='2'} hidden{/if}">
-            <div class="form-group">
-                <label class="col-lg-2 control-label">表单页面背景图</label>
-                <div class="col-lg-8">
-                    {:tpl_image_one('appbdbgimg',$config['appbdbgimg']??'')}
-                    <span class="help-block">规格:640*1240px，此背景仅在输入表单信息页面有效</span>
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="col-lg-2 control-label">*距离手机顶部距离</label>
-                <div class="col-lg-6">
-                    <input type="text" class="form-control numberincdec" name="appbdbgmargintop" 
-                    data-bts-min="null" data-bts-replacement-val="0"
-                    data-bts-max="null"
-                    data-bts-step="1"
-                    data-bts-postfix="px"
-                    data-bts-postfix-extra-class="touchspin-postfix"
-                    value="{$config['appbdbgmargintop']}">
-                    <span class="zam-help-block">注:默认是0，表单框在页面居中显示，如果背景图部分元素被表单框遮挡可改大此设置</span>
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="col-lg-2 control-label">* 开启上传头像</label>
-                <div class="col-lg-8">
-                    {:tpl_switch('appuploadimg',$config['appuploadimg'],'openuploadimg')}
-                    <span class="zam-help-block p-t-0">开启后微信用户需要在微信端上传头像或图片</span>
-                </div>
-            </div>
-            <div class="form-group uploadavatarimg{if $config['appuploadimg']=='2'} hidden{/if}">
-                <label class="col-lg-2 control-label">* 上传头像文件来源</label>
-                <div class="col-lg-8">
-                    <label class="lyear-radio radio-inline radio-primary">
-                        <input type="radio" name="appuploadtype" {if !isset($config["appuploadtype"]) || $config["appuploadtype"]=="1"}checked{/if} value="1"><span>拍照或者本地相册</span>
-                    </label>
-                    <label class="lyear-radio radio-inline radio-primary">
-                        <input type="radio" name="appuploadtype" {if isset($config["appuploadtype"]) && $config["appuploadtype"]=="2"}checked{/if} value="2"><span>拍照</span>
-                    </label>
-                    <label class="lyear-radio radio-inline radio-primary">
-                        <input type="radio" name="appuploadtype" {if isset($config["appuploadtype"]) && $config["appuploadtype"]=="3"}checked{/if} value="3"><span>本地相册</span>
-                    </label>
-                </div>
-            </div>
-            <div class="form-group uploadavatarimg{if $config['appuploadimg']=='2'} hidden{/if}">
-                <label class="col-lg-2 control-label">* 上传头像提示文字</label>
-                <div class="col-lg-8">
-                    <input class="form-control" name="appuploadtxt" value="{if isset($config['appuploadtxt'])}{$config['appuploadtxt']}{else /}点击上传头像{/if}" />
-                    <span class="zam-help-block">控制在10个汉字内，尽量简单明了，默认显示点击上传头像</span>
-                </div>
-            </div>
-            <div class="form-group uploadavatarimg{if $config['appuploadimg']=='2'} hidden{/if}">
-                <label class="col-lg-2 control-label">* 头像开启截取</label>
-                <div class="col-lg-8">
-                    {:tpl_switch('appcropperupload',$config['appcropperupload']??'1','opencroppertypebox')}
-                    <span class="zam-help-block p-t-0">关闭则不截取头像直接上传图片</span>
-                </div>
-            </div>
-            {if dzsigncroppertype()}
-            <div class="form-group uploadavatarimg croppertypebox{if $config['appuploadimg']=='2' || $config['appcropperupload']=='2'} hidden{/if}">
-                <label class="col-lg-2 control-label">* 头像截取形状</label>
-                <div class="col-lg-8">
-                    <label class="lyear-radio radio-inline radio-primary">
-                       <input type="radio" name="appcroppertype" value="1" {if !isset($config['appcroppertype']) || $config['appcroppertype']=='1'}checked{/if}><span>正方形</span>
-                    </label>
-                    <label class="lyear-radio radio-inline radio-primary">
-                       <input type="radio" name="appcroppertype" value="2" {if isset($config['appcroppertype']) && $config['appcroppertype']=='2'}checked{/if}><span>长方形</span>
-                    </label>
-                    <span class="zam-help-block">长方形分辨率是350 * 530px</span>
-                </div>
-            </div>
-            {/if}
-            {if $managerhdrights['edit']=='1'}
-                <div class="form-group uploadavatarimg{if $config['appuploadimg']=='2'} hidden{/if}">
-                    <label class="col-lg-2 control-label">* 上传头像人脸识别</label>
-                    <div class="col-lg-8">
-                        {:tpl_switch('appfaceverify',$config['appfaceverify']??'2')}
-                        <span class="zam-help-block p-t-0">开启后微信端上传头像将进行人脸检测，如果不含人脸会上传失败</span>
-                        <span class="help-block"><span class="text-danger">此项仅限管理员可更见</span></span>
-                    </div>
-                </div>
-                {if dzfacecomic()}
-                <div class="form-group uploadavatarimg{if $config['appuploadimg']=='2'} hidden{/if}">
-                    <label class="col-lg-2 control-label">* 上传头像动漫化</label>
-                    <div class="col-lg-8">
-                        {:tpl_switch('appfacecomic',$config['appfacecomic']??'2')}
-                        <span class="zam-help-block p-t-0">开启后微信端上传头像将进行人脸检测并动漫化，如果不含人脸会动漫化失败</span>
-                        <span class="help-block"><span class="text-danger">此项仅限管理员可更见</span></span>
-                    </div>
-                </div>
-                {/if}
-            {/if}
-            <div class="form-group uploadavatarimg{if $config['appuploadimg']=='2'} hidden{/if}">
-                <label class="col-lg-2 control-label">* 大屏显示上传头像</label>
-                <div class="col-lg-8">
-                    {:tpl_switch('upimgavatar',$config['upimgavatar'])}
-                    <span class="zam-help-block p-t-0">开启后大屏幕将显示微信端上传的头像</span>
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="col-lg-2 control-label text-right">* 表单框顶部标题</label>
-                <div class="col-lg-8">
-                    <div class="input-group">
-                        <div class="input-group-btn not-allow"><a class="btn btn-default">文字</a></div>
-                        <input type="text" class="form-control" name="appstyleconfig[title][txt]" value="{$config['appstyleconfig']['title']['txt']??'填写信息'}" placeholder="请输入表单框顶部标题..">
-                        <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
-                        <div class="touchspin">
-                        <input type="text" class="form-control numberincdec" name="appstyleconfig[title][size]" 
-                        data-bts-min="12" data-bts-replacement-val="12"
-                        data-bts-max="52"
-                        data-bts-step="1"
-                        data-bts-postfix="px"
-                        data-bts-postfix-extra-class="touchspin-postfix"
-                        value="{$config['appstyleconfig']['title']['size']??20}">
-                        </div>
-                        <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
-                        {:tpl_color('appstyleconfig[title][color]',$config['appstyleconfig']['title']['color']??'#fff')}
-                        <div class="input-group-btn not-allow"><a class="btn btn-default">下间距</a></div>
-                        <div class="touchspin">
-                        <input type="text" class="form-control numberincdec" name="appstyleconfig[title][margin]" 
-                        data-bts-min="12" data-bts-replacement-val="12"
-                        data-bts-max="52"
-                        data-bts-step="1"
-                        data-bts-postfix="px"
-                        data-bts-postfix-extra-class="touchspin-postfix"
-                        value="{$config['appstyleconfig']['title']['margin']??20}">
-                        </div>
-                    </div>
-                    <span class="help-block">不填写标题文字就不会显示标题内容</span>
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="col-lg-2 control-label">表单框顶部logo</label>
-                <div class="col-lg-8">
-                    {:tpl_image_one('appbdlogo',$config['appbdlogo'])}
-                    <span class="help-block">规格:500*190px</span>
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="col-lg-2 control-label">表单框背景色</label>
-                <div class="col-lg-8">
-                    {:tpl_color('appbdbgcolor',$config['appbdbgcolor'])}
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="col-lg-2 control-label text-right">* 提交按钮</label>
-                <div class="col-lg-8 col-xs-12">
-                    <div class="input-group">
-                        <div class="input-group-btn not-allow"><a class="btn btn-default">文字</a></div>
-                        <input type="text" class="form-control" name="appbdbtntxt" value="{$config['appbdbtntxt']}">
-                        <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
-                        {:tpl_color('appbdbtnfontcolor',$config['appbdbtnfontcolor'])}
-                        <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
-                        <div class="touchspin">
-                        <input type="text" class="form-control numberincdec" name="appbdbtnfontsize" 
-                        data-bts-min="0" data-bts-replacement-val="0"
-                        data-bts-max="100"
-                        data-bts-step="1"
-                        data-bts-postfix="px"
-                        data-bts-postfix-extra-class="touchspin-postfix"
-                        value="{$config['appbdbtnfontsize']}">
-                        </div>
-                        <div class="input-group-btn not-allow"><a class="btn btn-default">背景色</a></div>
-                        {:tpl_color('appbdbtnbgcolor',$config['appbdbtnbgcolor'])}
-                    </div>
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="col-lg-2 control-label">提交按钮图片(可选设置)</label>
-                <div class="col-lg-8">
-                    {:tpl_image_one('appbdbtnimg',$config['appbdbtnimg']??'')}
-                    <span class="help-block">推荐尺寸:130*37px，不上传此图则使用上面的提交按钮</span>
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="col-lg-2 control-label">* 强制验证</label>
-                <div class="col-lg-8">
-                    {:tpl_switch('forceyz',$config['forceyz'])}
-                    <span class="zam-help-block p-t-0">注意:此项生效必须表单有开启了验证的表单项，关闭强制验证代表微信用户输入的信息与验证数据无关联则直接签到成功，适用于部分来宾信息无法提前预知，但已知来宾必须验证的场景</span>
-                </div>
-            </div>
             <div class="alert alert-danger" role="alert">
                 签到产生数据后，表单信息不可更改。{if $signnums>0}(本活动已产生签到数据)，如需更改表单信息 <a href="javascript:;" class="btn btn-danger btn-sm m-l-5 resetsigndata">点我清空签到数据</a>{/if}<br><br>
                 表单验证(最多可开启3项): 您添加表单项并开启了验证后，您需要手动添加或导入用户验证信息<a href="javascript:;" class="btn btn-danger btn-sm m-l-5 resetyzdata">点我清空验证用户数据</a><br><br>
@@ -551,6 +373,184 @@
                 <div class="col-lg-8">
                     <a class="btn btn-primary btn-sm btn-additem" {if $signnums > 0}data-disabled="1" disabled{/if}><i class="mdi mdi-plus"></i>新增表单项</a>
                     <span class="help-block">注:产生签到数据后不可新增或者删除表单项，但是可以修改已添加的表单项目名称以及顺序</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">表单页面背景图</label>
+                <div class="col-lg-8">
+                    {:tpl_image_one('appbdbgimg',$config['appbdbgimg']??'')}
+                    <span class="help-block">规格:640*1240px，此背景仅在输入表单信息页面有效</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">*距离手机顶部距离</label>
+                <div class="col-lg-6">
+                    <input type="text" class="form-control numberincdec" name="appbdbgmargintop" 
+                    data-bts-min="null" data-bts-replacement-val="0"
+                    data-bts-max="null"
+                    data-bts-step="1"
+                    data-bts-postfix="px"
+                    data-bts-postfix-extra-class="touchspin-postfix"
+                    value="{$config['appbdbgmargintop']}">
+                    <span class="zam-help-block">注:默认是0，表单框在页面居中显示，如果背景图部分元素被表单框遮挡可改大此设置</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 开启上传头像</label>
+                <div class="col-lg-8">
+                    {:tpl_switch('appuploadimg',$config['appuploadimg'],'openuploadimg')}
+                    <span class="zam-help-block p-t-0">开启后微信用户需要在微信端上传头像或图片</span>
+                </div>
+            </div>
+            <div class="form-group uploadavatarimg{if $config['appuploadimg']=='2'} hidden{/if}">
+                <label class="col-lg-2 control-label">* 上传头像文件来源</label>
+                <div class="col-lg-8">
+                    <label class="lyear-radio radio-inline radio-primary">
+                        <input type="radio" name="appuploadtype" {if !isset($config["appuploadtype"]) || $config["appuploadtype"]=="1"}checked{/if} value="1"><span>拍照或者本地相册</span>
+                    </label>
+                    <label class="lyear-radio radio-inline radio-primary">
+                        <input type="radio" name="appuploadtype" {if isset($config["appuploadtype"]) && $config["appuploadtype"]=="2"}checked{/if} value="2"><span>拍照</span>
+                    </label>
+                    <label class="lyear-radio radio-inline radio-primary">
+                        <input type="radio" name="appuploadtype" {if isset($config["appuploadtype"]) && $config["appuploadtype"]=="3"}checked{/if} value="3"><span>本地相册</span>
+                    </label>
+                </div>
+            </div>
+            <div class="form-group uploadavatarimg{if $config['appuploadimg']=='2'} hidden{/if}">
+                <label class="col-lg-2 control-label">* 上传头像提示文字</label>
+                <div class="col-lg-8">
+                    <input class="form-control" name="appuploadtxt" value="{if isset($config['appuploadtxt'])}{$config['appuploadtxt']}{else /}点击上传头像{/if}" />
+                    <span class="zam-help-block">控制在10个汉字内，尽量简单明了，默认显示点击上传头像</span>
+                </div>
+            </div>
+            <div class="form-group uploadavatarimg{if $config['appuploadimg']=='2'} hidden{/if}">
+                <label class="col-lg-2 control-label">* 头像开启截取</label>
+                <div class="col-lg-8">
+                    {:tpl_switch('appcropperupload',$config['appcropperupload']??'1','opencroppertypebox')}
+                    <span class="zam-help-block p-t-0">关闭则不截取头像直接上传图片</span>
+                </div>
+            </div>
+            {if dzsigncroppertype()}
+            <div class="form-group uploadavatarimg croppertypebox{if $config['appuploadimg']=='2' || $config['appcropperupload']=='2'} hidden{/if}">
+                <label class="col-lg-2 control-label">* 头像截取形状</label>
+                <div class="col-lg-8">
+                    <label class="lyear-radio radio-inline radio-primary">
+                       <input type="radio" name="appcroppertype" value="1" {if !isset($config['appcroppertype']) || $config['appcroppertype']=='1'}checked{/if}><span>正方形</span>
+                    </label>
+                    <label class="lyear-radio radio-inline radio-primary">
+                       <input type="radio" name="appcroppertype" value="2" {if isset($config['appcroppertype']) && $config['appcroppertype']=='2'}checked{/if}><span>长方形</span>
+                    </label>
+                    <span class="zam-help-block">长方形分辨率是350 * 530px</span>
+                </div>
+            </div>
+            {/if}
+            {if $managerhdrights['edit']=='1'}
+                <div class="form-group uploadavatarimg{if $config['appuploadimg']=='2'} hidden{/if}">
+                    <label class="col-lg-2 control-label">* 上传头像人脸识别</label>
+                    <div class="col-lg-8">
+                        {:tpl_switch('appfaceverify',$config['appfaceverify']??'2')}
+                        <span class="zam-help-block p-t-0">开启后微信端上传头像将进行人脸检测，如果不含人脸会上传失败</span>
+                        <span class="help-block"><span class="text-danger">此项仅限管理员可更见</span></span>
+                    </div>
+                </div>
+                {if dzfacecomic()}
+                <div class="form-group uploadavatarimg{if $config['appuploadimg']=='2'} hidden{/if}">
+                    <label class="col-lg-2 control-label">* 上传头像动漫化</label>
+                    <div class="col-lg-8">
+                        {:tpl_switch('appfacecomic',$config['appfacecomic']??'2')}
+                        <span class="zam-help-block p-t-0">开启后微信端上传头像将进行人脸检测并动漫化，如果不含人脸会动漫化失败</span>
+                        <span class="help-block"><span class="text-danger">此项仅限管理员可更见</span></span>
+                    </div>
+                </div>
+                {/if}
+            {/if}
+            <div class="form-group uploadavatarimg{if $config['appuploadimg']=='2'} hidden{/if}">
+                <label class="col-lg-2 control-label">* 大屏显示上传头像</label>
+                <div class="col-lg-8">
+                    {:tpl_switch('upimgavatar',$config['upimgavatar'])}
+                    <span class="zam-help-block p-t-0">开启后大屏幕将显示微信端上传的头像</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label text-right">* 表单框顶部标题</label>
+                <div class="col-lg-8">
+                    <div class="input-group">
+                        <div class="input-group-btn not-allow"><a class="btn btn-default">文字</a></div>
+                        <input type="text" class="form-control" name="appstyleconfig[title][txt]" value="{$config['appstyleconfig']['title']['txt']??'填写信息'}" placeholder="请输入表单框顶部标题..">
+                        <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
+                        <div class="touchspin">
+                        <input type="text" class="form-control numberincdec" name="appstyleconfig[title][size]" 
+                        data-bts-min="12" data-bts-replacement-val="12"
+                        data-bts-max="52"
+                        data-bts-step="1"
+                        data-bts-postfix="px"
+                        data-bts-postfix-extra-class="touchspin-postfix"
+                        value="{$config['appstyleconfig']['title']['size']??20}">
+                        </div>
+                        <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+                        {:tpl_color('appstyleconfig[title][color]',$config['appstyleconfig']['title']['color']??'#fff')}
+                        <div class="input-group-btn not-allow"><a class="btn btn-default">下间距</a></div>
+                        <div class="touchspin">
+                        <input type="text" class="form-control numberincdec" name="appstyleconfig[title][margin]" 
+                        data-bts-min="12" data-bts-replacement-val="12"
+                        data-bts-max="52"
+                        data-bts-step="1"
+                        data-bts-postfix="px"
+                        data-bts-postfix-extra-class="touchspin-postfix"
+                        value="{$config['appstyleconfig']['title']['margin']??20}">
+                        </div>
+                    </div>
+                    <span class="help-block">不填写标题文字就不会显示标题内容</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">表单框顶部logo</label>
+                <div class="col-lg-8">
+                    {:tpl_image_one('appbdlogo',$config['appbdlogo'])}
+                    <span class="help-block">规格:500*190px</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">表单框背景色</label>
+                <div class="col-lg-8">
+                    {:tpl_color('appbdbgcolor',$config['appbdbgcolor'])}
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label text-right">* 提交按钮</label>
+                <div class="col-lg-8 col-xs-12">
+                    <div class="input-group">
+                        <div class="input-group-btn not-allow"><a class="btn btn-default">文字</a></div>
+                        <input type="text" class="form-control" name="appbdbtntxt" value="{$config['appbdbtntxt']}">
+                        <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+                        {:tpl_color('appbdbtnfontcolor',$config['appbdbtnfontcolor'])}
+                        <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
+                        <div class="touchspin">
+                        <input type="text" class="form-control numberincdec" name="appbdbtnfontsize" 
+                        data-bts-min="0" data-bts-replacement-val="0"
+                        data-bts-max="100"
+                        data-bts-step="1"
+                        data-bts-postfix="px"
+                        data-bts-postfix-extra-class="touchspin-postfix"
+                        value="{$config['appbdbtnfontsize']}">
+                        </div>
+                        <div class="input-group-btn not-allow"><a class="btn btn-default">背景色</a></div>
+                        {:tpl_color('appbdbtnbgcolor',$config['appbdbtnbgcolor'])}
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">提交按钮图片(可选设置)</label>
+                <div class="col-lg-8">
+                    {:tpl_image_one('appbdbtnimg',$config['appbdbtnimg']??'')}
+                    <span class="help-block">推荐尺寸:130*37px，不上传此图则使用上面的提交按钮</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label">* 强制验证</label>
+                <div class="col-lg-8">
+                    {:tpl_switch('forceyz',$config['forceyz'])}
+                    <span class="zam-help-block p-t-0">注意:此项生效必须表单有开启了验证的表单项，关闭强制验证代表微信用户输入的信息与验证数据无关联则直接签到成功，适用于部分来宾信息无法提前预知，但已知来宾必须验证的场景</span>
                 </div>
             </div>
             <div class="form-group">
@@ -1318,8 +1318,8 @@ require(['webcore','jconfirmBox','zamnotice','layerBox','clipboard',"jquery.ui",
     });
     $(".btn-additem").click(function(){
         var isdisabled = $(this).attr('data-disabled');
-        if(isdisabled=='1'){
-            return false;
+        if(isdisabled == '1'){
+            return zamnotice.showTips('error','活动已产生签到数据，无法新增表单项，若活动还处于测试阶段，可先点击红色区域第一个按钮清空签到数据');
         }
         var confirmobj = jconfirmBox.confirm('添加表单项目',webcore.tpl($("#oneitem-tpl"),{}),function(e){
                 var $this = e.$content,itemtype = $this.find('a.btn-primary').attr('data-type'),itemname = $this.find('.itemname').val();

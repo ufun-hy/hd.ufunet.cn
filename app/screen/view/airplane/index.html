@@ -1,0 +1,131 @@
+{include file='common/header' /}
+<style>
+    .lightfire-mainbox{
+        width: 100%;
+        height: 100%;
+        margin: 0 auto;
+        padding:0;
+        overflow: hidden;
+    }
+    
+    .lightfire-wrapper {
+        position: absolute;
+        top: 0;
+        right: 5px;
+        width: 238px;
+        height: 100%;
+    }
+    .lightfire-wrapper ul{
+        width: 100%;
+        height: 100%;
+    }
+    .lightfire-wrapper ul li{
+        width: 238px;
+        height: 68px;
+        padding: 0 20px;
+        box-sizing: border-box;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-image: url("{:tomedia($pcconfig['style']['namebg'])}");
+        margin-bottom: 5px;
+    }
+    .lightfire-wrapper ul li .avatarbox{
+        width: 48px;
+        height: 48px;
+        border: 2px solid {$pcconfig['style']['infoset']['avatarbordercolor']??'#785925'};
+        box-sizing: border-box;
+        border-radius: 50%;
+        overflow: hidden;
+    }
+    .lightfire-wrapper ul li .avatarbox img{
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+    }
+    .lightfire-wrapper ul li .scorebox{
+        width: calc(100% - 48px);
+        padding: 0 5px;
+        box-sizing: border-box;
+    }
+    .lightfire-wrapper ul li .scorebox .username{
+        -webkit-flex-shrink: 0;
+        flex-shrink: 0;
+        max-width: 70%;
+        font-size: {$pcconfig['style']['infoset']['namesize']??14};
+        color: {$pcconfig['style']['infoset']['namecolor']??'#333'};
+    }
+    .lightfire-wrapper ul li .scorebox .userscore{
+        -webkit-flex-shrink: 0;
+        flex-shrink: 0;
+        font-weight: 700;
+        text-align: right;
+        max-width: 30%;
+        overflow: hidden;
+        font-size: {$pcconfig['style']['infoset']['scoresize']??14};
+        color: {$pcconfig['style']['infoset']['scorecolor']??'#333'};
+    }
+    .game{
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+</style>
+<audio id="countaudio" src="/{:WIMGURL}shake/count.mp3"  preload="preload"  style="display:none"></audio>
+<audio id="overaudio" src="/{:SIMGURL}shake/over.mp3"  preload="preload"  style="display:none"></audio>
+<audio id="joinaudio" src="/{:SIMGURL}shake/join.mp3"  preload="preload" style="display:none"></audio>
+<div class="lightfire-mainbox zam-app-flex-ajCenter2">
+    <div class="emptybox zam-app-flex-ajCenter display-none">
+		<img src="/{:SIMGURL}common/empty.png">
+		<p style="padding:20px;">暂无可用轮次，请到后台添加</p>
+	</div>
+    <div class="lightfire-wrapper display-none">
+        <ul class="zam-app-flex zam-app-directionColumn zam-app-justifyCenter"></ul>
+    </div>
+</div>
+<style>
+.welcomeBox-logo{
+    height: 180px!important;
+}
+.start-btn{
+    width:260px;
+    height:85px;
+}
+</style>
+{include file='common/gamewelcome' /}
+{include file='common/gamecommon' /}
+{if !empty($pcconfig['style']['diycss'])}<style>{$pcconfig['style']['diycss']}</style>{/if}
+<script id="lineItem-tpl" type="html/javascript">
+    <li class="zam-app-flex zam-app-alignCenter">
+        <div class="avatarbox">
+            <img src="{:tomedia($pcconfig['style']['userdefaultimg'])}" />
+        </div>
+        <div class="scorebox zam-app-flex zam-app-alignCenter zam-app-justifyspacebetween">
+            <div class="username limitbox">{$pcconfig['style']['userdefaultname']??'虚位以待'}</div>
+            <div class="userscore">0</div>
+        </div>
+    </li>
+</script>
+<script>
+var game;
+var Gameconfig = {
+	gameImgs:{
+		background:"{:tomedia($pcconfig['bgimg'])}",
+		player:"{:tomedia($pcconfig['style']['appplayer'])}",
+		bullet:"{:tomedia($pcconfig['style']['appbullet'])}",
+		enemybullet:"{:tomedia($pcconfig['style']['enemybullet'])}",
+		enemyexplode:"{:tomedia($pcconfig['style']['enemyexplode'])}",
+		piuv:"{:tomedia($pcconfig['style']['piuvoice'])}",
+		boomv:"{:tomedia($pcconfig['style']['boomvoice'])}",
+	},
+    playerconfig:{:json_encode($pcconfig['playerconfig'])},
+    enemylists:{:json_encode($pcconfig['enemys']??[])},
+};
+var defaultImg = "{:tomedia($pcconfig['style']['userdefaultimg'])}";
+var defaultName = "{$pcconfig['style']['userdefaultname']??'虚位以待'}";
+require(['screenairplane'],function(screenairplane){
+    screenairplane.initGame();
+});
+</script>
+{include file='common/footer' /}

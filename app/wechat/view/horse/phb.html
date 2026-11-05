@@ -1,0 +1,103 @@
+<style>
+	.autophbbox{
+		position: absolute;
+		left: 0;
+		top: 0;
+		width: 100%;
+		height: 100%;
+		z-index: 10;
+		color: #fd7330;
+	}
+	.autophbbox .autophb-wrapper{
+		position: relative;
+		width: 5.63rem;
+		height: 6.74rem;
+		background-image: url(/{:WIMGURL}horse/imgs/bg.png?t=1);
+		background-size: cover;
+		background-repeat: no-repeat;
+	}
+	.autophbbox .close{
+		width: 0.8rem;
+		height: 0.8rem;
+		background-image: url(/{:WIMGURL}horse/imgs/close.png);
+		background-size: cover;
+		background-repeat: no-repeat;
+		margin-top: 0.6rem;
+	}
+	.autophbbox .autophb-wrapper .my-score{
+		margin-top: 0.92rem;
+		width: 4.43rem;
+		height: 1.71rem;
+		background-image: url(/{:WIMGURL}horse/imgs/my.png);
+		background-size: cover;
+		background-repeat: no-repeat;
+	}
+	.autophbbox .autophb-wrapper .my-score div{
+		margin-top: 0.28rem;
+		font-size: 0.86rem;
+		text-align: center;
+		font-weight: bold;
+	}
+	.autophbbox .autophb-wrapper .team-all-score{
+		margin-top: 0.4rem;
+		width: 4.43rem;
+		height: 2.7rem;
+		background-image: url(/{:WIMGURL}horse/imgs/teamall.png);
+		background-size: cover;
+		background-repeat: no-repeat;
+	}
+	.autophbbox .autophb-wrapper .team-all-score .team-score{
+		margin-top: 0.3rem;
+		width: 3.73rem;
+		height: 0.68rem;
+		background-image: url(/{:WIMGURL}horse/imgs/teamscore.png);
+		background-size: cover;
+		background-repeat: no-repeat;
+		font-size: 0.36rem;
+		text-align: center;
+		font-weight: bold;
+		align-items: flex-end;
+	}
+	.autophbbox .autophb-wrapper .team-all-score .all-score{
+		margin-top: 0.3rem;
+		width: 3.73rem;
+		height: 0.68rem;
+		background-image: url(/{:WIMGURL}horse/imgs/allscore.png);
+		background-size: cover;
+		background-repeat: no-repeat;
+		font-size: 0.36rem;
+		text-align: center;
+		font-weight: bold;
+		align-items: flex-end;
+	}
+	.autophbbox .autophb-wrapper .team-all-score .team-score div,.autophbbox .autophb-wrapper .team-all-score .all-score div{
+		width: 50%;
+	}
+	.autophbbox .autophb-wrapper div span{
+		margin:0 5px;
+	}
+	.righttxt{
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
+		padding: 0 1rem;
+	}
+</style>
+<script id="phb-tpl2" type="text/html">
+<div class="autophbbox zam-app-flex-ajCenter">
+	<div class="autophb-wrapper zam-app-flex-ajCenter">
+		<div class="my-score zam-app-flex-ajCenter">
+			<div><% d.score %></div>
+		</div>
+		<div class="team-all-score zam-app-flex-ajCenter">
+			<div class="team-score zam-app-flex-ajCenter">
+				<div><% d.teamrank %><span>/</span><% d.teamnum %></div>
+			</div>
+			<div class="all-score zam-app-flex-ajCenter">
+				<div><% d.allrank %><span>/</span><% d.allnum %></div>
+			</div>
+		</div>
+	</div>
+	<div class="close" onclick="javascript:$('.autophbbox').remove();"></div>
+</div>
+</script>

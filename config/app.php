@@ -1,4 +1,15 @@
 <?php
+/*
+ $ @Author: 赞木
+ $ @Company: 株洲米波网络科技有限公司
+ $ @Project: 米波现场v3
+ $ @Date: 2026-10-16 11:54:40
+ $ @LastEditors: 赞木
+ $ @LastEditTime: 2026-10-22 10:30:13
+ $ @Link: 公司官网地址:https://miboxianchang.cn
+ $ @Copyright: 本软件归株洲米波网络科技有限公司所有，非法渠道获得本系统或者未经授权使用本系统将依法追究当事人或公司法律责任
+ */
+
 /**
  * This file is part of webman.
  *

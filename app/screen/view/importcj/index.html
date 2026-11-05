@@ -49,9 +49,9 @@
     -webkit-align-items: center;
     -ms-flex-align: center;
     align-items: center;
-    color:{$pcconfig['styleconfig']['color']};
     transform-style: preserve-3d;
     will-change: transform;
+    color:{$pcconfig['styleconfig']['color']};
 }
 .importcj-wall .importcj-luckerbox-item .lucker-one-item {
     width: 100%;
@@ -77,7 +77,7 @@
 .importcj-wall .lucker-one-item .data-box .data-one{
     text-align: center;
     {if isset($pcconfig['styleconfig']['flytype'])}
-        font-size:{if $pcconfig['styleconfig']['flytype'] == '2'}{$pcconfig['styleconfig']['flyonesize']??50}{elseif $pcconfig['styleconfig']['flytype'] == '3'}{$pcconfig['styleconfig']['flygridsize']??50}{else}{$pcconfig['styleconfig']['flyspheresize']??50}{/if}px;
+        font-size:{if $pcconfig['styleconfig']['flytype'] == '2'}{$pcconfig['styleconfig']['flyonesize']??50}{elseif $pcconfig['styleconfig']['flytype'] == '3'}{$pcconfig['styleconfig']['flygridsize']??50}{elseif $pcconfig['styleconfig']['flytype'] == '4'}{$pcconfig['styleconfig']['flyspheresize']??50}{elseif $pcconfig['styleconfig']['flytype'] == '5'}{$pcconfig['styleconfig']['flycirclesize']??25}{else}{$pcconfig['styleconfig']['flywallsize']??25}{/if}px;
     {/if}
 }
 {if !empty($pcconfig) && isset($pcconfig['fieldconfig']) && !empty($pcconfig['fieldconfig'])}
@@ -296,8 +296,8 @@
     align-items: center;
     transform-style: preserve-3d;
     -webkit-transform-style: preserve-3d;
-    -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
     color:{$pcconfig['styleconfig']['color']};
 }
 .importcj-luckerbox-lists li.importcj-luckerbox-item .lucker-one-item {
@@ -433,6 +433,119 @@
     100%{opacity:1;transform: scale(1);}
 }
 {/if}
+.importcj-wall.type5{
+    perspective: 1500px;
+    -webkit-perspective: 1500px;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+}
+.importcj-wall.type5 .circle3DBox {
+    position: absolute;
+    top: {$pcconfig['styleconfig']['flycirclemargin']??-100}px;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-transform: translateZ(0); 
+    transform: translateZ(0);
+}
+.importcj-wall.type5 .circle3DBox ul {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width:100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
+    -webkit-transform: translateZ(0); 
+    transform: translateZ(0);
+}
+.importcj-wall.type5 .circle3DBox li {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    justify-content: center;
+    background-image: url("{:tomedia($pcconfig['styleconfig']['flycirclebg']??'/static/images/screen/importcj/databg.jpg')}");
+    background-size: cover;
+    width: {$pcconfig['styleconfig']['flycirclepx']??140}px;
+    height: {$pcconfig['styleconfig']['flycirclepx']??140}px;
+    margin-top:calc(-{$pcconfig['styleconfig']['flycirclepx']??140}px / 2);
+    margin-left:calc(-{$pcconfig['styleconfig']['flycirclepx']??140}px / 2);
+}
+
+
+.importcj-wall.type6 .wallbox{
+	width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.wallone{
+	flex: 1;
+    height: 100%;
+    display: flex;
+	justify-content: center;
+    flex-direction: column;
+	will-change: transform;
+}
+.wallone .lucker-one-item{
+    width: {$pcconfig['styleconfig']['flywallpx']??120}px;
+    flex-shrink: 0;
+    background-image: url("{:tomedia($pcconfig['styleconfig']['flywallbg']??'/static/images/screen/importcj/databg.jpg')}");
+    background-size: cover;
+	will-change: transform;
+    transform: translateZ(0);
+	-webkit-transform: translateZ(0);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.avatar_shadow{
+	animation: avatar_shadow 0.5s ease-in-out 0s alternate infinite;
+}
+@keyframes avatar_shadow {
+	from{
+		transform:scale(1);
+		-webkit-transform: scale(1);
+	}
+	to{
+		transform:scale(.8);
+		-webkit-transform: scale(.8);
+	}
+}
+.avatar_rotate{
+	animation: avatar_rotate 0.2s linear 0s infinite;
+}
+@keyframes avatar_rotate {
+    {if !isset($pcconfig['styleconfig']['flywalltype']) || $pcconfig['styleconfig']['flywalltype'] == '1'}
+    from{
+        transform: rotateX(0);
+    }to{
+        transform: rotateX(360deg);
+    }
+    {else /}
+    from{
+        transform: rotateY(0);
+    }to{
+        transform: rotateY(360deg);
+    }
+    {/if}
+}
+.avatar_scale{
+	animation: avatar_scale 0.2s linear 2 alternate;            
+}
+@keyframes avatar_scale {
+	from{
+		transform: scale(1);
+	}
+	to{
+		transform: scale(0);
+	}
+}
 </style>
 {if !empty($pcconfig['iscjingmusic'])}
 <audio id="cjingmusic" src="{:tomedia($pcconfig['iscjingmusic'])}" loop preload="preload" style="display:none"></audio>
@@ -478,9 +591,12 @@
         </div>
         <div class="importcj-tip">按空格键停止</div>
     </div>
+    {if ($pcconfig['showyanhua']??2) == '1'}
+    {include file="importcj/yanhua"}
+    {/if}
 </div>
 <script type="text/javascript">
-var isroundcj = "{$pcconfig['isroundcj']??2}",maxrollnum = parseInt("{$pcconfig['styleconfig']['maxrollnum']??20}"),isautoscroll = "{$pcconfig['autoscroll']??2}",autoscrollspeed = parseInt({$pcconfig['styleconfig']['autoscrollspeed']??30});
+var isroundcj = "{$pcconfig['isroundcj']??2}",maxrollnum = parseInt("{$pcconfig['styleconfig']['maxrollnum']??20}"),isautoscroll = "{$pcconfig['autoscroll']??2}",showyanhua = "{$pcconfig['showyanhua']??2}",autoscrollspeed = parseInt({$pcconfig['styleconfig']['autoscrollspeed']??30});
 require(['screenimportcj'],function(screenimportcj){
     var html = '';
     {if !empty($pcconfig['styleconfig']['hidevideo'])}

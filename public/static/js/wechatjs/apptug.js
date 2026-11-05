@@ -50,7 +50,7 @@ define('apptug', ['appsocket', 'jquery.shake', 'wechatcore'], function (appsocke
 					s.text(data.djs > 0 ? data.djs : 'GO');
 					b.removeClass('hidden');
 					self.changetip(self.statustip[1]);
-					wechatcore.playAudio(self.djsaudio);
+					wechatcore.audioPlay(self.djsaudio);
 					if (data.djs == 0) {
 						self.changetip(self.statustip[2]);
 					}
@@ -111,15 +111,12 @@ define('apptug', ['appsocket', 'jquery.shake', 'wechatcore'], function (appsocke
 				}
 			};
 			appsocket.init(params);
-			if ($("#appbgmusic").length > 0) {
-				self.appbgmusic = $("#appbgmusic")[0];
-				wechatcore.playAudio(self.appbgmusic);
-			}
+			wechatcore.bgAudioPlay();
 		},
 		initAudio: function () {
 			var self = this;
-			self.shakeaudio = $('#shakeaudio')[0];
-			self.djsaudio = $("#djsaudio")[0];
+			self.shakeaudio = { audio: wechatcore.autoAudio({ forceHowl: '1', audio: $("#shakeaudio")[0] }) };
+			self.djsaudio = { audio: wechatcore.autoAudio({ audio: $("#djsaudio")[0] }) };
 		},
 		bindEvent: function () {
 			var self = this;
@@ -171,7 +168,7 @@ define('apptug', ['appsocket', 'jquery.shake', 'wechatcore'], function (appsocke
 			}
 			self.changetip(self.kh[Math.floor(Math.random() * self.kh.length)]);
 			self.myscore++;
-			wechatcore.playAudio(self.shakeaudio);
+			wechatcore.audioPlay(self.shakeaudio);
 			self.setmyscore();
 			appsocket.sendgamedata({
 				myscore: self.myscore,

@@ -95,7 +95,12 @@ var initConfig = {
             title: '投票起止时间',
             align: 'center',
             formatter: function(value, row, index){
-                return `${value} - ${row.endtime}`;
+                var openroundtime = row.openroundtime || '2';
+                if(openroundtime == '1'){
+                    return `${value} - ${row.endtime}`;
+                }else{
+                    return '<span class="text-primary">未开启</span>';
+                }
             }
         },{
             field: 'usernum',

@@ -19,8 +19,8 @@
 		var XCV3Config = {
 		  staticurl:"__STATIC__/",
 		  cookie : {'pre': 'zam'},
-		  hdid:"{$hdinfo['hdid']}",
-		  rhdid:"{$hdinfo['id']}",
+		  hdid:"{$hdinfo['hdid']??''}",
+		  rhdid:"{$hdinfo['id']??''}",
 		  wsAddress:"{$wssaddress}",
 		  loadtype:"{$hdinfo['loadtype']??'1'}",
 		  screenfollow:"{$hdinfo['specialconfig']['followchange']??'1'}",
@@ -33,7 +33,7 @@
 		require.config({
 			waitSeconds:20,
 			baseUrl: XCV3Config.staticurl + "js",
-			urlArgs:'v=3.5.51',//+(new Date()).getTime(),
+			urlArgs:'v=3.6.2',//+(new Date()).getTime(),
 			paths: {
 				 css: "css.min",
 				 'async': "async",
@@ -114,6 +114,7 @@
 				 screenlantern: 'screenjs/screenlantern',
 				 screenswingsnake:'screenjs/screenswingsnake',
 				 screenlightfire:'screenjs/screenlightfire',
+				 screenairplane:'screenjs/screenairplane',
 				 dragqr:'screenjs/dragqr',
 				 fulldm:'screenjs/fulldm',
 				 danmuku:'screenjs/danmuku',

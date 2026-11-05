@@ -1,6 +1,7 @@
 define('screenhorse', ['screensocket', 'screencore', 'template', 'layerBox', 'fulldm', 'keyboard'], function (screensocket, screencore, template, layerBox, fulldm, keyboardJS) {
 	var screenhorse = {
 		gamestatus: 0,
+		gametime: 30,
 		stopclick: false,
 		maxscore: 120,
 		autorun: 2,
@@ -14,6 +15,7 @@ define('screenhorse', ['screensocket', 'screencore', 'template', 'layerBox', 'fu
 		audio: {},
 		init: function () {
 			var self = this;
+			self.setProgressBarHeight();
 			self.lineitemRender = template('shakeItem-tpl');
 			self.pmitemRender = template('pmshakeItem-tpl');
 			var params = {};
@@ -31,6 +33,7 @@ define('screenhorse', ['screensocket', 'screencore', 'template', 'layerBox', 'fu
 					self.initAudio();
 					self.bindEvent();
 					if (!$(".rankBox").is(":hidden")) $(".rankBox").addClass('display-none');
+					self.gametime = data.gametimesec || 30;
 					self.maxscore = data.maxscore;
 					self.isteam = data.isteam;
 					self.createLine(data.type);
@@ -41,6 +44,7 @@ define('screenhorse', ['screensocket', 'screencore', 'template', 'layerBox', 'fu
 						if ($('.welcomeBox').hasClass("display-none")) {
 							$('.welcomeBox').removeClass("display-none").animateControl(screencore.anicssArr());
 						}
+						self.hideDzpercent();
 						self.gamestatus = 1;
 						clearInterval(self.joinInterval);
 						self.autorun = data.autorun;
@@ -58,6 +62,7 @@ define('screenhorse', ['screensocket', 'screencore', 'template', 'layerBox', 'fu
 							}
 						}, 2e3);
 						$(".bgneedrun").addClass('runbg');
+						self.showDzpercent();
 					}
 				} else if (data.type == 'gameiscountdown') {
 					self.gametimererror = false;
@@ -72,10 +77,15 @@ define('screenhorse', ['screensocket', 'screencore', 'template', 'layerBox', 'fu
 				} else if (data.type == 'gameisdjs') {
 					self.gamestatus = 2;
 					self.gametimererror = false;
+					self.showDzpercent();
 					$(".welcomeBox,.webstartdjs").addClass('display-none');
 					var b = $(".webgamedjs"), s = b.find(".gamedjsani");
 					s.text(data.djs);
 					b.removeClass('display-none');
+					if (data.djs > 0 && !$(".bgneedrun").hasClass('runbg')) {
+						$(".bgneedrun").addClass('runbg');
+					}
+					self.changeDztime(data.djs);
 					if (data.djs == 0) {
 						self.gamestatus = 3;
 						b.addClass('display-none');
@@ -90,6 +100,7 @@ define('screenhorse', ['screensocket', 'screencore', 'template', 'layerBox', 'fu
 					btn.attr({ 'data-rotateid': data.rotateid, 'data-gamephb': data.gamephb });
 					screencore.gameEndphb((data.isteam == '1' ? data.teams : data.list), data.endphb);
 					screencore.sendLuckerTpl({ rotateid: data.rotateid });
+					self.appendLeftPhb((data.isteam == '1' ? data.teams : data.list));
 				} else if (data.type == 'gamehorserefresh' || data.type == 'gameerrorhaddone') {
 					window.location.reload();
 				} else if (data.type == 'gameiserror') {
@@ -327,6 +338,205 @@ define('screenhorse', ['screensocket', 'screencore', 'template', 'layerBox', 'fu
 			setTimeout(function () {
 				$(".start-btn").trigger('click');
 			}, 1e3)
+		},
+		showDzpercent: function () {
+			var dzpercent = $(".dzpercent");
+			if (dzpercent.length) {
+				dzpercent.find('.container').removeClass('hidden').addClass('ready');
+			}
+		},
+		hideDzpercent: function () {
+			var dzpercent = $(".dzpercent");
+			if (dzpercent.length) {
+				dzpercent.find('.container').removeClass('ready').addClass('hidden');
+			}
+		},
+		changeDztime: function (countdown) {
+			var self = this, dzpercent = $(".dzpercent");
+			if (dzpercent.length) {
+				var container = $('#container');
+				var adBackground = $('#adBackground');
+				var viewBtn = $('#viewBtn');
+				dzpercent.find('.countdown').text(countdown);
+				var progressOverlay = $("#progressOverlay"), progressHorse = $("#progressHorse");
+				var progressContainer = $('.progress-bar-container');
+				const progress = ((self.gametime - countdown) / self.gametime) * 100;
+				if (progressOverlay.length) progressOverlay.css('width', `${progress}%`);
+				// 更新 horse 位置，跟随进度条的右侧边缘（使用 transform 更平滑）
+				if (progressHorse.length) {
+					const containerWidth = progressContainer[0].offsetWidth;
+					const horseLeft = (containerWidth * progress / 100);
+					//progressHorse.css('transform', `translate(calc(${horseLeft}px - 50%), -50%)`)
+					progressHorse.css('left', `${horseLeft}px`)
+					// 当到达 100% 时，标记为停止状态
+					if (progress >= 100) {
+						progressHorse.addClass('stopped');
+					}
+				}
+
+				// 根据进度更新箭头图片
+				const arrows = $('.marker-arrow');
+				const arrowPositions = [20, 40, 60, 80, 98];
+				arrows.each((index, arrow) => {
+					if (progress >= arrowPositions[index]) {
+						arrow.classList.add('active');
+					} else {
+						arrow.classList.remove('active');
+					}
+				});
+
+				if (countdown <= 0) {
+					progressOverlay.css('width', `${progress}%`);
+					dzpercent.find('.countdown').text(0);
+					// 确保所有箭头都激活
+					arrows.each((index, arrow) => arrow.classList.add('active'));
+					// 马儿到达终点，保持显示
+					if (progressHorse) {
+						//const containerWidth = progressContainer[0].offsetWidth;
+						//progressHorse.css('transform', `translate(calc(${containerWidth}px - 50%), -50%)`)
+						//progressHorse.css('left', `${containerWidth}px`)
+						//progressHorse.addClass('stopped');
+					}
+					//显示广告
+					setTimeout(() => {
+						container.addClass('hidden');
+						$('.car-mainbox .shake-lists').css('z-index', 2);
+						$(".shakelineBox li").addClass('display-none');
+						if (adBackground) {
+							adBackground.addClass('show');
+						}
+						setTimeout(() => {
+							if (viewBtn) {
+								viewBtn.addClass('show');
+							}
+						}, 800);
+					}, 300);
+				} else {
+					$(".shakelineBox li").removeClass('display-none');
+				}
+
+			}
+		},
+		setProgressBarHeight: function () {
+			var dzpercent = $(".dzpercent");
+			if (dzpercent.length) {
+				const viewBtn = document.getElementById('viewBtn');
+				viewBtn.addEventListener('click', function () {
+					if (adBackground) {
+						adBackground.style.transition = 'none';
+						adBackground.classList.remove('show');
+						adBackground.classList.add('hide');
+					}
+					viewBtn.style.transition = 'none';
+					viewBtn.classList.remove('show');
+					viewBtn.classList.add('hide');
+					// 同时隐藏 bg.jpg
+					// document.body.classList.add('no-bg');
+					$('.car-mainbox .shake-lists').css('z-index', 1)
+				});
+				var container = $('#container');
+				const progressContainer = document.querySelector('.progress-bar-container');
+				const baseImg = new Image();
+				const overlayImg = new Image();
+
+				baseImg.onload = function () {
+					const containerWidth = progressContainer.offsetWidth;
+					const calculatedHeight = containerWidth / (baseImg.width / baseImg.height);
+					progressContainer.style.height = calculatedHeight + 'px';
+
+					overlayImg.onload = function () {
+						setTimeout(() => {
+							const progressOverlayInner = document.querySelector('.progress-bar-overlay-inner');
+							// 计算 loading2.png 的实际显示宽度（使用 auto 100%，高度是容器的 70%）
+							const overlayHeight = progressContainer.offsetHeight * 0.7;
+							const overlayWidth = overlayHeight * (overlayImg.width / overlayImg.height);
+
+							// 内部元素宽度应该等于 loading1 的实际显示宽度（容器宽度）
+							// 如果 loading2 的实际宽度小于容器宽度，需要拉伸或调整
+							// 为了确保能完全覆盖，使用容器宽度
+							if (progressOverlayInner) {
+								progressOverlayInner.style.width = containerWidth + 'px';
+								// 如果 loading2 的实际宽度小于容器宽度，调整 background-size
+								if (overlayWidth < containerWidth) {
+									progressOverlayInner.style.backgroundSize = containerWidth + 'px 100%';
+								}
+							}
+
+							// 初始化 horse 位置
+							if (progressHorse) {
+								// progressHorse.style.transform = 'translate(calc(0px - 50%), -50%)';
+								progressHorse.style.left = 0;
+							}
+
+							const markers = document.querySelectorAll('.marker-item');
+							markers.forEach((marker, index) => {
+								marker.style.left = (index === markers.length - 1 ? 98 : (index + 1) * 20) + '%';
+							});
+
+							// 所有计算完成后，显示容器
+							if (container.length) {
+								container.addClass('ready');
+							}
+						}, 10);
+					};
+					overlayImg.src = '/static/images/screen/horse/images/loading2.png';
+				};
+				baseImg.src = '/static/images/screen/horse/images/loading1.png';
+			}
+		},
+		appendLeftPhb: function (teams) {
+			var dzpercent = $(".dzpercent");
+			$(".rankBox .ranking-list").remove();
+			if (dzpercent.length) {
+				var arrs = [
+					{
+						city: '海西',
+						name: '',
+					},
+					{
+						city: '厦门',
+						name: '',
+					},
+					{
+						city: '福州',
+						name: '',
+					},
+					{
+						city: '泉莆',
+						name: '',
+					},
+					{
+						city: '漳龙',
+						name: '',
+					},
+					{
+						city: '川渝',
+						name: '',
+					},
+					{
+						city: '长沙',
+						name: '',
+					},
+					{
+						city: '广州',
+						name: '',
+					},
+					{
+						city: '南宁',
+						name: '',
+					}
+				];
+				// 遍历arrs数组
+				arrs.forEach(cityItem => {
+					// 在teams中查找匹配的team
+					const matchedTeam = teams.find(team => team.teamname === cityItem.city);
+					// 如果找到匹配的team，并且有bestone且有nickname
+					if (matchedTeam && matchedTeam.bestone && matchedTeam.bestone.nickname) {
+						cityItem.name = matchedTeam.bestone.nickname;
+					}
+				});
+				$(".rankBox").append(template('leftrank-tpl', { arrs: arrs }));
+			}
 		}
 	};
 	return screenhorse;

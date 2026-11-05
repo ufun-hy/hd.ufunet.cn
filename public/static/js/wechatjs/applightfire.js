@@ -58,7 +58,7 @@ define('applightfire', ['appsocket', 'jquery.shake', 'wechatcore'], function (ap
                     s.text(data.djs > 0 ? data.djs : 'GO');
                     b.removeClass('hidden');
                     self.changetip(self.statustip[1]);
-                    wechatcore.playAudio(self.djsaudio);
+                    wechatcore.audioPlay(self.djsaudio);
                     data.djs == 0 && self.changetip(self.statustip[2]);
                 } else if (data.type == 'gameisdjs') {
                     if (self.gamestatus == 1) {
@@ -140,31 +140,13 @@ define('applightfire', ['appsocket', 'jquery.shake', 'wechatcore'], function (ap
                 }
             };
             appsocket.init(params);
-            if ($("#appbgmusic").length > 0) {
-                self.appbgmusic = $("#appbgmusic")[0];
-                wechatcore.playAudio(self.appbgmusic);
-            }
+            wechatcore.bgAudioPlay();
         },
         initAudio: function () {
             var self = this;
-            self.shakeaudio = $('#shakeaudio')[0];
-            self.djsaudio = $("#djsaudio")[0];
-            self.boomaudio = '';
-            if (boomaudio) {
-                self.boomaudio = new Howl({
-                    src: boomaudio,
-                    loop: false,
-                    html5: /iPad|iPhone|iPod/.test(navigator.userAgent),
-                    preload: false,
-                }).load();
-            }
-        },
-        playBoomAudio: function () {
-            var self = this;
-            if (self.boomaudio) {
-                if (self.boomaudio.playing()) self.boomaudio.stop();
-                self.boomaudio.play();
-            }
+            self.shakeaudio = { audio: wechatcore.autoAudio({ forceHowl: '1', audio: $("#shakeaudio")[0] }) };
+            self.djsaudio = { audio: wechatcore.autoAudio({ audio: $("#djsaudio")[0] }) };
+            self.boomaudio = { audio: wechatcore.autoAudio({ audio: $("#boomaudio")[0] }) };
         },
         initplaytype: function () {
             var self = this;
@@ -206,7 +188,7 @@ define('applightfire', ['appsocket', 'jquery.shake', 'wechatcore'], function (ap
                     $('.zam-app-clickedimg').addClass('hidden');
                     $this.removeClass('hidden');
                 }, 300);
-                self.playBoomAudio();
+                wechatcore.audioPlay(self.boomaudio);
                 self.workerdata();
             });
             $('.zam-app-clickedimg').off('click').on('click', function () {
@@ -416,7 +398,7 @@ define('applightfire', ['appsocket', 'jquery.shake', 'wechatcore'], function (ap
                 self.setprogress(((self.myscore / self.maxscore).toFixed(2) * 100) + "%", self.myscore);
             }
             if (self.playtype == 1) {
-                wechatcore.playAudio(self.shakeaudio);
+                wechatcore.audioPlay(self.shakeaudio);
                 wechatcore.anicss('.zam-app-shakehand', 'shake');
             }
             appsocket.sendgamedata({

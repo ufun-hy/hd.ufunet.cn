@@ -39,8 +39,12 @@
 				$(".flystylebox .one").removeClass('hidden').siblings().addClass('hidden');
 			}else if(flytype == '3'){
 				$(".flystylebox .grid").removeClass('hidden').siblings().addClass('hidden');
-			}else{
+			}else if(flytype == '4'){
 				$(".flystylebox .sphere").removeClass('hidden').siblings().addClass('hidden');
+			}else if(flytype == '5'){
+				$(".flystylebox .circle").removeClass('hidden').siblings().addClass('hidden');
+			}else if(flytype == '6'){
+				$(".flystylebox .wall").removeClass('hidden').siblings().addClass('hidden');
 			}
 		}
 	});
@@ -81,6 +85,7 @@
 				</div>
 			</div>
 		</div>
+
 		<div class="grid{if isset($config['styleconfig']['flytype']) && $config['styleconfig']['flytype'] != '3'} hidden{/if}">
 			<div class="form-group">
 				<label class="col-lg-2 control-label">* 文字大小</label>
@@ -168,6 +173,152 @@
 				</div>
 			</div>
 		</div>
+		<!--circle-->
+		<div class="circle{if isset($config['styleconfig']['flytype']) && $config['styleconfig']['flytype'] != '5'} hidden{/if}">
+			<div class="form-group">
+				<label class="col-lg-2 control-label">* 方片大小</label>
+				<div class="col-lg-8">
+					<input type="text" class="form-control numberincdec" name="styleconfig[flycirclepx]" 
+						data-bts-min="140" data-bts-replacement-val="140"
+						data-bts-max="400"
+						data-bts-step="1"
+						data-bts-postfix="px"
+						data-bts-postfix-extra-class="touchspin-postfix"
+						value="{$config['styleconfig']['flycirclepx']??140}">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-lg-2 control-label">* 方片背景图</label>
+				<div class="col-lg-8">
+					{:tpl_image_one('styleconfig[flycirclebg]',$config['styleconfig']['flycirclebg']??'/static/images/screen/importcj/databg.jpg')}
+					<span class="help-block">规格:200*200px</span>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-lg-2 control-label">* 方片上文字大小</label>
+				<div class="col-lg-8">
+					<input type="text" class="form-control numberincdec" name="styleconfig[flycirclesize]" 
+						data-bts-min="1" data-bts-replacement-val="1"
+						data-bts-max="300"
+						data-bts-step="1"
+						data-bts-postfix="px"
+						data-bts-postfix-extra-class="touchspin-postfix"
+						value="{$config['styleconfig']['flycirclesize']??25}">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-lg-2 control-label">* 方片圈数</label>
+				<div class="col-lg-8">
+					<input type="text" class="form-control numberincdec" name="styleconfig[flycirclenum]" value="{$config['styleconfig']['flycirclenum']??6}"
+					data-bts-min="1" data-bts-replacement-val="6"
+					data-bts-max="20"
+					data-bts-step="1"
+					data-bts-postfix="圈"
+					data-bts-postfix-extra-class="touchspin-postfix"
+					>
+					<div class="help-block">根据屏幕设置合理的圈数，最大可以为20</div>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-lg-2 control-label">* 旋转一圈时间</label>
+				<div class="col-lg-8">
+					<input type="text" class="form-control numberincdec" name="styleconfig[flycirclespeed]" value="{$config['styleconfig']['flycirclespeed']??5}"
+					data-bts-min="1" data-bts-replacement-val="5"
+					data-bts-max="100"
+					data-bts-step="1"
+					data-bts-postfix="秒"
+					data-bts-postfix-extra-class="touchspin-postfix"
+					>
+					<div class="help-block">时间越短转的越快，最小可以是1秒</div>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-lg-2 control-label">* 圈体上下偏距</label>
+				<div class="col-lg-8">
+					<input type="text" class="form-control numberincdec" name="styleconfig[flycirclemargin]" 
+						data-bts-min="-1000" data-bts-replacement-val="-100"
+						data-bts-max="1000"
+						data-bts-step="1"
+						data-bts-postfix="px"
+						data-bts-postfix-extra-class="touchspin-postfix"
+						value="{$config['styleconfig']['flycirclemargin']??-100}">
+					<div class="help-block">填写负数往上偏，填写正数往下偏</div>
+				</div>
+			</div>
+		</div>
+		<!--wall-->
+		<div class="wall{if isset($config['styleconfig']['flytype']) && $config['styleconfig']['flytype'] != '6'} hidden{/if}">
+			<div class="form-group">
+				<label class="col-lg-2 control-label text-right">* 方片墙</label>
+				<div class="col-lg-8">
+					<div class="input-group">
+						<div class="input-group-btn not-allow"><a class="btn btn-default">列数</a></div>
+						<div class="touchspin">
+						<input type="text" class="form-control numberincdec" name="styleconfig[wallcols]" 
+						data-bts-min="1" data-bts-replacement-val="10"
+						data-bts-max="40"
+						data-bts-step="1"
+						data-bts-postfix="列"
+						data-bts-postfix-extra-class="touchspin-postfix"
+						value="{$config['styleconfig']['wallcols']??10}">
+						</div>
+						<div class="input-group-btn not-allow"><a class="btn btn-default">行数</a></div>
+						<div class="touchspin">
+						<input type="text" class="form-control numberincdec" name="styleconfig[wallrows]" 
+						data-bts-min="1" data-bts-replacement-val="1"
+						data-bts-max="40"
+						data-bts-step="1"
+						data-bts-postfix="行"
+						data-bts-postfix-extra-class="touchspin-postfix"
+						value="{$config['styleconfig']['wallrows']??5}">
+						</div>
+					</div>
+					<span class="help-block">根据投屏情况设置</span>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-lg-2 control-label">* 方片大小</label>
+				<div class="col-lg-8">
+					<input type="text" class="form-control numberincdec" name="styleconfig[flywallpx]" 
+						data-bts-min="120" data-bts-replacement-val="120"
+						data-bts-max="400"
+						data-bts-step="1"
+						data-bts-postfix="px"
+						data-bts-postfix-extra-class="touchspin-postfix"
+						value="{$config['styleconfig']['flywallpx']??120}">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-lg-2 control-label">* 方片背景图</label>
+				<div class="col-lg-8">
+					{:tpl_image_one('styleconfig[flywallbg]',$config['styleconfig']['flywallbg']??'/static/images/screen/importcj/databg.jpg')}
+					<span class="help-block">规格:200*200px</span>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-lg-2 control-label">* 方片上文字大小</label>
+				<div class="col-lg-8">
+					<input type="text" class="form-control numberincdec" name="styleconfig[flywallsize]" 
+						data-bts-min="1" data-bts-replacement-val="1"
+						data-bts-max="300"
+						data-bts-step="1"
+						data-bts-postfix="px"
+						data-bts-postfix-extra-class="touchspin-postfix"
+						value="{$config['styleconfig']['flywallsize']??25}">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-lg-2 control-label">* 翻转方式</label>
+				<div class="col-lg-8">
+					<label class="lyear-radio radio-inline radio-primary">
+						<input type="radio" name="styleconfig[flywalltype]" value="1" {if !isset($config['styleconfig']['flywalltype']) || $config['styleconfig']['flywalltype']=='1'}checked{/if}><span>上下翻转</span>
+					</label>
+					<label class="lyear-radio radio-inline radio-primary">
+						<input type="radio" name="styleconfig[flywalltype]" value="2" {if isset($config['styleconfig']['flywalltype']) && $config['styleconfig']['flywalltype']=='2'}checked{/if}><span>左右翻转</span>
+					</label>
+				</div>
+			</div>
+		</div>
 	</div>
 	<div class="form-group">
 		<label class="col-lg-2 control-label">主色调</label>
@@ -207,7 +358,7 @@
 		<label class="col-lg-2 control-label">* 随机滚动以及中奖列表文字大小</label>
 		<div class="col-lg-10">
 			<div class="input-group">
-                <div class="input-group-btn not-allow"><a class="btn btn-default">1-2个</a></div>
+                <div class="input-group-btn not-allow"><a style="padding:8px 2px;" class="btn btn-default">1-2个</a></div>
                 <div class="touchspin">
 					<input type="text" class="form-control numberincdec" name="styleconfig[rolltxt1]" 
 					data-bts-min="1" data-bts-replacement-val="1"
@@ -217,7 +368,7 @@
 					data-bts-postfix-extra-class="touchspin-postfix"
 					value="{$config['styleconfig']['rolltxt1']??50}">
                 </div>
-                <div class="input-group-btn not-allow"><a class="btn btn-default">3-4个</a></div>
+                <div class="input-group-btn not-allow"><a style="padding:8px 2px;" class="btn btn-default">3-4个</a></div>
 				<div class="touchspin">
 					<input type="text" class="form-control numberincdec" name="styleconfig[rolltxt2]" 
 					data-bts-min="1" data-bts-replacement-val="1"
@@ -227,7 +378,7 @@
 					data-bts-postfix-extra-class="touchspin-postfix"
 					value="{$config['styleconfig']['rolltxt2']??45}">
                 </div>
-				<div class="input-group-btn not-allow"><a class="btn btn-default">5-6个</a></div>
+				<div class="input-group-btn not-allow"><a style="padding:8px 2px;" class="btn btn-default">5-6个</a></div>
 				<div class="touchspin">
 					<input type="text" class="form-control numberincdec" name="styleconfig[rolltxt3]" 
 					data-bts-min="1" data-bts-replacement-val="1"
@@ -237,7 +388,7 @@
 					data-bts-postfix-extra-class="touchspin-postfix"
 					value="{$config['styleconfig']['rolltxt3']??35}">
                 </div>
-				<div class="input-group-btn not-allow"><a class="btn btn-default">7-8个</a></div>
+				<div class="input-group-btn not-allow"><a style="padding:8px 2px;" class="btn btn-default">7-8个</a></div>
 				<div class="touchspin">
 					<input type="text" class="form-control numberincdec" name="styleconfig[rolltxt4]" 
 					data-bts-min="1" data-bts-replacement-val="1"
@@ -247,7 +398,7 @@
 					data-bts-postfix-extra-class="touchspin-postfix"
 					value="{$config['styleconfig']['rolltxt4']??30}">
                 </div>
-				<div class="input-group-btn not-allow"><a class="btn btn-default">9个及以上</a></div>
+				<div class="input-group-btn not-allow"><a style="padding:8px 2px;" class="btn btn-default">9个及以上</a></div>
 				<div class="touchspin">
 					<input type="text" class="form-control numberincdec" name="styleconfig[rolltxt5]" 
 					data-bts-min="1" data-bts-replacement-val="1"
@@ -375,6 +526,13 @@
 		<div class="col-lg-8">
 			{:tpl_video('styleconfig[baozhavideo]',$config['styleconfig']['baozhavideo'])}
 			<span class="help-block">规格:1920px * 1080px</span>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-lg-2 control-label">* 结束抽奖烟花效果</label>
+		<div class="col-lg-8">
+			{:tpl_switch('showyanhua',$config['showyanhua']??'2')}
+			 <span class="help-block">关闭则抽奖结束不播放烟花效果</span>
 		</div>
 	</div>
 	<div class="form-group">

@@ -23,6 +23,7 @@ define('appjumprace', ['appsocket', 'wechatcore', 'phaser'], function (appsocket
                 self.initGame();
                 self.closerule = window.localStorage.getItem("closejumpracerule-" + XCV3Config.hdid);
                 self.bindEvent();
+                wechatcore.bgAudioPlay();
             });
         },
         initsocket: function () {
@@ -67,10 +68,6 @@ define('appjumprace', ['appsocket', 'wechatcore', 'phaser'], function (appsocket
                     }
                     self.showteambox(data.teaminfo, data.jointype);
                 } else if (data.type == 'gameiscountdown') {
-                    if ($("#bgm").length > 0 && game.musicPause) {
-                        if (!$("#bgm")[0].paused) $("#bgm")[0].pause();
-                        game.musicPause = false;
-                    }
                     self.gamestatus = 1;
                     self.myscore = 0;
                     self.hidemyteambox();
@@ -78,7 +75,7 @@ define('appjumprace', ['appsocket', 'wechatcore', 'phaser'], function (appsocket
                     s.text(data.djs > 0 ? data.djs : 'GO');
                     b.removeClass('hidden');
                     self.gametip = self.statustip[1];
-                    wechatcore.playAudio(self.djsaudio);
+                    wechatcore.audioPlay(self.djsaudio);
                     if (data.djs == 0) {
                         self.gametip = self.statustip[2];
                         setTimeout(function () {
@@ -149,7 +146,7 @@ define('appjumprace', ['appsocket', 'wechatcore', 'phaser'], function (appsocket
         },
         initAudio: function () {
             var self = this;
-            self.djsaudio = $("#djsaudio")[0];
+            self.djsaudio = { audio: wechatcore.autoAudio({ audio: $("#djsaudio")[0] }) };
         },
         bindEvent: function () {
             var self = this;
@@ -285,7 +282,7 @@ define('appjumprace', ['appsocket', 'wechatcore', 'phaser'], function (appsocket
         initGame: function () {
             var self = this;
             var loaderState = function (game) {
-                var _self = this, loadtxt, progresstxt, voices = ['jump', 'fall', 'score', 'score2'];
+                var _self = this, loadtxt, progresstxt;
                 this.init = function () {
                     game.scale.pagesAlignHorizontally = true;
                     game.scale.pageAlignVertically = true;
@@ -316,13 +313,22 @@ define('appjumprace', ['appsocket', 'wechatcore', 'phaser'], function (appsocket
                         progresstxt.text = progress + '%';
                     });
                     this.load.onLoadComplete.add(function () {
-                        if (voices.length > 0) {
-                            game.sound.setDecodedCallback(voices, function () {
-                                _self._startmenu();
-                            }, this);
-                        } else {
-                            _self._startmenu();
+                        var voices = [];
+                        if (Gameconfig.gameImgs.jump) {
+                            voices.push('jump');
                         }
+                        if (Gameconfig.gameImgs.fall) {
+                            voices.push('fall');
+                        }
+                        if (Gameconfig.gameImgs.score) {
+                            voices.push('score');
+                        }
+                        if (Gameconfig.gameImgs.score2) {
+                            voices.push('score2');
+                        }
+                        game.sound.setDecodedCallback(voices, function () {
+                            _self._startmenu();
+                        }, this);
                     });
                 };
                 this._startmenu = function () {
@@ -335,9 +341,7 @@ define('appjumprace', ['appsocket', 'wechatcore', 'phaser'], function (appsocket
             };
             var menuState = function (game) {
                 this.init = function () {
-                    if ($("#appbgmusic").length > 0) {
-                        wechatcore.playAudio($("#appbgmusic")[0]);
-                    }
+
                 };
                 this.create = function () {
                     for (var i = 0; i < 3; i++) {
@@ -395,13 +399,10 @@ define('appjumprace', ['appsocket', 'wechatcore', 'phaser'], function (appsocket
                     this.isplaying = true;
                 };
                 this.create = function () {
-                    if ($("#appbgmusic").length > 0) {
-                        $("#appbgmusic")[0].pause();
-                    }
-                    this.jumpbgm = this.game.add.audio('jump', 1, false);
-                    this.fallbgm = this.game.add.audio('fall', 1, false);
-                    this.scorebgm = this.game.add.audio('score', 1, false);
-                    this.score2bgm = this.game.add.audio('score2', 1, false);
+                    this.jumpbgm = this.game.add.audio('jump', 1);
+                    this.fallbgm = this.game.add.audio('fall', 1);
+                    this.scorebgm = this.game.add.audio('score', 1);
+                    this.score2bgm = this.game.add.audio('score2', 1);
 
                     this.showScore = game.add.sprite(10, 10);
                     this.scoreBox = game.add.sprite(0, 0, 'scorebox');
@@ -471,7 +472,7 @@ define('appjumprace', ['appsocket', 'wechatcore', 'phaser'], function (appsocket
                             }, this);
                             holding = true;
                             holdTime = this.game.time.now;
-                            game.playAudio(this.jumpbgm);
+                            game.playMusic(this.jumpbgm);
                         }
                     }, this);
                     this.game.input.onUp.add(this.jumpplate, this);
@@ -533,9 +534,9 @@ define('appjumprace', ['appsocket', 'wechatcore', 'phaser'], function (appsocket
                                 obj.visible = false;
                                 obj.scale.set(1);
                             }, this);
-                            game.playAudio(this.score2bgm);
+                            game.playMusic(this.score2bgm);
                         } else {
-                            game.playAudio(this.scorebgm);
+                            game.playMusic(this.scorebgm);
                         }
                         if (this.isplaying && self.gamestatus == 2 && self.gametime > 0) {
                             self.myscore += getscore;
@@ -578,7 +579,7 @@ define('appjumprace', ['appsocket', 'wechatcore', 'phaser'], function (appsocket
                             }
                         }
                     }, this);
-                    game.playAudio(this.fallbgm);
+                    game.playMusic(this.fallbgm);
 
                 };
                 this.makeplate = function (sprite, anim) {
@@ -651,9 +652,13 @@ define('appjumprace', ['appsocket', 'wechatcore', 'phaser'], function (appsocket
                 };
             };
             game = new Phaser.Game(Gameconfig.gameW, Gameconfig.gameH, Phaser.CANVAS, 'zam-app-mainbox', null, true);
-            game.playAudio = function (audio) {
-                wechatcore.playAudio(audio, '2');
-            };
+            game.playMusic = function (sound) {
+                var key = sound?.key || '';
+                var soundok = key && game.cache.checkSoundKey(key) && game.cache.isSoundDecoded(key);
+                if (soundok) {
+                    wechatcore.audioPlay({ audio: sound });
+                }
+            }
             game.state.add('loader', loaderState);
             game.state.add("menu", menuState);
             game.state.add("main", mainState);

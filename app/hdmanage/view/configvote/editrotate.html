@@ -19,13 +19,19 @@ table tr td{text-align:center!important}
     </div>
     <div class="carditem" style="min-height: 300px;">
         <div class="form-group">
-            <label class="col-lg-3 control-label">轮次名</label>
+            <label class="col-lg-3 control-label">轮次名称</label>
             <div class="col-lg-8">
-                <input class="form-control" type="text"  name="title" value="{$rotate['title']??''}" maxlength="120" placeholder="120个字符内">
+                <input class="form-control" type="text"  name="title" value="{$rotate['title']??''}" maxlength="120" placeholder="尽量简单明了，限120个字符">
             </div>
         </div>
-        <div class="form-group">
-            <label class="col-lg-3 control-label">起止时间</label>
+		<div class="form-group">
+			<label class="col-lg-3 control-label text-right">起止时间</label>
+			<div class="col-lg-8">
+				{:tpl_switch('openroundtime',$rotate['openroundtime']??'2','openroundtime')}
+			</div>
+		</div>
+        <div class="form-group roundstartendtime{if ($rotate['openroundtime']??'2') == '2'} hidden{/if}">
+            <label class="col-lg-3 control-label">时间范围</label>
             <div class="col-lg-8">
                 {:tpl_daterangetime([
                 	'name'=>'startendtime',
@@ -649,6 +655,18 @@ function opencanceltype(obj,status,url){
         obj.prev().val('1');
         obj.attr('data-status','1');
         $(".canceltypebox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openroundtime(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".roundstartendtime").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".roundstartendtime").removeClass('hidden');
     }
     obj.prev().prev().prop("checked",status=='1'?false:true);
 }

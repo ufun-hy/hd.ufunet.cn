@@ -166,49 +166,63 @@
     </div>
 </div>
 <div class="regbox{if !isset($config['reg']['open']) || $config['reg']['open'] == '2'} hidden{/if}">
-<div class="form-group">
-    <label class="col-lg-2 control-label">* 注册审核</label>
-    <div class="col-lg-8">
-        {:tpl_switch('reg[shenhe]',$config['reg']['shenhe'])}
-        <span class="help-block">开启则注册的账户需要管理员审核方可登录</span>
-    </div>
-</div>
-<div class="form-group">
-    <label class="col-lg-2 control-label">* 注册服务条款</label>
-    <div class="col-lg-8">
-        {:tpl_ueditor('reg[fwnotice]',$config['reg']['fwnotice'])}
-        <span class="help-block"><span class="text-danger">这个服务条款一定要好好的完善下内容，防止用户违法导致平台方受到牵连</span></span>
-    </div>
-</div>
-<div class="form-group">
-    <label class="col-lg-2 control-label">* 注册成功后自动创建活动</label>
-    <div class="col-lg-8">
-        {:tpl_switch('reg[autocreatehd]',$config['reg']['autocreatehd']??'2','openautocreatehd')}
-        <span class="help-block">开启则用户注册新账户后系统会自动给新账号创建一个测试活动</span>
-    </div>
-</div>
-<div class=" autocreatehdbox{if !isset($config['reg']['autocreatehd']) || $config['reg']['autocreatehd'] == '2'} hidden{/if}">
     <div class="form-group">
-        <label class="col-lg-2 control-label">* 活动主题</label>
+        <label class="col-lg-2 control-label">* 注册审核</label>
         <div class="col-lg-8">
-            <input class="form-control" type="text"  name="reg[autohdtitle]" value="{$config['reg']['autohdtitle']??'新用户体验活动'}">
-            <span class="help-block">用于自动创建的测试活动的主题名称</span>
+            {:tpl_switch('reg[shenhe]',$config['reg']['shenhe'])}
+            <span class="help-block">开启则用户注册账号时需要管理员审核方可登录</span>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-lg-2 control-label">* 活动默认人数</label>
+        <label class="col-lg-2 control-label">* 注册填写手机号</label>
         <div class="col-lg-8">
-            <input type="text" class="form-control numberincdec" name="reg[autohdperson]" 
-            data-bts-min="1" data-bts-replacement-val="1"
-            data-bts-max="null"
-            data-bts-step="1"
-            data-bts-postfix="人"
-            data-bts-postfix-extra-class="touchspin-postfix"
-            value="{$config['reg']['autohdperson']??200}">
-            <div class="help-block">该人数用于自动创建的测试活动发布时的默认人数</div>
+            {:tpl_switch('reg[mustphone]',$config['reg']['mustphone']??1,'openmustphone')}
+            <span class="help-block">开启则用户注册账号时需要填写手机号</span>
         </div>
     </div>
-</div>
+    <div class="form-group phoneyzbox{if isset($config['reg']['mustphone']) && $config['reg']['mustphone'] == '2'} hidden{/if}">
+        <label class="col-lg-2 control-label">* 注册手机短信验证</label>
+        <div class="col-lg-8">
+            {:tpl_switch('reg[phoneyz]',$config['reg']['phoneyz']??1)}
+            <span class="help-block">开启则用户注册账号时填写的手机号需进行短信验证码验证</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 注册服务条款</label>
+        <div class="col-lg-8">
+            {:tpl_ueditor('reg[fwnotice]',$config['reg']['fwnotice'])}
+            <span class="help-block"><span class="text-danger">这个服务条款一定要好好的完善下内容，防止用户违法导致平台方受到牵连</span></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-2 control-label">* 注册成功后自动创建活动</label>
+        <div class="col-lg-8">
+            {:tpl_switch('reg[autocreatehd]',$config['reg']['autocreatehd']??'2','openautocreatehd')}
+            <span class="help-block">开启则用户注册新账户后系统会自动给新账号创建一个测试活动</span>
+        </div>
+    </div>
+    <div class=" autocreatehdbox{if !isset($config['reg']['autocreatehd']) || $config['reg']['autocreatehd'] == '2'} hidden{/if}">
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 活动主题</label>
+            <div class="col-lg-8">
+                <input class="form-control" type="text"  name="reg[autohdtitle]" value="{$config['reg']['autohdtitle']??'新用户体验活动'}">
+                <span class="help-block">用于自动创建的测试活动的主题名称</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 活动默认人数</label>
+            <div class="col-lg-8">
+                <input type="text" class="form-control numberincdec" name="reg[autohdperson]" 
+                data-bts-min="1" data-bts-replacement-val="1"
+                data-bts-max="null"
+                data-bts-step="1"
+                data-bts-postfix="人"
+                data-bts-postfix-extra-class="touchspin-postfix"
+                value="{$config['reg']['autohdperson']??200}">
+                <div class="help-block">该人数用于自动创建的测试活动发布时的默认人数</div>
+            </div>
+        </div>
+    </div>
 </div>
 {include file='$Wpath/common/savepanel'}
 </form>
@@ -303,6 +317,18 @@ function openreg(obj,status,url){
         obj.prev().val('1');
         obj.attr('data-status','1');
         $(".regbox").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+function openmustphone(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".phoneyzbox").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".phoneyzbox").removeClass('hidden');
     }
     obj.prev().prev().prop("checked",status=='1'?false:true);
 }

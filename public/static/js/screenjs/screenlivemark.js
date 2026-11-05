@@ -1,20 +1,12 @@
 define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 'fulldm', 'keyboard', 'anime', 'jquery.ui'], function (screencore, screensocket, template, layerBox, fulldm, keyboardJS, anime) {
 	var screenlivemark = {
-			ntimeout: null,//普通定时器
-			stimeout: null,//成绩排名定时器
-			ztimeout: null,//赞排名定时器
-			otimeout: null,//单个用户定时器
-			pfuserid: 0,
-			openpubpw: 2,
-					pubweight: 0,
-					currentPwMap: {},
-					currentPwList: [],
-					currentPfItems: [],
-					currentPfMax: 10,
-					currentAvgPfItemHtml: '',
-					detailViewMode: 'judge',
-					activePwId: null,
-					detailPftype: '2',
+		ntimeout: null,//普通定时器
+		stimeout: null,//成绩排名定时器
+		ztimeout: null,//赞排名定时器
+		otimeout: null,//单个用户定时器
+		pfuserid: 0,
+		openpubpw: 2,
+		pubweight: 0,
 		init: function () {
 			var self = this;
 			var wsConfig = {};
@@ -75,16 +67,23 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 				self.initautoScroll('.livemark-users');
 			}, 2e3);
 		},
-			ajaxdata: function (fn) {
-				screencore.ajaxSubmit('/screen/livemark/getnormaldata', {}, '正在获取轮次数据').then(function (json) {
-					if (json.code == 0) {
-						if (json.msg != false) {
-							var pfuser = json.msg.pfusers;
-							$(".livemark-title").text(json.msg.title);
-							screenlivemark.renderNormalUsers(pfuser, json.msg.scoretype);
-							$(".emptybox").addClass('display-none');
-							json.msg.openzan == '2' ? $(".livemark-btns").addClass('display-none') : $(".livemark-btns").removeClass('display-none');
-							if (json.msg.pfstatus && json.msg.pfstatus == '2') {
+		ajaxdata: function (fn) {
+			screencore.ajaxSubmit('/screen/livemark/getnormaldata', {}, '正在获取轮次数据').then(function (json) {
+				if (json.code == 0) {
+					if (json.msg != false) {
+						var pfuser = json.msg.pfusers;
+						var normalhtml = "";
+						if (pfuser.length > 0) {
+							$.each(pfuser, function (k, v) {
+								v.scoretype = json.msg.scoretype;
+								normalhtml += template('normaluserItem', v);
+							})
+						}
+						$(".livemark-title").text(json.msg.title);
+						$(".livemark-users").html(normalhtml);
+						$(".emptybox").addClass('display-none');
+						json.msg.openzan == '2' ? $(".livemark-btns").addClass('display-none') : $(".livemark-btns").removeClass('display-none');
+						if (json.msg.pfstatus && json.msg.pfstatus == '2') {
 							$(".startstopbtn div").attr({ 'class': 'endstatus', 'data-state': '2' });
 						}
 						$(".livemark-list").removeClass('display-none');
@@ -100,26 +99,27 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 				layerBox.showMsg('网络太差，请稍后重试');
 			});
 		},
-			loadNormaldata: function () {
-				var self = this;
-				screencore.ajaxSubmit('/screen/livemark/getnormaldata', {}).then(function (json) {
-					if (json.code == 0) {
-						if (json.msg != false) {
-							var pfuser = json.msg.pfusers, visibleUsers = [], len = $(".livemark-users .livemark-user-item").length;
-							if (pfuser.length > 0) {
-								$.each(pfuser, function (k, v) {
-									if (v.screenshow == '1') {
-										visibleUsers.push(v);
-									}
-								})
-							}
-							json.msg.openzan == '2' ? $(".livemark-btns").addClass('display-none') : $(".livemark-btns").removeClass('display-none');
-							$(".livemark-title").text(json.msg.title);
-							self.renderNormalUsers(visibleUsers, json.msg.scoretype);
-							if (visibleUsers.length != len) {
-								self.startScrollY = $('.livemark-users').scrollTop();
-								self.scrollReset = true;
-								self.initautoScroll('.livemark-users');
+		loadNormaldata: function () {
+			var self = this;
+			screencore.ajaxSubmit('/screen/livemark/getnormaldata', {}).then(function (json) {
+				if (json.code == 0) {
+					if (json.msg != false) {
+						var pfuser = json.msg.pfusers, normalhtml = "", len = $(".livemark-users .livemark-user-item").length;
+						if (pfuser.length > 0) {
+							$.each(pfuser, function (k, v) {
+								if (v.screenshow == '1') {
+									v.scoretype = json.msg.scoretype;
+									normalhtml += template('normaluserItem', v);
+								}
+							})
+						}
+						json.msg.openzan == '2' ? $(".livemark-btns").addClass('display-none') : $(".livemark-btns").removeClass('display-none');
+						$(".livemark-title").text(json.msg.title);
+						$(".livemark-users").html(normalhtml);
+						if (pfuser.length != len) {
+							self.startScrollY = $('.livemark-users').scrollTop();
+							self.scrollReset = true;
+							self.initautoScroll('.livemark-users');
 						}
 					}
 				} else {
@@ -129,31 +129,47 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 				layerBox.showMsg('网络太差，请稍后重试');
 			});
 		},
-			loadScoredata: function () {
-				var self = this;
-				screencore.ajaxSubmit('/screen/livemark/getscoredata', {}).then(function (json) {
-					if (json.code == 0) {
+		loadScoredata: function () {
+			var self = this;
+			screencore.ajaxSubmit('/screen/livemark/getscoredata', {}).then(function (json) {
+				if (json.code == 0) {
 					if (json.msg != false) {
 						$(".livemark-title").text(json.msg.title);
-						var pfuser = (json.msg.pfusers || []),
-							len = $(".livemark-phb-top .livemark-phb-itembox").length + $(".livemark-phb-other-item").length;
-							self.updateScoreTopItem($(".livemark-phb-top .rank1"), pfuser[0] ? $.extend({}, pfuser[0], { keyindex: 1 }) : null, 1, json.msg.scoretype);
-							self.updateScoreTopItem($(".livemark-phb-top .rank2"), pfuser[1] ? $.extend({}, pfuser[1], { keyindex: 2 }) : null, 2, json.msg.scoretype);
-							self.updateScoreTopItem($(".livemark-phb-top .rank3"), pfuser[2] ? $.extend({}, pfuser[2], { keyindex: 3 }) : null, 3, json.msg.scoretype);
+						var pfuser = json.msg.pfusers, len = $(".livemark-phb-itembox").length + $(".livemark-phb-other-item").length;
+						if (pfuser.length > 0) {
+							if (pfuser[0]) {
+								pfuser[0].keyindex = 1;
+								pfuser[0].scoretype = json.msg.scoretype;
+								$(".livemark-phb-top .rank1").html(template('scorephbtopItem', pfuser[0])).attr('data-pfuserid', pfuser[0].id);
+							}
+							if (pfuser[1]) {
+								pfuser[1].keyindex = 2;
+								pfuser[1].scoretype = json.msg.scoretype;
+								$(".livemark-phb-top .rank2").html(template('scorephbtopItem', pfuser[1])).attr('data-pfuserid', pfuser[1].id);
+							}
+							if (pfuser[2]) {
+								pfuser[2].keyindex = 3;
+								pfuser[2].scoretype = json.msg.scoretype;
+								$(".livemark-phb-top .rank3").html(template('scorephbtopItem', pfuser[2])).attr('data-pfuserid', pfuser[2].id);
+							}
+							var otherhtml = "";
 							if (pfuser.length > 3) {
-								var otherUsers = [];
 								$.each(pfuser, function (k, v) {
 									if (k > 2) {
-										otherUsers.push($.extend({}, v, { keyindex: k + 1 }));
+										v.keyindex = k + 1;
+										v.scoretype = json.msg.scoretype;
+										otherhtml += template('scorephbotherItem', v);
 									}
-								});
-								self.renderScoreOthers(otherUsers, json.msg.scoretype);
-							} else {
-								$(".livemark-phb-others").empty();
+								})
 							}
-							if (pfuser.length != len) {
-								self.removeautoScroll('.livemark-phbs');
-								$('.livemark-phbs').scrollTop(0);
+							$(".livemark-phb-others").html(otherhtml);
+						} else {
+							$(".livemark-phb-top .rank2,.livemark-phb-top .rank1,.livemark-phb-top .rank3,.livemark-phb-others").empty();
+						}
+						if (pfuser.length != len) {
+							self.startScrollY = $('.livemark-phbs').scrollTop();
+							self.scrollReset = true;
+							self.initautoScroll('.livemark-phbs');
 						}
 						json.msg.openzan == '2' ? $(".livemark-btns").addClass('display-none') : $(".livemark-btns").removeClass('display-none');
 					}
@@ -164,9 +180,9 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 				layerBox.showMsg('网络太差，请稍后重试');
 			});
 		},
-			loadZandata: function () {
-				var self = this;
-				screencore.ajaxSubmit('/screen/livemark/getzandata', {}).then(function (json) {
+		loadZandata: function () {
+			var self = this;
+			screencore.ajaxSubmit('/screen/livemark/getzandata', {}).then(function (json) {
 				if (json.code == 0) {
 					if (json.msg != false) {
 						$(".livemark-title").text(json.msg.title);
@@ -199,124 +215,21 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 				} else {
 					layerBox.showMsg(json.msg);
 				}
-				}, function () {
-					layerBox.showMsg('网络太差，请稍后重试');
-				});
-			},
-			syncImage: function ($img, src) {
-				if (!$img || !$img.length) return;
-				src = src || '';
-				if (($img.attr('src') || '') !== src) {
-					$img.attr('src', src);
-				}
-			},
-			updateNormalUserItem: function ($item, data) {
-				if (!$item || !$item.length) return;
-				data = data || {};
-				$item.attr('data-pfuserid', data.id || 0);
-				$item.toggleClass('hidden', data.userstatus == '2' && data.screenshow == '2');
-				this.syncImage($item.find('.livemark-user-avatar img'), data.userimg);
-				$item.find('.livemark-user-name span').text(data.username || '');
-				$item.find('.livemark-user-score span:first-child').text((data.scoretype == '1' ? '总分' : '平均分') + '：');
-				$item.find('.livemark-user-score span:last-child').text(data.score === false ? '无' : (data.score || ''));
-				$item.find('.livemark-user-noscore').toggleClass('display-none', data.score !== false);
-			},
-			renderNormalUsers: function (pfuser, scoretype) {
-				var self = this;
-				var $container = $(".livemark-users");
-				var existMap = {};
-				$container.children('.livemark-user-item').each(function () {
-					existMap[String($(this).attr('data-pfuserid'))] = $(this);
-				});
-				$.each(pfuser || [], function (k, v) {
-					var itemData = $.extend({}, v, { scoretype: scoretype });
-					var itemKey = String(v.id);
-					var $item = existMap[itemKey];
-					if (!$item || !$item.length) {
-						$item = $(template('normaluserItem', itemData));
-					} else {
-						self.updateNormalUserItem($item, itemData);
-						delete existMap[itemKey];
-					}
-					$container.append($item);
-				});
-				$.each(existMap, function (key, $item) {
-					$item.remove();
-				});
-			},
-			setPhbScoreContent: function ($scoreBox, data, scoretype) {
-				if (!$scoreBox || !$scoreBox.length) return;
-				if (data.score === false) {
-					$scoreBox.html('<span class="livemark-phb-scoreValue is-empty">待评分</span>');
-				} else {
-					$scoreBox.html('<span class="livemark-phb-scoreLabel">' + (scoretype == '1' ? '总分' : '平均分') + '</span><span class="livemark-phb-scoreValue">' + data.score + '</span>');
-				}
-			},
-			updateScoreTopItem: function ($slot, data, rank, scoretype) {
-				if (!$slot || !$slot.length) return;
-				if (!data) {
-					$slot.empty().removeAttr('data-pfuserid');
-					return;
-				}
-				var itemKey = String(data.id);
-				if (($slot.attr('data-pfuserid') || '') !== itemKey || !$slot.children('.livemark-phb-itembox').length) {
-					var itemData = $.extend({}, data, { keyindex: rank, scoretype: scoretype });
-					$slot.html(template('scorephbtopItem', itemData)).attr('data-pfuserid', data.id);
-					return;
-				}
-				var $box = $slot.children('.livemark-phb-itembox');
-				$slot.attr('data-pfuserid', data.id);
-				this.syncImage($box.find('.user-img'), data.userimg);
-				$box.find('.livemark-phb-name').text(data.username || '');
-				$box.find('.livemark-phb-statusText').text('RANK ' + rank);
-				this.setPhbScoreContent($box.find('.livemark-phb-score'), data, scoretype);
-			},
-			updateScoreOtherItem: function ($item, data, scoretype) {
-				if (!$item || !$item.length) return;
-				$item.attr('data-pfuserid', data.id || 0);
-				$item.find('.livemark-phb-other-itembox').attr('class', 'livemark-phb-other-itembox is-rank-' + data.keyindex);
-				$item.find('.livemark-phb-badge-number').text(data.keyindex);
-				this.syncImage($item.find('.user-img'), data.userimg);
-				$item.find('.livemark-phb-other-name').text(data.username || '');
-				$item.find('.livemark-phb-statusText').text('RANK ' + data.keyindex);
-				this.setPhbScoreContent($item.find('.livemark-phb-other-score'), data, scoretype);
-			},
-			renderScoreOthers: function (pfuser, scoretype) {
-				var self = this;
-				var $container = $(".livemark-phb-others");
-				var existMap = {};
-				$container.children('.livemark-phb-other-item').each(function () {
-					existMap[String($(this).attr('data-pfuserid'))] = $(this);
-				});
-				$.each(pfuser || [], function (k, v) {
-					var itemKey = String(v.id);
-					var $item = existMap[itemKey];
-					if (!$item || !$item.length) {
-						$item = $(template('scorephbotherItem', $.extend({}, v, { scoretype: scoretype })));
-					} else {
-						self.updateScoreOtherItem($item, v, scoretype);
-						delete existMap[itemKey];
-					}
-					$container.append($item);
-				});
-				$.each(existMap, function (key, $item) {
-					$item.remove();
-				});
-			},
-			nowpfusers: [],
-			loadUserdata: function () {
+			}, function () {
+				layerBox.showMsg('网络太差，请稍后重试');
+			});
+		},
+		nowpfusers: [],
+		loadUserdata: function () {
 			var self = this, loadtype = '1';
 			if ($(".dzhuoba").length > 0) {
 				loadtype = '2';
 			} else if ($(".dzshule").length > 0) {
 				loadtype = '3';
 			}
-				screencore.ajaxSubmit('/screen/livemark/getuserdata', { loadtype: loadtype, pfuserid: self.pfuserid }).then(function (json) {
-						if (json.code == 0) {
-							var finalScore = (typeof (json.msg.score2) == 'undefined') ? json.msg.score : json.msg.score2;
-							var finalScoreText = finalScore === false ? '无' : finalScore;
-							var basicscore = parseFloat(json.msg.basicscore || 0);
-						if ($(".dzhuoba").length > 0) {
+			screencore.ajaxSubmit('/screen/livemark/getuserdata', { loadtype: loadtype, pfuserid: self.pfuserid }).then(function (json) {
+				if (json.code == 0) {
+					if ($(".dzhuoba").length > 0) {
 						if ($(".livemark-waitshow .publish-btn").attr('data-pfuserid') != json.msg.id) {
 							$(".livemark-waitshow .publish-btn").attr('data-hadclick', '2');
 							$(".livemark-waitshow .publish-btn").attr('data-pfuserid', json.msg.id);
@@ -354,7 +267,7 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 							});
 						}
 						$('.livemark-waitshow2 .pw-lists').html(pwhtml);
-							$('.livemark-waitshow2 .livemark-companyscore .scoreitembox .scoreitem div').text(finalScoreText);
+						$('.livemark-waitshow2 .livemark-companyscore .scoreitembox .scoreitem div').text(json.msg.score === false ? '无' : json.msg.score);
 						//json.msg.scoretype == '1' ? '总分' : '平均分'
 						$('.livemark-waitshow2 .livemark-companyscore .scoreitembox .scorename').text('得分');
 						if ($(".livemark-waitshow2 .publish-btn").attr('data-hadclick') == '2' && $(".livemark-waitshow2 .publish-btn").attr('data-pfuserid') == json.msg.id) {
@@ -383,8 +296,8 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 					}
 					$(".livemark-title").text(json.msg.title);
 					$(".livemark-userone-info img").attr('src', json.msg.userimg);
-					$(".livemark-userone-info div").text(json.msg.username || '');
-					$(".livemark-userone-des").text(json.msg.userdes || '');
+					$(".livemark-userone-info div").text(json.msg.username);
+					$(".livemark-userone-des").text(json.msg.userdes);
 					if (json.msg.openzan == '1') {
 						if (json.msg.zanpm === false) {
 							$(".livemark-user-rank").addClass('display-none');
@@ -408,27 +321,18 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 						}
 						$(".livemark-zanmain").addClass('display-none');
 					}
-							var showpws = json.msg.showpws || '2';
-							self.currentPwMap = {};
-							self.currentPwList = (showpws == '1' ? json.msg.pws : json.msg.pfusers) || [];
-							self.currentPfItems = $.isArray(json.msg.pfitem) ? json.msg.pfitem : [];
-							self.currentPfMax = json.msg.pfmax || self.currentPfMax || 10;
-							$.each(self.currentPwList, function (i, v) {
-								if (v && v.id !== undefined) {
-									self.currentPwMap[String(v.id)] = v;
-								}
-						});
+					var showpws = json.msg.showpws || '2';
 					if (json.msg.openpubpw == '1') {
 						$(".livemark-user-totalscore").addClass('ispubpwscore');
 						$('.livemark-user-score').addClass('hidden');
-						$('.openpubpw').removeClass('hidden').css({ "color": json.msg.scoretxtcolor }).css({ "background": "", "background-color": "" });
+						$('.openpubpw').removeClass('hidden').css({ "background-color": json.msg.scorebgcolor, "color": json.msg.scoretxtcolor });
 						if ($(".dzhuoba").length > 0) {
 							$('.openpubpw .score_pw').text(json.msg.score_pw === false ? '无' : json.msg.score_pw);
 							$('.openpubpw .showpub2').text((json.msg.livemarkgroups[0].groupname ? json.msg.livemarkgroups[0].groupname : '媒体评委') + "得分");
 							$('.openpubpw .showpub3').text((json.msg.livemarkgroups[1].groupname ? json.msg.livemarkgroups[1].groupname : '大众评委') + "得分");
 							$('.openpubpw .score_pub').text(json.msg.livemarkgroups[0].score === false ? '无' : json.msg.livemarkgroups[0].score);
 							$('.openpubpw .score_pub2').text(json.msg.livemarkgroups[1].score === false ? '无' : json.msg.livemarkgroups[1].score);
-							$('.openpubpw .score_last').text(finalScoreText);
+							$('.openpubpw .score_last').text(json.msg.score === false ? '无' : json.msg.score);
 							$('.openpubpw .pw_weight').text(100 - json.msg.pubweight);
 							$('.openpubpw .pub_weight').text(json.msg.livemarkgroups[0].pubweight || '2');
 							$('.openpubpw .pub_weight2').text(json.msg.livemarkgroups[1].pubweight || '3');
@@ -441,7 +345,7 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 							} else {
 								$('.openpubpw .score_pw .pw_score').text(json.msg.score_pw === false ? '无' : json.msg.score_pw);
 								$('.openpubpw .score_pub .pw_score').text(json.msg.score_pub === false ? '无' : json.msg.score_pub);
-								$('.openpubpw .score_last').text(finalScoreText);
+								$('.openpubpw .score_last').text(json.msg.score === false ? '无' : json.msg.score);
 							}
 							$('.openpubpw .score_pw .pw_num span').text(json.msg.hadpwnum || 0);
 							$('.openpubpw .score_pub .pw_num span').text(json.msg.pubhadpwnum || 0);
@@ -459,8 +363,8 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 						$(".livemark-user-totalscore").removeClass('ispubpwscore');
 						$('.livemark-user-score').removeClass('hidden');
 						$('.openpubpw').addClass('hidden');
-						$(".livemark-user-score .scoretype").text('得分：');
-						var scorenumtxt = finalScoreText;
+						$(".livemark-user-score .scoretype").text(json.msg.scoretype == '1' ? '总分：' : '平均分：');
+						var scorenumtxt = json.msg.score === false ? '无' : json.msg.score;
 						if (showpws == '1' && json.msg.hadpwnum < json.msg.totalpwnum) {
 							scorenumtxt = '评分中';
 						}
@@ -468,55 +372,23 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 						$(".livemark-user-score .pwbox .hadpwnum span").text(json.msg.hadpwnum || 0);
 						$(".livemark-user-score .pwbox .pwnums span").text(json.msg.totalpwnum || 0);
 					}
-						var tiphtml = '';
-						if (json.msg.pfmode == '2') {
-							if (json.msg.maxmintype != '2') {
-								if (json.msg.maxscore != '') {
-										tiphtml += '<span class="scoretip-item scoretip-max"><span class="scoretip-label">去最高</span><span class="scoretip-value maxscore">' + json.msg.maxscore + '分</span></span>';
+					var tiphtml = '';
+					if (json.msg.pfmode == '2') {
+						if (json.msg.maxmintype != '2') {
+							tiphtml += '去掉一个最高分';
+							if (json.msg.maxscore != '') {
+								tiphtml += '<span class="maxscore">' + json.msg.maxscore + '分</span>';
 							}
+							tiphtml += '，去掉一个最低分';
 							if (json.msg.minscore != '') {
-									tiphtml += '<span class="scoretip-item scoretip-min"><span class="scoretip-label">去最低</span><span class="scoretip-value minscore">' + json.msg.minscore + '分</span></span>';
-								}
+								tiphtml += '<span class="minscore">' + json.msg.minscore + '分</span>';
 							}
 						}
-						if (!isNaN(basicscore) && basicscore != 0) {
-							var adjustLabel = basicscore > 0 ? '加分' : '扣分';
-							var adjustScore = Math.abs(basicscore).toFixed(2);
-							tiphtml += '<span class="scoretip-item scoretip-adjust"><span class="scoretip-label">' + adjustLabel + '</span><span class="scoretip-value decscore">' + adjustScore + '分</span></span>';
-						}
-								$(".livemark-user-totalscore .scoretips").html(tiphtml);
-							self.detailPftype = json.msg.pftype || '2';
-							if (json.msg.pftype == '1') {
-								if (self.detailViewMode == 'avg') {
-									self.detailViewMode = 'judge';
-									self.activePwId = null;
-								}
-								$(".livemark-user-pj").addClass('display-none');
-							} else {
-								$(".livemark-user-pj").removeClass('display-none');
-						}
-						self.nowpfusers = json.msg.pfusers;
-							if ($(".decscorebox").length > 0) {
-							if (basicscore > 0) {
-								$(".decscorebox .decscorebox-icon").text('+');
-								$(".decscorebox .decscorebox-info-title").text('加分');
-								$(".decscorebox-info-score").text(basicscore.toFixed(2));
-								$(".lastscorebox .lastscorebox-info-score").text(finalScoreText);
-								$(".decscorebox").removeClass('hidden');
-								$(".lastscorebox").removeClass('hidden');
-							} else if (basicscore < 0) {
-								$(".decscorebox .decscorebox-icon").text('-');
-								$(".decscorebox .decscorebox-info-title").text('扣分');
-								$(".decscorebox-info-score").text((basicscore * -1).toFixed(2));
-								$(".lastscorebox .lastscorebox-info-score").text(finalScoreText);
-								$(".decscorebox").removeClass('hidden');
-								$(".lastscorebox").removeClass('hidden');
-							} else {
-								$(".decscorebox").addClass('hidden');
-								$(".lastscorebox").addClass('hidden');
-							}
-						}
-						if (showpws == '1') {
+					}
+					$(".livemark-user-totalscore .scoretips").html(tiphtml);
+					json.msg.pftype == '1' ? $(".livemark-user-pj").addClass('display-none') : $(".livemark-user-pj").removeClass('display-none');
+					self.nowpfusers = json.msg.pfusers;
+					if (showpws == '1') {
 						var pwhtml = '';
 						$.each(json.msg.pws, function (i, v) {
 							v.showpws = '1';
@@ -563,23 +435,19 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 									}
 								});
 							}
-								if (basicscore > 0) {
-									$(".decscorebox .decscorebox-icon").text('+');
-									$(".decscorebox .decscorebox-info-title").text('加分');
-									$(".decscorebox-info-score").text(basicscore.toFixed(2));
-								} else if (basicscore < 0) {
-									$(".decscorebox .decscorebox-icon").text('-');
-									$(".decscorebox .decscorebox-info-title").text('扣分');
-									$(".decscorebox-info-score").text((basicscore * -1).toFixed(2));
-								} else {
-									$(".decscorebox").addClass('hidden');
-									$(".lastscorebox").addClass('hidden');
-								}
-								if (basicscore != 0) {
-									$(".lastscorebox .lastscorebox-info-score").text(finalScoreText);
-									$(".decscorebox").removeClass('hidden');
-									$(".lastscorebox").removeClass('hidden');
-								}
+							var basicscore = parseFloat(json.msg.basicscore);
+							if (basicscore > 0) {
+								$(".decscorebox .decscorebox-icon").text('+');
+								$(".decscorebox .decscorebox-info-title").text('加分');
+								$(".decscorebox-info-score").text(basicscore.toFixed(2));
+							} else {
+								$(".decscorebox .decscorebox-icon").text('-');
+								$(".decscorebox .decscorebox-info-title").text('扣分');
+								$(".decscorebox-info-score").text((basicscore * -1).toFixed(2));
+							}
+							$(".lastscorebox .lastscorebox-info-score").text(json.msg.score2 === false ? '无' : json.msg.score2);
+							$(".decscorebox").removeClass('hidden');
+							$(".lastscorebox").removeClass('hidden');
 							$(".livemark-user-pingwei .pingweione").removeClass('ispwmax ispwmin');
 							var pwminitem = $(".livemark-user-pingwei .pwone-" + json.msg.minpwid);
 							var pwmaxitem = $(".livemark-user-pingwei .pwone-" + json.msg.maxpwid);
@@ -588,23 +456,15 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 								if (pwmaxitem.length > 0) pwmaxitem.addClass('ispwmax');
 							}
 						}
-						}
-						var pfitemhtml = '';
-						$.each(json.msg.pfitem, function (i, v) {
-							var item = $.extend({}, v);
-							var pwlen = (json.msg.pfusers || []).length || 1;
-							item.score = parseFloat(item.score / pwlen).toFixed(2);
-							item.dfmax = parseFloat(item.dfmax).toFixed(2);
-							item.percent = (item.score / item.dfmax) * 100;
-							pfitemhtml += template("pfitemone", item);
-						});
-						self.currentAvgPfItemHtml = pfitemhtml;
-						if (self.detailViewMode == 'judgeDetail') {
-							self.renderJudgeDetail(self.activePwId);
-						} else {
-							$(".livemark-user-single").html(self.currentAvgPfItemHtml);
-						}
-						self.applyDetailViewMode();
+					}
+					var pfitemhtml = '';
+					$.each(json.msg.pfitem, function (i, v) {
+						v.score = parseFloat(v.score / json.msg.pfusers.length).toFixed(2);
+						v.dfmax = parseFloat(v.dfmax).toFixed(2);
+						v.percent = (v.score / v.dfmax) * 100;
+						pfitemhtml += template("pfitemone", v);
+					});
+					$(".livemark-user-single").html(pfitemhtml);
 				} else {
 					layerBox.showMsg(json.msg);
 				}
@@ -618,7 +478,7 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 				var $this = $(this);
 				$(".livemark-scrollbox>div").addClass('display-none');
 				if ($this.hasClass('btn-mark')) {
-					if ($(".livemark-topbtn").attr('data-view') == 'list') {
+					if ($(".livemark-topbtn").text() == '查看排名') {
 						self.clearAll();
 						self.loadNormaldata();
 						self.ntimeout = setInterval(function () {
@@ -648,7 +508,7 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 			$(".livemark-topbtn").on('click', function () {
 				var $this = $(this);
 				$(".livemark-scrollbox>div").addClass('display-none');
-				if ($this.attr('data-view') == 'list') {
+				if ($this.text() == '查看排名') {
 					$(".livemark-users").empty();
 					self.removeautoScroll('.livemark-users');
 					self.clearAll();
@@ -658,7 +518,7 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 					}, 3e3);
 					$(".livemark-scrollbox .livemark-users").addClass('display-none');
 					$(".livemark-scrollbox .livemark-phbs").removeClass('display-none').scrollTop(0);
-					$this.attr('data-view', 'rank').text("返回列表");
+					$this.text("<<返回列表");
 				} else {//点击返回列表
 					$(".livemark-phb-top .rank2,.livemark-phb-top .rank1,.livemark-phb-top .rank3,.livemark-phb-others").empty();
 					self.removeautoScroll('.livemark-phbs');
@@ -669,13 +529,12 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 					}, 3e3);
 					$(".livemark-scrollbox .livemark-users").removeClass('display-none').scrollTop(0);
 					$(".livemark-scrollbox .livemark-phbs").addClass('display-none');
-					$this.attr('data-view', 'list').text("查看排名");
+					$this.text("查看排名");
 				}
 			});
 			$(".livemark-users").on('click', '.livemark-user-item', function () {
 				var $this = $(this);
 				self.pfuserid = $this.attr('data-pfuserid');
-				self.resetDetailViewMode();
 				self.clearAll();
 				self.loadUserdata();
 				self.otimeout = setInterval(function () {
@@ -688,7 +547,6 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 			$(".livemark-dianzans").on('click', '.livemark-dz-item', function () {
 				var $this = $(this);
 				self.pfuserid = $this.attr('data-pfuserid');
-				self.resetDetailViewMode();
 				self.clearAll();
 				self.loadUserdata();
 				self.otimeout = setInterval(function () {
@@ -700,7 +558,6 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 			$(".livemark-phbs").on('click', '.livemark-phb-item,.livemark-phb-other-item', function () {
 				var $this = $(this);
 				self.pfuserid = $this.attr('data-pfuserid');
-				self.resetDetailViewMode();
 				self.clearAll();
 				self.loadUserdata();
 				self.otimeout = setInterval(function () {
@@ -709,11 +566,10 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 				$(".livemark-list").addClass('display-none');
 				$(".livemark-userone").removeClass('display-none');
 			});
-				$(".livemark-userone").on('click', '.returnall', function () {
-					self.pfuserid = 0;
-					self.resetDetailViewMode();
-					var showboxClass = $(".livemark-scrollbox>div").not($(".display-none")).attr('class');
-					self.clearAll();
+			$(".livemark-userone").on('click', '.returnall', function () {
+				self.pfuserid = 0;
+				var showboxClass = $(".livemark-scrollbox>div").not($(".display-none")).attr('class');
+				self.clearAll();
 
 				if (showboxClass == 'livemark-users') {
 					self.loadNormaldata();
@@ -731,23 +587,26 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 						self.loadZandata();
 					}, 3e3);
 				}
-					$(".livemark-list").removeClass('display-none');
-					$(".livemark-userone").addClass('display-none');
-				});
-					//切换评委评分与单项分
-					$(".livemark-user-pj").on('click', function () {
-						self.setDetailViewMode(self.detailViewMode == 'judge' ? 'avg' : 'judge');
-					});
-					$(".livemark-user-pingwei").on('click', '.pingweione', function () {
-						self.setDetailViewMode('judgeDetail', $(this).attr('data-prid'));
-					});
-					$(".livemark-user-single").on('click', '.livemark-judge-detail-back', function () {
-						self.setDetailViewMode('judge');
-					});
-				//切换单个用户
-				$(".livemark-userone .livemark-prevone").on('click', function () {
-					if (self.pfuserid == 0) return false;
-					self.showprevnext('1');
+				$(".livemark-list").removeClass('display-none');
+				$(".livemark-userone").addClass('display-none');
+			});
+			//切换评委评分与单项分
+			$(".livemark-user-pj").on('click', function () {
+				var $this = $(this), btntext = $this.text();
+				if (btntext == '查看评委分') {
+					$this.text('查看单项平均分');
+					$(".livemark-user-pingwei").removeClass('display-none');
+					$(".livemark-user-single").addClass('display-none');
+				} else {
+					$this.text('查看评委分');
+					$(".livemark-user-pingwei").addClass('display-none');
+					$(".livemark-user-single").removeClass('display-none');
+				}
+			});
+			//切换单个用户
+			$(".livemark-userone .livemark-prevone").on('click', function () {
+				if (self.pfuserid == 0) return false;
+				self.showprevnext('1');
 			});
 			$(".livemark-userone .livemark-nextone").on('click', function () {
 				if (self.pfuserid == 0) return false;
@@ -830,190 +689,39 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 				$(".livemark-userone .livemark-nextone").trigger('click');
 			});
 
-			},
-			escapeHtml: function (text) {
-				if (text === undefined || text === null) return '';
-				return String(text).replace(/[&<>"']/g, function (s) {
-					return {
-						'&': '&amp;',
-						'<': '&lt;',
-						'>': '&gt;',
-						'"': '&quot;',
-						"'": '&#39;'
-					}[s];
-				});
-			},
-			parseMaybeJson: function (value) {
-				if ($.isArray(value)) return value;
-				if (typeof value == 'string' && value !== '') {
-					try {
-						var parsed = JSON.parse(value);
-						if ($.isArray(parsed)) return parsed;
-					} catch (e) { }
+		},
+		pwuserTime1: null,
+		loopTime: 1e3,
+		pwusermove: function () {
+			var t = this;
+			if (t.pwuserTime1 != null) {
+				return false;
+			}
+			var c_tag = $(".livemark-user-pingwei");
+			t.pwuserTime1 = setInterval(function () {
+				if ($(".livemark-user-scroll-list").outerHeight(true) > $(".livemark-user-scroll-list .livemark-user-pingwei").outerHeight(true)) {
+					return false;
 				}
-				return [];
-			},
-				setDetailViewMode: function (mode, pwid) {
-					if (mode == 'avg') {
-						this.detailViewMode = 'avg';
-						this.activePwId = null;
-						$(".livemark-user-single").html(this.currentAvgPfItemHtml);
-					} else if (mode == 'judgeDetail') {
-						this.detailViewMode = 'judgeDetail';
-						this.activePwId = pwid;
-						this.renderJudgeDetail(pwid);
-					} else {
-						this.detailViewMode = 'judge';
-						this.activePwId = null;
-					}
-					this.applyDetailViewMode();
-				},
-				resetDetailViewMode: function () {
-					this.detailViewMode = 'judge';
-					this.activePwId = null;
-					this.applyDetailViewMode();
-				},
-				applyDetailViewMode: function () {
-					var mode = (this.detailViewMode == 'avg' || this.detailViewMode == 'judgeDetail') ? this.detailViewMode : 'judge';
-					if (this.detailPftype == '1' && mode == 'avg') {
-						mode = 'judge';
-						this.detailViewMode = 'judge';
-						this.activePwId = null;
-					}
-					if (mode == 'avg' || mode == 'judgeDetail') {
-						$(".livemark-user-pj").text(mode == 'judgeDetail' ? '返回评分列表' : '查看评委分');
-						if (mode == 'judgeDetail') {
-							$(".livemark-user-pj").removeClass('display-none');
-							$(".livemark-user-single").addClass('is-judge-detail');
-						} else {
-							$(".livemark-user-single").removeClass('is-judge-detail');
-						}
-						$(".livemark-user-pingwei").addClass('display-none');
-						$(".livemark-user-single").removeClass('display-none');
-					} else {
-						$(".livemark-user-pj").text('查看单项平均分');
-						$(".livemark-user-single").removeClass('is-judge-detail');
-						if (this.detailPftype == '1') {
-							$(".livemark-user-pj").addClass('display-none');
-						}
-						$(".livemark-user-pingwei").removeClass('display-none');
-						$(".livemark-user-single").addClass('display-none');
-					}
-			},
-			pickFirst: function (obj, keys) {
-				for (var i = 0; i < keys.length; i++) {
-					if (obj && obj[keys[i]] !== undefined && obj[keys[i]] !== null && obj[keys[i]] !== '') {
-						return obj[keys[i]];
-					}
-					}
-					return '';
-				},
-				findPfItemMeta: function (field, index) {
-					var meta = null;
-					if (field !== undefined && field !== null && field !== '') {
-						$.each(this.currentPfItems || [], function (i, item) {
-							if (item && item.dffield == field) {
-								meta = item;
+				var top = c_tag.find(".pingweione").eq(0).outerHeight(true);
+				c_tag.find(".pingweione").eq(0).animate({ "margin-top": "-" + top + "px" }, t.loopTime, function () {
+					var $li = $(this), onepwid = $li.attr('data-prid');
+					$li.remove();
+					var isin = false;
+					if (t.nowpfusers.length > 0) {
+						$.each(t.nowpfusers, function (i, v) {
+							if (v.id == onepwid) {
+								isin = true;
 								return false;
 							}
 						});
 					}
-					if (!meta && index !== undefined && this.currentPfItems && this.currentPfItems[index]) {
-						meta = this.currentPfItems[index];
+					if (isin) {
+						$li.css("margin-top", "0px").appendTo(c_tag);
+					} else {
+						$li.css("margin-top", "0px");
 					}
-					return meta || {};
-				},
-				getPwDetailItems: function (pw) {
-					var self = this;
-					var candidates = ['pfitem', 'scoredetail', 'pfitems', 'pfs', 'items', 'scoreitems', 'score_items', 'scorelist', 'scores', 'details', 'dfitems'];
-					var source = [];
-					for (var i = 0; i < candidates.length; i++) {
-						source = self.parseMaybeJson(pw && pw[candidates[i]]);
-						if (source.length > 0) break;
-					}
-					return $.map(source, function (item, index) {
-						var field = self.pickFirst(item, ['field', 'dffield']);
-						var meta = self.findPfItemMeta(field, index);
-						var name = self.pickFirst(item, ['dfname', 'name', 'title', 'itemname', 'pfname', 'scoretitle']) || meta.dfname || (field == 'normal_01' ? '评分' : ('评分项' + (index + 1)));
-						var score = self.pickFirst(item, ['score', 'totalscore', 'dfscore', 'value', 'num', 'point']);
-						var max = self.pickFirst(item, ['dfmax', 'maxscore', 'fullscore', 'total', 'max']) || meta.dfmax || 0;
-						if (!max && field == 'normal_01') {
-							max = self.pickFirst(pw, ['dfmax', 'maxscore', 'pfmax']) || self.currentPfMax || 10;
-						}
-						var scoreNum = parseFloat(score);
-						var maxNum = parseFloat(max);
-						return {
-							dfname: name,
-							score: isNaN(scoreNum) ? (score === '' ? '--' : score) : scoreNum.toFixed(2),
-							dfmax: isNaN(maxNum) ? max : maxNum.toFixed(2),
-							percent: (!isNaN(scoreNum) && !isNaN(maxNum) && maxNum > 0) ? (scoreNum / maxNum) * 100 : 0
-						};
-					});
-				},
-				getPwName: function (pw) {
-					return this.pickFirst(pw, ['pwname', 'name', 'username', 'nickname']) || '评委';
-				},
-				getPwComment: function (pw) {
-					return this.pickFirst(pw, ['pfword', 'comment', 'remark', 'content', 'words']);
-				},
-				renderJudgeScoreItem: function (item) {
-					var score = item.score === undefined || item.score === null || item.score === '' ? '--' : item.score;
-					var max = item.dfmax === undefined || item.dfmax === null || item.dfmax === '' ? '--' : item.dfmax;
-					var percent = parseFloat(item.percent);
-					if (isNaN(percent)) percent = 0;
-					percent = Math.max(0, Math.min(percent, 100));
-					return '<div class="livemark-judge-score-item">'
-						+ '<div class="livemark-judge-score-name">' + this.escapeHtml(item.dfname) + '</div>'
-						+ '<div class="livemark-judge-score-bar">'
-						+ '<div class="livemark-judge-score-bar-per" style="width:' + percent + '%;"></div>'
-						+ '<div class="livemark-judge-score-value">' + this.escapeHtml(score) + ' / ' + this.escapeHtml(max) + '分</div>'
-						+ '</div>'
-						+ '</div>';
-				},
-				renderJudgeComment: function (pw) {
-					var comment = this.getPwComment(pw) || '暂无意见';
-					return '<div class="livemark-judge-comment-one">'
-						+ '<div class="livemark-judge-comment-name">' + this.escapeHtml(this.getPwName(pw)) + '</div>'
-						+ '<div class="livemark-judge-comment-text">' + this.escapeHtml(comment) + '</div>'
-						+ '</div>';
-				},
-				renderJudgeDetail: function (prid) {
-					var self = this;
-					var pw = self.currentPwMap[String(prid)] || {};
-					var name = self.getPwName(pw);
-					var score = self.pickFirst(pw, ['totalscore', 'score', 'dfscore', 'tw']);
-					var itemhtml = '';
-					$.each(self.getPwDetailItems(pw), function (i, item) {
-						itemhtml += self.renderJudgeScoreItem(item);
-					});
-					if (itemhtml === '') {
-						itemhtml = '<div class="livemark-judge-score-empty">暂无评分细项</div>';
-					}
-					var html = '<div class="livemark-judge-detail">'
-						+ '<div class="livemark-judge-detail-head">'
-						+ '<div><span class="livemark-judge-detail-label">当前评委</span><span class="livemark-judge-detail-name">' + self.escapeHtml(name) + '</span></div>'
-						+ '<div class="livemark-judge-detail-actions">'
-						+ '<span class="livemark-judge-detail-score">得分：' + self.escapeHtml(score === '' ? '--' : score) + '</span>'
-						+ '<button type="button" class="livemark-judge-detail-back">返回评分列表</button>'
-						+ '</div>'
-						+ '</div>'
-						+ '<div class="livemark-judge-detail-body">'
-						+ '<div class="livemark-judge-detail-left">'
-						+ '<div class="livemark-judge-detail-title">评分细项</div>'
-						+ itemhtml
-						+ '</div>'
-						+ '<div class="livemark-judge-detail-right">'
-						+ '<div class="livemark-judge-detail-title">当前评委评分意见</div>'
-						+ '<div class="livemark-judge-comment-list">' + self.renderJudgeComment(pw) + '</div>'
-						+ '</div>'
-						+ '</div>'
-						+ '</div>';
-					$(".livemark-user-single").html(html);
-				},
-			pwuserTime1: null,
-		loopTime: 1e3,
-		pwusermove: function () {
-			return false;
+				});
+			}, t.loopTime + 500);
 		},
 		showprevnextRound: function (ctype) {
 			ctype = ctype || "1";
@@ -1025,7 +733,6 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 		showprevnext: function (type) {
 			var self = this;
 			type = type || '1';
-			self.resetDetailViewMode();
 			self.clearAll();
 			screencore.ajaxSubmit('/screen/livemark/prevnext', { pfuserid: self.pfuserid, ctype: type }).then(function (json) {
 				if (json.code == 0) {
@@ -1046,23 +753,23 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 			}, function () {
 				layerBox.showMsg('网络太差，请稍后重试');
 			});
-			},
-				clearAll: function () {
-					var self = this;
-					$(".openpubpw").addClass('hidden');
-					self.ntimeout != null && clearInterval(self.ntimeout);
-				self.stimeout != null && clearInterval(self.stimeout);
-				self.ztimeout != null && clearInterval(self.ztimeout);
-				self.otimeout != null && clearInterval(self.otimeout);
-				self.clearpwtimer();
-			},
+		},
+		clearAll: function () {
+			var self = this;
+			$(".openpubpw").addClass('hidden');
+			self.ntimeout != null && clearInterval(self.ntimeout);
+			self.stimeout != null && clearInterval(self.stimeout);
+			self.ztimeout != null && clearInterval(self.ztimeout);
+			self.otimeout != null && clearInterval(self.otimeout);
+			self.clearpwtimer();
+		},
 		clearpwtimer: function () {
 			var self = this;
 			clearInterval(self.pwuserTime1);
 			self.pwuserTime1 = null;
 			$(".livemark-user-pingwei").empty();
 		},
-		scrollSpeed: 14,
+		scrollSpeed: 40,
 		animescrollobj: null,
 		startScrollY: 0,
 		scrollReset: false,
@@ -1073,25 +780,33 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 				return false;
 			}
 			anime.remove(classname);
-			var scrollHeight = $(classname)[0].scrollHeight, height = $(classname).outerHeight(), maxscrollH = Math.ceil(scrollHeight - height);
+			var self = this, scrollHeight = $(classname)[0].scrollHeight, height = $(classname).outerHeight(), maxscrollH = Math.ceil(scrollHeight - height);
 			if (maxscrollH > 0) {
-				var currentTop = resettype ? $(classname).scrollTop() : (self.startScrollY || $(classname).scrollTop());
-				if (currentTop >= maxscrollH) {
-					currentTop = 0;
-					$(classname).scrollTop(0);
+				if (self.loopScrollcount % 2 === 0) {
+					var duration = (self.startScrollY / self.scrollSpeed) * 1e3;
+					var scrollTop = [self.startScrollY, 0];
+					if (resettype) {
+						duration = (maxscrollH / self.scrollSpeed) * 1e3;
+						scrollTop = [maxscrollH, 0];
+					}
+				} else {
+					var duration = ((maxscrollH - self.startScrollY) / self.scrollSpeed) * 1e3;
+					var scrollTop = [self.startScrollY, maxscrollH];
 				}
-				var duration = Math.max(((maxscrollH - currentTop) / self.scrollSpeed) * 1e3, 3000);
 				self.animescrollobj = anime({
 					targets: classname,
-					scrollTop: [currentTop, maxscrollH],
+					scrollTop: scrollTop,
 					duration: duration,
+					direction: 'alternate',
+					loop: true,
 					autoplay: true,
 					easing: 'linear',
-					complete: function () {
-						$(classname).scrollTop(0);
+					loopComplete: function (anim) {
 						self.startScrollY = 0;
-						if (!$(classname).is(':hover')) {
-							self.initautoScroll(classname, true);
+						self.loopScrollcount++;
+						if (self.scrollReset) {
+							self.initautoScroll(classname, self.loopScrollcount % 2 === 0);
+							self.scrollReset = false;
 						}
 					},
 				});
@@ -1103,7 +818,8 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 				});
 				$(classname).unbind("mouseleave").bind("mouseleave", function () {
 					self.startScrollY = $(classname).scrollTop();
-					self.initautoScroll(classname, true);
+					self.scrollReset = true;
+					self.initautoScroll(classname);
 				});
 			}
 		},
@@ -1121,6 +837,7 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 			}
 			self.startScrollY = 0;
 			self.scrollReset = false;
+			self.loopScrollcount = 1;
 		},
 	};
 	return screenlivemark;

@@ -253,12 +253,12 @@
 </section>
 <script id="onehb-tpl" type="text/html">
 <div class="grab_one_redenvelop zam-app-flex-ajCenter">
-    <p class="txt">你抢到了一个神秘红包<br>快拆开看看</p>
+    <p class="txt">你抢到了一个神秘{if $appconfig['ishb'] == '1'}红包{else/}礼包{/if}<br>快拆开看看</p>
     <div class="one_redenvelop">
 	  <div class="user_info">
 		<img src="{:tomedia($wxuser['avatar'])}">
 		<div class="user_info_name limitbox">{$wxuser['nickname']}</div>
-		<span class="user_info_tip">恭喜您获得一个红包</span>
+		<span class="user_info_tip">恭喜您获得一个{if $appconfig['ishb'] == '1'}红包{else/}礼包{/if}</span>
 	  </div>
 	  <div class="btn_open zam-app-flex-ajCenter2">拆</div>
     </div>
@@ -289,14 +289,15 @@
 			<div class="money_info">
 				<span><% d.sender %></span>
 			</div>
-			<div class="money"><b><% d.sendmoney %></b>元</div>
-			<p class="tip">已发放到您的微信钱包</p>
+			<div class="money"><b><% d.sendmoney %></b>{$appconfig['moneyunit']}</div>
+			<p class="tip">{:$appconfig['appgethbtxt']??'已发放到您的微信钱包'}</p>
 		</div>
 	</div>
 	<span onclick="javascript:$('.money_redenvelop').remove();" class="close"></span>
 </div>
 </script>
 <script>
+var isdirectOpen = "{$appconfig['isdirectopen']??2}";
 require(['appredpack'],function (appredpack){
 	appredpack.init();
 });

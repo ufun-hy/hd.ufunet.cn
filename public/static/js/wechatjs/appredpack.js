@@ -97,7 +97,40 @@ define('appredpack', ['appsocket', 'wechatcore'], function (appsocket, wechatcor
 			$(".redenvelop_list").on('click', 'li', function () {
 				if (isopening) return;
 				isopening = true;
-				$("body").append(wechatcore.tpl($("#onehb-tpl"), {}));
+				if (isdirectOpen == '1') {
+					var index = wechatcore.loading('加载中...');
+					wechatcore.ajaxSubmit('/wechat/redpack/redpackopen', { rotateid: self.rotateid }, false).then(function (data) {
+						if (data.code == 0) {
+							var packobj = $(wechatcore.tpl($("#moneyhb-tpl"), data.msg));
+							$("body").append(packobj);
+							$('.money_redenvelop').on('click', function (e) {
+								var $target = $(e.target);
+								if (!$target.closest('.money_box').length && !$target.is('.money_box')) {
+									packobj.remove();
+								}
+							});
+						} else if (data.code == 1) {
+							var emptyobj = $(wechatcore.tpl($("#emptyhb-tpl"), {}));
+							$("body").append(emptyobj);
+							$('.prize_redenvelop').on('click', function (e) {
+								var $target = $(e.target);
+								if (!$target.closest('.prize_box').length && !$target.is('.prize_box')) {
+									emptyobj.remove();
+								}
+							});
+						} else {
+							wechatcore.msg(data.msg);
+						}
+						isopening = false;
+						wechatcore.close(index);
+					}, function () {
+						isopening = false;
+						wechatcore.close(index);
+						wechatcore.msg('网络太差，请稍后重试');
+					});
+				} else {
+					$("body").append(wechatcore.tpl($("#onehb-tpl"), {}));
+				}
 			});
 			$("body").on('click', '.one_redenvelop .btn_open', function () {
 				var $this = $(this);

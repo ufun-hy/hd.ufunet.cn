@@ -359,18 +359,23 @@ define('appcutfruit', ['appsocket', 'wechatcore', 'phaser'], function (appsocket
       game.load.image('timebox', Gameconfig.gameImgs.timebox);
       game.load.image('fruitcut', Gameconfig.gameImgs.fruitcut);
       game.load.spritesheet('boomcut', Gameconfig.gameImgs.boomcut, 140, 147);
-      //game.load.audio('bgv', Gameconfig.gameImgs.bgv, true);
       game.load.audio('boomv', Gameconfig.gameImgs.boomv, true);
       game.load.audio('cutv', Gameconfig.gameImgs.cutv, true);
       game.load.audio('overv', Gameconfig.gameImgs.overv, true);
-      if (Gameconfig.gameImgs.bgv) {
-        game.load.audio('bgv', Gameconfig.gameImgs.bgv, true);
-      }
       game.load.onFileComplete.add(function (progress) {
         progresstxt.text = progress + '%';
       });
       game.load.onLoadComplete.add(function () {
-        var voices = ['boomv', 'cutv', 'overv'];
+        var voices = [];
+        if (Gameconfig.gameImgs.boomv) {
+          voices.push('boomv');
+        }
+        if (Gameconfig.gameImgs.cutv) {
+          voices.push('cutv');
+        }
+        if (Gameconfig.gameImgs.overv) {
+          voices.push('overv');
+        }
         game.sound.setDecodedCallback(voices, function () {
           loadtext.destroy();
           progresstxt.destroy();
@@ -393,10 +398,6 @@ define('appcutfruit', ['appsocket', 'wechatcore', 'phaser'], function (appsocket
       this.titleimg.scale.set(0.96);
       this.gametxt = game.add.text(game.world.centerX, game.world.centerY + 180, '等待游戏开始', { fill: '#fff', fontSize: '32px' });
       this.gametxt.anchor.set(0.5);
-      if (!game.musicPause && $("#bgm").length > 0) {
-        wechatcore.playAudio($("#bgm")[0]);
-        game.musicPause = true;
-      }
     },
     update: function () {
       this.gametxt.text = appcutfruit.gametip;
@@ -409,9 +410,7 @@ define('appcutfruit', ['appsocket', 'wechatcore', 'phaser'], function (appsocket
       this.fruits = [];
       this.playing = true;
       this.bombExplode = false;
-      this.blade = new Blade({
-        game: game
-      });
+      this.blade = new Blade({ game: game });
       this.blade.allowBlade();
       this.lostCount = 0;
       this.scoreAnim();
@@ -419,13 +418,10 @@ define('appcutfruit', ['appsocket', 'wechatcore', 'phaser'], function (appsocket
       this.timeAnim();
       this.timeTextAnim();
       this.gameoverBox();
-      this.boomv = game.add.audio('boomv', 0.2, false);
-      this.cutv = game.add.audio('cutv', 0.2, false);
-      this.overv = game.add.audio('overv', 0.2, false);
-      if ($("#bgm").length > 0 && game.musicPause) {
-        if (!$("#bgm")[0].paused) $("#bgm")[0].pause();
-        game.musicPause = false;
-      }
+      this.boomv = game.add.audio('boomv', 0.5);
+      this.cutv = game.add.audio('cutv', 0.5);
+      this.overv = game.add.audio('overv', 0.5);
+
     },
     update: function () {
       if (!this.bombExplode) {
@@ -460,9 +456,6 @@ define('appcutfruit', ['appsocket', 'wechatcore', 'phaser'], function (appsocket
         this.gameOver();
       }
       appcutfruit.showpmbtn ? (this.pmbtn.visible = true) : (this.pmbtn.visible = false);
-    },
-    playAudio: function (audio) {
-      wechatcore.playAudio(audio, '2');
     },
     scoreAnim: function () {
       this.scoreImage = game.add.image(8, 20, 'scorebox');
@@ -574,11 +567,11 @@ define('appcutfruit', ['appsocket', 'wechatcore', 'phaser'], function (appsocket
       this.showScoretxt(fruit);
       if (fruit.sprite().key == 'bomb') {
         fruit.explode();
-        this.playAudio(this.boomv);
+        game.playMusic(this.boomv);
       } else {
         var deg = this.blade.collideDeg();
         fruit.half(deg, true);
-        this.playAudio(this.cutv);
+        game.playMusic(this.cutv);
       }
     },
     randColor: function () {
@@ -624,14 +617,13 @@ define('appcutfruit', ['appsocket', 'wechatcore', 'phaser'], function (appsocket
       });
     },
     gameOver: function () {
-      var _this = this;
-      _this.playing = false;
-      _this.boomv.stop();
-      _this.cutv.stop();
-      _this.overnum.text = "您的得分:" + appcutfruit.myscore;
-      setTimeout(function () {
-        _this.overPopup.visible = true;
-        _this.playAudio(_this.overv);
+      this.playing = false;
+      this.boomv.stop();
+      this.cutv.stop();
+      this.overnum.text = "您的得分:" + appcutfruit.myscore;
+      setTimeout(() => {
+        this.overPopup.visible = true;
+        game.playMusic(this.overv);
       }, 400);
     }
   };
@@ -662,6 +654,7 @@ define('appcutfruit', ['appsocket', 'wechatcore', 'phaser'], function (appsocket
         self.initGame();
         self.closerule = window.localStorage.getItem("closecutfruitrule-" + XCV3Config.hdid);
         self.bindEvent();
+        wechatcore.bgAudioPlay();
       });
     },
     initsocket: function () {
@@ -709,10 +702,7 @@ define('appcutfruit', ['appsocket', 'wechatcore', 'phaser'], function (appsocket
           }
           self.showteambox(data.teaminfo, data.jointype);
         } else if (data.type == 'gameiscountdown') {
-          if ($("#bgm").length > 0 && game.musicPause) {
-            if (!$("#bgm")[0].paused) $("#bgm")[0].pause();
-            game.musicPause = false;
-          }
+
           self.gamestatus = 1;
           self.myscore = 0;
           self.hidemyteambox();
@@ -720,7 +710,7 @@ define('appcutfruit', ['appsocket', 'wechatcore', 'phaser'], function (appsocket
           s.text(data.djs > 0 ? data.djs : 'GO');
           b.removeClass('hidden');
           self.gametip = self.statustip[1];
-          wechatcore.playAudio(self.djsaudio);
+          wechatcore.audioPlay(self.djsaudio);
           if (data.djs == 0) {
             self.gametip = self.statustip[2];
             setTimeout(function () {
@@ -790,8 +780,7 @@ define('appcutfruit', ['appsocket', 'wechatcore', 'phaser'], function (appsocket
       appsocket.init(params);
     },
     initAudio: function () {
-      var self = this;
-      self.djsaudio = $("#djsaudio")[0];
+      this.djsaudio = { audio: wechatcore.autoAudio({ audio: $("#djsaudio")[0] }) };
     },
     bindEvent: function () {
       var self = this;
@@ -927,7 +916,13 @@ define('appcutfruit', ['appsocket', 'wechatcore', 'phaser'], function (appsocket
     initGame: function () {
       var self = this;
       game = new Phaser.Game(Gameconfig.gameW, Gameconfig.gameH, Phaser.CANVAS, 'zam-app-mainbox', null, true);
-      game.musicPause = false;
+      game.playMusic = function (sound) {
+        var key = sound?.key || '';
+        var soundok = key && game.cache.checkSoundKey(key) && game.cache.isSoundDecoded(key);
+        if (soundok) {
+          wechatcore.audioPlay({ audio: sound });
+        }
+      }
       game.States = {};
       game.States.boot = function () {
         this.init = BootScene.init;

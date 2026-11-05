@@ -6,20 +6,7 @@
     </div>
     <div id="wechatconfigbox" class="collapse in">
         {include file="$Wpath/common/gameconfigwechatcommon" /}
-        <div class="form-group">
-            <label class="col-lg-2 control-label">* 准许重复中奖</label>
-            <div class="col-lg-3">
-                {:tpl_switch('canrepeat',$config['canrepeat'])}
-                <span class="help-block">开启后用户可以多轮游戏中奖</span>
-            </div>
-        </div>
-        <div class="form-group">
-            <label class="col-lg-2 control-label">* 点击下一轮自动创建</label>
-            <div class="col-lg-3">
-                {:tpl_switch('autocreate',$config['autocreate'])}
-                <span class="help-block">自动创建的轮次以最后一轮为模板</span>
-            </div>
-        </div>
+        {include file="$Wpath/common/gameconfigwechatsame"}
         <div class="form-group">
             <label class="col-lg-2 control-label text-right">* 微信端显示得分</label>
             <div class="col-lg-8">
@@ -40,7 +27,7 @@
         <div class="form-group">
             <label class="col-lg-2 control-label">* 自定义角色</label>
             <div class="col-lg-8">
-                {:tpl_switch('rolestype',$config['rolestype'],'openroleimgs')}
+                {:tpl_switch('rolestype',$config['rolestype']??'2','openroleimgs')}
                 <span class="help-block">默认使用风格内的角色图</span>
             </div>
         </div>
@@ -49,21 +36,21 @@
             <div class="form-group">
               <label class="col-lg-2 control-label text-right">* 孔图</label>
               <div class="col-lg-8">
-                {:tpl_image_one('roleimgs[hole]', $config['roleimgs']['hole'])}
+                {:tpl_image_one('roleimgs[hole]', $config['roleimgs']['hole']??'')}
                 <span class="help-block">规格:345*115px</span>
               </div>
             </div>
              <div class="form-group">
               <label class="col-lg-2 control-label text-right">* 角色1(点击此角色加分)</label>
               <div class="col-lg-8">
-                {:tpl_image_one('roleimgs[tiger]', $config['roleimgs']['tiger'])}
+                {:tpl_image_one('roleimgs[tiger]', $config['roleimgs']['tiger']??'')}
                 <span class="help-block">规格:303*280px</span>
               </div>
             </div>
             <div class="form-group">
               <label class="col-lg-2 control-label text-right">* 角色2(点击此角色减分)</label>
               <div class="col-lg-8">
-                {:tpl_image_one('roleimgs[fox]', $config['roleimgs']['fox'])}
+                {:tpl_image_one('roleimgs[fox]', $config['roleimgs']['fox']??'')}
                 <span class="help-block">规格:303*280px</span>
               </div>
             </div>

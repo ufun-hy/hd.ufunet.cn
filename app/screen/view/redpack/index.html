@@ -494,9 +494,9 @@
 		</div>
 		<div class="redpack-luckerinfo">
 			<p>{{ nickname }}</p>
-			<span>获得红包{{ prizemoney }}元</span>
+			<span>获得{if $pcconfig['ishb'] == '1'}红包{/if}{{ prizemoney }}{$pcconfig['moneyunit']}</span>
 		</div>
-		<div class="redpack-bg"><b>{{ prizemoney }}元</b></div>
+		<div class="redpack-bg"><b>{{ prizemoney }}{$pcconfig['moneyunit']}</b></div>
 	</li>
 </script>
 <script type="text/html" id="poplucker-tpl">
@@ -507,7 +507,7 @@
 			</div>			      
 			<div class="txt zam-app-flex-ajCenter">			       
 				<p>{{ nickname }}</p>
-				<p>获得{{ prizemoney }}元红包一个</p>
+				<p>获得{{ prizemoney }}{$pcconfig['moneyunit']}{if $pcconfig['ishb'] == '1'}红包一个{/if}</p>
 			</div>	
 		</div>			 
 	</div>
@@ -521,7 +521,7 @@
 			</div>			      
 			<div class="record-info">			       
 				<p class="record-name">{{ nickname}}</p>
-				<p class="record-money">抢到 {{ totalmoney }} 元红包</p>
+				<p class="record-money">抢到 {{ totalmoney }} {$pcconfig['moneyunit']}{if $pcconfig['ishb'] == '1'}红包{/if}</p>
 			</div>	
 		</div>
 	</li>

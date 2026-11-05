@@ -5,6 +5,8 @@
 * @Last Modified time: 2022-09-21 08:38:30
 */
 define('appydj', ['appsocket', 'wechatcore', 'jquery.shake'], function (appsocket, wechatcore, Shake) {
+	let lastShakeTime = 0;
+	let shakeInstance = null;
 	var appydj = {
 		rotateid: 0,
 		gamestatus: 0,
@@ -21,7 +23,7 @@ define('appydj', ['appsocket', 'wechatcore', 'jquery.shake'], function (appsocke
 					wechatcore.connectsocket({ clientid: data.clientid });
 				} else if (data.type == 'gameiswait' || data.type == 'gameisrun') {
 					//$(".countNum b").text(data.gametime);
-					self.closerule = window.localStorage.getItem("closeydjrule-" + XCV3Config.hdid);
+					self.closerule = window.localStorage.getItem(`closeydjrule-${XCV3Config.hdid}`);
 					self.rotateid = data.rotateid;
 					if (data.type == 'gameiswait') {
 						self.gamestatus = 1;
@@ -93,28 +95,40 @@ define('appydj', ['appsocket', 'wechatcore', 'jquery.shake'], function (appsocke
 				}
 			};
 			appsocket.init(params);
+			self.initAudio();
 			self.bindEvent();
+		},
+		initAudio: function () {
+			this.shakeaudio = { audio: wechatcore.autoAudio({ audio: $("#shakeaudio")[0] }) };
 		},
 		bindEvent: function () {
 			var self = this;
-			var myShakeEvent = new Shake({ threshold: 20 });
-			myShakeEvent.start();
-			$(window).on('shake', function () {
+			shakeInstance = new Shake({ threshold: 20, timeout: 1000 });
+			shakeInstance.start();
+			$(window).off('shake').on('shake', function () {
 				if (self.gamestatus != '2') {
-					return false;
+					return;
 				}
-				if (self.isopening) {
-					return false;
+				if (self.isopening || $(".prize_redenvelop").length) {
+					return;
 				}
+				const currentTime = Date.now();
+				const timeSinceLastShake = currentTime - lastShakeTime;
+
+				// 防止过于频繁的摇动
+				if (timeSinceLastShake < 1000) {
+					return;
+				}
+				lastShakeTime = currentTime;
 				self.isopening = true;
-				wechatcore.playAudio($('#shakeaudio')[0]);
+				wechatcore.audioPlay(self.shakeaudio);
 				wechatcore.ajaxSubmit('/wechat/ydj/ydjopen', { rotateid: self.rotateid }, '正在努力加载..').then(function (data) {
 					if (data.code == 0) {
 						if (data.msg.prizetype == '1') {
 							data.msg.txt = appgetaddress;
 						} else {
 							data.msg.prizename = "<b>" + data.msg.sendmoney + "</b>元";
-							data.msg.txt = "已发放到您的微信钱包";
+							data.msg.txt = appgethbtxt;
 						}
 						var packobj = $(wechatcore.tpl($("#prize-tpl"), data.msg));
 						$("body").append(packobj);
@@ -126,20 +140,26 @@ define('appydj', ['appsocket', 'wechatcore', 'jquery.shake'], function (appsocke
 							}
 						});
 					} else if (data.code == 1) {
-						self.isopening = false;
+						setTimeout(function () {
+							self.isopening = false;
+						}, 200)
 						wechatcore.msg(failtxt);
 					} else {
-						self.isopening = false;
+						setTimeout(function () {
+							self.isopening = false;
+						}, 200)
 						wechatcore.msg(data.msg);
 					}
 				}, function () {
-					self.isopening = false;
+					setTimeout(function () {
+						self.isopening = false;
+					}, 200)
 					wechatcore.msg('姿势不对，啥也没摇到');
 				});
 			});
 			$(".game-rules").on('click', function () {
 				$('.game-rules').addClass('hidden');
-				window.localStorage.setItem("closeydjrule-" + XCV3Config.hdid, '1');
+				window.localStorage.setItem(`closeydjrule-${XCV3Config.hdid}`, '1');
 			});
 		},
 		changetip: function (tips) {

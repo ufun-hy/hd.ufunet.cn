@@ -1,0 +1,54 @@
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 玩家子弹飞行速度</label>
+    <div class="col-lg-4">
+        <input type="text" class="form-control numberincdec" name="playerconfig[bulletspeed]" value="{$config['playerconfig']['bulletspeed']??400}"
+        data-bts-min="100" data-bts-replacement-val="400"
+        data-bts-max="null"
+        data-bts-step="1"
+        data-bts-postfix="速度"
+        data-bts-postfix-extra-class="touchspin-postfix"
+        >
+        <span class="zam-help-block">建议设置在1000以内</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label">* 玩家子弹生成速度</label>
+    <div class="col-lg-4">
+        <input type="text" class="form-control numberincdec" name="playerconfig[bulletinterval]" value="{$config['playerconfig']['bulletinterval']??300}"
+        data-bts-min="200" data-bts-replacement-val="300"
+        data-bts-max="null"
+        data-bts-step="1"
+        data-bts-postfix="毫秒"
+        data-bts-postfix-extra-class="touchspin-postfix"
+        >
+        <span class="zam-help-block">生成速度越快，子弹越密集，建议设置在600毫秒以内</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 玩家击落敌机后爆炸</label>
+    <div class="col-lg-8">
+        {:tpl_switch('playerconfig[hitenemyexplode]',$config['playerconfig']['hitenemyexplode']??1)}
+        <span class="zam-help-block">开启则玩家发射的子弹击落敌机后，敌机会立刻爆炸</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 玩家被敌机击中闪烁</label>
+    <div class="col-lg-8">
+        {:tpl_switch('playerconfig[bullethitplayer]',$config['playerconfig']['bullethitplayer']??1)}
+        <span class="zam-help-block">开启则敌机发射的子弹击中玩家后，玩家会闪烁0.8秒</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 玩家与敌机撞击闪烁效果</label>
+    <div class="col-lg-8">
+        {:tpl_switch('playerconfig[playercrashenemy1]',$config['playerconfig']['playercrashenemy1']??1)}
+        <span class="zam-help-block">开启则敌机与玩家相撞后，玩家会闪烁0.8秒</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 玩家与敌机撞击后爆炸</label>
+    <div class="col-lg-8">
+        {:tpl_switch('playerconfig[playercrashenemy2]',$config['playerconfig']['playercrashenemy2']??1)}
+        <span class="zam-help-block">开启则敌机与玩家相撞后，敌机会发生爆炸</span>
+    </div>
+</div>
