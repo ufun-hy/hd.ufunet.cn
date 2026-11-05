@@ -4,7 +4,7 @@ const task=await taskSpace(globalThis.RESULT_TEST_SPACE),page=task.page('p1');
 await page.goto('http://127.0.0.1:8767/tests/importcj-result/jump.html');
 await page.waitForFunction(()=>window.showJump&&window.jQuery);
 const result=await page.evaluate(async()=>{
-    const source=await(await fetch('/public/static/js/screenjs/screenimportcj.js')).text();
+    const source=await(await fetch('/public/static/js/screenjs/screenimportcj-custom.js')).text();
     const original={setTimeout,clearTimeout,setInterval,clearInterval,now:Date.now};
     const jobs=new Map();let now=0,id=100000;
     Date.now=()=>now;window.setTimeout=(fn,ms=0)=>{jobs.set(++id,{fn,time:now+ms,repeat:0});return id;};
@@ -23,7 +23,7 @@ const result=await page.evaluate(async()=>{
         function define(name,deps,factory){controller=factory(core,{showMsg(){}},()=>{metrics.legacy++;return '';},{},()=>{},{Object3D:function(){}},{},null,null,null,jumpStageModule,null);}
         new Function('define','$','isroundcj','isautoscroll','maxrollnum','XCV3Config',source)(define,$,round?'1':'0','1',1,{rhdid:1});
         const rows=Array.from({length:3},(_,i)=>({dataid:i+1,datafield1:'C'+i,datafield2:'候选'+i,datafield3:'1381234000'+i}));
-        Object.assign(controller,{flytype:'7',isstart:'1',visualState:'ready',datas:rows,fieldconfig:[{fieldname:'座位'},{fieldname:'姓名'},{fieldname:'手机',fieldsecret:'1'}],resultConfig:{},prizeInfo:[{id:1,prizename:'测试礼品',stoptype}],prizeIndex:0,drawCount:3,
+        Object.assign(controller,{flytype:'12',isstart:'1',visualState:'ready',datas:rows,fieldconfig:[{fieldname:'座位'},{fieldname:'姓名'},{fieldname:'手机',fieldsecret:'1'}],resultConfig:{},prizeInfo:[{id:1,prizename:'测试礼品',stoptype}],prizeIndex:0,drawCount:3,
             unifiedPrize:{update(){}},getPrize:()=>({id:1,prizename:'测试礼品'}),getCurrentPrizeId:()=>1,validateDrawCount:()=>({ok:true,value:3}),
             syncLegacyDrawCount(){},rememberLastSuccessfulPrize(){},syncPrizeStats(){},getDanmakuSpeedPreset:()=> 'normal',
             getControlSnapshot(){return {state:this.visualState,primaryText:this.visualState==='drawing'?'停止抽奖':'开始抽奖',primaryEnabled:true};},

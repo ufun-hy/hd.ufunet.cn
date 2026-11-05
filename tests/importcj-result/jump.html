@@ -19,7 +19,7 @@ require(['screenjs/screenimportcj-stage-ui'],function(stage){
         if(window.ui) ui.destroy();
         window.jumpEvents=[];
         var colors=(options.config||{}).resultcardmode==='transparent'?['#fff3d6','#f4dfa6','#fff3d6','#f4dfa6']:['#692f13','#83502f','#944422','#664422'];
-        window.ui=stage.create({root:document.querySelector('.importcj-mainbox'),flytype:'7',resultConfig:options.config||{},fieldConfig:['座位号','姓名','部门','编号'].slice(0,options.fields||4).map(function(name,i){return {fieldname:name,fieldcolor:colors[i]};}),callbacks:{
+        window.ui=stage.create({root:document.querySelector('.importcj-mainbox'),flytype:'12',resultConfig:options.config||{},fieldConfig:['座位号','姓名','部门','编号'].slice(0,options.fields||4).map(function(name,i){return {fieldname:name,fieldcolor:colors[i]};}),callbacks:{
             onPrimaryAction:function(){if(ui.state==='drawing') stopJump();else if(ui.state==='result') ui.setState('ready');else showJump(options);},
             onRecords:function(){ui.setRecords(window.jumpWinners);ui.setState('records');},
             onRecordsClose:function(){ui.setState('result');}

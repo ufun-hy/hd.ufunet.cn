@@ -1,7 +1,8 @@
+<!-- shortcut: Route custom styles to their existing screen until both style families share tested rendering. -->
+{if in_array(($pcconfig['styleconfig']['flytype']??'1'), ['10','11','12'])}
+{include file='importcj/custom' /}
+{else}
 {include file='common/header' /}
-{if isset($pcconfig['styleconfig']['flytype']) && $pcconfig['styleconfig']['flytype'] == '5'}
-<link rel="stylesheet" href="/static/css/screencss/screenimportcj-halo.css">
-{/if}
 <style>
 ::-webkit-scrollbar {
     width: 10px;
@@ -14,14 +15,10 @@
 ::-webkit-scrollbar-thumb {
     border-radius: 10px;
     outline-offset: -2px;
-    {if !isset($pcconfig['styleconfig']['flytype']) || $pcconfig['styleconfig']['flytype'] != '6'}
     background-color: {$pcconfig['styleconfig']['color']};
-    {/if}
 }
 ::-webkit-scrollbar-thumb:hover {
-    {if !isset($pcconfig['styleconfig']['flytype']) || $pcconfig['styleconfig']['flytype'] != '6'}
     background-color: {$pcconfig['styleconfig']['color']};
-    {/if}
 }
 .hidden{display: none}
 .header{pointer-events: none;}
@@ -56,11 +53,9 @@
     -webkit-align-items: center;
     -ms-flex-align: center;
     align-items: center;
-    {if !isset($pcconfig['styleconfig']['flytype']) || $pcconfig['styleconfig']['flytype'] != '6'}
-    color:{$pcconfig['styleconfig']['color']};
-    {/if}
     transform-style: preserve-3d;
     will-change: transform;
+    color:{$pcconfig['styleconfig']['color']};
 }
 .importcj-wall .importcj-luckerbox-item .lucker-one-item {
     width: 100%;
@@ -86,7 +81,7 @@
 .importcj-wall .lucker-one-item .data-box .data-one{
     text-align: center;
     {if isset($pcconfig['styleconfig']['flytype'])}
-        font-size:{if $pcconfig['styleconfig']['flytype'] == '2'}{$pcconfig['styleconfig']['flyonesize']??50}{elseif $pcconfig['styleconfig']['flytype'] == '3'}{$pcconfig['styleconfig']['flygridsize']??50}{else}{$pcconfig['styleconfig']['flyspheresize']??50}{/if}px;
+        font-size:{if $pcconfig['styleconfig']['flytype'] == '2'}{$pcconfig['styleconfig']['flyonesize']??50}{elseif $pcconfig['styleconfig']['flytype'] == '3'}{$pcconfig['styleconfig']['flygridsize']??50}{elseif $pcconfig['styleconfig']['flytype'] == '4'}{$pcconfig['styleconfig']['flyspheresize']??50}{elseif $pcconfig['styleconfig']['flytype'] == '5'}{$pcconfig['styleconfig']['flycirclesize']??25}{else}{$pcconfig['styleconfig']['flywallsize']??25}{/if}px;
     {/if}
 }
 {if !empty($pcconfig) && isset($pcconfig['fieldconfig']) && !empty($pcconfig['fieldconfig'])}
@@ -123,8 +118,8 @@
     top: 18px;
 }
 .importcj-lists .importcj-header .importcj-headerbg {width: 1034px;height: 76px;text-align: center;margin: 0 auto; background: url({:tomedia($pcconfig['styleconfig']['topbg'])}) no-repeat; background-size: cover;}
-.importcj-lists .importcj-header .awardname {font-weight: bold; font-size: {$pcconfig['styleconfig']['awardsize']??30}px;{if !isset($pcconfig['styleconfig']['flytype']) || $pcconfig['styleconfig']['flytype'] != '6'}color: {$pcconfig['styleconfig']['color']};{/if}line-height:1}
-.importcj-lists .importcj-header .prizename {height:30px;text-align: center;font-size: {$pcconfig['styleconfig']['prizesize']??25}px;font-weight: bold;{if !isset($pcconfig['styleconfig']['flytype']) || $pcconfig['styleconfig']['flytype'] != '6'}color:{$pcconfig['styleconfig']['color']};{/if}line-height: 1;}
+.importcj-lists .importcj-header .awardname {font-weight: bold; font-size: {$pcconfig['styleconfig']['awardsize']??30}px;color: {$pcconfig['styleconfig']['color']};line-height:1}
+.importcj-lists .importcj-header .prizename {height:30px;text-align: center;font-size: {$pcconfig['styleconfig']['prizesize']??25}px;font-weight: bold;color:{$pcconfig['styleconfig']['color']};line-height: 1;}
 .isroundcj .importcj-header .prizename{display: none;}
 .headerani { animation: headerani 0.6s ease-out 0s both; }
 @keyframes headerani { 
@@ -148,12 +143,12 @@
         opacity:1
     }
 }
-.importcj-lists .importcj-footer-box {width: 100%; height: 100%; background: url({:tomedia($pcconfig['styleconfig']['bottombg'])}) no-repeat center center; background-size: 100% 100%; box-sizing: border-box;{if !isset($pcconfig['styleconfig']['flytype']) || $pcconfig['styleconfig']['flytype'] != '6'}color: {$pcconfig['styleconfig']['color']};{/if} font-size: 18px;}
+.importcj-lists .importcj-footer-box {width: 100%; height: 100%; background: url({:tomedia($pcconfig['styleconfig']['bottombg'])}) no-repeat center center; background-size: 100% 100%; box-sizing: border-box;color: {$pcconfig['styleconfig']['color']}; font-size: 18px;}
 .importcj-lists .importcj-footer-box .select-prize{height: 45px; line-height: 45px; position: absolute; top:16px;left: 120px;}
 .importcj-lists .importcj-footer-box .select-prize .active-prize{padding:0 10px;width: 100px;text-align: center;}
 .importcj-lists .importcj-footer-box .select-prize span{font-size: 20px;font-weight: bold;cursor: pointer;}
 .importcj-lists .importcj-footer-box .select-box {position: absolute; top:-10px;left: 50%;transform: translate(-50%, 0%); width: 220px; height: 45px; line-height: 45px;display: flex; flex-wrap: nowrap; justify-content: center; font-size: 14px;}
-.importcj-lists .importcj-footer-box input{width:45px;line-height: 45px; font-size: 18px; height: 25px; margin: 10px 4px; border-radius: 6px; border: 0; text-align: center;{if !isset($pcconfig['styleconfig']['flytype']) || $pcconfig['styleconfig']['flytype'] != '6'}color: {$pcconfig['styleconfig']['color']};{/if} background-color: rgba(255,235,59,0.15);}
+.importcj-lists .importcj-footer-box input{width:45px;line-height: 45px; font-size: 18px; height: 25px; margin: 10px 4px; border-radius: 6px; border: 0; text-align: center; color: {$pcconfig['styleconfig']['color']}; background-color: rgba(255,235,59,0.15);}
 .importcj-lists .importcj-footer-box input:focus{outline: 0;border: 0;}
 .importcj-lists .importcj-footer-box .btn-start,.importcj-lists .importcj-footer-box .btn-close {width: 153px; height: 45px; line-height: 45px; position: absolute; top:50px;left: calc(50% - 153px/2);text-align: center; border-radius: 45px;cursor: pointer; color: #fff; font-size: 18px;font-weight:bold;letter-spacing: 3px;background-image: url({:tomedia($pcconfig['styleconfig']['btn'])});backgroud-repeat: no-repeat; background-size: cover;}
 .importcj-lists .importcj-footer-box .btn-showalllucker {width: 200px; height: 45px; line-height: 45px; position: absolute; top:16px;right: 140px; text-align: center; cursor: pointer;}
@@ -279,7 +274,7 @@
 .isdrawed .importcj-lists .importcj-footer{height: 58px;}
 .isdrawed .importcj-lists .importcj-footer .btn-start,.isdrawed .importcj-lists .importcj-footer .btn-close{top: 10px;}
 .isdrawed .importcj-lists .importcj-body .importcj-luckerbox{display: block!important}
-.isdrawed:not(.flybox6) .importcj-lists .importcj-footer-box{background:none;}
+.isdrawed .importcj-lists .importcj-footer-box{background:none;}
 .isdrawed .importcj-awardbox,.isdrawed .importcj-footer-box .select-box,.isdrawed .importcj-footer-box .select-prize,.isdrawed .importcj-footer-box .btn-showalllucker{display: none}
 .importcj-luckerbox-lists {transform-style: preserve-3d;
     -webkit-transform-style: preserve-3d;
@@ -305,11 +300,9 @@
     align-items: center;
     transform-style: preserve-3d;
     -webkit-transform-style: preserve-3d;
-    -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
-    {if !isset($pcconfig['styleconfig']['flytype']) || $pcconfig['styleconfig']['flytype'] != '6'}
+    -webkit-backface-visibility: hidden;
     color:{$pcconfig['styleconfig']['color']};
-    {/if}
 }
 .importcj-luckerbox-lists li.importcj-luckerbox-item .lucker-one-item {
     padding: {$pcconfig['styleconfig']['padding']??7}px;
@@ -432,7 +425,7 @@
 .isdrawing .importcj-awardbox,.isdrawing .importcj-footer-box .select-box,.isdrawing .importcj-footer-box .select-prize,.isdrawing .importcj-footer-box .btn-showalllucker,.isdrawing .importcj-tip{
     display:none;
 }
-.isdrawing:not(.flybox6) .importcj-footer-box{
+.isdrawing .importcj-footer-box{
     background:none;
 }
 .isdrawing .importcj-footer .btn-start{
@@ -444,17 +437,120 @@
     100%{opacity:1;transform: scale(1);}
 }
 {/if}
+.importcj-wall.type5{
+    perspective: 1500px;
+    -webkit-perspective: 1500px;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+}
+.importcj-wall.type5 .circle3DBox {
+    position: absolute;
+    top: {$pcconfig['styleconfig']['flycirclemargin']??-100}px;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-transform: translateZ(0); 
+    transform: translateZ(0);
+}
+.importcj-wall.type5 .circle3DBox ul {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width:100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
+    -webkit-transform: translateZ(0); 
+    transform: translateZ(0);
+}
+.importcj-wall.type5 .circle3DBox li {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    justify-content: center;
+    background-image: url("{:tomedia($pcconfig['styleconfig']['flycirclebg']??'/static/images/screen/importcj/databg.jpg')}");
+    background-size: cover;
+    width: {$pcconfig['styleconfig']['flycirclepx']??140}px;
+    height: {$pcconfig['styleconfig']['flycirclepx']??140}px;
+    margin-top:calc(-{$pcconfig['styleconfig']['flycirclepx']??140}px / 2);
+    margin-left:calc(-{$pcconfig['styleconfig']['flycirclepx']??140}px / 2);
+}
+
+
+.importcj-wall.type6 .wallbox{
+	width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.wallone{
+	flex: 1;
+    height: 100%;
+    display: flex;
+	justify-content: center;
+    flex-direction: column;
+	will-change: transform;
+}
+.wallone .lucker-one-item{
+    width: {$pcconfig['styleconfig']['flywallpx']??120}px;
+    flex-shrink: 0;
+    background-image: url("{:tomedia($pcconfig['styleconfig']['flywallbg']??'/static/images/screen/importcj/databg.jpg')}");
+    background-size: cover;
+	will-change: transform;
+    transform: translateZ(0);
+	-webkit-transform: translateZ(0);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.avatar_shadow{
+	animation: avatar_shadow 0.5s ease-in-out 0s alternate infinite;
+}
+@keyframes avatar_shadow {
+	from{
+		transform:scale(1);
+		-webkit-transform: scale(1);
+	}
+	to{
+		transform:scale(.8);
+		-webkit-transform: scale(.8);
+	}
+}
+.avatar_rotate{
+	animation: avatar_rotate 0.2s linear 0s infinite;
+}
+@keyframes avatar_rotate {
+    {if !isset($pcconfig['styleconfig']['flywalltype']) || $pcconfig['styleconfig']['flywalltype'] == '1'}
+    from{
+        transform: rotateX(0);
+    }to{
+        transform: rotateX(360deg);
+    }
+    {else /}
+    from{
+        transform: rotateY(0);
+    }to{
+        transform: rotateY(360deg);
+    }
+    {/if}
+}
+.avatar_scale{
+	animation: avatar_scale 0.2s linear 2 alternate;            
+}
+@keyframes avatar_scale {
+	from{
+		transform: scale(1);
+	}
+	to{
+		transform: scale(0);
+	}
+}
 </style>
-<link rel="stylesheet" href="/static/css/screencss/screen-prize.css?v=20260926-prize-controls-1">
-<link rel="stylesheet" href="/static/css/screencss/screenimportcj-prize.css">
-<link rel="stylesheet" href="/static/css/screencss/screen-stage-ui.css">
-<link rel="stylesheet" href="/static/css/screencss/screenimportcj-stage-ui.css">
-{if isset($pcconfig['styleconfig']['flytype']) && $pcconfig['styleconfig']['flytype'] == '7'}
-<link rel="stylesheet" href="/static/css/screencss/screenimportcj-jump.css">
-{/if}
-{if isset($pcconfig['styleconfig']['flytype']) && $pcconfig['styleconfig']['flytype'] == '6'}
-<link rel="stylesheet" href="/static/css/screencss/screenimportcj-danmaku.css">
-{/if}
 {if !empty($pcconfig['iscjingmusic'])}
 <audio id="cjingmusic" src="{:tomedia($pcconfig['iscjingmusic'])}" loop preload="preload" style="display:none"></audio>
 {/if}
@@ -467,20 +563,20 @@
         <p style="padding:20px;">请到后台添加{if isset($pcconfig['isroundcj']) && $pcconfig['isroundcj']=='1'}轮次{else /}奖品{/if}</p>
     </div>
     <div class="importcj-lists zam-app-flex-ajCenter hidden">
-        <div class="importcj-header importcj-legacy-visual zam-app-flex-ajCenter headerani">
+        <div class="importcj-header zam-app-flex-ajCenter headerani">
             <div class="importcj-headerbg"><span class="awardname">xxx</span></div>
             <div class="prizename">xxx奖品</div>
         </div>
         <div class="importcj-body zam-app-flex-ajCenter">
-            <div class="importcj-awardlist importcj-legacy-visual"></div>
-            <div class="importcj-luckerbox importcj-legacy-visual">
+            <div class="importcj-awardlist"></div>
+            <div class="importcj-luckerbox">
                 <div class="importcj-luckerbox-content">
-                    <ul class="importcj-luckerbox-lists importcj-legacy-visual"></ul>
+                    <ul class="importcj-luckerbox-lists"></ul>
                     <div class="importcj-btip hidden">尽显公平与公正</div>
                 </div>
             </div>
         </div>
-        <div class="importcj-footer{if isset($pcconfig['styleconfig']['flytype']) && $pcconfig['styleconfig']['flytype'] == '6'} importcj-legacy-visual{/if} footerani"{if isset($pcconfig['styleconfig']['flytype']) && $pcconfig['styleconfig']['flytype'] == '6'} aria-hidden="true"{/if}>
+        <div class="importcj-footer footerani">
             <div class="importcj-footer-box">
                 <div class="select-prize zam-app-flex">
                     <div class="prev-prize"><span class="mxc-back"></span></div>
@@ -494,14 +590,17 @@
                 </div>
                 <div class="btn-start">开始</div>
                 <div class="btn-close hidden">关闭</div>
-                <div class="btn-showalllucker">{$pcconfig['styleconfig']['listname']??'中奖列表'} · <span class="lucker-numbox">已中奖 <span class="lucker-num">0</span> / 总名额 <span class="prize-num">0</span></span></div>
+                <div class="btn-showalllucker">{$pcconfig['styleconfig']['listname']??'中奖列表'}<span class="lucker-numbox"><span class="lucker-num">0</span>/<span class="prize-num">0</span></span></div>
             </div>
         </div>
         <div class="importcj-tip">按空格键停止</div>
     </div>
+    {if ($pcconfig['showyanhua']??2) == '1'}
+    {include file="importcj/yanhua"}
+    {/if}
 </div>
 <script type="text/javascript">
-var isroundcj = "{$pcconfig['isroundcj']??2}",maxrollnum = parseInt("{$pcconfig['styleconfig']['maxrollnum']??20}"),isautoscroll = "{$pcconfig['autoscroll']??2}",autoscrollspeed = parseInt({$pcconfig['styleconfig']['autoscrollspeed']??30});
+var isroundcj = "{$pcconfig['isroundcj']??2}",maxrollnum = parseInt("{$pcconfig['styleconfig']['maxrollnum']??20}"),isautoscroll = "{$pcconfig['autoscroll']??2}",showyanhua = "{$pcconfig['showyanhua']??2}",autoscrollspeed = parseInt({$pcconfig['styleconfig']['autoscrollspeed']??30});
 require(['screenimportcj'],function(screenimportcj){
     var html = '';
     {if !empty($pcconfig['styleconfig']['hidevideo'])}
@@ -516,8 +615,8 @@ require(['screenimportcj'],function(screenimportcj){
 </script>
 <script id="prize-tpl" type="html/javascript">
 <div class="importcj-awardbox zam-app-flex-ajCenter awardboxani">
-    <div class="importcj-prizeimg zam-app-flex-ajCenter"><img src="{{ prizeimg }}" onerror="this.classList.add('is-broken'); this.parentNode.classList.add('is-image-missing');"></div>
-    {{ if showPrizeInfo }}
+    <div class="importcj-prizeimg zam-app-flex-ajCenter"><img src="{{ prizeimg }}"></div>
+    {{ if isroundcj == '1' }}
     <div class="importcj-prizeinfo">
         <div class="importcj-prizename">{{ prizename }}</div>
         <div class="importcj-prizenum">{{ num }}个</div>
@@ -566,3 +665,5 @@ require(['screenimportcj'],function(screenimportcj){
 </div>
 </script>
 {include file='common/footer' /}
+
+{/if}
