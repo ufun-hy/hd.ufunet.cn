@@ -16,6 +16,9 @@ define('apphorse', ['appsocket', 'jquery.shake', 'wechatcore'], function (appsoc
 		kh: ['加油啊', '看什么看，速度了', '别停啊，伙计', '加油~加油'],
 		init: function () {
 			var self = this;
+			if (XCV3Config.rhdid == '359-1') {
+				self.statustip = ['Starting Soon', 'Get Ready', 'Live Now.  Keep Going', 'Thanks for Joining']
+			}
 			var params = {};
 			params.onmessage = function (data) {
 				if (data.type == 'connected') {
@@ -58,7 +61,7 @@ define('apphorse', ['appsocket', 'jquery.shake', 'wechatcore'], function (appsoc
 					s.text(data.djs > 0 ? data.djs : 'GO');
 					b.removeClass('hidden');
 					self.changetip(self.statustip[1]);
-					wechatcore.playAudio(self.djsaudio);
+					wechatcore.audioPlay(self.djsaudio);
 				} else if (data.type == 'gameisdjs') {
 					if (self.gamestatus == 1) {
 						self.changetip(self.statustip[2]);
@@ -138,16 +141,13 @@ define('apphorse', ['appsocket', 'jquery.shake', 'wechatcore'], function (appsoc
 				}
 			};
 			appsocket.init(params);
-			if ($("#appbgmusic").length > 0) {
-				self.appbgmusic = $("#appbgmusic")[0];
-				wechatcore.playAudio(self.appbgmusic);
-			}
+			wechatcore.bgAudioPlay();
 		},
 		initAudio: function () {
 			var self = this;
-			self.shakeaudio = $('#shakeaudio')[0];
-			self.djsaudio = $("#djsaudio")[0];
-			self.clickaudio = $('#clickaudio').length ? $("#clickaudio")[0] : '';
+			self.shakeaudio = { audio: wechatcore.autoAudio({ forceHowl: '1', audio: $("#shakeaudio")[0] }) };
+			self.djsaudio = { audio: wechatcore.autoAudio({ audio: $("#djsaudio")[0] }) };
+			self.clickaudio = { audio: wechatcore.autoAudio({ forceHowl: '1', audio: $("#clickaudio")[0] }) };
 		},
 		initplaytype: function () {
 			var self = this;
@@ -400,11 +400,9 @@ define('apphorse', ['appsocket', 'jquery.shake', 'wechatcore'], function (appsoc
 				self.setprogress(((self.myscore / self.maxscore).toFixed(2) * 100) + "%", self.myscore);
 			}
 			if (self.playtype == 1) {
-				wechatcore.playAudio(self.shakeaudio);
+				wechatcore.audioPlay(self.shakeaudio);
 			} else if (self.playtype == 3) {
-				if (self.clickaudio) {
-					wechatcore.playAudio(self.clickaudio);
-				}
+				wechatcore.audioPlay(self.clickaudio);
 			}
 			appsocket.sendgamedata({
 				myscore: self.myscore,
@@ -431,6 +429,11 @@ define('apphorse', ['appsocket', 'jquery.shake', 'wechatcore'], function (appsoc
 		},
 		showphbbtn: function (rotateid, gamephb, team) {
 			$(".zam-app-shake-over .phb-btn").attr({ 'data-rotateid': rotateid, 'data-gamephb': gamephb, 'data-teamid': team }).removeClass('hidden');
+			if (autophb == '1') {
+				setTimeout(function () {
+					$(".phb-btn").trigger('click');
+				}, 100);
+			}
 		},
 		hidephbbtn: function () {
 			$(".zam-app-shake-over .phb-btn").addClass('hidden');

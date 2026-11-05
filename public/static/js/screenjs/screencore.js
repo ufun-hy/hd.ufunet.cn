@@ -308,20 +308,25 @@ define('screencore', ['jquery', 'layerBox'], function ($, layerBox) {
 			num = num || 10;
 			var r = $(".rankBox"), o = $(".rank-others li"), oo = $(".rank-others2 li");
 			for (var i = 0, j = list.length; i < j; i++) {
+				var one = list[i] || false;
+				if (XCV3Config.rhdid == '-1' && one.bestone) {
+					one.nickname = `<div>${(one.nickname || '')}</div>`;
+					one.nickname += `<div class="bestone"><tt>${(one.bestone.nickname || '')}</tt><tt>${(one.bestone.score || '')}</tt></div>`;
+				}
 				if (i < 3) {
-					if (i < num && list[i]) {
+					if (i < num && one) {
 						var box = i == 0 ? r.find('.rank-item-first') : i == 1 ? r.find('.rank-item-second') : r.find('.rank-item-third');
-						box.find('img').attr('src', list[i].avatar);
-						box.find('p').text(list[i].nickname);
+						box.find('img').attr('src', one.avatar);
+						box.find('p').html(one.nickname);
 					}
 				} else {
-					if (i < num && list[i]) {
+					if (i < num && one) {
 						if (i > 9) {
-							oo.eq((i - 10)).find('img').attr('src', list[i].avatar);
-							oo.eq((i - 10)).find('p span').text(list[i].nickname);
+							oo.eq((i - 10)).find('img').attr('src', one.avatar);
+							oo.eq((i - 10)).find('p span').html(one.nickname);
 						} else {
-							o.eq((i - 3)).find('img').attr('src', list[i].avatar);
-							o.eq((i - 3)).find('p span').text(list[i].nickname);
+							o.eq((i - 3)).find('img').attr('src', one.avatar);
+							o.eq((i - 3)).find('p span').html(one.nickname);
 						}
 					}
 				}
@@ -741,7 +746,7 @@ define('screencore', ['jquery', 'layerBox'], function ($, layerBox) {
 		},
 		bgmusicplay: function () {
 			var self = this, bgmusicbtn = self.getdom('.openmusic'), bgmusic = $('#bgmusic');
-			if (bgmusicbtn.length > 0 && bgmusic.length > 0 && bgmusicbtn.attr('data-open') == '1') {
+			if (bgmusicbtn.length && bgmusic.length && bgmusicbtn.attr('data-open') == '1') {
 				bgmusic.get(0).play();
 			}
 		},

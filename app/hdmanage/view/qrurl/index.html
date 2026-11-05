@@ -21,6 +21,7 @@ function loadqr(obj){
     require(['webcore'],function(webcore){
         webcore.ajaxSubmit("{:gohdmanage('qrurl/makeqr',['hdid'=>$hdid])}",{qrtype:"{$qrtype}",modulefield:modulefield,appid:appid}).then(function(json){
             if(json.code==0){
+                json.msg.module = modulefield;
                 var qrtype = json.msg.qrtype,errmsg = json.msg.errmsg;
                 if(qrtype < 4){
                   $(obj).removeAttr('onload');
@@ -399,6 +400,27 @@ require(['webcore','zamnotice','clipboard','jconfirmBox','zvalidator'],function(
             zamnotice.showTips('error','网络差,操作失败');
         });
     });
+    $("#listtable").on('click','.btn-resetgreen',function(){
+      var $this = $(this);
+      jconfirmBox.confirm('温馨提示','重置二维码将生成新的绿色通道二维码，之前的绿色通道二维码将失效，您确定要重置么？',function(){
+          webcore.ajaxSubmit("{:gohdmanage('qrurl/resetgreen',['hdid'=>$hdid])}",{}).then(function(json){
+              if(json.code==0){
+                  zamnotice.showTips('success','重置成功');
+                  $this.parent().parent().html(`<div class="qrimgbox">
+                        <div class="waitqrimgbox">
+                          <i class="mdi mdi-48px mdi-spin mdi-loading"></i>
+                          <div>二维码生成中...</div>
+                        </div>  
+                        <img class="wechatqr hidden" src="/{:SYSIMGURL}loading.png" onload="loadqr(this)" data-modulename="绿色通道" data-modulefield="green" data-appid="{if $qrtype == '4'}{$wxminiappid}{else /}{$appid}{/if}" />
+                      </div>`)
+              }else{
+                  zamnotice.showTips('error',json.msg);
+              }
+          }, function(json){
+              zamnotice.showTips('error','网络差。操作失败');
+          });
+      });
+    });
 });
 </script>
 <script id='qrbtns-tpl' type="text/template">
@@ -427,6 +449,11 @@ require(['webcore','zamnotice','clipboard','jconfirmBox','zvalidator'],function(
         <a class="btn btn-success btn-xs btn-download ishighlight" href="javascript:void(0)">
             <i class="mdi mdi-download"></i> 下载高清二维码
         </a>
+        <%# if(d.module == 'green'){ %>
+          <a class="btn btn-danger btn-xs btn-resetgreen" href="javascript:void(0)">
+              <i class="mdi mdi-gavel"></i> 重置二维码
+          </a>
+        <%# } %>
         <%# } %>
     </div>
     <%# if(d.tiptxt != ''){ %>

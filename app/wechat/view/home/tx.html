@@ -76,7 +76,7 @@ function checkInput(obj) {
 }
 var clicktx = false;
 require(['wechatcore'],function (wechatcore) {
-	$(".btn-tx").on('click',function(){
+	$(".btn-tx").click(function(){
 		var txmoney = $(".txmoney").val();
 		if(txmoney=='') return wechatcore.msg('请输入提现金额');
 		if(clicktx) return;
@@ -106,9 +106,9 @@ require(['wechatcore'],function (wechatcore) {
 			wechatcore.msg('出现异常，提现失败');
 		});
 	});
-	$(".btn-txall").on('click',function(){
+	$(".btn-txall").click(function(){
 		var mymoneynum = $(".mymoneynum").text();
-		if(mymoneynum == ''||mymoneynum <= 0 ) return wechatcore.msg('账户余额不足以提现');
+		if(mymoneynum == '' || mymoneynum <= 0 ) return wechatcore.msg('账户余额不足以提现');
 		$(".txmoney").val(mymoneynum);
 	});
 });

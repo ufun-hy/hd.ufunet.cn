@@ -1,4 +1,4 @@
-{if in_array($gametype,['shake','monkey','horse','car','bike','mls','swim','swingsnake','lightfire'])}
+{if in_array($gametype,['shake','monkey','horse','car','bike','mls','swim','swingsnake','lightfire','airplane'])}
 <div class="form-group filetypes">
     <label class="col-lg-2 control-label">* 网页标题类型</label>
     <div class="col-lg-8">
@@ -69,14 +69,14 @@
 <div class="form-group">
     <label class="col-lg-2 control-label">* 游戏规则</label>
     <div class="col-lg-3">
-        {:tpl_switch('ruleinfo[open]',$config['ruleinfo']['open'],'appruleinfo')}
+        {:tpl_switch('ruleinfo[open]',$config['ruleinfo']['open']??'2','appruleinfo')}
         <span class="help-block">开启后微信端将显示规则按钮</span>
     </div>
 </div>
 <div class="form-group apprulebox{if !isset($config['ruleinfo']['open']) || $config['ruleinfo']['open']=='2'} hidden{/if}">
     <label class="col-lg-2 control-label">* 规则内容</label>
     <div class="col-lg-8">
-        {:tpl_ueditor('ruleinfo[rulecont]',$config['ruleinfo']['rulecont'])}
+        {:tpl_ueditor('ruleinfo[rulecont]',$config['ruleinfo']['rulecont']??'')}
     </div>
 </div>
 

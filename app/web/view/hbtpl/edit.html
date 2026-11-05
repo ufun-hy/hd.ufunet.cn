@@ -89,7 +89,7 @@
       <label class="col-lg-3 control-label">* 发放模式</label>
       <div class="col-lg-8">
         <label class="lyear-radio radio-inline radio-primary">
-        <input type="radio" name="isasync" value="1" {if isset($config['isasync']) && $config['isasync']=='1'}checked{/if}><span>异步发放 <b class="label label-warning">公测中</b></span>
+        <input type="radio" name="isasync" value="1" {if isset($config['isasync']) && $config['isasync']=='1'}checked{/if}><span>异步发放</span>
         </label>
         <label class="lyear-radio radio-inline radio-primary">
         <input type="radio" name="isasync" value="2" {if !isset($config['isasync']) || $config['isasync']=='2'}checked{/if}><span>同步发放</span>
@@ -98,7 +98,7 @@
             <div>注意事项:</div>
             <div>1 同步发放每秒大约仅可发放1-2个红包</div>
             <div>2 异步发放每秒大约可发放20-50个红包，发放红包较多时能明显感觉到速度超级给力</div>
-            <div>3 同步发放相较异步发放效率比较低，但对服务器性能开销比较小</div>
+            <div>3 同步发放相较异步发放效率较低，但服务器性能开销较小</div>
         </span>
       </div>
   </div>
@@ -137,17 +137,25 @@
         <input class="form-control" type="text"  name="billscene_id" value="{$config['billscene_id']??1000}">
         <div class="help-block">
           <div>默认是1000，使用现金营销场景</div>
-          <div>具体的场景值，如下</div>
-          <div>1000:现金营销</div>
-          <div class="text-danger">商家转账这个产品微信商户在2025年01月15日上线</div>
+          <div class="text-danger">商家转账目前暂无法申请新场景所以这个场景id只能填写1000</div>
+          <div>具体的场景值列表</div>
+          <div>1000:现金营销<br>1002:行政补贴<br>1004:保险理赔<br>1005:佣金报酬<br>1006:企业报销<br>1007:企业补贴<br>1009:采购货款<br>1010:二手回收<br>1011:企业赔付<br>1013:公益补助</div>
         </div>
       </div>
     </div>
     <div class="form-group">
-      <label class="col-lg-3 control-label">* 支持0.3元</label>
+      <label class="col-lg-3 control-label">* 红包最小金额</label>
       <div class="col-lg-7">
-          {:tpl_switch('supporttiny',$config['supporttiny'])}
-          <span class="help-block">如果不支持，可以到微信商户平台发起申请，一般商家转账到零钱接口默认支持</span>
+          <input type="text" class="form-control numberincdec" name="minmoney" 
+          data-bts-min="0.1" data-bts-replacement-val="1"
+          data-bts-max="null"
+          data-bts-decimals="2"
+          data-bts-step="0.1"
+          data-bts-postfix="元"
+          data-bts-postfix-extra-class="touchspin-postfix"
+          data-bts-force-step-divisibility="xstwo"
+          value="{$config['minmoney']??1}">
+          <div class="help-block m-0"><span class="text-danger">如果您要填写小于1的数值，请务必到微信商户产品中心内查看对应的产品是否已经支持了该金额</span>，最小可以设置为0.1元</div>
       </div>
     </div>
     {if dznormalrequest('transfersplit')}

@@ -382,9 +382,9 @@ require(['screencore','template','layerBox','marqueen','screensocket','fulldm','
 });
 {// 背景视频加载完成后全屏并自动播放}
 var videobgobj = $(".pcbgBox .videoBg");
-if(videobgobj.length > 0){
+if(videobgobj.length){
 	var videosrc = videobgobj.attr('data-src'),videosrcs = videosrc.split('.'),videotype = (videosrcs[videosrcs.length-1] ? videosrcs[videosrcs.length-1] : '');
-	if(videotype.indexOf('m3u8')!=-1){
+	if(videotype.indexOf('m3u8') > -1){
 		require(['hls'],function (Hls) {
 			var hls = new Hls();
 			hls.loadSource(videosrc);
@@ -404,6 +404,20 @@ if(videobgobj.length > 0){
 		        });
 		    });
 		};
+		require(['screencore'],function (screencore) {
+			var videoObj = videobgobj[0],isPlaying = (!videoObj.paused && !videoObj.ended),isMuted = videoObj.muted;
+			if(isPlaying && isMuted){
+				$(".full-main").append(`<a class="btn btn-primary btn-play mxc-notification" style="position:absolute;left:10px;top:10px;font-size:24px;color:#fff;z-index:10;cursor:pointer;opacity:0.01"></a>`)
+				$(".btn-play").on('click',function(){
+					videoObj.muted = !videoObj.muted;
+					if($(this).hasClass('mxc-notificationfill')){
+						$(this).removeClass('mxc-notificationfill').addClass('mxc-notification')
+					}else{
+						$(this).removeClass('mxc-notification').addClass('mxc-notificationfill')
+					}
+				});
+			}
+		});
 	}
 }
 {// 网络断开与连接上}

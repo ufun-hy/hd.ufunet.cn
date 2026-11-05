@@ -1,0 +1,45 @@
+<style>
+.dhh-nav{
+    position: absolute;
+    top: 0rem;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    z-index: 1;
+    background-color: #fff;
+}
+.dhh-nav ul,.dhh-nav ul:before{border:0!important;background: none!important}
+.dhh-nav ul .grids-item{padding: 0.22rem 0;}
+.dhh-nav ul .grids-item:before,.dhh-nav ul .grids-item:after{border: 0!important}
+.dhh-nav ul .grids-item .btn{
+    height: 0.8rem;
+    line-height: 0.8rem;
+    padding: 0 0.42rem;
+    font-size: 0.32rem;
+}
+</style>
+{php}
+$rounds = [
+    [
+        'title'=>'第一轮',
+        'href'=>'https://zam.miboxianchang.cn/wechat/vote/index?hdid=Z6ff624lHW6LdLL6cg6363fHlL2Wf2WE',
+    ],
+    [
+        'title'=>'第二轮',
+        'href'=>'https://zam.miboxianchang.cn/wechat/vote/index?hdid=MWm77mZ28L32l27MP8Ls8flSmZ20p6PS',
+    ],
+    [
+        'title'=>'第三轮',
+        'href'=>'https://zam.miboxianchang.cn/wechat/vote/index?hdid=g9k5Z3kkvv5988WkhiZw3T9hBhTLzpKg',
+    ]
+];
+{/php}
+<div class="dhh-nav">
+    <ul class="m-grids-{:count($rounds)}">
+    {foreach $rounds as $r}
+    <li class="grids-item">
+        <a class="btn btn-{if strexists($r['href'],$hdinfo['hdid'])}primary{else /}hollow{/if}" href="{$r['href']}">{$r['title']}</a>
+    </li>
+    {/foreach}
+    </ul>
+</div>

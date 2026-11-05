@@ -100,7 +100,7 @@ define('appshakestart', ['appsocket', 'jquery.shake', 'wechatcore', 'bubbleHeart
 		},
 		initAudio: function () {
 			var self = this;
-			self.shakeaudio = $('#shakeaudio')[0];
+			self.shakeaudio = { audio: wechatcore.autoAudio({ forceHowl: '1', audio: $("#shakeaudio")[0] }) };
 		},
 		initplaytype: function () {
 			var self = this;
@@ -215,7 +215,7 @@ define('appshakestart', ['appsocket', 'jquery.shake', 'wechatcore', 'bubbleHeart
 			if (self.gamestatus != 2) return;
 			self.myscore++;
 			if (self.shaketype == '1') {
-				wechatcore.playAudio(self.shakeaudio);
+				wechatcore.audioPlay(self.shakeaudio);
 			}
 			appsocket.sendgamedata({
 				myscore: self.myscore,

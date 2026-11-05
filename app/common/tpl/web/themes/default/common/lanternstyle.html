@@ -78,10 +78,11 @@
                         </tr>
                     </thead>
                     <tbody class="lantern-lists">
+                        {if isset($config['pcstyle']['lanterns']) && !empty($config['pcstyle']['lanterns'])}
                         {foreach $config['pcstyle']['lanterns'] as $d}
                         <tr>
                             <td>
-                                {:tpl_image_one('pcstyle[lanterns]',$d)}
+                                {:tpl_image_one('pcstyle[lanterns][]',$d)}
                                 <div class="mt10">注：标准尺寸150 * 190px，推荐使用png图片</div>
                             </td>
                             <td class="text-center">
@@ -90,6 +91,7 @@
                             </td>
                         </tr>
                         {/foreach}
+                        {/if}
                     </tbody>
                     <tfoot>
                         <tr>
@@ -250,7 +252,7 @@
 <script id='addlantern' type="text/template">
     <tr>
         <td>
-            {:tpl_image_one('pcstyle[lanterns]','')}
+            {:tpl_image_one('pcstyle[lanterns][]','')}
             <div class="mt10">注：标准尺寸150 * 190px，推荐使用png图片</div>
         </td>
         <td class="text-center">

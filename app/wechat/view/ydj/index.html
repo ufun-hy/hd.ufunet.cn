@@ -173,8 +173,7 @@
 </div>
 </script>
 <script>
-var failtxt = "{$appconfig['appfailtxt']}";
-var appgetaddress = "{if isset($appconfig['appgetaddress'])}{$appconfig['appgetaddress']}{else}请到领奖处领取{/if}";
+var failtxt = "{$appconfig['appfailtxt']}",appgetaddress = "{$appconfig['appgetaddress']??'请到领奖处领取'}",appgethbtxt = "{:$appconfig['appgethbtxt']??'已发放到您的微信钱包'}";
 require(['wechatcore','appydj'],function (wechatcore,appydj){
    wechatcore.gameInit(appydj);
 });

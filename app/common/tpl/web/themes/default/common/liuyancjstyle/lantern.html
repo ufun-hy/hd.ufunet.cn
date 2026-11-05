@@ -9,10 +9,11 @@
                 </tr>
             </thead>
             <tbody class="lantern-lists">
+                {if isset($config['lanternstyle']['lanterns']) && !empty($config['lanternstyle']['lanterns'])}
                 {foreach $config['lanternstyle']['lanterns'] as $d}
                 <tr>
                     <td>
-                        {:tpl_image_one('lanternstyle[lanterns]',$d)}
+                        {:tpl_image_one('lanternstyle[lanterns][]',$d)}
                         <div class="mt10">注：标准尺寸150 * 190px，推荐使用png图片</div>
                     </td>
                     <td class="text-center">
@@ -21,6 +22,7 @@
                     </td>
                 </tr>
                 {/foreach}
+                {/if}
             </tbody>
             <tfoot>
                 <tr>
@@ -98,9 +100,24 @@
             var $this = $(this);
             jconfirmBox.confirm('温馨提示','您确定要删除么？',function(){
                 $this.parent().parent().remove();
-                zamnotice.showTips('success','删除成功');
             });
         });
         $('.lantern-lists').sortable({handle: ".sortmove"}).disableSelection();
+        $(".addlantern").click(function () {
+            var whtml = $(webcore.tpl($("#addlantern"), {})).clone();
+            $(".lantern-lists").append(whtml);
+        });
     })
+</script>
+<script id='addlantern' type="text/template">
+    <tr>
+        <td>
+            {:tpl_image_one('lanternstyle[lanterns][]','')}
+            <div class="mt10">注：标准尺寸150 * 190px，推荐使用png图片</div>
+        </td>
+        <td class="text-center">
+            <a class="btn btn-xs btn-primary zam-sortable sortmove" data-tooltip="laytip" title="拖动排序" href="javascript:void(0)"> <i class="mdi mdi-arrow-all"></i> </a>
+            <a class="btn btn-danger btn-xs btn-del"><i class="mdi mdi-close"></i></a>
+        </td>
+    </tr>
 </script>

@@ -273,11 +273,15 @@ require(['wechatcore'],function (wechatcore) {
 			<%  d.nickname %>
 			<%# if(d.fromtypename!=""){ %>
 				<span class="fromstylespan">
-				<%# if(d.stylename==""){ %>
+				<%# if(d.stylename == ""){ %>
 					<span class="fromspan">(<% d.fromtypename %>)</span>
 				<%# }else{ %>
-					 (<span class="fromspan"><% d.fromtypename %></span><span class="stylespan"> - <% d.stylename %></span>)
-				<%# } %>
+					{if $hdinfo['id'] == '359-1'}
+					(Hong Kong Horse Racing Game)
+					{else /}
+					(<span class="fromspan"><% d.fromtypename %></span><span class="stylespan"> - <% d.stylename %></span>)
+					{/if}
+					<%# } %>
 				</span>
 			<%# } %>
 		</div>

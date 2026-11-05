@@ -12,6 +12,7 @@ var initConfig = {
             edit:true,
             del:true,
             data:true,
+            shenhe:{title:"复制",icon:"mdi-content-copy",class:"success"},
             reset:{title:"立即结束",icon:"mdi-gavel",class:"danger",except:{'only':'2'}},
         },
         func:{
@@ -26,11 +27,11 @@ var initConfig = {
                             confirmObj.close();
                         }else{
                             zamnotice.showTips('error',json.msg);
-                             return false;
+                            return false;
                         }
                     }, function(json){
                         zamnotice.showTips('error','网络差。操作失败');
-                         return false;
+                        return false;
                     });
                 });
             },
@@ -65,6 +66,21 @@ var initConfig = {
                     });
                 });
             },
+            shenhe:function(value, row, index){
+                jconfirmBox.confirm('温馨提示','复制轮次无法复制轮次内定用户，您确定要复制当前轮次生成新的一轮么？',function(){
+                    webcore.ajaxSubmit("{:gohdmanage('configredpack/copyrotate',['hdid'=>$hdid])}",{rotateid:row.id}).then(function(json){
+                        if(json.code==0){
+                            webtable.refresh();
+                            zamnotice.showTips('success','复制成功');
+                        }else{
+                            zamnotice.showTips('error',json.msg);
+                        }
+                    }, function(json){
+                        zamnotice.showTips('error','网络差。操作失败');
+                    });
+                });
+            },
+            
         }
     },
     columns:[{

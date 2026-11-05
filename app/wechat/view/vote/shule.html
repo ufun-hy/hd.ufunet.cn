@@ -135,19 +135,21 @@
 <script>
 var remainSec,votetxt = "{$appconfig['votetxt']??'投票'}";
 $(function(){
-	{if $rotate['endtime'] < time()}
-		$(".timeremain .timeremain-title span").text(votetxt+'已结束');
-		$(".remainnums").remove();
-	{elseif $rotate['starttime'] > time() /}
-		$(".timeremain .timeremain-title span").text('距离'+votetxt+'开始时间');
-		remainSec = parseInt("{$rotate['starttime'] - time()}");
-		timerun(remainSec);
-		$(".remainnums").remove();
-	{else /}
-		{// 进行中}
-		$(".timeremain .timeremain-title span").text('距离'+votetxt+'结束时间');
-		remainSec = parseInt("{$rotate['endtime'] - time()}");
-		timerun(remainSec);
+	{if ($rotate['openroundtime']??'2') == '1'}
+		{if $rotate['endtime'] < time()}
+			$(".timeremain .timeremain-title span").text(votetxt+'已结束');
+			$(".remainnums").remove();
+		{elseif $rotate['starttime'] > time() /}
+			$(".timeremain .timeremain-title span").text('距离'+votetxt+'开始时间');
+			remainSec = parseInt("{$rotate['starttime'] - time()}");
+			timerun(remainSec);
+			$(".remainnums").remove();
+		{else /}
+			{// 进行中}
+			$(".timeremain .timeremain-title span").text('距离'+votetxt+'结束时间');
+			remainSec = parseInt("{$rotate['endtime'] - time()}");
+			timerun(remainSec);
+		{/if}
 	{/if}
 })
 {// 倒计时逻辑}

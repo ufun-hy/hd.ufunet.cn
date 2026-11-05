@@ -8,7 +8,10 @@
     padding:10px;
 }
 .cateBox .catespan label{margin-top: 0!important}
-.cateBox .catespan .personnum{position:absolute;right:60px;}
+.cateBox .catespan .outputbox{
+    position: absolute;
+    right: 20px;
+}
 .cateBox .catespan input{margin:0;margin-right:5px;}
 .nditem-lists tr td{text-align: center}
 </style>
@@ -34,18 +37,36 @@
                     <div class="col-lg-8">
                         {if !empty($groups)}
                             {foreach $groups as $group}
-                                <span class="catespan">
-                                    <label class="lyear-checkbox checkbox-inline checkbox-primary">
-                                        <input type="checkbox" name="groupids[]" value="{$group['id']}" {if !empty($config['groupids']) && in_array($group['id'],$config['groupids'])}checked{/if}><span>{$group['groupname']}</span>
-                                    </label>
-                                    <span class="personnum pull-right text-danger">{$group['num']} 个</span>
-                                </span>
+                                <div class="catespan{if $group['issel'] == '1'} issel{/if}">
+                                    <div class="groupidbox">
+                                        <label class="lyear-checkbox checkbox-inline checkbox-primary">
+                                            <input type="checkbox" name="groupids[id][]" value="{$group['id']}" {if $group['issel'] == '1'}checked{/if}><span>{$group['groupname']}（<span class="text-danger">共{$group['num']}个</span>）</span>
+                                        </label>
+                                    </div>
+                                    <div class="outputbox{if $group['issel'] == '2' || ($pcconfig['setonegroupnum']??'2') == '2'} hidden{/if}">
+                                        <div class="input-group">
+                                            <div class="input-group-btn not-allow"><a class="btn btn-default">抽取</a></div>
+                                            <div class="touchspin">
+                                                <input type="text" class="form-control numberincdec" {if $group['issel'] == '1'}name="groupids[out][]" {/if}
+                                                data-bts-min="0" data-bts-replacement-val="0"
+                                                data-bts-max="null"
+                                                data-bts-step="1"
+                                                data-bts-postfix="人"
+                                                data-bts-postfix-extra-class="touchspin-postfix"
+                                                value="{$group['out']??0}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             {/foreach}
                         {else /}
                         <div class="form-control-static">暂未添加分组，<a href="{:gohdmanage('configimportcj/groups',['hdid'=>$hdid])}">点我添加分组</a></div>
                         {/if}
                         <div class="help-block">
-                            <span class="text-error">选择了分组，本奖品的数据只能从所选的分组内的数据里抽出，请一定保证所选分组内包含的名单数量大于等于本奖品数量</span>
+                            <div class="text-error">选择了分组，本奖品的数据只能从所选的分组内的数据里抽出，请一定保证所选分组内包含的名单数量大于等于本奖品数量</div>
+                            {if ($pcconfig['setonegroupnum']??2) == '1'}
+                            <div class="m-t-5"><span class="text-danger">抽取0人即为该分组抽取人数为随机</span></div>
+                            {/if}
                         </div>
                     </div>
                 </div>
@@ -187,6 +208,24 @@
 </div>  
 <script>
 require(['webcore','jconfirmBox','zamnotice','layerBox',"bootstrap-touchspin","bootstrap-daterangepicker",'jztree'],function(webcore,jconfirmBox,zamnotice,layerBox){
+    var setonegroupnum = "{$pcconfig['setonegroupnum']??2}";
+    $('.groupidbox input').on('click', function(e) {
+        var $this = $(this),$catespan = $this.parent().parent().parent(),$outputbox = $catespan.find('.outputbox');
+        var s = $this.prop('checked');
+        if(s){
+            if(setonegroupnum == '1'){
+                $outputbox.removeClass('hidden');
+            }
+            $catespan.addClass('issel');
+            $outputbox.find('input').attr('name','groupids[out][]');
+        } else{
+            if(setonegroupnum == '1'){
+                $outputbox.addClass('hidden');
+            }
+            $catespan.removeClass('issel');
+            $outputbox.find('input').attr('name','');
+        }
+    });
     tpl_switch();
     $(".grouptypes label").click(function(){
         var grouptype = $(this).find('input').val();

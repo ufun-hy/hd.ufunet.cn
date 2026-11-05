@@ -8,10 +8,12 @@ input,textarea{font:inherit;font-family: 微软雅黑,"Microsoft YaHei";backgrou
 .zam-app-sign{
 	position: absolute;
 	top: 0;
-	left: 0;
+	/* left: 0; */
+	left: 50%;
+    transform: translateX(-50%);
 	width: 100%;
 	height: 100%;
-	overflow: hidden scroll;
+	overflow: hidden;
 	background-repeat: no-repeat;
     background-size: 100% 100%;
     {if isset($appconfig['appbgimg']) && !empty($appconfig['appbgimg'])}
@@ -395,7 +397,7 @@ require(['wechatcore','q-select','swiper','cropper','mobileselect'],function (we
 	});
 	$('.zam-app-sign').removeClass('zam-app-justifyCenter');
 	if($(".zam-app-signbox").outerHeight(true) >= $('.zam-app-sign').outerHeight(true)){
-		$('.zam-app-sign').css({background:'none'});
+		$('.zam-app-sign').css({background:'none','overflow-y':'scroll'});
 		$(".zam-app-bodyBg").css({"opacity":'1'});
 	}else{
 		{if !isset($appconfig['appbdbgmargintop']) || $appconfig['appbdbgmargintop'] == '0'}
@@ -503,7 +505,11 @@ require(['wechatcore','q-select','swiper','cropper','mobileselect'],function (we
 								return false;
 							}
 							if(isfloat=='5' && !/^-?\d+$/.test(inputval)){
-								wechatcore.showtopmsg(bdtitle+'只能输入整数'+typenames[isfloat]);
+								var tiptxt = bdtitle+'只能输入整数'+typenames[isfloat];
+								if(XCV3Config.rhdid == '359-1'){
+									tiptxt = 'Please provide valid mobile number';
+								}
+								wechatcore.showtopmsg(tiptxt);
 								hascheck = false;
 								return false;
 							}
@@ -583,12 +589,20 @@ require(['wechatcore','q-select','swiper','cropper','mobileselect'],function (we
 								}
 							}
 							if(dmin > 0 && inputval.length < dmin){
-								wechatcore.showtopmsg(bdtitle+'最少需输入'+dmin+'位'+typenames[isfloat]);
+								var tiptxt = bdtitle+'最少需输入'+dmin+'位'+typenames[isfloat];
+								if(XCV3Config.rhdid == '359-1'){
+									tiptxt = 'Please provide valid mobile number';
+								}
+								wechatcore.showtopmsg(tiptxt);
 								hascheck = false;
 								return false;
 							}
 							if(dmax > 0 && inputval.length > dmax){
-								wechatcore.showtopmsg(bdtitle+'最多只能输入'+dmax+'位'+typenames[isfloat]);
+								var tiptxt = bdtitle+'最多只能输入'+dmax+'位'+typenames[isfloat];
+								if(XCV3Config.rhdid == '359-1'){
+									tiptxt = 'Please provide valid mobile number';
+								}
+								wechatcore.showtopmsg(tiptxt);
 								hascheck = false;
 								return false;
 							}
@@ -597,7 +611,12 @@ require(['wechatcore','q-select','swiper','cropper','mobileselect'],function (we
 					if($(this).attr('data-type')=='email'){
 						var regex = /^([a-zA-Z0-9_\.\-\+])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
 						if(!regex.test(inputval)) {
-							wechatcore.showtopmsg(bdtitle+'格式有误');
+							var tiptxt = bdtitle+'格式有误';
+							if(XCV3Config.rhdid == '359-1'){
+								tiptxt = 'Please provide valid email';
+								//Please provide valid mobile number
+							}
+							wechatcore.showtopmsg(tiptxt);
 							hascheck = false;
 							return false;
 						}
@@ -683,7 +702,11 @@ require(['wechatcore','q-select','swiper','cropper','mobileselect'],function (we
 								return false;
 							}
 							if(isfloat=='5' && !/^-?\d+$/.test(inputval)){
-								wechatcore.showtopmsg(bdtitle+'只能输入整数'+typenames[isfloat]);
+								var tiptxt = bdtitle+'只能输入整数'+typenames[isfloat];
+								if(XCV3Config.rhdid == '359-1'){
+									tiptxt = 'Please provide valid mobile number';
+								}
+								wechatcore.showtopmsg(tiptxt);
 								hascheck = false;
 								return false;
 							}
@@ -763,12 +786,20 @@ require(['wechatcore','q-select','swiper','cropper','mobileselect'],function (we
 								}
 							}
 							if(dmin > 0 && inputval.length < dmin){
-								wechatcore.showtopmsg(bdtitle+'最少需输入'+dmin+'位'+typenames[isfloat]);
+								var tiptxt = bdtitle+'最少需输入'+dmin+'位'+typenames[isfloat];
+								if(XCV3Config.rhdid == '359-1'){
+									tiptxt = 'Please provide valid mobile number';
+								}
+								wechatcore.showtopmsg(tiptxt);
 								hascheck = false;
 								return false;
 							}
 							if(dmax > 0 && inputval.length > dmax){
-								wechatcore.showtopmsg(bdtitle+'最多只能输入'+dmax+'位'+typenames[isfloat]);
+								var tiptxt = bdtitle+'最多只能输入'+dmax+'位'+typenames[isfloat];
+								if(XCV3Config.rhdid == '359-1'){
+									tiptxt = 'Please provide valid mobile number';
+								}
+								wechatcore.showtopmsg(tiptxt);
 								hascheck = false;
 								return false;
 							}
@@ -777,7 +808,11 @@ require(['wechatcore','q-select','swiper','cropper','mobileselect'],function (we
 					if($(this).attr('data-type')=='email'){
 						var regex = /^([a-zA-Z0-9_\.\-\+])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
 						if(!regex.test(inputval)) {
-							wechatcore.showtopmsg(bdtitle+'格式有误');
+							var tiptxt = bdtitle+'格式有误';
+							if(XCV3Config.rhdid == '359-1'){
+								tiptxt = 'Please provide valid email';
+							}
+							wechatcore.showtopmsg(tiptxt);
 							hascheck = false;
 							return false;
 						}

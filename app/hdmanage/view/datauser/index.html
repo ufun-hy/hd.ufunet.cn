@@ -5,8 +5,9 @@
 2 禁言用户不可在上墙或者霸屏内发送消息<br>
 3 黑名单用户无法进入活动<br>
 4 抽奖不中即为用户不会在3d抽奖，抽奖箱，砸金蛋，巨幕抽奖，普通抽奖等抽奖功能中奖<br>
+5 表格内中奖信息列不统计红包雨功能内中奖记录<br>
 {if dzguestopen()}
-5 来源是其他的用户一般是通过手机浏览器等进入活动的用户<br>
+6 来源是其他的用户一般是通过手机浏览器等进入活动的用户<br>
 {/if}
 {if $admin['id'] == '1'}
 <div class="m-t-10 m-b-t">
@@ -80,6 +81,16 @@
             {/foreach}
           </select>
         </div>
+    </div>
+    <div class="form-group">
+        <div class="input-group input-group-sm">
+          <span class="input-group-addon">中奖情况</span>
+            <select id="prizeid" class="form-control">
+              <option value="0" selected>不限制</option>
+              <option value="-1">未中奖</option>
+              <option value="-2">已中奖</option>
+            </select>
+          </div>
     </div>
     <a class="btn btn-primary btn-sm btn-search" href="javascript:void(0)"><i class="mdi mdi-magnify"></i> 搜索</a>
     <a class="btn btn-warning btn-sm btn-export" href="javascript:void(0)"><i class="mdi mdi-export"></i> 导出</a>
@@ -285,12 +296,26 @@ var initConfig = {
             title: '签到',
             align: 'center',
         },{
+            field: 'luckrecords',
+            title: '中奖信息',
+            align: 'center',
+            formatter: function(value, row, index){
+                if(!value.length){
+                    return `<span class="text-success">未中奖</span>`;
+                }
+                var html = ``;
+                value.forEach((item)=>{
+                    html += `<div class="m-b-5">(${item.fromtypename}) (${item.prizetype == '1' ? '<span class="text-primary">实物</span>' : '<span class="text-warning">红包</span>'}) ${item.prizename}</div>`
+                });
+                return html;
+            },
+        },{
             field: 'joininfohtml',
             title: '加入时间/ip/地址',
             align: 'center'
         }
     ],
-    searchParamas:[{'type':'1','id':'keyword'},{'type':'2','id':'sextype'},{'type':'2','id':'blacktype'},{'type':'2','id':'managetype'},{'type':'2','id':'excepttype'},{'type':'2','id':'signtype'},{'type':'2','id':'estoppeltype'}],
+    searchParamas:[{'type':'1','id':'keyword'},{'type':'2','id':'sextype'},{'type':'2','id':'blacktype'},{'type':'2','id':'managetype'},{'type':'2','id':'excepttype'},{'type':'2','id':'signtype'},{'type':'2','id':'estoppeltype'},{'type':'2','id':'prizeid'}],
     toolbar:{
         add:function(){
             var confirmObj = jconfirmBox.ajaxconfirm("新增用户","{:gohdmanage('datauser/save',['hdid'=>$hdid])}",{ishtml:'1'},'html','col-lg-6 col-lg-offset-3',function(e){
@@ -469,7 +494,7 @@ function getaddr(cobj){
                     $(".pulladdrAlert .hadnum").text(result.success);
                     setTimeout(function(){
                         getaddr(cobj);
-                    },500);
+                    },900);
                 }else{
                     $(".pulladdrAlert .hadnum").text(result.total);
                     zamnotice.showTips('success','恭喜，已完成所有用户的ip地址获取',2e3,function(){

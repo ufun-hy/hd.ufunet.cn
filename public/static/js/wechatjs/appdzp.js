@@ -264,11 +264,11 @@ define('appdzp', ['appsocket', 'wechatcore', 'luckycanvas', 'sweetalert'], funct
 		playrotateaudio: function () {
 			var self = this;
 			if (self.rotateInfo.cjstyle == '1') {
-				if ($("#dzprotatemusic").length > 0) {
+				if ($("#dzprotatemusic").length) {
 					$("#dzprotatemusic")[0].play();
 				}
 			} else if (self.rotateInfo.cjstyle == '2') {
-				if ($("#jggrotatemusic").length > 0) {
+				if ($("#jggrotatemusic").length) {
 					$("#jggrotatemusic")[0].play();
 				}
 			}
@@ -276,21 +276,17 @@ define('appdzp', ['appsocket', 'wechatcore', 'luckycanvas', 'sweetalert'], funct
 		playsuccessaudio: function () {
 			var self = this;
 			if (self.rotateInfo.cjstyle == '1') {
-				if ($("#dzprotatemusic").length > 0 && !$("#dzprotatemusic")[0].paused) {
+				if ($("#dzprotatemusic").length && !$("#dzprotatemusic")[0].paused) {
 					$("#dzprotatemusic")[0].currentTime = 0;
 					$("#dzprotatemusic")[0].pause();
 				}
-				if ($("#dzpsumusic").length > 0) {
-					wechatcore.playAudio($("#dzpsumusic")[0]);
-				}
+				wechatcore.audioPlay({ audio: wechatcore.autoAudio({ audio: $("#dzpsumusic")[0] }) });
 			} else if (self.rotateInfo.cjstyle == '2') {
-				if ($("#jggrotatemusic").length > 0 && !$("#jggrotatemusic")[0].paused) {
+				if ($("#jggrotatemusic").length && !$("#jggrotatemusic")[0].paused) {
 					$("#jggrotatemusic")[0].currentTime = 0;
 					$("#jggrotatemusic")[0].pause();
 				}
-				if ($("#jggsumusic").length > 0) {
-					wechatcore.playAudio($("#jggsumusic")[0]);
-				}
+				wechatcore.audioPlay({ audio: wechatcore.autoAudio({ audio: $("#jggsumusic")[0] }) });
 			}
 		},
 		showpopbox: function (prize) {

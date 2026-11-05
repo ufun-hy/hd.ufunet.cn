@@ -6,11 +6,25 @@
         <input type="text" class="form-control" value="" id="keyword" name="username" placeholder="请输入本地数据相关信息">
       </div>
     </div>
+    <div class="form-group">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">中奖限制</span>
+          <select id="prizeid" class="form-control">
+            <option value="0" selected>不限制</option>
+            <option value="-1">未中奖</option>
+            <option value="-2">已中奖</option>
+            {foreach $prizes as $key=>$prize} 
+                <option value="{$prize['id']}">中了{$prize['awardname']} - {$prize['prizename']}</option>
+            {/foreach}
+          </select>
+        </div>
+    </div>
     <a class="btn btn-primary btn-sm btn-search" href="javascript:void(0)"><i class="mdi mdi-magnify"></i> 搜索</a>
 </div>
 {include file='$Wpath/common/tabletoolbar'}
 <table id="listtable" class="zam-btable"></table>
-<script>    
+<script>
+var prizesall = {:json_encode($prizes)};
 require(['webcore','webtable','jconfirmBox','zamnotice','clipboard','layerBox','jcode'],function(webcore,webtable,jconfirmBox,zamnotice,Clipboard,layerBox){
 var initConfig = {
     tableId:'#listtable',
@@ -81,9 +95,26 @@ var initConfig = {
                 html += "<i class='mdi mdi-pencil m-l-5 cursor changegroupid' data-dataid="+row.id+" data-groupid="+row.groupid+"></i>";
                 return html;
             },
+        },{
+            field: 'prizeids',
+            title: '中奖信息',
+            align: 'center',
+            formatter: function(value, row, index){
+                if(!value.length){
+                    return `<span class="text-success">未中奖</span>`;
+                }
+                var html = ``;
+                value.forEach((pid)=>{
+                    var prize = prizesall.find((item)=> item.id == pid)
+                    if(prize){
+                        html += `<div class="m-b-5">${prize.awardname || ''} - ${prize.prizename || ''}</div>`
+                    }
+                });
+                return html;
+            },
         }
     ],
-    searchParamas:[{'type':'1','id':'keyword'}],
+    searchParamas:[{'type':'1','id':'keyword'},{'type':'2','id':'prizeid'}],
     toolbar:{
         add:function(){
             var confirmObj = jconfirmBox.ajaxconfirm("新增数据","{:gohdmanage('configimportcj/editdata',['hdid'=>$hdid])}",{ishtml:'1'},'html','col-lg-10 col-lg-offset-1',function(e){
@@ -166,6 +197,9 @@ var initConfig = {
     },
 };
 webtable.init(initConfig);
+$('.zam-inline-searchbar select').change(function(e) {
+     webtable.refresh();
+});
 $("#listtable").on('click','.changegroupid',function(){
     var dataid = $(this).attr('data-dataid'),imggroupid = $(this).attr('data-groupid');
     var confirmObj = jconfirmBox.ajaxconfirm((imggroupid=='0'?"加入分组":"修改分组"),"{:gohdmanage('configimportcj/showgroup',['hdid'=>$hdid])}",{dataid:dataid},'html','col-lg-8 col-lg-offset-2',function(e){

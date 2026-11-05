@@ -1,0 +1,290 @@
+<div class="form-group">
+    <label class="col-lg-2 control-label"> 自定义敌机</label>
+    <div class="col-lg-10">
+        <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th style="width:30%;text-align: center;">飞机图</th>
+                <th style="width:50%;text-align: center;">设置</th>
+                <th style="width:20%;text-align: center;">操作</th>
+              </tr>
+            </thead>
+            <tbody class="enemy-lists">
+            {if !empty($config['enemys'])}
+            {foreach $config['enemys'] as $enemy}    
+            <tr>
+                <td>
+                  {:tpl_image_one('enemys[img][]', $enemy['img'])}
+                  <span class="help-block mt0">注:飞机图控制在100*100px以内</span>
+                </td>
+                <td>
+                    <div class="form-group">
+                        <label class="col-lg-4 control-label">* 飞行线路</label>
+                        <div class="col-lg-6">
+                            <select class="form-control input-sm" name="enemys[movetype][]" size="1">
+                                <option value="1" {if $enemy['movetype']=='1'}selected{/if}>直线</option>
+                                <option value="2" {if $enemy['movetype']=='2'}selected{/if}>曲线</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-4 control-label">* 生命</label>
+                        <div class="col-lg-6">
+                            <input type="text" class="form-control input-sm numberincdec" name="enemys[life][]" 
+                            data-bts-min="1" data-bts-replacement-val="1"
+                            data-bts-max="10"
+                            data-bts-step="1"
+                            data-bts-postfix="命"
+                            data-bts-postfix-extra-class="touchspin-postfix" value="{$enemy['life']??1}">
+                            <span class="help-block mt0">生命即为玩家需要击中多少次才能击落</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-4 control-label">* 击落分数</label>
+                        <div class="col-lg-6">
+                            <input type="text" class="form-control input-sm numberincdec" name="enemys[score][]" 
+                            data-bts-min="1" data-bts-replacement-val="1"
+                            data-bts-max="10"
+                            data-bts-step="1"
+                            data-bts-postfix="分"
+                            data-bts-postfix-extra-class="touchspin-postfix" value="{$enemy['score']??1}">
+                            <span class="help-block mt0">玩家击落此飞机加多少分</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-4 control-label">* 生成速度</label>
+                        <div class="col-lg-6">
+                            <input type="text" class="form-control input-sm numberincdec" name="enemys[makespeed][]" 
+                            data-bts-min="500" data-bts-replacement-val="1000"
+                            data-bts-max="20000"
+                            data-bts-step="1"
+                            data-bts-postfix="毫秒"
+                            data-bts-postfix-extra-class="touchspin-postfix" value="{$enemy['makespeed']??1000}">
+                            <span class="help-block mt0">每多少毫秒生成一架飞机，1秒即为1000毫秒</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-4 control-label">* 飞行速度</label>
+                        <div class="col-lg-6">
+                            <input type="text" class="form-control input-sm numberincdec" name="enemys[flyspeed][]" 
+                            data-bts-min="200" data-bts-replacement-val="300"
+                            data-bts-max="20000"
+                            data-bts-step="1"
+                            data-bts-postfix="速度"
+                            data-bts-postfix-extra-class="touchspin-postfix" value="{$enemy['flyspeed']??300}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-4 control-label">* 发射子弹</label>
+                        <div class="col-lg-8" style="text-align: left;">
+                            <label class="lyear-switch switch-primary normal-swith switch-solid" style="height:38px">
+                                <input type="checkbox"{if ($enemy['openbullet']??'1') == '1'} checked="checked"{/if}>
+                                <input type="hidden" name="enemys[openbullet][]" value="{$enemy['openbullet']??'1'}">
+                                <span data-status="{$enemy['openbullet']??'1'}" data-func="openenemybullet" class="normal-span has-func" data-ajax=""></span>
+                            </label>        
+                        </div>
+                    </div>
+                    <div class="bulletbox{if ($enemy['openbullet']??'1') == '2'} hidden{/if}">
+                    <div class="form-group">
+                        <label class="col-lg-4 control-label">* 子弹生成速度</label>
+                        <div class="col-lg-6">
+                            <input type="text" class="form-control input-sm numberincdec" name="enemys[bulletspeed][]" 
+                            data-bts-min="500" data-bts-replacement-val="2000"
+                            data-bts-max="20000"
+                            data-bts-step="1"
+                            data-bts-postfix="毫秒"
+                            data-bts-postfix-extra-class="touchspin-postfix" value="{$enemy['bulletspeed']??2000}">
+                            <span class="help-block mt0">每多少毫秒生成一颗子弹，1秒即为1000毫秒</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-4 control-label">* 子弹击中玩家减</label>
+                        <div class="col-lg-6">
+                            <input type="text" class="form-control input-sm numberincdec" name="enemys[bulletscore][]" 
+                            data-bts-min="0" data-bts-replacement-val="1"
+                            data-bts-max="10"
+                            data-bts-step="1"
+                            data-bts-postfix="分"
+                            data-bts-postfix-extra-class="touchspin-postfix" value="{$enemy['bulletscore']??1}">
+                            <span class="help-block mt0">玩家被子弹击中减多少分，设置0即为不减分</span>
+                        </div>
+                    </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-4 control-label">* 与玩家相撞减</label>
+                        <div class="col-lg-6">
+                            <input type="text" class="form-control input-sm numberincdec" name="enemys[crashscore][]" 
+                            data-bts-min="0" data-bts-replacement-val="0"
+                            data-bts-max="10"
+                            data-bts-step="1"
+                            data-bts-postfix="分"
+                            data-bts-postfix-extra-class="touchspin-postfix" value="{$enemy['crashscore']??0}">
+                            <span class="help-block mt0">与玩家相撞减多少分，设置0即为不减分</span>
+                        </div>
+                    </div>
+                </td>
+                <td class="text-center">
+                    <a class="btn btn-xs btn-primary zam-sortable btn-move" href="javascript:void(0)"> <i class="mdi mdi-arrow-all"></i> </a>
+                    <a class="btn btn-xs btn-danger btn-del" href="javascript:void(0)"> <i class="mdi mdi-close"></i> </a>
+                </td>
+            </tr>
+            {/foreach}
+            {/if}
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="3">
+                  <a class="btn btn-primary btn-xs addplate" href="javascript:;"> <i class="mdi mdi-plus"></i>新增敌机</a>
+                  <div class="m-t-10"></div>
+                </td>
+              </tr>
+            </tfoot>
+        </table>
+    </div>
+  </div>
+  <script>
+    require(['webcore','jconfirmBox','zamnotice','zvalidator',"bootstrap-touchspin","jquery.ui"],function(webcore,jconfirmBox,zamnotice){
+        $('.enemy-lists').sortable({handle: ".btn-move"});
+        $(".enemy-lists").disableSelection();
+        $(".addplate").click(function(){
+            $(".enemy-lists").append(webcore.tpl($("#enemy-tpl"),{}));
+            $(".numberincdec").TouchSpin().on("change", function(){
+                var $this = $(this),funcstr = $this.data('func');
+                var func = window[funcstr];
+                func && func(this);
+            });
+            tpl_switch();
+        });
+        $(".enemy-lists").on('click','.btn-del',function(){
+            $(this).parent().parent().remove();
+        });
+    });
+    function openenemybullet(obj,status,url){
+        if(status=='1'){
+            obj.prev().val('2');
+            obj.attr('data-status','2');
+            obj.parent().parent().parent().next().addClass('hidden');
+        }else{
+            obj.prev().val('1');
+            obj.attr('data-status','1');
+            obj.parent().parent().parent().next().removeClass('hidden');
+        }
+        obj.prev().prev().prop("checked",status=='1'?false:true);
+    }
+  </script>
+<script id='enemy-tpl' type="text/template">
+    <tr>
+        <td>
+          {:tpl_image_one('enemys[img][]', '')}
+          <span class="help-block mt0">注:飞机图控制在100*100px以内</span>
+        </td>
+        <td>
+            <div class="form-group">
+                <label class="col-lg-4 control-label">* 飞行线路</label>
+                <div class="col-lg-6">
+                    <select class="form-control input-sm" name="enemys[movetype][]" size="1">
+                        <option value="1" selected>直线</option>
+                        <option value="2">曲线</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-4 control-label">* 生命</label>
+                <div class="col-lg-6">
+                    <input type="text" class="form-control input-sm numberincdec" name="enemys[life][]" 
+                    data-bts-min="1" data-bts-replacement-val="1"
+                    data-bts-max="10"
+                    data-bts-step="1"
+                    data-bts-postfix="命"
+                    data-bts-postfix-extra-class="touchspin-postfix" value="1">
+                    <span class="help-block mt0">生命即为玩家需要击中多少次才能击落</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-4 control-label">* 击落加</label>
+                <div class="col-lg-6">
+                    <input type="text" class="form-control input-sm numberincdec" name="enemys[score][]" 
+                    data-bts-min="1" data-bts-replacement-val="1"
+                    data-bts-max="10"
+                    data-bts-step="1"
+                    data-bts-postfix="分"
+                    data-bts-postfix-extra-class="touchspin-postfix" value="1">
+                    <span class="help-block mt0">玩家击落此飞机加多少分</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-4 control-label">* 生成速度</label>
+                <div class="col-lg-6">
+                    <input type="text" class="form-control input-sm numberincdec" name="enemys[makespeed][]" 
+                    data-bts-min="500" data-bts-replacement-val="1000"
+                    data-bts-max="20000"
+                    data-bts-step="1"
+                    data-bts-postfix="毫秒"
+                    data-bts-postfix-extra-class="touchspin-postfix" value="1000">
+                    <span class="help-block mt0">每多少毫秒生成一架飞机，1秒即为1000毫秒</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-4 control-label">* 飞行速度</label>
+                <div class="col-lg-6">
+                    <input type="text" class="form-control input-sm numberincdec" name="enemys[flyspeed][]" 
+                    data-bts-min="200" data-bts-replacement-val="300"
+                    data-bts-max="20000"
+                    data-bts-step="1"
+                    data-bts-postfix="速度"
+                    data-bts-postfix-extra-class="touchspin-postfix" value="300">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-4 control-label">* 发射子弹</label>
+                <div class="col-lg-8">
+                    <label class="lyear-switch switch-primary normal-swith switch-solid" style="height:38px">
+                        <input type="checkbox" checked="checked">
+                        <input type="hidden" name="enemys[openbullet][]" value="1">
+                        <span data-status="1" data-func="openenemybullet" class="normal-span has-func" data-ajax=""></span>
+                    </label>        
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-4 control-label">* 子弹生成速度</label>
+                <div class="col-lg-6">
+                    <input type="text" class="form-control input-sm numberincdec" name="enemys[bulletspeed][]" 
+                    data-bts-min="500" data-bts-replacement-val="2000"
+                    data-bts-max="20000"
+                    data-bts-step="1"
+                    data-bts-postfix="毫秒"
+                    data-bts-postfix-extra-class="touchspin-postfix" value="2000">
+                    <span class="help-block mt0">每多少毫秒生成一颗子弹，1秒即为1000毫秒</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-4 control-label">* 子弹击中玩家减</label>
+                <div class="col-lg-6">
+                    <input type="text" class="form-control input-sm numberincdec" name="enemys[bulletscore][]" 
+                    data-bts-min="0" data-bts-replacement-val="1"
+                    data-bts-max="10"
+                    data-bts-step="1"
+                    data-bts-postfix="分"
+                    data-bts-postfix-extra-class="touchspin-postfix" value="1">
+                    <span class="help-block mt0">玩家被子弹击中减多少分，设置0即为不减分</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-4 control-label">* 与玩家相撞减</label>
+                <div class="col-lg-6">
+                    <input type="text" class="form-control input-sm numberincdec" name="enemys[crashscore][]" 
+                    data-bts-min="0" data-bts-replacement-val="0"
+                    data-bts-max="10"
+                    data-bts-step="1"
+                    data-bts-postfix="分"
+                    data-bts-postfix-extra-class="touchspin-postfix" value="0">
+                    <span class="help-block mt0">与玩家相撞减多少分，设置0即为不减分</span>
+                </div>
+            </div>
+        </td>
+        <td class="text-center">
+            <a class="btn btn-xs btn-primary zam-sortable btn-move" href="javascript:void(0)"> <i class="mdi mdi-arrow-all"></i> </a>
+            <a class="btn btn-xs btn-danger btn-del" href="javascript:void(0)"> <i class="mdi mdi-close"></i> </a>
+        </td>
+    </tr>
+</script>

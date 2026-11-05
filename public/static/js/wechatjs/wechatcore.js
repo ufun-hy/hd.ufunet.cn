@@ -1,4 +1,4 @@
-define('wechatcore', ['jquery', 'ydui', 'layer', 'laytpl', 'slideBox', 'dialog', 'glightbox', (XCV3Config.clienttype == '2' ? 'DouyinOpenJSBridge' : 'template'), (XCV3Config.amconfig.type == '1' ? 'directoss' : (XCV3Config.amconfig.type == '2' ? 'directcos' : (XCV3Config.amconfig.type == '3' ? 'directqiniu' : 'template'))), 'howler'], function ($, YDUI, layer, laytpl, slideBox, dialog, GLightbox, DouyinOpenJSBridge, directup) {
+define('wechatcore', ['jquery', 'ydui', 'layer', 'laytpl', 'slideBox', 'dialog', 'glightbox', (XCV3Config.clienttype == '2' ? 'DouyinOpenJSBridge' : 'template'), (XCV3Config.amconfig.type == '1' ? 'directoss' : (XCV3Config.amconfig.type == '2' ? 'directcos' : (XCV3Config.amconfig.type == '3' ? 'directqiniu' : 'template'))), 'howler', 'phaser'], function ($, YDUI, layer, laytpl, slideBox, dialog, GLightbox, DouyinOpenJSBridge, directup) {
 	var wechatcore = {
 		newjointimer: null,
 		tipzIndex: 2000,
@@ -537,7 +537,7 @@ define('wechatcore', ['jquery', 'ydui', 'layer', 'laytpl', 'slideBox', 'dialog',
 									return false;
 								}
 								var loadindex = self.loading('图片上传中，请稍后...');
-								self.ajaxSubmit('/common/sts/getsts', { type: XCV3Config.amconfig.type }).then(function (json) {
+								self.ajaxSubmit('/wechat/sts/getsts', { type: XCV3Config.amconfig.type }).then(function (json) {
 									if (json.code == 0) {
 										if (amtype == '1') {
 											var client = new directup(json.msg);
@@ -674,7 +674,7 @@ define('wechatcore', ['jquery', 'ydui', 'layer', 'laytpl', 'slideBox', 'dialog',
 							return false;
 						}
 						var loadindex = self.loading('图片上传中，请稍后...');
-						self.ajaxSubmit('/common/sts/getsts', { type: XCV3Config.amconfig.type }).then(function (json) {
+						self.ajaxSubmit('/wechat/sts/getsts', { type: XCV3Config.amconfig.type }).then(function (json) {
 							if (json.code == 0) {
 								if (amtype == '1') {
 									var client = new directup(json.msg);
@@ -801,7 +801,7 @@ define('wechatcore', ['jquery', 'ydui', 'layer', 'laytpl', 'slideBox', 'dialog',
 				});
 			} else {
 				var loadindex = self.loading('视频上传中，请稍后...');
-				self.ajaxSubmit('/common/sts/getsts', { type: XCV3Config.amconfig.type }).then(function (json) {
+				self.ajaxSubmit('/wechat/sts/getsts', { type: XCV3Config.amconfig.type }).then(function (json) {
 					if (json.code == 0) {
 						if (amtype == '1') {
 							var client = new directup(json.msg);
@@ -1196,7 +1196,7 @@ define('wechatcore', ['jquery', 'ydui', 'layer', 'laytpl', 'slideBox', 'dialog',
 				}
 			});
 		},
-		alert: function (obj) {
+		alerts: function (obj) {
 			if (typeof obj === 'object' && obj !== null && !Array.isArray(obj)) {
 				obj = JSON.stringify(obj);
 			}
@@ -1322,7 +1322,12 @@ define('wechatcore', ['jquery', 'ydui', 'layer', 'laytpl', 'slideBox', 'dialog',
 									content += json.msg.prizetype == '1' ? '(实物)' : '(红包)';
 								}
 								content += (json.msg.awardname ? json.msg.awardname + ' - ' : '') + json.msg.prizename + (json.msg.prizetype == '2' ? (' - ' + json.msg.prizemoney + '元') : '');
-								self.ask('恭喜您中奖啦', content, ['查看详情', '关闭'], function (index) {
+								var asktitle = '恭喜您中奖啦', askbtns = ['查看详情', '关闭'];
+								if (XCV3Config.rhdid == '359-1') {
+									asktitle = 'Congratulations';
+									askbtns = ['Details', 'Close'];
+								}
+								self.ask(asktitle, content, askbtns, function (index) {
 									self.close(index);
 									self.reloadpage(reloadurl);
 								});
@@ -1503,6 +1508,12 @@ define('wechatcore', ['jquery', 'ydui', 'layer', 'laytpl', 'slideBox', 'dialog',
 						Permittitle = "由於IOS系統需要手動獲取訪問動作與方向的權限，為保障遊戲正常運行，請在訪問提示中點擊允許。";
 						Gotit = '我知道了';
 					}
+					if (XCV3Config.rhdid == '359-1') {
+						Tiptitle = 'Warm Reminder';
+						Refusetitle = 'Motion and Orientation access is disabled.  Please reopen the game and allow access to continue';
+						Permittitle = 'To join the game, please press “Allow” when Motion & Orientation access prompted by IOS';
+						Gotit = 'OK';
+					}
 					window.DeviceMotionEvent.requestPermission().then(function (r) {
 						if (r != 'granted') {
 							self.ask(Tiptitle, Refusetitle, [Gotit], function (index) {
@@ -1555,7 +1566,7 @@ define('wechatcore', ['jquery', 'ydui', 'layer', 'laytpl', 'slideBox', 'dialog',
 				});
 			} else {
 				if (typeof obj === 'function') {
-					obj && obj();
+					obj();
 				} else {
 					obj && self.shakePermit2(function () {
 						obj.init();
@@ -1581,57 +1592,111 @@ define('wechatcore', ['jquery', 'ydui', 'layer', 'laytpl', 'slideBox', 'dialog',
 				func && func()
 			});
 		},
-		playAudio: function (audio, type) {
-			var self = this, type = type || '1';
+		autoAudio: function (config) {
+			var self = this, isIos = self.device(1), forceHowl = config?.forceHowl || '2', audio = config?.audio || '';
+			return forceHowl == '2' && isIos ? audio : new Howl({
+				src: audio?.src || '',
+				loop: audio?.loop || false,
+				pool: config?.pool || 1,
+				//html5: isIos,
+			});
+		},
+		audioPlay: function (params) {
+			var self = this, defaultConfig = {
+				audio: null,
+				playinout: '2',
+			};
+			var audioConfig = Object.assign({}, defaultConfig, params)
 			if (XCV3Config.clienttype == '1') {
 				(parent.wx || wx).getNetworkType({
-					success: function (res) {
-						self.playAudiotypes(audio, type);
+					success: function () {
+						self.audioPlayParse(audioConfig);
 					}
 				});
 			} else if (XCV3Config.clienttype == '2') {
 				if (dysdkobj) {
-					dysdkobj.bridge.call('music', {}, function (res) {
-						self.playAudiotypes(audio, type);
-					}, function (res) {
-						self.playAudiotypes(audio, type);
+					dysdkobj.bridge.call('music', {}, () => {
+						self.audioPlayParse(audioConfig);
+					}, () => {
+						self.audioPlayParse(audioConfig);
 					});
-				}
-			} else {
-				self.playAudiotypes(audio, type);
-			}
-		},
-		playAudiotypes: function (audio, type) {
-			var self = this;
-			if (type == '1') {
-				/*
-				audio.play().then(function(){}).catch(function(err){
-					//self.howlerPlay(audio);
-				});
-				*/
-				if (self.device(1)) {
-					audio.play();
 				} else {
-					self.howlerPlay(audio);
+					self.audioPlayParse(audioConfig);
 				}
 			} else {
-				audio.play();
+				self.audioPlayParse(audioConfig);
 			}
 		},
-		howlerPlay: function (audio) {
-			var sound = new Howl({
-				src: [audio.src],
-				loop: audio.loop || false,
-				onplayerror: function (err) {
-					sound.once('unlock', function () {
-						sound.play();
-					});
+		audioPlayParse: function (config) {
+			var self = this, audio = config?.audio || '';
+			if (!audio) {
+				return;
+			}
+			if (audio instanceof Howl || audio instanceof Phaser.Sound) {
+				self.startPlay(audio, config);
+			} else {
+				if (self.device(1)) {
+					self.startPlay(audio, config);
+				} else {
+					self.startPlay(new Howl({
+						src: audio?.src,
+						loop: audio?.loop || false,
+						pool: audio?.pool || 5,
+					}), config);
 				}
-			});
-			if (sound.playing()) sound.stop();
-			sound.play();
+			}
 		},
-		/*数组按某值排序 */
+		startPlay: function (audio, config) {
+			var self = this;
+			try {
+				audio.play();
+				self.pageShowChange(audio, config);
+			} catch (err) { }
+		},
+		pageShowChange: function (audio, config) {
+			var playinout = config?.playinout || '2';
+			if (playinout == '1') {
+				let wasPausedByPageHide = false;
+				let isPageVisible = true;
+				const pageShow = () => {
+					if (wasPausedByPageHide && !isPageVisible) {
+						wasPausedByPageHide = false;
+						isPageVisible = true;
+						audio.play();
+					}
+				};
+				const pageHide = () => {
+					if (isPageVisible) {
+						isPageVisible = false;
+						let isPlaying = false;
+						if (audio instanceof Howl) {
+							isPlaying = audio.playing();
+						} else {
+							isPlaying = audio && !audio.paused;
+						}
+						if (isPlaying) {
+							wasPausedByPageHide = true;
+							audio.pause();
+						}
+					}
+				};
+				$(document).on('visibilitychange', function () {
+					if (document.hidden) {
+						pageHide();
+					} else {
+						pageShow();
+					}
+				});
+				if (this.device(1)) {
+					$(window).on('pageshow', pageShow);
+					$(window).on('focus', pageShow);
+					$(window).on('pagehide', pageHide);
+				}
+			}
+		},
+		bgAudioPlay: function () {
+			wechatcore.audioPlay({ audio: wechatcore.autoAudio({ audio: $("#appbgmusic")[0] }), playinout: '1' });
+		},
 		sortBy: function (attr, rev) {
 			rev = rev || 1;
 			return function (a, b) {

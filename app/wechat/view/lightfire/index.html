@@ -95,6 +95,9 @@
 {if !empty($appconfig['style']['diycss'])}<style>{$appconfig['style']['diycss']}</style>{/if}
 <audio id="djsaudio" src="/{:WIMGURL}shake/count.mp3"></audio>
 <audio id="shakeaudio" src="/{:WIMGURL}shake/shake.mp3"></audio>
+{if isset($appconfig['style']['boomaudio']) && !empty($appconfig['style']['boomaudio'])}
+<audio id="boomaudio" src="{:tomedia($appconfig['style']['boomaudio'])}"></audio>
+{/if}
 <div class="zam-app-shake-main zam-app-flex-ajCenter">
 	<div class="zam-app-click-ing zam-app-flex-ajCenter hidden">
 		<img class="zam-app-clickimg" src="{:tomedia($appconfig['style']['lightimg'])}">
@@ -110,7 +113,6 @@
 	<i class="mxc-unie6b2"></i><span>0</span>
 </div>
 <script>
-var boomaudio = "{:tomedia($appconfig['style']['boomaudio']??'')}";
 require(['wechatcore','applightfire'],function (wechatcore,applightfire) {
 	applightfire.init();
 	$(".phb-btn").on('click',function(){
