@@ -2,7 +2,6 @@
 
 namespace app\common\service\common;
 
-use support\Log;
 use think\facade\Db;
 
 final class LivemarkScoreReasonService
@@ -13,17 +12,12 @@ final class LivemarkScoreReasonService
             return '';
         }
 
-        try {
-            $table = self::table();
-            $rows = Db::query(
-                "SELECT `score_reason` FROM `{$table}` WHERE `id` = ? AND `huodong_id` = ? LIMIT 1",
-                [$pfuserId, $huodongId]
-            );
-            return (string) ($rows[0]['score_reason'] ?? '');
-        } catch (\Throwable $exception) {
-            Log::error(sprintf('Unable to read score reason for participant %d: %s', $pfuserId, $exception->getMessage()));
-            return '';
-        }
+        $table = self::table();
+        $rows = Db::query(
+            "SELECT `score_reason` FROM `{$table}` WHERE `id` = ? AND `huodong_id` = ? LIMIT 1",
+            [$pfuserId, $huodongId]
+        );
+        return (string) ($rows[0]['score_reason'] ?? '');
     }
 
     public static function save(int $huodongId, int $pfuserId, string $reason): void

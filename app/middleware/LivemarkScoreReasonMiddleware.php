@@ -67,10 +67,15 @@ class LivemarkScoreReasonMiddleware implements MiddlewareInterface
             return $response;
         }
 
-        $payload['msg']['score_reason'] = LivemarkScoreReasonService::get(
-            (int) ($request->realhdid ?? 0),
-            (int) $payload['msg']['id']
-        );
+        try {
+            $payload['msg']['score_reason'] = LivemarkScoreReasonService::get(
+                (int) ($request->realhdid ?? 0),
+                (int) $payload['msg']['id']
+            );
+        } catch (\Throwable $exception) {
+            Log::error(sprintf('Unable to read score reason for participant %d: %s', (int) $payload['msg']['id'], $exception->getMessage()));
+            return $response;
+        }
         $body = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         return $body === false ? $response : $response->withBody($body);
     }
