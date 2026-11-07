@@ -507,7 +507,7 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 								}
 							}
 						}
-						if (!isNaN(basicscore) && basicscore != 0) {
+						if ($(".decscorebox").length > 0 && !isNaN(basicscore) && basicscore != 0) {
 							var adjustLabel = basicscore > 0 ? '加分' : '扣分';
 							var adjustScore = Math.abs(basicscore).toFixed(2);
 							tiphtml += '<span class="scoretip-item scoretip-adjust"><span class="scoretip-label">' + adjustLabel + '</span><span class="scoretip-value decscore">' + adjustScore + '分</span></span>';
