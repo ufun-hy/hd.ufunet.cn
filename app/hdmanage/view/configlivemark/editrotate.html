@@ -773,6 +773,8 @@
 		$(".adduser").on('click', function () {
 			var confirmObj = jconfirmBox.ajaxconfirm("新增评分用户", "{:gohdmanage('configlivemark/editpfuser',['hdid'=>$hdid])}", { rotateid: rotateid }, 'html', 'col-lg-8 col-lg-offset-2', function (e) {
 				var userarr = webcore.serializeObject(e.find('form'));
+				var scoreReason = userarr.score_reason || '';
+				delete userarr.score_reason;
 				userarr.userimgprev = e.find('img').attr("src");
 				if (userarr.username == '' || userarr.userimg == '') {
 					zamnotice.showTips('error', '用户名与头像必须设置');
@@ -782,7 +784,7 @@
 					userarr.userdes = " ";
 				}
 				if (rotateid != '') {
-					webcore.ajaxSubmit("{:gohdmanage('configlivemark/savepfuser',['hdid'=>$hdid])}", { rotateid: rotateid, userarr: userarr }).then(function (json) {
+					webcore.ajaxSubmit("{:gohdmanage('configlivemark/savepfuser',['hdid'=>$hdid])}", { rotateid: rotateid, userarr: userarr, score_reason: scoreReason }).then(function (json) {
 						if (json.code == 0) {
 							confirmObj.close();
 							userarr.id = json.msg;
@@ -818,13 +820,15 @@
 			}
 			var confirmObj = jconfirmBox.ajaxconfirm("编辑评分用户", "{:gohdmanage('configlivemark/editpfuser',['hdid'=>$hdid])}", { rotateid: rotateid, pfuserid: pfuserid, edituserarr: edituserarr }, 'html', 'col-lg-8 col-lg-offset-2', function (e) {
 				var userarr = webcore.serializeObject(e.find('form'));
+				var scoreReason = userarr.score_reason || '';
+				delete userarr.score_reason;
 				userarr.userimgprev = e.find('img').attr("src");
 				if (userarr.username == '' || userarr.userimg == '') {
 					zamnotice.showTips('error', '用户名与头像必须设置');
 					return false;
 				}
 				if (pfuserid) {
-					webcore.ajaxSubmit("{:gohdmanage('configlivemark/savepfuser',['hdid'=>$hdid])}", { rotateid: rotateid, pfuserid: pfuserid, userarr: userarr }).then(function (json) {
+					webcore.ajaxSubmit("{:gohdmanage('configlivemark/savepfuser',['hdid'=>$hdid])}", { rotateid: rotateid, pfuserid: pfuserid, userarr: userarr, score_reason: scoreReason }).then(function (json) {
 						if (json.code == 0) {
 							confirmObj.close();
 							userarr.id = pfuserid;
