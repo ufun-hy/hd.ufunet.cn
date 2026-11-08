@@ -20,12 +20,13 @@ for ($i = 0; $i < 60 && !$pdo; $i++) {
     }
 }
 Db::$pdo = $pdo;
-$pdo->exec('DROP TABLE IF EXISTS mibov3_huodong_livemark_offsite_rotate, mibov3_huodong_livemark_offsite_score, mibov3_huodong_rotatelivemarkuser');
+$pdo->exec('DROP TABLE IF EXISTS mibov3_huodong_livemark_offsite_rotate, mibov3_huodong_livemark_offsite_score, mibov3_huodong_livemarkuser');
 foreach (array_filter(array_map('trim', explode(';', preg_replace('/^--.*$/m', '', file_get_contents('/app/database/migrations/20261108_create_livemark_offsite_score_tables.sql'))))) as $sql) {
     $pdo->exec($sql);
 }
-$pdo->exec('CREATE TABLE mibov3_huodong_rotatelivemarkuser (id INT PRIMARY KEY, basicscore DECIMAL(10,2) NOT NULL DEFAULT 0)');
-$pdo->exec("INSERT INTO mibov3_huodong_rotatelivemarkuser VALUES (7072, 30.12), (7073, 0), (7074, 0)");
+// 线上旧选手表（与 LivemarkScoreReasonService、20261107 迁移一致）
+$pdo->exec('CREATE TABLE mibov3_huodong_livemarkuser (id INT PRIMARY KEY, huodong_id INT NOT NULL, basicscore DECIMAL(10,2) NOT NULL DEFAULT 0)');
+$pdo->exec("INSERT INTO mibov3_huodong_livemarkuser VALUES (7072, 100, 30.12), (7073, 100, 0), (7074, 100, 0), (8001, 200, 5)");
 
 $fail = 0;
 $pass = 0;
@@ -140,12 +141,17 @@ check('HTML 页面不改', $res->rawBody(), '<html>page</html>');
 $r = respond('/screen/livemark/getuserdata', ['code' => -1, 'msg' => 'err']);
 check('错误响应不改', $r['msg'], 'err');
 
-$pdo->exec('RENAME TABLE mibov3_huodong_rotatelivemarkuser TO tmp_user');
+$pdo->exec('RENAME TABLE mibov3_huodong_livemarkuser TO tmp_user');
 $GLOBALS['__logs'] = [];
 $r = respond('/screen/livemark/getscoredata', ['code' => 0, 'msg' => ['pfusers' => [['id' => 7072, 'score' => '47.12']]]]);
 check('读不到调整分时保留原排行', $r['msg']['pfusers'][0]['score'], '47.12');
 check('并记录日志', count($GLOBALS['__logs']) > 0, true);
-$pdo->exec('RENAME TABLE tmp_user TO mibov3_huodong_rotatelivemarkuser');
+$pdo->exec("INSERT INTO mibov3_huodong_livemark_offsite_score (huodong_id, rotate_id, pfuser_id, score) VALUES (100, 5, 9999, 50), (100, 5, 8001, 50)");
+$r = respond('/screen/livemark/getscoredata', ['code' => 0, 'msg' => ['pfusers' => [['id' => 7072, 'score' => '47.12'], ['id' => 9999, 'score' => '80.00']]]]);
+check('选手不在旧表中时保留原排行', array_column($r['msg']['pfusers'], 'score'), ['47.12', '80.00']);
+$r = respond('/screen/livemark/getscoredata', ['code' => 0, 'msg' => ['pfusers' => [['id' => 7072, 'score' => '47.12'], ['id' => 8001, 'score' => '80.00']]]]);
+check('旧表中属于其他活动的选手不读调整分', array_column($r['msg']['pfusers'], 'score'), ['47.12', '80.00']);
+$pdo->exec('RENAME TABLE tmp_user TO mibov3_huodong_livemarkuser');
 
 check('关闭场外分数可保存', save(array_merge($valid, ['offsiteopen' => '2', 'offsiteweight' => '0']))['code'], 0);
 $r = respond('/screen/livemark/getuserdata', ['code' => 0, 'msg' => ['id' => 7072, 'score' => '17.00', 'score2' => '47.12', 'basicscore' => '30.12']]);

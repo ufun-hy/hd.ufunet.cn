@@ -174,15 +174,15 @@ final class LivemarkOffsiteScoreService
             return $users;
         }
 
-        $needLookup = false;
+        $lookupIds = [];
         foreach ($users as $user) {
-            if (is_array($user) && self::isScored($user['score'] ?? false) && !is_numeric($user['basicscore'] ?? null)) {
-                $needLookup = true;
-                break;
+            if (is_array($user) && (int) ($user['id'] ?? 0) > 0
+                && self::isScored($user['score'] ?? false) && !is_numeric($user['basicscore'] ?? null)) {
+                $lookupIds[] = (int) $user['id'];
             }
         }
-        $storedBasic = $needLookup ? self::basicScores($ids) : [];
-        if ($storedBasic === null) {
+        $storedBasic = self::basicScores($lookupIds, $huodongId);
+        if ($storedBasic === null || array_diff($lookupIds, array_keys($storedBasic)) !== []) {
             // Without the adjustment we cannot recover the on-site score; keep
             // the original list rather than publish a wrong ranking.
             return $users;
@@ -200,7 +200,7 @@ final class LivemarkOffsiteScoreService
             if (self::isScored($user['score'] ?? false)) {
                 $basic = is_numeric($user['basicscore'] ?? null)
                     ? (float) $user['basicscore']
-                    : (float) ($storedBasic[$pfuserId] ?? 0.0);
+                    : $storedBasic[$pfuserId];
                 $onsite = (float) $user['score'] - $basic;
                 $user['offsite']['onsite'] = self::format($user['score'], $onsite);
                 $user['score'] = self::format($user['score'], self::combine($onsite, $offsite, $weight, $basic));
@@ -272,7 +272,7 @@ final class LivemarkOffsiteScoreService
     /**
      * @return array<int, float>|null null when the legacy table cannot be read
      */
-    private static function basicScores(array $pfuserIds): ?array
+    private static function basicScores(array $pfuserIds, ?int $huodongId): ?array
     {
         if ($pfuserIds === []) {
             return [];
@@ -280,10 +280,13 @@ final class LivemarkOffsiteScoreService
 
         try {
             $placeholders = implode(',', array_fill(0, count($pfuserIds), '?'));
-            $rows = Db::query(
-                'SELECT `id`, `basicscore` FROM `' . self::table('huodong_rotatelivemarkuser') . "` WHERE `id` IN ({$placeholders})",
-                array_values($pfuserIds)
-            );
+            $params = array_values($pfuserIds);
+            $sql = 'SELECT `id`, `basicscore` FROM `' . self::table('huodong_livemarkuser') . "` WHERE `id` IN ({$placeholders})";
+            if ($huodongId !== null && $huodongId > 0) {
+                $sql .= ' AND `huodong_id` = ?';
+                $params[] = $huodongId;
+            }
+            $rows = Db::query($sql, $params);
         } catch (\Throwable $exception) {
             Log::error(sprintf('Unable to read livemark basicscore: %s', $exception->getMessage()));
 
