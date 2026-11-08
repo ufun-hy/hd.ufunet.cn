@@ -1,6 +1,6 @@
 # 评分场外分数计分检查
 
-在 PHP 8.2 和真实的 MySQL 8.4 上运行 `LivemarkOffsiteScoreService` 以及两个场外分数中间件。webman 的 Request/Response 和 think-orm 的 `Db` 由 `stubs.php` 用最小实现替代；数据表通过执行 `database/migrations/20261108_create_livemark_offsite_score_tables.sql` 建立。
+在 PHP 8.2 和真实的 MySQL 8.4 上运行 `LivemarkOffsiteScoreService` 以及两个场外分数中间件。webman 的 Request/Response 和 think-orm 的 `Db` 由 `stubs.php` 用最小实现替代；数据表通过执行 `database/migrations/20261108_create_livemark_offsite_score_tables.sql` 和 `20261108_create_livemark_offsite_access_table.sql` 建立。
 
 在仓库根目录运行：
 
@@ -23,5 +23,7 @@ docker rm -f lmtest-mysql && docker network rm lmtest
 - 不应改动的接口和响应
 - 读不到调整分时保留原排行
 - 关闭场外分数后恢复原分数
+- 管理员在特殊设置中未开启时：忽略场外字段、不计分，数据保留
+- 特殊设置开关的管理员令牌：缺少、错误、换会话、换活动时都不能修改开关
 
 这里不覆盖加密控制器本身、模板编译和大屏渲染，这些仍需在实际环境中验收。

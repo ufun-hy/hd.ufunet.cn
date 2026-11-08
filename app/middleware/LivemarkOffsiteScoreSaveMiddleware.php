@@ -2,6 +2,7 @@
 
 namespace app\middleware;
 
+use app\common\service\common\LivemarkOffsiteAccessService;
 use app\common\service\common\LivemarkOffsiteScoreService;
 use support\Log;
 use Webman\Http\Request;
@@ -24,6 +25,10 @@ class LivemarkOffsiteScoreSaveMiddleware implements MiddlewareInterface
 
         $open = (string) $request->post('offsiteopen', '');
         if (!in_array($open, ['1', '2'], true)) {
+            return $handler($request);
+        }
+        // 管理员未在特殊设置中开启场外分数时，忽略提交的场外字段。
+        if (!LivemarkOffsiteAccessService::isOpen($request->realhdid ?? 0)) {
             return $handler($request);
         }
 

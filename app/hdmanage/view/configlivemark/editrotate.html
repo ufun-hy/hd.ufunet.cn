@@ -17,6 +17,7 @@
 		margin-top: 10px;
 	}
 </style>
+{php}$livemarkOffsiteAllowed = \app\common\service\common\LivemarkOffsiteAccessService::isOpen(request()->realhdid ?? 0);{/php}
 <div class="form-horizontal confirmbox-pop rotate-pop">
 	<form class="confirm-formbox" method="post">
 		<div class="text-center">
@@ -26,7 +27,7 @@
 				<a href="javascript:void(0)" class="btn btn-default"><span>参评选手</span></a>
 				<a href="javascript:void(0)" class="btn btn-default"><span>专业评委</span></a>
 				<a href="javascript:void(0)" class="btn btn-default"><span>大众点赞</span></a>
-				<a href="javascript:void(0)" class="btn btn-default"><span>场外分数</span></a>
+				{if $livemarkOffsiteAllowed}<a href="javascript:void(0)" class="btn btn-default"><span>场外分数</span></a>{/if}
 			</div>
 		</div>
 		<div class="carditem">
@@ -504,6 +505,7 @@
 				</div>
 			</div>
 		</div>
+		{if $livemarkOffsiteAllowed}
 		<div class="carditem hidden">
 			{if isset($rotate['id']) && !empty($rotate['id'])}
 			{php}$livemarkOffsite = \app\common\service\common\LivemarkOffsiteScoreService::editorData((int) $rotate['id']);{/php}
@@ -565,6 +567,7 @@
 			</div>
 			{/if}
 		</div>
+		{/if}
 	</form>
 </div>
 <script id='newdfitem-tpl' type="text/template">

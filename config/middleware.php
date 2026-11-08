@@ -39,6 +39,7 @@ return [
           app\middleware\LivemarkDeductionScoreVisibilityMiddleware::class,
           app\middleware\LivemarkRevealScoreMiddleware::class,
           app\middleware\LivemarkScoreReasonMiddleware::class,
+          app\middleware\LivemarkOffsiteAccessMiddleware::class,
           app\middleware\LivemarkOffsiteScoreSaveMiddleware::class,
           app\middleware\LivemarkOffsiteScoreResponseMiddleware::class,
      ],

@@ -49,13 +49,35 @@ namespace think\facade {
 }
 
 namespace Webman\Http {
+    class Session
+    {
+        private array $data = [];
+
+        public function get($name, $default = null)
+        {
+            return $this->data[$name] ?? $default;
+        }
+
+        public function set($name, $value): void
+        {
+            $this->data[$name] = $value;
+        }
+    }
+
     class Request
     {
         public $realhdid;
+        private Session $sessionStore;
 
-        public function __construct(private string $method, private string $path, private array $postData = [], $realhdid = null)
+        public function __construct(private string $method, private string $path, private array $postData = [], $realhdid = null, ?Session $session = null)
         {
             $this->realhdid = $realhdid;
+            $this->sessionStore = $session ?? new Session();
+        }
+
+        public function session(): Session
+        {
+            return $this->sessionStore;
         }
 
         public function method(): string

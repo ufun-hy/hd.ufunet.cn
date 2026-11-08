@@ -229,6 +229,8 @@ final class LivemarkOffsiteScoreService
             $sql = 'SELECT s.`rotate_id`, s.`pfuser_id`, s.`score`, r.`weight`, r.`title`'
                 . ' FROM `' . self::table('huodong_livemark_offsite_score') . '` s'
                 . ' INNER JOIN `' . self::table('huodong_livemark_offsite_rotate') . '` r ON r.`rotate_id` = s.`rotate_id` AND r.`open` = 1'
+                // 只有管理员在特殊设置中开启了场外分数的活动才计入。
+                . ' INNER JOIN `' . self::table('huodong_livemark_offsite_access') . '` a ON a.`huodong_id` = s.`huodong_id` AND a.`open` = 1'
                 . " WHERE s.`pfuser_id` IN ({$placeholders})";
             if ($huodongId !== null && $huodongId > 0) {
                 $sql .= ' AND s.`huodong_id` = ? AND r.`huodong_id` = ?';

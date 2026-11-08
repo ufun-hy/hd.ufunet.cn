@@ -856,6 +856,15 @@
 		                <span class="help-block"><span class="text-danger">此项仅管理员可设置</span>，开启后当前活动所属用户可以在抽奖功能里内定用户</span>
 		            </div>
 		        </div>
+		        <div class="form-group">
+		            <label class="col-lg-2 control-label">* 评分场外分数</label>
+		            <div class="col-lg-8">
+		                {php}$livemarkOffsiteOpen = \app\common\service\common\LivemarkOffsiteAccessService::isOpen(request()->realhdid ?? 0) ? '1' : '2';$livemarkOffsiteToken = \app\common\service\common\LivemarkOffsiteAccessService::issueToken(request()->realhdid ?? 0);{/php}
+		                {:tpl_switch('livemarkoffsiteopen',$livemarkOffsiteOpen)}
+		                <input type="hidden" name="livemarkoffsitetoken" value="{$livemarkOffsiteToken}">
+		                <span class="help-block"><span class="text-danger">此项仅管理员可设置</span>，开启后当前活动所属用户可以在评分轮次里配置场外分数并按占比计入最终得分；关闭后不显示场外分数设置，已录入的场外分数保留但不再计入得分</span>
+		            </div>
+		        </div>
 		        {if dzgamend()}
 			        <div class="form-group">
 			            <label class="col-lg-2 control-label">* 游戏内定用户</label>
