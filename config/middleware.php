@@ -36,9 +36,12 @@ return [
           app\middleware\HbwallPrizeImportQuantityMiddleware::class,
           app\middleware\LivemarkJudgeScoreVisibilityMiddleware::class,
           app\middleware\LivemarkDeductionScoreVisibilityMiddleware::class,
+          app\middleware\LivemarkOffsiteScoreSaveMiddleware::class,
+          app\middleware\LivemarkOffsiteScoreResponseMiddleware::class,
      ],
      'screen' => [
           app\middleware\ScreenCheck::class,
+          app\middleware\LivemarkOffsiteScoreResponseMiddleware::class,
      ],
      'wechat' => [
           app\middleware\WechatCheck::class,

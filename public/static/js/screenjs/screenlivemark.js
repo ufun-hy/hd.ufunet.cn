@@ -512,6 +512,14 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 							var adjustScore = Math.abs(basicscore).toFixed(2);
 							tiphtml += '<span class="scoretip-item scoretip-adjust"><span class="scoretip-label">' + adjustLabel + '</span><span class="scoretip-value decscore">' + adjustScore + '分</span></span>';
 						}
+						if (json.msg.offsite) {
+							var offsite = json.msg.offsite;
+							var offsiteTitle = $('<span>').text(offsite.title || '场外分数').html();
+							if (offsite.onsite !== false) {
+								tiphtml += '<span class="scoretip-item scoretip-onsite"><span class="scoretip-label">场内' + (100 - offsite.weight) + '%</span><span class="scoretip-value">' + offsite.onsite + '分</span></span>';
+							}
+							tiphtml += '<span class="scoretip-item scoretip-offsite"><span class="scoretip-label">' + offsiteTitle + offsite.weight + '%</span><span class="scoretip-value">' + offsite.score + '分</span></span>';
+						}
 								$(".livemark-user-totalscore .scoretips").html(tiphtml);
 							self.detailPftype = json.msg.pftype || '2';
 							if (json.msg.pftype == '1') {

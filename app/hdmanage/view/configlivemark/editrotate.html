@@ -26,6 +26,7 @@
 				<a href="javascript:void(0)" class="btn btn-default"><span>参评选手</span></a>
 				<a href="javascript:void(0)" class="btn btn-default"><span>专业评委</span></a>
 				<a href="javascript:void(0)" class="btn btn-default"><span>大众点赞</span></a>
+				<a href="javascript:void(0)" class="btn btn-default"><span>场外分数</span></a>
 			</div>
 		</div>
 		<div class="carditem">
@@ -510,6 +511,67 @@
 					</div>
 				</div>
 			</div>
+		</div>
+		<div class="carditem hidden">
+			{if isset($rotate['id']) && !empty($rotate['id'])}
+			{php}$livemarkOffsite = \app\common\service\common\LivemarkOffsiteScoreService::editorData((int) $rotate['id']);{/php}
+			<div class="form-group">
+				<label class="col-lg-3 control-label">* 场外分数</label>
+				<div class="col-lg-8">
+					{:tpl_switch('offsiteopen',$livemarkOffsite['open'],'openoffsite')}
+					<span class="help-block">最终得分 = 场内得分 × (100 − 场外占比)% + 场外分数 × 场外占比% + 人工调整分</span>
+				</div>
+			</div>
+			<div class="offsitebox{if $livemarkOffsite['open']=='2'} hidden{/if}">
+				<div class="form-group">
+					<label class="col-lg-3 control-label">* 场外分数名称</label>
+					<div class="col-lg-5">
+						<input type="text" class="form-control" name="offsitename" maxlength="20" value="{$livemarkOffsite['title']}">
+						<span class="help-block">大屏、微信端与数据列表中显示的名称，如“网络投票”“前期考核”</span>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-lg-3 control-label">* 场外分数占比</label>
+					<div class="col-lg-5">
+						<input type="text" class="form-control numberincdec" name="offsiteweight" data-bts-min="0"
+							data-bts-replacement-val="0" data-bts-max="100" data-bts-step="1"
+							value="{$livemarkOffsite['weight']}">
+						<span class="help-block">请填写1-100的整数，场内得分占比为 100 减去该值</span>
+					</div>
+				</div>
+				<div class="form-group col-lg-12" style="margin-right: 0;margin-left: 0">
+					<table class="we7-table table" style="margin-bottom:0px;">
+						<thead>
+							<tr>
+								<th style="width:20%;text-align:center;">选手头像</th>
+								<th style="width:40%;text-align:center;">选手名</th>
+								<th style="width:40%;text-align:center;">场外分数</th>
+							</tr>
+						</thead>
+						<tbody>
+							{volist name="rotate.users" id="pfuser"}
+							{php}$offsiteScore = $livemarkOffsite['scores'][(int) $pfuser['id']] ?? '0';{/php}
+							<tr>
+								<td><div class="userimgbox"><img src="{:tomedia($pfuser['userimg']);}"></div></td>
+								<td><span>{$pfuser['username']}</span></td>
+								<td>
+									<input type="number" class="form-control" min="0" step="0.01" name="offsitescore_{$pfuser['id']}"
+										value="{$offsiteScore}">
+								</td>
+							</tr>
+							{/volist}
+						</tbody>
+					</table>
+					<span class="help-block">未填写视为0分。在“参评选手”中新增选手后，请保存轮次并重新打开本页录入其场外分数</span>
+				</div>
+			</div>
+			{else}
+			<div class="form-group">
+				<div class="col-lg-8 col-lg-offset-3">
+					<span class="help-block text-danger">请先保存轮次并添加参评选手，再打开编辑配置场外分数</span>
+				</div>
+			</div>
+			{/if}
 		</div>
 	</form>
 </div>
@@ -1069,6 +1131,18 @@
 			var confirmobj = jconfirmBox.ajaxconfirm("评委" + pwname + "二维码", "{:gohdmanage('configlivemark/showpwqr',['hdid'=>$hdid])}", { rotateid: rotateid, pwcode: pwcode, pwname: pwname }, 'html', 'col-lg-10 col-lg-offset-1', function (e) { }, false, '2');
 		});
 	});
+	function openoffsite(obj, status, url) {
+		if (status == '1') {
+			obj.prev().val('2');
+			obj.attr('data-status', '2');
+			$(".offsitebox").addClass('hidden');
+		} else {
+			obj.prev().val('1');
+			obj.attr('data-status', '1');
+			$(".offsitebox").removeClass('hidden');
+		}
+		obj.prev().prev().prop("checked", status == '1' ? false : true);
+	}
 	function openpubpw(obj, status, url) {
 		if (status == '1') {
 			obj.prev().val('2');

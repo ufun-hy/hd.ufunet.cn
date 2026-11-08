@@ -82,6 +82,7 @@ var initConfig = {
                     ${row.rotate.pfmode == '2' ? `<div><span class="text-danger" style="font-size:10px;">(去掉一个最高和一个最低)</span></div>` : ''}
                     ${value.score_pub ? `<div>大众评委：${(value.score_pub === false ? '无' : value.score_pub)}（占比${row.rotate.pubweight}%）</div>` : ''}
                     ${(value.score_pub && value.score_pw) ? `<div>专业评委：${(value.score_pw === false ? '无' : value.score_pw)}（占比${(100 - row.rotate.pubweight)}%）</div>`:''}
+                    ${value.offsite ? `<div>场内得分：${(value.offsite.onsite === false ? '无' : value.offsite.onsite)}（占比${100 - value.offsite.weight}%）</div><div>${ jQuery('<span>').text(value.offsite.title).html() }：${value.offsite.score}（占比${value.offsite.weight}%）</div>` : ''}
                     <div>最终得分：<span class="text-danger">${(value.score === false ? '无' : value.score)}</span></p>
                     {if request()->host(true) == 'hd.shulehudong.com' && request()->realhdid == '1698'}
                     <p>中间分：<span class="text-danger">${(value.zjscore === false ? '无' : value.zjscore)}</span></p>
