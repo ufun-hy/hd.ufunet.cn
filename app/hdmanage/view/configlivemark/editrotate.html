@@ -79,6 +79,17 @@
 						<span class="help-block">请填写1-100的整数</span>
 					</div>
 				</div>
+				<div class="form-group">
+					<label class="col-lg-3 control-label">* 显示评分颜色</label>
+					<div class="col-lg-4">
+						<div class="input-group">
+							<div class="input-group-btn not-allow"><a class="btn btn-default">背景色</a></div>
+							{:tpl_color('scorebgcolor',$rotate['scorebgcolor'])}
+							<div class="input-group-btn not-allow"><a class="btn btn-default">文字颜色</a></div>
+							{:tpl_color('scoretxtcolor',$rotate['scoretxtcolor'])}
+						</div>
+					</div>
+				</div>
 				<div class="form-group maxmintypebox{if $rotate['pfmode'] == '1'} hidden{/if}">
 					<label class="col-lg-3 control-label">* 去掉最高和最低分模式</label>
 					<div class="col-lg-8">
@@ -152,21 +163,6 @@
 				<label class="col-lg-3 control-label">* 微信端主色调</label>
 				<div class="col-lg-3">
 					{:tpl_color('maincolor',$rotate['maincolor'])}
-				</div>
-			</div>
-			<div class="form-group">
-				<label class="col-lg-3 control-label">* 大屏评分颜色</label>
-				<div class="col-lg-6">
-					<div class="input-group">
-						<div class="input-group-btn not-allow"><a class="btn btn-default">背景色</a></div>
-						{:tpl_color('scorebgcolor',$rotate['scorebgcolor'])}
-						<div class="input-group-btn not-allow"><a class="btn btn-default">文字颜色</a></div>
-						{:tpl_color('scoretxtcolor',$rotate['scoretxtcolor'])}
-						<div class="input-group-btn">
-							<a class="btn btn-info btn-livemark-techblue" href="javascript:void(0)">启用科技蓝</a>
-						</div>
-					</div>
-					<span class="help-block">文字颜色为 #4DB8FF 时，大屏启用科技蓝主题；其他颜色保持默认主题</span>
 				</div>
 			</div>
 		</div>
@@ -301,11 +297,10 @@
 						<tr>
 							<th style="width:10%;text-align:center;">评分状态</th>
 							<th style="width:10%;text-align:center;">大屏展示</th>
-							<th style="width:15%;text-align:center;">选手头像</th>
-							<th style="width:15%;text-align:center;">选手名</th>
+							<th style="width:20%;text-align:center;">选手头像</th>
+							<th style="width:20%;text-align:center;">选手名</th>
 							<th style="width:20%;text-align:center;">选手简介</th>
-							<th style="width:15%;text-align:center;">人工调整分</th>
-							<th style="width:15%;text-align:center;">操作</th>
+							<th style="width:20%;text-align:center;">操作</th>
 						</tr>
 					</thead>
 					<tbody class="user-lists">
@@ -337,15 +332,12 @@
 								<input type="hidden" name="username[]" value="{$pfuser['username']}">
 								<span>{$pfuser['username']}</span>
 							</td>
-								<td>
-									<input type="hidden" name="userdes[]" value="{$pfuser['userdes']}">
-									<input type="hidden" name="basicscore[]" value="{$pfuser['basicscore']??'0'}">
-									<span>{$pfuser['userdes']}</span>
-								</td>
-								<td>
-									<span class="{if isset($pfuser['basicscore']) && $pfuser['basicscore'] < 0}text-danger{elseif isset($pfuser['basicscore']) && $pfuser['basicscore'] > 0}text-success{/if}">{$pfuser['basicscore']??'0'}分</span>
-								</td>
-								<td>
+							<td>
+								<input type="hidden" name="userdes[]" value="{$pfuser['userdes']}">
+								<input type="hidden" name="basicscore[]" value="{$pfuser['basicscore']??'0'}">
+								<span>{$pfuser['userdes']}</span>
+							</td>
+							<td>
 								<a href="javascript:;" data-pfuserid="{$pfuser['id']}" class="btn btn-primary btn-xs btn-edituser">
 									<i class="mdi mdi-pencil"></i>
 								</a>
@@ -366,7 +358,7 @@
 					</tbody>
 					<tfoot style="border: 1px solid #efefef;">
 						<tr>
-								<td colspan="7">
+							<td colspan="6">
 								<a class="btn btn-primary btn-sm adduser" href="javascript:;"> <i
 										class="mdi mdi-plus"></i>&nbsp;<span>新增选手</span></a>
 								<a class="btn btn-warning btn-sm importuser" href="javascript:;"> <i
@@ -639,11 +631,8 @@
 	  <span><% d.username %></span>
 	</td>
 	<td>
-	  <input type="hidden" name="userdes[]" value="<% d.userdes %>">
+	   <input type="hidden" name="userdes[]" value="<% d.userdes %>">
 	  <span><% d.userdes %></span>
-	</td>
-	<td>
-	  <span class="<%# if(parseFloat(d.basicscore || 0) < 0){ %>text-danger<%# }else if(parseFloat(d.basicscore || 0) > 0){ %>text-success<%# } %>"><% d.basicscore || 0 %>分</span>
 	</td>
 	<td>
 		<a href="javascript:;" <%# if(d.id){ %>data-pfuserid="<% d.id %>"<%# } %> class="btn btn-primary btn-xs btn-edituser">
@@ -714,19 +703,6 @@
 			});
 		})
 		var rotateid = "{if isset($rotate['id'])}{$rotate['id']}{else}{/if}";
-		var $maincolor = $('[name="maincolor"]');
-		if (rotateid == '' && ($maincolor.val() || '').toLowerCase() == '#0090ff') {
-			$maincolor.val('#000000').trigger('change');
-			if ($maincolor.data('spectrum.id')) $maincolor.spectrum('set', '#000000');
-		}
-		$(".btn-livemark-techblue").on('click', function () {
-			var $scorebg = $('[name="scorebgcolor"]'), $scoretxt = $('[name="scoretxtcolor"]');
-			$scorebg.val('rgba(15,35,68,0.58)').trigger('change');
-			$scoretxt.val('#4DB8FF').trigger('change');
-			if ($scorebg.data('spectrum.id')) $scorebg.spectrum('set', 'rgba(15,35,68,0.58)');
-			if ($scoretxt.data('spectrum.id')) $scoretxt.spectrum('set', '#4DB8FF');
-			zamnotice.showTips('success', '已填入科技蓝大屏颜色，请保存当前轮次');
-		});
 		$(".adddfitem").on('click', function () {
 			if ($(".dfitem-lists tr").length >= 50) {
 				return zamnotice.showTips('error', '多项打分内的打分项最多可添加50个');
@@ -859,6 +835,8 @@
 		$(".adduser").on('click', function () {
 			var confirmObj = jconfirmBox.ajaxconfirm("新增评分用户", "{:gohdmanage('configlivemark/editpfuser',['hdid'=>$hdid])}", { rotateid: rotateid }, 'html', 'col-lg-8 col-lg-offset-2', function (e) {
 				var userarr = webcore.serializeObject(e.find('form'));
+				var scoreReason = userarr.score_reason || '';
+				delete userarr.score_reason;
 				userarr.userimgprev = e.find('img').attr("src");
 				if (userarr.username == '' || userarr.userimg == '') {
 					zamnotice.showTips('error', '用户名与头像必须设置');
@@ -868,7 +846,7 @@
 					userarr.userdes = " ";
 				}
 				if (rotateid != '') {
-					webcore.ajaxSubmit("{:gohdmanage('configlivemark/savepfuser',['hdid'=>$hdid])}", { rotateid: rotateid, userarr: userarr }).then(function (json) {
+					webcore.ajaxSubmit("{:gohdmanage('configlivemark/savepfuser',['hdid'=>$hdid])}", { rotateid: rotateid, userarr: userarr, score_reason: scoreReason }).then(function (json) {
 						if (json.code == 0) {
 							confirmObj.close();
 							userarr.id = json.msg;
@@ -904,13 +882,15 @@
 			}
 			var confirmObj = jconfirmBox.ajaxconfirm("编辑评分用户", "{:gohdmanage('configlivemark/editpfuser',['hdid'=>$hdid])}", { rotateid: rotateid, pfuserid: pfuserid, edituserarr: edituserarr }, 'html', 'col-lg-8 col-lg-offset-2', function (e) {
 				var userarr = webcore.serializeObject(e.find('form'));
+				var scoreReason = userarr.score_reason || '';
+				delete userarr.score_reason;
 				userarr.userimgprev = e.find('img').attr("src");
 				if (userarr.username == '' || userarr.userimg == '') {
 					zamnotice.showTips('error', '用户名与头像必须设置');
 					return false;
 				}
 				if (pfuserid) {
-					webcore.ajaxSubmit("{:gohdmanage('configlivemark/savepfuser',['hdid'=>$hdid])}", { rotateid: rotateid, pfuserid: pfuserid, userarr: userarr }).then(function (json) {
+					webcore.ajaxSubmit("{:gohdmanage('configlivemark/savepfuser',['hdid'=>$hdid])}", { rotateid: rotateid, pfuserid: pfuserid, userarr: userarr, score_reason: scoreReason }).then(function (json) {
 						if (json.code == 0) {
 							confirmObj.close();
 							userarr.id = pfuserid;

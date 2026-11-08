@@ -1,0 +1,240 @@
+<style>
+    .dzpercent{position:absolute;left: 0;top: 0;width: 100%; height: 100%;}
+    .ad-background {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: url('/static/images/screen/horse/images/ad.jpg') center/cover no-repeat;
+        opacity: 0; transform: scale(0.5) rotate(-180deg);
+        transition: opacity 0.8s ease, transform 0.8s ease; z-index: 1;
+    }
+    .ad-background.show { opacity: 1; transform: scale(1) rotate(0deg); }
+    .ad-background.hide { opacity: 0; transform: scale(1.2); transition: none; pointer-events: none; display: none; }
+        
+    .container { width: 100%; height: 100%; position: relative; transition: opacity 0.5s ease; opacity: 0; }
+    .container.ready { opacity: 1; }
+    .container.hidden { opacity: 0; pointer-events: none; }
+    
+    .progress-section {
+        position: absolute; top: 50px; left: 50%; transform: translateX(-50%);
+        width: 70%; max-width: 1000px;
+    }
+    .progress-bar-container { position: relative; width: 100%; height: 200px; }
+    .progress-bar-base {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        background: url('/static/images/screen/horse/images/loading1.png') left center/contain no-repeat;
+    }
+    .progress-bar-overlay {
+        position: absolute; top: 50%; left: 0; width: 0%; height: 76%;
+        transform: translateY(-50%); overflow: hidden;
+        transition: width 1s linear; border-radius: 0 25px 25px 0;
+    }
+    .progress-bar-overlay-inner {
+        position: absolute; top: 0; left: 3px; height: 100%;
+        background: url('/static/images/screen/horse/images/loading2.png') left center/auto 100% no-repeat;
+        /* 使用 auto 100% 确保高度填满，宽度通过 JavaScript 动态设置确保等于容器宽度 */
+    }
+    .progress-horse {
+        position: absolute; 
+        top: 50%; 
+        left: 0;
+        transform: translate(-50%, -50%);
+        width: 50px; 
+        height: 50px;
+        background: url('/static/images/screen/horse/images/horse.gif') center/contain no-repeat;
+        z-index: 20;
+        pointer-events: none;
+        transition: left 1s linear;
+        /* transition: transform 0.1s linear; */
+        /* transform: translate(calc(0px - 50%), -50%); */
+        opacity: 1;
+    }
+    .progress-horse.stopped {
+        /* 停止 gif，尝试使用静态图片，如果没有则保持 gif */
+        background-image: url('/static/images/screen/horse/images/horse.png');
+    }
+    .progress-markers { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; }
+    .marker-item { position: absolute; display: flex; flex-direction: column; align-items: center; transform: translateX(-50%); }
+    .marker-arrow { width: 26px; height: 26px; background: url('/static/images/screen/horse/images/arrow.png') center/contain no-repeat; z-index: 10; transition: background-image 0.2s ease; margin-top: 7px; }
+    .marker-arrow.active { background-image: url('/static/images/screen/horse/images/arrow1.png'); }
+    .marker-number { position: absolute; bottom: 100%; margin-bottom: -15px; width: 60px; height: 60px; background-size: contain; background-repeat: no-repeat; background-position: center; }
+    .marker-number.num-1 { background-image: url('/static/images/screen/horse/images/1.png'); }
+    .marker-number.num-2 { background-image: url('/static/images/screen/horse/images/2.png'); }
+    .marker-number.num-3 { background-image: url('/static/images/screen/horse/images/3.png'); }
+    .marker-number.num-4 { background-image: url('/static/images/screen/horse/images/4.png'); }
+    .marker-number.num-5 { background-image: url('/static/images/screen/horse/images/5.png'); }
+    
+    .countdown {
+        position: absolute; top: 20px; right: 50px; font-size: 48px;
+        color: #fff; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); z-index: 100;
+    }
+    .view-btn {
+        position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%);
+        width: 200px; height: 60px; border: none; background: transparent;
+        background-image: url('/static/images/screen/horse/images/view_btn.png'); background-size: contain; background-position: center; background-repeat: no-repeat;
+        cursor: pointer; z-index: 1000; opacity: 0; transition: opacity 0.5s ease; pointer-events: none;
+    }
+    .view-btn.show { opacity: 1; pointer-events: auto; }
+    .view-btn.hide { opacity: 0 !important; pointer-events: none; transition: none; }
+    .view-btn.show:hover { opacity: 0.8; }
+</style>
+<div class="dzpercent">
+    <div class="ad-background" id="adBackground"></div>
+    <div class="container hidden" id="container">
+        <div class="countdown" id="countdown">30</div>
+        <div class="progress-section">
+            <div class="progress-bar-container">
+                <div class="progress-bar-base"></div>
+                <div class="progress-bar-overlay" id="progressOverlay">
+                    <div class="progress-bar-overlay-inner"></div>
+                </div>
+                <div class="progress-horse" id="progressHorse"></div>
+                <div class="progress-markers">
+                    <div class="marker-item"><div class="marker-arrow" data-index="0"></div><div class="marker-number num-1"></div></div>
+                    <div class="marker-item"><div class="marker-arrow" data-index="1"></div><div class="marker-number num-2"></div></div>
+                    <div class="marker-item"><div class="marker-arrow" data-index="2"></div><div class="marker-number num-3"></div></div>
+                    <div class="marker-item"><div class="marker-arrow" data-index="3"></div><div class="marker-number num-4"></div></div>
+                    <div class="marker-item"><div class="marker-arrow" data-index="4"></div><div class="marker-number num-5"></div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <button class="view-btn" id="viewBtn"></button>
+</div>
+<style>
+    .ranking-list {
+        position: fixed; left: 30px; top: 50%; transform: translateY(-50%) scale(0.55);
+        /* background: transparent; */
+        padding: 0;
+        margin: 0;
+        border-radius: 0;
+        z-index: 10000; 
+        min-width: 280px;
+        transform-origin: left center;
+        /* box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15); */
+        overflow: visible;
+    }
+    .ranking-title {
+        position: relative;
+        width: 100%;
+        margin: 20px 0 -107px 0;
+        z-index: 2;
+        display: block;
+    }
+    .ranking-title img {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+    .ranking-title-text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 24px; 
+        color: #f9f3d5; 
+        font-weight: 900; 
+        text-align: center; 
+        z-index: 3;
+        /* font-family: 'SimHei', 'Microsoft YaHei', '黑体', 'Arial Black', sans-serif; */
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        letter-spacing: 2px;
+        white-space: nowrap;
+    }
+    /* .ranking-title::before,
+    .ranking-title::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 30px;
+        height: 30px;
+        background: radial-gradient(circle, #ffd700 0%, #ffb300 100%);
+        border-radius: 50%;
+        opacity: 0.6;
+    }
+    .ranking-title::before {
+        left: 15px;
+    }
+    .ranking-title::after {
+        right: 15px;
+    } */
+    .ranking-content {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        position: relative;
+        z-index: 1;
+        display: block;
+    }
+    .ranking-content img {
+        width: 95%;
+        height: auto;
+        display: block;
+        opacity: 0.6;
+        margin: 0 auto;
+    }
+    .ranking-content-inner {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        padding: 105px 50px 60px 50px;
+        box-sizing: border-box;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start; /* 单位名称整体左对齐 */
+    }
+    .ranking-item {
+        font-size: 34px; 
+        color: #eb552c; 
+        margin: 10px 0; 
+        line-height: 1.5;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start; /* 当前行内内容左对齐 */
+        font-weight: 500;
+        position: relative;
+        z-index: 3;
+        width: 100%;
+        margin-left: 25%;
+    }
+    /* .ranking-item::before {
+        content: '';
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        background: #3e2723;
+        border-radius: 50%;
+        margin-right: 12px;
+        flex-shrink: 0;
+    } */
+    .ranking-item .region {
+        display: inline-block; 
+        min-width: 70px; 
+        font-weight: 600;
+        color: #eb552c;
+    }
+    .ranking-item .name {
+        color: #eb552c; 
+        font-weight: bold;
+        margin-left: 5px;
+    }
+</style>
+<script id="leftrank-tpl" type="html/javascript">
+<div class="ranking-list">
+    <div class="ranking-title">
+        <img src="/static/images/screen/horse/images/top_title.png" alt="">
+        <div class="ranking-title-text"></div>
+    </div>
+    <div class="ranking-content">
+        <img src="/static/images/screen/horse/images/content_bg.png" alt="">
+        <div class="ranking-content-inner">
+            {{ each arrs as team}}
+            <div class="ranking-item"><span class="region">{{ team.city }}：</span><span class="name">{{ team.name }}</span></div>
+            {{ /each }}
+        </div>
+    </div>
+</div>
+</script>

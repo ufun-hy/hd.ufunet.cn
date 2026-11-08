@@ -76,6 +76,9 @@ define('screencar', ['screensocket', 'screencore', 'template', 'layerBox', 'full
 					var b = $(".webgamedjs"), s = b.find(".gamedjsani");
 					s.text(data.djs);
 					b.removeClass('display-none');
+					if (data.djs > 0 && !$(".bgneedrun").hasClass('runbg')) {
+						$(".bgneedrun").addClass('runbg');
+					}
 					if (data.djs == 0) {
 						self.gamestatus = 3;
 						b.addClass('display-none');

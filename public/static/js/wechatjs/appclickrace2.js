@@ -23,6 +23,7 @@ define('appclickrace', ['appsocket', 'wechatcore', 'phaser'], function (appsocke
                 self.initGame();
                 self.closerule = window.localStorage.getItem("closeclickracerule-" + XCV3Config.hdid);
                 self.bindEvent();
+                wechatcore.bgAudioPlay();
             });
         },
         initsocket: function () {
@@ -77,7 +78,7 @@ define('appclickrace', ['appsocket', 'wechatcore', 'phaser'], function (appsocke
                     s.text(data.djs > 0 ? data.djs : 'GO');
                     b.removeClass('hidden');
                     self.gametip = self.statustip[1];
-                    wechatcore.playAudio(self.djsaudio);
+                    wechatcore.audioPlay(self.djsaudio);
                     if (data.djs == 0) {
                         self.gametip = self.statustip[2];
                         setTimeout(function () {
@@ -148,7 +149,7 @@ define('appclickrace', ['appsocket', 'wechatcore', 'phaser'], function (appsocke
         },
         initAudio: function () {
             var self = this;
-            self.djsaudio = $("#djsaudio")[0];
+            self.djsaudio = { audio: wechatcore.autoAudio({ audio: $("#djsaudio")[0] }) };
         },
         bindEvent: function () {
             var self = this;
@@ -339,9 +340,7 @@ define('appclickrace', ['appsocket', 'wechatcore', 'phaser'], function (appsocke
             };
             var menuState = function (game) {
                 this.init = function () {
-                    if ($("#appbgmusic").length > 0) {
-                        wechatcore.playAudio($("#appbgmusic")[0]);
-                    }
+
                 };
                 this.create = function () {
                     this.title = this.game.add.sprite(this.world.centerX, 200, "title");
@@ -370,9 +369,7 @@ define('appclickrace', ['appsocket', 'wechatcore', 'phaser'], function (appsocke
             };
             var mainState = function (game) {
                 this.create = function () {
-                    if ($("#appbgmusic").length > 0) {
-                        $("#appbgmusic")[0].pause();
-                    }
+
                     isGameOver = false;
                     this.startTime = Date.now();
                     gameSpeed = 10;
@@ -568,9 +565,6 @@ define('appclickrace', ['appsocket', 'wechatcore', 'phaser'], function (appsocke
                 };
             };
             game = new Phaser.Game(Gameconfig.gameW, Gameconfig.gameH, Phaser.CANVAS, '', null, true);
-            game.playAudio = function (audio) {
-                wechatcore.playAudio(audio, '2');
-            };
             game.state.add('loader', loaderState);
             game.state.add("menu", menuState);
             game.state.add("main", mainState);

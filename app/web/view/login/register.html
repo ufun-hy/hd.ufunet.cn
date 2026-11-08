@@ -107,9 +107,11 @@
 <div class="lyear-wrapper">
   <div class="lyear-login">
     <div class="login-center">
+      {if !empty($config['common']['logo'])}
       <div class="login-header text-center">
         <img src="{:tomedia($config['common']['logo'])}">
       </div>
+      {/if}
       <ul class="nav nav-tabs text-center login-nav">
         <li class="nav-item active d-inline-block" style="float: none">
           <a data-toggle="tab" href="#username-login">账号注册</a>
@@ -122,10 +124,12 @@
               <input type="text" placeholder="请输入您的用户名" class="form-control username" name="username" maxlength="20" />
               <span class="mdi mdi-account form-control-feedback" aria-hidden="true"></span>
             </div>
+            {if $config['mustphone'] == '1'}
             <div class="form-group has-feedback feedback-left">
               <input type="text" placeholder="请输入您的手机号" class="form-control mobile" name="mobile" maxlength="11"  />
               <span class="mdi mdi-cellphone form-control-feedback" aria-hidden="true"></span>
             </div>
+            {if $config['phoneyz'] == '1'}
             <div class="form-group has-feedback feedback-left">
               <div class="input-group zam-flex zam-alignItems">
                 <input name="mobilecode" type="text" class="form-control mobilecode" placeholder="请输入短信验证码" maxlength="4">
@@ -133,6 +137,8 @@
                 <span href="javascript:void(0)" class="input-group-addon btn btn-primary btn-sendcode" style="width: 100px;height: 38px;line-height: 38px;padding: 0 10px;">发送验证码</span>
               </div>
             </div>
+            {/if}
+            {/if}
             <div class="form-group namelogin has-feedback feedback-left feedback-right">
               <input type="password"  style="display:none" autocomplete="new-password"/>
               <input type="password" placeholder="请输入密码" class="form-control password" name="password" />
@@ -284,7 +290,6 @@ require(['webcore','layerBox','zamnotice','zvalidator','slider-min'],function(we
             layerno.find('.layui-layer-btn0').addClass('disabled');
             webcore.ajaxSubmit("{:goweb('register/sendcode')}",{
               username:username,
-              username2:username,
               mobile:mobile,
               yzm:yzm
             }).then(function(json){

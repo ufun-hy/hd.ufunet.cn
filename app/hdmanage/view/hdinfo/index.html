@@ -148,6 +148,9 @@
 				{if $managerhdrights['userid']=='1'}
 					<a href="javascript:void(0)" class="btn btn-default"><span>支付与红包模板</span></a>
 				{/if}
+				{if $managerhdrights['userid']=='1' && dznormalrequest('autoredirect')}
+					<a href="javascript:void(0)" class="btn btn-default"><span>活动炮灰域名</span></a>
+				{/if}
 				{if $managerhdrights['edit']=='1'}
 					<a href="javascript:void(0)" class="btn btn-default"><span>自定义css</span></a>
 				{/if}
@@ -404,8 +407,16 @@
 				    <div class="col-lg-4">
 				      <div class="input-group">
 				        <span class="input-group-btn"><a class="btn btn-default">大小</a></span>
-				        <input type="text" class="form-control" name="screenconfig[noticesize]" value="{$config['screenconfig']['noticesize']}">
-				        <span class="input-group-btn"><a class="btn btn-default">px，颜色</a></span>
+				        <div class="touchspin">
+							<input type="text" class="form-control numberincdec" name="screenconfig[noticesize]" value="{$config['screenconfig']['noticesize']??25}"
+							data-bts-min="14" data-bts-replacement-val="25"
+							data-bts-max="200"
+							data-bts-step="1"
+							data-bts-postfix="px"
+							data-bts-postfix-extra-class="touchspin-postfix"
+							>
+						</div>
+						<span class="input-group-btn"><a class="btn btn-default">px，颜色</a></span>
 				        {:tpl_color('screenconfig[noticecolor]',$config['screenconfig']['noticecolor'])}
 				      </div>
 				    </div>
@@ -447,12 +458,27 @@
 				  <span class="help-block">规格:200*200px，上传后大屏端所有二维码将使用此二维码图片</span>
 				</div>
 		    </div>
-		    <div class="form-group">
-				<label class="col-lg-2 control-label">二维码下说明文字</label>
+			<div class="form-group">
+				<label class="col-lg-2 control-label">* 二维码下说明文字</label>
 				<div class="col-lg-8">
-				  <input type="text" class="form-control" name="screenconfig[qrtxt]" value="{$config['screenconfig']['qrtxt']}">
+				  <div class="input-group">
+					<span class="input-group-btn"><a class="btn btn-default">内容</a></span>
+					<input type="text" class="form-control" name="screenconfig[qrtxt]" value="{$config['screenconfig']['qrtxt']}">
+					<span class="input-group-btn"><a class="btn btn-default">大小</a></span>
+					<div class="touchspin">
+					<input type="text" class="form-control numberincdec" name="screenconfig[qrtxtsize]" value="{$config['screenconfig']['qrtxtsize']??16}"
+					data-bts-min="14" data-bts-replacement-val="16"
+					data-bts-max="60"
+					data-bts-step="1"
+					data-bts-postfix="px"
+					data-bts-postfix-extra-class="touchspin-postfix"
+					>
+					</div>
+					<span class="input-group-btn"><a class="btn btn-default">颜色</a></span>
+					{:tpl_color('screenconfig[qrtxtcolor]',$config['screenconfig']['qrtxtcolor']??'#ffffff')}
+				  </div>
 				</div>
-		    </div>
+			</div>
 		    <div class="form-group">
 				<label class="col-lg-2 control-label">* 大屏加载模式</label>
 				<div class="col-lg-8">
@@ -848,6 +874,13 @@
 			            </div>
 			        </div>
 		        {/if}
+				<div class="form-group{if !dztransferbill()} hidden{/if}">
+					<label class="col-lg-2 control-label">* 商家转账免确认授权</label>
+					<div class="col-lg-3">
+						{:tpl_switch('specialconfig[forcebillauth]',$config['specialconfig']['forcebillauth']??'1')}
+						<span class="help-block">开启则活动用户需进行商家转账免确认授权</span>
+					</div>
+				</div>
 	        {/if}
 	        {if $managerhdrights['changehdurl']=='1'}
 		        <div class="form-group">
@@ -1253,7 +1286,7 @@
 								<input type="radio" name="douyinconfig[subtype]" value="1" {if !isset($config['douyinconfig']['subtype']) || $config['douyinconfig']['subtype']=='1'}checked{/if} onclick="douyinsubtype(this)"><span>图片引导</span>
 								</label>
 								<label class="lyear-radio radio-inline radio-primary">
-								<input type="radio" name="douyinconfig[subtype]" value="2" {if $config['douyinconfig']['subtype']=='2'}checked{/if} onclick="douyinsubtype(this)"><span>自定义链接引导</span>
+								<input type="radio" name="douyinconfig[subtype]" value="2" {if isset($config['douyinconfig']['subtype']) && $config['douyinconfig']['subtype']=='2'}checked{/if} onclick="douyinsubtype(this)"><span>自定义链接引导</span>
 								</label>
 				            </div>
 				        </div>
@@ -1460,6 +1493,54 @@
 	        </div>
 		</div>
 		{/if}
+		{if $managerhdrights['userid']=='1' && dznormalrequest('autoredirect')}
+		<div class="highconfig-item hidden">
+			<div class="form-group">
+				<label class="col-lg-2 control-label">开启防限制</label>
+				<div class="col-lg-8">
+				{:tpl_switch("preventlimitconfig[open]",$config['preventlimitconfig']['open']??'1')}
+				<span class="help-block">系统已 <span class="label label-{$autopl == '1' ? 'success' : 'warning'}">{$autopl == '1' ? '开启' : '关闭'} </span>全局域名防限制</span>
+				<span class="help-block text-danger">若系统关闭了全局防限制，此处开启防限制无效</span>
+				<span class="help-block text-danger">此项限admin账号可设置</span>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-lg-2 control-label">炮灰域名</label>
+				<div class="col-lg-8">
+					<table class="table table-bordered">
+						<thead>
+						  <tr>
+							<th style="width:70%;text-align:center;">域名</th>
+							<th style="width:30%;text-align:center;">操作</th>
+						  </tr>
+						</thead>
+						<tbody class="paohui-lists">
+						{foreach $config['preventlimitconfig']['hosts'] as $h}    
+						<tr>
+							<td class="text-center">
+							   <input class="form-control" name="preventlimitconfig[hosts][]" value="{$h}" placeholder="请输入域名，例如：zam.baidu.com" onKeyup="return trimSpace(this);">
+							</td>
+							<td class="text-center">
+							   <a class="btn btn-danger btn-xs btn-del"><i class="mdi mdi-close"></i></a>
+							   <a class="btn btn-primary btn-xs mousemove zam-sortable"><i class="mdi mdi-arrow-all"></i></a>
+							</td>
+						</tr>
+						{/foreach}
+						</tbody>
+						<tfoot>
+						  <tr>
+							<td colspan="2">
+							  <a class="btn btn-primary btn-xs addpaohui" href="javascript:;" > <i class="mdi mdi-plus"></i>新增</a>
+							  <span class="help-block">注：不添加就会使用系统配置的炮灰域名</span>
+							  <span class="help-block">注：添加的域名一般是二级域名，例如：zam.baidu.com</span>
+							</td>
+						  </tr>
+						</tfoot>
+					</table>
+				</div>
+			</div>
+		</div>
+		{/if}
 		{if $managerhdrights['edit']=='1'}
 		<div class="highconfig-item hidden">
 	        <div class="form-group">
@@ -1516,7 +1597,7 @@
 </tr>
 </script>
 <script type="text/javascript">
-require(['webcore','jconfirmBox','zamnotice','layerBox','clipboard','zvalidator','citypicker'],function(webcore,jconfirmBox,zamnotice,layerBox,Clipboard){
+require(['webcore','jconfirmBox','zamnotice','layerBox','clipboard','zvalidator','citypicker','jquery.ui'],function(webcore,jconfirmBox,zamnotice,layerBox,Clipboard){
 	var clipboard = new Clipboard('.zam-clip', {
         text: function(e) {
             return $(e).data('url') || $(e).data('href')
@@ -1732,6 +1813,13 @@ require(['webcore','jconfirmBox','zamnotice','layerBox','clipboard','zvalidator'
     if($(".ajaxkeyword").val()!='' && $(".zam-wechataccountList .zam-wechataccountItem.active").length > 0){
     	$(".ajaxkeyword").trigger('change');
     }
+	$('.paohui-lists').sortable({handle: ".mousemove"}).disableSelection();
+	$(".addpaohui").click(function(){
+        $(".paohui-lists").append($(webcore.tpl($("#addpaohuitpl"),{})).clone());
+    });
+    $(".paohui-lists").on('click','.btn-del',function(){
+        $(this).parent().parent().remove();
+    })
 });
 function opennotice(obj,status){
 	if(status=='1'){
@@ -2044,5 +2132,16 @@ function openpcadvimg(obj,status){
 	<a class="btn btn-xs btn-danger" href="javascript:void(0)" onclick="javascript:$(this).parents('tr').remove();"> <i class="mdi mdi-close"></i> </a>
 </td>
 </tr>
+</script>
+<script id='addpaohuitpl' type="text/template">
+    <tr>
+     <td class="text-center">
+         <input class="form-control" name="preventlimitconfig[hosts][]" value="" placeholder="请输入域名，例如：zam.baidu.com" onKeyup="return trimSpace(this);">
+     </td>
+     <td class="text-center">
+        <a class="btn btn-danger btn-xs btn-del"><i class="mdi mdi-close"></i></a>
+        <a class="btn btn-primary btn-xs mousemove zam-sortable"><i class="mdi mdi-arrow-all"></i></a>
+     </td>
+    </tr>
 </script>
 {include file='$Wpath/common/footer'}

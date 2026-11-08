@@ -1,7 +1,10 @@
 {include file='$Wpath/common/header'}
-<div class="alert alert-danger">
-    务必认真填写以下信息，一经授权无法更改
+{if empty($config['sitecode'])}
+<div class="alert alert-danger">务必认真填写以下信息，一经授权无法更改
 </div>
+{else /}
+<div class="alert alert-success">站点已完成授权</div>
+{/if}
 <form id="formBox" class="zam-formvalidation form-horizontal" method="post">
   <div class="form-group">
       <label class="col-lg-2 control-label">* 授权域名</label>
@@ -36,8 +39,6 @@
       <div class="col-lg-8">
         {if empty($config['sitecode'])}
           <button type="submit" class="btn btn-primary btn-sm sqpost">立即授权</button>
-        {else}
-        <div class="form-control-static text-primary">站点已授权</div>
         {/if}
       </div>
   </div>

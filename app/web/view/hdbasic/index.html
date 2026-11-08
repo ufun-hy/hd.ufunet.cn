@@ -649,9 +649,24 @@
   </div>
 </div>
 <div class="form-group">
-  <label class="col-lg-3 control-label">二维码下说明文字</label>
+  <label class="col-lg-3 control-label">* 二维码下说明文字</label>
   <div class="col-lg-8">
+    <div class="input-group">
+    <span class="input-group-btn"><a class="btn btn-default">内容</a></span>
     <input type="text" class="form-control" name="screenconfig[qrtxt]" value="{$config['screenconfig']['qrtxt']}">
+    <span class="input-group-btn"><a class="btn btn-default">大小</a></span>
+    <div class="touchspin">
+    <input type="text" class="form-control numberincdec" name="screenconfig[qrtxtsize]" value="{$config['screenconfig']['qrtxtsize']??16}"
+    data-bts-min="14" data-bts-replacement-val="16"
+    data-bts-max="60"
+    data-bts-step="1"
+    data-bts-postfix="px"
+    data-bts-postfix-extra-class="touchspin-postfix"
+    >
+    </div>
+    <span class="input-group-btn"><a class="btn btn-default">颜色</a></span>
+    {:tpl_color('screenconfig[qrtxtcolor]',$config['screenconfig']['qrtxtcolor']??'#ffffff')}
+    </div>
   </div>
 </div>
 <div class="form-group">
@@ -679,7 +694,15 @@
     <div class="col-lg-4">
       <div class="input-group">
         <span class="input-group-btn"><a class="btn btn-default">大小</a></span>
-        <input type="text" class="form-control" name="screenconfig[noticesize]" value="{$config['screenconfig']['noticesize']}">
+        <div class="touchspin">
+          <input type="text" class="form-control numberincdec" name="screenconfig[noticesize]" value="{$config['screenconfig']['noticesize']??25}"
+          data-bts-min="14" data-bts-replacement-val="25"
+          data-bts-max="200"
+          data-bts-step="1"
+          data-bts-postfix="px"
+          data-bts-postfix-extra-class="touchspin-postfix"
+          >
+        </div>
         <span class="input-group-btn"><a class="btn btn-default">px，颜色</a></span>
         {:tpl_color('screenconfig[noticecolor]',$config['screenconfig']['noticecolor'])}
       </div>
@@ -1045,6 +1068,13 @@
         {:tpl_switch('specialconfig[signinfy]',$config['specialconfig']['signinfy'])}
         <span class="help-block">开启后用户签到数据将写入到sign.txt</span>
     </div>
+</div>
+<div class="form-group">
+  <label class="col-lg-3 control-label">* 商家转账免确认授权</label>
+  <div class="col-lg-3">
+      {:tpl_switch('specialconfig[forcebillauth]',$config['specialconfig']['forcebillauth']??'1')}
+      <span class="help-block">开启后若系统红包模板选择的是商家转账接口则新创建的活动默认会检查用户是否同意了免确认授权，可在具体的某个活动的活动信息的特殊设置里关闭</span>
+  </div>
 </div>
 <div class="zam-titleBox">地区限制设置</div>
 <div class="form-group">

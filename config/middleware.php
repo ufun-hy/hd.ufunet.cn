@@ -36,11 +36,13 @@ return [
           app\middleware\HbwallPrizeImportQuantityMiddleware::class,
           app\middleware\LivemarkJudgeScoreVisibilityMiddleware::class,
           app\middleware\LivemarkDeductionScoreVisibilityMiddleware::class,
+          app\middleware\LivemarkScoreReasonMiddleware::class,
           app\middleware\LivemarkOffsiteScoreSaveMiddleware::class,
           app\middleware\LivemarkOffsiteScoreResponseMiddleware::class,
      ],
      'screen' => [
           app\middleware\ScreenCheck::class,
+          app\middleware\LivemarkScoreReasonMiddleware::class,
           app\middleware\LivemarkOffsiteScoreResponseMiddleware::class,
      ],
      'wechat' => [

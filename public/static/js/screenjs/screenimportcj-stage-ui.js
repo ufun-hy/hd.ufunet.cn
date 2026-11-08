@@ -138,7 +138,7 @@ define(['screenjs/screen-stage-ui', 'screenjs/screenimportcj-result', 'screenjs/
                 return this.setState('result');
             };
             ui.prepareDrawing = function (data) {
-                if (String(options.flytype) !== '7' || !this.importResult) return false;
+                if (String(options.flytype) !== '12' || !this.importResult) return false;
                 this.importResult.prepareJump(data);
                 return true;
             };

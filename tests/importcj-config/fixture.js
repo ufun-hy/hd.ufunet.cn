@@ -30,13 +30,13 @@
     }
     var env = {
         config: config, hdid: 1, gametype: 'importcj', realhdid: mode === 'activity',
-        styles: ['随机滚动', '单个飞出', '矩阵', '球体'].map(function (name, i) {
+        styles: ['随机滚动', '单个飞出', '矩阵', '球体', '官方星球', '官方上墙'].map(function (name, i) {
             return { val: String(i + 1), name: name, img: '/static/images/sys/style/importcj/' + (i + 1) + '.jpg' };
         }),
         isset: function (x) { return x != null; }, empty: function (x) { return !x; },
         in_array: function (x, a) { return a.indexOf(x) >= 0; },
         max: Math.max, min: Math.min, intval: function (x) { return parseInt(x, 10); },
-        tomedia: function (x) { return x; }, goopenscreen: function () { return '#'; },
+        tomedia: function (x) { return x; }, goopenscreen: function () { return '#'; }, dzcjgroupnums: function () { return false; },
         tpl_color: input, tpl_audio: input, tpl_video: input, tpl_image_one: input,
         tpl_switch: function (name, value) { return '<input type="hidden" name="' + escape(name) + '" value="' + escape(value) + '"><span>模拟开关：' + escape(value) + '</span>'; },
         entries: function (value) { return Array.isArray(value) ? value.map(function (v, i) { return [i, v]; }) : Object.entries(value); },

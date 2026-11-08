@@ -1,2 +1,2 @@
 <?php 
- return ['version'=>'5.2.6'];
+ return ['version'=>'5.3.8'];

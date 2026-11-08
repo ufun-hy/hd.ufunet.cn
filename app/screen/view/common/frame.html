@@ -27,7 +27,7 @@
 		};
 		require.config({
 			baseUrl: XCV3Config.staticurl + "js",
-			urlArgs:'v=2.6.71',//+Math.random(),
+			urlArgs:'v=2.6.61',//+Math.random(),
 			paths: {
 				 css: "css.min",
 				 jquery:"jquery.2.1.4",
@@ -279,32 +279,13 @@
 	</script>
 </head>
 <body>
-{php}
-$screenExtraQuery = '';
-if (request()->get('theme') == 'blue') {
-	$screenExtraQuery = 'theme=blue';
-} elseif (request()->get('livemark_theme') == 'blue') {
-	$screenExtraQuery = 'livemark_theme=blue';
-}
-$screenFrameUrl = $url;
-if ($screenExtraQuery !== '') {
-	$screenFrameUrl .= (strpos($screenFrameUrl, '?') === false ? '?' : '&') . $screenExtraQuery;
-}
-{/php}
-<iframe src="{$screenFrameUrl}" id="myframe" name="myframe" sandbox="allow-forms allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts allow-modals allow-top-navigation" scrolling="yes" frameborder="0" width="100%" height="100%" style="position: fixed;top: 0;left: 0;width: 100%;height: 100%;"></iframe>
+<iframe src="{$url}" id="myframe" name="myframe" sandbox="allow-forms allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts allow-modals allow-top-navigation" scrolling="yes" frameborder="0" width="100%" height="100%" style="position: fixed;top: 0;left: 0;width: 100%;height: 100%;"></iframe>
 <div class="framefooterbox">
 	{include file='common/footer_menu' /}
 </div>
 </body>
 <script type="text/javascript">
 require(['screencore','template','layerBox','screensocket','fulldm','keyboard','dragqr'],function(screencore,template,layerBox,screensocket,fulldm,keyboardJS,dragqr){
-	var screenExtraQuery = "{$screenExtraQuery}";
-	function appendScreenExtraQuery(frameUrl){
-		if(!screenExtraQuery || frameUrl.indexOf(screenExtraQuery) !== -1){
-			return frameUrl;
-		}
-		return frameUrl + (frameUrl.indexOf('?') === -1 ? '?' : '&') + screenExtraQuery;
-	}
 	document.getElementById('myframe').addEventListener('load', function(){
 		$("title").text($("#myframe").contents().find("title").text() || "");
 	}, true);
@@ -350,7 +331,7 @@ require(['screencore','template','layerBox','screensocket','fulldm','keyboard','
 			});
 		}
 		historyreplace(iconmodule);
-		$("#myframe").attr('src',appendScreenExtraQuery(iconhref + (iconhand=='2' ? "?hdid={$hdinfo['hdid']}":"")));
+		$("#myframe").attr('src',iconhref + (iconhand=='2' ? "?hdid={$hdinfo['hdid']}":""));
 	});
 	$(".control-module-list .icon-box").on('mouseenter',function(e) {
 		$(".menutooltip").remove();
@@ -373,7 +354,7 @@ require(['screencore','template','layerBox','screensocket','fulldm','keyboard','
 			if(data.code==0){
 				$this.addClass('active').siblings().removeClass('active');
 				screensocket.isclose = false;
-				$("#myframe").attr('src',appendScreenExtraQuery(data.msg));
+				$("#myframe").attr('src',data.msg);
 				historyreplace(iconmodule);
 			}else{
 				layerBox.showMsg(data.msg);

@@ -72,6 +72,9 @@ define('screenswim', ['screensocket', 'screencore', 'template', 'layerBox', 'ful
 					var b = $(".webgamedjs"), s = b.find(".gamedjsani");
 					s.text(data.djs);
 					b.removeClass('display-none');
+					if (data.djs > 0 && !$(".swim-box").hasClass('runbg2')) {
+						$(".swim-box").addClass('runbg2');
+					}
 					if (data.djs == 0) {
 						self.gamestatus = 3;
 						b.addClass('display-none');

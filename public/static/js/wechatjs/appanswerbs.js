@@ -72,7 +72,7 @@ define('appanswerbs', ['appsocket', 'wechatcore'], function (appsocket, wechatco
 					}
 					self.saveSeconds = 0;
 					self.startTime = 0;
-					wechatcore.playAudio(self.djsaudio);
+					wechatcore.audioPlay(self.djsaudio);
 					self.hidemyteambox();
 				} else if (data.type == 'gameisdjs') {
 					self.hidemyteambox();
@@ -146,14 +146,12 @@ define('appanswerbs', ['appsocket', 'wechatcore'], function (appsocket, wechatco
 			};
 			appsocket.init(params);
 			wechatcore.gameInit(function () {
-				if ($("#appbgmusic").length > 0) {
-					wechatcore.playAudio($("#appbgmusic")[0]);
-				}
+				wechatcore.bgAudioPlay();
 			});
 		},
 		initAudio: function () {
 			var self = this;
-			self.djsaudio = $("#djsaudio")[0];
+			self.djsaudio = { audio: wechatcore.autoAudio({ audio: $("#djsaudio")[0] }) };
 		},
 		bindEvent: function () {
 			var self = this;

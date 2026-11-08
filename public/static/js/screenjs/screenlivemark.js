@@ -507,10 +507,11 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 								}
 							}
 						}
-						if (!isNaN(basicscore) && basicscore != 0) {
-							var adjustLabel = basicscore > 0 ? '加分' : '扣分';
-							var adjustScore = Math.abs(basicscore).toFixed(2);
-							tiphtml += '<span class="scoretip-item scoretip-adjust"><span class="scoretip-label">' + adjustLabel + '</span><span class="scoretip-value decscore">' + adjustScore + '分</span></span>';
+						if ($(".decscorebox").length > 0 && !isNaN(basicscore) && basicscore != 0) {
+							var scoreReason = $.trim(json.msg.score_reason || '');
+							var adjustLabel = scoreReason || (basicscore > 0 ? '加分' : '扣分');
+							var adjustScore = (scoreReason ? (basicscore > 0 ? '+' : '-') : '') + Math.abs(basicscore).toFixed(2);
+							tiphtml += '<span class="scoretip-item scoretip-adjust"><span class="scoretip-label"></span><span class="scoretip-value decscore">' + adjustScore + '分</span></span>';
 						}
 						if (json.msg.offsite) {
 							var offsite = json.msg.offsite;
@@ -520,7 +521,8 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 							}
 							tiphtml += '<span class="scoretip-item scoretip-offsite"><span class="scoretip-label">' + offsiteTitle + offsite.weight + '%</span><span class="scoretip-value">' + offsite.score + '分</span></span>';
 						}
-								$(".livemark-user-totalscore .scoretips").html(tiphtml);
+								var $scoreTips = $(".livemark-user-totalscore .scoretips").html(tiphtml);
+								if (adjustLabel) $scoreTips.find('.scoretip-adjust .scoretip-label').text(adjustLabel).attr('title', adjustLabel);
 							self.detailPftype = json.msg.pftype || '2';
 							if (json.msg.pftype == '1') {
 								if (self.detailViewMode == 'avg') {

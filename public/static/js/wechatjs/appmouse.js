@@ -70,7 +70,7 @@ define('appmouse', ['appsocket', 'wechatcore', 'howler', 'jquerytrans'], functio
 					s.text(data.djs > 0 ? data.djs : 'GO');
 					b.removeClass('hidden');
 					self.changetip(self.statustip[1]);
-					wechatcore.playAudio(self.djsaudio);
+					wechatcore.audioPlay(self.djsaudio);
 					self.hidetip();
 					data.djs == 0 && self.changetip(self.statustip[2]);
 				} else if (data.type == 'gameisdjs') {
@@ -155,71 +155,14 @@ define('appmouse', ['appsocket', 'wechatcore', 'howler', 'jquerytrans'], functio
 			};
 			appsocket.init(params);
 			wechatcore.gameInit(function () {
-				if ($("#appbgmusic").length > 0) {
-					wechatcore.playAudio($("#appbgmusic")[0]);
-				}
+				wechatcore.bgAudioPlay();
 			});
 		},
 		initAudio: function () {
 			var self = this;
-			self.succaudio = $('#successaudio').length ? $('#successaudio')[0] : '';
-			self.failaudio = $('#failaudio').length ? $('#failaudio')[0] : '';
-			self.djsaudio = $("#djsaudio")[0];
-			if (XCV3Config.isiframe) {
-				parent.wx.getNetworkType({
-					success: function (res) {
-						if (self.succaudio) {
-							self.succaudio.load();
-						}
-						if (self.failaudio) {
-							self.failaudio.load();
-						}
-						self.djsaudio.load();
-					}
-				});
-			} else {
-				wx.getNetworkType({
-					success: function (res) {
-						if (self.succaudio) {
-							self.succaudio.load();
-						}
-						if (self.failaudio) {
-							self.failaudio.load();
-						}
-						self.djsaudio.load();
-					}
-				});
-			}
-			if (!self._djsaudio) {
-				self._djsaudio = new Howl({
-					src: [$('#djsaudio').attr("src")],
-					onplayerror: function () {
-						self._djsaudio.once('unlock', function () {
-							self._djsaudio.play();
-						});
-					}
-				});
-			}
-			if (!self._succaudio && self.succaudio) {
-				self._succaudio = new Howl({
-					src: [$('#successaudio').attr("src")],
-					onplayerror: function () {
-						self._succaudio.once('unlock', function () {
-							self._succaudio.play();
-						});
-					}
-				});
-			}
-			if (!self._failaudio && self.failaudio) {
-				self._failaudio = new Howl({
-					src: [$('#failaudio').attr("src")],
-					onplayerror: function () {
-						self._failaudio.once('unlock', function () {
-							self._failaudio.play();
-						});
-					}
-				});
-			}
+			self.djsaudio = { audio: wechatcore.autoAudio({ audio: $("#djsaudio")[0] }) };
+			self.succaudio = { audio: wechatcore.autoAudio({ audio: $("#successaudio")[0] }) };
+			self.failaudio = { audio: wechatcore.autoAudio({ audio: $("#failaudio")[0] }) };
 		},
 		bindEvent: function () {
 			var self = this;
@@ -230,17 +173,13 @@ define('appmouse', ['appsocket', 'wechatcore', 'howler', 'jquerytrans'], functio
 				if (istiger == '1') {
 					self.myscore += self.tigerinc;
 					self.showScore($(this), "+" + self.tigerinc);
-					if (self._succaudio) {
-						self._succaudio.play();
-					}
+					wechatcore.audioPlay(self.succaudio);
 				} else {
 					self.myscore -= self.foxdec;
 					if (self.myscore < 0) {
 						self.myscore = 0;
 					}
-					if (self._failaudio) {
-						self._failaudio.play();
-					}
+					wechatcore.audioPlay(self.failaudio);
 					self.showScore($(this), "-" + self.foxdec);
 				}
 				appsocket.sendgamedata({

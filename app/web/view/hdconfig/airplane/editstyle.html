@@ -1,0 +1,219 @@
+{include file='$Wpath/common/header'}
+<div class="confirmbox-pop">
+<div class="text-center">
+      <div class="btn-group pop-btns" style="margin-bottom:10px;">
+        <a href="javascript:void(0)" class="btn btn-default btn-primary"><span>基础设置</span></a>
+        <a href="javascript:void(0)" class="btn btn-default"><span>大屏欢迎页</span></a>
+        <a href="javascript:void(0)" class="btn btn-default"><span>大屏设置</span></a>
+        <a href="javascript:void(0)" class="btn btn-default"><span>排行榜</span></a>
+        <a href="javascript:void(0)" class="btn btn-default"><span>微信设置</span></a>
+        <a href="javascript:void(0)" class="btn btn-default"><span>自定义css</span></a>
+      </div>
+</div>
+<form id="formBox" class="zam-formvalidation form-horizontal" method="post">
+  <div class="carditem">
+    {include file='$Wpath/common/gamestyle/basic'}
+    {include file='$Wpath/common/gamestyle/bgmusic'}
+    <div class="form-group">
+      <label class="col-lg-2 control-label">* 发射子弹音效</label>
+      <div class="col-lg-8">
+          {:tpl_audio('piuvoice',$config['piuvoice'])}
+          <span class="help-block">尽量控制在200KB内</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label">* 敌机爆炸音效</label>
+      <div class="col-lg-8">
+          {:tpl_audio('boomvoice',$config['boomvoice'])}
+          <span class="help-block">尽量控制在200KB内</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label">* 游戏结束音效</label>
+      <div class="col-lg-8">
+          {:tpl_audio('overvoice',$config['overvoice'])}
+          <span class="help-block">尽量控制在200KB内</span>
+      </div>
+    </div>
+  </div>
+  <div class="carditem hidden">
+    {include file='$Wpath/common/gamestyle/welcome'}
+  </div>
+  <div class="carditem hidden">
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 用户背景</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('namebg', $config['namebg'])}
+        <span class="help-block">{$desconfig['namebg']}</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 用户名</label>
+      <div class="col-lg-6">
+          <div class="input-group">
+              <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+              {:tpl_color('infoset[namecolor]',$config['infoset']['namecolor']??'#333')}
+              <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
+              <div class="touchspin">
+              <input type="text" class="form-control numberincdec" name="infoset[namesize]" 
+                  data-bts-min="1" data-bts-replacement-val="14"
+                  data-bts-max="60"
+                  data-bts-step="1"
+                  data-bts-postfix="px"
+                  data-bts-postfix-extra-class="touchspin-postfix"
+                  value="{$config['infoset']['namesize']??14}">
+              </div>
+          </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 成绩</label>
+      <div class="col-lg-6">
+          <div class="input-group">
+              <div class="input-group-btn not-allow"><a class="btn btn-default">颜色</a></div>
+              {:tpl_color('infoset[scorecolor]',$config['infoset']['scorecolor']??'#333')}
+              <div class="input-group-btn not-allow"><a class="btn btn-default">大小</a></div>
+              <div class="touchspin">
+              <input type="text" class="form-control numberincdec" name="infoset[scoresize]" 
+                  data-bts-min="1" data-bts-replacement-val="16"
+                  data-bts-max="60"
+                  data-bts-step="1"
+                  data-bts-postfix="px"
+                  data-bts-postfix-extra-class="touchspin-postfix"
+                  value="{$config['infoset']['scoresize']??16}">
+              </div>
+          </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label">* 用户头像边界色</label>
+      <div class="col-lg-3">
+          {:tpl_color('infoset[avatarbordercolor]',$config['infoset']['avatarbordercolor']??'#785925')}
+          <span class="help-block">默认灰色#785925</span>
+      </div>
+    </div>
+  </div>
+  <div class="carditem hidden">
+    {include file='$Wpath/common/gamestyle/phb'}
+  </div>
+  <div class="carditem hidden">
+    <div class="form-group">
+      <label class="col-md-2 control-label text-right">* 微信背景图</label>
+      <div class="col-md-8">
+        {:tpl_image_one('appbgimg', $config['appbgimg'])}
+        <span class="help-block">{$desconfig['appbgimg']}</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 顶部图</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('apptopimg', $config['apptopimg'])}
+        <span class="help-block">{$desconfig['apptopimg']}</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 飞机</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('appplayer', $config['appplayer'])}
+        <span class="help-block">{$desconfig['appplayer']}</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 子弹</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('appbullet', $config['appbullet'])}
+        <span class="help-block">{$desconfig['appbullet']}</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 敌机子弹</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('enemybullet', $config['enemybullet'])}
+        <span class="help-block">{$desconfig['enemybullet']}</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 敌机爆炸效果</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('enemyexplode', $config['enemyexplode'])}
+        <span class="help-block">{$desconfig['enemyexplode']}</span>
+      </div>
+    </div>
+    {include file="$Wpath/common/airplaneenemy" /}
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 左侧成绩背景</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('appscorebg', $config['appscorebg'])}
+        <span class="help-block">{$desconfig['appscorebg']}</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 右侧时间背景</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('apptimebg', $config['apptimebg'])}
+        <span class="help-block">{$desconfig['apptimebg']}</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-lg-2 control-label text-right">* 游戏结束背景</label>
+      <div class="col-lg-8">
+        {:tpl_image_one('appoverbg', $config['appoverbg'])}
+        <span class="help-block">{$desconfig['appoverbg']}</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-md-2 control-label text-right">* 排名按钮</label>
+      <div class="col-md-8">
+        {:tpl_image_one('apppm', $config['apppm'])}
+        <span class="help-block">{$desconfig['apppm']}</span>
+      </div>
+    </div>
+    
+  </div>
+  <div class="carditem hidden">
+    {include file='$Wpath/common/gamestyle/diycss'}
+  </div>
+  {include file='$Wpath/common/cancelsavepanel'}
+</form>
+</div>
+<script type="text/javascript">
+require(['webcore','jconfirmBox','zamnotice','zvalidator'],function(webcore,jconfirmBox,zamnotice){
+  $(".confirmbox-pop .pop-btns a.btn").click(function(){
+      $(this).addClass('btn-primary').siblings().removeClass("btn-primary");
+      $(".confirmbox-pop .carditem").addClass('hidden').eq($(this).index()).removeClass('hidden');
+  });
+  $(".confirmbox-pop .type-btns a.btn").click(function(){
+      $(this).addClass('btn-primary').siblings().removeClass("btn-primary");
+      $(".confirmbox-pop .typeitem").addClass('hidden').eq($(this).index()).removeClass('hidden');
+  });
+  $('#formBox').formValidation({
+      framework: 'bootstrap',
+      excluded: [':disabled'],
+      message: '您填写的内容无效',
+      fields: {}
+  }).on('success.form.fv', function(e) {
+    e.preventDefault();
+    var $form = $(e.target);
+    var postData = webcore.serializeObject($form);
+    var bload = $form.find(".zam-fixedbottom button").lyearloading({opacity: 0.2,spinnerSize: 'nm'});
+    $form.formValidation('disableSubmitButtons', true);
+    webcore.ajaxSubmit("{:goweb('hdconfig/edit'.$gametype.'style')}",postData).then(function(json){
+      bload.hide();
+      if(json.code==0){
+          $form.formValidation('disableSubmitButtons', false);
+          zamnotice.showTips('success','操作成功',1e3,function(){
+            window.location.href = "{:goweb('hdconfig/'.$gametype.'style')}";
+          });
+        }else{
+            zamnotice.showTips('error',json.msg);
+            $form.formValidation('disableSubmitButtons', false);
+        }
+    }, function(json){
+      bload.hide();
+      zamnotice.showTips('error','网络差。操作失败');
+      $form.formValidation('disableSubmitButtons', false);
+    });
+  });
+});
+</script>
+{include file='$Wpath/common/footer'}

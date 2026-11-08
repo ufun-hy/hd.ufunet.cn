@@ -26,16 +26,6 @@
           </select>
         </div>
     </div>
-    <div class="form-group m-l-5">
-      <div class="input-group input-group-sm">
-        <span class="input-group-addon">是否支持0.3元</span>
-          <select id="supporttype" class="form-control">
-            {foreach $yesnos as $key=>$item}
-            <option value="{$key}" {if $key == "0"}selected{/if}>{$item}</option>
-            {/foreach}
-          </select>
-        </div>
-    </div>
     <a class="btn btn-primary btn-sm btn-search" href="javascript:void(0)"><i class="mdi mdi-magnify"></i> 搜索</a>
 </div>
 {include file='$Wpath/common/tabletoolbar'}
@@ -94,7 +84,7 @@ var initConfig = {
             title: 'ID',
             align: 'center',
             width:'6%',
-            //visible: false
+            visible: false
         }, {
             field: 'tplname',
             title: '模板名',
@@ -111,26 +101,31 @@ var initConfig = {
             field: 'sendtypehtml',
             title: '发放类型',
             align:'center',
+            formatter: function (value, row, index) {
+                return `<div class="m-b-10"><span class="label label-${row.isasync == '1' ? 'success' : 'primary'}">${row.isasync == '1' ? '异步' : '同步'}发放</span></div>${value}`;
+            },
         }, {
             field: 'app_id',
             title: 'APPID',
             align:'center',
-            width:'20%',
         },  {
             field: 'mch_id',
             title: '商户号',
             align: 'center',
         },  {
-            field: 'supporttinyhtml',
-            title: '支持0.3元',
+            field: 'minmoney',
+            title: '红包最小金额',
             align: 'center',
+            formatter: function (value, row, index) {
+                return `${value || '1.00'}元`;
+            },
         },  {
             field: 'create_time',
             title: '添加时间',
             align: 'center',
         }
     ],
-    searchParamas:[{'type':'1','id':'keyword'},{'type':'2','id':'tpltype'},{'type':'2','id':'sendtype'},{'type':'2','id':'supporttype'}],
+    searchParamas:[{'type':'1','id':'keyword'},{'type':'2','id':'tpltype'},{'type':'2','id':'sendtype'}],
     toolbar:{
         add:function(ajaxurl){
             var confirmObj = jconfirmBox.ajaxconfirm("新增模板",ajaxurl,{ishtml:'1'},'html','col-lg-8 col-lg-offset-2',function(e){

@@ -5,9 +5,9 @@ await page.cdp('Network.enable');await page.cdp('Network.setCacheDisabled',{cach
 await page.goto('http://127.0.0.1:8767/tests/importcj-result/');
 await page.waitForFunction(()=>window.showResult&&ui.importResult);
 const checks=await page.evaluate(async()=>{
-    const source=await(await fetch('/public/static/js/screenjs/screenimportcj.js')).text();
+    const source=await(await fetch('/public/static/js/screenjs/screenimportcj-custom.js')).text();
     const results=[];
-    for(const flytype of ['1','5','6']){
+    for(const flytype of ['1','10','11']){
         showResult(0);ui.setState('drawing');
         let controller,videoPlays=0,videoPauses=0,legacyWrites=0,scrolls=0,resultsShown=0,stops=0;
         const video={play(){videoPlays++;},pause(){videoPauses++;}};

@@ -1,3 +1,8 @@
+{php}
+if($hdinfo['id'] == '359-1'){
+	$pcconfig['style']['userdefaultname'] = 'TBA';
+}
+{/php}
 {include file='common/header' /}
 <style>
 .shake-mainbox{
@@ -24,7 +29,8 @@
     background-size: 1920px 100%;
 }
 .car-topbg.runbg {
-	-webkit-animation: runbg 60s infinite linear normal none
+	animation: runbg {if empty($pcconfig['style']['topbgspeed'])}20{else}{$pcconfig['style']['topbgspeed']}{/if}s infinite linear normal none;
+	-webkit-animation: runbg {if empty($pcconfig['style']['topbgspeed'])}20{else}{$pcconfig['style']['topbgspeed']}{/if}s infinite linear normal none;
 }
 {if !empty($pcconfig['style']['topbg2'])}
 .car-topbg2{
@@ -37,7 +43,8 @@
     background-size: 1920px 100%;
 }
 .car-topbg2.runbg {
-	-webkit-animation: runbg {if empty($pcconfig['style']['topbgspeed'])}20{else}{$pcconfig['style']['topbgspeed']}{/if}s infinite linear normal none
+	animation: runbg {if empty($pcconfig['style']['topbgspeed'])}20{else}{$pcconfig['style']['topbgspeed']}{/if}s infinite linear normal none;
+	-webkit-animation: runbg {if empty($pcconfig['style']['topbgspeed'])}20{else}{$pcconfig['style']['topbgspeed']}{/if}s infinite linear normal none;
 }
 {/if}
 .car-track .shakelineBox{
@@ -50,7 +57,8 @@
 	background-size: 1920px 100%;
 }
 .car-track .shakelineBox.runbg {
-	-webkit-animation: runbg {if empty($pcconfig['style']['trackimgspeed'])}20{else}{$pcconfig['style']['trackimgspeed']}{/if}s infinite linear normal none
+	animation: runbg {if empty($pcconfig['style']['trackimgspeed'])}20{else}{$pcconfig['style']['trackimgspeed']}{/if}s infinite linear normal none;
+	-webkit-animation: runbg {if empty($pcconfig['style']['trackimgspeed'])}20{else}{$pcconfig['style']['trackimgspeed']}{/if}s infinite linear normal none;
 }
 {if !empty($pcconfig['style']['trackimgbg'])}
 	.car-track .shakelineBoxbg{
@@ -63,14 +71,22 @@
 		background-size: 1920px 100%;
 	}
 	.car-track .shakelineBoxbg.runbg {
-		-webkit-animation: runbg  {if empty($pcconfig['style']['trackimgspeed'])}20{else}{$pcconfig['style']['trackimgspeed']}{/if}s infinite linear normal none
+		animation: runbg  {if empty($pcconfig['style']['trackimgspeed'])}20{else}{$pcconfig['style']['trackimgspeed']}{/if}s infinite linear normal none;
+		-webkit-animation: runbg  {if empty($pcconfig['style']['trackimgspeed'])}20{else}{$pcconfig['style']['trackimgspeed']}{/if}s infinite linear normal none;
 	}
 {/if}
+@keyframes runbg {
+	0% {
+		background-position: 0 100%
+	}
+	100% {
+		background-position: -1920px 100%
+	}
+}
 @-webkit-keyframes runbg {
 	0% {
 		background-position: 0 100%
 	}
-
 	100% {
 		background-position: -1920px 100%
 	}
@@ -142,6 +158,9 @@
 		<ul class="shakelineBox bgneedrun"></ul>
 		{if !empty($pcconfig['style']['trackimgbg'])}
 		<div class="shakelineBoxbg bgneedrun"></div>
+		{/if}
+		{if $hdinfo['id'] == '-1'}
+			{include file='horse/percent' /}
 		{/if}
 	</div>
 </section>

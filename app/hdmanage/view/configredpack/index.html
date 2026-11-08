@@ -36,21 +36,18 @@
         <span class="config-titlebtn pull-right" data-toggle="collapse" data-target="#srconfigbox" aria-expanded="false"><span>折叠</span> <i class="mdi mdi-chevron-double-up"></i></span>
     </div>
     <div id="srconfigbox" class="collapse in">
-        <div class="form-group">
-            <label class="col-lg-2 control-label">* 所有轮次单个用户最多可中红包</label>
-            <div class="col-lg-2">
-                <input type="text" class="form-control numberincdec" name="maxget" value="{$config['maxget']}"
-                data-bts-min="0" data-bts-replacement-val="0"
-                data-bts-max="null"
-                data-bts-step="1"
-                >
-                <span class="zam-help-block">注:0为不限制个数</span>
-            </div>
-        </div>
+        {include file="$Wpath/common/redpackmaxget" /}
         <div class="form-group">
             <label class="col-lg-2 control-label">* 空包提示文字</label>
             <div class="col-lg-7">
                  <input class="form-control" name="emptytxt" value="{$config['emptytxt']}" />
+                <span class="zam-help-block">注:尽量简单明了，控制在12个字以内</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">* 红包中奖提示文字</label>
+            <div class="col-lg-7">
+                <input class="form-control" name="appgethbtxt" value="{$config['appgethbtxt']??'已发放到您的微信钱包'}" />
                 <span class="zam-help-block">注:尽量简单明了，控制在12个字以内</span>
             </div>
         </div>

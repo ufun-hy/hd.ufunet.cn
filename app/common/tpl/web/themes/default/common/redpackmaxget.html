@@ -1,0 +1,37 @@
+<div class="form-group">
+    <label class="col-lg-2 control-label text-right">* 控制所有轮次单个用户最多可中红包</label>
+    <div class="col-lg-5">
+        {:tpl_switch('openmaxget',$config['openmaxget']??2,'openmaxget')}
+        <div class="help-block">
+            <div class="text-danger">一般无需开启此项，轮次内部可控制每轮每个用户可中红包个数</div>
+        </div>
+    </div>
+</div>
+<div class="form-group maxgetnums{if ($config['openmaxget']??2) == '2'} hidden{/if}">
+    <label class="col-lg-2 control-label">* 最多红包</label>
+    <div class="col-lg-2">
+        <input type="text" class="form-control numberincdec" name="maxget" value="{$config['maxget']}"
+        data-bts-min="0" 
+        data-bts-replacement-val="0"
+        data-bts-max="null"
+        data-bts-step="1"
+        data-bts-postfix="个"
+        data-bts-postfix-extra-class="touchspin-postfix"
+        >
+        <span class="zam-help-block">注:0为不限制</span>
+    </div>
+</div>
+<script>
+function openmaxget(obj,status,url){
+    if(status=='1'){
+        obj.prev().val('2');
+        obj.attr('data-status','2');
+        $(".maxgetnums").addClass('hidden');
+    }else{
+        obj.prev().val('1');
+        obj.attr('data-status','1');
+        $(".maxgetnums").removeClass('hidden');
+    }
+    obj.prev().prev().prop("checked",status=='1'?false:true);
+}
+</script>

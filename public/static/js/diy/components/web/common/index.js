@@ -386,7 +386,7 @@ Vue.component('mibi-attachment-dialog', {
                     this.$message.error(`${file.name}格式错误，只能上传${appexts}格式的文件`);
                 }
                 if (!islowermax) {
-                    this.$message.error(`${file.name}过大，文件大小必须小于${maxsize}M`);
+                    this.$message.error(`${file.name}过大，文件大小必须小于${maxsize}KB`);
                 }
             }
             return isallowext && islowermax;

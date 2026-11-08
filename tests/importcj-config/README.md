@@ -8,8 +8,8 @@
 python3 -m http.server 8767 --bind 127.0.0.1
 ```
 
-预览地址：`http://127.0.0.1:8767/tests/importcj-config/?mode=activity&flytype=6`。
-`mode=web` 对应系统默认配置，`flytype=1` 至 `6` 对应各初始风格。
+预览地址：`http://127.0.0.1:8767/tests/importcj-config/?mode=activity&flytype=11`。
+`mode=web` 对应系统默认配置，`flytype=1` 至 `6` 为服务商风格，`10` 至 `12` 为定制风格。
 
 在已创建的 Ego task space 中运行（替换空间 ID）：
 
@@ -18,7 +18,7 @@ globalThis.CONFIG_TEST_SPACE = 15;
 await import('file:///Users/ufun/code/2026/hd.ufunet.cn/tests/importcj-config/browser-checks.mjs');
 ```
 
-覆盖两个入口、六种初始风格、适用字段显示、反复切换后所有字段值保留、旧版区折叠时的序列化、弹幕颜色联动、结果配置不重复、键盘选风格不误触上传。
+覆盖两个入口、服务商与定制风格选择、适用字段显示、反复切换后所有字段值保留、旧版区折叠时的序列化、弹幕颜色联动、结果配置不重复、键盘选风格不误触上传。
 
 使用生产 `webcore.serializeObject` 函数和真实 jQuery serializeArray 检查提交值。字段增删及字号校验沿用 `tests/importcj-result/field-config-checks.mjs`。
 

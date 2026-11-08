@@ -64,7 +64,7 @@ define('appshuqian', ['appsocket', 'wechatcore'], function (appsocket, wechatcor
 					s.text(data.djs > 0 ? data.djs : 'GO');
 					b.removeClass('hidden');
 					self.changetip(self.statustip[1]);
-					wechatcore.playAudio(self.djsaudio);
+					wechatcore.audioPlay(self.djsaudio);
 					self.hidetip();
 					if (data.djs == 0) {
 						self.changetip(self.statustip[2]);
@@ -183,9 +183,7 @@ define('appshuqian', ['appsocket', 'wechatcore'], function (appsocket, wechatcor
 			};
 			appsocket.init(params);
 			wechatcore.gameInit(function () {
-				if ($("#appbgmusic").length > 0) {
-					wechatcore.playAudio($("#appbgmusic")[0]);
-				}
+				wechatcore.bgAudioPlay();
 			});
 			function getHiddenProp() {
 				var prefixes = ['webkit', 'moz', 'ms', 'o'];
@@ -209,8 +207,8 @@ define('appshuqian', ['appsocket', 'wechatcore'], function (appsocket, wechatcor
 		},
 		initAudio: function () {
 			var self = this;
-			self.shakeaudio = $('#shakeaudio')[0];
-			self.djsaudio = $("#djsaudio")[0];
+			self.shakeaudio = { audio: wechatcore.autoAudio({ forceHowl: '1', audio: $("#shakeaudio")[0] }) };
+			self.djsaudio = { audio: wechatcore.autoAudio({ audio: $("#djsaudio")[0] }) };
 		},
 		touchID: null,
 		processEvent: function (event) {
@@ -258,9 +256,6 @@ define('appshuqian', ['appsocket', 'wechatcore'], function (appsocket, wechatcor
 			var self = this, moneyBox = $(".money_box");
 			let startY = 0;
 			let hasScored = false;
-			$(".body").one('click', function () {
-				wechatcore.howlerPlay(self.shakeaudio);
-			});
 			moneyBox.off('touchstart').on('touchstart', function (event) {
 				if (self.gamestatus != 2 || (self.isteam == '1' && (self.myteam == '0' || self.myteam == ''))) return;
 				const touches = event.originalEvent.touches;
@@ -286,7 +281,7 @@ define('appshuqian', ['appsocket', 'wechatcore'], function (appsocket, wechatcor
 					setTimeout(function () {
 						$this.append('<div class="money"></div>');
 					}, 100);
-					wechatcore.howlerPlay(self.shakeaudio);
+					wechatcore.audioPlay(self.shakeaudio);
 					moneyimg.animate({
 						"bottom": "110%"
 					}, 400, function () {
@@ -301,52 +296,6 @@ define('appshuqian', ['appsocket', 'wechatcore'], function (appsocket, wechatcor
 				startY = 0;
 				hasScored = false;
 			});
-			//var self = this, moneyBox = $(".money_box"), startY = 0, moveEndY = 0;
-			/*
-			moneyBox.off("touchstart").on("touchstart", function (e) {
-				var flag = self.processEvent(e);
-				if (!flag) {
-					self.errtimes++;
-					if (self.errtimes > 1) {
-						self.touchID = null;
-						self.errtimes = 0;
-					}
-					return;
-				}
-				if (self.gamestatus != 2 || (self.isteam == '1' && (self.myteam == '0' || self.myteam == ''))) return;
-				if (e.cancelable) {
-					if (!e.defaultPrevented) {
-						e.preventDefault();
-					}
-				}
-				startY = e.originalEvent.changedTouches[0].pageY;
-			});
-			moneyBox.off("touchend").on("touchend", function (e) {
-				var flag = self.processEvent(e);
-				if (!flag) return;
-				if (self.gamestatus != 2 || (self.isteam == '1' && (self.myteam == '0' || self.myteam == ''))) return;
-				moneyBox.find('.money').show();
-				if (e.cancelable) {
-					if (!e.defaultPrevented) {
-						e.preventDefault();
-					}
-				}
-				moveEndY = e.originalEvent.changedTouches[0].pageY;
-				if (moveEndY - startY < -50) {
-					$('.ri').show();
-					wechatcore.howlerPlay(self.shakeaudio);
-					moneyBox.find('.money').animate({
-						"bottom": "110%"
-					}, 400, function () {
-						$(this).remove();
-						self.workerdata();
-					});
-					setTimeout(function () {
-						moneyBox.append('<div class="money"></div>');
-					}, 100)
-				}
-			});
-			*/
 			$(".money-tips").off('click').on('click', function () {
 				self.onlygamestatus();
 			});
