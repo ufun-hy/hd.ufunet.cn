@@ -1,6 +1,7 @@
 {include file='common/header' /}
 {php}$livemarkShowPwScore = \app\common\service\common\LivemarkJudgeScoreVisibilityService::get(request()->realhdid ?? 0);{/php}
 {php}$livemarkShowDecScore = \app\common\service\common\LivemarkDeductionScoreVisibilityService::get(request()->realhdid ?? 0);{/php}
+{php}$livemarkRevealScore = \app\common\service\common\LivemarkRevealScoreService::get(request()->realhdid ?? 0);{/php}
 <style>
 .headerTitle{opacity:0;}
 .livemark-mainbox{
@@ -2853,7 +2854,7 @@
     </div>
     <div class="livemark-userone zam-app-flex display-none">
         <div class="livemark-userone-topactions">
-            {if request()->host(true) == 'hotbav3.hotba88.com' && $hdinfo['id'] != '787'}
+            {if (request()->host(true) == 'hotbav3.hotba88.com' && $hdinfo['id'] != '787') || $livemarkRevealScore == '1'}
             <div class="pubscore-btn" data-pfuserid='0' data-hadclick='2'>得分统计中</div>
             {/if}
             <div class="startstopbtn"><div class="startstatus" data-state="1"></div></div>
@@ -3402,6 +3403,23 @@
     color:var(--livemark-text-color, #fff);
 }
 
+/* 主持人亮分：公布前评委卡片只显示评分状态，并隐藏单项平均分与评委明细入口。 */
+.pingweione .pw-score-status{
+    display:none;
+}
+.livemark-mainbox.livemark-reveal-pending .pingweione .pw-score-num{
+    display:none;
+}
+.livemark-mainbox.livemark-reveal-pending .pingweione .pw-score-status{
+    display:inline;
+}
+.livemark-mainbox.livemark-reveal-pending .livemark-user-pj{
+    display:none !important;
+}
+.livemark-mainbox.livemark-reveal-pending .livemark-user-pingwei .pingweione{
+    cursor:default;
+}
+
 /* 得分组成算式：最终得分一行 + 算式一行 + 说明一行，总高度控制在汇总区 132px 内容高度以内。 */
 .livemark-user-totalscore.has-score-formula{
     gap:6px;
@@ -3440,6 +3458,10 @@
     font-weight:800;
     line-height:1.15;
     white-space:nowrap;
+}
+/* 科技蓝主题下最终得分与说明同为主题蓝，算式数值用白色区分。 */
+.livemark-theme-tech_blue .livemark-user-totalscore .scoretips .score-term-value{
+    color:#fff;
 }
 .livemark-user-totalscore .scoretips .score-term.is-add .score-term-value{
     color:#7fd6a4;
@@ -3641,14 +3663,14 @@
         {{ if showpws == '1'}}
             <div class="pingwei-score zam-app-flex-ajCenter{{ if hadpf == '1'}} pingwei-hadpf{{ /if }}">
                 {if $livemarkShowPwScore == '1'}
-                <span class="pingwei-score-value">{{ if hadpf == '1'}}{{ totalscore }}{{ else }}打分中{{ /if }}</span>
+                <span class="pingwei-score-value">{{ if hadpf == '1'}}<span class="pw-score-num">{{ totalscore }}</span><span class="pw-score-status">已提交</span>{{ else }}打分中{{ /if }}</span>
                 {else /}
                 <span class="pingwei-score-value">{{ if hadpf == '1'}}已提交{{ else }}打分中{{ /if }}</span>
                 {/if}
             </div>
         {{ else }}
             <div class="pingwei-score zam-app-flex-ajCenter">
-                <span class="pingwei-score-value pingwei-score-number">{{ totalscore }}</span>
+                <span class="pingwei-score-value pingwei-score-number"><span class="pw-score-num">{{ totalscore }}</span><span class="pw-score-status">已提交</span></span>
             </div>
         {{ /if }}
     </div>
@@ -3669,7 +3691,7 @@
 </div>
 </script>
 <script>
-require.config({ urlArgs: 'v=3.6.3-livemark-score-formula-20261108' });
+require.config({ urlArgs: 'v=3.6.5-livemark-reveal-score-20261108' });
 require(['screencore', 'screenlivemark'],function (screencore, screenlivemark) {
     function isTechBlueScoreColor(color) {
         color = (color || '').replace(/\s+/g, '').toLowerCase();

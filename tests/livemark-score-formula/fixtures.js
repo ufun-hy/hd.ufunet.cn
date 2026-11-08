@@ -55,11 +55,38 @@ window.SCORE_FORMULA_FIXTURES = {
         basic: -2,
         msg: { openpubpw: '1', pubweight: '35', scoretype: '1', pfmode: '2', maxmintype: '1', maxscore: '9.50', minscore: '6.00', score_pw: '90.56', score_pub: '88.00', hadpwnum: 15, pubhadpwnum: 1286, score: '89.72', score2: '87.72', basicscore: '-2.00', score_reason: '超过规定时间30秒扣分', offsite: { title: '线上网络投票得分（第一阶段）', weight: 25, score: '90.00', onsite: '89.54' } }
     },
+    'pub-only': {
+        label: '大众评委 · 大众占比 100%',
+        final: '60.00',
+        basic: 0,
+        msg: { openpubpw: '1', pubweight: '100', scoretype: '2', pfmode: '2', maxmintype: '1', maxscore: '50.00', minscore: '28.78', score_pw: '37.79', score_pub: '60.00', hadpwnum: 6, pubhadpwnum: 35, score: '60.00', basicscore: '0' }
+    },
+    'pub-dechidden': {
+        label: '大众评委 · 关闭“显示扣分与最终得分”且有调整',
+        final: '60.00',
+        basic: 20,
+        hideDec: true,
+        msg: { openpubpw: '1', pubweight: '30', scoretype: '2', pfmode: '2', maxmintype: '1', maxscore: '50.00', minscore: '28.78', score_pw: '40.79', score_pub: '38.20', hadpwnum: 6, pubhadpwnum: 35, score: '40.00', score2: '60.00', basicscore: '20.00' }
+    },
+    'pub-hidepw': {
+        label: '大众评委 · 关闭“大屏显示评委分数”',
+        final: '87.54',
+        basic: -2,
+        hidePw: true,
+        msg: { openpubpw: '1', pubweight: '40', scoretype: '1', pfmode: '2', maxmintype: '1', maxscore: '9.50', minscore: '6.00', score_pw: '90.56', score_pub: '88.00', hadpwnum: 5, pubhadpwnum: 120, score: '89.54', score2: '87.54', basicscore: '-2.00', score_reason: '超时扣分' }
+    },
+    'normal-reveal': {
+        label: '普通模式 · 主持人亮分，公布前',
+        final: '76.32',
+        basic: 30.12,
+        reveal: true,
+        msg: { openpubpw: '2', scoretype: '1', pfmode: '2', maxmintype: '1', maxscore: '9.50', minscore: '6.00', score: '46.20', score2: '76.32', basicscore: '30.12', score_reason: '超时扣分', offsite: { title: '网络投票', weight: 40, score: '90.00', onsite: '17.00' } }
+    },
     'pub-reveal': {
-        label: '大众评委 · 公布前',
+        label: '大众评委 · 主持人亮分，公布前',
         final: '87.72',
         basic: 0,
         reveal: true,
-        msg: { openpubpw: '1', pubweight: '40', scoretype: '1', pfmode: '1', score_pw: '90.56', score_pub: '88.00', hadpwnum: 5, pubhadpwnum: 120, score: '89.54', basicscore: '0' }
+        msg: { openpubpw: '1', pubweight: '40', scoretype: '1', pfmode: '2', maxmintype: '1', maxscore: '9.50', minscore: '6.00', score_pw: '90.56', score_pub: '88.00', hadpwnum: 5, pubhadpwnum: 120, score: '89.54', basicscore: '0' }
     }
 };

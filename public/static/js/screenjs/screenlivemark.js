@@ -398,10 +398,12 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 					});
 					html = '<div class="score-formula">' + html + '</div>';
 				}
-				if (msg.pfmode == '2' && msg.maxmintype != '2' && (msg.maxscore !== '' || msg.minscore !== '')) {
+				// 公布前不提示去分；关闭“大屏显示评委分数”时只说明去分，不暴露被去掉评委的分值。
+				if (!revealPending && msg.pfmode == '2' && msg.maxmintype != '2') {
+					var hidePwScore = $(".livemark-mainbox").hasClass('livemark-hide-pw-score');
 					var parts = [];
-					if (msg.maxscore !== '' && msg.maxscore !== undefined && msg.maxscore !== null) parts.push('最高分 ' + msg.maxscore);
-					if (msg.minscore !== '' && msg.minscore !== undefined && msg.minscore !== null) parts.push('最低分 ' + msg.minscore);
+					if (msg.maxscore !== '' && msg.maxscore !== undefined && msg.maxscore !== null) parts.push(hidePwScore ? '最高分' : '最高分 ' + msg.maxscore);
+					if (msg.minscore !== '' && msg.minscore !== undefined && msg.minscore !== null) parts.push(hidePwScore ? '最低分' : '最低分 ' + msg.minscore);
 					if (parts.length) html += '<div class="score-note">' + (msg.openpubpw == '1' ? '专家评委' : '') + '已去掉' + self.escapeHtml(parts.join('、')) + '</div>';
 				}
 				$('.openpubpw').addClass('hidden');
@@ -409,7 +411,9 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 				$(".livemark-user-totalscore").toggleClass('has-score-formula', showFormula);
 				// 公布前统一显示 ---，避免普通模式隐藏分数后留下空行。
 				$(".livemark-user-score .scoretype,.livemark-user-score .scorenum").removeClass('hidden');
-				$(".livemark-user-score .scoretype").text(showFormula ? '最终得分' : (msg.scoretype == '1' ? '总分' : '平均分'));
+				// 不展示算式时分数可能已含人工调整，沿用原版“得分”；只有大众评委一项时注明来源。
+				var plainLabel = (msg.openpubpw == '1' && terms.length == 1 && !terms[0].adjust) ? terms[0].name + '得分' : '得分';
+				$(".livemark-user-score .scoretype").text(showFormula ? '最终得分' : plainLabel);
 				$(".livemark-user-score .scorenum").text(revealPending ? '---' : finalScoreText);
 				$(".livemark-user-totalscore .scoretips").html(html);
 			},
@@ -488,6 +492,12 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 							if (json.msg.openpubpw != '1') {
 								$(".livemark-user-score .scoretype,.livemark-user-score .scorenum").removeClass('hidden');
 							}
+						}
+						// 公布前评委卡片只显示评分状态，并退回评委列表，避免通过单项平均分或评委明细推算得分。
+						var revealPending = $(".livemark-userone .pubscore-btn").attr('data-hadclick') == '2';
+						$(".livemark-mainbox").toggleClass('livemark-reveal-pending', revealPending);
+						if (revealPending && self.detailViewMode != 'judge') {
+							self.resetDetailViewMode();
 						}
 					}
 					$(".livemark-title").text(json.msg.title);
@@ -881,7 +891,7 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 						self.setDetailViewMode(self.detailViewMode == 'judge' ? 'avg' : 'judge');
 					});
 					$(".livemark-user-pingwei").on('click', '.pingweione', function () {
-						if ($(".livemark-mainbox").hasClass('livemark-hide-pw-score')) return false;
+						if ($(".livemark-mainbox").is('.livemark-hide-pw-score, .livemark-reveal-pending')) return false;
 						self.setDetailViewMode('judgeDetail', $(this).attr('data-prid'));
 					});
 					$(".livemark-user-single").on('click', '.livemark-judge-detail-back', function () {

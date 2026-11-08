@@ -1,6 +1,6 @@
 # 大屏单人详情得分区预览
 
-直接从 `app/screen/view/livemark/index.html` 提取两段无条件生效的 `<style>` 和单人详情区的 HTML，加载真实的 `public/static/js/screenjs/screenlivemark.js`，再调用 `renderScoreFormula` 渲染 `fixtures.js` 里的场景。改版前的展示（`normal-old`、`pub-old`）只用来对比高度。
+直接从 `app/screen/view/livemark/index.html` 提取两段无条件生效的 `<style>` 和单人详情区的 HTML，加载真实的 `public/static/js/screenjs/screenlivemark.js`，再调用 `renderScoreFormula` 渲染 `fixtures.js` 里的场景。评委卡片用 `index.html` 里真实的 `pwpfItem` 模板和 `template.js`（art-template）渲染，用来核对公布前和关闭“大屏显示评委分数”时卡片只显示评分状态。改版前的展示（`normal-old`、`pub-old`）只用来对比高度。
 
 在仓库根目录启动静态服务：
 

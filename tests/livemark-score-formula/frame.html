@@ -8,6 +8,7 @@
 <body>
 <div id="root"></div>
 <script src="../../public/static/js/jquery.2.2.4.js"></script>
+<script src="../../public/static/js/template/template.js"></script>
 <script>var screenlivemarkFactory; window.define = function (name, deps, factory) { screenlivemarkFactory = factory; };</script>
 <script src="../../public/static/js/screenjs/screenlivemark.js"></script>
 <script src="fixtures.js"></script>
@@ -27,13 +28,30 @@
     var start = src.indexOf('<div class="livemark-userone');
     var markup = src.slice(start, src.indexOf('{//huobapf}', start));
     if (fx.hideDec) markup = markup.replace(/\{if \$livemarkShowDecScore == '1'\}[\s\S]*?\{\/if\}/, '');
+    // “得分统计中”按钮只在开启主持人亮分（或 hotbav3 定制站点）时输出；其余场景按未开启处理。
+    if (!fx.reveal) markup = markup.replace(/\{if \(request\(\)->host\(true\) == 'hotbav3\.hotba88\.com'[^}]*\}[\s\S]*?\{\/if\}/, '');
     markup = markup.replace(/\{:[^}]*\}/g, '').replace(/\{(if|elseif|else|\/if)[^}]*\}/g, '');
     document.getElementById('root').innerHTML = '<section class="livemark-mainbox normal-box zam-app-flex-ajCenter2">' + markup + '</section>';
+    if (fx.hidePw) $('.livemark-mainbox').addClass('livemark-hide-pw-score');
+    // 评委卡片用 index.html 里真实的 pwpfItem 模板和 art-template 渲染。
+    var tpl = src.match(/<script id="pwpfItem" type="html\/javascript">([\s\S]*?)<\/script>/)[1]
+        .replace(/\{if \$livemarkShowPwScore == '1'\}([\s\S]*?)\{else \/\}([\s\S]*?)\{\/if\}/, function (m, shown, hidden) { return fx.hidePw ? hidden : shown; });
+    var tplEl = document.createElement('script');
+    tplEl.type = 'html/javascript';
+    tplEl.id = 'pwpfItem';
+    tplEl.text = tpl;
+    document.body.appendChild(tplEl);
+    var judges = [['评委1', '37.57', '1'], ['评委2', '43.44', '1'], ['评委3', '', '2']];
+    $('.livemark-user-pingwei').html(judges.map(function (j, i) {
+        return template('pwpfItem', { id: i + 1, pwname: j[0], pwimg: '', totalscore: j[1], hadpf: j[2], showpws: '1', pfword: '' });
+    }).join(''));
     $('.livemark-userone').removeClass('display-none');
     $('.livemark-userone-info div').text('选手 7072');
     $('.livemark-userone-des').text('参赛作品：城市更新与社区共建方案');
     // 模板默认 data-hadclick='2'（未公布）；除“公布前”场景外按已公布预览。
     $('.livemark-userone .pubscore-btn').attr('data-hadclick', fx.reveal ? '2' : '1');
+    // 与 getuserdata 回调一致：未亮分时给 mainbox 加 livemark-reveal-pending。
+    $('.livemark-mainbox').toggleClass('livemark-reveal-pending', !!fx.reveal);
 
     if (fx.old === 'normal') {
         $('.livemark-user-score').removeClass('hidden');
@@ -76,7 +94,11 @@
         formulaWidth: document.querySelector('.score-formula') ? Math.round(document.querySelector('.score-formula').scrollWidth) : null,
         formulaBox: document.querySelector('.score-formula') ? Math.round(document.querySelector('.score-formula').clientWidth) : null,
         truncatedCaptions: terms,
-        clippedMeta: clippedMeta
+        clippedMeta: clippedMeta,
+        judgeTexts: Array.from(document.querySelectorAll('.pingwei-score-value')).map(function (el) { return el.innerText.trim(); }).join(' / '),
+        note: (document.querySelector('.score-note') || {}).textContent || '',
+        pjVisible: $('.livemark-user-pj').is(':visible'),
+        finalText: $('.livemark-user-score .scoretype').text() + ' ' + $('.livemark-user-score .scorenum').text()
     };
 })();
 </script>

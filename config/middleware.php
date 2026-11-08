@@ -24,6 +24,7 @@ return [
           app\middleware\WebCheck::class,
           app\middleware\LivemarkJudgeScoreVisibilityMiddleware::class,
           app\middleware\LivemarkDeductionScoreVisibilityMiddleware::class,
+          app\middleware\LivemarkRevealScoreMiddleware::class,
      ],
      'myhd' => [
           app\middleware\MyhdCheck::class,
@@ -36,6 +37,7 @@ return [
           app\middleware\HbwallPrizeImportQuantityMiddleware::class,
           app\middleware\LivemarkJudgeScoreVisibilityMiddleware::class,
           app\middleware\LivemarkDeductionScoreVisibilityMiddleware::class,
+          app\middleware\LivemarkRevealScoreMiddleware::class,
           app\middleware\LivemarkScoreReasonMiddleware::class,
           app\middleware\LivemarkOffsiteScoreSaveMiddleware::class,
           app\middleware\LivemarkOffsiteScoreResponseMiddleware::class,
