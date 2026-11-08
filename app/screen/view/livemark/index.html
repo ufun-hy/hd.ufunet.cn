@@ -3401,6 +3401,125 @@
 .livemark-mainbox .openpubpw .pubweightbox{
     color:var(--livemark-text-color, #fff);
 }
+
+/* 得分组成算式：最终得分一行 + 算式一行 + 说明一行，总高度控制在汇总区 132px 内容高度以内。 */
+.livemark-user-totalscore.has-score-formula{
+    gap:6px;
+}
+.livemark-user-totalscore.has-score-formula .livemark-user-score-main{
+    min-height:48px;
+}
+.livemark-user-totalscore.has-score-formula .scoretips{
+    flex-direction:column;
+    flex-wrap:nowrap;
+    gap:4px;
+    padding:0;
+}
+.livemark-user-totalscore .scoretips .score-formula{
+    display:flex;
+    flex-wrap:nowrap;
+    align-items:stretch;
+    justify-content:center;
+    gap:4px;
+    width:100%;
+    min-width:0;
+}
+.livemark-user-totalscore .scoretips .score-term{
+    flex:0 1 auto;
+    min-width:auto;
+    padding:4px 9px;
+    border-radius:10px;
+    border:1px solid rgba(255,255,255,.16);
+    background:rgba(255,255,255,.07);
+    box-sizing:border-box;
+    text-align:center;
+}
+.livemark-user-totalscore .scoretips .score-term-value{
+    color:var(--livemark-text-color, #fff);
+    font-size:20px;
+    font-weight:800;
+    line-height:1.15;
+    white-space:nowrap;
+}
+.livemark-user-totalscore .scoretips .score-term.is-add .score-term-value{
+    color:#7fd6a4;
+}
+.livemark-user-totalscore .scoretips .score-term.is-deduct .score-term-value{
+    color:#ff8a80;
+}
+.livemark-user-totalscore .scoretips .score-term-caption{
+    display:flex;
+    justify-content:center;
+    min-width:0;
+    margin-top:1px;
+    color:var(--livemark-text-color, #fff);
+    opacity:.68;
+    font-size:12px;
+    line-height:1.2;
+    white-space:nowrap;
+}
+.livemark-user-totalscore .scoretips .score-term-name{
+    max-width:5em;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+.livemark-user-totalscore .scoretips .score-term-meta{
+    flex:0 0 auto;
+}
+.livemark-user-totalscore .scoretips .score-op{
+    flex:0 0 auto;
+    align-self:center;
+    color:var(--livemark-text-color, #fff);
+    opacity:.5;
+    font-size:18px;
+    line-height:1;
+}
+.livemark-user-totalscore .scoretips .score-paren{
+    flex:0 0 auto;
+    align-self:center;
+    color:var(--livemark-text-color, #fff);
+    opacity:.55;
+    font-size:30px;
+    font-weight:300;
+    line-height:1;
+}
+.livemark-user-totalscore .scoretips .score-group-share{
+    flex:0 0 auto;
+    align-self:center;
+    color:var(--livemark-text-color, #fff);
+    opacity:.75;
+    font-size:14px;
+    font-weight:700;
+    line-height:1;
+    white-space:nowrap;
+}
+@media (max-aspect-ratio: 3/2){
+    .livemark-user-totalscore .scoretips .score-formula{
+        gap:3px;
+    }
+    .livemark-user-totalscore .scoretips .score-term{
+        padding:4px 7px;
+    }
+    .livemark-user-totalscore .scoretips .score-term-value{
+        font-size:18px;
+    }
+    .livemark-user-totalscore .scoretips .score-term-caption{
+        font-size:11px;
+    }
+    .livemark-user-totalscore .scoretips .score-paren{
+        font-size:26px;
+    }
+}
+.livemark-user-totalscore .scoretips .score-note{
+    color:var(--livemark-text-color, #fff);
+    opacity:.6;
+    font-size:12px;
+    line-height:1.2;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    max-width:100%;
+}
 </style>
 <script id="normaluserItem" type="html/javascript">
 <div class="livemark-user-item{{ if userstatus=='2' && screenshow=='2' }} hidden{{ /if }}" data-pfuserid="{{ id }}">
@@ -3550,7 +3669,7 @@
 </div>
 </script>
 <script>
-require.config({ urlArgs: 'v=3.6.2-livemark-reason-20261107' });
+require.config({ urlArgs: 'v=3.6.3-livemark-score-formula-20261108' });
 require(['screencore', 'screenlivemark'],function (screencore, screenlivemark) {
     function isTechBlueScoreColor(color) {
         color = (color || '').replace(/\s+/g, '').toLowerCase();

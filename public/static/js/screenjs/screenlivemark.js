@@ -326,6 +326,93 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 				});
 			},
 			nowpfusers: [],
+			// 默认详情布局：最终得分 + 组成算式；定制的 dzhuoba/dzshule 布局保持原样。
+			useScoreFormula: function () {
+				return $(".livemark-user-score-main").length > 0 && $(".dzhuoba, .dzshule").length <= 0;
+			},
+			formatScoreLike: function (ref, value) {
+				var str = String(ref), match = str.match(/\.(\d+)$/);
+				var decimals = match ? match[1].length : (/^-?\d+$/.test(str) ? 0 : 2);
+				return value.toFixed(decimals);
+			},
+			formatShare: function (value) {
+				return String(Math.round(value * 10) / 10);
+			},
+			buildScoreTerms: function (msg, basicscore) {
+				var self = this, terms = [], offsite = msg.offsite || null;
+				var offsiteWeight = offsite ? (parseFloat(offsite.weight) || 0) : 0;
+				var onsiteShare = 100 - offsiteWeight;
+				if (msg.openpubpw == '1') {
+					// 启用场外分数时专家与大众用括号组成场内分：(专家 × (100-p)% + 大众 × p%) × (100-w)%。
+					var pubWeight = parseFloat(msg.pubweight) || 0, grouped = !!offsite && pubWeight < 100;
+					if (pubWeight < 100) {
+						terms.push({ name: '专家评委', value: msg.score_pw, share: 100 - pubWeight, count: msg.hadpwnum || 0, group: grouped });
+					}
+					terms.push({ name: '大众评委', value: msg.score_pub, share: offsite && !grouped ? onsiteShare : pubWeight, count: msg.pubhadpwnum || 0, group: grouped, groupShare: onsiteShare });
+				} else {
+					var onsite = msg.score;
+					if (offsite) {
+						onsite = offsite.onsite;
+					} else if (typeof msg.score2 == 'undefined' && msg.score !== false && basicscore != 0) {
+						onsite = self.formatScoreLike(msg.score, parseFloat(msg.score) - basicscore);
+					}
+					terms.push({ name: offsite ? '场内得分' : '评委得分', value: onsite, share: offsite ? onsiteShare : null });
+				}
+				if (offsite) {
+					terms.push({ name: offsite.title || '场外分数', value: offsite.score, share: offsiteWeight });
+				}
+				if (!isNaN(basicscore) && basicscore != 0) {
+					var reason = $.trim(msg.score_reason || '');
+					terms.push({ adjust: true, name: reason || (basicscore > 0 ? '加分' : '扣分'), value: Math.abs(basicscore).toFixed(2), sign: basicscore > 0 ? '+' : '−' });
+				}
+				return terms;
+			},
+			renderScoreFormula: function (msg, finalScoreText, basicscore) {
+				var self = this;
+				var revealPending = $(".livemark-userone .pubscore-btn").length > 0 && $(".livemark-userone .pubscore-btn").attr('data-hadclick') == '2';
+				var terms = self.buildScoreTerms(msg, basicscore);
+				var hasHiddenAdjust = basicscore != 0 && $(".decscorebox").length <= 0;
+				// 只在算式能加回最终得分时展示；人工调整被隐藏时不展示不完整的算式。
+				var showFormula = terms.length >= 2 && !hasHiddenAdjust;
+				var html = '';
+				if (showFormula) {
+					$.each(terms, function (i, term) {
+						if (i > 0) html += '<div class="score-op">' + (term.adjust ? term.sign : '+') + '</div>';
+						if (term.group && (i == 0 || !terms[i - 1].group)) html += '<div class="score-paren">(</div>';
+						var value = revealPending ? '---' : (term.value === false || term.value === null || term.value === undefined ? '无' : term.value);
+						// 卡片两行：分值，以及“名称 · 占比 · 人数”，控制得分区高度不挤压下方评委列表。
+						// 空间不足时只截断名称，占比和人数始终完整显示。
+						var meta = [];
+						if (term.share !== null && term.share !== undefined) meta.push(self.formatShare(term.share) + '%');
+						if (term.count !== undefined) meta.push(term.count + '人');
+						var captionText = [term.name].concat(meta).join(' · ');
+						html += '<div class="score-term' + (term.adjust ? (term.sign == '+' ? ' is-add' : ' is-deduct') : '') + '" title="' + self.escapeHtml(captionText) + '">'
+							+ '<div class="score-term-value">' + self.escapeHtml(value) + '</div>'
+							+ '<div class="score-term-caption"><span class="score-term-name">' + self.escapeHtml(term.name) + '</span>'
+							+ (meta.length ? '<span class="score-term-meta">&nbsp;·&nbsp;' + self.escapeHtml(meta.join(' · ')) + '</span>' : '')
+							+ '</div>'
+							+ '</div>';
+						if (term.group && (i == terms.length - 1 || !terms[i + 1].group)) {
+							html += '<div class="score-paren">)</div><div class="score-group-share">×' + self.formatShare(term.groupShare) + '%</div>';
+						}
+					});
+					html = '<div class="score-formula">' + html + '</div>';
+				}
+				if (msg.pfmode == '2' && msg.maxmintype != '2' && (msg.maxscore !== '' || msg.minscore !== '')) {
+					var parts = [];
+					if (msg.maxscore !== '' && msg.maxscore !== undefined && msg.maxscore !== null) parts.push('最高分 ' + msg.maxscore);
+					if (msg.minscore !== '' && msg.minscore !== undefined && msg.minscore !== null) parts.push('最低分 ' + msg.minscore);
+					if (parts.length) html += '<div class="score-note">' + (msg.openpubpw == '1' ? '专家评委' : '') + '已去掉' + self.escapeHtml(parts.join('、')) + '</div>';
+				}
+				$('.openpubpw').addClass('hidden');
+				$('.livemark-user-score').removeClass('hidden');
+				$(".livemark-user-totalscore").toggleClass('has-score-formula', showFormula);
+				// 公布前统一显示 ---，避免普通模式隐藏分数后留下空行。
+				$(".livemark-user-score .scoretype,.livemark-user-score .scorenum").removeClass('hidden');
+				$(".livemark-user-score .scoretype").text(showFormula ? '最终得分' : (msg.scoretype == '1' ? '总分' : '平均分'));
+				$(".livemark-user-score .scorenum").text(revealPending ? '---' : finalScoreText);
+				$(".livemark-user-totalscore .scoretips").html(html);
+			},
 			loadUserdata: function () {
 			var self = this, loadtype = '1';
 			if ($(".dzhuoba").length > 0) {
@@ -521,8 +608,12 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 							}
 							tiphtml += '<span class="scoretip-item scoretip-offsite"><span class="scoretip-label">' + offsiteTitle + offsite.weight + '%</span><span class="scoretip-value">' + offsite.score + '分</span></span>';
 						}
+							if (self.useScoreFormula()) {
+								self.renderScoreFormula(json.msg, finalScoreText, basicscore);
+							} else {
 								var $scoreTips = $(".livemark-user-totalscore .scoretips").html(tiphtml);
 								if (adjustLabel) $scoreTips.find('.scoretip-adjust .scoretip-label').text(adjustLabel).attr('title', adjustLabel);
+							}
 							self.detailPftype = json.msg.pftype || '2';
 							if (json.msg.pftype == '1') {
 								if (self.detailViewMode == 'avg') {

@@ -1,0 +1,84 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../../public/static/css/screen/style.css">
+<style>html,body{margin:0;width:100%;height:100%;background:#0f1a33;overflow:hidden}</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="../../public/static/js/jquery.2.2.4.js"></script>
+<script>var screenlivemarkFactory; window.define = function (name, deps, factory) { screenlivemarkFactory = factory; };</script>
+<script src="../../public/static/js/screenjs/screenlivemark.js"></script>
+<script src="fixtures.js"></script>
+<script>
+(async function () {
+    var name = decodeURIComponent(location.hash.slice(1));
+    var fx = window.SCORE_FORMULA_FIXTURES[name];
+    var src = await (await fetch('../../app/screen/view/livemark/index.html')).text();
+
+    // 只取无条件生效的两段 <style>（huobapf 等定制段使用 <style type="text/css">）。
+    var css = Array.from(src.matchAll(/<style>([\s\S]*?)<\/style>/g)).map(function (m) { return m[1]; }).join('\n')
+        .replace(/\{:[^}]*\}/g, '').replace(/\{(if|elseif|else|\/if)[^}]*\}/g, '');
+    var style = document.createElement('style');
+    style.textContent = css;
+    document.head.appendChild(style);
+
+    var start = src.indexOf('<div class="livemark-userone');
+    var markup = src.slice(start, src.indexOf('{//huobapf}', start));
+    if (fx.hideDec) markup = markup.replace(/\{if \$livemarkShowDecScore == '1'\}[\s\S]*?\{\/if\}/, '');
+    markup = markup.replace(/\{:[^}]*\}/g, '').replace(/\{(if|elseif|else|\/if)[^}]*\}/g, '');
+    document.getElementById('root').innerHTML = '<section class="livemark-mainbox normal-box zam-app-flex-ajCenter2">' + markup + '</section>';
+    $('.livemark-userone').removeClass('display-none');
+    $('.livemark-userone-info div').text('选手 7072');
+    $('.livemark-userone-des').text('参赛作品：城市更新与社区共建方案');
+    // 模板默认 data-hadclick='2'（未公布）；除“公布前”场景外按已公布预览。
+    $('.livemark-userone .pubscore-btn').attr('data-hadclick', fx.reveal ? '2' : '1');
+
+    if (fx.old === 'normal') {
+        $('.livemark-user-score').removeClass('hidden');
+        $('.livemark-user-score .scoretype').text('得分：');
+        $('.livemark-user-score .scorenum').text(fx.final);
+    } else if (fx.old === 'pub') {
+        $('.livemark-user-totalscore').addClass('ispubpwscore');
+        $('.livemark-user-score').addClass('hidden');
+        $('.openpubpw').removeClass('hidden');
+        $('.openpubpw .score_pw .pw_score').text('90.56');
+        $('.openpubpw .score_pub .pw_score').text('88.00');
+        $('.openpubpw .score_last').text(fx.final);
+    }
+    if (fx.old) {
+        $('.livemark-user-totalscore .scoretips').html(fx.pills.map(function (p) {
+            return '<span class="scoretip-item"><span class="scoretip-label">' + p[0] + '</span><span class="scoretip-value">' + p[1] + '</span></span>';
+        }).join(''));
+    } else {
+        var screenlivemark = screenlivemarkFactory({ ajaxSubmit: function () {} }, {}, function () { return ''; }, {}, {}, {}, {});
+        if (fx.msg.openpubpw == '1') {
+            $('.livemark-user-totalscore').addClass('ispubpwscore');
+            $('.livemark-user-score').addClass('hidden');
+            $('.openpubpw').removeClass('hidden');
+        }
+        screenlivemark.renderScoreFormula(fx.msg, fx.final, fx.basic);
+    }
+
+    await new Promise(function (r) { setTimeout(r, 150); });
+    var rect = function (sel) { var el = document.querySelector(sel); return el ? Math.round(el.getBoundingClientRect().height) : null; };
+    var total = document.querySelector('.livemark-user-totalscore');
+    var terms = Array.from(document.querySelectorAll('.score-term-name')).filter(function (el) { return el.scrollWidth > el.clientWidth; }).length;
+    var clippedMeta = Array.from(document.querySelectorAll('.score-term-meta')).filter(function (el) {
+        var box = el.closest('.score-term').getBoundingClientRect(), r = el.getBoundingClientRect();
+        return r.right > box.right + 0.5 || r.left < box.left - 0.5;
+    }).length;
+    window.__result = {
+        summary: rect('.livemark-user-summary'),
+        scoreArea: Math.round(total.scrollHeight),
+        detailPanel: rect('.livemark-user-detailpanel'),
+        formulaWidth: document.querySelector('.score-formula') ? Math.round(document.querySelector('.score-formula').scrollWidth) : null,
+        formulaBox: document.querySelector('.score-formula') ? Math.round(document.querySelector('.score-formula').clientWidth) : null,
+        truncatedCaptions: terms,
+        clippedMeta: clippedMeta
+    };
+})();
+</script>
+</body>
+</html>
