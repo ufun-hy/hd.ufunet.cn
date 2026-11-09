@@ -131,6 +131,18 @@ check('排行分数（7072 从库读调整分）', array_column($r['msg']['pfuse
 $r = respond('/screen/livemark/getscoredata', ['code' => 0, 'msg' => ['pfusers' => [['id' => 7073, 'score' => '60', 'basicscore' => '0']]]]);
 check('整数分保持整数：60 → 40', $r['msg']['pfusers'][0]['score'], '40');
 
+echo "大屏选手列表 getnormaldata\n";
+$r = respond('/screen/livemark/getnormaldata', ['code' => 0, 'msg' => ['title' => 't', 'pfusers' => [
+    ['id' => 7073, 'score' => '60.00', 'basicscore' => '0', 'screenshow' => '1'],
+    ['id' => 7074, 'score' => false, 'screenshow' => '1'],
+    ['id' => 7072, 'score' => '47.12', 'screenshow' => '1'],
+]]]);
+check('列表不改变顺序', array_column($r['msg']['pfusers'], 'id'), [7073, 7074, 7072]);
+check('列表分数与排行榜一致', array_column($r['msg']['pfusers'], 'score'), ['40.00', false, '76.32']);
+check('保留其他字段', $r['msg']['pfusers'][0]['screenshow'], '1');
+$r = respond('/screen/livemark/getnormaldata', ['code' => 0, 'msg' => ['pfusers' => [['id' => 7072, 'score' => '47.12']]]], 200);
+check('其他活动的列表不受影响', $r['msg']['pfusers'][0]['score'], '47.12');
+
 echo "后台数据列表 datalivemark/index\n";
 $r = respond('/hdmanage/datalivemark/index', ['total' => 2, 'rows' => [
     ['id' => 7073, 'scoredata' => ['score' => '60.00']],
@@ -149,7 +161,7 @@ check('单个选手不重排', S::applyToTemplateUser(['id' => 7072, 'score' => 
 check('非数组原样返回', S::applyToTemplateList(null), null);
 
 echo "不应改动的情况\n";
-$r = respond('/screen/livemark/getnormaldata', ['code' => 0, 'msg' => ['pfusers' => [['id' => 7072, 'score' => '47.12']]]]);
+$r = respond('/screen/livemark/getzandata', ['code' => 0, 'msg' => ['pfusers' => [['id' => 7072, 'score' => '47.12']]]]);
 check('其他接口不改', $r['msg']['pfusers'][0]['score'], '47.12');
 $req = new Request('GET', '/hdmanage/datalivemark/index', [], 100);
 $res = (new LivemarkOffsiteScoreResponseMiddleware())->process($req, fn () => new Response(200, [], '<html>page</html>'));

@@ -239,7 +239,7 @@ define('screenlivemark', ['screencore', 'screensocket', 'template', 'layerBox', 
 				$item.toggleClass('hidden', data.userstatus == '2' && data.screenshow == '2');
 				this.syncImage($item.find('.livemark-user-avatar img'), data.userimg);
 				$item.find('.livemark-user-name span').text(data.username || '');
-				$item.find('.livemark-user-score span:first-child').text((data.scoretype == '1' ? '总分' : '平均分') + '：');
+				$item.find('.livemark-user-score span:first-child').text((data.offsite ? '最终得分' : (data.scoretype == '1' ? '总分' : '平均分')) + '：');
 				$item.find('.livemark-user-score span:last-child').text(data.score === false ? '无' : (data.score || ''));
 				$item.find('.livemark-user-noscore').toggleClass('display-none', data.score !== false);
 			},

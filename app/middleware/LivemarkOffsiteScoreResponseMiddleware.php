@@ -10,12 +10,14 @@ use Webman\MiddlewareInterface;
 
 /**
  * Rewrites the scores returned by the encrypted livemark actions so that the
- * screen, ranking and admin list show the off-site weighted final score.
+ * screen player list, detail, ranking and admin list show the off-site
+ * weighted final score.
  */
 class LivemarkOffsiteScoreResponseMiddleware implements MiddlewareInterface
 {
     private const DETAIL_PATH = 'screen/livemark/getuserdata';
     private const RANKING_PATH = 'screen/livemark/getscoredata';
+    private const NORMAL_PATH = 'screen/livemark/getnormaldata';
     private const ADMIN_LIST_PATH = 'hdmanage/datalivemark/index';
 
     public function process(Request $request, callable $handler): Response
@@ -23,7 +25,7 @@ class LivemarkOffsiteScoreResponseMiddleware implements MiddlewareInterface
         $path = trim($request->path(), '/');
         $response = $handler($request);
 
-        if (!in_array($path, [self::DETAIL_PATH, self::RANKING_PATH, self::ADMIN_LIST_PATH], true)
+        if (!in_array($path, [self::DETAIL_PATH, self::RANKING_PATH, self::NORMAL_PATH, self::ADMIN_LIST_PATH], true)
             || $response->getStatusCode() < 200 || $response->getStatusCode() >= 300) {
             return $response;
         }
@@ -69,7 +71,12 @@ class LivemarkOffsiteScoreResponseMiddleware implements MiddlewareInterface
         if (!is_array($payload['msg']['pfusers'] ?? null)) {
             return false;
         }
-        $payload['msg']['pfusers'] = LivemarkOffsiteScoreService::applyToRanking($payload['msg']['pfusers'], $huodongId);
+        // The normal player list keeps its stage order; only the ranking is resorted.
+        $payload['msg']['pfusers'] = LivemarkOffsiteScoreService::applyToRanking(
+            $payload['msg']['pfusers'],
+            $huodongId,
+            $path === self::RANKING_PATH
+        );
 
         return true;
     }

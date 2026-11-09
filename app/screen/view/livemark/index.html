@@ -3553,7 +3553,7 @@
             <div class="livemark-user-name limitbox"><span>{{ username }}</span></div> 
             <div class="livemark-user-score zam-app-flex zam-app-flex-alignflexend">
                 <span>
-                {{ if scoretype=='1' }}总分{{ else }}平均分{{ /if }}：
+                {{ if offsite }}最终得分{{ else if scoretype=='1' }}总分{{ else }}平均分{{ /if }}：
                 </span> 
                 <span>
                 {{ if score===false }}
@@ -3691,7 +3691,7 @@
 </div>
 </script>
 <script>
-require.config({ urlArgs: 'v=3.6.5-livemark-reveal-score-20261108' });
+require.config({ urlArgs: 'v=3.6.6-livemark-normal-offsite-20261109' });
 require(['screencore', 'screenlivemark'],function (screencore, screenlivemark) {
     function isTechBlueScoreColor(color) {
         color = (color || '').replace(/\s+/g, '').toLowerCase();
