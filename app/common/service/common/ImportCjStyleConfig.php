@@ -3,6 +3,13 @@ namespace app\common\service\common;
 
 final class ImportCjStyleConfig
 {
+    // Vendor 5.3.8 styles 5/6 keep vendor templates; styles 1-4 and 10-12 keep the
+    // customized screen, result themes and prize stage they used before the upgrade.
+    public static function usesCustomTemplate($flytype): bool
+    {
+        return !in_array((string) ($flytype ?? '1'), ['5', '6'], true);
+    }
+
     public static function normalize(array $style): array
     {
         // Combined vendor/custom forms formerly submitted these scalar fields twice.

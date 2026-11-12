@@ -91,6 +91,9 @@ foreach ([0, 123] as $GLOBALS['testActivity']) {
                 check($values[$name][0] === $expected, "$flytype/$scenario: wrong recovered value for $name");
             }
             check(count($values['autoscroll'] ?? []) === 1, 'Missing legacy autoscroll setting');
+            // Styles 1-4 must keep the customized form/screen (result themes, prize stage); only vendor 5/6 use vendor templates.
+            $custom = !in_array($flytype, ['5', '6'], true);
+            check((strpos($html, 'data-importcj-styles=') !== false) === $custom, "$flytype: wrong config template");
             $screenData = $data;
             $screenData['fieldconfig'] = [];
             $engine = new think\Template(['view_path' => $screenViews, 'cache_path' => $cache, 'tpl_cache' => false]);
@@ -98,6 +101,7 @@ foreach ([0, 123] as $GLOBALS['testActivity']) {
             $engine->fetch('importcj/index', ['pcconfig' => $screenData]);
             $screenHtml = ob_get_clean();
             check(strpos($screenHtml, 'importcj-mainbox') !== false, 'Screen body did not render');
+            check((strpos($screenHtml, 'screen-prize.css') !== false) === $custom, "$flytype: wrong screen template");
             check(preg_match('/screenimportcj\.init\((\{[^\r\n]*\})\);/', $screenHtml, $init) === 1, 'Screen init config missing');
             $screenSettings = json_decode($init[1], true, 512, JSON_THROW_ON_ERROR);
             foreach ($settings as $key => $value) {

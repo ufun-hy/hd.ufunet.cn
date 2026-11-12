@@ -8,7 +8,8 @@
             <span class="help-block">仅用于旧版长列表，当前结果页使用分页展示。</span>
         </div>
     </div>
-{if in_array(($config['styleconfig']['flytype']??'1'), ['10','11','12'])}
+{php}$importcjCustom = \app\common\service\common\ImportCjStyleConfig::usesCustomTemplate($config['styleconfig']['flytype'] ?? '1');{/php}
+{if $importcjCustom}
 <div class="form-group">
 		<label class="col-lg-2 control-label">* 旧版奖项及奖品名称大小</label>
 		<div class="col-lg-10">

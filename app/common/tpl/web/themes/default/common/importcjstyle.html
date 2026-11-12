@@ -1,6 +1,7 @@
 {php}$config['styleconfig'] = \app\common\service\common\ImportCjStyleConfig::normalize($config['styleconfig'] ?? []);{/php}
-<!-- shortcut: Separate templates keep vendor styles 5/6 and custom styles 10–12 working; consolidate after live regression coverage. -->
-{if in_array(($config['styleconfig']['flytype']??'1'), ['10','11','12'])}
+<!-- shortcut: Vendor styles 5/6 use vendor templates; 1-4 and 10-12 keep the customized form. Consolidate after live regression coverage. -->
+{php}$importcjCustom = \app\common\service\common\ImportCjStyleConfig::usesCustomTemplate($config['styleconfig']['flytype'] ?? '1');{/php}
+{if $importcjCustom}
 {include file="$Wpath/common/importcjstyle-custom" /}
 {else}
 <div class="config-titlebox">

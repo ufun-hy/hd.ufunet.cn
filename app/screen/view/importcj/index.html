@@ -1,6 +1,7 @@
 {php}$pcconfig['styleconfig'] = \app\common\service\common\ImportCjStyleConfig::normalize($pcconfig['styleconfig'] ?? []);{/php}
-<!-- shortcut: Route custom styles to their existing screen until both style families share tested rendering. -->
-{if in_array(($pcconfig['styleconfig']['flytype']??'1'), ['10','11','12'])}
+<!-- shortcut: Vendor styles 5/6 use the vendor screen; 1-4 and 10-12 keep the customized screen until both share tested rendering. -->
+{php}$importcjCustom = \app\common\service\common\ImportCjStyleConfig::usesCustomTemplate($pcconfig['styleconfig']['flytype'] ?? '1');{/php}
+{if $importcjCustom}
 {include file='importcj/custom' /}
 {else}
 {include file='common/header' /}
