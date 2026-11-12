@@ -17,6 +17,10 @@
     <a class="btn btn-info btn-sm btn-export3" href="javascript:void(0)"><i class="mdi mdi-export"></i> 导出参评用户成绩数据</a>
     <a class="btn btn-warning btn-sm btn-export" href="javascript:void(0)"><i class="mdi mdi-export"></i> 导出专业评分数据</a>
     <a class="btn btn-success btn-sm btn-export2" href="javascript:void(0)"><i class="mdi mdi-export"></i> 导出大众评分数据</a>
+    {php}$livemarkOffsiteAllowed = \app\common\service\common\LivemarkOffsiteAccessService::isOpen(request()->realhdid ?? 0);{/php}
+    {if $livemarkOffsiteAllowed}
+    <a class="btn btn-primary btn-sm btn-export-offsite" href="javascript:void(0)"><i class="mdi mdi-export"></i> 导出最终成绩（含场外分数）</a>
+    {/if}
     
 </div>
 {include file='$Wpath/common/tabletoolbar'}
@@ -165,6 +169,84 @@ $('.btn-export2').on('click',function(){
         zamnotice.showTips('error','网络差,操作失败');
     });
 });
+// 场外分数由中间件写入后台列表，原版导出读不到，这里取列表数据在浏览器生成 CSV。
+$('.btn-export-offsite').on('click',function(){
+    var $btn = $(this), rotateid = $("#rotateid option:selected").val()||'';
+    if(+rotateid < 1) {
+        return zamnotice.showTips('error','请先选择轮次');
+    }
+    if($btn.data('loading')) return;
+    $btn.data('loading', true);
+    var psize = 500, rows = [];
+    var done = function(){ $btn.data('loading', false); };
+    var fetchPage = function(page){
+        webcore.ajaxSubmit("{:gohdmanage('datalivemark/index',['hdid'=>$hdid])}",{page:page,psize:psize,rotateid:rotateid}).then(function(json){
+            var list = (json && (json.rows || (json.msg && json.msg.rows) || (json.data && json.data.rows))) || null;
+            if(!$.isArray(list)){
+                done();
+                return zamnotice.showTips('error',(json && typeof json.msg == 'string') ? json.msg : '获取成绩数据失败');
+            }
+            var total = +((json.total !== undefined ? json.total : (json.msg && json.msg.total)) || 0);
+            rows = rows.concat(list);
+            if(list.length >= psize && rows.length < total && page < 200){
+                return fetchPage(page + 1);
+            }
+            done();
+            exportOffsiteCsv(rows, $("#rotateid option:selected").text());
+        }, function(){
+            done();
+            zamnotice.showTips('error','网络差,操作失败');
+        });
+    };
+    fetchPage(1);
+});
+function exportOffsiteCsv(rows, rotateTitle){
+    var offsiteRow = null;
+    $.each(rows, function(k, v){
+        if(v && v.scoredata && v.scoredata.offsite){ offsiteRow = v; return false; }
+    });
+    if(!offsiteRow){
+        return zamnotice.showTips('error','该轮次未启用场外分数，请使用原有的导出');
+    }
+    var info = offsiteRow.scoredata.offsite, weight = +info.weight;
+    var isScored = function(v){ return v !== false && v !== null && v !== undefined && v !== '' && !isNaN(+v); };
+    var items = $.map(rows, function(v){
+        var s = v.scoredata || {}, o = s.offsite || {};
+        return { name: v.username || '已删除', score: s.score, onsite: o.onsite, basic: o.basic, offsite: o.score, pfnum: v.pfnum };
+    });
+    var sorted = items.slice().sort(function(a, b){
+        var sa = isScored(a.score), sb = isScored(b.score);
+        if(sa != sb) return sa ? -1 : 1;
+        return sa ? (+b.score - +a.score) : 0;
+    });
+    var rank = 0, last = null;
+    $.each(sorted, function(k, v){
+        if(!isScored(v.score)){ v.rank = ''; return; }
+        if(last === null || +v.score !== last){ rank = k + 1; last = +v.score; }
+        v.rank = rank;
+    });
+    var cell = function(v){
+        v = (v === false || v === null || v === undefined) ? '' : String(v);
+        if(/^[=+\-@\t\r]/.test(v)) v = "'" + v;
+        return '"' + v.replace(/"/g, '""') + '"';
+    };
+    var show = function(v){ return isScored(v) ? v : '无'; };
+    var lines = [[
+        '排名', '参评选手', '场内得分（占比' + (100 - weight) + '%）', (info.title || '场外分数') + '（占比' + weight + '%）', '人工调整分', '最终得分', '评分人数'
+    ]];
+    $.each(sorted, function(k, v){
+        lines.push([v.rank, v.name, show(v.onsite), v.offsite, isScored(v.score) ? v.basic : '', show(v.score), v.pfnum]);
+    });
+    var csv = '\ufeff' + $.map(lines, function(line){ return $.map(line, cell).join(','); }).join('\r\n');
+    var blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = (rotateTitle || '评分') + '-最终成绩.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
+}
 $('.btn-export3').on('click',function(){
     var rotateid = $("#rotateid option:selected").val()||'';
     if(+rotateid < 1) {

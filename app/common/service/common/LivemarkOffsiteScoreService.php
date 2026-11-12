@@ -203,6 +203,7 @@ final class LivemarkOffsiteScoreService
                     : $storedBasic[$pfuserId];
                 $onsite = (float) $user['score'] - $basic;
                 $user['offsite']['onsite'] = self::format($user['score'], $onsite);
+                $user['offsite']['basic'] = self::format($user['score'], $basic);
                 $user['score'] = self::format($user['score'], self::combine($onsite, $offsite, $weight, $basic));
             }
             $users[$key] = $user;

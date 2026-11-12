@@ -152,6 +152,7 @@ check('不改变顺序', array_column($r['rows'], 'id'), [7073, 7072]);
 check('列表最终分', [$r['rows'][0]['scoredata']['score'], $r['rows'][1]['scoredata']['score']], ['40.00', '76.32']);
 check('保留原字段', $r['rows'][1]['scoredata']['score_pw'], '17.00');
 check('列表场内分', $r['rows'][1]['scoredata']['offsite']['onsite'], '17.00');
+check('列表调整分（供导出最终成绩使用）', [$r['rows'][0]['scoredata']['offsite']['basic'], $r['rows'][1]['scoredata']['offsite']['basic']], ['0.00', '30.12']);
 
 echo "微信模板\n";
 $GLOBALS['__request'] = new Request('GET', '/wechat/livemark/scorephb', [], 100);
