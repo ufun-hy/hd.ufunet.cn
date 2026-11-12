@@ -1,22 +1,4 @@
-{php}
-// Older combined forms saved these scalar settings as duplicate-value arrays.
-// Keep the first control's value (the visible vendor setting) when reading them.
-foreach (['awardsize' => 30, 'prizesize' => 25, 'autoscrollspeed' => 50,
-          'topbg' => '', 'prizebg' => '', 'bottombg' => '', 'btn' => '',
-          'showstopbtn' => '2', 'hidevideo' => '', 'baozhavideo' => '',
-          'listname' => '中奖列表'] as $importSetting => $importDefault) {
-    if (isset($config['styleconfig'][$importSetting]) && is_array($config['styleconfig'][$importSetting])) {
-        $importScalar = null;
-        array_walk_recursive($config['styleconfig'][$importSetting], function ($value) use (&$importScalar) {
-            if ($importScalar === null && is_scalar($value)) {
-                $importScalar = $value;
-            }
-        });
-        $config['styleconfig'][$importSetting] = $importScalar ?? $importDefault;
-    }
-}
-unset($importSetting, $importDefault, $importScalar);
-{/php}
+{php}$config['styleconfig'] = \app\common\service\common\ImportCjStyleConfig::normalize($config['styleconfig'] ?? []);{/php}
 <!-- shortcut: Separate templates keep vendor styles 5/6 and custom styles 10–12 working; consolidate after live regression coverage. -->
 {if in_array(($config['styleconfig']['flytype']??'1'), ['10','11','12'])}
 {include file="$Wpath/common/importcjstyle-custom" /}

@@ -3,6 +3,7 @@
 // Uses ThinkPHP's real compiler; upload controls are inert inputs, no app/DB boot.
 $root = $argv[1] ?? dirname(__DIR__, 2);
 $vendor = $argv[2] ?? $root . '/vendor';
+require_once $root . '/app/common/service/common/ImportCjStyleConfig.php';
 spl_autoload_register(function ($class) use ($vendor) {
     if (strpos($class, 'think\\') === 0) {
         $file = $vendor . '/topthink/think-template/src/' . str_replace('\\', '/', substr($class, 6)) . '.php';
@@ -13,7 +14,7 @@ set_error_handler(function ($level, $message, $file, $line) {
     if (error_reporting() & $level) throw new ErrorException($message, 0, $level, $file, $line);
 });
 function request() { return (object) ['realhdid' => $GLOBALS['testActivity']]; }
-function tomedia($value) { return $value; }
+function tomedia($value) { return trim($value ?? ''); }
 function control($name, $value) {
     return '<input name="' . htmlspecialchars($name, ENT_QUOTES) . '" value="' . htmlspecialchars((string) ($value ?? ''), ENT_QUOTES) . '">';
 }
@@ -35,6 +36,11 @@ foreach (array_merge($parts, ['importcjstyle-custom', 'configscreenmusic']) as $
     }
 }
 $config['fieldconfig'] = [['fieldname' => '姓名']];
+foreach (['index', 'custom'] as $screen) {
+    $source = file_get_contents($root . '/app/screen/view/importcj/' . $screen . '.html');
+    preg_match_all('/\$pcconfig\[\x27styleconfig\x27\]\[\x27([^\x27]+)\x27\]/', $source, $matches);
+    foreach ($matches[1] as $key) $config['styleconfig'][$key] = null;
+}
 $settings = ['awardsize' => '36', 'prizesize' => '28', 'autoscrollspeed' => '60',
     'topbg' => '/top.png', 'prizebg' => '/prize.png', 'bottombg' => '/bottom.png',
     'btn' => '/button.png', 'showstopbtn' => '1', 'hidevideo' => '/start.mp4',
@@ -44,6 +50,13 @@ $defaults = array_merge($settings, ['awardsize' => '30', 'prizesize' => '25', 'a
     'hidevideo' => '', 'baozhavideo' => '', 'listname' => '中奖列表']);
 $cache = sys_get_temp_dir() . '/importcj-template-test-' . uniqid() . '/';
 mkdir($cache, 0700);
+define('SIMGURL', 'static/images/screen/');
+// Real screen templates with inert shared header/footer, no sockets or app startup.
+$screenViews = $cache . 'screen/';
+mkdir($screenViews . 'importcj', 0700, true);
+mkdir($screenViews . 'common', 0700, true);
+foreach (['index', 'custom'] as $screen) copy($root . '/app/screen/view/importcj/' . $screen . '.html', $screenViews . 'importcj/' . $screen . '.html');
+foreach (['common/header', 'common/footer', 'importcj/yanhua'] as $stub) file_put_contents($screenViews . $stub . '.html', '');
 $styles = [];
 foreach (range(1, 6) as $type) $styles[] = ['val' => (string) $type, 'name' => 'Style ' . $type, 'img' => '/style.png'];
 $count = 0;
@@ -78,9 +91,22 @@ foreach ([0, 123] as $GLOBALS['testActivity']) {
                 check($values[$name][0] === $expected, "$flytype/$scenario: wrong recovered value for $name");
             }
             check(count($values['autoscroll'] ?? []) === 1, 'Missing legacy autoscroll setting');
+            $screenData = $data;
+            $screenData['fieldconfig'] = [];
+            $engine = new think\Template(['view_path' => $screenViews, 'cache_path' => $cache, 'tpl_cache' => false]);
+            ob_start();
+            $engine->fetch('importcj/index', ['pcconfig' => $screenData]);
+            $screenHtml = ob_get_clean();
+            check(strpos($screenHtml, 'importcj-mainbox') !== false, 'Screen body did not render');
+            check(preg_match('/screenimportcj\.init\((\{[^\r\n]*\})\);/', $screenHtml, $init) === 1, 'Screen init config missing');
+            $screenSettings = json_decode($init[1], true, 512, JSON_THROW_ON_ERROR);
+            foreach ($settings as $key => $value) {
+                $expected = $scenario === 'empty' ? $defaults[$key] : ($scenario === 'zero' ? '0' : $value);
+                check(is_scalar($screenSettings[$key]) && (string) $screenSettings[$key] === $expected, 'Screen received array/wrong value: ' . $key);
+            }
             $count++;
         }
     }
 }
-echo "PASS: $count render scenarios; all 11 previously duplicated settings remain scalar.\n";
+echo "PASS: $count config + $count screen render scenarios; all 11 affected settings remain scalar.\n";
 echo "Test cache retained: $cache\n";

@@ -278,6 +278,16 @@ define('appjjb', ['appsocket', 'wechatcore', 'phaser'], function (appsocket, wec
 			self.rotateid = rotateid;
 			self.gamephb = gamephb;
 		},
+		applyPlayerHitbox: function (player) {
+			// The style may specify left, top, width and height as sprite proportions.
+			var value = window.getComputedStyle(document.documentElement).getPropertyValue('--jjb-player-hitbox').trim();
+			if (!value) return;
+			var box = value.split(/\s+/).map(Number);
+			if (box.length !== 4 || box.some(function (n) { return !Number.isFinite(n) || n < 0 || n > 1; }) ||
+				box[2] === 0 || box[3] === 0 || box[0] + box[2] > 1 || box[1] + box[3] > 1) return;
+			var body = player.body, width = body.sourceWidth, height = body.sourceHeight;
+			body.setSize(width * box[2], height * box[3], width * box[0], height * box[1]);
+		},
 		initGame: function () {
 			var self = this;
 			game = new Phaser.Game(Gameconfig.gameW, Gameconfig.gameH, Phaser.CANVAS, 'zam-app-mainbox', null, true);
@@ -375,6 +385,7 @@ define('appjjb', ['appsocket', 'wechatcore', 'phaser'], function (appsocket, wec
 						this.player.anchor.set(0.5, 0.5);
 						//this.player.scale.set(0.9);
 						game.physics.arcade.enable(this.player);
+						self.applyPlayerHitbox(this.player);
 						this.player.body.collideWorldBounds = true;
 						// this.player.body.bounce.set(0);
 						this.onStart();
