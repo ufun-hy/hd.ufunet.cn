@@ -152,7 +152,10 @@ require(['webcore','jconfirmBox','zamnotice','layerBox','zvalidator'],function(w
         tpl_switch();
     });
     $(".fieldlists").on('click','.btn-delone',function(){
-        $(this).parent().parent().remove();
+        var $row = $(this).parent().parent();
+        // Font-scale inputs are auto-registered by FormValidation; unregister them first or saving crashes on the removed input.
+        $row.find('.import-field-scale[name]').each(function () { $('#formBox').formValidation('removeField', $(this)); });
+        $row.remove();
     });
 });
 function openfieldsecret(obj,status,url){
